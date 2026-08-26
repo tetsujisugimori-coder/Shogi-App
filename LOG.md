@@ -157,5 +157,76 @@
 - `npm run check`: 正常終了（lint → test → build を一括実行）
 - UI目視・スタイル確認: リアル調本黄楊彫駒、本榧盤、星印、リムライト、駒台、レスポンシブ配置がすべて維持されていることを確認
 
+## [2026-08-26] Node.js 24系要件の適正化・package-lock.jsonのnpm完全再生成・検証パイプラインの導入
+
+### Node.js要件を見直した理由
+1. `package-lock.json` 内の `jsdom 30.0.1` が `node: "^22.22.2 || ^24.15.0 || >=26.0.0"` を要求しており、Node.js 20 では `.npmrc` の `engine-strict=true` により `npm ci` が失敗する状態であった。
+2. 以前の `package-lock.json` では 315 パッケージ中 314 件で `resolved` および `integrity` が欠落しており、外部環境や CI での再現性が損なわれていた。
+3. Node.js 24系（最低動作要件: `24.15.0`、推奨・検証環境: `24.19.0` LTS）へ要件を整理し、Node.js 24.19.0＋npm 11.17.0 環境でロックファイルを完全に再生成した。
+
+### 環境および設定値
+- **Node.js 最低動作要件**: `24.15.0` (`engines.node: ">=24.15.0 <25"`)
+- **Node.js 推奨・標準検証環境**: `24.19.0` LTS
+- **実際の実行環境 `node --version`**: `v24.19.0`
+- **実際の実行環境 `npm --version`**: `11.17.0`
+- **`packageManager` の値**: `"npm@11.17.0"`
+- **`engines` の値**: `{ "node": ">=24.15.0 <25", "npm": ">=11.0.0" }`
+- **`.nvmrc` の追加**: `24.19.0`
+- **`.npmrc` の設定**:
+  ```
+  package-lock=true
+  engine-strict=true
+  omit-lockfile-registry-resolved=false
+  ```
+
+### package-lock.json の完全再生成と検証
+- **再生成手順**:
+  1. `bun.lock` 等の不要ロックファイルが存在しないことを確認。
+  2. 既存の `node_modules` および `package-lock.json` を削除。
+  3. `omit-lockfile-registry-resolved=false` 設定下で Node.js 24.19.0 / npm 11.17.0 により `npm install` を実行。
+  4. 生成された `package-lock.json` を `scripts/verify-lockfile.mjs` で全件検査。
+- **再生成前の状態**: パッケージ総数 316件（ルート含む） / `resolved` 欠落 314件 / `integrity` 欠落 314件
+- **再生成後の状態**: パッケージ総数 399件（ルート含む） / 検査対象 398件 / `resolved` 欠落 0件 / `integrity` 欠落 0件
+- **ロックファイル検証スクリプト (`scripts/verify-lockfile.mjs`)**:
+  - `package-lock.json` の存在・JSON 構文、ルート名 `shogi-app`、`lockfileVersion: 3`、ルート dependencies / devDependencies の一致、他ツールロックファイルの不存在、全通常パッケージの `version` / `resolved` / `integrity` 存在を厳格に検査。
+  - `npm run verify:lock` で単体実行可能。
+
+### GitHub Actions CI の更新 (`.github/workflows/ci.yml`)
+- Node.js バージョンを `24.19.0` に明示更新。
+- npm キャッシュ（キャッシュキー基準: `package-lock.json`）を構成。
+- `workflow_dispatch` を追加し、手動実行に対応。
+- ステップ順序: `node --version` / `npm --version` → `npm ci` → `npm run verify:lock` → `npm run lint` → `npm test` → `npm run build`
+
+### テストスイートの拡充 (`src/test/shogi.test.tsx`)
+- テストファイル数: 1ファイル (`src/test/shogi.test.tsx`)
+- 総テスト件数: **28件**（28 passed / 0 failed / 0 skipped）
+- 追加・更新テスト:
+  - `engines.node` が `>=24.15.0 <25` を指定していること
+  - `packageManager` が npm の完全な SemVer（`npm@11.17.0`）であること
+  - `.nvmrc` が `24.19.0` を指定していること
+  - `.npmrc` に `package-lock=true`, `engine-strict=true`, `omit-lockfile-registry-resolved=false` が含まれていること
+  - `package-lock.json` のルート名・依存関係一致・他ツールロックファイルの不存在
+  - `scripts/verify-lockfile.mjs` が正常終了すること
+  - 既存の盤面・駒・成駒・星印・ARIA・roving tabindex（矢印キー、Enter/Space、クリック連携、モード切替）の全18件を完全維持。
+
+### 実行した検証コマンドと結果
+- `node --version`: `v24.19.0` (終了コード 0)
+- `npm --version`: `11.17.0` (終了コード 0)
+- `npm run verify:lock`: 正常終了 (終了コード 0, 欠落 0件)
+- `npm ci`: 正常終了 (終了コード 0, audited 303 packages in 6s, 0 vulnerabilities)
+- `npm run lint` (`tsc --noEmit`): 型エラー 0件で正常終了 (終了コード 0)
+- `npm test` (`vitest run`): 全28テストすべて合格 (終了コード 0, 28 passed in 1.63s)
+- `npm run build`: 本番ビルド正常完了 (終了コード 0, dist/ 出力)
+- `npm run clean`: 正常終了 (終了コード 0, `dist`, `server.js` 削除)
+- clean後の `npm run build`: 正常完了 (終了コード 0)
+- `npm run check`: 正常終了 (終了コード 0, verify:lock → lint → test → build 一括成功)
+
+### 確認・未解決事項
+- **GitHub Actions**: ワークフロー定義（`.github/workflows/ci.yml`）の設定完了。リモート GitHub 上での実実行は未実施（未実行）。
+- **UI確認**: ソース上の UI・CSS・コンポーネントの変更なし（将棋盤・駒・駒台・roving tabindex はすべて維持）。ブラウザ目視確認は未実施。
+- **未確認事項**: GitHub Actions リモート実行環境でのログ
+- **未解決事項**: なし
+
+
 
 

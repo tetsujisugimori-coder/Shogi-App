@@ -3,19 +3,20 @@
   "private": true,
   "version": "0.0.0",
   "type": "module",
-  "packageManager": "npm@10.9.8",
+  "packageManager": "npm@11.17.0",
   "engines": {
-    "node": ">=20.0.0",
-    "npm": ">=10.0.0"
+    "node": ">=24.15.0 <25",
+    "npm": ">=11.0.0"
   },
   "scripts": {
     "dev": "vite --port=3000 --host=0.0.0.0",
     "build": "vite build",
     "preview": "vite preview",
     "clean": "node scripts/clean.mjs",
+    "verify:lock": "node scripts/verify-lockfile.mjs",
     "lint": "tsc --noEmit",
     "test": "vitest run",
-    "check": "npm run lint && npm test && npm run build"
+    "check": "npm run verify:lock && npm run lint && npm test && npm run build"
   },
   "dependencies": {
     "@google/genai": "^2.4.0",

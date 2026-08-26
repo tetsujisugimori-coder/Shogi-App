@@ -4,6 +4,7 @@ import userEvent from '@testing-library/user-event';
 import React from 'react';
 import fs from 'node:fs';
 import path from 'node:path';
+import { execSync } from 'node:child_process';
 import {
   createInitialBoardState,
   getSquareAriaLabel,
@@ -13,7 +14,7 @@ import {
 } from '../types/shogi';
 import { ShogiBoard } from '../components/shogi/ShogiBoard';
 
-describe('1. npm・環境・設定ファイルの検証', () => {
+describe('1. Node.js 24系・npm・環境・設定ファイルの検証', () => {
   const rootDir = process.cwd();
   const packageJson = JSON.parse(fs.readFileSync(path.resolve(rootDir, 'package.json'), 'utf-8'));
   const packageLockJson = JSON.parse(
@@ -24,32 +25,82 @@ describe('1. npm・環境・設定ファイルの検証', () => {
     expect(packageJson.name).toBe('shogi-app');
   });
 
-  it('packageManager が npm を指定していること', () => {
-    expect(packageJson.packageManager).toMatch(/^npm@\d+\.\d+\.\d+/);
+  it('packageManager が npm を指定し完全なSemVerであること', () => {
+    expect(packageJson.packageManager).toMatch(/^npm@\d+\.\d+\.\d+$/);
   });
 
-  it('Node.js の engines が指定されていること', () => {
+  it('Node.js の engines.node が Node.js 24.15.0 以上 25 未満を指定していること', () => {
     expect(packageJson.engines).toBeDefined();
-    expect(packageJson.engines.node).toBe('>=20.0.0');
-    expect(packageJson.engines.npm).toBe('>=10.0.0');
+    expect(packageJson.engines.node).toBe('>=24.15.0 <25');
+    expect(packageJson.engines.npm).toBeDefined();
+    expect(packageJson.engines.npm).toMatch(/^>=\d+/);
   });
 
-  it('package-lock.json が存在しルート名が shogi-app であること', () => {
+  it('.nvmrc が存在し 24.19.0 を指定していること', () => {
+    const nvmrcPath = path.resolve(rootDir, '.nvmrc');
+    expect(fs.existsSync(nvmrcPath)).toBe(true);
+    const content = fs.readFileSync(nvmrcPath, 'utf-8').trim();
+    expect(content).toBe('24.19.0');
+  });
+
+  it('.npmrc が存在し厳格な設定が含まれていること', () => {
+    const npmrcPath = path.resolve(rootDir, '.npmrc');
+    expect(fs.existsSync(npmrcPath)).toBe(true);
+    const content = fs.readFileSync(npmrcPath, 'utf-8');
+    expect(content).toContain('package-lock=true');
+    expect(content).toContain('engine-strict=true');
+    expect(content).toContain('omit-lockfile-registry-resolved=false');
+  });
+
+  it('package-lock.json が存在しルート名が shogi-app で lockfileVersion が 3 であること', () => {
     expect(fs.existsSync(path.resolve(rootDir, 'package-lock.json'))).toBe(true);
     expect(packageLockJson.name).toBe('shogi-app');
+    expect(packageLockJson.lockfileVersion).toBe(3);
   });
 
-  it('bun.lock が存在しないこと', () => {
+  it('package-lock.json のルート依存関係が package.json と一致すること', () => {
+    const rootPkg = packageLockJson.packages?.[''] || {};
+    const lockDeps = rootPkg.dependencies || packageLockJson.dependencies || {};
+    const pkgDeps = packageJson.dependencies || {};
+    for (const dep of Object.keys(pkgDeps)) {
+      expect(lockDeps[dep]).toBeDefined();
+    }
+
+    const lockDevDeps = rootPkg.devDependencies || packageLockJson.devDependencies || {};
+    const pkgDevDeps = packageJson.devDependencies || {};
+    for (const dep of Object.keys(pkgDevDeps)) {
+      expect(lockDevDeps[dep]).toBeDefined();
+    }
+  });
+
+  it('bun.lock, yarn.lock, pnpm-lock.yaml が存在しないこと', () => {
     expect(fs.existsSync(path.resolve(rootDir, 'bun.lock'))).toBe(false);
+    expect(fs.existsSync(path.resolve(rootDir, 'bun.lockb'))).toBe(false);
+    expect(fs.existsSync(path.resolve(rootDir, 'yarn.lock'))).toBe(false);
+    expect(fs.existsSync(path.resolve(rootDir, 'pnpm-lock.yaml'))).toBe(false);
   });
 
   it('clean スクリプトが rm -rf に依存せずクロスプラットフォームスクリプトを呼び出していること', () => {
     expect(packageJson.scripts.clean).toBe('node scripts/clean.mjs');
     expect(fs.existsSync(path.resolve(rootDir, 'scripts/clean.mjs'))).toBe(true);
   });
+
+  it('ロックファイル検証スクリプト verify-lockfile.mjs が存在し正常終了すること', () => {
+    expect(packageJson.scripts['verify:lock']).toBe('node scripts/verify-lockfile.mjs');
+    const verifyScriptPath = path.resolve(rootDir, 'scripts/verify-lockfile.mjs');
+    expect(fs.existsSync(verifyScriptPath)).toBe(true);
+
+    const output = execSync('node scripts/verify-lockfile.mjs', {
+      cwd: rootDir,
+      encoding: 'utf-8',
+    });
+    expect(output).toContain('SUCCESS: package-lock.json is valid and complete.');
+    expect(output).toContain('Missing "resolved":      0');
+    expect(output).toContain('Missing "integrity":     0');
+  });
 });
 
-describe('2. 将棋盤および駒のデータ・表示ロジック（既存基本要件）', () => {
+describe('2. 将棋盤および駒のデータ・表示ロジック（基本仕様）', () => {
   it('盤面が9行×9列である', () => {
     const boardState = createInitialBoardState();
     expect(boardState.squares).toHaveLength(9);

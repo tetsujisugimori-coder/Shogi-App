@@ -5,6 +5,7 @@ on:
     branches: [main, master]
   pull_request:
     branches: [main, master]
+  workflow_dispatch:
 
 permissions:
   contents: read
@@ -20,11 +21,20 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '22'
+          node-version: '24.19.0'
           cache: 'npm'
+          cache-dependency-path: 'package-lock.json'
+
+      - name: Display Node.js & npm version
+        run: |
+          node --version
+          npm --version
 
       - name: Clean install dependencies
         run: npm ci
+
+      - name: Verify package-lock integrity
+        run: npm run verify:lock
 
       - name: Run TypeScript type check
         run: npm run lint

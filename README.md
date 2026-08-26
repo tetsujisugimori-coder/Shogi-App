@@ -15,7 +15,7 @@
 - 表示専用モードでのアクセシビリティ対応（81マスの不要なTab停止ゼロ化）
 - 対局・操作モードでの roving tabindex キーボード操作（矢印キー移動、Enter/Space決定）
 - スクリーンリーダー対応（先手王将・後手玉将・成駒・空マスの正確なARIA読み上げ）
-- Node.js＋npmに統一された依存管理とクロスプラットフォームクリーン処理
+- Node.js 24系＋npmに統一された厳格な依存関係・ロックファイル管理とクロスプラットフォームクリーン処理
 
 ### 未実装の範囲（今後の開発フェーズ）
 - 駒の移動および合法手判定
@@ -27,51 +27,86 @@
 
 ## 開発環境と動作要件
 
-- **Node.js**: `v20.0.0` 以上（`v22` 推奨）
-- **npm**: `v10.0.0` 以上（本リポジトリでは npm を唯一の標準パッケージマネージャーとして使用します。Bun、yarn、pnpm は使用しません）
+| 項目 | 指定バージョン / 要件 | 役割・説明 |
+| :--- | :--- | :--- |
+| **Node.js 最低動作要件** | `24.15.0` (`>=24.15.0 <25`) | 現在固定されている依存パッケージ（`jsdom 30.0.1`等）が必要とする最低ライン |
+| **Node.js 推奨・標準環境** | `24.19.0` LTS | 開発・テスト・検証で実際に使用する推奨LTSバージョン（`.nvmrc` に固定） |
+| **CI 検証環境** | `24.19.0` | GitHub Actions で実行する検証環境 |
+| **対応メジャーバージョン** | **Node.js 24系** | Node.js 20, 21, 22, 23, 25 はサポート対象外（Node.js 26 は今回未サポート） |
+| **パッケージマネージャー** | `npm@11.17.0` | 本リポジトリ唯一の標準パッケージマネージャー（`packageManager` に明記） |
+
+> **注意 (Windows をご利用の方へ)**:
+> Windows 環境（PowerShell / コマンドプロンプト）では `.nvmrc` が自動で読み込まれない場合があります。
+> 必ずターミナルで `node --version` を実行し、`v24.15.0` 以上（推奨: `v24.19.0`）であることを確認してください。
+
+---
+
+## セットアップ手順
+
+1. **Node.js バージョンの確認**
+   ```bash
+   node --version
+   ```
+   ※ 出力が `v24.15.0` 未満の場合は、Node.js 24.19.0 LTS に更新してください（nvm 等をご利用の場合は `nvm use` を実行）。
+
+2. **npm バージョンの確認**
+   ```bash
+   npm --version
+   ```
+
+3. **依存パッケージのクリーンインストール**
+   `package-lock.json` に基づき、厳密なインストールを実行します：
+   ```bash
+   npm ci
+   ```
+
+4. **一括検証（ロックファイル・型・テスト・ビルド）**
+   ```bash
+   npm run check
+   ```
+
+5. **開発サーバー起動**
+   ローカル開発サーバー（ポート3000）を起動：
+   ```bash
+   npm run dev
+   ```
 
 ---
 
 ## コマンド一覧
 
-### 初回セットアップ
-依存パッケージの厳密なクリーンインストール（`package-lock.json`準拠）:
+### ロックファイル整合性検証
+`package-lock.json` の欠落（`resolved`, `integrity`）や他ツールロックファイルの混入を検査：
 ```bash
-npm ci
-```
-
-### 開発サーバー起動
-ローカル開発サーバー（ポート3000）を起動:
-```bash
-npm run dev
+npm run verify:lock
 ```
 
 ### 型チェック
-TypeScriptの厳格な型チェック（`strict: true`）:
+TypeScript の厳格な型チェック（`strict: true`）：
 ```bash
 npm run lint
 ```
 
 ### テスト実行
-Vitestによるテストスイート（単体テスト・DOMアクセシビリティテスト）の実行:
+Vitest によるテストスイート（単体テスト・DOMアクセシビリティテスト・設定テスト）の実行：
 ```bash
 npm test
 ```
 
 ### 本番ビルド
-Viteによるプロダクションビルド:
+Vite によるプロダクションビルド：
 ```bash
 npm run build
 ```
 
-### 一括検証
-型チェック、テスト、ビルドを順番に実行し、いずれかが失敗した場合は停止:
+### 一括検証（チェックパイプライン）
+ロックファイル検証 → 型チェック → テスト → ビルドを順番に実行（いずれかが失敗した場合は即時停止）：
 ```bash
 npm run check
 ```
 
-### クリーンアップ（Windows / macOS / Linux クロスプラットフォーム）
-ビルド成果物（`dist`）および一時ファイルを安全に削除:
+### クリーンアップ（クロスプラットフォーム対応）
+ビルド成果物（`dist`）および一時ファイルを安全に削除（Windows / macOS / Linux 対応）：
 ```bash
 npm run clean
 ```
@@ -79,4 +114,4 @@ npm run clean
 ---
 
 ## CI / CD
-GitHub Actions（`.github/workflows/ci.yml`）により、main/master ブランチへの push および pull request 時に `npm ci` → `npm run lint` → `npm test` → `npm run build` が自動実行されます。
+GitHub Actions（`.github/workflows/ci.yml`）により、main/master ブランチへの push、pull request、および手動実行（`workflow_dispatch`）時に Node.js `24.19.0` 上で `npm ci` → `npm run verify:lock` → `npm run lint` → `npm test` → `npm run build` が自動実行されます。
