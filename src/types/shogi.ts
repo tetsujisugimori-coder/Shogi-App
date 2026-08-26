@@ -1,6 +1,6 @@
 /**
  * Shogi Domain Types & Constants
- * Designed for future extensibility: AI evaluation, move history, spectator view, board animations.
+ * Fully unified piece definitions, accessible screen-reader labels, and symmetric board geometry.
  */
 
 export type Player = 'sente' | 'gote';
@@ -20,10 +20,15 @@ export interface Piece {
   type: PieceType;
   player: Player;
   isPromoted?: boolean;
-  kanji: string; // e.g. "玉将" or "王将"
-  kanjiTop?: string; // First character (e.g. "玉", "金", "歩")
-  kanjiBottom?: string; // Second character (e.g. "将", "馬", "兵")
-  promotedKanji?: string;
+}
+
+export interface PieceDisplayInfo {
+  topChar: string;
+  bottomChar: string;
+  fullName: string;
+  ariaName: string;
+  isPromoted: boolean;
+  isPromotedColor: boolean;
 }
 
 export interface BoardSquare {
@@ -34,7 +39,7 @@ export interface BoardSquare {
   rankKanji: string; // '一' | '二' | ... | '九'
   coordinateLabel: string; // e.g. '7七', '5一'
   piece: Piece | null;
-  isStarSquare?: boolean; // True for intersection star markers (3-3, 3-7, 7-3, 7-7)
+  hasBottomRightStarMarker: boolean; // True if this square's bottom-right intersection has a star marker (at 3/9 and 6/9)
 }
 
 export type BoardStatus = 'preparation' | 'active' | 'check' | 'blunder' | 'evaluating' | 'ended';
@@ -55,53 +60,181 @@ export const RANK_KANJI = ['一', '二', '三', '四', '五', '六', '七', '八
 export const FILE_NUMBERS = [9, 8, 7, 6, 5, 4, 3, 2, 1] as const;
 
 /**
- * Japanese display names for piece types
+ * Checks if a piece type can be promoted.
+ * Note: King (王将/玉将) and Gold (金将) cannot promote.
  */
-export const PIECE_DISPLAY_NAMES: Record<PieceType, { normal: { sente: string; gote: string }; promoted?: string }> = {
-  king: {
-    normal: { sente: '王', gote: '玉' },
-  },
-  rook: {
-    normal: { sente: '飛', gote: '飛' },
-    promoted: '竜',
-  },
-  bishop: {
-    normal: { sente: '角', gote: '角' },
-    promoted: '馬',
-  },
-  gold: {
-    normal: { sente: '金', gote: '金' },
-  },
-  silver: {
-    normal: { sente: '銀', gote: '銀' },
-    promoted: '成銀',
-  },
-  knight: {
-    normal: { sente: '桂', gote: '桂' },
-    promoted: '成桂',
-  },
-  lance: {
-    normal: { sente: '香', gote: '香' },
-    promoted: '成香',
-  },
-  pawn: {
-    normal: { sente: '歩', gote: '歩' },
-    promoted: 'と',
-  },
-};
+export function canPromote(type: PieceType): boolean {
+  return type !== 'king' && type !== 'gold';
+}
+
+/**
+ * Unified getter for piece display characters, formal name, and ARIA label.
+ * Single source of truth for both visual rendering and accessibility.
+ */
+export function getPieceDisplayInfo(
+  type: PieceType,
+  player: Player,
+  isPromoted: boolean = false
+): PieceDisplayInfo {
+  const isActualPromoted = isPromoted && canPromote(type);
+  const playerLabel = player === 'sente' ? '先手' : '後手';
+
+  if (type === 'king') {
+    const kanjiTop = player === 'sente' ? '王' : '玉';
+    const fullName = player === 'sente' ? '王将' : '玉将';
+    return {
+      topChar: kanjiTop,
+      bottomChar: '将',
+      fullName,
+      ariaName: `${playerLabel}の${fullName}`,
+      isPromoted: false,
+      isPromotedColor: false,
+    };
+  }
+
+  if (type === 'gold') {
+    return {
+      topChar: '金',
+      bottomChar: '将',
+      fullName: '金将',
+      ariaName: `${playerLabel}の金将`,
+      isPromoted: false,
+      isPromotedColor: false,
+    };
+  }
+
+  if (isActualPromoted) {
+    switch (type) {
+      case 'rook':
+        return {
+          topChar: '竜',
+          bottomChar: '王',
+          fullName: '竜王',
+          ariaName: `${playerLabel}の竜王`,
+          isPromoted: true,
+          isPromotedColor: true,
+        };
+      case 'bishop':
+        return {
+          topChar: '竜',
+          bottomChar: '馬',
+          fullName: '竜馬',
+          ariaName: `${playerLabel}の竜馬`,
+          isPromoted: true,
+          isPromotedColor: true,
+        };
+      case 'silver':
+        return {
+          topChar: '成',
+          bottomChar: '銀',
+          fullName: '成銀',
+          ariaName: `${playerLabel}の成銀`,
+          isPromoted: true,
+          isPromotedColor: true,
+        };
+      case 'knight':
+        return {
+          topChar: '成',
+          bottomChar: '桂',
+          fullName: '成桂',
+          ariaName: `${playerLabel}の成桂`,
+          isPromoted: true,
+          isPromotedColor: true,
+        };
+      case 'lance':
+        return {
+          topChar: '成',
+          bottomChar: '香',
+          fullName: '成香',
+          ariaName: `${playerLabel}の成香`,
+          isPromoted: true,
+          isPromotedColor: true,
+        };
+      case 'pawn':
+        return {
+          topChar: 'と',
+          bottomChar: '金',
+          fullName: 'と金',
+          ariaName: `${playerLabel}のと金`,
+          isPromoted: true,
+          isPromotedColor: true,
+        };
+      default:
+        break;
+    }
+  }
+
+  // Standard non-promoted pieces
+  switch (type) {
+    case 'rook':
+      return {
+        topChar: '飛',
+        bottomChar: '車',
+        fullName: '飛車',
+        ariaName: `${playerLabel}の飛車`,
+        isPromoted: false,
+        isPromotedColor: false,
+      };
+    case 'bishop':
+      return {
+        topChar: '角',
+        bottomChar: '行',
+        fullName: '角行',
+        ariaName: `${playerLabel}の角行`,
+        isPromoted: false,
+        isPromotedColor: false,
+      };
+    case 'silver':
+      return {
+        topChar: '銀',
+        bottomChar: '将',
+        fullName: '銀将',
+        ariaName: `${playerLabel}の銀将`,
+        isPromoted: false,
+        isPromotedColor: false,
+      };
+    case 'knight':
+      return {
+        topChar: '桂',
+        bottomChar: '馬',
+        fullName: '桂馬',
+        ariaName: `${playerLabel}の桂馬`,
+        isPromoted: false,
+        isPromotedColor: false,
+      };
+    case 'lance':
+      return {
+        topChar: '香',
+        bottomChar: '車',
+        fullName: '香車',
+        ariaName: `${playerLabel}の香車`,
+        isPromoted: false,
+        isPromotedColor: false,
+      };
+    case 'pawn':
+      return {
+        topChar: '歩',
+        bottomChar: '兵',
+        fullName: '歩兵',
+        ariaName: `${playerLabel}の歩兵`,
+        isPromoted: false,
+        isPromotedColor: false,
+      };
+  }
+}
 
 /**
  * Standard Hirate (平手) initial board setup.
  *
  * Sente (先手 - Bottom):
- *  - Rank 7 (row 6): Pawns (歩) on all 9 files
- *  - Rank 8 (row 7): 88 Bishop (角), 28 Rook (飛)
- *  - Rank 9 (row 8): 99 Lance(香), 89 Knight(桂), 79 Silver(銀), 69 Gold(金), 59 King(王), 49 Gold(金), 39 Silver(銀), 29 Knight(桂), 19 Lance(香)
+ *  - Rank 7 (row 6): Pawns (歩兵) on all 9 files
+ *  - Rank 8 (row 7): 88 Bishop (角行), 28 Rook (飛車)
+ *  - Rank 9 (row 8): 99 Lance, 89 Knight, 79 Silver, 69 Gold, 59 King (王将), 49 Gold, 39 Silver, 29 Knight, 19 Lance
  *
  * Gote (後手 - Top):
- *  - Rank 1 (row 0): 91 Lance(香), 81 Knight(桂), 71 Silver(銀), 61 Gold(金), 51 King(玉), 41 Gold(金), 31 Silver(銀), 21 Knight(桂), 11 Lance(香)
- *  - Rank 2 (row 1): 82 Rook(飛), 22 Bishop(角)
- *  - Rank 3 (row 2): Pawns (歩) on all 9 files
+ *  - Rank 1 (row 0): 91 Lance, 81 Knight, 71 Silver, 61 Gold, 51 King (玉将), 41 Gold, 31 Silver, 21 Knight, 11 Lance
+ *  - Rank 2 (row 1): 82 Rook (飛車), 22 Bishop (角行)
+ *  - Rank 3 (row 2): Pawns (歩兵) on all 9 files
  */
 export function createInitialBoardState(): BoardState {
   const squares: BoardSquare[][] = [];
@@ -115,63 +248,66 @@ export function createInitialBoardState(): BoardState {
       const file = 9 - col;
       const coordinateLabel = `${file}${rankKanji}`;
 
-      // Star intersections at (file 7, rank 3), (file 3, rank 3), (file 7, rank 7), (file 3, rank 7)
-      // in 0-indexed: (row 2, col 2) = 73, (row 2, col 6) = 33, (row 6, col 2) = 77, (row 6, col 6) = 37
-      const isStarSquare =
-        (row === 2 || row === 6) && (col === 2 || col === 6);
+      // Star markers on intersections at exactly 3/9 and 6/9 of board dimensions.
+      // When rendered at the bottom-right of square (row, col), the valid 0-indexed indices are:
+      // (row 2, col 2) -> intersection between rank 3/4 & file 7/6 (3/9 width, 3/9 height)
+      // (row 2, col 5) -> intersection between rank 3/4 & file 4/3 (6/9 width, 3/9 height)
+      // (row 5, col 2) -> intersection between rank 6/7 & file 7/6 (3/9 width, 6/9 height)
+      // (row 5, col 5) -> intersection between rank 6/7 & file 4/3 (6/9 width, 6/9 height)
+      const hasBottomRightStarMarker = (row === 2 || row === 5) && (col === 2 || col === 5);
 
       let piece: Piece | null = null;
 
       // Rank 1 (row 0): Gote base line
       if (row === 0) {
         if (file === 9 || file === 1) {
-          piece = { id: `gote-lance-${file}`, type: 'lance', player: 'gote', kanji: '香車', kanjiTop: '香', kanjiBottom: '車' };
+          piece = { id: `gote-lance-${file}`, type: 'lance', player: 'gote' };
         } else if (file === 8 || file === 2) {
-          piece = { id: `gote-knight-${file}`, type: 'knight', player: 'gote', kanji: '桂馬', kanjiTop: '桂', kanjiBottom: '馬' };
+          piece = { id: `gote-knight-${file}`, type: 'knight', player: 'gote' };
         } else if (file === 7 || file === 3) {
-          piece = { id: `gote-silver-${file}`, type: 'silver', player: 'gote', kanji: '銀将', kanjiTop: '銀', kanjiBottom: '将' };
+          piece = { id: `gote-silver-${file}`, type: 'silver', player: 'gote' };
         } else if (file === 6 || file === 4) {
-          piece = { id: `gote-gold-${file}`, type: 'gold', player: 'gote', kanji: '金将', kanjiTop: '金', kanjiBottom: '将' };
+          piece = { id: `gote-gold-${file}`, type: 'gold', player: 'gote' };
         } else if (file === 5) {
-          piece = { id: `gote-king-5`, type: 'king', player: 'gote', kanji: '玉将', kanjiTop: '玉', kanjiBottom: '将' };
+          piece = { id: `gote-king-5`, type: 'king', player: 'gote' };
         }
       }
       // Rank 2 (row 1): Gote special pieces
       else if (row === 1) {
         if (file === 8) {
-          piece = { id: `gote-rook-8`, type: 'rook', player: 'gote', kanji: '飛車', kanjiTop: '飛', kanjiBottom: '車' };
+          piece = { id: `gote-rook-8`, type: 'rook', player: 'gote' };
         } else if (file === 2) {
-          piece = { id: `gote-bishop-2`, type: 'bishop', player: 'gote', kanji: '角行', kanjiTop: '角', kanjiBottom: '行' };
+          piece = { id: `gote-bishop-2`, type: 'bishop', player: 'gote' };
         }
       }
       // Rank 3 (row 2): Gote pawns
       else if (row === 2) {
-        piece = { id: `gote-pawn-${file}`, type: 'pawn', player: 'gote', kanji: '歩兵', kanjiTop: '歩', kanjiBottom: '兵' };
+        piece = { id: `gote-pawn-${file}`, type: 'pawn', player: 'gote' };
       }
       // Rank 7 (row 6): Sente pawns
       else if (row === 6) {
-        piece = { id: `sente-pawn-${file}`, type: 'pawn', player: 'sente', kanji: '歩兵', kanjiTop: '歩', kanjiBottom: '兵' };
+        piece = { id: `sente-pawn-${file}`, type: 'pawn', player: 'sente' };
       }
       // Rank 8 (row 7): Sente special pieces
       else if (row === 7) {
         if (file === 8) {
-          piece = { id: `sente-bishop-8`, type: 'bishop', player: 'sente', kanji: '角行', kanjiTop: '角', kanjiBottom: '行' };
+          piece = { id: `sente-bishop-8`, type: 'bishop', player: 'sente' };
         } else if (file === 2) {
-          piece = { id: `sente-rook-2`, type: 'rook', player: 'sente', kanji: '飛車', kanjiTop: '飛', kanjiBottom: '車' };
+          piece = { id: `sente-rook-2`, type: 'rook', player: 'sente' };
         }
       }
       // Rank 9 (row 8): Sente base line
       else if (row === 8) {
         if (file === 9 || file === 1) {
-          piece = { id: `sente-lance-${file}`, type: 'lance', player: 'sente', kanji: '香車', kanjiTop: '香', kanjiBottom: '車' };
+          piece = { id: `sente-lance-${file}`, type: 'lance', player: 'sente' };
         } else if (file === 8 || file === 2) {
-          piece = { id: `sente-knight-${file}`, type: 'knight', player: 'sente', kanji: '桂馬', kanjiTop: '桂', kanjiBottom: '馬' };
+          piece = { id: `sente-knight-${file}`, type: 'knight', player: 'sente' };
         } else if (file === 7 || file === 3) {
-          piece = { id: `sente-silver-${file}`, type: 'silver', player: 'sente', kanji: '銀将', kanjiTop: '銀', kanjiBottom: '将' };
+          piece = { id: `sente-silver-${file}`, type: 'silver', player: 'sente' };
         } else if (file === 6 || file === 4) {
-          piece = { id: `sente-gold-${file}`, type: 'gold', player: 'sente', kanji: '金将', kanjiTop: '金', kanjiBottom: '将' };
+          piece = { id: `sente-gold-${file}`, type: 'gold', player: 'sente' };
         } else if (file === 5) {
-          piece = { id: `sente-king-5`, type: 'king', player: 'sente', kanji: '王将', kanjiTop: '王', kanjiBottom: '将' };
+          piece = { id: `sente-king-5`, type: 'king', player: 'sente' };
         }
       }
 
@@ -183,7 +319,7 @@ export function createInitialBoardState(): BoardState {
         rankKanji,
         coordinateLabel,
         piece,
-        isStarSquare,
+        hasBottomRightStarMarker,
       });
     }
 
@@ -203,6 +339,7 @@ export function createInitialBoardState(): BoardState {
 
 /**
  * Generates an accessible screen-reader description for a square and piece.
+ * E.g. "5筋 9段、先手の王将", "5筋 1段、後手の玉将", "4筋 5段、空のマス"
  */
 export function getSquareAriaLabel(square: BoardSquare): string {
   const positionStr = `${square.file}筋 ${square.rank}段`;
@@ -210,18 +347,11 @@ export function getSquareAriaLabel(square: BoardSquare): string {
     return `${positionStr}、空のマス`;
   }
 
-  const playerStr = square.piece.player === 'sente' ? '先手' : '後手';
-  const pieceNameMap: Record<PieceType, string> = {
-    king: square.piece.kanji === '王' ? '王将' : '玉将',
-    rook: square.piece.isPromoted ? '竜王' : '飛車',
-    bishop: square.piece.isPromoted ? '竜馬' : '角行',
-    gold: '金将',
-    silver: square.piece.isPromoted ? '成銀' : '銀将',
-    knight: square.piece.isPromoted ? '成桂' : '桂馬',
-    lance: square.piece.isPromoted ? '成香' : '香車',
-    pawn: square.piece.isPromoted ? 'と金' : '歩兵',
-  };
+  const displayInfo = getPieceDisplayInfo(
+    square.piece.type,
+    square.piece.player,
+    square.piece.isPromoted
+  );
 
-  const name = pieceNameMap[square.piece.type];
-  return `${positionStr}、${playerStr}の${name}`;
+  return `${positionStr}、${displayInfo.ariaName}`;
 }

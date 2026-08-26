@@ -1,9 +1,10 @@
 import React from 'react';
 import { Swords } from 'lucide-react';
+import { AppView } from '../../types/navigation';
 
 interface AppHeaderProps {
-  currentView: string;
-  onSelectView: (view: string) => void;
+  currentView: AppView;
+  onSelectView: (view: AppView) => void;
 }
 
 export const AppHeader: React.FC<AppHeaderProps> = ({ currentView, onSelectView }) => {

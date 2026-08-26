@@ -17,6 +17,16 @@ export const ShogiBoard: React.FC<ShogiBoardProps> = ({
   selectedSquare = null,
   onSquareClick,
 }) => {
+  const isInteractive = typeof onSquareClick === 'function';
+
+  const handleKeyDown = (e: React.KeyboardEvent, square: BoardSquare) => {
+    if (!isInteractive) return;
+    if (e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault();
+      onSquareClick(square);
+    }
+  };
+
   return (
     <div
       id="shogi-board-wrapper"
@@ -44,7 +54,6 @@ export const ShogiBoard: React.FC<ShogiBoardProps> = ({
             id="shogi-board-frame"
             className="relative rounded-sm transition-all duration-300"
             style={{
-              // Rich 3D Solid Board depth simulation with side & bottom slab
               boxShadow: `
                 0 30px 60px -15px rgba(0, 0, 0, 0.9),
                 0 15px 25px -5px rgba(0, 0, 0, 0.7),
@@ -73,7 +82,6 @@ export const ShogiBoard: React.FC<ShogiBoardProps> = ({
               <div
                 className="relative p-2.5 sm:p-3.5"
                 style={{
-                  // Authentic Hyuga Kaya (日向榧) honey-amber warm woodgrain
                   background:
                     'linear-gradient(178deg, #deb06c 0%, #d49f55 30%, #c88f42 70%, #b87c2e 100%)',
                 }}
@@ -97,14 +105,19 @@ export const ShogiBoard: React.FC<ShogiBoardProps> = ({
                   id="shogi-grid"
                   role="grid"
                   aria-label="将棋盤 9×9マス"
-                  className="relative grid grid-cols-9 w-[min(78vw,480px)] h-[min(78vw,480px)] sm:w-[480px] sm:h-[480px] rounded-[1px] overflow-hidden"
+                  className="relative flex flex-col w-[min(78vw,480px)] h-[min(78vw,480px)] sm:w-[480px] sm:h-[480px] rounded-[1px] overflow-hidden"
                   style={{
                     border: '1.5px solid rgba(40, 20, 5, 0.95)',
                     boxShadow: 'inset 0 0 4px rgba(60, 25, 5, 0.4)',
                   }}
                 >
                   {squares.map((rowSquares, rowIndex) => (
-                    <React.Fragment key={`row-${rowIndex}`}>
+                    <div
+                      key={`grid-row-${rowIndex}`}
+                      role="row"
+                      aria-label={`${RANK_KANJI[rowIndex]}段目`}
+                      className="grid grid-cols-9 flex-1"
+                    >
                       {rowSquares.map((square, colIndex) => {
                         const isSelected =
                           selectedSquare?.row === rowIndex && selectedSquare?.col === colIndex;
@@ -114,27 +127,30 @@ export const ShogiBoard: React.FC<ShogiBoardProps> = ({
                             key={`sq-${square.coordinateLabel}`}
                             id={`square-${square.coordinateLabel}`}
                             role="gridcell"
-                            tabIndex={0}
+                            tabIndex={isInteractive ? 0 : undefined}
                             aria-label={getSquareAriaLabel(square)}
                             data-file={square.file}
                             data-rank={square.rank}
                             data-coordinate={square.coordinateLabel}
-                            onClick={() => onSquareClick?.(square)}
-                            className={`relative flex items-center justify-center aspect-square cursor-default ${
+                            onClick={isInteractive ? () => onSquareClick(square) : undefined}
+                            onKeyDown={isInteractive ? (e) => handleKeyDown(e, square) : undefined}
+                            className={`relative flex items-center justify-center aspect-square select-none ${
+                              isInteractive ? 'cursor-pointer hover:bg-amber-400/20' : 'cursor-default'
+                            } ${
                               isSelected ? 'bg-amber-400/30 ring-1 ring-amber-300 z-20' : ''
                             }`}
                             style={{
-                              // Dark lacquer grid line boundaries (漆目罫線)
                               borderRight:
                                 colIndex < 8 ? '1px solid rgba(45, 22, 6, 0.9)' : 'none',
                               borderBottom:
                                 rowIndex < 8 ? '1px solid rgba(45, 22, 6, 0.9)' : 'none',
                             }}
                           >
-                            {/* Star Dot Marker (星 - 黒漆ドット) on intersections (3-3, 3-7, 7-3, 7-7) */}
-                            {square.isStarSquare && (
+                            {/* Star Dot Marker (星 - 黒漆ドット) on intersections (3-3, 3-6, 6-3, 6-6) */}
+                            {square.hasBottomRightStarMarker && (
                               <div
                                 aria-hidden="true"
+                                data-testid="star-marker"
                                 className="absolute -bottom-[2.5px] -right-[2.5px] w-1.5 h-1.5 rounded-full bg-[#1e0e04] shadow-[0_0.5px_1px_rgba(0,0,0,0.9)] z-20 pointer-events-none"
                               />
                             )}
@@ -150,7 +166,7 @@ export const ShogiBoard: React.FC<ShogiBoardProps> = ({
                           </div>
                         );
                       })}
-                    </React.Fragment>
+                    </div>
                   ))}
                 </div>
               </div>

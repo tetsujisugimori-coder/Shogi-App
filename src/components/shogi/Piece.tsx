@@ -1,5 +1,5 @@
 import React from 'react';
-import { Piece as PieceModel, PieceType } from '../../types/shogi';
+import { Piece as PieceModel, PieceType, getPieceDisplayInfo } from '../../types/shogi';
 
 interface PieceProps {
   piece: PieceModel;
@@ -31,12 +31,8 @@ export const Piece: React.FC<PieceProps> = ({
   className = '',
 }) => {
   const isGote = piece.player === 'gote';
-  const isPromoted = Boolean(piece.isPromoted);
+  const displayInfo = getPieceDisplayInfo(piece.type, piece.player, piece.isPromoted);
   const sizeConfig = PIECE_SIZE_SCALE[piece.type] || PIECE_SIZE_SCALE.pawn;
-
-  // Render 2-character stacked calligraphy if available, else standard kanji
-  const topChar = piece.kanjiTop || (piece.kanji.length === 2 ? piece.kanji[0] : piece.kanji);
-  const bottomChar = piece.kanjiBottom || (piece.kanji.length === 2 ? piece.kanji[1] : null);
 
   return (
     <div
@@ -44,14 +40,14 @@ export const Piece: React.FC<PieceProps> = ({
       data-piece-id={piece.id}
       data-piece-type={piece.type}
       data-player={piece.player}
-      data-promoted={isPromoted}
+      data-promoted={displayInfo.isPromoted}
       data-square={squareCoordinate}
       aria-hidden="true" // Screen readers read the parent square's aria-label
       className={`relative flex items-center justify-center ${sizeConfig.width} ${sizeConfig.height} transition-transform duration-200 select-none ${
         isGote ? 'rotate-180' : ''
       } ${isSelected ? 'scale-110 -translate-y-1 z-30' : 'z-10'} ${className}`}
     >
-      {/* 3D Realistic Cast Shadow onto Kaya Board (Directional bottom shadow) */}
+      {/* 3D Realistic Cast Shadow onto Kaya Board */}
       <div
         aria-hidden="true"
         className="absolute inset-0 pointer-events-none"
@@ -81,7 +77,6 @@ export const Piece: React.FC<PieceProps> = ({
         className="w-full h-full relative flex items-center justify-center"
         style={{
           clipPath: 'polygon(50% 0%, 88% 22%, 100% 100%, 0% 100%, 12% 22%)',
-          // Realistic Tsuge (Boxwood) wood gradient
           background:
             'linear-gradient(175deg, #fcedd0 0%, #f4dda9 25%, #e8c682 65%, #d6ad62 100%)',
           boxShadow: 'inset 0 1px 1.5px rgba(255, 255, 255, 0.8), inset 0 -2px 3px rgba(100, 50, 10, 0.35)',
@@ -121,27 +116,25 @@ export const Piece: React.FC<PieceProps> = ({
           }}
         />
 
-        {/* Authentic Two-Character Vertical Japanese Calligraphy (黒漆 彫駒文字) */}
+        {/* Unified Two-Character Vertical Japanese Calligraphy (黒漆 / 朱漆 彫駒文字) */}
         <div
           className={`relative z-10 flex flex-col items-center justify-center leading-none select-none ${
-            isPromoted ? 'text-[#a01818]' : 'text-[#120f0c]'
+            displayInfo.isPromotedColor ? 'text-[#b91c1c]' : 'text-[#120f0c]'
           } ${sizeConfig.textScale}`}
           style={{
             fontFamily:
               '"Shippori Mincho", "Yuji Boku", "Noto Serif JP", "Yu Mincho", "Hiragino Mincho ProN", serif',
             fontWeight: 800,
-            textShadow: '0 0.5px 0.5px rgba(255, 255, 255, 0.5), 0 1px 1px rgba(60, 30, 5, 0.25)',
+            textShadow: displayInfo.isPromotedColor
+              ? '0 0.5px 0.5px rgba(255, 255, 255, 0.6), 0 1px 1px rgba(80, 20, 10, 0.25)'
+              : '0 0.5px 0.5px rgba(255, 255, 255, 0.5), 0 1px 1px rgba(60, 30, 5, 0.25)',
             transform: 'translateY(2%)',
           }}
         >
-          {bottomChar ? (
-            <div className="flex flex-col items-center justify-center gap-[0.5px] py-0.5">
-              <span className="leading-[1.05] tracking-tight block scale-y-[1.02]">{topChar}</span>
-              <span className="leading-[1.05] tracking-tight block scale-y-[1.02]">{bottomChar}</span>
-            </div>
-          ) : (
-            <span className="leading-none text-[clamp(14px,2.8vw,20px)] scale-y-[1.05]">{topChar}</span>
-          )}
+          <div className="flex flex-col items-center justify-center gap-[0.5px] py-0.5">
+            <span className="leading-[1.05] tracking-tight block scale-y-[1.02]">{displayInfo.topChar}</span>
+            <span className="leading-[1.05] tracking-tight block scale-y-[1.02]">{displayInfo.bottomChar}</span>
+          </div>
         </div>
       </div>
 

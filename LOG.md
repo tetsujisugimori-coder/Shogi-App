@@ -74,3 +74,38 @@
 ## [2026-08-26] アプリタイトルの変更（SHOGI-APP）
 - アプリケーション名称を「SHOGI-APP」に更新（`metadata.json`, `index.html`, `AppHeader.tsx`, `LOG.md`）
 
+## [2026-08-26] レビュー指摘事項の全修正・整合性向上・テスト導入
+
+### 修正の目的
+リアル調の将棋盤・駒デザインを維持しながら、駒データ、表示文字、読み上げ、盤上の星の対称配置、TypeScript設定、アクセシビリティ（キーボード操作・Tab停止位置）の不整合を解消し、堅牢で検証可能な盤面表示基盤を確立する。
+
+### 主な修正内容
+
+1. **成駒表示・読み上げ情報の一元化 (`src/types/shogi.ts`, `src/components/shogi/Piece.tsx`)**:
+   - `Piece` モデルから重複していた `kanji`, `kanjiTop`, `kanjiBottom`, `promotedKanji` を削除し、`type`, `player`, `isPromoted` を基準に導出する構造へ移行。
+   - `getPieceDisplayInfo(type, player, isPromoted)` を実装し、通常2文字表記（王将、玉将、飛車、角行、金将、銀将、桂馬、香車、歩兵）、成駒文字（竜王、竜馬、成銀、成桂、成香、と金）、赤文字フラグ、スクリーンリーダー用ARIA名称（`先手の竜王` 等）を単一ソースから一元取得。
+   - `canPromote(type)` により、王将・玉将・金将が成駒にならない仕様を明確化。
+2. **王将・玉将のARIAラベル修正 (`src/types/shogi.ts`)**:
+   - 文字列比較を廃止し、`player`（先手: 王将、後手: 玉将）を基準に判定。
+   - 5九が「5筋 9段、先手の王将」、5一が「5筋 1段、後手の玉将」と正確に読み上げられるよう修正。
+3. **盤上の星の位置修正 (`src/types/shogi.ts`, `src/components/shogi/ShogiBoard.tsx`)**:
+   - 盤幅・盤高の 3/9 および 6/9 の交点にあたる (row 2, col 2), (row 2, col 5), (row 5, col 2), (row 5, col 5) の右下交点へ星を対称配置。
+   - プロパティ名を `hasBottomRightStarMarker` に改名し、描画意図を明確化。
+4. **TypeScript strict化と型定義追加 (`package.json`, `tsconfig.json`, `src/types/navigation.ts`)**:
+   - `@types/react`, `@types/react-dom` を導入。
+   - `tsconfig.json` にて `strict: true`, `noImplicitAny: true`, `strictNullChecks: true` を有効化し、型エラーのないクリーンなコードを維持。
+   - 画面識別子に `AppView = 'shogi'` のunion型を導入。
+   - `package.json` の名前を `shogi-app` に変更。
+5. **アクセシビリティ修正 (`src/components/shogi/ShogiBoard.tsx`, `index.html`)**:
+   - 表示専用時（`onSquareClick` 未指定）はマスに `tabIndex` を設定せず、81個の不要なTab停止位置を排除。
+   - `role="grid"` の配下に各段ごとの `role="row"` を追加し、各マスに `role="gridcell"` を正しく設定。
+   - `index.html` の言語属性を `<html lang="ja">` に修正。
+6. **自動テストの導入 (`vitest`, `src/test/shogi.test.tsx`)**:
+   - 盤面サイズ（9×9）、初期配置枚数（40枚）、全駒IDの一意性、主要駒（飛車・角・王将・玉将）の初期配置座標、王将・玉将・空マスのARIA名称、各成駒の文字変換、星の4箇所対称配置、表示専用時のTab停止位置ゼロ化を網羅する12件の単体・DOMテストを作成。
+
+### 実行した検証コマンドと結果
+- `npm test`: 12テストすべて合格（Pass 12 / 12）
+- `npm run lint` (`tsc --noEmit`): 型エラー 0件で正常完了
+- `npm run build`: 本番バンドルビルド正常完了
+
+
