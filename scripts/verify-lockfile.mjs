@@ -1,13 +1,14 @@
 import fs from 'node:fs';
 import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 
 /**
- * Validates package-lock.json integrity, schema consistency, and lockfile exclusivity.
+ * Validates lockfile integrity, exact matching dependencies with package.json, and checking forbidden lockfiles.
+ * @param {string} [rootDir=process.cwd()]
+ * @returns {{ valid: boolean, errors: string[], summary: { lockfileName: string, lockfileVersion: number | string, totalEntries: number, inspected: number, exceptions: number, missingResolved: number, missingIntegrity: number } }}
  */
-function verifyLockfile() {
-  const rootDir = process.cwd();
+export function validateLockfile(rootDir = process.cwd()) {
   const errors = [];
-  const warnings = [];
 
   // 1. Prohibited lockfile check
   const prohibitedLockfiles = ['bun.lock', 'bun.lockb', 'yarn.lock', 'pnpm-lock.yaml'];
@@ -20,56 +21,118 @@ function verifyLockfile() {
   // 2. package.json existence & parsing
   const pkgPath = path.resolve(rootDir, 'package.json');
   if (!fs.existsSync(pkgPath)) {
-    console.error('[verify:lock] package.json not found');
-    process.exit(1);
+    return {
+      valid: false,
+      errors: ['package.json not found'],
+      summary: {
+        lockfileName: 'N/A',
+        lockfileVersion: 'N/A',
+        totalEntries: 0,
+        inspected: 0,
+        exceptions: 0,
+        missingResolved: 0,
+        missingIntegrity: 0,
+      },
+    };
   }
   let pkg;
   try {
     pkg = JSON.parse(fs.readFileSync(pkgPath, 'utf-8'));
   } catch (err) {
-    console.error('[verify:lock] Failed to parse package.json:', err.message);
-    process.exit(1);
+    return {
+      valid: false,
+      errors: [`Failed to parse package.json: ${err.message}`],
+      summary: {
+        lockfileName: 'N/A',
+        lockfileVersion: 'N/A',
+        totalEntries: 0,
+        inspected: 0,
+        exceptions: 0,
+        missingResolved: 0,
+        missingIntegrity: 0,
+      },
+    };
   }
 
   // 3. package-lock.json existence & parsing
   const lockPath = path.resolve(rootDir, 'package-lock.json');
   if (!fs.existsSync(lockPath)) {
-    console.error('[verify:lock] package-lock.json not found');
-    process.exit(1);
+    return {
+      valid: false,
+      errors: ['package-lock.json not found'],
+      summary: {
+        lockfileName: 'N/A',
+        lockfileVersion: 'N/A',
+        totalEntries: 0,
+        inspected: 0,
+        exceptions: 0,
+        missingResolved: 0,
+        missingIntegrity: 0,
+      },
+    };
   }
   let lock;
   try {
     lock = JSON.parse(fs.readFileSync(lockPath, 'utf-8'));
   } catch (err) {
-    console.error('[verify:lock] Failed to parse package-lock.json:', err.message);
-    process.exit(1);
+    return {
+      valid: false,
+      errors: [`Failed to parse package-lock.json: ${err.message}`],
+      summary: {
+        lockfileName: 'N/A',
+        lockfileVersion: 'N/A',
+        totalEntries: 0,
+        inspected: 0,
+        exceptions: 0,
+        missingResolved: 0,
+        missingIntegrity: 0,
+      },
+    };
   }
 
-  // 4. Root name & lockfileVersion validation
-  if (lock.name !== 'shogi-app') {
-    errors.push(`package-lock.json root name mismatch: expected "shogi-app", got "${lock.name}"`);
+  // 4. Root name & lockfileVersion validation (Compare with pkg.name)
+  if (lock.name !== pkg.name) {
+    errors.push(`package-lock.json root name mismatch: expected "${pkg.name}", got "${lock.name}"`);
   }
   if (lock.lockfileVersion !== 3) {
     errors.push(`package-lock.json lockfileVersion mismatch: expected 3, got ${lock.lockfileVersion}`);
   }
 
-  // 5. Root dependencies & devDependencies consistency with package.json
+  // 5. Exact match comparison for dependencies and devDependencies
   const rootPackage = lock.packages?.[''] || {};
-  const pkgDeps = pkg.dependencies || {};
-  const lockDeps = rootPackage.dependencies || lock.dependencies || {};
-  for (const [dep, ver] of Object.entries(pkgDeps)) {
-    if (!lockDeps[dep]) {
-      errors.push(`Missing dependency "${dep}" in package-lock.json root`);
+
+  function compareDeps(field, expectedDeps, actualDeps) {
+    const expected = expectedDeps || {};
+    const actual = actualDeps || {};
+
+    const expectedKeys = Object.keys(expected);
+    const actualKeys = Object.keys(actual);
+
+    // Missing in lockfile or version mismatch
+    for (const key of expectedKeys) {
+      if (!(key in actual)) {
+        errors.push(
+          `Missing ${field} in package-lock.json root: "${key}" (expected "${expected[key]}", but was missing)`
+        );
+      } else if (actual[key] !== expected[key]) {
+        errors.push(
+          `Version mismatch for ${field} "${key}": expected "${expected[key]}", got "${actual[key]}" in package-lock.json root`
+        );
+      }
+    }
+
+    // Extra in lockfile
+    for (const key of actualKeys) {
+      if (!(key in expected)) {
+        errors.push(
+          `Extra ${field} in package-lock.json root: "${key}" (found "${actual[key]}", but not present in package.json)`
+        );
+      }
     }
   }
 
-  const pkgDevDeps = pkg.devDependencies || {};
-  const lockDevDeps = rootPackage.devDependencies || lock.devDependencies || {};
-  for (const [dep, ver] of Object.entries(pkgDevDeps)) {
-    if (!lockDevDeps[dep]) {
-      errors.push(`Missing devDependency "${dep}" in package-lock.json root`);
-    }
-  }
+  compareDeps('dependencies', pkg.dependencies, rootPackage.dependencies || lock.dependencies);
+  compareDeps('devDependencies', pkg.devDependencies, rootPackage.devDependencies || lock.devDependencies);
 
   // 6. Packages entries inspection (resolved & integrity validation)
   const packages = lock.packages || {};
@@ -109,16 +172,36 @@ function verifyLockfile() {
     }
   }
 
-  console.log('--- Lockfile Verification Summary ---');
-  console.log(`Lockfile Name:           ${lock.name}`);
-  console.log(`Lockfile Version:        ${lock.lockfileVersion}`);
-  console.log(`Total Package Entries:   ${totalPackages}`);
-  console.log(`Inspected Registry Pkgs: ${inspectedCount}`);
-  console.log(`Valid Exceptions:        ${exceptionCount}`);
-  console.log(`Missing "resolved":      ${missingResolvedCount}`);
-  console.log(`Missing "integrity":     ${missingIntegrityCount}`);
+  const summary = {
+    lockfileName: lock.name,
+    lockfileVersion: lock.lockfileVersion,
+    totalEntries: totalPackages,
+    inspected: inspectedCount,
+    exceptions: exceptionCount,
+    missingResolved: missingResolvedCount,
+    missingIntegrity: missingIntegrityCount,
+  };
 
-  if (errors.length > 0) {
+  return {
+    valid: errors.length === 0,
+    errors,
+    summary,
+  };
+}
+
+export function printSummaryAndExit(result) {
+  const { valid, errors, summary } = result;
+
+  console.log('--- Lockfile Verification Summary ---');
+  console.log(`Lockfile Name:           ${summary.lockfileName}`);
+  console.log(`Lockfile Version:        ${summary.lockfileVersion}`);
+  console.log(`Total Package Entries:   ${summary.totalEntries}`);
+  console.log(`Inspected Registry Pkgs: ${summary.inspected}`);
+  console.log(`Valid Exceptions:        ${summary.exceptions}`);
+  console.log(`Missing "resolved":      ${summary.missingResolved}`);
+  console.log(`Missing "integrity":     ${summary.missingIntegrity}`);
+
+  if (!valid) {
     console.error(`\n[verify:lock] FAILED with ${errors.length} error(s):`);
     for (const err of errors.slice(0, 10)) {
       console.error(` - ${err}`);
@@ -133,4 +216,8 @@ function verifyLockfile() {
   process.exit(0);
 }
 
-verifyLockfile();
+// Run if executed directly
+if (process.argv[1] && fileURLToPath(import.meta.url) === path.resolve(process.argv[1])) {
+  const result = validateLockfile();
+  printSummaryAndExit(result);
+}

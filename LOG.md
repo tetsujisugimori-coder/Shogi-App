@@ -227,6 +227,65 @@
 - **未確認事項**: GitHub Actions リモート実行環境でのログ
 - **未解決事項**: なし
 
+---
+
+## [2026-08-26] GitHub Actions v7移行・ロックファイル完全一致検証・@types/node 24系固定・install script審査管理
+
+### 修正の目的
+Node.js 24系移行後に残っていたGitHub ActionsのNode.js 20 Action deprecation警告、ロックファイル検証の依存完全一致比較の不足、`@types/node` のバージョン不整合（v20）、および npm 11.17 における未審査 install script の警告・セキュリティ課題を解消する。
+
+### 変更したファイル一覧
+- `.github/workflows/ci.yml`: `actions/checkout` および `actions/setup-node` を `@v7` に更新
+- `package.json`:
+  - `devDependencies["@types/node"]` を `^20.19.33` から `^24.0.0` に更新
+  - `allowScripts` フィールドを追加し、`esbuild: true`, `@google/genai: false`, `protobufjs: false`, `fsevents: false` を明示設定
+- `.npmrc`: `strict-allow-scripts=true` を追加
+- `scripts/verify-lockfile.mjs`:
+  - `package.json` と `package-lock.json`（ルート）の `dependencies` および `devDependencies` のキー・バージョンの双方向完全一致検証を追加
+  - ハードコードされていたルート名比較を `pkg.name` 参照に変更
+  - 未使用変数を整理し、モジュールエクスポート関数 `validateLockfile(rootDir)` を追加
+- `package-lock.json`:
+  - Node.js `v24.19.0` / npm `11.17.0` 環境下でクリーン再生成（`@types/node` が `24.13.3` に解決、`allowScripts` 審査反映）
+- `src/test/shogi.test.tsx`:
+  - `allowScripts` および `strict-allow-scripts=true` の検証テストを追加
+  - `@types/node` の 24系指定およびロックファイル解決バージョン検証を追加
+  - 一時ディレクトリ（`os.tmpdir()`）を利用した `validateLockfile` の肯定・否定テスト（バージョン不一致、余分な依存、欠落した依存、devDependencies不一致、`resolved` 欠落、`integrity` 欠落、他ツールロックファイル検知）8件を追加
+- `README.md`: 「依存パッケージの install script 審査（セキュリティ方針）」セクションを追記
+
+### 判断理由
+1. **GitHub Actions v7**:
+   - `actions/checkout@v4` および `actions/setup-node@v4` は内部で Node.js 20 ランタイムを使用しており、GitHub Actions 実行時に deprecation 警告が出力されていた。Node.js 24 ランタイムで動作する `@v7` に更新することで警告を解消。
+2. **`@types/node` の 24系固定**:
+   - プロジェクト全体のNode.js要件が24系であるため、型定義も `^24.0.0` に固定し、実際の解決バージョンも `24.13.3` とした。
+3. **install script の審査管理 (`allowScripts` / `strict-allow-scripts=true`)**:
+   - npm 11.17 では install script を持つパッケージに対する審査管理が強化された。
+   - `esbuild` は Vite やテストの実行に不可欠なネイティブバイナリのダウンロード・設定を行うため `true`（許可）。
+   - `@google/genai` は `preinstall: no-op` のため `false`（拒否）。
+   - `protobufjs` は非推奨バージョンの警告表示のみのため `false`（拒否）。
+   - `fsevents` は macOS 専用の optional dependency であり、Linux/Windows/CI では `node-gyp rebuild` 不要のため `false`（拒否）。
+   - `.npmrc` に `strict-allow-scripts=true` を設定することで、将来的に未審査のスクリプトを持つパッケージが導入された場合に `npm ci` で即座に遮断・検知可能とした。
+4. **ロックファイル完全一致検証**:
+   - 単に `package.json` にあるキーが `package-lock.json` に存在するかだけでなく、バージョンの完全一致、`package-lock.json` 側に余分なエントリがないか、`devDependencies` も含めた双方向検証を実装。
+   - 否定テストにおいてテスト用一時ディレクトリを `fs.mkdtempSync` で作成し、テスト後に `afterEach` でクリーンアップすることで、リポジトリ本体のロックファイルを破壊せずに検証。
+
+### 実行した検証コマンドと結果
+- `node --version`: `v24.19.0` (終了コード 0)
+- `npm --version`: `11.17.0` (終了コード 0)
+- `npm ci`: 正常終了 (終了コード 0, audited 303 packages in 7s, 0 vulnerabilities, allow-scripts 警告ゼロ)
+- `npm run verify:lock`: 正常終了 (終了コード 0, 欠落 0件, 完全一致)
+- `npm run lint` (`tsc --noEmit`): 型エラー 0件で正常終了 (終了コード 0)
+- `npm test` (`vitest run`): 全39テストすべて合格 (終了コード 0, 39 passed in 1.50s)
+- `npm run build`: 本番ビルド正常完了 (終了コード 0, dist/ 出力)
+- `npm run clean`: 正常終了 (終了コード 0, `dist`, `server.js` 削除)
+- clean後の `npm run build`: 正常完了 (終了コード 0)
+- `npm run check`: 正常終了 (終了コード 0, verify:lock → lint → test → build 一括成功)
+
+### 確認・未解決事項
+- **GitHub Actions**: ワークフロー定義（`.github/workflows/ci.yml`）の設定完了（`@v7` 更新済み）。リモート GitHub 上での実実行はローカルサンドボックス環境のため未実施。
+- **UI確認**: UI・CSS・コンポーネントコードの変更なし（将棋盤・彫駒・駒台・roving tabindex 等のデザイン・レイアウトはすべて完全維持）。
+- **未解決事項**: なし
+
+
 
 
 

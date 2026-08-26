@@ -113,5 +113,15 @@ npm run clean
 
 ---
 
+## 依存パッケージの install script 審査（セキュリティ方針）
+
+npm 11.17 以降のセキュアなスクリプト実行制御に準拠し、依存パッケージの install script を明示的に審査・管理しています：
+
+- **許可・拒否の管理**: `package.json` の `allowScripts` フィールドで各パッケージのスクリプト実行許可（`true`）／拒否（`false`）を個別に指定します（例: ビルドに必須な `esbuild` は `true`、単なる表示のみの `@google/genai`, `protobufjs`, `fsevents` は `false`）。
+- **未審査スクリプトの遮断**: `.npmrc` に `strict-allow-scripts=true` を設定しているため、`allowScripts` に記載のない未審査のスクリプトが存在する場合、`npm ci` / `npm install` はエラーとなり実行が停止します。
+- **新しい依存関係追加時の運用**: 新たにパッケージを追加・更新する際は、必ず install script（`preinstall`, `install`, `postinstall`）の有無と処理内容を確認し、真にビルドや動作に不可欠なもののみを許可してください（安易に全スクリプトを許可したり `--dangerously-allow-all-scripts` を使用しないこと）。
+
+---
+
 ## CI / CD
 GitHub Actions（`.github/workflows/ci.yml`）により、main/master ブランチへの push、pull request、および手動実行（`workflow_dispatch`）時に Node.js `24.19.0` 上で `npm ci` → `npm run verify:lock` → `npm run lint` → `npm test` → `npm run build` が自動実行されます。

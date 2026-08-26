@@ -1,9 +1,10 @@
-import { describe, it, expect, vi } from 'vitest';
+import { describe, it, expect, vi, afterEach } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import React from 'react';
 import fs from 'node:fs';
 import path from 'node:path';
+import os from 'node:os';
 import { execSync } from 'node:child_process';
 import {
   createInitialBoardState,
@@ -13,6 +14,7 @@ import {
   BoardSquare,
 } from '../types/shogi';
 import { ShogiBoard } from '../components/shogi/ShogiBoard';
+import { validateLockfile } from '../../scripts/verify-lockfile.mjs';
 
 describe('1. Node.js 24系・npm・環境・設定ファイルの検証', () => {
   const rootDir = process.cwd();
@@ -27,6 +29,7 @@ describe('1. Node.js 24系・npm・環境・設定ファイルの検証', () => 
 
   it('packageManager が npm を指定し完全なSemVerであること', () => {
     expect(packageJson.packageManager).toMatch(/^npm@\d+\.\d+\.\d+$/);
+    expect(packageJson.packageManager).toBe('npm@11.17.0');
   });
 
   it('Node.js の engines.node が Node.js 24.15.0 以上 25 未満を指定していること', () => {
@@ -36,6 +39,18 @@ describe('1. Node.js 24系・npm・環境・設定ファイルの検証', () => 
     expect(packageJson.engines.npm).toMatch(/^>=\d+/);
   });
 
+  it('package.json の @types/node が ^24.0.0 を指定していること', () => {
+    expect(packageJson.devDependencies['@types/node']).toMatch(/^\^?24\./);
+  });
+
+  it('package.json の allowScripts で必要なスクリプトが審査されていること', () => {
+    expect(packageJson.allowScripts).toBeDefined();
+    expect(packageJson.allowScripts['esbuild']).toBe(true);
+    expect(packageJson.allowScripts['@google/genai']).toBe(false);
+    expect(packageJson.allowScripts['protobufjs']).toBe(false);
+    expect(packageJson.allowScripts['fsevents']).toBe(false);
+  });
+
   it('.nvmrc が存在し 24.19.0 を指定していること', () => {
     const nvmrcPath = path.resolve(rootDir, '.nvmrc');
     expect(fs.existsSync(nvmrcPath)).toBe(true);
@@ -43,34 +58,37 @@ describe('1. Node.js 24系・npm・環境・設定ファイルの検証', () => 
     expect(content).toBe('24.19.0');
   });
 
-  it('.npmrc が存在し厳格な設定が含まれていること', () => {
+  it('.npmrc が存在し strict-allow-scripts を含む厳格な設定が含まれていること', () => {
     const npmrcPath = path.resolve(rootDir, '.npmrc');
     expect(fs.existsSync(npmrcPath)).toBe(true);
     const content = fs.readFileSync(npmrcPath, 'utf-8');
     expect(content).toContain('package-lock=true');
     expect(content).toContain('engine-strict=true');
     expect(content).toContain('omit-lockfile-registry-resolved=false');
+    expect(content).toContain('strict-allow-scripts=true');
   });
 
-  it('package-lock.json が存在しルート名が shogi-app で lockfileVersion が 3 であること', () => {
+  it('package-lock.json が存在しルート名が package.json.name と一致し lockfileVersion が 3 であること', () => {
     expect(fs.existsSync(path.resolve(rootDir, 'package-lock.json'))).toBe(true);
-    expect(packageLockJson.name).toBe('shogi-app');
+    expect(packageLockJson.name).toBe(packageJson.name);
     expect(packageLockJson.lockfileVersion).toBe(3);
   });
 
-  it('package-lock.json のルート依存関係が package.json と一致すること', () => {
+  it('package-lock.json のルート依存関係が package.json と完全一致すること', () => {
     const rootPkg = packageLockJson.packages?.[''] || {};
     const lockDeps = rootPkg.dependencies || packageLockJson.dependencies || {};
     const pkgDeps = packageJson.dependencies || {};
-    for (const dep of Object.keys(pkgDeps)) {
-      expect(lockDeps[dep]).toBeDefined();
-    }
+    expect(lockDeps).toEqual(pkgDeps);
 
     const lockDevDeps = rootPkg.devDependencies || packageLockJson.devDependencies || {};
     const pkgDevDeps = packageJson.devDependencies || {};
-    for (const dep of Object.keys(pkgDevDeps)) {
-      expect(lockDevDeps[dep]).toBeDefined();
-    }
+    expect(lockDevDeps).toEqual(pkgDevDeps);
+  });
+
+  it('package-lock.json 内の @types/node が 24系として解決されていること', () => {
+    const nodeTypesPkg = packageLockJson.packages?.['node_modules/@types/node'];
+    expect(nodeTypesPkg).toBeDefined();
+    expect(nodeTypesPkg.version).toMatch(/^24\./);
   });
 
   it('bun.lock, yarn.lock, pnpm-lock.yaml が存在しないこと', () => {
@@ -100,7 +118,124 @@ describe('1. Node.js 24系・npm・環境・設定ファイルの検証', () => 
   });
 });
 
-describe('2. 将棋盤および駒のデータ・表示ロジック（基本仕様）', () => {
+describe('2. ロックファイル検証ロジックの完全一致および否定テスト', () => {
+  const rootDir = process.cwd();
+  const packageJson = JSON.parse(fs.readFileSync(path.resolve(rootDir, 'package.json'), 'utf-8'));
+  const packageLockJson = JSON.parse(
+    fs.readFileSync(path.resolve(rootDir, 'package-lock.json'), 'utf-8')
+  );
+
+  let tempDir = '';
+
+  const setupTempProject = (
+    customPkg = packageJson,
+    customLock = packageLockJson,
+    extraFiles: Record<string, string> = {}
+  ) => {
+    tempDir = fs.mkdtempSync(path.join(os.tmpdir(), 'shogi-lock-test-'));
+    fs.writeFileSync(path.resolve(tempDir, 'package.json'), JSON.stringify(customPkg, null, 2));
+    fs.writeFileSync(path.resolve(tempDir, 'package-lock.json'), JSON.stringify(customLock, null, 2));
+    for (const [filename, content] of Object.entries(extraFiles)) {
+      fs.writeFileSync(path.resolve(tempDir, filename), content);
+    }
+    return tempDir;
+  };
+
+  afterEach(() => {
+    if (tempDir && fs.existsSync(tempDir)) {
+      fs.rmSync(tempDir, { recursive: true, force: true });
+      tempDir = '';
+    }
+  });
+
+  it('完全に一致する正常なプロジェクト構成では成功すること', () => {
+    const dir = setupTempProject();
+    const result = validateLockfile(dir);
+    expect(result.valid).toBe(true);
+    expect(result.errors).toHaveLength(0);
+    expect(result.summary.missingResolved).toBe(0);
+    expect(result.summary.missingIntegrity).toBe(0);
+  });
+
+  it('package.json 側の依存バージョンだけを変えると失敗すること (Version mismatch)', () => {
+    const modifiedPkg = JSON.parse(JSON.stringify(packageJson));
+    modifiedPkg.dependencies['react'] = '^19.99.0'; // 存在しない/不一致バージョン
+    const dir = setupTempProject(modifiedPkg, packageLockJson);
+    const result = validateLockfile(dir);
+
+    expect(result.valid).toBe(false);
+    expect(result.errors.some((err: string) => err.includes('Version mismatch for dependencies "react"'))).toBe(true);
+  });
+
+  it('package-lock.json 側だけに余分な依存を追加すると失敗すること (Extra dependency)', () => {
+    const modifiedLock = JSON.parse(JSON.stringify(packageLockJson));
+    modifiedLock.packages[''].dependencies['extra-pkg'] = '^1.0.0';
+    const dir = setupTempProject(packageJson, modifiedLock);
+    const result = validateLockfile(dir);
+
+    expect(result.valid).toBe(false);
+    expect(result.errors.some((err: string) => err.includes('Extra dependencies in package-lock.json root: "extra-pkg"'))).toBe(true);
+  });
+
+  it('package-lock.json 側から依存を削除すると失敗すること (Missing dependency)', () => {
+    const modifiedLock = JSON.parse(JSON.stringify(packageLockJson));
+    delete modifiedLock.packages[''].dependencies['react'];
+    const dir = setupTempProject(packageJson, modifiedLock);
+    const result = validateLockfile(dir);
+
+    expect(result.valid).toBe(false);
+    expect(result.errors.some((err: string) => err.includes('Missing dependencies in package-lock.json root: "react"'))).toBe(true);
+  });
+
+  it('devDependencies のバージョン不一致や欠落・余分も正しく検出されること', () => {
+    const modifiedPkg = JSON.parse(JSON.stringify(packageJson));
+    modifiedPkg.devDependencies['vitest'] = '^9.9.9';
+    const dir = setupTempProject(modifiedPkg, packageLockJson);
+    const result = validateLockfile(dir);
+
+    expect(result.valid).toBe(false);
+    expect(result.errors.some((err: string) => err.includes('Version mismatch for devDependencies "vitest"'))).toBe(true);
+  });
+
+  it('resolved を削除すると失敗すること', () => {
+    const modifiedLock = JSON.parse(JSON.stringify(packageLockJson));
+    // 任意のパッケージから resolved を削除
+    const firstPkgKey = Object.keys(modifiedLock.packages).find((k) => k !== '');
+    if (firstPkgKey) {
+      delete modifiedLock.packages[firstPkgKey].resolved;
+    }
+    const dir = setupTempProject(packageJson, modifiedLock);
+    const result = validateLockfile(dir);
+
+    expect(result.valid).toBe(false);
+    expect(result.summary.missingResolved).toBeGreaterThan(0);
+    expect(result.errors.some((err: string) => err.includes('is missing "resolved" field'))).toBe(true);
+  });
+
+  it('integrity を削除すると失敗すること', () => {
+    const modifiedLock = JSON.parse(JSON.stringify(packageLockJson));
+    const firstPkgKey = Object.keys(modifiedLock.packages).find((k) => k !== '');
+    if (firstPkgKey) {
+      delete modifiedLock.packages[firstPkgKey].integrity;
+    }
+    const dir = setupTempProject(packageJson, modifiedLock);
+    const result = validateLockfile(dir);
+
+    expect(result.valid).toBe(false);
+    expect(result.summary.missingIntegrity).toBeGreaterThan(0);
+    expect(result.errors.some((err: string) => err.includes('is missing "integrity" field'))).toBe(true);
+  });
+
+  it('npm 以外のロックファイル (bun.lock 等) が存在すると失敗すること', () => {
+    const dir = setupTempProject(packageJson, packageLockJson, { 'bun.lock': 'test' });
+    const result = validateLockfile(dir);
+
+    expect(result.valid).toBe(false);
+    expect(result.errors.some((err: string) => err.includes('Prohibited lockfile found: bun.lock'))).toBe(true);
+  });
+});
+
+describe('3. 将棋盤および駒のデータ・表示ロジック（基本仕様）', () => {
   it('盤面が9行×9列である', () => {
     const boardState = createInitialBoardState();
     expect(boardState.squares).toHaveLength(9);
@@ -243,7 +378,7 @@ describe('2. 将棋盤および駒のデータ・表示ロジック（基本仕�
   });
 });
 
-describe('3. 表示専用盤面のアクセシビリティ検証', () => {
+describe('4. 表示専用盤面のアクセシビリティ検証', () => {
   it('tabIndex={0} のマスが0個であり、role="grid", role="row" (9個), role="gridcell" (81個) が構築されること', () => {
     const boardState = createInitialBoardState();
     const { container } = render(<ShogiBoard squares={boardState.squares} />);
@@ -264,7 +399,7 @@ describe('3. 表示専用盤面のアクセシビリティ検証', () => {
   });
 });
 
-describe('4. インタラクティブ盤面の roving tabindex およびキーボード操作検証', () => {
+describe('5. インタラクティブ盤面の roving tabindex およびキーボード操作検証', () => {
   it('初期状態で tabIndex={0} が1個、tabIndex={-1} が80個であること（既定初期位置: 7七）', () => {
     const boardState = createInitialBoardState();
     const handleClick = vi.fn();
@@ -339,7 +474,6 @@ describe('4. インタラクティブ盤面の roving tabindex およびキー�
     // 5. 盤端テスト: 9一 (row 0, col 0) に移動してさらに上・左を押しても盤外へ出ない
     const square91 = container.querySelector('#square-9一') as HTMLElement;
     square91.focus();
-    // クリックまたはフォーカスでroving tabindexが更新される
     await user.click(square91);
     expect(square91).toHaveAttribute('tabindex', '0');
 
