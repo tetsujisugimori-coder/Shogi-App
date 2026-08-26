@@ -497,9 +497,62 @@ Node.js 24系移行後に残っていたGitHub ActionsのNode.js 20 Action depre
 ### 確認・未確認・未解決事項
 - **UI確認**: UI・CSS・コンポーネントコードの変更なし（将棋盤、本黄楊彫駒、本榧盤、星印、リムライト、駒台、roving tabindex 等のデザイン・レイアウト・動作仕様はすべて完全維持）。ブラウザ目視確認は UI ファイルを変更していないため未実施。
 - **ローカル実機環境**: 現在のコンテナは Linux (`4.19.0-gvisor`) であるため、ローカル上では macOS ネイティブの `fsevents` 実動作は実行不可（スクリプトは非 darwin 環境として静的検査のみ通過）。
-- **リモート GitHub Actions**: ワークフロー定義（`ubuntu-latest` / `macos-latest` マトリックスおよび実行順序）を設定完了。リモート GitHub への push およびリモート CI 実行結果はプッシュ後の確認待ち。
+- **リモート GitHub Actions**: 基準コミット `cb26cdcd79b4245196b76e5d246ec59e914359ae` にて GitHub Actions Run ID `33015386094`（Linux Job: `98332143911`、macOS Job: `98332144103`）の完全成功を確認済み。
 - **残った警告**: `node-domexception@1.0.0` の deprecated 警告（`@google/genai` 深層依存）。install script 関連警告はゼロ。
 - **未解決事項**: なし
+
+---
+
+## 11. macOS検証スクリプトの例外・後処理異常系ハンドリング修正および検証記録
+
+### 基準コミットと成功済み GitHub Actions の確認
+- **対象リポジトリ**: `tetsujisugimori-coder/Shogi-App`
+- **基準コミット**: `cb26cdcd79b4245196b76e5d246ec59e914359ae`
+- **成功済み GitHub Actions Run ID**: `33015386094` (`https://github.com/tetsujisugimori-coder/Shogi-App/actions/runs/33015386094`)
+  - **Linux (ubuntu-latest) Job ID**: `98332143911` (Status: SUCCESS)
+  - **macOS (macos-latest) Job ID**: `98332144103` (Status: SUCCESS)
+- **事実関係**: 基準コミット時点で `package-lock.json` は完全同期済みであり、Linux / macOS 両ジョブにおいて `npm ci`, `verify:lock`, `verify:macos-fsevents`, `lint`, `test`, `build` の全工程がグリーンで成功している。
+
+### 今回の修正内容（指摘対応3点）
+1. **後処理失敗を成功扱いしない設計の導入**:
+   - `scripts/verify-macos-fsevents.mjs` に `runCleanups(cleanups)` を導入。
+   - `fsevents` watcher 停止、`fsevents` 一時ディレクトリ削除、Vite サーバー停止、Vite 一時ディレクトリ削除の各後処理を順次実行し、途中で例外が発生しても後続処理を最後まで実行して全エラーを収集。
+   - `combineErrors(primaryError, cleanupErrors)` により、本体成功＋クリーンアップ失敗時は `cause` 付き `Error` または `AggregateError` をスローして検証全体を失敗として扱う（`success: true` や成功メッセージを出力しない）。
+   - 本体失敗＋クリーンアップ失敗時も `AggregateError` で両方の原因を保持。
+2. **`fsevents.getInfo()` の例外を Promise へ確実に伝播**:
+   - `createFsEventPromise()` ヘルパーを新設し、watcher コールバック内で同期例外・`getInfo()` 例外が発生した場合は直ちに `try...catch` で捕捉して `eventPromise` を reject。
+   - 例外発生時にもタイムアウト用タイマー（`eventTimer`）を確実に解除。
+   - 複数回コールバックやタイムアウト競合による多重 resolve / reject を防止する `isSettled` ガードを実装。
+3. **事実関係のログ記録と package-lock.json の維持**:
+   - `package-lock.json` は基準コミット時点で正しく同期されており、今回の修正では変更を加えず維持。
+   - CI 成功の事実関係および異常系テストの拡充記録を本ログへ追記。
+
+### 単体テスト拡充（`src/test/shogi.test.tsx`）
+- `6. macOS 検証スクリプトの後処理エラー集約および getInfo 例外伝播の単体テスト`:
+  - `runCleanups` の順次実行・エラー収集テスト
+  - `combineErrors` の単一/複数/本体失敗併発エラー集約テスト
+  - `createFsEventPromise` の `getInfo()` 例外 reject・タイマー解除テスト
+  - `createFsEventPromise` の正常系 resolve・多重発火防止テスト
+  - `verifyMacOsFsevents` のシミュレーション（本体＋クリーンアップ成功）
+  - `verifyMacOsFsevents` の各後処理失敗時（watcher停止失敗、一時Dir削除失敗、Vite server close失敗）の拒否テスト
+  - `verifyMacOsFsevents` の非macOS環境における静的メタデータ検査テスト
+
+### 実行した検証コマンドと結果
+- `npm run verify:lock`: 正常終了 (終了コード 0, missingVersion: 0, missingResolved: 0, missingIntegrity: 0)
+- `npm run verify:macos-fsevents`: 正常終了 (終了コード 0, Linux環境として静的検査を通過)
+- `npm run lint` (`tsc --noEmit`): 型エラー 0件で正常終了 (終了コード 0)
+- `npm test` (`vitest run`): 全55テストすべて合格 (終了コード 0, 55 passed)
+- `npm run build`: 本番ビルド正常完了 (終了コード 0, dist/ 出力)
+- `npm run clean`: 正常終了 (終了コード 0, dist 削除)
+- clean後の `npm run build`: 正常完了 (終了コード 0)
+- `npm run check`: 正常終了 (終了コード 0, lock検証 → lint → test 55件 → build 一括成功)
+
+### テスト結果内訳
+- **テスト総数**: 55
+- **成功数**: 55
+- **失敗数**: 0
+- **skipped数**: 0
+
 
 
 

@@ -7,15 +7,239 @@ import { fileURLToPath } from 'node:url';
 const require = createRequire(import.meta.url);
 
 /**
+ * Executes cleanup tasks sequentially, ensuring all tasks run even if some throw.
+ * Returns an array of failed cleanup descriptors: { name: string, error: Error }.
+ *
+ * @param {Array<{ name: string, run: () => void | Promise<void> }>} cleanups
+ * @returns {Promise<Array<{ name: string, error: Error }>>}
+ */
+export async function runCleanups(cleanups) {
+  const errors = [];
+  for (const cleanup of cleanups) {
+    try {
+      await cleanup.run();
+    } catch (err) {
+      const normalizedError = err instanceof Error ? err : new Error(String(err));
+      errors.push({
+        name: cleanup.name,
+        error: normalizedError,
+      });
+    }
+  }
+  return errors;
+}
+
+/**
+ * Combines a primary verification error with any cleanup errors.
+ *
+ * - If neither error exists, returns null.
+ * - If only primary error exists, returns the primary error.
+ * - If only cleanup errors exist:
+ *     - Single cleanup error: returns a formatted Error with cause.
+ *     - Multiple cleanup errors: returns an AggregateError.
+ * - If both primary and cleanup errors exist: returns an AggregateError containing all errors.
+ *
+ * @param {Error|null} primaryError
+ * @param {Array<{ name: string, error: Error }>} cleanupErrors
+ * @returns {Error|AggregateError|null}
+ */
+export function combineErrors(primaryError, cleanupErrors = []) {
+  const hasPrimary = Boolean(primaryError);
+  const hasCleanups = cleanupErrors.length > 0;
+
+  if (!hasPrimary && !hasCleanups) {
+    return null;
+  }
+
+  if (!hasPrimary) {
+    if (cleanupErrors.length === 1) {
+      const single = cleanupErrors[0];
+      const err = new Error(`Cleanup failed [${single.name}]: ${single.error.message}`);
+      err.cause = single.error;
+      return err;
+    }
+    const errors = cleanupErrors.map(
+      (c) => new Error(`[${c.name}] ${c.error.message}`, { cause: c.error })
+    );
+    const message = `Multiple cleanup tasks failed (${cleanupErrors.length} errors):\n` +
+      cleanupErrors.map((c) => ` - [${c.name}]: ${c.error.message}`).join('\n');
+    return new AggregateError(errors, message);
+  }
+
+  if (!hasCleanups) {
+    return primaryError;
+  }
+
+  const allErrors = [
+    primaryError,
+    ...cleanupErrors.map((c) => new Error(`[${c.name}] ${c.error.message}`, { cause: c.error })),
+  ];
+  const message = `Verification failed: ${primaryError.message}\nAdditionally, ${cleanupErrors.length} cleanup task(s) failed:\n` +
+    cleanupErrors.map((c) => ` - [${c.name}]: ${c.error.message}`).join('\n');
+  return new AggregateError(allErrors, message, { cause: primaryError });
+}
+
+/**
+ * Creates and manages a Promise for native fsevents event reception.
+ * Guards against race conditions, ensures getInfo() errors reject the Promise,
+ * and clears timers on settlement.
+ *
+ * @param {Object} params
+ * @param {any} params.fsevents - fsevents module instance or mock
+ * @param {string} params.tempDir - Target directory path to watch
+ * @param {number} [params.timeoutMs=5000] - Timeout in milliseconds
+ * @param {Function} [params.getInfoFn] - Optional getInfo function override for testing
+ * @returns {{
+ *   eventPromise: Promise<{ filepath: string, flags: number, info: any }>,
+ *   getStopWatcher: () => (() => Promise<void>|void) | null,
+ *   clearTimer: () => void,
+ *   isSettled: () => boolean
+ * }}
+ */
+export function createFsEventPromise({ fsevents, tempDir, timeoutMs = 5000, getInfoFn }) {
+  let fseventTimer = null;
+  let stopWatcher = null;
+  let settled = false;
+
+  const eventPromise = new Promise((resolve, reject) => {
+    fseventTimer = setTimeout(() => {
+      if (settled) return;
+      settled = true;
+      if (fseventTimer) {
+        clearTimeout(fseventTimer);
+        fseventTimer = null;
+      }
+      reject(new Error('Timeout waiting for fsevents native event'));
+    }, timeoutMs);
+
+    try {
+      stopWatcher = fsevents.watch(tempDir, (filepath, flags) => {
+        if (settled) return;
+        try {
+          const infoGetter = getInfoFn || fsevents.getInfo;
+          const info = infoGetter.call(fsevents, filepath, flags);
+          settled = true;
+          if (fseventTimer) {
+            clearTimeout(fseventTimer);
+            fseventTimer = null;
+          }
+          resolve({ filepath, flags, info });
+        } catch (err) {
+          settled = true;
+          if (fseventTimer) {
+            clearTimeout(fseventTimer);
+            fseventTimer = null;
+          }
+          reject(err instanceof Error ? err : new Error(String(err)));
+        }
+      });
+    } catch (e) {
+      if (settled) return;
+      settled = true;
+      if (fseventTimer) {
+        clearTimeout(fseventTimer);
+        fseventTimer = null;
+      }
+      reject(e instanceof Error ? e : new Error(String(e)));
+    }
+  });
+
+  return {
+    eventPromise,
+    getStopWatcher: () => stopWatcher,
+    clearTimer: () => {
+      if (fseventTimer) {
+        clearTimeout(fseventTimer);
+        fseventTimer = null;
+      }
+    },
+    isSettled: () => settled,
+  };
+}
+
+/**
+ * Creates and manages a Promise for Vite watcher file change detection.
+ *
+ * @param {Object} params
+ * @param {any} params.viteServer - Vite dev server instance
+ * @param {number} [params.timeoutMs=6000] - Timeout in milliseconds
+ * @returns {{
+ *   promise: Promise<string>,
+ *   getHandler: () => ((changedPath: string) => void) | null,
+ *   clearTimer: () => void,
+ *   isSettled: () => boolean
+ * }}
+ */
+export function createViteWatcherPromise({ viteServer, timeoutMs = 6000 }) {
+  let viteTimer = null;
+  let viteChangeHandler = null;
+  let settled = false;
+
+  const promise = new Promise((resolve, reject) => {
+    viteTimer = setTimeout(() => {
+      if (settled) return;
+      settled = true;
+      if (viteTimer) {
+        clearTimeout(viteTimer);
+        viteTimer = null;
+      }
+      reject(new Error('Timeout waiting for Vite file watcher event'));
+    }, timeoutMs);
+
+    viteChangeHandler = (changedPath) => {
+      if (settled) return;
+      settled = true;
+      if (viteTimer) {
+        clearTimeout(viteTimer);
+        viteTimer = null;
+      }
+      resolve(changedPath);
+    };
+
+    viteServer.watcher.on('change', viteChangeHandler);
+  });
+
+  return {
+    promise,
+    getHandler: () => viteChangeHandler,
+    clearTimer: () => {
+      if (viteTimer) {
+        clearTimeout(viteTimer);
+        viteTimer = null;
+      }
+    },
+    isSettled: () => settled,
+  };
+}
+
+/**
  * Verifies fsevents loading, native watching, and Vite file watcher functionality on macOS (darwin).
  * If executed on non-darwin platforms (e.g. Linux CI/container), performs static inspection and logs platform info.
+ *
+ * @param {Object} [options] - Test injection options
+ * @param {boolean} [options.forceDarwin] - Override platform detection for tests
+ * @param {any} [options.fseventsMock] - Inject fsevents module mock for tests
+ * @param {Function} [options.viteCreateServerMock] - Inject Vite createServer mock for tests
+ * @param {number} [options.fseventTimeoutMs] - Custom timeout for fsevents
+ * @param {number} [options.viteTimeoutMs] - Custom timeout for Vite watcher
+ * @param {number} [options.settleDelayMs] - Custom delay before trigger
+ * @param {number} [options.viteSettleDelayMs] - Custom delay before Vite trigger
+ * @param {Function} [options.getInfoFn] - Custom getInfo function override
+ * @param {boolean} [options.failWatcherStop] - Simulate fsevents watcher stop failure
+ * @param {boolean} [options.failFseventsTempDirRemoval] - Simulate fsevents tempDir removal failure
+ * @param {boolean} [options.failViteListenerRemoval] - Simulate Vite listener removal failure
+ * @param {boolean} [options.failViteServerClose] - Simulate Vite server close failure
+ * @param {boolean} [options.failViteTempDirRemoval] - Simulate Vite tempDir removal failure
+ * @param {boolean} [options.skipVite] - Skip Vite step for isolated fsevents tests
  */
 export async function verifyMacOsFsevents(options = {}) {
-  const isDarwin = process.platform === 'darwin';
+  const isDarwin = options.forceDarwin !== undefined ? options.forceDarwin : process.platform === 'darwin';
   console.log(`[verify:macos-fsevents] Running on platform: ${process.platform} (${os.type()} ${os.release()})`);
 
   if (!isDarwin) {
     console.log('[verify:macos-fsevents] Current platform is not darwin (macOS).');
+    console.log('[verify:macos-fsevents] Static inspection note: macOS native watching was NOT executed on this platform.');
+    console.log('[verify:macos-fsevents] Static inspection note: Vite watcher macOS native path was NOT executed on this platform.');
     console.log('[verify:macos-fsevents] Inspecting package-lock.json for fsevents metadata:');
 
     const lockPath = path.resolve(process.cwd(), 'package-lock.json');
@@ -31,8 +255,8 @@ export async function verifyMacOsFsevents(options = {}) {
         console.log(' - fsevents not found in package-lock.json node_modules');
       }
     }
-    console.log('[verify:macos-fsevents] Non-darwin platform check passed.');
-    return { success: true, platform: process.platform, isDarwin: false };
+    console.log('[verify:macos-fsevents] Non-darwin platform static check passed (native macOS watch skipped).');
+    return { success: true, platform: process.platform, isDarwin: false, nativeVerified: false };
   }
 
   // --- macOS (Darwin) verification ---
@@ -41,7 +265,7 @@ export async function verifyMacOsFsevents(options = {}) {
   // 1. Verify fsevents module resolution and loading
   let fsevents;
   try {
-    fsevents = require('fsevents');
+    fsevents = options.fseventsMock || require('fsevents');
     console.log(' [1/3] Successfully required fsevents module on macOS');
   } catch (err) {
     console.error(` [1/3] FAILED to require fsevents: ${err.message}`);
@@ -57,78 +281,87 @@ export async function verifyMacOsFsevents(options = {}) {
   const tempDir = fs.mkdtempSync(path.join(os.tmpdir(), 'shogi-fsevents-test-'));
   console.log(` [2/3] Testing native fsevents watcher in temporary directory: ${tempDir}`);
   let stopWatcher = null;
-  let fseventTimer = null;
+  let fseventWatcherControl = null;
+  let fseventPrimaryError = null;
+
   try {
-    let eventReceived = false;
-
-    const eventPromise = new Promise((resolve, reject) => {
-      fseventTimer = setTimeout(() => {
-        if (!eventReceived) {
-          reject(new Error('Timeout waiting for fsevents native event'));
-        }
-      }, 5000);
-
-      try {
-        stopWatcher = fsevents.watch(tempDir, (filepath, flags) => {
-          eventReceived = true;
-          if (fseventTimer) {
-            clearTimeout(fseventTimer);
-            fseventTimer = null;
-          }
-          resolve({ filepath, flags, info: fsevents.getInfo(filepath, flags) });
-        });
-      } catch (e) {
-        if (fseventTimer) {
-          clearTimeout(fseventTimer);
-          fseventTimer = null;
-        }
-        reject(e);
-      }
+    fseventWatcherControl = createFsEventPromise({
+      fsevents,
+      tempDir,
+      timeoutMs: options.fseventTimeoutMs || 5000,
+      getInfoFn: options.getInfoFn,
     });
 
-    // Allow fsevents to start listening
-    await new Promise((r) => setTimeout(r, 100));
+    // Give watcher brief moment to initialize
+    await new Promise((r) => setTimeout(r, options.settleDelayMs || 100));
+
+    stopWatcher = fseventWatcherControl.getStopWatcher();
 
     // Create a temporary file to trigger native event
     const triggerFile = path.join(tempDir, 'watch-trigger.txt');
     fs.writeFileSync(triggerFile, 'test content for fsevents', 'utf-8');
 
-    const eventData = await eventPromise;
+    const eventData = await fseventWatcherControl.eventPromise;
     console.log(`       fsevents native event received successfully: ${path.basename(eventData.filepath)}`);
+  } catch (err) {
+    fseventPrimaryError = err instanceof Error ? err : new Error(String(err));
   } finally {
-    if (fseventTimer) {
-      clearTimeout(fseventTimer);
-      fseventTimer = null;
+    if (fseventWatcherControl) {
+      fseventWatcherControl.clearTimer();
+      stopWatcher = fseventWatcherControl.getStopWatcher() || stopWatcher;
     }
-    if (stopWatcher) {
-      try {
-        await stopWatcher();
-      } catch (err) {
-        console.error('       [cleanup warning] Failed to stop fsevents watcher:', err);
-      }
-      stopWatcher = null;
-    }
-    if (fs.existsSync(tempDir)) {
-      try {
-        fs.rmSync(tempDir, { recursive: true, force: true });
-      } catch (err) {
-        console.error('       [cleanup warning] Failed to remove fsevents tempDir:', err);
-      }
+
+    const cleanups = [
+      {
+        name: 'fsevents watcher stop',
+        run: async () => {
+          if (options.failWatcherStop) {
+            throw new Error('Injected error: failed to stop fsevents watcher');
+          }
+          if (stopWatcher) {
+            await stopWatcher();
+            stopWatcher = null;
+          }
+        },
+      },
+      {
+        name: 'fsevents temp directory removal',
+        run: () => {
+          if (options.failFseventsTempDirRemoval) {
+            throw new Error('Injected error: failed to remove fsevents tempDir');
+          }
+          if (fs.existsSync(tempDir)) {
+            fs.rmSync(tempDir, { recursive: true, force: true });
+          }
+        },
+      },
+    ];
+
+    const cleanupErrors = await runCleanups(cleanups);
+    const combined = combineErrors(fseventPrimaryError, cleanupErrors);
+    if (combined) {
+      throw combined;
     }
   }
 
   // 3. Test Vite watcher in an isolated directory
+  if (options.skipVite) {
+    console.log('[verify:macos-fsevents] Vite watcher step skipped per options.');
+    return { success: true, platform: 'darwin', isDarwin: true, nativeVerified: true };
+  }
+
   console.log(' [3/3] Testing Vite dev watcher integration...');
   const viteTempDir = fs.mkdtempSync(path.join(os.tmpdir(), 'shogi-vite-watch-test-'));
   let viteServer = null;
-  let viteTimer = null;
-  let viteChangeHandler = null;
+  let viteWatcherControl = null;
+  let vitePrimaryError = null;
+
   try {
-    const { createServer } = await import('vite');
+    const createServerFn = options.viteCreateServerMock || (await import('vite')).createServer;
     fs.writeFileSync(path.join(viteTempDir, 'index.html'), '<html><body>Watcher Test</body></html>', 'utf-8');
     fs.writeFileSync(path.join(viteTempDir, 'test.js'), 'export const a = 1;', 'utf-8');
 
-    viteServer = await createServer({
+    viteServer = await createServerFn({
       root: viteTempDir,
       logLevel: 'error',
       server: {
@@ -139,61 +372,73 @@ export async function verifyMacOsFsevents(options = {}) {
 
     await viteServer.listen();
 
-    let viteChangeDetected = false;
-    const vitePromise = new Promise((resolve, reject) => {
-      viteTimer = setTimeout(() => {
-        if (!viteChangeDetected) {
-          reject(new Error('Timeout waiting for Vite file watcher event'));
-        }
-      }, 6000);
-
-      viteChangeHandler = (changedPath) => {
-        viteChangeDetected = true;
-        if (viteTimer) {
-          clearTimeout(viteTimer);
-          viteTimer = null;
-        }
-        resolve(changedPath);
-      };
-
-      viteServer.watcher.on('change', viteChangeHandler);
+    viteWatcherControl = createViteWatcherPromise({
+      viteServer,
+      timeoutMs: options.viteTimeoutMs || 6000,
     });
 
     // Allow watcher to initialize
-    await new Promise((r) => setTimeout(r, 200));
+    await new Promise((r) => setTimeout(r, options.viteSettleDelayMs || 200));
 
     // Modify file
     fs.appendFileSync(path.join(viteTempDir, 'test.js'), '\nexport const b = 2;');
 
-    const changedFile = await vitePromise;
+    const changedFile = await viteWatcherControl.promise;
     console.log(`       Vite watcher detected file change successfully: ${path.basename(changedFile)}`);
+  } catch (err) {
+    vitePrimaryError = err instanceof Error ? err : new Error(String(err));
   } finally {
-    if (viteTimer) {
-      clearTimeout(viteTimer);
-      viteTimer = null;
+    if (viteWatcherControl) {
+      viteWatcherControl.clearTimer();
     }
-    if (viteServer) {
-      try {
-        if (viteChangeHandler && viteServer.watcher) {
-          viteServer.watcher.off('change', viteChangeHandler);
-        }
-        await viteServer.close();
-      } catch (err) {
-        console.error('       [cleanup warning] Failed to close Vite server:', err);
-      }
-      viteServer = null;
-    }
-    if (fs.existsSync(viteTempDir)) {
-      try {
-        fs.rmSync(viteTempDir, { recursive: true, force: true });
-      } catch (err) {
-        console.error('       [cleanup warning] Failed to remove viteTempDir:', err);
-      }
+
+    const cleanups = [
+      {
+        name: 'Vite listener removal',
+        run: () => {
+          if (options.failViteListenerRemoval) {
+            throw new Error('Injected error: failed to remove Vite listener');
+          }
+          const handler = viteWatcherControl?.getHandler();
+          if (handler && viteServer?.watcher) {
+            viteServer.watcher.off('change', handler);
+          }
+        },
+      },
+      {
+        name: 'Vite server close',
+        run: async () => {
+          if (options.failViteServerClose) {
+            throw new Error('Injected error: failed to close Vite server');
+          }
+          if (viteServer) {
+            await viteServer.close();
+            viteServer = null;
+          }
+        },
+      },
+      {
+        name: 'Vite temp directory removal',
+        run: () => {
+          if (options.failViteTempDirRemoval) {
+            throw new Error('Injected error: failed to remove viteTempDir');
+          }
+          if (fs.existsSync(viteTempDir)) {
+            fs.rmSync(viteTempDir, { recursive: true, force: true });
+          }
+        },
+      },
+    ];
+
+    const cleanupErrors = await runCleanups(cleanups);
+    const combined = combineErrors(vitePrimaryError, cleanupErrors);
+    if (combined) {
+      throw combined;
     }
   }
 
   console.log('[verify:macos-fsevents] All macOS fsevents & Vite watcher tests PASSED successfully.\n');
-  return { success: true, platform: 'darwin', isDarwin: true };
+  return { success: true, platform: 'darwin', isDarwin: true, nativeVerified: true };
 }
 
 // Run directly from CLI
