@@ -5,7 +5,7 @@ import { fileURLToPath } from 'node:url';
 /**
  * Validates lockfile integrity, exact matching dependencies with package.json, and checking forbidden lockfiles.
  * @param {string} [rootDir=process.cwd()]
- * @returns {{ valid: boolean, errors: string[], summary: { lockfileName: string, lockfileVersion: number | string, totalEntries: number, inspected: number, exceptions: number, missingResolved: number, missingIntegrity: number } }}
+ * @returns {{ valid: boolean, errors: string[], summary: { lockfileName: string, lockfileVersion: number | string, totalEntries: number, inspected: number, exceptions: number, missingVersion: number, missingResolved: number, missingIntegrity: number } }}
  */
 export function validateLockfile(rootDir = process.cwd()) {
   const errors = [];
@@ -30,6 +30,7 @@ export function validateLockfile(rootDir = process.cwd()) {
         totalEntries: 0,
         inspected: 0,
         exceptions: 0,
+        missingVersion: 0,
         missingResolved: 0,
         missingIntegrity: 0,
       },
@@ -48,6 +49,7 @@ export function validateLockfile(rootDir = process.cwd()) {
         totalEntries: 0,
         inspected: 0,
         exceptions: 0,
+        missingVersion: 0,
         missingResolved: 0,
         missingIntegrity: 0,
       },
@@ -66,6 +68,7 @@ export function validateLockfile(rootDir = process.cwd()) {
         totalEntries: 0,
         inspected: 0,
         exceptions: 0,
+        missingVersion: 0,
         missingResolved: 0,
         missingIntegrity: 0,
       },
@@ -84,6 +87,7 @@ export function validateLockfile(rootDir = process.cwd()) {
         totalEntries: 0,
         inspected: 0,
         exceptions: 0,
+        missingVersion: 0,
         missingResolved: 0,
         missingIntegrity: 0,
       },
@@ -141,6 +145,7 @@ export function validateLockfile(rootDir = process.cwd()) {
 
   let inspectedCount = 0;
   let exceptionCount = 0;
+  let missingVersionCount = 0;
   let missingResolvedCount = 0;
   let missingIntegrityCount = 0;
 
@@ -158,6 +163,7 @@ export function validateLockfile(rootDir = process.cwd()) {
     inspectedCount++;
 
     if (!pkgInfo.version) {
+      missingVersionCount++;
       errors.push(`Package "${key}" is missing "version" field`);
     }
 
@@ -178,6 +184,7 @@ export function validateLockfile(rootDir = process.cwd()) {
     totalEntries: totalPackages,
     inspected: inspectedCount,
     exceptions: exceptionCount,
+    missingVersion: missingVersionCount,
     missingResolved: missingResolvedCount,
     missingIntegrity: missingIntegrityCount,
   };
@@ -198,6 +205,7 @@ export function printSummaryAndExit(result) {
   console.log(`Total Package Entries:   ${summary.totalEntries}`);
   console.log(`Inspected Registry Pkgs: ${summary.inspected}`);
   console.log(`Valid Exceptions:        ${summary.exceptions}`);
+  console.log(`Missing "version":       ${summary.missingVersion}`);
   console.log(`Missing "resolved":      ${summary.missingResolved}`);
   console.log(`Missing "integrity":     ${summary.missingIntegrity}`);
 

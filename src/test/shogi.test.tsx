@@ -15,6 +15,7 @@ import {
 } from '../types/shogi';
 import { ShogiBoard } from '../components/shogi/ShogiBoard';
 import { validateLockfile } from '../../scripts/verify-lockfile.mjs';
+import { verifyMacOsFsevents } from '../../scripts/verify-macos-fsevents.mjs';
 
 describe('1. Node.js 24系・npm・環境・設定ファイルの検証', () => {
   const rootDir = process.cwd();
@@ -32,11 +33,10 @@ describe('1. Node.js 24系・npm・環境・設定ファイルの検証', () => 
     expect(packageJson.packageManager).toBe('npm@11.17.0');
   });
 
-  it('Node.js の engines.node が Node.js 24.15.0 以上 25 未満を指定していること', () => {
+  it('Node.js の engines.node が Node.js 24.15.0 以上 25 未満、npm が >=11.17.0 <12 を指定していること', () => {
     expect(packageJson.engines).toBeDefined();
     expect(packageJson.engines.node).toBe('>=24.15.0 <25');
-    expect(packageJson.engines.npm).toBeDefined();
-    expect(packageJson.engines.npm).toMatch(/^>=\d+/);
+    expect(packageJson.engines.npm).toBe('>=11.17.0 <12');
   });
 
   it('package.json の @types/node が ^24.0.0 を指定していること', () => {
@@ -72,6 +72,11 @@ describe('1. Node.js 24系・npm・環境・設定ファイルの検証', () => 
     expect(fs.existsSync(path.resolve(rootDir, 'package-lock.json'))).toBe(true);
     expect(packageLockJson.name).toBe(packageJson.name);
     expect(packageLockJson.lockfileVersion).toBe(3);
+  });
+
+  it('package-lock.json のルート engines.npm が >=11.17.0 <12 であること', () => {
+    const rootPkg = packageLockJson.packages?.[''] || {};
+    expect(rootPkg.engines?.npm).toBe('>=11.17.0 <12');
   });
 
   it('package-lock.json のルート依存関係が package.json と完全一致すること', () => {
@@ -113,8 +118,14 @@ describe('1. Node.js 24系・npm・環境・設定ファイルの検証', () => 
       encoding: 'utf-8',
     });
     expect(output).toContain('SUCCESS: package-lock.json is valid and complete.');
+    expect(output).toContain('Missing "version":       0');
     expect(output).toContain('Missing "resolved":      0');
     expect(output).toContain('Missing "integrity":     0');
+  });
+
+  it('verifyMacOsFsevents スクリプトが正常にロードされ実行できること', async () => {
+    const result = await verifyMacOsFsevents();
+    expect(result.success).toBe(true);
   });
 });
 
@@ -153,6 +164,7 @@ describe('2. ロックファイル検証ロジックの完全一致および否�
     const result = validateLockfile(dir);
     expect(result.valid).toBe(true);
     expect(result.errors).toHaveLength(0);
+    expect(result.summary.missingVersion).toBe(0);
     expect(result.summary.missingResolved).toBe(0);
     expect(result.summary.missingIntegrity).toBe(0);
   });
@@ -197,9 +209,39 @@ describe('2. ロックファイル検証ロジックの完全一致および否�
     expect(result.errors.some((err: string) => err.includes('Version mismatch for devDependencies "vitest"'))).toBe(true);
   });
 
+  it('version を削除すると失敗し、missingVersion が 1 として集計され対象パッケージが特定できること', () => {
+    const modifiedLock = JSON.parse(JSON.stringify(packageLockJson));
+    const targetPkgKey = Object.keys(modifiedLock.packages).find((k) => k !== '');
+    expect(targetPkgKey).toBeDefined();
+    if (targetPkgKey) {
+      delete modifiedLock.packages[targetPkgKey].version;
+    }
+    const dir = setupTempProject(packageJson, modifiedLock);
+    const result = validateLockfile(dir);
+
+    expect(result.valid).toBe(false);
+    expect(result.summary.missingVersion).toBe(1);
+    expect(result.errors.some((err: string) => err.includes(`Package "${targetPkgKey}" is missing "version" field`))).toBe(true);
+  });
+
+  it('link: true や symlink: true の正当な例外エントリは missingVersion に数えられないこと', () => {
+    const modifiedLock = JSON.parse(JSON.stringify(packageLockJson));
+    modifiedLock.packages['node_modules/my-local-link'] = {
+      link: true,
+      // no version, resolved, or integrity
+    };
+    const dir = setupTempProject(packageJson, modifiedLock);
+    const result = validateLockfile(dir);
+
+    expect(result.valid).toBe(true);
+    expect(result.summary.exceptions).toBe(1);
+    expect(result.summary.missingVersion).toBe(0);
+    expect(result.summary.missingResolved).toBe(0);
+    expect(result.summary.missingIntegrity).toBe(0);
+  });
+
   it('resolved を削除すると失敗すること', () => {
     const modifiedLock = JSON.parse(JSON.stringify(packageLockJson));
-    // 任意のパッケージから resolved を削除
     const firstPkgKey = Object.keys(modifiedLock.packages).find((k) => k !== '');
     if (firstPkgKey) {
       delete modifiedLock.packages[firstPkgKey].resolved;

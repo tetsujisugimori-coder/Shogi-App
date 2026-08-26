@@ -12,7 +12,12 @@ permissions:
 
 jobs:
   verify:
-    runs-on: ubuntu-latest
+    name: Verify on ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest]
 
     steps:
       - name: Checkout repository
@@ -44,3 +49,7 @@ jobs:
 
       - name: Run production build
         run: npm run build
+
+      - name: Verify macOS fsevents & file watcher (macOS only)
+        if: runner.os == 'macOS'
+        run: node scripts/verify-macos-fsevents.mjs

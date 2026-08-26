@@ -285,6 +285,114 @@ Node.js 24系移行後に残っていたGitHub ActionsのNode.js 20 Action depre
 - **UI確認**: UI・CSS・コンポーネントコードの変更なし（将棋盤・彫駒・駒台・roving tabindex 等のデザイン・レイアウトはすべて完全維持）。
 - **未解決事項**: なし
 
+---
+
+## [2026-08-26] npm対応バージョン整合・macOS fsevents実機検証基盤・missingVersion集計・ログ事実誤認訂正
+
+### 修正目的
+1. `package.json` の `engines.npm` をプロジェクト標準（`11.17.0`）および `strict-allow-scripts` 要件に即した `">=11.17.0 <12"` へ更新し、`package-lock.json`・テスト・README と整合させる。
+2. `fsevents` のライフサイクルスクリプト内容・依存経路・macOS 実動作を調査し、`allowScripts` における `fsevents: false` の技術的根拠を確立するとともに、macOS 検証スクリプトおよび GitHub Actions CI マトリックス（`macos-latest`）を整備する。
+3. `scripts/verify-lockfile.mjs` に `missingVersion` の集計を追加し、通常パッケージの `version` 欠落件数の明示およびテストを追加する。
+4. `LOG.md` 過去記録の事実誤認（`@types/node` の変更前バージョン）を明示訂正し、前回 CI 警告（`node-domexception@1.0.0`）の依存経路と影響を記録する。
+
+### 変更したファイル一覧
+- `package.json`: `engines.npm` を `">=11.17.0 <12"` へ変更
+- `package-lock.json`: npm `11.17.0` / Node.js `24.19.0` によりルート `engines.npm` を更新
+- `scripts/verify-lockfile.mjs`: `summary.missingVersion` の集計と CLI 出力を追加
+- `scripts/verify-macos-fsevents.mjs`: 新規作成（macOS 上での `fsevents` モジュール読み込み、ネイティブ監視、Vite watcher 動作確認とリソース安全解放）
+- `.github/workflows/ci.yml`: `ubuntu-latest` / `macos-latest` のマトリックス実行と macOS 専用 `verify-macos-fsevents.mjs` ステップを追加
+- `src/test/shogi.test.tsx`: `engines.npm` 一致テスト、`missingVersion` 集計および否定テスト、`verifyMacOsFsevents` 実行テストを追加
+- `README.md`: npm 要件（`>=11.17.0 <12`）、`fsevents: false` の理由、CI マトリックス構成を反映
+- `LOG.md`: 本エントリを末尾に追記
+
+### npm対応バージョンの修正理由と更新方法
+- **修正理由**: 本プロジェクトは npm `11.17.0` を標準パッケージマネージャーとしており、`.npmrc` で使用している `strict-allow-scripts` 関連機能は npm 11.17 以降で保証されるため。また、npm 12 は現時点でサポート対象外であるため、要件を `">=11.17.0 <12"` とした。
+- **更新方法**: `package-lock.json` の手動編集は行わず、Node.js `24.19.0` / npm `11.17.0` 環境下で `npm install --package-lock-only` を実行してルート `engines.npm` を更新。
+
+### fsevents の調査内容・macOS 検証・最終判断
+- **依存経路**:
+  - `vite@6.4.3` -> `optionalDependencies: { "fsevents": "~2.3.3" }`
+  - `rollup@4.63.0` -> `optionalDependencies: { "fsevents": "~2.3.2" }`
+  - `tsx@4.23.12` -> `optionalDependencies: { "fsevents": "~2.3.3" }`
+- **install script の確認内容**:
+  - 解決バージョン: `fsevents@2.3.3`
+  - lifecycle script: `"install": "node-gyp rebuild"`
+  - 調査事実: `fsevents@2.3.3` の npm 配布 tarball にはコンパイル済みのバイナリ `fsevents.node` (163.6kB) が同梱されている。`fsevents.js` は直接 `require("./fsevents.node")` を呼び出すため、`node-gyp rebuild` を実行しなくてもネイティブ監視機能を利用可能である。
+- **macOS 検証の実装**:
+  - `scripts/verify-macos-fsevents.mjs` を実装し、macOS 上で以下を検証できるようにした：
+    1. `require('fsevents')` の正常ロードと API エクスポート（`watch`, `getInfo`）
+    2. 一時ディレクトリ（`os.tmpdir()`）でのネイティブファイル変更イベント受信とウォッチャー停止
+    3. Vite dev サーバー watcher によるファイル変更検知およびサーバー停止・一時ファイル安全削除（`try...finally`）
+  - `.github/workflows/ci.yml` に `macos-latest` マトリックスを追加し、CI 上で継続的に検証可能とした。
+- **最終判断と根拠**:
+  - **判断**: `allowScripts` で `fsevents: false` を維持する（拒否）。
+  - **根拠**: ビルド済みバイナリが同梱されているため、スクリプト実行を拒否しても macOS 上でのファイル監視・Vite dev 動作に一切支障がなく、不要なビルドスクリプト実行を防ぐことができるため。
+
+### ロックファイル検証における missingVersion 集計とテスト
+- `scripts/verify-lockfile.mjs` の `validateLockfile` に `missingVersion` カウントを追加。
+- 出力サマリーに `Missing "version": <count>` を追加。
+- `src/test/shogi.test.tsx` に以下の自動テストを追加：
+  - 正常なロックファイルで `missingVersion === 0`
+  - `version` を削除した際に `valid === false`、`summary.missingVersion === 1`、対象パッケージ名がエラーに含まれること
+  - `link: true` や `symlink: true` の正当な例外エントリは `missingVersion` に加算されないこと
+  - 既存の `missingResolved` / `missingIntegrity` の集計が維持されていること
+
+### 事実誤認の訂正（@types/node 変更前情報）
+- **【訂正】** 前回の `LOG.md`（2026-08-26 GitHub Actions v7移行の項）において、`@types/node` の変更前バージョンを「`^20.19.33`」と記録しておりましたが、これは事実誤認でした。
+- **実際の変更前状態**:
+  - `package.json`: `^22.14.0`
+  - `package-lock.json` の解決バージョン: `22.20.1`
+
+### 前回CIおよび警告の記録
+- **前回 CI URL**: `https://github.com/tetsujisugimori-coder/Shogi-App/actions/runs/33009508904`
+- **前回 CI Run ID**: `33009508904`
+- **`node-domexception@1.0.0` の deprecated 警告について**:
+  - **依存経路**: `@google/genai@2.19.0` -> `google-auth-library@10.9.1` -> `gaxios@7.3.1` -> `node-fetch@3.3.2` -> `fetch-blob@3.2.0` -> `node-domexception@1.0.0`
+  - **警告内容**: `node-domexception@1.0.0: Use your platform's native DOMException instead`
+  - **実行への影響**: Node.js 24 にはグローバル `DOMException` が標準搭載されているため、実行時・テスト・ビルド時の機能障害はありません。
+  - **今回修正しなかった理由**: `@google/genai` の推移的依存の深層にあり、個別強制更新を行うと SDK の整合性を損なうリスクがあるため。
+  - **将来の対応候補**: `@google/genai` や `google-auth-library` のアップストリーム更新でネイティブ DOMException へ切り替わった段階で追従する。
+
+### package-lock.json の集計結果
+- **ロックファイル名**: `shogi-app`
+- **lockfileVersion**: `3`
+- **ルート engines.npm**: `">=11.17.0 <12"`
+- **総エントリ数**: `399`（ルート含む）
+- **検査対象パッケージ数**: `398`
+- **正当な例外数**: `0`
+- **`version` 欠落数 (`missingVersion`)**: `0`
+- **`resolved` 欠落数 (`missingResolved`)**: `0`
+- **`integrity` 欠落数 (`missingIntegrity`)**: `0`
+- **`@types/node` 解決バージョン**: `24.13.3`
+- **dependencies 完全一致**: 一致（11パッケージ完全合致）
+- **devDependencies 完全一致**: 一致（13パッケージ完全合致）
+
+### 実行した検証コマンドと結果
+- `node --version`: `v24.19.0` (終了コード 0)
+- `npm --version`: `11.17.0` (終了コード 0)
+- `npm ci`: 正常終了 (終了コード 0, audited 303 packages in 6s, 0 vulnerabilities)
+- `npm run verify:lock`: 正常終了 (終了コード 0, missingVersion: 0, missingResolved: 0, missingIntegrity: 0)
+- `npm run lint` (`tsc --noEmit`): 型エラー 0件で正常終了 (終了コード 0)
+- `npm test` (`vitest run`): 全43テストすべて合格 (終了コード 0, 43 passed in 1.43s)
+- `npm run build`: 本番ビルド正常完了 (終了コード 0, dist/ 出力)
+- `npm run clean`: 正常終了 (終了コード 0, `dist` 削除)
+- clean後の `npm run build`: 正常完了 (終了コード 0)
+- `npm run check`: 正常終了 (終了コード 0, verify:lock → lint → test → build 一括成功)
+- `node scripts/verify-macos-fsevents.mjs`: 正常終了 (終了コード 0, プラットフォーム検査・メタデータ整合確認)
+
+### テスト結果内訳
+- **テスト総数**: 43
+- **成功数**: 43
+- **失敗数**: 0
+- **skipped数**: 0
+
+### 確認・未確認・未解決事項
+- **UI確認**: UI・CSS・コンポーネントコードの変更なし（将棋盤、本黄楊彫駒、本榧盤、星印、リムライト、駒台、roving tabindex 等のデザイン・レイアウト・動作仕様はすべて完全維持）。ブラウザ目視確認は UI ファイルを変更していないため未実施。
+- **GitHub Actions**: ワークフロー定義（`ubuntu-latest` / `macos-latest` マトリックス）の設定完了。リモート実行についてはワークフロー定義のみ確認、リモート実行未確認。
+- **残った警告**: `node-domexception@1.0.0` の deprecated 警告（`@google/genai` 深層依存）。install script 関連警告はゼロ。
+- **未解決事項**: なし
+
+
 
 
 

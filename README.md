@@ -31,9 +31,10 @@
 | :--- | :--- | :--- |
 | **Node.js 最低動作要件** | `24.15.0` (`>=24.15.0 <25`) | 現在固定されている依存パッケージ（`jsdom 30.0.1`等）が必要とする最低ライン |
 | **Node.js 推奨・標準環境** | `24.19.0` LTS | 開発・テスト・検証で実際に使用する推奨LTSバージョン（`.nvmrc` に固定） |
-| **CI 検証環境** | `24.19.0` | GitHub Actions で実行する検証環境 |
-| **対応メジャーバージョン** | **Node.js 24系** | Node.js 20, 21, 22, 23, 25 はサポート対象外（Node.js 26 は今回未サポート） |
+| **npm 動作要件** | `11.17.0` (`>=11.17.0 <12`) | `strict-allow-scripts` 機能をセキュアに利用するための要件（npm 12系は今回未サポート） |
 | **パッケージマネージャー** | `npm@11.17.0` | 本リポジトリ唯一の標準パッケージマネージャー（`packageManager` に明記） |
+| **CI 検証環境** | `24.19.0` (Linux / macOS) | GitHub Actions で実行する検証環境（`ubuntu-latest`, `macos-latest`） |
+| **対応メジャーバージョン** | **Node.js 24系** | Node.js 20, 21, 22, 23, 25 はサポート対象外（Node.js 26 は今回未サポート） |
 
 > **注意 (Windows をご利用の方へ)**:
 > Windows 環境（PowerShell / コマンドプロンプト）では `.nvmrc` が自動で読み込まれない場合があります。
@@ -117,11 +118,21 @@ npm run clean
 
 npm 11.17 以降のセキュアなスクリプト実行制御に準拠し、依存パッケージの install script を明示的に審査・管理しています：
 
-- **許可・拒否の管理**: `package.json` の `allowScripts` フィールドで各パッケージのスクリプト実行許可（`true`）／拒否（`false`）を個別に指定します（例: ビルドに必須な `esbuild` は `true`、単なる表示のみの `@google/genai`, `protobufjs`, `fsevents` は `false`）。
+- **許可・拒否の個別管理**: `package.json` の `allowScripts` フィールドで各パッケージのスクリプト実行許可（`true`）／拒否（`false`）を個別に指定します：
+  - `esbuild`: `true`（Vite・テスト・ビルドに必要なバイナリインストーラー）
+  - `@google/genai`: `false`（不要な no-op スクリプト）
+  - `protobufjs`: `false`（非推奨警告メッセージ表示のみ）
+  - `fsevents`: `false`（`fsevents@2.3.3` は pre-built の `fsevents.node` バイナリを同梱して配布しているため、`node-gyp rebuild` は不要であり、拒否設定でも macOS ネイティブファイル監視および Vite は正常に動作します）
 - **未審査スクリプトの遮断**: `.npmrc` に `strict-allow-scripts=true` を設定しているため、`allowScripts` に記載のない未審査のスクリプトが存在する場合、`npm ci` / `npm install` はエラーとなり実行が停止します。
 - **新しい依存関係追加時の運用**: 新たにパッケージを追加・更新する際は、必ず install script（`preinstall`, `install`, `postinstall`）の有無と処理内容を確認し、真にビルドや動作に不可欠なもののみを許可してください（安易に全スクリプトを許可したり `--dangerously-allow-all-scripts` を使用しないこと）。
 
 ---
 
 ## CI / CD
-GitHub Actions（`.github/workflows/ci.yml`）により、main/master ブランチへの push、pull request、および手動実行（`workflow_dispatch`）時に Node.js `24.19.0` 上で `npm ci` → `npm run verify:lock` → `npm run lint` → `npm test` → `npm run build` が自動実行されます。
+GitHub Actions（`.github/workflows/ci.yml`）により、main/master ブランチへの push、pull request、および手動実行（`workflow_dispatch`）時に、Linux（`ubuntu-latest`）および macOS（`macos-latest`）の両 OS 環境において Node.js `24.19.0` 上で以下の一貫したパイプラインが自動実行されます：
+- `npm ci`（依存関係インストール・スクリプト遮断検証）
+- `npm run verify:lock`（ロックファイル完全性検証・欠落集計）
+- `npm run lint`（TypeScript 型チェック）
+- `npm test`（Vitest テストスイート）
+- `npm run build`（本番ビルド）
+- `node scripts/verify-macos-fsevents.mjs`（macOS環境でのみ実行: `fsevents` ネイティブ監視・Vite watcher 動作確認）
