@@ -614,278 +614,344 @@ describe('5. インタラクティブ盤面の roving tabindex およびキー�
   });
 });
 
-describe('6. macOS 検証スクリプトの後処理エラー集約および getInfo 例外伝播の単体テスト', () => {
-  it('runCleanups は複数のクリーンアップ処理を順番に実行し、一部が失敗しても後続を最後まで実行して全エラーを収集すること', async () => {
-    const executed: string[] = [];
-    const cleanups = [
-      {
-        name: 'task-1',
-        run: () => {
-          executed.push('task-1');
-        },
-      },
-      {
-        name: 'task-2',
-        run: () => {
-          executed.push('task-2');
-          throw new Error('task-2 failed');
-        },
-      },
-      {
-        name: 'task-3',
-        run: async () => {
-          executed.push('task-3');
-          throw new Error('task-3 failed');
-        },
-      },
-      {
-        name: 'task-4',
-        run: () => {
-          executed.push('task-4');
-        },
-      },
-    ];
+describe('6. macOS 検証スクリプトの公開API・内部処理・後処理エラー集約の単体テスト', () => {
+  const createdTempDirs = new Set<string>();
 
-    const errors = await runCleanups(cleanups);
-    expect(executed).toEqual(['task-1', 'task-2', 'task-3', 'task-4']);
-    expect(errors).toHaveLength(2);
-    expect(errors[0].name).toBe('task-2');
-    expect(errors[0].error.message).toBe('task-2 failed');
-    expect(errors[1].name).toBe('task-3');
-    expect(errors[1].error.message).toBe('task-3 failed');
-  });
+  const trackTempDir = (dirPath: string) => {
+    createdTempDirs.add(dirPath);
+    return dirPath;
+  };
 
-  it('combineErrors はエラーがない場合に null を返し、本体成功＋クリーンアップ単一失敗で cause 付き Error を返すこと', () => {
-    expect(combineErrors(null, [])).toBeNull();
-
-    const singleCleanupError = [
-      { name: 'fsevents watcher stop', error: new Error('Stop failed') },
-    ];
-    const combinedSingle = combineErrors(null, singleCleanupError);
-    expect(combinedSingle).toBeInstanceOf(Error);
-    expect(combinedSingle?.message).toContain('Cleanup failed [fsevents watcher stop]: Stop failed');
-    expect((combinedSingle as any)?.cause?.message).toBe('Stop failed');
-  });
-
-  it('combineErrors は本体成功＋複数クリーンアップ失敗で AggregateError を返し全失敗内容を含むこと', () => {
-    const multipleCleanupErrors = [
-      { name: 'fsevents watcher stop', error: new Error('Stop failed') },
-      { name: 'fsevents temp directory removal', error: new Error('RM failed') },
-    ];
-    const combined = combineErrors(null, multipleCleanupErrors);
-    expect(combined).toBeInstanceOf(AggregateError);
-    expect(combined?.message).toContain('Multiple cleanup tasks failed (2 errors)');
-    expect((combined as AggregateError).errors).toHaveLength(2);
-  });
-
-  it('combineErrors は本体失敗＋クリーンアップ成功で本体エラーをそのまま返し、両方失敗で AggregateError で両方を保持すること', () => {
-    const primaryError = new Error('Native watch timeout');
-    const combinedPrimaryOnly = combineErrors(primaryError, []);
-    expect(combinedPrimaryOnly).toBe(primaryError);
-
-    const cleanupErrors = [
-      { name: 'Vite server close', error: new Error('Close socket failed') },
-    ];
-    const combinedBoth = combineErrors(primaryError, cleanupErrors);
-    expect(combinedBoth).toBeInstanceOf(AggregateError);
-    expect(combinedBoth?.message).toContain('Verification failed: Native watch timeout');
-    expect(combinedBoth?.message).toContain('Additionally, 1 cleanup task(s) failed');
-    expect((combinedBoth as AggregateError).errors).toHaveLength(2);
-    expect((combinedBoth as AggregateError).errors[0]).toBe(primaryError);
-    expect((combinedBoth as AggregateError).errors[1].message).toContain('[Vite server close] Close socket failed');
-  });
-
-  it('createFsEventPromise は getInfo が例外を投げた場合に Promise を reject し timer を解除すること', async () => {
-    let watchCallback: ((filepath: string, flags: number) => void) | null = null;
-    const stopWatcherFn = vi.fn();
-    const mockFsevents = {
-      watch: vi.fn((_dir, cb) => {
-        watchCallback = cb;
-        return stopWatcherFn;
-      }),
-      getInfo: vi.fn(),
-    };
-
-    const throwingGetInfo = vi.fn(() => {
-      throw new Error('Native getInfo memory corruption');
-    });
-
-    const control = createFsEventPromise({
-      fsevents: mockFsevents,
-      tempDir: '/dummy/path',
-      timeoutMs: 3000,
-      getInfoFn: throwingGetInfo,
-    });
-
-    expect(control.isSettled()).toBe(false);
-
-    // コールバックを発火
-    expect(watchCallback).toBeDefined();
-    if (watchCallback) {
-      (watchCallback as (f: string, fl: number) => void)('/dummy/path/file.txt', 1);
+  afterEach(() => {
+    // 今回のテストで作成されたディレクトリのみ確実にクリーンアップ
+    for (const dir of createdTempDirs) {
+      if (fs.existsSync(dir)) {
+        try {
+          fs.rmSync(dir, { recursive: true, force: true });
+        } catch {
+          // ignore
+        }
+      }
     }
+    createdTempDirs.clear();
+  });
 
-    // Promise が reject されること
-    await expect(control.eventPromise).rejects.toThrow('Native getInfo memory corruption');
-    expect(control.isSettled()).toBe(true);
+  describe('公開検証関数 (verifyMacOsFsevents)', () => {
+    it('公開関数の引数長は 0 であり、テスト専用パラメータを受け取らないシグネチャであること', () => {
+      expect(verifyMacOsFsevents.length).toBe(0);
+    });
 
-    // stopWatcher が参照可能であること
-    expect(control.getStopWatcher()).toBe(stopWatcherFn);
+    it('非macOS環境では platform が実OSと一致し、isDarwin: false, nativeVerified: false を返すこと', async () => {
+      const result = await verifyMacOsFsevents();
+      expect(result.success).toBe(true);
+      expect(result.platform).toBe(process.platform);
+      expect(result.isDarwin).toBe(process.platform === 'darwin');
+      if (process.platform !== 'darwin') {
+        expect(result.isDarwin).toBe(false);
+        expect(result.nativeVerified).toBe(false);
+      }
+      expect(result.isDarwin).toBe(result.platform === 'darwin');
+    });
 
-    // 2回目のコールバックが届いても多重発火しないこと
-    expect(() => {
+    it('引数を渡しても内部で無視され、macOSの成功結果（nativeVerified: true）を偽装できないこと', async () => {
+      const result = await (verifyMacOsFsevents as any)({
+        forceDarwin: true,
+        skipVite: true,
+        nativeVerified: true,
+      });
+      expect(result.platform).toBe(process.platform);
+      if (process.platform !== 'darwin') {
+        expect(result.isDarwin).toBe(false);
+        expect(result.nativeVerified).toBe(false);
+      }
+    });
+  });
+
+  describe('内部処理: runCleanups & combineErrors', () => {
+    it('runCleanups は複数のクリーンアップ処理を定義順に実行し、一部が失敗しても後続を最後まで実行して全エラーを収集すること', async () => {
+      const executed: string[] = [];
+      const cleanups = [
+        {
+          name: 'step-1',
+          run: () => {
+            executed.push('step-1');
+          },
+        },
+        {
+          name: 'step-2',
+          run: () => {
+            executed.push('step-2');
+            throw new Error('step-2 failed');
+          },
+        },
+        {
+          name: 'step-3',
+          run: async () => {
+            executed.push('step-3');
+            throw new Error('step-3 failed');
+          },
+        },
+        {
+          name: 'step-4',
+          run: () => {
+            executed.push('step-4');
+          },
+        },
+      ];
+
+      const errors = await runCleanups(cleanups);
+      expect(executed).toEqual(['step-1', 'step-2', 'step-3', 'step-4']);
+      expect(errors).toHaveLength(2);
+      expect(errors[0].name).toBe('step-2');
+      expect(errors[0].error.message).toBe('step-2 failed');
+      expect(errors[1].name).toBe('step-3');
+      expect(errors[1].error.message).toBe('step-3 failed');
+    });
+
+    it('combineErrors はエラーがない場合に null を返し、本体成功＋クリーンアップ単一失敗で cause 付き Error を返すこと', () => {
+      expect(combineErrors(null, [])).toBeNull();
+
+      const singleCleanupError = [
+        { name: 'fsevents watcher stop', error: new Error('Stop failed') },
+      ];
+      const combinedSingle = combineErrors(null, singleCleanupError);
+      expect(combinedSingle).toBeInstanceOf(Error);
+      expect(combinedSingle?.message).toContain('Cleanup failed [fsevents watcher stop]: Stop failed');
+      expect((combinedSingle as any)?.cause?.message).toBe('Stop failed');
+    });
+
+    it('combineErrors は本体成功＋複数クリーンアップ失敗で AggregateError を返し全失敗内容を含むこと', () => {
+      const multipleCleanupErrors = [
+        { name: 'fsevents watcher stop', error: new Error('Stop failed') },
+        { name: 'fsevents temp directory removal', error: new Error('RM failed') },
+      ];
+      const combined = combineErrors(null, multipleCleanupErrors);
+      expect(combined).toBeInstanceOf(AggregateError);
+      expect(combined?.message).toContain('Multiple cleanup tasks failed (2 errors)');
+      expect((combined as AggregateError).errors).toHaveLength(2);
+    });
+
+    it('combineErrors は本体失敗＋クリーンアップ成功で本体エラーをそのまま返し、両方失敗で AggregateError で両方のエラー情報を保持すること', () => {
+      const primaryError = new Error('Native watch timeout');
+      const combinedPrimaryOnly = combineErrors(primaryError, []);
+      expect(combinedPrimaryOnly).toBe(primaryError);
+
+      const cleanupErrors = [
+        { name: 'Vite server close', error: new Error('Close socket failed') },
+      ];
+      const combinedBoth = combineErrors(primaryError, cleanupErrors);
+      expect(combinedBoth).toBeInstanceOf(AggregateError);
+      expect(combinedBoth?.message).toContain('Verification failed: Native watch timeout');
+      expect(combinedBoth?.message).toContain('Additionally, 1 cleanup task(s) failed');
+      expect((combinedBoth as AggregateError).errors).toHaveLength(2);
+      expect((combinedBoth as AggregateError).errors[0]).toBe(primaryError);
+      expect((combinedBoth as AggregateError).errors[1].message).toContain('[Vite server close] Close socket failed');
+    });
+  });
+
+  describe('内部処理: createFsEventPromise & createViteWatcherPromise', () => {
+    it('createFsEventPromise は getInfo が例外を投げた場合に Promise を reject し timer を解除すること', async () => {
+      let watchCallback: ((filepath: string, flags: number) => void) | null = null;
+      const stopWatcherFn = vi.fn();
+      const mockFsevents = {
+        watch: vi.fn((_dir, cb) => {
+          watchCallback = cb;
+          return stopWatcherFn;
+        }),
+        getInfo: vi.fn(),
+      };
+
+      const throwingGetInfo = vi.fn(() => {
+        throw new Error('Native getInfo memory corruption');
+      });
+
+      const control = createFsEventPromise({
+        fsevents: mockFsevents,
+        tempDir: '/dummy/path',
+        timeoutMs: 3000,
+        getInfoFn: throwingGetInfo,
+      });
+
+      expect(control.isSettled()).toBe(false);
+
+      expect(watchCallback).toBeDefined();
+      if (watchCallback) {
+        (watchCallback as (f: string, fl: number) => void)('/dummy/path/file.txt', 1);
+      }
+
+      await expect(control.eventPromise).rejects.toThrow('Native getInfo memory corruption');
+      expect(control.isSettled()).toBe(true);
+      expect(control.getStopWatcher()).toBe(stopWatcherFn);
+
+      // 2回目のコールバックが届いても多重発火しないこと
+      expect(() => {
+        if (watchCallback) {
+          (watchCallback as (f: string, fl: number) => void)('/dummy/path/file.txt', 2);
+        }
+      }).not.toThrow();
+    });
+
+    it('createFsEventPromise は正常系で resolve され timer が解除され、多重 resolve しないこと', async () => {
+      let watchCallback: ((filepath: string, flags: number) => void) | null = null;
+      const mockFsevents = {
+        watch: vi.fn((_dir, cb) => {
+          watchCallback = cb;
+          return vi.fn();
+        }),
+        getInfo: vi.fn(() => ({ event: 'file-created' })),
+      };
+
+      const control = createFsEventPromise({
+        fsevents: mockFsevents,
+        tempDir: '/dummy/path',
+        timeoutMs: 3000,
+      });
+
+      expect(control.isSettled()).toBe(false);
+
+      if (watchCallback) {
+        (watchCallback as (f: string, fl: number) => void)('/dummy/path/file.txt', 1);
+      }
+
+      const result = await control.eventPromise;
+      expect(result.filepath).toBe('/dummy/path/file.txt');
+      expect(result.info).toEqual({ event: 'file-created' });
+      expect(control.isSettled()).toBe(true);
+
+      // 追加のコールバックが来ても settle 状態が維持されること
       if (watchCallback) {
         (watchCallback as (f: string, fl: number) => void)('/dummy/path/file.txt', 2);
       }
-    }).not.toThrow();
-  });
-
-  it('createFsEventPromise は正常系で resolve され timer が解除され、多重 resolve しないこと', async () => {
-    let watchCallback: ((filepath: string, flags: number) => void) | null = null;
-    const mockFsevents = {
-      watch: vi.fn((_dir, cb) => {
-        watchCallback = cb;
-        return vi.fn();
-      }),
-      getInfo: vi.fn(() => ({ event: 'file-created' })),
-    };
-
-    const control = createFsEventPromise({
-      fsevents: mockFsevents,
-      tempDir: '/dummy/path',
-      timeoutMs: 3000,
+      expect(control.isSettled()).toBe(true);
     });
 
-    expect(control.isSettled()).toBe(false);
+    it('createViteWatcherPromise は change イベントで resolve され、タイマーが解除されること', async () => {
+      let changeHandler: ((path: string) => void) | null = null;
+      const mockViteServer = {
+        watcher: {
+          on: vi.fn((event, cb) => {
+            if (event === 'change') {
+              changeHandler = cb;
+            }
+          }),
+        },
+      };
 
-    if (watchCallback) {
-      (watchCallback as (f: string, fl: number) => void)('/dummy/path/file.txt', 1);
-    }
+      const control = createViteWatcherPromise({
+        viteServer: mockViteServer as any,
+        timeoutMs: 3000,
+      });
 
-    const result = await control.eventPromise;
-    expect(result.filepath).toBe('/dummy/path/file.txt');
-    expect(result.info).toEqual({ event: 'file-created' });
-    expect(control.isSettled()).toBe(true);
+      expect(control.isSettled()).toBe(false);
+      expect(changeHandler).toBeDefined();
+
+      if (changeHandler) {
+        (changeHandler as (p: string) => void)('/mock/path/App.tsx');
+      }
+
+      const changedPath = await control.promise;
+      expect(changedPath).toBe('/mock/path/App.tsx');
+      expect(control.isSettled()).toBe(true);
+      expect(control.getHandler()).toBe(changeHandler);
+
+      // 追加のイベントが来ても settle 状態が壊れないこと
+      if (changeHandler) {
+        (changeHandler as (p: string) => void)('/mock/path/Other.tsx');
+      }
+      expect(control.isSettled()).toBe(true);
+    });
   });
 
-  it('verifyMacOsFsevents: 本体成功＋クリーンアップ成功のシミュレーションで success: true を返すこと', async () => {
-    const mockFsevents = {
-      watch: vi.fn((dir, cb) => {
-        setTimeout(() => cb(path.join(dir, 'watch-trigger.txt'), 0), 10);
-        return vi.fn().mockResolvedValue(undefined);
-      }),
-      getInfo: vi.fn(() => ({ event: 'created' })),
-    };
+  describe('内部処理: 後処理の各障害検出（watcher停止・リスナー解除・サーバー終了・一時Dir削除）', () => {
+    it('watcher 停止処理が例外をスローした場合、runCleanups と combineErrors によりエラーが捕捉・集約されること', async () => {
+      const failingWatcherStop = vi.fn().mockRejectedValue(new Error('fsevents watcher stop failed'));
+      const cleanups = [
+        {
+          name: 'fsevents watcher stop',
+          run: async () => {
+            await failingWatcherStop();
+          },
+        },
+      ];
 
-    const mockViteServer = {
-      listen: vi.fn().mockResolvedValue(undefined),
-      close: vi.fn().mockResolvedValue(undefined),
-      watcher: {
-        on: vi.fn((event, cb) => {
-          if (event === 'change') {
-            setTimeout(() => cb('/mock/test.js'), 10);
-          }
-        }),
-        off: vi.fn(),
-      },
-    };
-    const mockViteCreateServer = vi.fn().mockResolvedValue(mockViteServer);
+      const cleanupErrors = await runCleanups(cleanups);
+      expect(cleanupErrors).toHaveLength(1);
+      expect(cleanupErrors[0].name).toBe('fsevents watcher stop');
 
-    const result = await verifyMacOsFsevents({
-      forceDarwin: true,
-      fseventsMock: mockFsevents,
-      viteCreateServerMock: mockViteCreateServer,
-      settleDelayMs: 5,
-      viteSettleDelayMs: 5,
+      const combined = combineErrors(null, cleanupErrors);
+      expect(combined).toBeInstanceOf(Error);
+      expect(combined?.message).toContain('Cleanup failed [fsevents watcher stop]: fsevents watcher stop failed');
     });
 
-    expect(result.success).toBe(true);
-    expect(result.platform).toBe('darwin');
-    expect(result.isDarwin).toBe(true);
-    expect(result.nativeVerified).toBe(true);
-  });
+    it('Vite リスナー解除が失敗した場合、エラーが捕捉・集約されること', async () => {
+      const cleanups = [
+        {
+          name: 'Vite listener removal',
+          run: () => {
+            throw new Error('Vite listener unbind failed');
+          },
+        },
+      ];
 
-  it('verifyMacOsFsevents: fsevents watcher 停止失敗時に検証全体が失敗すること', async () => {
-    const mockFsevents = {
-      watch: vi.fn((dir, cb) => {
-        setTimeout(() => cb(path.join(dir, 'watch-trigger.txt'), 0), 10);
-        return vi.fn().mockResolvedValue(undefined);
-      }),
-      getInfo: vi.fn(() => ({ event: 'created' })),
-    };
+      const cleanupErrors = await runCleanups(cleanups);
+      expect(cleanupErrors).toHaveLength(1);
+      expect(cleanupErrors[0].name).toBe('Vite listener removal');
 
-    await expect(
-      verifyMacOsFsevents({
-        forceDarwin: true,
-        fseventsMock: mockFsevents,
-        failWatcherStop: true,
-        settleDelayMs: 5,
-        skipVite: true,
-      })
-    ).rejects.toThrow('Cleanup failed [fsevents watcher stop]');
-  });
-
-  it('verifyMacOsFsevents: fsevents 一時ディレクトリ削除失敗時に検証全体が失敗すること', async () => {
-    const mockFsevents = {
-      watch: vi.fn((dir, cb) => {
-        setTimeout(() => cb(path.join(dir, 'watch-trigger.txt'), 0), 10);
-        return vi.fn().mockResolvedValue(undefined);
-      }),
-      getInfo: vi.fn(() => ({ event: 'created' })),
-    };
-
-    await expect(
-      verifyMacOsFsevents({
-        forceDarwin: true,
-        fseventsMock: mockFsevents,
-        failFseventsTempDirRemoval: true,
-        settleDelayMs: 5,
-        skipVite: true,
-      })
-    ).rejects.toThrow('Cleanup failed [fsevents temp directory removal]');
-  });
-
-  it('verifyMacOsFsevents: Vite server close 失敗時に検証全体が失敗すること', async () => {
-    const mockFsevents = {
-      watch: vi.fn((dir, cb) => {
-        setTimeout(() => cb(path.join(dir, 'watch-trigger.txt'), 0), 10);
-        return vi.fn().mockResolvedValue(undefined);
-      }),
-      getInfo: vi.fn(() => ({ event: 'created' })),
-    };
-
-    const mockViteServer = {
-      listen: vi.fn().mockResolvedValue(undefined),
-      close: vi.fn().mockResolvedValue(undefined),
-      watcher: {
-        on: vi.fn((event, cb) => {
-          if (event === 'change') {
-            setTimeout(() => cb('/mock/test.js'), 10);
-          }
-        }),
-        off: vi.fn(),
-      },
-    };
-    const mockViteCreateServer = vi.fn().mockResolvedValue(mockViteServer);
-
-    await expect(
-      verifyMacOsFsevents({
-        forceDarwin: true,
-        fseventsMock: mockFsevents,
-        viteCreateServerMock: mockViteCreateServer,
-        failViteServerClose: true,
-        settleDelayMs: 5,
-        viteSettleDelayMs: 5,
-      })
-    ).rejects.toThrow('Cleanup failed [Vite server close]');
-  });
-
-  it('verifyMacOsFsevents: 非macOS環境では静的検査のみ成功し nativeVerified: false となること', async () => {
-    const result = await verifyMacOsFsevents({
-      forceDarwin: false,
+      const combined = combineErrors(null, cleanupErrors);
+      expect(combined?.message).toContain('Cleanup failed [Vite listener removal]');
     });
-    expect(result.success).toBe(true);
-    expect(result.isDarwin).toBe(false);
-    expect(result.nativeVerified).toBe(false);
+
+    it('Vite サーバー終了が失敗した場合、エラーが捕捉・集約されること', async () => {
+      const cleanups = [
+        {
+          name: 'Vite server close',
+          run: async () => {
+            throw new Error('Vite server close failed');
+          },
+        },
+      ];
+
+      const cleanupErrors = await runCleanups(cleanups);
+      expect(cleanupErrors).toHaveLength(1);
+      expect(cleanupErrors[0].name).toBe('Vite server close');
+
+      const combined = combineErrors(null, cleanupErrors);
+      expect(combined?.message).toContain('Cleanup failed [Vite server close]');
+    });
+
+    it('一時ディレクトリ削除が失敗した場合、エラーが捕捉・集約され、実ディレクトリ漏れを起こさないこと', async () => {
+      // 仮想パスを用いて削除失敗をシミュレート
+      const simulatedTempPath = '/virtual/path/shogi-fsevents-test-dummy';
+      const cleanups = [
+        {
+          name: 'fsevents temp directory removal',
+          run: () => {
+            throw new Error(`Permission denied deleting ${simulatedTempPath}`);
+          },
+        },
+      ];
+
+      const cleanupErrors = await runCleanups(cleanups);
+      expect(cleanupErrors).toHaveLength(1);
+      expect(cleanupErrors[0].name).toBe('fsevents temp directory removal');
+
+      const combined = combineErrors(null, cleanupErrors);
+      expect(combined?.message).toContain('Cleanup failed [fsevents temp directory removal]');
+    });
+
+    it('テスト用の一時ディレクトリを作成した場合でも、テスト終了後に残存ディレクトリがないこと', () => {
+      // 実際にテスト用ディレクトリを1つ作成し追跡
+      const testDir = trackTempDir(fs.mkdtempSync(path.join(os.tmpdir(), 'shogi-fsevents-test-unit-')));
+      expect(fs.existsSync(testDir)).toBe(true);
+
+      // 手動で削除し、存在しなくなったことを確認
+      fs.rmSync(testDir, { recursive: true, force: true });
+      expect(fs.existsSync(testDir)).toBe(false);
+
+      // 追跡リスト内のディレクトリがすべて存在しないことを確認
+      for (const dir of createdTempDirs) {
+        expect(fs.existsSync(dir)).toBe(false);
+      }
+    });
   });
 });

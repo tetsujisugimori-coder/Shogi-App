@@ -214,27 +214,15 @@ export function createViteWatcherPromise({ viteServer, timeoutMs = 6000 }) {
 
 /**
  * Verifies fsevents loading, native watching, and Vite file watcher functionality on macOS (darwin).
- * If executed on non-darwin platforms (e.g. Linux CI/container), performs static inspection and logs platform info.
+ * On non-darwin platforms (Linux/Windows), performs static inspection and logs platform info.
+ * This public function accepts no parameters to prevent environment spoofing or step skipping.
  *
- * @param {Object} [options] - Test injection options
- * @param {boolean} [options.forceDarwin] - Override platform detection for tests
- * @param {any} [options.fseventsMock] - Inject fsevents module mock for tests
- * @param {Function} [options.viteCreateServerMock] - Inject Vite createServer mock for tests
- * @param {number} [options.fseventTimeoutMs] - Custom timeout for fsevents
- * @param {number} [options.viteTimeoutMs] - Custom timeout for Vite watcher
- * @param {number} [options.settleDelayMs] - Custom delay before trigger
- * @param {number} [options.viteSettleDelayMs] - Custom delay before Vite trigger
- * @param {Function} [options.getInfoFn] - Custom getInfo function override
- * @param {boolean} [options.failWatcherStop] - Simulate fsevents watcher stop failure
- * @param {boolean} [options.failFseventsTempDirRemoval] - Simulate fsevents tempDir removal failure
- * @param {boolean} [options.failViteListenerRemoval] - Simulate Vite listener removal failure
- * @param {boolean} [options.failViteServerClose] - Simulate Vite server close failure
- * @param {boolean} [options.failViteTempDirRemoval] - Simulate Vite tempDir removal failure
- * @param {boolean} [options.skipVite] - Skip Vite step for isolated fsevents tests
+ * @returns {Promise<{ success: boolean, platform: string, isDarwin: boolean, nativeVerified: boolean }>}
  */
-export async function verifyMacOsFsevents(options = {}) {
-  const isDarwin = options.forceDarwin !== undefined ? options.forceDarwin : process.platform === 'darwin';
-  console.log(`[verify:macos-fsevents] Running on platform: ${process.platform} (${os.type()} ${os.release()})`);
+export async function verifyMacOsFsevents() {
+  const currentPlatform = process.platform;
+  const isDarwin = currentPlatform === 'darwin';
+  console.log(`[verify:macos-fsevents] Running on platform: ${currentPlatform} (${os.type()} ${os.release()})`);
 
   if (!isDarwin) {
     console.log('[verify:macos-fsevents] Current platform is not darwin (macOS).');
@@ -256,7 +244,7 @@ export async function verifyMacOsFsevents(options = {}) {
       }
     }
     console.log('[verify:macos-fsevents] Non-darwin platform static check passed (native macOS watch skipped).');
-    return { success: true, platform: process.platform, isDarwin: false, nativeVerified: false };
+    return { success: true, platform: currentPlatform, isDarwin: false, nativeVerified: false };
   }
 
   // --- macOS (Darwin) verification ---
@@ -265,7 +253,7 @@ export async function verifyMacOsFsevents(options = {}) {
   // 1. Verify fsevents module resolution and loading
   let fsevents;
   try {
-    fsevents = options.fseventsMock || require('fsevents');
+    fsevents = require('fsevents');
     console.log(' [1/3] Successfully required fsevents module on macOS');
   } catch (err) {
     console.error(` [1/3] FAILED to require fsevents: ${err.message}`);
@@ -288,12 +276,11 @@ export async function verifyMacOsFsevents(options = {}) {
     fseventWatcherControl = createFsEventPromise({
       fsevents,
       tempDir,
-      timeoutMs: options.fseventTimeoutMs || 5000,
-      getInfoFn: options.getInfoFn,
+      timeoutMs: 5000,
     });
 
     // Give watcher brief moment to initialize
-    await new Promise((r) => setTimeout(r, options.settleDelayMs || 100));
+    await new Promise((r) => setTimeout(r, 100));
 
     stopWatcher = fseventWatcherControl.getStopWatcher();
 
@@ -315,9 +302,6 @@ export async function verifyMacOsFsevents(options = {}) {
       {
         name: 'fsevents watcher stop',
         run: async () => {
-          if (options.failWatcherStop) {
-            throw new Error('Injected error: failed to stop fsevents watcher');
-          }
           if (stopWatcher) {
             await stopWatcher();
             stopWatcher = null;
@@ -327,9 +311,6 @@ export async function verifyMacOsFsevents(options = {}) {
       {
         name: 'fsevents temp directory removal',
         run: () => {
-          if (options.failFseventsTempDirRemoval) {
-            throw new Error('Injected error: failed to remove fsevents tempDir');
-          }
           if (fs.existsSync(tempDir)) {
             fs.rmSync(tempDir, { recursive: true, force: true });
           }
@@ -345,11 +326,6 @@ export async function verifyMacOsFsevents(options = {}) {
   }
 
   // 3. Test Vite watcher in an isolated directory
-  if (options.skipVite) {
-    console.log('[verify:macos-fsevents] Vite watcher step skipped per options.');
-    return { success: true, platform: 'darwin', isDarwin: true, nativeVerified: true };
-  }
-
   console.log(' [3/3] Testing Vite dev watcher integration...');
   const viteTempDir = fs.mkdtempSync(path.join(os.tmpdir(), 'shogi-vite-watch-test-'));
   let viteServer = null;
@@ -357,11 +333,11 @@ export async function verifyMacOsFsevents(options = {}) {
   let vitePrimaryError = null;
 
   try {
-    const createServerFn = options.viteCreateServerMock || (await import('vite')).createServer;
+    const { createServer } = await import('vite');
     fs.writeFileSync(path.join(viteTempDir, 'index.html'), '<html><body>Watcher Test</body></html>', 'utf-8');
     fs.writeFileSync(path.join(viteTempDir, 'test.js'), 'export const a = 1;', 'utf-8');
 
-    viteServer = await createServerFn({
+    viteServer = await createServer({
       root: viteTempDir,
       logLevel: 'error',
       server: {
@@ -374,11 +350,11 @@ export async function verifyMacOsFsevents(options = {}) {
 
     viteWatcherControl = createViteWatcherPromise({
       viteServer,
-      timeoutMs: options.viteTimeoutMs || 6000,
+      timeoutMs: 6000,
     });
 
     // Allow watcher to initialize
-    await new Promise((r) => setTimeout(r, options.viteSettleDelayMs || 200));
+    await new Promise((r) => setTimeout(r, 200));
 
     // Modify file
     fs.appendFileSync(path.join(viteTempDir, 'test.js'), '\nexport const b = 2;');
@@ -396,9 +372,6 @@ export async function verifyMacOsFsevents(options = {}) {
       {
         name: 'Vite listener removal',
         run: () => {
-          if (options.failViteListenerRemoval) {
-            throw new Error('Injected error: failed to remove Vite listener');
-          }
           const handler = viteWatcherControl?.getHandler();
           if (handler && viteServer?.watcher) {
             viteServer.watcher.off('change', handler);
@@ -408,9 +381,6 @@ export async function verifyMacOsFsevents(options = {}) {
       {
         name: 'Vite server close',
         run: async () => {
-          if (options.failViteServerClose) {
-            throw new Error('Injected error: failed to close Vite server');
-          }
           if (viteServer) {
             await viteServer.close();
             viteServer = null;
@@ -420,9 +390,6 @@ export async function verifyMacOsFsevents(options = {}) {
       {
         name: 'Vite temp directory removal',
         run: () => {
-          if (options.failViteTempDirRemoval) {
-            throw new Error('Injected error: failed to remove viteTempDir');
-          }
           if (fs.existsSync(viteTempDir)) {
             fs.rmSync(viteTempDir, { recursive: true, force: true });
           }

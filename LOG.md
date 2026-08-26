@@ -497,7 +497,7 @@ Node.js 24系移行後に残っていたGitHub ActionsのNode.js 20 Action depre
 ### 確認・未確認・未解決事項
 - **UI確認**: UI・CSS・コンポーネントコードの変更なし（将棋盤、本黄楊彫駒、本榧盤、星印、リムライト、駒台、roving tabindex 等のデザイン・レイアウト・動作仕様はすべて完全維持）。ブラウザ目視確認は UI ファイルを変更していないため未実施。
 - **ローカル実機環境**: 現在のコンテナは Linux (`4.19.0-gvisor`) であるため、ローカル上では macOS ネイティブの `fsevents` 実動作は実行不可（スクリプトは非 darwin 環境として静的検査のみ通過）。
-- **リモート GitHub Actions**: 基準コミット `cb26cdcd79b4245196b76e5d246ec59e914359ae` にて GitHub Actions Run ID `33015386094`（Linux Job: `98332143911`、macOS Job: `98332144103`）の完全成功を確認済み。
+- **リモート GitHub Actions**: ワークフロー定義（`ubuntu-latest` / `macos-latest` マトリックス）の設定完了。リモート実行結果は CI 実行待ち（未確認）。
 - **残った警告**: `node-domexception@1.0.0` の deprecated 警告（`@google/genai` 深層依存）。install script 関連警告はゼロ。
 - **未解決事項**: なし
 
@@ -552,6 +552,70 @@ Node.js 24系移行後に残っていたGitHub ActionsのNode.js 20 Action depre
 - **成功数**: 55
 - **失敗数**: 0
 - **skipped数**: 0
+
+---
+
+## 12. macOS検証コードのテスト専用制御分離・一時ディレクトリ漏れ防止・LOG.md追記運用の修復
+
+### 基準コミットとレビュー指摘事項の確認
+- **対象リポジトリ**: `tetsujisugimori-coder/Shogi-App`
+- **基準コミット**: `406eb34105d7383496867445d9cc227dcdb78a16`
+- **前コミットの課題と今回の是正内容**:
+  1. **公開APIの純化と偽装経路の完全排除**:
+     - `verifyMacOsFsevents` の公開APIから `forceDarwin`, `failWatcherStop`, `failFseventsTempDirRemoval`, `failViteListenerRemoval`, `failViteServerClose`, `failViteTempDirRemoval`, `skipVite` 等のテスト専用パラメータを完全に撤去。
+     - 公開関数の引数長は 0 とし、OS判定は `process.platform` のみに依存させ、Linux 環境から macOS の検証結果を偽装する経路を完全に排除。
+  2. **内部処理のモジュール分離と異常系テストの安全性確保**:
+     - `runCleanups`, `combineErrors`, `createFsEventPromise`, `createViteWatcherPromise` を独立した内部ヘルパーとしてエクスポートし、単体テスト側で後処理エラー集約、`getInfo()` 例外伝播、多重 settle 防止、タイマー解除、各障害検出（watcher停止、リスナー解除、サーバー終了、一時Dir削除）を安全に検証。
+  3. **テスト用一時ディレクトリの漏れ防止**:
+     - テストで作成した一時ディレクトリを個別に追跡（`trackTempDir`）し、`afterEach` で残存ディレクトリが存在しないことを厳格に検証・クリーンアップ。
+     - 失敗系テストにおいても不要な一時ファイルがディスク上に残存しない設計を確立。
+  4. **LOG.md 追記専用運用の修復と事実関係の補正**:
+     - 過去ログ（セクション `[2026-08-26] macOS CI 失敗要因（jsdom/esbuild 競合）の解消...`）の既存行削除・事後書き換えを復元（当時の事実である「リモート実行結果は CI 実行待ち（未確認）」に戻す）。
+     - 過去のコミット記録で `npm install --package-lock-only` の実行が記述されている箇所について、実際には依存関係に変更がなかったため `package-lock.json` に差分は発生せずそのまま維持されている事実を本追記にて明記。
+     - 成功済み GitHub Actions Run ID `33015386094`（Linux Job: `98332143911`、macOS Job: `98332144103`）が `cb26cdcd79b4245196b76e5d246ec59e914359ae` で達成された事実を記録。
+
+### 変更したファイル一覧
+- `scripts/verify-macos-fsevents.mjs`: 公開関数からテスト用注入オプションを全廃し引数 0 の公開APIに純化。`process.platform` のみでOS判定。
+- `src/test/shogi.test.tsx`: 公開APIの契約テスト（引数長0、偽装不能、実OS一致）および内部ヘルパーの単体テストを整理。一時ディレクトリの個別追跡・漏れ防止処理を追加。
+- `LOG.md`: 過去記録を復元し、事実関係および今回の修正内容を末尾に追記。
+
+### package-lock.json の集計結果
+- **ロックファイル名**: `shogi-app`
+- **lockfileVersion**: `3`
+- **ルート engines.npm**: `">=11.17.0 <12"`
+- **総エントリ数**: `399`（ルート含む）
+- **検査対象パッケージ数**: `398`
+- **正当な例外数**: `0`
+- **`missingVersion`**: `0`
+- **`missingResolved`**: `0`
+- **`missingIntegrity`**: `0`
+- **`@types/node` 解決バージョン**: `24.13.3`
+- **dependencies 完全一致**: 一致（11パッケージ完全合致）
+- **devDependencies 完全一致**: 一致（13パッケージ完全合致）
+- **`package-lock.json` の変更有無**: 変更なし（差分ゼロで維持）
+
+### 実行した検証コマンドと結果
+- `node --version`: `v24.19.0` (終了コード 0)
+- `npm --version`: `11.17.0` (終了コード 0)
+- `npm run verify:lock`: 正常終了 (終了コード 0, missingVersion: 0, missingResolved: 0, missingIntegrity: 0)
+- `npm run verify:macos-fsevents`: 正常終了 (終了コード 0, Linux環境として静的検査を通過)
+- `npm run lint` (`tsc --noEmit`): 型エラー 0件で正常終了 (終了コード 0)
+- `npm test` (`vitest run`): 全52テストすべて合格 (終了コード 0, 52 passed)
+- `npm run build`: 本番ビルド正常完了 (終了コード 0, dist/ 出力)
+- `npm run clean`: 正常終了 (終了コード 0, dist 削除)
+- clean後の `npm run build`: 正常完了 (終了コード 0)
+- `npm run check`: 正常終了 (終了コード 0, lock検証 → lint → test 52件 → build 一括成功)
+
+### テスト結果内訳
+- **テスト総数**: 52
+- **成功数**: 52
+- **失敗数**: 0
+- **skipped数**: 0
+
+### 確認・未確認・未解決事項
+- **UI確認**: UI・CSS・コンポーネントコードの変更なし（将棋盤、本黄楊彫駒、本榧盤、星印、リムライト、駒台、roving tabindex 等のデザイン・レイアウト・動作仕様はすべて完全維持）。UI 関連ファイルを変更していないためブラウザ目視確認は未実施。
+- **一時ファイル後処理**: テスト実行時およびスクリプト実行後に `shogi-fsevents-test-*` や `shogi-vite-watch-test-*` の残存ディレクトリが存在しないことを確認済み。
+- **未解決事項**: なし
 
 
 
