@@ -15,7 +15,6 @@ import {
 } from '../types/shogi';
 import { ShogiBoard } from '../components/shogi/ShogiBoard';
 import { validateLockfile } from '../../scripts/verify-lockfile.mjs';
-import { verifyMacOsFsevents } from '../../scripts/verify-macos-fsevents.mjs';
 
 describe('1. Node.js 24系・npm・環境・設定ファイルの検証', () => {
   const rootDir = process.cwd();
@@ -123,9 +122,16 @@ describe('1. Node.js 24系・npm・環境・設定ファイルの検証', () => 
     expect(output).toContain('Missing "integrity":     0');
   });
 
-  it('verifyMacOsFsevents スクリプトが正常にロードされ実行できること', async () => {
-    const result = await verifyMacOsFsevents();
-    expect(result.success).toBe(true);
+  it('macOS 検証スクリプト verify-macos-fsevents.mjs が存在し package.json に登録されていること', () => {
+    expect(packageJson.scripts['verify:macos-fsevents']).toBe('node scripts/verify-macos-fsevents.mjs');
+    const macosScriptPath = path.resolve(rootDir, 'scripts/verify-macos-fsevents.mjs');
+    expect(fs.existsSync(macosScriptPath)).toBe(true);
+
+    const ciWorkflowPath = path.resolve(rootDir, '.github/workflows/ci.yml');
+    expect(fs.existsSync(ciWorkflowPath)).toBe(true);
+    const ciContent = fs.readFileSync(ciWorkflowPath, 'utf-8');
+    expect(ciContent).toContain('npm run verify:macos-fsevents');
+    expect(ciContent).toContain("runner.os == 'macOS'");
   });
 });
 
@@ -224,11 +230,25 @@ describe('2. ロックファイル検証ロジックの完全一致および否�
     expect(result.errors.some((err: string) => err.includes(`Package "${targetPkgKey}" is missing "version" field`))).toBe(true);
   });
 
-  it('link: true や symlink: true の正当な例外エントリは missingVersion に数えられないこと', () => {
+  it('link: true の正当な例外エントリは exceptions に集計され missingVersion 等に数えられないこと', () => {
     const modifiedLock = JSON.parse(JSON.stringify(packageLockJson));
     modifiedLock.packages['node_modules/my-local-link'] = {
       link: true,
-      // no version, resolved, or integrity
+    };
+    const dir = setupTempProject(packageJson, modifiedLock);
+    const result = validateLockfile(dir);
+
+    expect(result.valid).toBe(true);
+    expect(result.summary.exceptions).toBe(1);
+    expect(result.summary.missingVersion).toBe(0);
+    expect(result.summary.missingResolved).toBe(0);
+    expect(result.summary.missingIntegrity).toBe(0);
+  });
+
+  it('symlink: true の正当な例外エントリは exceptions に集計され missingVersion 等に数えられないこと', () => {
+    const modifiedLock = JSON.parse(JSON.stringify(packageLockJson));
+    modifiedLock.packages['node_modules/my-local-symlink'] = {
+      symlink: true,
     };
     const dir = setupTempProject(packageJson, modifiedLock);
     const result = validateLockfile(dir);

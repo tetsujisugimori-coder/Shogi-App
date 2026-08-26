@@ -41,6 +41,10 @@ jobs:
       - name: Verify package-lock integrity
         run: npm run verify:lock
 
+      - name: Verify macOS fsevents & file watcher (macOS only)
+        if: runner.os == 'macOS'
+        run: npm run verify:macos-fsevents
+
       - name: Run TypeScript type check
         run: npm run lint
 
@@ -49,7 +53,3 @@ jobs:
 
       - name: Run production build
         run: npm run build
-
-      - name: Verify macOS fsevents & file watcher (macOS only)
-        if: runner.os == 'macOS'
-        run: node scripts/verify-macos-fsevents.mjs

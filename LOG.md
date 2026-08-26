@@ -392,6 +392,116 @@ Node.js 24系移行後に残っていたGitHub ActionsのNode.js 20 Action depre
 - **残った警告**: `node-domexception@1.0.0` の deprecated 警告（`@google/genai` 深層依存）。install script 関連警告はゼロ。
 - **未解決事項**: なし
 
+---
+
+## [2026-08-26] macOS CI 失敗要因（jsdom/esbuild 競合）の解消・Vitest との分離・リソース後処理強化
+
+### 失敗した GitHub Actions の記録
+- **対象コミット**: `d8e19a51b442b08dca748955ba08d309e4db0f1c`
+- **GitHub Actions Run ID**: `33013609340`
+- **macOS Job ID**: `98325976076`
+- **ワークフロー全体結果**: failure
+- **Linux ジョブ (`ubuntu-latest`)**: success
+- **macOS ジョブ (`macos-latest`)**: failure
+- **macOS テスト結果**: 43件中42件成功・1件失敗（`verifyMacOsFsevents` テストが失敗）
+- **macOS で発生したエラー**:
+  ```text
+  Invariant violation:
+  "new TextEncoder().encode("") instanceof Uint8Array" is incorrectly false
+  ```
+- **macOS 本番ビルド**: skipped
+- **macOS 専用独立検証ステップ**: skipped
+- **根本原因の分析**:
+  `fsevents` モジュールの読み込みやネイティブイベント受信自体は成功していたものの、Vitest の `environment: 'jsdom'` 上で Vite / esbuild を直接起動したことにより、jsdom のグローバル型と Node.js ネイティブの `Uint8Array` / `TextEncoder` 参照が不整合を起こし、esbuild の不変条件検査（Invariant violation）で例外が発生したことが直接の原因であった。これは `fsevents` 自体の不具合や動作不良ではない。
+
+### 今回の修正目的
+1. macOS 固有の Vite / esbuild 統合検証を Vitest（jsdom）環境から完全に分離し、独立した Node.js プロセスとして実行する構成へ変更。
+2. `package.json` に `"verify:macos-fsevents": "node scripts/verify-macos-fsevents.mjs"` を追加し、単体テスト側では静的な契約（ファイル存在、scripts 登録、CI 設定）のみを検証する。
+3. GitHub Actions の実行順序を修正し、macOS ジョブにおいて `npm ci` → `verify:lock` の直後に `verify:macos-fsevents`（`if: runner.os == 'macOS'`）を実行するように配置。
+4. `scripts/verify-macos-fsevents.mjs` のリソース管理を強化し、watcher（`stopWatcher`）、タイムアウト timer、Vite サーバー、一時ディレクトリを `try...finally` で確実に停止・解放・削除する（エラー隠蔽防止）。
+5. `src/test/shogi.test.tsx` において、`link: true` と `symlink: true` の例外テストを個別に分離して各項目の集計を検証。
+6. `fsevents: false` の維持判断および README の事実に基づく表現への更新。
+
+### 変更したファイル一覧
+- `package.json`: `"verify:macos-fsevents": "node scripts/verify-macos-fsevents.mjs"` を追加
+- `package-lock.json`: `npm install --package-lock-only` により scripts の変更を同期
+- `scripts/verify-macos-fsevents.mjs`: `stopWatcher`、timer、Vite server、一時ディレクトリの安全な `finally` 後処理およびエラー隠蔽防止処理を追加
+- `.github/workflows/ci.yml`: 実行ステップ順序を修正（`npm ci` → `verify:lock` → `verify:macos-fsevents` [macOSのみ] → `lint` → `test` → `build`）
+- `src/test/shogi.test.tsx`: `verifyMacOsFsevents` の直接 import / 実行を削除し、スクリプト存在・scripts 登録・CI 定義の静的契約テストを追加。`link: true` / `symlink: true` を個別テスト化
+- `README.md`: `allowScripts.fsevents` の説明を事実ベースに更新、CI ステップ順序を反映
+- `LOG.md`: 本エントリを末尾に追記
+
+### Vitest と macOS 統合検証の分離方法
+- `src/test/shogi.test.tsx` から `import { verifyMacOsFsevents }` および Vitest 内での直接実行テストを削除。
+- `package.json` に `"verify:macos-fsevents": "node scripts/verify-macos-fsevents.mjs"` を追加。
+- Vitest 側では以下の静的契約のみを検証：
+  1. `scripts/verify-macos-fsevents.mjs` が存在する
+  2. `package.json` に `verify:macos-fsevents` が登録されている
+  3. `.github/workflows/ci.yml` に `npm run verify:macos-fsevents` が `if: runner.os == 'macOS'` 条件で設定されている
+- 重い統合検証自体は、GitHub Actions の macOS 環境において純粋な Node.js プロセスとして独立実行する。
+
+### リソース後処理の修正内容
+- **fsevents ネイティブ監視**:
+  - `stopWatcher` および `fseventTimer` を `try` スコープ外で宣言・保持。
+  - `finally` ブロックで `clearTimeout(fseventTimer)` を確実に実行。
+  - `finally` ブロックで `if (stopWatcher) await stopWatcher()` を実行。
+  - `finally` ブロックで `tempDir`（`os.tmpdir()` 配下の専用一時ディレクトリのみ）を `rmSync` で削除。
+  - 後処理時のエラーをログ出力し、検証本来のエラーを握り潰さない構造に変更。
+- **Vite watcher**:
+  - `viteServer`、`viteTimer`、`viteChangeHandler` を `try` スコープ外で宣言・保持。
+  - `finally` ブロックで `clearTimeout(viteTimer)`、イベントリスナー解除（`watcher.off`）、`viteServer.close()` を実行。
+  - `finally` ブロックで `viteTempDir` を安全に削除。
+  - ポート番号は `port: 0` を使用し固定ポート競合を防止。
+
+### link / symlink のテスト結果
+- `link: true の正当な例外エントリは exceptions に集計され missingVersion 等に数えられないこと`: 成功 (`valid === true`, `exceptions: 1`, `missingVersion: 0`, `missingResolved: 0`, `missingIntegrity: 0`)
+- `symlink: true の正当な例外エントリは exceptions に集計され missingVersion 等に数えられないこと`: 成功 (`valid === true`, `exceptions: 1`, `missingVersion: 0`, `missingResolved: 0`, `missingIntegrity: 0`)
+
+### `fsevents: false` の判断
+- **判断**: `package.json` の `allowScripts.fsevents` は `false`（拒否）を維持。
+- **理由**: `fsevents@2.3.3` には pre-built の `fsevents.node` バイナリが同梱されており、install script（`node-gyp rebuild`）を拒否した状態でもモジュール読み込みが可能であるため。独立した Node.js プロセスで実行される macOS CI ステップにて、ネイティブ監視および Vite watcher の動作を継続検証する。
+
+### package-lock.json の集計結果
+- **ロックファイル名**: `shogi-app`
+- **lockfileVersion**: `3`
+- **ルート engines.npm**: `">=11.17.0 <12"`
+- **総エントリ数**: `399`（ルート含む）
+- **検査対象パッケージ数**: `398`
+- **正当な例外数**: `0`
+- **`missingVersion`**: `0`
+- **`missingResolved`**: `0`
+- **`missingIntegrity`**: `0`
+- **`@types/node` 解決バージョン**: `24.13.3`
+- **dependencies 完全一致**: 一致（11パッケージ完全合致）
+- **devDependencies 完全一致**: 一致（13パッケージ完全合致）
+
+### 実行した検証コマンドと結果（ローカル環境）
+- `node --version`: `v24.19.0` (終了コード 0)
+- `npm --version`: `11.17.0` (終了コード 0)
+- `npm ci`: 正常終了 (終了コード 0, audited 303 packages in 6s, 0 vulnerabilities)
+- `npm run verify:lock`: 正常終了 (終了コード 0, missingVersion: 0, missingResolved: 0, missingIntegrity: 0)
+- `npm run verify:macos-fsevents`: 正常終了 (終了コード 0, Linux環境として静的メタデータ検査を通過)
+- `npm run lint` (`tsc --noEmit`): 型エラー 0件で正常終了 (終了コード 0)
+- `npm test` (`vitest run`): 全44テストすべて合格 (終了コード 0, 44 passed in 1.37s)
+- `npm run build`: 本番ビルド正常完了 (終了コード 0, dist/ 出力)
+- `npm run clean`: 正常終了 (終了コード 0, `dist` 削除)
+- clean後の `npm run build`: 正常完了 (終了コード 0)
+- `npm run check`: 正常終了 (終了コード 0, verify:lock → lint → test → build 一括成功)
+
+### テスト結果内訳
+- **テスト総数**: 44
+- **成功数**: 44
+- **失敗数**: 0
+- **skipped数**: 0
+
+### 確認・未確認・未解決事項
+- **UI確認**: UI・CSS・コンポーネントコードの変更なし（将棋盤、本黄楊彫駒、本榧盤、星印、リムライト、駒台、roving tabindex 等のデザイン・レイアウト・動作仕様はすべて完全維持）。ブラウザ目視確認は UI ファイルを変更していないため未実施。
+- **ローカル実機環境**: 現在のコンテナは Linux (`4.19.0-gvisor`) であるため、ローカル上では macOS ネイティブの `fsevents` 実動作は実行不可（スクリプトは非 darwin 環境として静的検査のみ通過）。
+- **リモート GitHub Actions**: ワークフロー定義（`ubuntu-latest` / `macos-latest` マトリックスおよび実行順序）を設定完了。リモート GitHub への push およびリモート CI 実行結果はプッシュ後の確認待ち。
+- **残った警告**: `node-domexception@1.0.0` の deprecated 警告（`@google/genai` 深層依存）。install script 関連警告はゼロ。
+- **未解決事項**: なし
+
+
 
 
 

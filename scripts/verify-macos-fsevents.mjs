@@ -56,12 +56,13 @@ export async function verifyMacOsFsevents(options = {}) {
   // 2. Test fsevents native file watching in an isolated temporary directory
   const tempDir = fs.mkdtempSync(path.join(os.tmpdir(), 'shogi-fsevents-test-'));
   console.log(` [2/3] Testing native fsevents watcher in temporary directory: ${tempDir}`);
+  let stopWatcher = null;
+  let fseventTimer = null;
   try {
     let eventReceived = false;
-    let stopWatcher = null;
 
     const eventPromise = new Promise((resolve, reject) => {
-      const timer = setTimeout(() => {
+      fseventTimer = setTimeout(() => {
         if (!eventReceived) {
           reject(new Error('Timeout waiting for fsevents native event'));
         }
@@ -70,11 +71,17 @@ export async function verifyMacOsFsevents(options = {}) {
       try {
         stopWatcher = fsevents.watch(tempDir, (filepath, flags) => {
           eventReceived = true;
-          clearTimeout(timer);
+          if (fseventTimer) {
+            clearTimeout(fseventTimer);
+            fseventTimer = null;
+          }
           resolve({ filepath, flags, info: fsevents.getInfo(filepath, flags) });
         });
       } catch (e) {
-        clearTimeout(timer);
+        if (fseventTimer) {
+          clearTimeout(fseventTimer);
+          fseventTimer = null;
+        }
         reject(e);
       }
     });
@@ -88,13 +95,25 @@ export async function verifyMacOsFsevents(options = {}) {
 
     const eventData = await eventPromise;
     console.log(`       fsevents native event received successfully: ${path.basename(eventData.filepath)}`);
-
-    if (stopWatcher) {
-      await stopWatcher();
-    }
   } finally {
+    if (fseventTimer) {
+      clearTimeout(fseventTimer);
+      fseventTimer = null;
+    }
+    if (stopWatcher) {
+      try {
+        await stopWatcher();
+      } catch (err) {
+        console.error('       [cleanup warning] Failed to stop fsevents watcher:', err);
+      }
+      stopWatcher = null;
+    }
     if (fs.existsSync(tempDir)) {
-      fs.rmSync(tempDir, { recursive: true, force: true });
+      try {
+        fs.rmSync(tempDir, { recursive: true, force: true });
+      } catch (err) {
+        console.error('       [cleanup warning] Failed to remove fsevents tempDir:', err);
+      }
     }
   }
 
@@ -102,6 +121,8 @@ export async function verifyMacOsFsevents(options = {}) {
   console.log(' [3/3] Testing Vite dev watcher integration...');
   const viteTempDir = fs.mkdtempSync(path.join(os.tmpdir(), 'shogi-vite-watch-test-'));
   let viteServer = null;
+  let viteTimer = null;
+  let viteChangeHandler = null;
   try {
     const { createServer } = await import('vite');
     fs.writeFileSync(path.join(viteTempDir, 'index.html'), '<html><body>Watcher Test</body></html>', 'utf-8');
@@ -120,17 +141,22 @@ export async function verifyMacOsFsevents(options = {}) {
 
     let viteChangeDetected = false;
     const vitePromise = new Promise((resolve, reject) => {
-      const timer = setTimeout(() => {
+      viteTimer = setTimeout(() => {
         if (!viteChangeDetected) {
           reject(new Error('Timeout waiting for Vite file watcher event'));
         }
       }, 6000);
 
-      viteServer.watcher.on('change', (changedPath) => {
+      viteChangeHandler = (changedPath) => {
         viteChangeDetected = true;
-        clearTimeout(timer);
+        if (viteTimer) {
+          clearTimeout(viteTimer);
+          viteTimer = null;
+        }
         resolve(changedPath);
-      });
+      };
+
+      viteServer.watcher.on('change', viteChangeHandler);
     });
 
     // Allow watcher to initialize
@@ -142,11 +168,27 @@ export async function verifyMacOsFsevents(options = {}) {
     const changedFile = await vitePromise;
     console.log(`       Vite watcher detected file change successfully: ${path.basename(changedFile)}`);
   } finally {
+    if (viteTimer) {
+      clearTimeout(viteTimer);
+      viteTimer = null;
+    }
     if (viteServer) {
-      await viteServer.close();
+      try {
+        if (viteChangeHandler && viteServer.watcher) {
+          viteServer.watcher.off('change', viteChangeHandler);
+        }
+        await viteServer.close();
+      } catch (err) {
+        console.error('       [cleanup warning] Failed to close Vite server:', err);
+      }
+      viteServer = null;
     }
     if (fs.existsSync(viteTempDir)) {
-      fs.rmSync(viteTempDir, { recursive: true, force: true });
+      try {
+        fs.rmSync(viteTempDir, { recursive: true, force: true });
+      } catch (err) {
+        console.error('       [cleanup warning] Failed to remove viteTempDir:', err);
+      }
     }
   }
 

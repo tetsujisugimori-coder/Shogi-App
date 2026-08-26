@@ -122,7 +122,7 @@ npm 11.17 以降のセキュアなスクリプト実行制御に準拠し、依�
   - `esbuild`: `true`（Vite・テスト・ビルドに必要なバイナリインストーラー）
   - `@google/genai`: `false`（不要な no-op スクリプト）
   - `protobufjs`: `false`（非推奨警告メッセージ表示のみ）
-  - `fsevents`: `false`（`fsevents@2.3.3` は pre-built の `fsevents.node` バイナリを同梱して配布しているため、`node-gyp rebuild` は不要であり、拒否設定でも macOS ネイティブファイル監視および Vite は正常に動作します）
+  - `fsevents`: `false`（`fsevents@2.3.3` は pre-built の `fsevents.node` バイナリを同梱して配布しているため、`node-gyp rebuild` を拒否した状態でもモジュール読み込みが可能であり、独立した macOS CI 検証スクリプトにおいてネイティブ監視および Vite watcher の動作を継続検証しています）
 - **未審査スクリプトの遮断**: `.npmrc` に `strict-allow-scripts=true` を設定しているため、`allowScripts` に記載のない未審査のスクリプトが存在する場合、`npm ci` / `npm install` はエラーとなり実行が停止します。
 - **新しい依存関係追加時の運用**: 新たにパッケージを追加・更新する際は、必ず install script（`preinstall`, `install`, `postinstall`）の有無と処理内容を確認し、真にビルドや動作に不可欠なもののみを許可してください（安易に全スクリプトを許可したり `--dangerously-allow-all-scripts` を使用しないこと）。
 
@@ -132,7 +132,7 @@ npm 11.17 以降のセキュアなスクリプト実行制御に準拠し、依�
 GitHub Actions（`.github/workflows/ci.yml`）により、main/master ブランチへの push、pull request、および手動実行（`workflow_dispatch`）時に、Linux（`ubuntu-latest`）および macOS（`macos-latest`）の両 OS 環境において Node.js `24.19.0` 上で以下の一貫したパイプラインが自動実行されます：
 - `npm ci`（依存関係インストール・スクリプト遮断検証）
 - `npm run verify:lock`（ロックファイル完全性検証・欠落集計）
+- `npm run verify:macos-fsevents`（macOS環境でのみ実行: 独立した Node.js プロセスによる `fsevents` ネイティブ監視・Vite watcher 動作確認）
 - `npm run lint`（TypeScript 型チェック）
 - `npm test`（Vitest テストスイート）
 - `npm run build`（本番ビルド）
-- `node scripts/verify-macos-fsevents.mjs`（macOS環境でのみ実行: `fsevents` ネイティブ監視・Vite watcher 動作確認）
