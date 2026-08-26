@@ -612,10 +612,92 @@ Node.js 24系移行後に残っていたGitHub ActionsのNode.js 20 Action depre
 - **失敗数**: 0
 - **skipped数**: 0
 
+## 13. macOS CI 失敗の解消、内部フェーズ分離、本番 cleanup 経路の単体テスト及び一時ディレクトリ検査厳格化の記録
+
+### 基準コミットと対象
+- **対象リポジトリ**: `tetsujisugimori-coder/Shogi-App`
+- **基準コミット**: `8f1fc15ebdfc2b179c5d6467fc138bc9de755d91`
+- **修正目的**: macOS CI の Vitest 実行失敗を解消し、公開 API を引数 0 の純粋な状態に保ったまま、本番と同じ cleanup 経路（watcher 停止、リスナー解除、サーバー終了、一時ディレクトリ削除）の異常系・正常系を安全に自動テストできるモジュール分離構成へ整理すること。
+
+### GitHub Actions 失敗の記録と原因分析
+- **Workflow Run ID**: `33021752036`
+- **対象コミット**: `8f1fc15ebdfc2b179c5d6467fc138bc9de755d91`
+- **Event**: `push`
+- **Linux Job ID**: `98353532441`（成功: 59/59 テスト成功、ビルド成功）
+- **macOS Job ID**: `98353532664`（失敗: 57成功・2失敗、テスト失敗のためビルド未実行）
+- **macOS CI での独立した検証**: `npm run verify:macos-fsevents` は成功し、実 `fsevents` ネイティブイベントおよび Vite ファイル変更検知は正常に動作していた。
+- **macOS CI 失敗の直接原因**: `src/test/shogi.test.tsx` 内で `verifyMacOsFsevents()` を直接呼び出す 2 件のテスト（実OSと戻り値の一致テスト、引数による偽装防止テスト）が存在し、macOS 環境下の Vitest (jsdom) 内部で実際の Vite / esbuild サーバーが起動され、esbuild の `TextEncoder` / `Uint8Array` 環境不整合が発生したことによる。
+
+### 過去記録の訂正事項
+- 基準コミット時点の記録で「52テスト成功」と記載されていたが、CI 上では実際には 59 テストが検出されていた。
+- 基準コミット時点の「一時ディレクトリ残存なし」の確認手法において、`afterEach` 内で削除エラーを握りつぶして Set を消去していたため、潜在的な削除失敗を見逃す可能性があった。
+- 基準コミット時点の「未解決事項なし」の記録後に、上記 macOS CI 失敗（Run ID: `33021752036`）が発生した。
+
+### 修正内容とアーキテクチャ設計
+1. **Vitest と macOS 実検証の役割分担の完全分離**:
+   - macOS の実 `fsevents` および実 Vite 検証は、CI の独立したステップ `npm run verify:macos-fsevents` だけで実行する。
+   - Vitest の jsdom 環境では macOS 用の実 Vite サーバーを起動しない。
+   - `verifyMacOsFsevents()` を直接呼ぶ非 macOS 向けテストは `it.skipIf(process.platform === 'darwin')` により macOS 上では明示的にスキップし、テスト名も「非macOS環境では〜」と明示。
+   - `verifyMacOsFsevents.length === 0` の公開契約テストは全 OS で実行・維持。
+2. **公開 API の純化と内部フェーズのモジュール分離**:
+   - `scripts/verify-macos-fsevents.mjs`: 公開関数 `verifyMacOsFsevents()`（引数 0、`process.platform` による厳格な判定、CLI エントリーポイント、macOS 実機検証時のみ Vite を動的 import）。
+   - `scripts/verify-macos-fsevents-core.mjs`:
+     - `verifyFseventsNativePhase(deps)`: `fsevents` ネイティブ監視フェーズ
+     - `verifyViteWatcherPhase(deps)`: Vite watcher 監視フェーズ
+     - `runCleanups(cleanups)`: クリーンアップの順序保証と完全実行
+     - `combineErrors(primaryError, cleanupErrors)`: 主エラーと cleanup エラーの合成
+     - `createFsEventPromise(params)` / `createViteWatcherPromise(params)`: settle 制御とタイマー解除
+     - 各フェーズは `fs`, `fsevents`, `createServer` 等の依存性注入を受け入れ、実ディレクトリを作成しない仮想モックによる異常系テストが可能。
+3. **本番と同じ cleanup 経路の単体テスト**:
+   - `fsevents watcher` 停止失敗時にフェーズ全体が失敗し、一時ディレクトリ削除が試行されること。
+   - `fsevents` 一時ディレクトリ削除失敗時にフェーズ全体が失敗すること。
+   - Vite リスナー解除失敗時にフェーズ全体が失敗し、サーバー終了とディレクトリ削除が試行されること。
+   - Vite サーバー終了失敗時にフェーズ全体が失敗し、一時ディレクトリ削除が試行されること。
+   - Vite 一時ディレクトリ削除失敗時にフェーズ全体が失敗すること。
+   - 主処理と cleanup の両方が失敗した場合に `AggregateError` で両方の原因を保持すること。
+   - 全処理成功時にすべての cleanup が定義順に実行されること。
+   - `getInfo()` 例外が Promise reject として伝播すること。
+   - 多重 settle 防止および timeout タイマー解除が正常に機能すること。
+4. **一時ディレクトリ漏れ防止の厳密化**:
+   - 異常系テストでは仮想ファイルシステム / モックを使用し、実ディスクへの不要なディレクトリ作成を防止。
+   - 実ディレクトリを作成した場合は `createdTempDirs` に追跡し、`afterEach` で `fs.existsSync(dir)` が `false` であることを厳格に検査。残存が確認された場合は例外をスローしてテストを失敗させる。
+
+### 変更ファイル一覧
+- `scripts/verify-macos-fsevents-core.mjs` (新規作成: 内部フェーズ関数・エラー集約・Promise制御ヘルパーを独立)
+- `scripts/verify-macos-fsevents.mjs` (更新: 公開API引数0維持、内部フェーズ関数の呼び出しと再エクスポート)
+- `src/test/shogi.test.tsx` (更新: 非macOSテストのskipIf対応、モック依存性注入による本番cleanup経路の網羅的単体テスト、厳格な一時ディレクトリ残存検査)
+- `LOG.md` (更新: 本セクション 13 を末尾追記)
+
+### package-lock.json および UI の維持状況
+- **`package-lock.json`**: 変更なし（差分ゼロを維持）
+- **`package.json`**: 変更なし（差分ゼロを維持）
+- **`.github/workflows/ci.yml`**: 変更なし（差分ゼロを維持）
+- **UI・コンポーネント・CSS**: 将棋盤、駒、成駒、ARIA属性、roving tabindex、デザイン関連ファイルへの変更なし（差分ゼロを維持）
+
+### ローカル実行検証結果
+- `node --version`: `v24.19.0` (終了コード 0)
+- `npm --version`: `11.17.0` (終了コード 0)
+- `npm run verify:lock`: 正常終了 (終了コード 0, missingVersion: 0, missingResolved: 0, missingIntegrity: 0)
+- `npm run verify:macos-fsevents`: 正常終了 (終了コード 0, Linux環境として静的検査を通過)
+- `npm run lint` (`tsc --noEmit`): 型エラー 0件で正常終了 (終了コード 0)
+- `npm test` (`vitest run`): 全63テストすべて合格 (終了コード 0, 63 passed, 0 failed, 0 skipped on Linux)
+- `npm run build`: 本番ビルド正常完了 (終了コード 0, dist/ 出力)
+- `npm run clean`: 正常終了 (終了コード 0, dist/ 削除)
+- clean後の `npm run build`: 正常完了 (終了コード 0)
+- `npm run check`: 正常終了 (終了コード 0, lock検証 → lint → test 63件 → build 一括成功)
+
+### テスト結果内訳
+- **テスト総数**: 63
+- **成功数**: 63
+- **失敗数**: 0
+- **skipped数**: 0 (Linux環境。macOS環境では非macOS向け2テストがskipされ 61 passed / 2 skipped / 0 failed となる想定)
+
 ### 確認・未確認・未解決事項
-- **UI確認**: UI・CSS・コンポーネントコードの変更なし（将棋盤、本黄楊彫駒、本榧盤、星印、リムライト、駒台、roving tabindex 等のデザイン・レイアウト・動作仕様はすべて完全維持）。UI 関連ファイルを変更していないためブラウザ目視確認は未実施。
-- **一時ファイル後処理**: テスト実行時およびスクリプト実行後に `shogi-fsevents-test-*` や `shogi-vite-watch-test-*` の残存ディレクトリが存在しないことを確認済み。
+- **リモートCI状況**: ローカル検証とワークフロー定義のみ確認。修正コミットのリモートCIは未確認。
+- **UI確認**: UI・CSS・コンポーネントコードの変更なし。UI 関連ファイルを変更していないためブラウザ目視確認は未実施。
+- **残存警告**: なし
 - **未解決事項**: なし
+
 
 
 
