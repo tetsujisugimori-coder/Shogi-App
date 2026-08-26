@@ -108,4 +108,54 @@
 - `npm run lint` (`tsc --noEmit`): 型エラー 0件で正常完了
 - `npm run build`: 本番バンドルビルド正常完了
 
+## [2026-08-26] 依存管理のNode.js＋npmへの完全統一・Roving Tabindexキーボード操作・CI導入
+
+### 修正の目的
+標準実行環境をBunからNode.js＋npmへ統一し、異なるPCやGitHub Actionsで確実に再現可能な環境を構築するとともに、対局モード時のアクセシビリティ（81個のTab停止問題）をRoving Tabindex方式により解消する。
+
+### 主な修正内容
+
+1. **Node.js＋npmへの依存管理完全統一**:
+   - `bun.lock` を完全に削除。
+   - `package.json` に `packageManager: "npm@10.9.8"` および `engines: { "node": ">=20.0.0", "npm": ">=10.0.0" }` を明記。
+   - `.npmrc` に `package-lock=true`, `engine-strict=true` を設定。
+   - npmにより `package-lock.json`（ルート名: `shogi-app`）を生成・コミット対象化。
+   - `README.md` を作成し、Node.js＋npm前提の環境・コマンド体系・実装状況をドキュメント化。
+
+2. **Windows対応クロスプラットフォーム `clean` スクリプト (`scripts/clean.mjs`)**:
+   - Unix依存の `rm -rf` を廃止し、Node.js標準の `node:fs/promises` (`rm` API) を利用したスクリプトを作成。
+   - `dist` と `server.js` のみを安全に削除し、存在しない場合もエラーにならず正常終了するよう実装。
+   - `npm run check` スクリプトを追加し、`npm run lint && npm test && npm run build` の一括検証に対応。
+
+3. **対局・操作モード時の Roving Tabindex キーボード操作 (`src/components/shogi/ShogiBoard.tsx`)**:
+   - `onSquareClick` が渡されたインタラクティブ時、81マスのうち現在位置の1マスのみを `tabIndex={0}`、残り80マスを `tabIndex={-1}` に設定。
+   - 盤面内の `cellRefs`（Map）を用いてスコープ内でフォーカス管理を実施（グローバルDOM検索の排除）。
+   - 上下左右の矢印キーで隣接マスへのフォーカス移動（盤端での範囲制限および `e.preventDefault()` によるスクロール防止）。
+   - EnterキーおよびSpaceキーによる `onSquareClick` 実行。
+   - マウスクリック時に該当マスを roving tabindex の現在位置に更新。
+   - 初期フォーカス位置は `selectedSquare`（指定時）または既定マス `7七`（row 6, col 2）。
+   - フォーカス時に `focus-visible:ring-2 focus-visible:ring-amber-300` で視認性を確保。
+
+4. **GitHub Actions CI ワークフローの追加 (`.github/workflows/ci.yml`)**:
+   - push / pull request 時に Node.js 22 + npm キャッシュで `npm ci` → `npm run lint` → `npm test` → `npm run build` を自動実行する最小権限（`contents: read`）ワークフローを定義。
+
+5. **自動テストスイートの大幅拡充 (`src/test/shogi.test.tsx`)**:
+   - npm設定・ロックファイル検証（6件）
+   - 基本盤面・駒データ・成駒・星対称位置検証（11件）
+   - 表示専用アクセシビリティ検証（1件）
+   - インタラクティブ盤面の roving tabindex（初期位置、矢印キー移動、盤端境界、Enter/Space実行、クリック連携、モード切替時のTab数遷移）（6件）
+   - 合計24テストケースを作成し、全テスト合格を確認。
+
+### 実行した検証コマンドと結果
+- `node --version`: `v22.23.2`
+- `npm --version`: `10.9.8`
+- `npm ci`: 正常終了（audited 316 packages in 11s, 0 vulnerabilities）
+- `npm run lint` (`tsc --noEmit`): 型エラー 0件で正常終了
+- `npm test` (`vitest run`): 1ファイル・全24テストすべて合格（24 passed in 1.76s）
+- `npm run clean`: 正常終了（`dist`, `server.js` を安全に削除）
+- `npm run build`: 正常終了（`dist/` へのバンドル出力完了）
+- `npm run check`: 正常終了（lint → test → build を一括実行）
+- UI目視・スタイル確認: リアル調本黄楊彫駒、本榧盤、星印、リムライト、駒台、レスポンシブ配置がすべて維持されていることを確認
+
+
 

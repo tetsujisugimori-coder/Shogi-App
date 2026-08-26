@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { BoardSquare, BoardStatus, FILE_NUMBERS, RANK_KANJI, getSquareAriaLabel } from '../../types/shogi';
 import { Piece } from './Piece';
 
@@ -10,6 +10,10 @@ interface ShogiBoardProps {
   onSquareClick?: (square: BoardSquare) => void;
 }
 
+// Default initial focus position: 7七 (row 6, col 2 -> 7筋 7段)
+// In traditional Shogi research, 7七 (▲7六歩 or ▲7七...) is a standard opening file/square.
+const DEFAULT_INITIAL_FOCUS = { row: 6, col: 2 };
+
 export const ShogiBoard: React.FC<ShogiBoardProps> = ({
   squares,
   status = 'preparation',
@@ -19,12 +23,96 @@ export const ShogiBoard: React.FC<ShogiBoardProps> = ({
 }) => {
   const isInteractive = typeof onSquareClick === 'function';
 
+  // Roving tabindex position management
+  // Priority: 1. selectedSquare if provided and within bounds, 2. DEFAULT_INITIAL_FOCUS (7七: row 6, col 2)
+  const [focusedSquare, setFocusedSquare] = useState<{ row: number; col: number }>(() => {
+    if (
+      selectedSquare &&
+      selectedSquare.row >= 0 &&
+      selectedSquare.row < 9 &&
+      selectedSquare.col >= 0 &&
+      selectedSquare.col < 9
+    ) {
+      return { row: selectedSquare.row, col: selectedSquare.col };
+    }
+    return DEFAULT_INITIAL_FOCUS;
+  });
+
+  // Track if selectedSquare changed from props
+  useEffect(() => {
+    if (
+      selectedSquare &&
+      selectedSquare.row >= 0 &&
+      selectedSquare.row < 9 &&
+      selectedSquare.col >= 0 &&
+      selectedSquare.col < 9
+    ) {
+      setFocusedSquare({ row: selectedSquare.row, col: selectedSquare.col });
+    }
+  }, [selectedSquare]);
+
+  // Scoped references for cells within the board (to avoid global querySelector)
+  const cellRefs = useRef<Map<string, HTMLDivElement>>(new Map());
+
+  // Focus the target cell within the board without global queries
+  const focusCell = (row: number, col: number) => {
+    const key = `${row}-${col}`;
+    const el = cellRefs.current.get(key);
+    if (el) {
+      el.focus();
+    }
+  };
+
   const handleKeyDown = (e: React.KeyboardEvent, square: BoardSquare) => {
     if (!isInteractive) return;
-    if (e.key === 'Enter' || e.key === ' ') {
-      e.preventDefault();
-      onSquareClick(square);
+
+    let targetRow = square.row;
+    let targetCol = square.col;
+    let handled = false;
+
+    switch (e.key) {
+      case 'ArrowUp':
+        // Move up (decrement row, stay bounded >= 0)
+        targetRow = Math.max(0, square.row - 1);
+        handled = true;
+        break;
+      case 'ArrowDown':
+        // Move down (increment row, stay bounded <= 8)
+        targetRow = Math.min(8, square.row + 1);
+        handled = true;
+        break;
+      case 'ArrowLeft':
+        // Move left (decrement col, stay bounded >= 0)
+        targetCol = Math.max(0, square.col - 1);
+        handled = true;
+        break;
+      case 'ArrowRight':
+        // Move right (increment col, stay bounded <= 8)
+        targetCol = Math.min(8, square.col + 1);
+        handled = true;
+        break;
+      case 'Enter':
+      case ' ': // Space key
+        e.preventDefault();
+        onSquareClick(square);
+        return;
+      default:
+        return;
     }
+
+    if (handled) {
+      e.preventDefault(); // Prevent page scroll on arrow keys
+      if (targetRow !== square.row || targetCol !== square.col) {
+        setFocusedSquare({ row: targetRow, col: targetCol });
+        focusCell(targetRow, targetCol);
+      }
+    }
+  };
+
+  const handleCellClick = (square: BoardSquare) => {
+    if (!isInteractive) return;
+    setFocusedSquare({ row: square.row, col: square.col });
+    onSquareClick(square);
   };
 
   return (
@@ -121,23 +209,40 @@ export const ShogiBoard: React.FC<ShogiBoardProps> = ({
                       {rowSquares.map((square, colIndex) => {
                         const isSelected =
                           selectedSquare?.row === rowIndex && selectedSquare?.col === colIndex;
+                        const isRovingTabTarget =
+                          isInteractive &&
+                          focusedSquare.row === rowIndex &&
+                          focusedSquare.col === colIndex;
 
                         return (
                           <div
                             key={`sq-${square.coordinateLabel}`}
                             id={`square-${square.coordinateLabel}`}
+                            ref={(el) => {
+                              const key = `${rowIndex}-${colIndex}`;
+                              if (el) {
+                                cellRefs.current.set(key, el);
+                              } else {
+                                cellRefs.current.delete(key);
+                              }
+                            }}
                             role="gridcell"
-                            tabIndex={isInteractive ? 0 : undefined}
+                            tabIndex={isInteractive ? (isRovingTabTarget ? 0 : -1) : undefined}
+                            aria-selected={isSelected ? true : undefined}
                             aria-label={getSquareAriaLabel(square)}
                             data-file={square.file}
                             data-rank={square.rank}
                             data-coordinate={square.coordinateLabel}
-                            onClick={isInteractive ? () => onSquareClick(square) : undefined}
+                            onClick={isInteractive ? () => handleCellClick(square) : undefined}
                             onKeyDown={isInteractive ? (e) => handleKeyDown(e, square) : undefined}
-                            className={`relative flex items-center justify-center aspect-square select-none ${
-                              isInteractive ? 'cursor-pointer hover:bg-amber-400/20' : 'cursor-default'
+                            className={`relative flex items-center justify-center aspect-square select-none outline-none ${
+                              isInteractive
+                                ? 'cursor-pointer hover:bg-amber-400/20 focus-visible:ring-2 focus-visible:ring-amber-300 focus-visible:ring-inset focus-visible:z-30'
+                                : 'cursor-default'
                             } ${
-                              isSelected ? 'bg-amber-400/30 ring-1 ring-amber-300 z-20' : ''
+                              isSelected
+                                ? 'bg-amber-400/30 ring-1 ring-amber-300 z-20'
+                                : ''
                             }`}
                             style={{
                               borderRight:
