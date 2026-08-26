@@ -1,0 +1,6 @@
+{
+  "name": "SHOGI-APP",
+  "description": "AI対局・棋譜分析・将棋研究プラットフォーム",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
