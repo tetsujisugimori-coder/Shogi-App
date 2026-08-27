@@ -39,6 +39,7 @@ export const ILLEGAL_MOVE_MESSAGES: Record<IllegalMoveReason, string> = {
   invalid_hand_piece_state: '成った状態など不正な持ち駒は打つことができません。',
   dead_piece_drop: 'これ以上進めない段へ持ち駒を打つことはできません（行き所のない駒）。',
   nifu: '同じ筋に未成の歩があるため、二歩となる歩打ちはできません。',
+  pawn_drop_mate: '歩を打って相手玉を詰ませる打ち歩詰めは禁止されています。',
   game_already_ended: '対局は既に終局しています。',
 };
 

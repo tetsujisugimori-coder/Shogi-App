@@ -1176,3 +1176,62 @@ PR #1のレビュー指摘を受け、簡易APIの`applyMove`と合法手候補�
 - 打ち歩詰め、一般的な詰み・終局判定、千日手、連続王手の千日手、投了。
 - KIF / CSA / USI入出力、AI対局・将棋エンジン接続、Undo / Redo / 待った / 局面リセット。
 - 駒台上の同種駒集約表示、ドラッグ＆ドロップ。
+
+## [2026-08-27] 打ち歩詰め判定の実装
+
+### 基準と作業範囲
+
+- 基準コミット: `45d71bc2cad11ef241ab4ee7b9c8bfcfda7b7865`（PR #3「基本的な駒打ち」マージ済み）
+- 作業ブランチ: `feat/pawn-drop-mate`
+- `IllegalMoveReason` に専用理由コード `pawn_drop_mate` と日本語メッセージを追加し、歩打ちで相手玉を詰ませる禁じ手を拒否するようにした。
+- 一般的な詰み判定・通常の詰みによる終局処理は今回も対象外とした。
+
+### 設計判断と判定手順
+
+- `validateDrop` の既存順序を維持し、終局済み、盤外、持ち駒ID、所有者、王、成った持ち駒、着手先占有、行き所のない駒打ち、二歩を先に検証する。
+- `simulateDropSquares` で一度だけイミュータブルな仮想盤面を作り、まず既存の `isKingInCheck` で自玉の王手放置を拒否する。その後、未成の歩に限って相手玉の王手を確認する。
+- 相手玉が王手なら、仮想盤面上の相手側全駒を走査し、既存の `getLegalMoves` が返す合法な盤上移動が一つでもあるか確認する。応手が一つもない場合だけ打ち歩詰めとする。
+- `getLegalMoves` の既存仕様を再利用することで、玉の退避、玉による歩取り、他駒による歩取りを数えつつ、玉の自殺手、王手放置、ピンされた駒の移動を除外する。先手・後手の向きは座標で分岐せず、歩の既存の利きと `isKingInCheck` で対称に扱う。
+- 歩による直接王手には持ち駒の合駒が存在せず、持ち駒を打って打たれた歩を取ることもできないため、応手探索は盤上移動だけに限定した。`validateDrop` / `getLegalDropSquares` を再帰呼び出しせず、一般詰み判定と混同しない内部関数 `hasLegalBoardMoveResponseToPawnCheck` に閉じ込めた。
+- 元の `BoardState`、盤面、持ち駒、駒オブジェクトは変更しない。検証を通さない低レベル盤面更新関数や一般詰み判定APIは追加公開していない。
+
+### assist / strict方式とUI
+
+- `getLegalDropSquares` は `validateDrop` と同じ判定を使うため、打ち歩詰めマスを候補から除外する。合法候補は同じ局面の `executeDrop` で適用できる整合性を維持した。
+- assist方式は `pawn_drop_mate` で拒否し、入力 `state` と同じ参照を返す。盤面、持ち駒、手番、手数、履歴、直前着手、終局状態を変更しない。
+- strict方式は盤面、持ち駒、手番、手数、合法手履歴、直前着手を進めず、`kind: 'drop'`、`from: null`、`pieceId`、`pieceType: 'pawn'`、提案元、エンジン名、`pawn_drop_mate` を `foulHistory` に記録して提案者側の反則負けにする。
+- UIは既存の候補生成をそのまま利用し、禁止マスの強調と「歩兵を打てる」ARIA案内を表示しない。玉が逃げられる類似局面では同じ歩打ちを候補表示する。フッターの「準備中」を実装済みの表現へ更新した。
+
+### 変更ファイル
+
+- `src/types/shogi.ts`
+- `src/domain/shogi/drops.ts`
+- `src/domain/shogi/validation.ts`
+- `src/components/shogi/ShogiResearchScreen.tsx`
+- `src/test/shogi-drop.test.tsx`
+- `src/test/shogi.test.tsx`
+- `README.md`
+- `LOG.md`
+- `package.json`、`package-lock.json`、CI設定、新規依存パッケージの変更はない。
+
+### 追加テストと結果
+
+- `src/test/shogi-drop.test.tsx` に16件を追加した。先手5二歩打と後手5八歩打の対称な打ち歩詰め、玉の退避、玉による歩取り、他駒による歩取り、非王手、歩以外の駒打ち、突き歩詰め、二歩と自玉王手の検証優先順、ピンされた応手駒、候補/API整合、イミュータビリティ、assist、strict、UI候補・ARIAを検証した。
+- テスト局面には先手王と後手玉を配置し、仮想盤面の `isKingInCheck` と各相手駒の `getLegalMoves` も確認した。
+- 既存200件を含む最終テスト総数: **216/216 passed**（2 test files）。
+
+### 検証結果
+
+- 実行環境: Node.js `v24.14.1` / npm `11.11.0`。リポジトリ標準方針の Node.js `24.19.0` / npm `11.17.0` より古い環境だったため、その設定や依存ファイルは変更していない。
+- `npm run lint`: 成功（TypeScriptエラーなし）。
+- `npm test`: 成功（2ファイル、216件）。
+- `npm run build`: 成功（Vite production build、1690 modules transformed）。
+- `npm run check`: 成功（lockfile検証、lint、216テスト、build）。lockfileは399エントリ、registry package 398件、欠落ゼロ。
+- `git diff --check`: 成功。
+- npm `11.11.0` では `.npmrc` の `strict-allow-scripts` に対する将来互換性警告が表示されたが、各コマンドの終了コードは0だった。
+- ブラウザでの手動目視確認は実施していない。UI挙動はVitest + Testing LibraryのDOMテストで確認した。
+
+### 残る未実装事項
+
+- 一般的な詰み判定と通常の詰みによる終局、王手状態のUI表示、千日手・連続王手の千日手、投了。
+- KIF / CSA / USI入出力、Undo / Redo / 待った、AI・将棋エンジン接続。

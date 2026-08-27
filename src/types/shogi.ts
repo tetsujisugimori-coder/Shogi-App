@@ -78,6 +78,7 @@ export type IllegalMoveReason =
   | 'invalid_hand_piece_state'
   | 'dead_piece_drop'
   | 'nifu'
+  | 'pawn_drop_mate'
   | 'game_already_ended';
 
 export type MoveValidationResult =

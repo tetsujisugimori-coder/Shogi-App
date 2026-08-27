@@ -22,6 +22,7 @@ import {
   determineDefaultExecutionMode,
   getPieceNotationKanji,
 } from './gameState';
+import { getLegalMoves } from './moves';
 import { ILLEGAL_MOVE_MESSAGES } from './validation';
 
 function getHands(state: BoardState): { current: Piece[]; opponent: Piece[] } {
@@ -68,6 +69,37 @@ export function simulateDropSquares(
     isPromoted: false,
   };
   return nextSquares;
+}
+
+function hasLegalBoardMoveResponseToPawnCheck(
+  squares: BoardSquare[][],
+  respondingPlayer: Player
+): boolean {
+  for (let row = 0; row < 9; row += 1) {
+    for (let col = 0; col < 9; col += 1) {
+      const piece = squares[row][col].piece;
+      if (
+        piece?.player === respondingPlayer &&
+        getLegalMoves(squares, { row, col }, respondingPlayer).length > 0
+      ) {
+        return true;
+      }
+    }
+  }
+  return false;
+}
+
+function isPawnDropMateOnSimulatedBoard(
+  squares: BoardSquare[][],
+  droppingPlayer: Player
+): boolean {
+  const respondingPlayer: Player = droppingPlayer === 'sente' ? 'gote' : 'sente';
+
+  if (!isKingInCheck(squares, respondingPlayer)) {
+    return false;
+  }
+
+  return !hasLegalBoardMoveResponseToPawnCheck(squares, respondingPlayer);
 }
 
 /** Validates one proposed drop in the documented rule order. */
@@ -158,6 +190,18 @@ export function validateDrop(
       isValid: false,
       reason: 'self_check_unresolved',
       message: ILLEGAL_MOVE_MESSAGES.self_check_unresolved,
+    };
+  }
+
+  if (
+    piece.type === 'pawn' &&
+    !piece.isPromoted &&
+    isPawnDropMateOnSimulatedBoard(simulatedSquares, state.turn)
+  ) {
+    return {
+      isValid: false,
+      reason: 'pawn_drop_mate',
+      message: ILLEGAL_MOVE_MESSAGES.pawn_drop_mate,
     };
   }
 
