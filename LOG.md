@@ -1059,3 +1059,38 @@ Node.js 24系移行後に残っていたGitHub ActionsのNode.js 20 Action depre
 - `npm test`: 成功（137件）
 - `npm run build`: 成功
 - `npm run check`: 成功
+
+## [2026-08-27] PR #1レビュー修正: applyMove必須成りと不成棋譜
+
+### 概要
+
+PR #1のレビュー指摘を受け、簡易APIの`applyMove`と合法手候補の不整合を解消し、不成を選択した指し手の表示用棋譜を明確化しました。
+
+### 修正内容
+
+1. **`applyMove`の成り方決定**
+   - `getPromotionStatus`の結果を一度取得し、必須成りは`promotion: 'promote'`、任意成りは後方互換のため`promotion: 'decline'`、成りなしは指定なしで`executeMove`へ渡すよう修正。
+   - `getLegalMoves`が返す必須成り候補を`applyMove`へ渡しても拒否されていた不整合を解消。
+   - `executeMove`の直接呼び出しでは、成り指定不足や不正指定に対する既存の厳格な検証を維持。
+
+2. **不成の表示用棋譜**
+   - `promotion: 'decline'`の指し手へ「不成」を付け、`▲5三銀不成`のように表示するよう修正。
+   - `promote`は「成」、`none`は接尾辞なし、既存の成駒は「成銀」「竜」「馬」などの駒名のみを使用する仕様を維持。
+
+3. **テスト**
+   - 先手・後手の歩、香、桂について、すべての必須成り境界をパラメータ化して`applyMove`による成駒への局面更新を検証。
+   - 必須成り候補の`getLegalMoves`と`applyMove`の一連の整合性を検証。
+   - 任意成りを`applyMove`が不成として適用し、履歴と棋譜へ記録することを検証。
+   - `promote`、`decline`、`none`、成銀、竜、馬の棋譜表記を個別に検証。
+   - 通常手、非合法手、成駒捕獲、成り選択UI、strict/assist方式の既存回帰テストを維持。
+
+### 検証結果
+
+- Node.js: `v24.19.0`
+- npm: `11.17.0`
+- `npm run verify:lock`: 成功
+- `npm run lint`: 成功
+- `npm test`: 成功（152件）
+- `npm run build`: 成功
+- `npm run check`: 成功
+- `git diff --check`: 成功

@@ -133,6 +133,17 @@ describe('16. 成り・不成選択と必須成り', () => {
       { row: 0, col: 0, piece: { id: 'king-g', type: 'king', player: 'gote' } },
     ]);
 
+    const requiredPromotionCases = [
+      { label: '先手の歩 row 0', type: 'pawn', player: 'sente', from: { row: 1, col: 4 }, to: { row: 0, col: 4 } },
+      { label: '先手の香 row 0', type: 'lance', player: 'sente', from: { row: 1, col: 4 }, to: { row: 0, col: 4 } },
+      { label: '先手の桂 row 0', type: 'knight', player: 'sente', from: { row: 2, col: 4 }, to: { row: 0, col: 3 } },
+      { label: '先手の桂 row 1', type: 'knight', player: 'sente', from: { row: 3, col: 4 }, to: { row: 1, col: 3 } },
+      { label: '後手の歩 row 8', type: 'pawn', player: 'gote', from: { row: 7, col: 4 }, to: { row: 8, col: 4 } },
+      { label: '後手の香 row 8', type: 'lance', player: 'gote', from: { row: 7, col: 4 }, to: { row: 8, col: 4 } },
+      { label: '後手の桂 row 7', type: 'knight', player: 'gote', from: { row: 5, col: 4 }, to: { row: 7, col: 3 } },
+      { label: '後手の桂 row 8', type: 'knight', player: 'gote', from: { row: 6, col: 4 }, to: { row: 8, col: 3 } },
+    ] as const;
+
     it('任意成りは指定なしを拒否し、promote と decline を履歴込みで区別すること', () => {
       const state = optionalSilverState();
       const missing = executeMove(state, { row: 3, col: 4 }, { row: 2, col: 4 });
@@ -152,7 +163,7 @@ describe('16. 成り・不成選択と必須成り', () => {
       if (declined.type === 'applied') {
         expect(declined.state.squares[2][4].piece?.isPromoted).toBeFalsy();
         expect(declined.move.promotion).toBe('decline');
-        expect(declined.move.notation).toBe('▲5三銀');
+        expect(declined.move.notation).toBe('▲5三銀不成');
       }
     });
 
@@ -219,6 +230,110 @@ describe('16. 成り・不成選択と必須成り', () => {
       const moved = applyMove(initial, { row: 6, col: 2 }, { row: 5, col: 2 });
       expect(moved.squares[5][2].piece?.type).toBe('pawn');
       expect(moved.history[0].promotion).toBe('none');
+    });
+
+    it('applyMove は先手の歩を2段目から1段目へ自動的に成って適用すること', () => {
+      const state = createPromotionTestBoard([
+        { row: 1, col: 4, piece: { id: 'required-pawn-s', type: 'pawn', player: 'sente' } },
+      ]);
+
+      const moved = applyMove(state, { row: 1, col: 4 }, { row: 0, col: 4 });
+
+      expect(moved).not.toBe(state);
+      expect(moved.squares[1][4].piece).toBeNull();
+      expect(moved.squares[0][4].piece).toMatchObject({
+        id: 'required-pawn-s',
+        type: 'pawn',
+        player: 'sente',
+        isPromoted: true,
+      });
+      expect(moved.turn).toBe('gote');
+      expect(moved.moveNumber).toBe(state.moveNumber + 1);
+      expect(moved.history).toHaveLength(1);
+      expect(moved.history[0].promotion).toBe('promote');
+      expect(moved.history[0].notation).toBe('▲5一歩成');
+    });
+
+    it.each(requiredPromotionCases)(
+      'applyMove は必須成り境界（$label）を成駒として適用すること',
+      ({ type, player, from, to }) => {
+        const state = createPromotionTestBoard([
+          { row: from.row, col: from.col, piece: { id: `required-${player}-${type}-${to.row}`, type, player } },
+        ], player);
+
+        const moved = applyMove(state, from, to);
+
+        expect(moved).not.toBe(state);
+        expect(moved.squares[from.row][from.col].piece).toBeNull();
+        expect(moved.squares[to.row][to.col].piece).toMatchObject({ type, player, isPromoted: true });
+        expect(moved.history).toHaveLength(1);
+        expect(moved.history[0].promotion).toBe('promote');
+        expect(moved.history[0].notation).toMatch(/成$/);
+      }
+    );
+
+    it('getLegalMoves の必須成り候補を applyMove へ渡すと成駒として着手できること', () => {
+      const from = { row: 2, col: 4 };
+      const to = { row: 0, col: 3 };
+      const state = createPromotionTestBoard([
+        { row: from.row, col: from.col, piece: { id: 'candidate-knight-s', type: 'knight', player: 'sente' } },
+      ]);
+
+      expect(getLegalMoves(state.squares, from, state.turn)).toContainEqual(to);
+      const moved = applyMove(state, from, to);
+
+      expect(moved.squares[from.row][from.col].piece).toBeNull();
+      expect(moved.squares[to.row][to.col].piece).toMatchObject({
+        id: 'candidate-knight-s',
+        isPromoted: true,
+      });
+    });
+
+    it('applyMove は任意成りを後方互換の不成として適用し棋譜へ「不成」を付けること', () => {
+      const state = optionalSilverState();
+      const moved = applyMove(state, { row: 3, col: 4 }, { row: 2, col: 4 });
+
+      expect(moved).not.toBe(state);
+      expect(moved.squares[2][4].piece?.type).toBe('silver');
+      expect(moved.squares[2][4].piece?.isPromoted).toBeFalsy();
+      expect(moved.history[0].promotion).toBe('decline');
+      expect(moved.history[0].notation).toBe('▲5三銀不成');
+    });
+
+    it('generateMoveNotation は promote に「成」を付けること', () => {
+      const silver: Piece = { id: 'notation-silver', type: 'silver', player: 'sente' };
+      expect(generateMoveNotation('sente', silver, { row: 2, col: 4 }, 'promote')).toBe('▲5三銀成');
+    });
+
+    it('generateMoveNotation は decline に「不成」を付けること', () => {
+      const silver: Piece = { id: 'notation-silver', type: 'silver', player: 'sente' };
+      expect(generateMoveNotation('sente', silver, { row: 2, col: 4 }, 'decline')).toBe('▲5三銀不成');
+    });
+
+    it('generateMoveNotation は none に接尾辞を付けないこと', () => {
+      const pawn: Piece = { id: 'notation-pawn', type: 'pawn', player: 'sente' };
+      expect(generateMoveNotation('sente', pawn, { row: 5, col: 2 }, 'none')).toBe('▲7六歩');
+    });
+
+    it('すでに成っている銀・飛・角の通常移動は成駒名だけを表示すること', () => {
+      expect(generateMoveNotation(
+        'sente',
+        { id: 'promoted-silver', type: 'silver', player: 'sente', isPromoted: true },
+        { row: 2, col: 4 },
+        'none'
+      )).toBe('▲5三成銀');
+      expect(generateMoveNotation(
+        'sente',
+        { id: 'promoted-rook', type: 'rook', player: 'sente', isPromoted: true },
+        { row: 4, col: 4 },
+        'none'
+      )).toBe('▲5五竜');
+      expect(generateMoveNotation(
+        'sente',
+        { id: 'promoted-bishop', type: 'bishop', player: 'sente', isPromoted: true },
+        { row: 4, col: 4 },
+        'none'
+      )).toBe('▲5五馬');
     });
   });
 

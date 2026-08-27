@@ -76,7 +76,8 @@ export function getPieceNotationKanji(
 }
 
 /**
- * Generates a human-readable and structured Japanese move notation (e.g. "▲7六歩", "△3四歩", "▲5三成銀").
+ * Generates Japanese move notation for normal moves, promotion choices, and promoted pieces.
+ * Examples: "▲7六歩", "▲5三銀成", "▲5三銀不成", "▲5三成銀".
  */
 export function generateMoveNotation(
   player: Player,
@@ -91,7 +92,9 @@ export function generateMoveNotation(
     player,
     piece.isPromoted ?? false
   );
-  return `${symbol}${destCoord}${pieceKanji}${promotion === 'promote' ? '成' : ''}`;
+  const promotionSuffix =
+    promotion === 'promote' ? '成' : promotion === 'decline' ? '不成' : '';
+  return `${symbol}${destCoord}${pieceKanji}${promotionSuffix}`;
 }
 
 /**
@@ -376,9 +379,13 @@ export function applyMove(
   to: Coordinate
 ): BoardState {
   const piece = state.squares[from.row]?.[from.col]?.piece;
-  const promotion = piece && getPromotionStatus(piece, from, to) === 'optional'
-    ? 'decline'
-    : undefined;
+  const promotionStatus = piece ? getPromotionStatus(piece, from, to) : 'none';
+  const promotion: PromotionChoice | undefined =
+    promotionStatus === 'required'
+      ? 'promote'
+      : promotionStatus === 'optional'
+        ? 'decline'
+        : undefined;
   const result = executeMove(state, from, to, { mode: 'assist', promotion });
   return result.state;
 }
