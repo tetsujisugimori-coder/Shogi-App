@@ -6,7 +6,9 @@ import { ShogiResearchScreen } from '../components/shogi/ShogiResearchScreen';
 import {
   cloneBoardSquares,
   executeDrop,
+  executeMove,
   getLegalDropSquares,
+  getLegalMoves,
   isKingInCheck,
   simulateDropSquares,
   validateDrop,
@@ -41,6 +43,49 @@ function createDropState(
 
 const senteKing: Piece = { id: 'king-s', type: 'king', player: 'sente' };
 const goteKing: Piece = { id: 'king-g', type: 'king', player: 'gote' };
+
+function createPawnDropMateState(droppingPlayer: Player = 'sente') {
+  const pawn: Piece = {
+    id: `${droppingPlayer}-mate-pawn`,
+    type: 'pawn',
+    player: droppingPlayer,
+  };
+  const isSente = droppingPlayer === 'sente';
+  const to = { row: isSente ? 1 : 7, col: 4 };
+  const state = createDropState([pawn], droppingPlayer, isSente
+    ? [
+        { row: 8, col: 4, piece: senteKing },
+        { row: 0, col: 4, piece: goteKing },
+        { row: 2, col: 4, piece: { id: 'sente-pawn-guard', type: 'gold', player: 'sente' } },
+        { row: 0, col: 3, piece: { id: 'gote-left-blocker', type: 'lance', player: 'gote' } },
+        { row: 0, col: 5, piece: { id: 'gote-right-blocker', type: 'lance', player: 'gote' } },
+        { row: 1, col: 3, piece: { id: 'gote-left-front-blocker', type: 'pawn', player: 'gote' } },
+        { row: 1, col: 5, piece: { id: 'gote-right-front-blocker', type: 'pawn', player: 'gote' } },
+      ]
+    : [
+        { row: 8, col: 4, piece: senteKing },
+        { row: 0, col: 4, piece: goteKing },
+        { row: 6, col: 4, piece: { id: 'gote-pawn-guard', type: 'gold', player: 'gote' } },
+        { row: 8, col: 3, piece: { id: 'sente-left-blocker', type: 'lance', player: 'sente' } },
+        { row: 8, col: 5, piece: { id: 'sente-right-blocker', type: 'lance', player: 'sente' } },
+        { row: 7, col: 3, piece: { id: 'sente-left-front-blocker', type: 'pawn', player: 'sente' } },
+        { row: 7, col: 5, piece: { id: 'sente-right-front-blocker', type: 'pawn', player: 'sente' } },
+      ]);
+  return { state, pawn, to, respondingPlayer: isSente ? 'gote' as const : 'sente' as const };
+}
+
+function expectNoLegalBoardMoveResponses(
+  squares: BoardState['squares'],
+  respondingPlayer: Player
+) {
+  for (let row = 0; row < 9; row += 1) {
+    for (let col = 0; col < 9; col += 1) {
+      if (squares[row][col].piece?.player === respondingPlayer) {
+        expect(getLegalMoves(squares, { row, col }, respondingPlayer)).toEqual([]);
+      }
+    }
+  }
+}
 
 describe('駒打ちドメイン', () => {
   it.each(['pawn', 'lance', 'knight', 'silver', 'gold', 'bishop', 'rook'] as const)(
@@ -192,6 +237,150 @@ describe('駒打ちドメイン', () => {
     expect(validateDrop(state, pawn1.id, { row: 4, col: 2 })).toMatchObject({ reason: 'nifu' });
   });
 
+  it('先手5二歩打が完全な詰みになる場合はpawn_drop_mateで拒否する', () => {
+    const { state, pawn, to, respondingPlayer } = createPawnDropMateState('sente');
+    const simulated = simulateDropSquares(state.squares, pawn, to);
+
+    expect(isKingInCheck(state.squares, respondingPlayer)).toBe(false);
+    expect(isKingInCheck(simulated, respondingPlayer)).toBe(true);
+    expectNoLegalBoardMoveResponses(simulated, respondingPlayer);
+    expect(validateDrop(state, pawn.id, to)).toEqual({
+      isValid: false,
+      reason: 'pawn_drop_mate',
+      message: '歩を打って相手玉を詰ませる打ち歩詰めは禁止されています。',
+    });
+  });
+
+  it('後手5八歩打でも対称に打ち歩詰めを拒否する', () => {
+    const { state, pawn, to, respondingPlayer } = createPawnDropMateState('gote');
+    const simulated = simulateDropSquares(state.squares, pawn, to);
+
+    expect(isKingInCheck(simulated, respondingPlayer)).toBe(true);
+    expectNoLegalBoardMoveResponses(simulated, respondingPlayer);
+    expect(validateDrop(state, pawn.id, to)).toMatchObject({
+      isValid: false,
+      reason: 'pawn_drop_mate',
+    });
+  });
+
+  it('玉に逃げられるマスが一つでもあれば歩打ちは合法になる', () => {
+    const { state, pawn, to } = createPawnDropMateState('sente');
+    state.squares[0][3].piece = null;
+    const simulated = simulateDropSquares(state.squares, pawn, to);
+
+    expect(getLegalMoves(simulated, { row: 0, col: 4 }, 'gote')).toContainEqual({ row: 0, col: 3 });
+    expect(validateDrop(state, pawn.id, to)).toEqual({ isValid: true });
+    expect(getLegalDropSquares(state, pawn.id)).toContainEqual(to);
+    expect(executeDrop(state, pawn.id, to).type).toBe('applied');
+  });
+
+  it('玉が打たれた歩を安全に取れる場合は歩打ちを許可する', () => {
+    const { state, pawn, to } = createPawnDropMateState('sente');
+    state.squares[2][4].piece = null;
+    const simulated = simulateDropSquares(state.squares, pawn, to);
+
+    expect(getLegalMoves(simulated, { row: 0, col: 4 }, 'gote')).toContainEqual(to);
+    expect(validateDrop(state, pawn.id, to)).toEqual({ isValid: true });
+  });
+
+  it('玉以外の相手駒が打たれた歩を合法的に取れる場合は歩打ちを許可する', () => {
+    const { state, pawn, to } = createPawnDropMateState('sente');
+    state.squares[0][3].piece = { id: 'gote-capturing-gold', type: 'gold', player: 'gote' };
+    const simulated = simulateDropSquares(state.squares, pawn, to);
+
+    expect(getLegalMoves(simulated, { row: 0, col: 3 }, 'gote')).toContainEqual(to);
+    expect(validateDrop(state, pawn.id, to)).toEqual({ isValid: true });
+  });
+
+  it('歩打ちが王手でなければ相手の盤上合法手の有無にかかわらず打ち歩詰めにしない', () => {
+    const { state, pawn } = createPawnDropMateState('sente');
+    const to = { row: 4, col: 4 };
+    const simulated = simulateDropSquares(state.squares, pawn, to);
+
+    expect(isKingInCheck(simulated, 'gote')).toBe(false);
+    expect(validateDrop(state, pawn.id, to)).toEqual({ isValid: true });
+  });
+
+  it('歩以外の駒を打って詰みの形になってもpawn_drop_mateにしない', () => {
+    const { state, to } = createPawnDropMateState('sente');
+    const lance: Piece = { id: 'sente-mating-lance', type: 'lance', player: 'sente' };
+    state.senteHand = [lance];
+    const simulated = simulateDropSquares(state.squares, lance, to);
+
+    expect(isKingInCheck(simulated, 'gote')).toBe(true);
+    expectNoLegalBoardMoveResponses(simulated, 'gote');
+    expect(validateDrop(state, lance.id, to)).toEqual({ isValid: true });
+  });
+
+  it('盤上の歩を進めて詰ませる突き歩詰めは歩打ち判定の対象にしない', () => {
+    const state = createDropState([], 'sente', [
+      { row: 8, col: 4, piece: senteKing },
+      { row: 0, col: 4, piece: goteKing },
+      { row: 2, col: 4, piece: { id: 'moving-pawn', type: 'pawn', player: 'sente' } },
+      { row: 3, col: 4, piece: { id: 'pawn-guard-rook', type: 'rook', player: 'sente' } },
+      { row: 0, col: 3, piece: { id: 'gote-left-blocker', type: 'lance', player: 'gote' } },
+      { row: 0, col: 5, piece: { id: 'gote-right-blocker', type: 'lance', player: 'gote' } },
+      { row: 1, col: 3, piece: { id: 'gote-left-front-blocker', type: 'pawn', player: 'gote' } },
+      { row: 1, col: 5, piece: { id: 'gote-right-front-blocker', type: 'pawn', player: 'gote' } },
+    ]);
+    const result = executeMove(state, { row: 2, col: 4 }, { row: 1, col: 4 }, {
+      promotion: 'decline',
+    });
+
+    expect(result.type).toBe('applied');
+    if (result.type !== 'applied') return;
+    expect(isKingInCheck(result.state.squares, 'gote')).toBe(true);
+    expectNoLegalBoardMoveResponses(result.state.squares, 'gote');
+  });
+
+  it('二歩にも打ち歩詰めにもなる入力では先にnifuを返す', () => {
+    const { state, pawn, to } = createPawnDropMateState('sente');
+    state.squares[2][4].piece = { id: 'sente-nifu-guard', type: 'pawn', player: 'sente' };
+
+    expect(validateDrop(state, pawn.id, to)).toMatchObject({ isValid: false, reason: 'nifu' });
+  });
+
+  it('自玉の王手を放置する歩打ちは打ち歩詰めより先にself_check_unresolvedを返す', () => {
+    const { state, pawn, to } = createPawnDropMateState('sente');
+    state.squares[8][4].piece = null;
+    state.squares[8][8].piece = { ...senteKing };
+    state.squares[3][8].piece = { id: 'gote-checking-rook', type: 'rook', player: 'gote' };
+
+    expect(isKingInCheck(state.squares, 'sente')).toBe(true);
+    expect(validateDrop(state, pawn.id, to)).toMatchObject({
+      isValid: false,
+      reason: 'self_check_unresolved',
+    });
+  });
+
+  it('ピンされた相手駒による見かけ上の歩取りを合法な応手として数えない', () => {
+    const { state, pawn, to } = createPawnDropMateState('sente');
+    state.squares[0][3].piece = { id: 'pinned-gote-gold', type: 'gold', player: 'gote' };
+    state.squares[0][0].piece = { id: 'pinning-sente-rook', type: 'rook', player: 'sente' };
+    const simulated = simulateDropSquares(state.squares, pawn, to);
+
+    expect(getLegalMoves(simulated, { row: 0, col: 3 }, 'gote')).not.toContainEqual(to);
+    expectNoLegalBoardMoveResponses(simulated, 'gote');
+    expect(validateDrop(state, pawn.id, to)).toMatchObject({ reason: 'pawn_drop_mate' });
+  });
+
+  it('打ち歩詰めマスを候補から除外し、判定中も元のstate・盤面・持ち駒を変更しない', () => {
+    const { state, pawn, to } = createPawnDropMateState('sente');
+    const snapshot = JSON.stringify(state);
+    const originalSquares = state.squares;
+    const originalHand = state.senteHand;
+    const originalHandPiece = state.senteHand[0];
+    const originalBoardPiece = state.squares[2][4].piece;
+
+    expect(getLegalDropSquares(state, pawn.id)).not.toContainEqual(to);
+    expect(validateDrop(state, pawn.id, to)).toMatchObject({ reason: 'pawn_drop_mate' });
+    expect(JSON.stringify(state)).toBe(snapshot);
+    expect(state.squares).toBe(originalSquares);
+    expect(state.senteHand).toBe(originalHand);
+    expect(state.senteHand[0]).toBe(originalHandPiece);
+    expect(state.squares[2][4].piece).toBe(originalBoardPiece);
+  });
+
   it.each([
     ['飛車', { row: 0, col: 4, piece: { id: 'checking-rook', type: 'rook', player: 'gote' } as Piece }, { row: 4, col: 4 }],
     ['角', { row: 4, col: 0, piece: { id: 'checking-bishop', type: 'bishop', player: 'gote' } as Piece }, { row: 6, col: 2 }],
@@ -237,6 +426,16 @@ describe('駒打ちドメイン', () => {
     expect(state.foulHistory).toEqual([]);
   });
 
+  it('assist方式は打ち歩詰めを同じstate参照で拒否し全内容を維持する', () => {
+    const { state, pawn, to } = createPawnDropMateState('sente');
+    const snapshot = JSON.stringify(state);
+    const result = executeDrop(state, pawn.id, to, { mode: 'assist' });
+
+    expect(result).toMatchObject({ type: 'rejected', reason: 'pawn_drop_mate' });
+    expect(result.state).toBe(state);
+    expect(JSON.stringify(state)).toBe(snapshot);
+  });
+
   it('strict方式は駒打ち反則履歴だけを追加して正しい反則負けにする', () => {
     const pawn: Piece = { id: 'pawn', type: 'pawn', player: 'sente' };
     const state = createDropState([pawn], 'sente', [
@@ -264,6 +463,42 @@ describe('駒打ちドメイン', () => {
     expect(result.state.moveNumber).toBe(state.moveNumber);
     expect(result.state.history).toBe(state.history);
     expect(result.state.lastMove).toBe(state.lastMove);
+  });
+
+  it('strict方式は打ち歩詰めを詳細記録して提案者側の反則負けにする', () => {
+    const { state, pawn, to } = createPawnDropMateState('sente');
+    const result = executeDrop(state, pawn.id, to, {
+      mode: 'strict',
+      proposer: 'shogi_engine',
+      engineName: 'PawnMateEngine',
+    });
+
+    expect(result.type).toBe('foul_loss');
+    if (result.type !== 'foul_loss') return;
+    expect(result.result).toMatchObject({
+      winner: 'gote',
+      loser: 'sente',
+      foulReason: 'pawn_drop_mate',
+    });
+    expect(result.foul).toMatchObject({
+      kind: 'drop',
+      from: null,
+      to,
+      pieceId: pawn.id,
+      pieceType: 'pawn',
+      reason: 'pawn_drop_mate',
+      proposer: 'shogi_engine',
+      engineName: 'PawnMateEngine',
+    });
+    expect(result.state.squares).toBe(state.squares);
+    expect(result.state.senteHand).toBe(state.senteHand);
+    expect(result.state.goteHand).toBe(state.goteHand);
+    expect(result.state.turn).toBe(state.turn);
+    expect(result.state.moveNumber).toBe(state.moveNumber);
+    expect(result.state.history).toBe(state.history);
+    expect(result.state.lastMove).toBe(state.lastMove);
+    expect(result.state.status).toBe('ended');
+    expect(result.state.foulHistory).toEqual([result.foul]);
   });
 
   it('strict方式で不存在IDはpieceType:null、相手IDは実在駒種を記録する', () => {
@@ -349,6 +584,31 @@ describe('駒打ちUI・アクセシビリティ', () => {
     expect(nifu).not.toHaveAttribute('data-candidate');
     expect(dead).not.toHaveAttribute('data-candidate');
     expect(occupied).not.toHaveAttribute('data-candidate');
+  });
+
+  it('打ち歩詰めマスを強調せず「歩兵を打てる」というARIA案内も付けない', async () => {
+    const user = userEvent.setup();
+    const { state, pawn } = createPawnDropMateState('sente');
+    render(<ShogiResearchScreen initialState={state} />);
+
+    await user.click(document.querySelector(`[data-hand-piece-id="${pawn.id}"]`) as HTMLElement);
+    const target = document.querySelector('[data-coordinate="5二"]');
+    expect(target).not.toHaveAttribute('data-candidate');
+    expect(target).not.toHaveAttribute('data-candidate-kind');
+    expect(target).not.toHaveAttribute('aria-label', expect.stringContaining('歩兵を打てる'));
+  });
+
+  it('玉が逃げられる類似局面では同じ歩打ちを候補とARIAに表示する', async () => {
+    const user = userEvent.setup();
+    const { state, pawn } = createPawnDropMateState('sente');
+    state.squares[0][3].piece = null;
+    render(<ShogiResearchScreen initialState={state} />);
+
+    await user.click(document.querySelector(`[data-hand-piece-id="${pawn.id}"]`) as HTMLElement);
+    const target = document.querySelector('[data-coordinate="5二"]');
+    expect(target).toHaveAttribute('data-candidate', 'true');
+    expect(target).toHaveAttribute('data-candidate-kind', 'drop');
+    expect(target).toHaveAttribute('aria-label', expect.stringContaining('歩兵を打てる'));
   });
 
   it('候補選択で駒打ちし、持ち駒・手番・履歴・直前着手を更新して着手先へフォーカスする', async () => {
