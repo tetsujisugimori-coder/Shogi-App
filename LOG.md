@@ -1235,3 +1235,77 @@ PR #1のレビュー指摘を受け、簡易APIの`applyMove`と合法手候補�
 
 - 一般的な詰み判定と通常の詰みによる終局、王手状態のUI表示、千日手・連続王手の千日手、投了。
 - KIF / CSA / USI入出力、Undo / Redo / 待った、AI・将棋エンジン接続。
+
+## [2026-08-28] 一般的な詰み判定・終局処理・王手UIの実装
+
+### 基準と実装目的
+
+- 基準コミット: `5b924c565f60c0052fdd9ba0b79e9c90a2ff9965`（作業開始時の最新 `main`、`origin/main` と一致）
+- 作業ブランチ: `feat/checkmate-adjudication`
+- 合法手の適用後、交代済みの次手番側について一般的な王手・詰みを判定し、通常移動と駒打ちを同じ終局処理へ統合することを目的とした。
+
+### 詰み判定の手順と応手探索
+
+- `src/domain/shogi/checkmate.ts` に純粋関数 `isPlayerInCheck`、`hasLegalBoardMove`、`hasLegalDrop`、`hasLegalResponse`、`isCheckmate` を追加し、`src/domain/shogi/index.ts` から公開した。
+- 指定プレイヤーの玉が王手でなければ、合法手がない局面でも詰みとしない。王手なら、盤上の全自駒と持ち駒の全IDを順に調べ、いずれか一つでも合法な応手があれば詰みとしない短絡評価にした。
+- 盤上応手は既存 `getLegalMoves` を再利用し、玉の退避、玉・他駒による王手駒捕獲、盤上移動による合駒、ピンされた駒と王手放置の除外を一元化した。成りが必須または任意の移動先には必ず合法な成り方があるため、移動先の存在を応手として数える。
+- 駒打ち応手は既存の `validateDrop` / `getLegalDropSquares` を再利用し、飛車・角・香の直線王手への合駒、二歩、行き所のない駒打ち、王手放置、打ち歩詰めを同じ規則で検証する。入力state・盤面・持ち駒・駒オブジェクトは変更しない。
+
+### 打ち歩詰めとの境界
+
+- 未成歩を打って即詰みにする手は、従来どおり `validateDrop` 内で着手前に `pawn_drop_mate` として拒否する。assistは入力stateと同じ参照で拒否し、strictは提案者側の `foul_loss` として記録する。
+- 一般詰み判定から `executeMove` / `executeDrop` は呼ばない。打ち歩詰め判定も直接王手された側の盤上合法手だけを調べ、一般詰み判定を再帰呼び出ししないため、相互再帰やスタックオーバーフローを作らない。
+- 盤上の歩を進める突き歩詰めと、歩以外の駒打ちによる詰みは合法な `checkmate` として終局する。
+
+### 状態更新とUI表示
+
+- `src/domain/shogi/adjudication.ts` の `adjudicateAfterLegalMove` を、`executeMove` と `executeDrop` の合法手適用直後に共通利用した。次手番側が詰みなら `status: 'ended'` と勝者・敗者・`endReason: 'checkmate'`、応手がある王手なら `status: 'check'` / `result: null`、非王手なら `status: 'active'` / `result: null` にする。
+- 詰みを与えた着手も、盤面・持ち駒・手番・手数・履歴・`lastMove`・成り・駒取り・棋譜を通常どおり更新し、反則履歴には入れない。assist / strictの合法手は同じ判定を通る。
+- `ShogiResearchScreen` のステータスバッジへ「王手 / 先手番・後手番」と「終局 / 先手勝ち・後手勝ち（詰み）」を追加し、既存の反則負け表示と区別した。`role="status"` / `aria-live="polite"` を維持し、色だけでなく文字で通知する。
+- 終局時は選択・候補・成りダイアログを消し、盤のクリック・キーボード操作と両駒台を無効化する。フッターも一般的な詰み判定・終局処理まで対応済みの内容へ更新した。
+
+### 循環依存を避ける設計判断
+
+- 従来 `drops.ts` にあった純粋な駒打ち検証・候補生成・仮想盤面処理を、依存関係の下位に置く `dropRules.ts` へ分離した。`drops.ts` は既存公開APIを再exportして互換性を維持する。
+- 盤面複製と手番反転を `boardStateUtils.ts` へ分離した。依存方向を `gameState.ts` / `drops.ts` → `adjudication.ts` → `checkmate.ts` → `dropRules.ts` / `moves.ts` / `attacks.ts` とし、`gameState.ts` と `drops.ts` の相互import、および新モジュールを介した循環importを避けた。
+- 検証を省略する `internalApplyLegalMove` / `internalApplyLegalDrop` は従来どおり各実行モジュール内部に閉じ、公開していない。
+
+### 追加・変更ファイル
+
+- 追加: `src/domain/shogi/adjudication.ts`
+- 追加: `src/domain/shogi/boardStateUtils.ts`
+- 追加: `src/domain/shogi/checkmate.ts`
+- 追加: `src/domain/shogi/dropRules.ts`
+- 追加: `src/test/shogi-checkmate.test.tsx`
+- 変更: `src/domain/shogi/gameState.ts`, `src/domain/shogi/drops.ts`, `src/domain/shogi/index.ts`
+- 変更: `src/components/shogi/ShogiResearchScreen.tsx`
+- 変更: `src/test/shogi.test.tsx`, `README.md`, `LOG.md`
+- `package.json`、`package-lock.json`、CI設定、依存パッケージの変更: なし
+
+### テストと検証結果
+
+- 新規テスト: 30件。通常移動・成り・突き歩・歩以外の駒打ちによる詰み、玉の退避、玉・他駒による王手駒捕獲、盤上・持ち駒の合駒、二歩・行き所、ピン、非王手、先後対称、勝敗・履歴、イミュータビリティ、assist / strict、終局後拒否、打ち歩詰め境界、再帰ループ防止、王手・詰みUI、終局後操作停止を検証した。
+- 最終テスト総数: **246/246 passed**（3 test files）。既存216件をすべて維持した。
+- 実行環境: Node.js `v24.14.1` / npm `11.11.0`。リポジトリ指定の Node.js `>=24.15.0 <25` / npm `>=11.17.0 <12` より古いため、その差異を記録し、設定・依存ファイルは変更していない。
+- `node --version`: `v24.14.1`
+- `npm --version`: `11.11.0`
+- `npm run verify:lock`: 成功（399エントリ、registry package 398件、欠落ゼロ）
+- `npm run lint`: 成功（TypeScriptエラーなし）
+- `npm test`: 成功（3ファイル、246件）
+- `npm run build`: 成功（1694 modules transformed）
+- `npm run check`: 成功（lock / lint / 246 tests / build）
+- `git diff --check`: 成功
+- npm `11.11.0` では `.npmrc` の `strict-allow-scripts` に将来互換性警告が出たが、全コマンドの終了コードは0だった。
+
+### ブラウザ目視確認
+
+- 実施あり。Vite開発サーバーと接続済みChromeを使用し、PC幅 1440×1100 と狭幅 500×1000 を確認した。
+- 通常状態は「対局中 / 先手番」、81マス、roving tabindex 1件、更新後フッターを確認した。狭幅では横スクロールがなく、盤・駒台・バッジ・フッターの崩れがないことを画像で確認した。
+- 王手状態は「王手 / 先手番」と `aria-live="polite"`、詰み終局は「終局 / 先手勝ち（詰み）」、盤のTab停止0件、候補0件、選択0件、両駒台 `data-active="false"` を実画面で確認した。
+- 全状態でViteエラーオーバーレイなし、ブラウザコンソールエラーなし。王手・詰み確認用の一時初期state差分は確認後に完全に戻し、成果物へ含めていない。
+
+### 残る未実装事項
+
+- 千日手、連続王手の千日手、投了、入玉宣言、持将棋。
+- KIF / CSA / USI入出力、Undo / Redo、待った、局面リセット。
+- AI対局・将棋エンジン接続、形勢評価グラフ。

@@ -5,11 +5,9 @@
  */
 
 import {
-  BoardSquare,
   BoardState,
   ExecutionMode,
   MoveFoulRecord,
-  IllegalMoveReason,
   NormalMoveRecord,
   MovePromotion,
   MoveValidationResult,
@@ -28,6 +26,8 @@ import {
   FoulLossExecutionResult,
   RejectedExecutionResult,
 } from './executionPolicy';
+import { adjudicateAfterLegalMove } from './adjudication';
+import { cloneBoardSquares } from './boardStateUtils';
 
 export type { FoulLossExecutionResult, RejectedExecutionResult } from './executionPolicy';
 
@@ -106,14 +106,7 @@ export function generateMoveNotation(
 /**
  * Deep clones the 9x9 board squares without mutating the original state.
  */
-export function cloneBoardSquares(squares: BoardSquare[][]): BoardSquare[][] {
-  return squares.map((row) =>
-    row.map((square) => ({
-      ...square,
-      piece: square.piece ? { ...square.piece } : null,
-    }))
-  );
-}
+export { cloneBoardSquares } from './boardStateUtils';
 
 /**
  * Internal helper to apply a verified legal move to the board state.
@@ -308,7 +301,7 @@ export function executeMove(
     }
     return {
       type: 'applied',
-      state: applied.state,
+      state: adjudicateAfterLegalMove(applied.state, state.turn),
       move: applied.move,
     };
   }
