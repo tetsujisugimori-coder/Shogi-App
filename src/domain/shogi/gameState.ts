@@ -101,10 +101,10 @@ export function cloneBoardSquares(squares: BoardSquare[][]): BoardSquare[][] {
 }
 
 /**
- * Applies a verified legal move to the board state.
- * Returns a newly constructed immutable BoardState.
+ * Internal helper to apply a verified legal move to the board state.
+ * NOT exported to ensure all external callers validate moves through executeMove.
  */
-export function applyLegalMove(
+function internalApplyLegalMove(
   state: BoardState,
   from: Coordinate,
   to: Coordinate
@@ -171,8 +171,26 @@ export function applyLegalMove(
   };
 }
 
+/**
+ * Determines default execution mode according to the proposer type.
+ * - 'human' or omitted: 'assist' (interactive UI assistance)
+ * - 'local_ai' or 'shogi_engine': 'strict' (engine experimentation / foul loss rule)
+ */
+export function determineDefaultExecutionMode(
+  proposer: ProposerType = 'human'
+): ExecutionMode {
+  switch (proposer) {
+    case 'local_ai':
+    case 'shogi_engine':
+      return 'strict';
+    case 'human':
+    default:
+      return 'assist';
+  }
+}
+
 export interface ExecuteMoveOptions {
-  mode?: ExecutionMode; // Default: 'assist'
+  mode?: ExecutionMode; // If omitted, defaults according to proposer
   proposer?: ProposerType; // Default: 'human'
   engineName?: string;
 }
@@ -213,24 +231,24 @@ export function executeMove(
   to: Coordinate,
   options: ExecuteMoveOptions = {}
 ): MoveExecutionResult {
-  const mode = options.mode ?? 'assist';
   const proposer = options.proposer ?? 'human';
+  const mode = options.mode ?? determineDefaultExecutionMode(proposer);
 
-  // If game is already ended, reject further moves
+  // If game is already ended, reject further moves without triggering new foul losses or mutating state
   if (state.status === 'ended') {
     return {
       type: 'rejected',
       state,
-      reason: 'out_of_bounds',
+      reason: 'game_already_ended',
       message: '対局は既に終局しています。',
     };
   }
 
   const validation = validateMove(state, from, to);
 
-  // If move is legal, apply it
+  // If move is legal, apply it through the internal helper
   if (validation.isValid) {
-    const nextState = applyLegalMove(state, from, to);
+    const nextState = internalApplyLegalMove(state, from, to);
     return {
       type: 'applied',
       state: nextState,
@@ -239,8 +257,18 @@ export function executeMove(
   }
 
   // If move is illegal:
-  const originSquare = state.squares[from?.row]?.[from?.col];
-  const pieceType = originSquare?.piece?.type ?? 'pawn';
+  // Accurately record source piece if one exists on the board; do not fabricate a pieceType (e.g. pawn)
+  const isFromInBounds =
+    from &&
+    typeof from.row === 'number' &&
+    typeof from.col === 'number' &&
+    from.row >= 0 &&
+    from.row < 9 &&
+    from.col >= 0 &&
+    from.col < 9;
+
+  const originSquare = isFromInBounds ? state.squares[from.row]?.[from.col] : undefined;
+  const pieceType = originSquare?.piece?.type ?? null;
 
   const foulRecord: FoulRecord = {
     moveNumber: state.moveNumber,

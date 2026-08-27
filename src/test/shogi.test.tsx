@@ -36,11 +36,12 @@ import {
   validateMove,
   executeMove,
   applyMove,
-  applyLegalMove,
+  determineDefaultExecutionMode,
   generateMoveNotation,
   getPieceNotationKanji,
   cloneBoardSquares,
 } from '../domain/shogi';
+import * as ShogiDomainModule from '../domain/shogi';
 import { validateLockfile } from '../../scripts/verify-lockfile.mjs';
 import {
   runCleanups,
@@ -2161,4 +2162,202 @@ describe('9. 将棋ドメイン層・駒移動・合法手・手番・取り駒�
     });
   });
 
+  describe('15. 公開API・提案元別既定モード・反則履歴駒種・終局後拒否の厳密検証', () => {
+    describe('15.1 公開APIと低レベル盤面更新関数のカプセル化', () => {
+      it('src/domain/shogi/index.ts から低レベル盤面更新関数 (applyLegalMove / internalApplyLegalMove) が公開されていないこと', () => {
+        const exports = ShogiDomainModule as Record<string, unknown>;
+        expect(exports['applyLegalMove']).toBeUndefined();
+        expect(exports['internalApplyLegalMove']).toBeUndefined();
+        expect(typeof exports['executeMove']).toBe('function');
+        expect(typeof exports['applyMove']).toBe('function');
+        expect(typeof exports['determineDefaultExecutionMode']).toBe('function');
+      });
+
+      it('公開API applyMove に不正手を渡しても盤面が更新されないこと（アシスト方式で保護）', () => {
+        const state = createInitialBoardState();
+        // 歩を7七(6,2)から7五(4,2)へ二段進める不正手
+        const nextState = applyMove(state, { row: 6, col: 2 }, { row: 4, col: 2 });
+        expect(nextState).toBe(state);
+        expect(nextState.squares[6][2].piece?.type).toBe('pawn');
+        expect(nextState.squares[4][2].piece).toBeNull();
+        expect(nextState.turn).toBe('sente');
+        expect(nextState.moveNumber).toBe(1);
+      });
+
+      it('公開API applyMove に合法手を渡した場合は正常に局面が更新されること', () => {
+        const state = createInitialBoardState();
+        const nextState = applyMove(state, { row: 6, col: 2 }, { row: 5, col: 2 });
+        expect(nextState).not.toBe(state);
+        expect(nextState.squares[6][2].piece).toBeNull();
+        expect(nextState.squares[5][2].piece?.type).toBe('pawn');
+        expect(nextState.turn).toBe('gote');
+        expect(nextState.moveNumber).toBe(2);
+      });
+    });
+
+    describe('15.2 提案元 (proposer) に応じた既定モードの選択', () => {
+      it('determineDefaultExecutionMode が proposer に応じて適切なモードを返すこと', () => {
+        expect(determineDefaultExecutionMode(undefined)).toBe('assist');
+        expect(determineDefaultExecutionMode('human')).toBe('assist');
+        expect(determineDefaultExecutionMode('local_ai')).toBe('strict');
+        expect(determineDefaultExecutionMode('shogi_engine')).toBe('strict');
+      });
+
+      it('proposer 省略時は assist 方式となり、不正手で対局継続されること', () => {
+        const state = createInitialBoardState();
+        const res = executeMove(state, { row: 6, col: 2 }, { row: 4, col: 2 });
+        expect(res.type).toBe('rejected');
+        expect(res.state.status).toBe('active');
+      });
+
+      it('proposer: human で mode 省略時は assist 方式となり、不正手で対局継続されること', () => {
+        const state = createInitialBoardState();
+        const res = executeMove(state, { row: 6, col: 2 }, { row: 4, col: 2 }, { proposer: 'human' });
+        expect(res.type).toBe('rejected');
+        expect(res.state.status).toBe('active');
+      });
+
+      it('proposer: local_ai で mode 省略時は strict 方式となり、不正手で反則負けになること', () => {
+        const state = createInitialBoardState();
+        const res = executeMove(state, { row: 6, col: 2 }, { row: 4, col: 2 }, { proposer: 'local_ai' });
+        expect(res.type).toBe('foul_loss');
+        if (res.type === 'foul_loss') {
+          expect(res.state.status).toBe('ended');
+          expect(res.result.winner).toBe('gote');
+          expect(res.result.loser).toBe('sente');
+          expect(res.foul.proposer).toBe('local_ai');
+        }
+      });
+
+      it('proposer: shogi_engine で mode 省略時は strict 方式となり、不正手で反則負けになること', () => {
+        const state = createInitialBoardState();
+        const res = executeMove(state, { row: 6, col: 2 }, { row: 4, col: 2 }, {
+          proposer: 'shogi_engine',
+          engineName: 'YaneuraOu-v8',
+        });
+        expect(res.type).toBe('foul_loss');
+        if (res.type === 'foul_loss') {
+          expect(res.state.status).toBe('ended');
+          expect(res.result.winner).toBe('gote');
+          expect(res.foul.proposer).toBe('shogi_engine');
+          expect(res.foul.engineName).toBe('YaneuraOu-v8');
+        }
+      });
+
+      it('明示された mode は proposer の既定値より優先されること (local_ai + mode: assist / human + mode: strict)', () => {
+        const state = createInitialBoardState();
+
+        // local_ai に mode: assist を明示 -> 拒否のみで終局しない
+        const resAiAssist = executeMove(state, { row: 6, col: 2 }, { row: 4, col: 2 }, {
+          proposer: 'local_ai',
+          mode: 'assist',
+        });
+        expect(resAiAssist.type).toBe('rejected');
+        expect(resAiAssist.state.status).toBe('active');
+
+        // human に mode: strict を明示 -> 反則負けで終局
+        const resHumanStrict = executeMove(state, { row: 6, col: 2 }, { row: 4, col: 2 }, {
+          proposer: 'human',
+          mode: 'strict',
+        });
+        expect(resHumanStrict.type).toBe('foul_loss');
+        if (resHumanStrict.type === 'foul_loss') {
+          expect(resHumanStrict.state.status).toBe('ended');
+          expect(resHumanStrict.foul.proposer).toBe('human');
+        }
+      });
+    });
+
+    describe('15.3 反則履歴の駒種 (FoulRecord.pieceType) の厳密記録', () => {
+      it('実在する歩の不正手では pieceType: "pawn" が記録されること', () => {
+        const state = createInitialBoardState();
+        const res = executeMove(state, { row: 6, col: 2 }, { row: 4, col: 2 }, { proposer: 'local_ai' });
+        expect(res.type).toBe('foul_loss');
+        if (res.type === 'foul_loss') {
+          expect(res.foul.pieceType).toBe('pawn');
+          expect(res.foul.from).toEqual({ row: 6, col: 2 });
+          expect(res.foul.to).toEqual({ row: 4, col: 2 });
+          expect(res.foul.reason).toBe('invalid_piece_move');
+        }
+      });
+
+      it('空マス (4,4) を移動元にした不正手では pieceType: null が記録され架空の駒種が補完されないこと', () => {
+        const state = createInitialBoardState();
+        const res = executeMove(state, { row: 4, col: 4 }, { row: 3, col: 4 }, { proposer: 'local_ai' });
+        expect(res.type).toBe('foul_loss');
+        if (res.type === 'foul_loss') {
+          expect(res.foul.pieceType).toBeNull();
+          expect(res.foul.from).toEqual({ row: 4, col: 4 });
+          expect(res.foul.to).toEqual({ row: 3, col: 4 });
+          expect(res.foul.reason).toBe('no_piece_at_source');
+        }
+      });
+
+      it('盤外 (-1, 0) を移動元にした不正手では pieceType: null が記録されること', () => {
+        const state = createInitialBoardState();
+        const res = executeMove(state, { row: -1, col: 0 }, { row: 0, col: 0 }, { proposer: 'shogi_engine' });
+        expect(res.type).toBe('foul_loss');
+        if (res.type === 'foul_loss') {
+          expect(res.foul.pieceType).toBeNull();
+          expect(res.foul.from).toEqual({ row: -1, col: 0 });
+          expect(res.foul.to).toEqual({ row: 0, col: 0 });
+          expect(res.foul.reason).toBe('out_of_bounds');
+        }
+      });
+    });
+
+    describe('15.4 終局後の着手理由と状態保護', () => {
+      it('終局済みの状態 (status: "ended") に対する着手は game_already_ended で拒否されること', () => {
+        const endedState: BoardState = {
+          ...createInitialBoardState(),
+          status: 'ended',
+          result: {
+            winner: 'gote',
+            loser: 'sente',
+            endReason: 'foul_loss',
+            foulReason: 'invalid_piece_move',
+            details: '不正着手',
+          },
+          foulHistory: [
+            {
+              moveNumber: 1,
+              player: 'sente',
+              from: { row: 6, col: 2 },
+              to: { row: 4, col: 2 },
+              pieceType: 'pawn',
+              reason: 'invalid_piece_move',
+              message: '不正着手',
+              proposer: 'local_ai',
+              timestamp: 1000,
+            },
+          ],
+        };
+
+        // assist 方式での着手
+        const resAssist = executeMove(endedState, { row: 6, col: 2 }, { row: 5, col: 2 }, { mode: 'assist' });
+        expect(resAssist.type).toBe('rejected');
+        if (resAssist.type === 'rejected') {
+          expect(resAssist.reason).toBe('game_already_ended');
+          expect(resAssist.message).toBe('対局は既に終局しています。');
+          expect(resAssist.state).toBe(endedState);
+        }
+
+        // strict 方式での着手（新たな反則負けを生成せず拒否のみ行うこと）
+        const resStrict = executeMove(endedState, { row: 6, col: 2 }, { row: 5, col: 2 }, {
+          proposer: 'shogi_engine',
+        });
+        expect(resStrict.type).toBe('rejected');
+        if (resStrict.type === 'rejected') {
+          expect(resStrict.reason).toBe('game_already_ended');
+          expect(resStrict.message).toBe('対局は既に終局しています。');
+          expect(resStrict.state).toBe(endedState);
+          // 勝敗結果や反則履歴、手数、手番が一切変化していないこと
+          expect(resStrict.state.result?.winner).toBe('gote');
+          expect(resStrict.state.foulHistory).toHaveLength(1);
+          expect(resStrict.state.moveNumber).toBe(1);
+          expect(resStrict.state.turn).toBe('sente');
+        }
+      });
+    });
+  });
 

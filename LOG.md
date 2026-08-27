@@ -987,14 +987,40 @@ Node.js 24系移行後に残っていたGitHub ActionsのNode.js 20 Action depre
 - `npm test`: **SUCCESS** (110テスト全件合格)
 - `npm run build`: **SUCCESS** (Vite production build 正常完了)
 
+---
 
+## 16. 公開APIのカプセル化・提案元別既定モード・反則履歴駒種厳密化・終局後着手拒否の改修
 
+### 概要
+コミット `0877eab369f4852f56e8d6f7615e161df6f724e6` におけるレビュー指摘事項に基づき、盤面更新APIのカプセル化、提案元に応じた既定モード選択、反則履歴の駒種特定、および終局後着手の安全拒否処理を実装・強化しました。
 
+### 修正内容と設計判断
 
+1. **盤面更新処理のカプセル化と公開APIの統一 (`src/domain/shogi/gameState.ts`, `src/domain/shogi/index.ts`)**:
+   - **原因**: 検証をバイパスして盤面を更新する低レベル関数 `applyLegalMove` が公開されていたため、外部から不正手を適用可能でした。
+   - **対処**: 低レベル関数を `internalApplyLegalMove` に改名し非公開（内部専用）に変更。外部向けAPIを `executeMove` に統一し、後方互換関数 `applyMove` も内部で `executeMove` のアシスト方式を経由するよう統一。検証回避経路を完全排除しました。
 
+2. **提案元（proposer）に応じた既定モードの自動選択 (`src/domain/shogi/gameState.ts`)**:
+   - **原因**: `mode` 省略時に一律で `assist` 方式となっていたため、AIや将棋エンジンからの指し手提案でも禁じ手が単に拒否される不整合がありました。
+   - **対処**: ドメイン層に `determineDefaultExecutionMode` を新設。
+     - `proposer: 'human'`（または省略時）: `assist`
+     - `proposer: 'local_ai'` / `'shogi_engine'`: `strict`
+     - `mode` が明示指定された場合は明示値を優先。
 
+3. **反則履歴の駒種（`FoulRecord.pieceType`）の厳密記録 (`src/types/shogi.ts`, `src/domain/shogi/gameState.ts`)**:
+   - **原因**: 移動元が空マスや盤外の場合に便宜的に `pawn`（歩）をフォールバック設定していたため、AIの不正手が「歩による反則」として誤記録されていました。
+   - **対処**: `FoulRecord.pieceType` の型を `PieceType | null` に変更。移動元座標に実在する駒が存在する場合のみその駒種を記録し、空マスや盤外の場合は `null`（駒特定不能）を明示的に記録。提案座標はそのまま保持。
 
+4. **終局後の着手理由コード（`game_already_ended`）の追加と状態保護 (`src/types/shogi.ts`, `src/domain/shogi/gameState.ts`)**:
+   - **原因**: 終局済み（`state.status === 'ended'`）の局面に対する着手が `out_of_bounds` として拒否され、理由コードの混同が発生していました。
+   - **対処**: `IllegalMoveReason` に専用の `game_already_ended` を追加。終局後の着手は `assist` / `strict` いずれのモードでも `game_already_ended` で安全に拒否され、新規の反則負け記録や状態変更（勝敗、反則履歴、手数、手番、盤面）を一切起こさないよう保護。
 
+5. **テストスイートの拡充 (`src/test/shogi.test.tsx`)**:
+   - セクション15を追加し、モジュールexport検証、不正手防止、提案元別既定モード、反則履歴駒種記録、終局後拒否および状態非破壊性を網羅。
+   - 総テスト数: **123/123 passed** (全件合格)。
 
-
-
+### 検証結果 (`npm run check`)
+- `npm run verify:lock`: **SUCCESS** (398パッケージ検証、欠落ゼロ、完全一致)
+- `npm run lint`: **SUCCESS** (`tsc --noEmit` 型エラーなし)
+- `npm test`: **SUCCESS** (123テスト全件合格)
+- `npm run build`: **SUCCESS** (Vite production build 正常完了)

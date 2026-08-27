@@ -63,7 +63,8 @@ export type IllegalMoveReason =
   | 'captured_king'
   | 'dead_piece'
   | 'king_suicide'
-  | 'self_check_unresolved';
+  | 'self_check_unresolved'
+  | 'game_already_ended';
 
 export type MoveValidationResult =
   | { isValid: true }
@@ -88,7 +89,12 @@ export interface FoulRecord {
   player: Player;
   from: { row: number; col: number };
   to: { row: number; col: number };
-  pieceType: PieceType;
+  /**
+   * Type of piece at source coordinate if a piece existed.
+   * `null` explicitly indicates that no piece was identified at the source coordinate
+   * (e.g. source was empty or out of bounds), NOT a default/fallback piece like pawn.
+   */
+  pieceType: PieceType | null;
   reason: IllegalMoveReason;
   message: string;
   proposer: ProposerType;

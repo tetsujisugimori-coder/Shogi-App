@@ -30,6 +30,7 @@ export const ILLEGAL_MOVE_MESSAGES: Record<IllegalMoveReason, string> = {
   dead_piece: 'これ以上進めない段への未成駒の移動は禁止されています（行き所のない駒）。',
   king_suicide: '王将・玉将を相手の利きがあるマスへ移動することはできません（自滅手）。',
   self_check_unresolved: '自玉が王手を受ける状態になる着手、または王手放置は反則です。',
+  game_already_ended: '対局は既に終局しています。',
 };
 
 /**
