@@ -676,9 +676,12 @@ describe('6. macOS 検証スクリプトの公開API・内部処理・本番clea
     );
   });
 
-  describe('内部フェーズ: verifyFseventsNativePhase の本番 cleanup 経路テスト', () => {
-    it('全処理成功時は watcher停止と一時ディレクトリ削除の両方の cleanup が実行されること', async () => {
-      const stopWatcherFn = vi.fn().mockResolvedValue(undefined);
+  describe('内部フェーズ: verifyFseventsNativePhase の本番 cleanup 経路と安全性テスト', () => {
+    it('全処理成功時は watcher停止 → 一時ディレクトリ削除の順で cleanup が実行されること', async () => {
+      const executionOrder: string[] = [];
+      const stopWatcherFn = vi.fn().mockImplementation(async () => {
+        executionOrder.push('watcher-stop');
+      });
       const mockFsevents = {
         watch: vi.fn((dir, cb) => {
           setTimeout(() => cb(path.join(dir, 'watch-trigger.txt'), 0), 10);
@@ -688,11 +691,16 @@ describe('6. macOS 検証スクリプトの公開API・内部処理・本番clea
       };
 
       const deletedDirs: string[] = [];
+      let createdDirPrefix = '';
       const virtualFs = {
-        mkdtempSync: vi.fn(() => '/virtual/temp/fsevents-success'),
+        mkdtempSync: vi.fn((prefix) => {
+          createdDirPrefix = prefix;
+          return '/virtual/temp/fsevents-success';
+        }),
         writeFileSync: vi.fn(),
         existsSync: vi.fn(() => true),
         rmSync: vi.fn((dir) => {
+          executionOrder.push('temp-dir-remove');
           deletedDirs.push(dir);
         }),
       };
@@ -705,12 +713,64 @@ describe('6. macOS 検証スクリプトの公開API・内部処理・本番clea
       });
 
       expect(result.filepath).toBe('/virtual/temp/fsevents-success/watch-trigger.txt');
+      expect(virtualFs.mkdtempSync).toHaveBeenCalledTimes(1);
+      expect(createdDirPrefix).toContain('shogi-fsevents-test-');
       expect(stopWatcherFn).toHaveBeenCalledTimes(1);
-      expect(deletedDirs).toContain('/virtual/temp/fsevents-success');
+      expect(deletedDirs).toEqual(['/virtual/temp/fsevents-success']);
+      expect(executionOrder).toEqual(['watcher-stop', 'temp-dir-remove']);
     });
 
-    it('fsevents watcher 停止が失敗するとフェーズ全体が失敗し、一時ディレクトリ削除は試行されること', async () => {
-      const failingStopWatcher = vi.fn().mockRejectedValue(new Error('Stop watcher socket error'));
+    it('所有権の安全性: deps に任意の tempDir を渡しても無視され、mkdtempSync の戻り値のみが削除対象となること', async () => {
+      const stopWatcherFn = vi.fn().mockResolvedValue(undefined);
+      const mockFsevents = {
+        watch: vi.fn((dir, cb) => {
+          setTimeout(() => cb(path.join(dir, 'watch-trigger.txt'), 0), 10);
+          return stopWatcherFn;
+        }),
+        getInfo: vi.fn(() => ({ event: 'created' })),
+      };
+
+      const checkedPaths: string[] = [];
+      const deletedDirs: string[] = [];
+      let mkdtempArg = '';
+      const virtualFs = {
+        mkdtempSync: vi.fn((prefix: string) => {
+          mkdtempArg = prefix;
+          return '/virtual/owned-by-fsevents-phase';
+        }),
+        writeFileSync: vi.fn(),
+        existsSync: vi.fn((target: string) => {
+          checkedPaths.push(target);
+          return true;
+        }),
+        rmSync: vi.fn((dir: string) => {
+          deletedDirs.push(dir);
+        }),
+      };
+
+      const sentinelPath = '/sentinel/must-not-delete';
+      const result = await (verifyFseventsNativePhase as any)({
+        fs: virtualFs as any,
+        fsevents: mockFsevents,
+        tempDir: sentinelPath, // 渡しても無視されなければならない
+        settleDelayMs: 5,
+        timeoutMs: 1000,
+      });
+
+      expect(virtualFs.mkdtempSync).toHaveBeenCalledTimes(1);
+      expect(mkdtempArg).toContain('shogi-fsevents-test-');
+      expect(result.filepath).toBe('/virtual/owned-by-fsevents-phase/watch-trigger.txt');
+      expect(deletedDirs).toEqual(['/virtual/owned-by-fsevents-phase']);
+      expect(deletedDirs).not.toContain(sentinelPath);
+      expect(checkedPaths).not.toContain(sentinelPath);
+    });
+
+    it('fsevents watcher 停止が失敗しても、先行失敗後に一時ディレクトリ削除が試行され実行順が維持されること', async () => {
+      const executionOrder: string[] = [];
+      const failingStopWatcher = vi.fn().mockImplementation(async () => {
+        executionOrder.push('watcher-stop');
+        throw new Error('Stop watcher socket error');
+      });
       const mockFsevents = {
         watch: vi.fn((dir, cb) => {
           setTimeout(() => cb(path.join(dir, 'watch-trigger.txt'), 0), 10);
@@ -725,6 +785,7 @@ describe('6. macOS 検証スクリプトの公開API・内部処理・本番clea
         writeFileSync: vi.fn(),
         existsSync: vi.fn(() => true),
         rmSync: vi.fn((dir) => {
+          executionOrder.push('temp-dir-remove');
           deletedDirs.push(dir);
         }),
       };
@@ -739,7 +800,8 @@ describe('6. macOS 検証スクリプトの公開API・内部処理・本番clea
       ).rejects.toThrow('Cleanup failed [fsevents watcher stop]: Stop watcher socket error');
 
       expect(failingStopWatcher).toHaveBeenCalledTimes(1);
-      expect(deletedDirs).toContain('/virtual/temp/fsevents-stop-fail');
+      expect(deletedDirs).toEqual(['/virtual/temp/fsevents-stop-fail']);
+      expect(executionOrder).toEqual(['watcher-stop', 'temp-dir-remove']);
     });
 
     it('fsevents 一時ディレクトリ削除が失敗するとフェーズ全体が失敗すること', async () => {
@@ -773,8 +835,12 @@ describe('6. macOS 検証スクリプトの公開API・内部処理・本番clea
       expect(stopWatcherFn).toHaveBeenCalledTimes(1);
     });
 
-    it('主処理失敗（タイムアウト）かつ watcher 停止も失敗した場合、AggregateError で両方のエラーを保持すること', async () => {
-      const failingStopWatcher = vi.fn().mockRejectedValue(new Error('Stop watcher failed on timeout'));
+    it('主処理失敗（タイムアウト）かつ watcher 停止も失敗した場合、AggregateError で両方のエラーを保持しディレクトリ削除も試行されること', async () => {
+      const executionOrder: string[] = [];
+      const failingStopWatcher = vi.fn().mockImplementation(async () => {
+        executionOrder.push('watcher-stop');
+        throw new Error('Stop watcher failed on timeout');
+      });
       const mockFsevents = {
         watch: vi.fn(() => {
           // コールバックを発火せずタイムアウトさせる
@@ -789,6 +855,7 @@ describe('6. macOS 検証スクリプトの公開API・内部処理・本番clea
         writeFileSync: vi.fn(),
         existsSync: vi.fn(() => true),
         rmSync: vi.fn((dir) => {
+          executionOrder.push('temp-dir-remove');
           deletedDirs.push(dir);
         }),
       };
@@ -811,15 +878,21 @@ describe('6. macOS 検証スクリプトの公開API・内部処理・本番clea
       }
 
       expect(failingStopWatcher).toHaveBeenCalledTimes(1);
-      expect(deletedDirs).toContain('/virtual/temp/fsevents-both-fail');
+      expect(deletedDirs).toEqual(['/virtual/temp/fsevents-both-fail']);
+      expect(executionOrder).toEqual(['watcher-stop', 'temp-dir-remove']);
     });
   });
 
-  describe('内部フェーズ: verifyViteWatcherPhase の本番 cleanup 経路テスト', () => {
-    it('全処理成功時は リスナー解除・サーバー終了・一時ディレクトリ削除の全 cleanup が実行されること', async () => {
+  describe('内部フェーズ: verifyViteWatcherPhase の本番 cleanup 経路と安全性テスト', () => {
+    it('全処理成功時は リスナー解除 → サーバー終了 → 一時ディレクトリ削除 の順で cleanup が実行されること', async () => {
+      const executionOrder: string[] = [];
       let changeHandler: ((file: string) => void) | null = null;
-      const offFn = vi.fn();
-      const closeFn = vi.fn().mockResolvedValue(undefined);
+      const offFn = vi.fn().mockImplementation(() => {
+        executionOrder.push('listener-remove');
+      });
+      const closeFn = vi.fn().mockImplementation(async () => {
+        executionOrder.push('server-close');
+      });
 
       const mockViteServer = {
         listen: vi.fn().mockResolvedValue(undefined),
@@ -836,12 +909,17 @@ describe('6. macOS 検証スクリプトの公開API・内部処理・本番clea
       };
 
       const deletedDirs: string[] = [];
+      let createdDirPrefix = '';
       const virtualFs = {
-        mkdtempSync: vi.fn(() => '/virtual/vite-success'),
+        mkdtempSync: vi.fn((prefix) => {
+          createdDirPrefix = prefix;
+          return '/virtual/vite-success';
+        }),
         writeFileSync: vi.fn(),
         appendFileSync: vi.fn(),
         existsSync: vi.fn(() => true),
         rmSync: vi.fn((dir) => {
+          executionOrder.push('temp-dir-remove');
           deletedDirs.push(dir);
         }),
       };
@@ -854,13 +932,72 @@ describe('6. macOS 検証スクリプトの公開API・内部処理・本番clea
       });
 
       expect(changedFile).toBe('/virtual/vite-success/test.js');
+      expect(virtualFs.mkdtempSync).toHaveBeenCalledTimes(1);
+      expect(createdDirPrefix).toContain('shogi-vite-watch-test-');
       expect(offFn).toHaveBeenCalledWith('change', changeHandler);
       expect(closeFn).toHaveBeenCalledTimes(1);
-      expect(deletedDirs).toContain('/virtual/vite-success');
+      expect(deletedDirs).toEqual(['/virtual/vite-success']);
+      expect(executionOrder).toEqual(['listener-remove', 'server-close', 'temp-dir-remove']);
     });
 
-    it('Vite リスナー解除が失敗するとフェーズ全体が失敗し、サーバー終了と一時ディレクトリ削除が試行されること', async () => {
+    it('所有権の安全性: deps に任意の tempDir を渡しても無視され、mkdtempSync の戻り値のみが削除対象となること', async () => {
+      const offFn = vi.fn();
       const closeFn = vi.fn().mockResolvedValue(undefined);
+
+      const mockViteServer = {
+        listen: vi.fn().mockResolvedValue(undefined),
+        close: closeFn,
+        watcher: {
+          on: vi.fn((event, cb) => {
+            if (event === 'change') {
+              setTimeout(() => cb('/virtual/owned-by-vite-phase/test.js'), 10);
+            }
+          }),
+          off: offFn,
+        },
+      };
+
+      const checkedPaths: string[] = [];
+      const deletedDirs: string[] = [];
+      let mkdtempArg = '';
+      const virtualFs = {
+        mkdtempSync: vi.fn((prefix: string) => {
+          mkdtempArg = prefix;
+          return '/virtual/owned-by-vite-phase';
+        }),
+        writeFileSync: vi.fn(),
+        appendFileSync: vi.fn(),
+        existsSync: vi.fn((target: string) => {
+          checkedPaths.push(target);
+          return true;
+        }),
+        rmSync: vi.fn((dir: string) => {
+          deletedDirs.push(dir);
+        }),
+      };
+
+      const sentinelPath = '/sentinel/must-not-delete-vite';
+      const changedFile = await (verifyViteWatcherPhase as any)({
+        fs: virtualFs as any,
+        createServer: vi.fn().mockResolvedValue(mockViteServer),
+        tempDir: sentinelPath, // 渡しても無視されなければならない
+        settleDelayMs: 5,
+        timeoutMs: 1000,
+      });
+
+      expect(virtualFs.mkdtempSync).toHaveBeenCalledTimes(1);
+      expect(mkdtempArg).toContain('shogi-vite-watch-test-');
+      expect(changedFile).toBe('/virtual/owned-by-vite-phase/test.js');
+      expect(deletedDirs).toEqual(['/virtual/owned-by-vite-phase']);
+      expect(deletedDirs).not.toContain(sentinelPath);
+      expect(checkedPaths).not.toContain(sentinelPath);
+    });
+
+    it('Vite リスナー解除が失敗しても、先行失敗後にサーバー終了と一時ディレクトリ削除が試行され実行順が維持されること', async () => {
+      const executionOrder: string[] = [];
+      const closeFn = vi.fn().mockImplementation(async () => {
+        executionOrder.push('server-close');
+      });
       const mockViteServer = {
         listen: vi.fn().mockResolvedValue(undefined),
         close: closeFn,
@@ -871,6 +1008,7 @@ describe('6. macOS 検証スクリプトの公開API・内部処理・本番clea
             }
           }),
           off: vi.fn(() => {
+            executionOrder.push('listener-remove');
             throw new Error('Watcher off threw unexpected exception');
           }),
         },
@@ -883,6 +1021,7 @@ describe('6. macOS 検証スクリプトの公開API・内部処理・本番clea
         appendFileSync: vi.fn(),
         existsSync: vi.fn(() => true),
         rmSync: vi.fn((dir) => {
+          executionOrder.push('temp-dir-remove');
           deletedDirs.push(dir);
         }),
       };
@@ -897,20 +1036,28 @@ describe('6. macOS 検証スクリプトの公開API・内部処理・本番clea
       ).rejects.toThrow('Cleanup failed [Vite listener removal]: Watcher off threw unexpected exception');
 
       expect(closeFn).toHaveBeenCalledTimes(1);
-      expect(deletedDirs).toContain('/virtual/vite-off-fail');
+      expect(deletedDirs).toEqual(['/virtual/vite-off-fail']);
+      expect(executionOrder).toEqual(['listener-remove', 'server-close', 'temp-dir-remove']);
     });
 
-    it('Vite サーバー終了が失敗するとフェーズ全体が失敗し、一時ディレクトリ削除が試行されること', async () => {
+    it('Vite サーバー終了が失敗しても、先行失敗後に一時ディレクトリ削除が試行され実行順が維持されること', async () => {
+      const executionOrder: string[] = [];
+      const offFn = vi.fn().mockImplementation(() => {
+        executionOrder.push('listener-remove');
+      });
       const mockViteServer = {
         listen: vi.fn().mockResolvedValue(undefined),
-        close: vi.fn().mockRejectedValue(new Error('Port unbind failed on server close')),
+        close: vi.fn().mockImplementation(async () => {
+          executionOrder.push('server-close');
+          throw new Error('Port unbind failed on server close');
+        }),
         watcher: {
           on: vi.fn((event, cb) => {
             if (event === 'change') {
               setTimeout(() => cb('/virtual/vite-close-fail/test.js'), 10);
             }
           }),
-          off: vi.fn(),
+          off: offFn,
         },
       };
 
@@ -921,6 +1068,7 @@ describe('6. macOS 検証スクリプトの公開API・内部処理・本番clea
         appendFileSync: vi.fn(),
         existsSync: vi.fn(() => true),
         rmSync: vi.fn((dir) => {
+          executionOrder.push('temp-dir-remove');
           deletedDirs.push(dir);
         }),
       };
@@ -934,7 +1082,8 @@ describe('6. macOS 検証スクリプトの公開API・内部処理・本番clea
         })
       ).rejects.toThrow('Cleanup failed [Vite server close]: Port unbind failed on server close');
 
-      expect(deletedDirs).toContain('/virtual/vite-close-fail');
+      expect(deletedDirs).toEqual(['/virtual/vite-close-fail']);
+      expect(executionOrder).toEqual(['listener-remove', 'server-close', 'temp-dir-remove']);
     });
 
     it('Vite 一時ディレクトリ削除が失敗するとフェーズ全体が失敗すること', async () => {

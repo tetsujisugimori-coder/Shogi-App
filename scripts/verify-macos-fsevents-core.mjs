@@ -211,11 +211,11 @@ export function createViteWatcherPromise({ viteServer, timeoutMs = 6000 }) {
 /**
  * Executes the isolated native fsevents watcher verification phase.
  * Accepts dependencies for full testability without leaking resources.
+ * Always creates and manages its own unique temporary directory.
  *
  * @param {Object} [deps]
  * @param {any} [deps.fs] - File system implementation (default: node:fs)
  * @param {any} [deps.fsevents] - fsevents module or mock (required)
- * @param {string} [deps.tempDir] - Optional custom temporary directory path
  * @param {number} [deps.timeoutMs=5000] - Timeout in milliseconds
  * @param {number} [deps.settleDelayMs=100] - Settling delay before trigger
  * @param {Function} [deps.getInfoFn] - Optional getInfo function override
@@ -228,7 +228,7 @@ export async function verifyFseventsNativePhase(deps = {}) {
     throw new Error('fsevents module is required for verifyFseventsNativePhase');
   }
 
-  const tempDir = deps.tempDir || fsImpl.mkdtempSync(path.join(os.tmpdir(), 'shogi-fsevents-test-'));
+  const tempDir = fsImpl.mkdtempSync(path.join(os.tmpdir(), 'shogi-fsevents-test-'));
   let stopWatcher = null;
   let fseventWatcherControl = null;
   let fseventPrimaryError = null;
@@ -295,11 +295,11 @@ export async function verifyFseventsNativePhase(deps = {}) {
 /**
  * Executes the isolated Vite dev watcher verification phase.
  * Accepts dependencies for full testability without loading Vite in Vitest jsdom.
+ * Always creates and manages its own unique temporary directory.
  *
  * @param {Object} [deps]
  * @param {any} [deps.fs] - File system implementation (default: node:fs)
  * @param {Function} [deps.createServer] - Vite createServer function (required)
- * @param {string} [deps.tempDir] - Optional custom temporary directory path
  * @param {number} [deps.timeoutMs=6000] - Timeout in milliseconds
  * @param {number} [deps.settleDelayMs=200] - Settling delay before trigger
  * @returns {Promise<string>} Path of the modified file detected by Vite
@@ -311,7 +311,7 @@ export async function verifyViteWatcherPhase(deps = {}) {
     throw new Error('createServer function is required for verifyViteWatcherPhase');
   }
 
-  const viteTempDir = deps.tempDir || fsImpl.mkdtempSync(path.join(os.tmpdir(), 'shogi-vite-watch-test-'));
+  const viteTempDir = fsImpl.mkdtempSync(path.join(os.tmpdir(), 'shogi-vite-watch-test-'));
   let viteServer = null;
   let viteWatcherControl = null;
   let vitePrimaryError = null;

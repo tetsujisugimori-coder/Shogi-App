@@ -698,6 +698,87 @@ Node.js 24系移行後に残っていたGitHub ActionsのNode.js 20 Action depre
 - **残存警告**: なし
 - **未解決事項**: なし
 
+## 14. 一時ディレクトリ所有権統一、本番 cleanup 実行順テストおよび成功済み CI 記録の追記
+
+### 基準コミットと対象
+- **対象リポジトリ**: `tetsujisugimori-coder/Shogi-App`
+- **基準コミット**: `3c2221298bd1889e4f01d950a034a81128f2fe11`
+- **修正目的**: 一時ディレクトリの所有権を明確にし、内部検証関数（`verifyFseventsNativePhase`, `verifyViteWatcherPhase`）が自分自身で作成した専用ディレクトリ（`mkdtempSync` の戻り値）だけを削除する構造へ統一すること。呼び出し側からの任意パス削除経路（`deps.tempDir`）を完全に廃止し、本番 cleanup 経路の厳密な実行順序テストと成功済み GitHub Actions の記録を完成させること。
+
+### 前回復旧コミットに対する成功済み GitHub Actions の記録
+- **Workflow URL**: `https://github.com/tetsujisugimori-coder/Shogi-App/actions/runs/33023929031`
+- **Run ID**: `33023929031`
+- **対象コミット**: `3c2221298bd1889e4f01d950a034a81128f2fe11`
+- **Event**: `push`
+- **macOS Job ID**: `98360680019`
+- **Linux Job ID**: `98360680315`
+- **実行結果**:
+  - **Linux**: 63/63 テスト成功、ビルド成功
+  - **macOS**: 61成功・2 skipped（非macOS向けテスト）・0失敗、ビルド成功
+  - **macOS の実 `fsevents` ネイティブイベント**: 成功
+  - **macOS の Vite ファイル変更検知**: 成功
+  - **Node.js バージョン**: `24.19.0`
+  - **npm バージョン**: `11.17.0`
+  - **Conclusion**: `success` (両 OS とも完全成功)
+- **残存警告状況**:
+  - `node-domexception@1.0.0` の deprecated 警告が Linux / macOS ともに残存（jsdom 間接依存によるもので実害なし）
+  - install script 未審査警告はなし
+
+### 修正内容と設計
+1. **一時ディレクトリ所有権ルールの統一と `deps.tempDir` の完全廃止**:
+   - `verifyFseventsNativePhase(deps)` および `verifyViteWatcherPhase(deps)` から `deps.tempDir` および JSDoc `@param {string} [deps.tempDir]` を完全に削除。
+   - 呼び出し側が外部パスや既存パスを指定して削除させる経路を根絶。
+   - 各フェーズ関数は必ず内部で `fsImpl.mkdtempSync(path.join(os.tmpdir(), 'shogi-fsevents-test-'))` / `fsImpl.mkdtempSync(path.join(os.tmpdir(), 'shogi-vite-watch-test-'))` を実行し、その戻り値として得られた専用パスのみを追跡・削除する設計に統一。
+2. **削除対象の安全性テストの追加**:
+   - `deps` に余分なプロパティ（例: `tempDir: '/sentinel/must-not-delete'`）を渡しても完全に無視され、`mkdtempSync` が返した専用仮想パスのみが `rmSync` の対象となることを検証。
+   - 呼び出し側が渡したパスに対して `existsSync` や `rmSync` が一切実行されないことを検証。
+   - 親ディレクトリや OS 一時ディレクトリ全体を巻き込まないことを検証。
+3. **本番 cleanup の厳密な実行順序テストの追加**:
+   - モック実行時に共通の `executionOrder` 配列へタスク名を記録し、実際のフェーズ関数の cleanup 順序を検証。
+   - **fsevents フェーズ期待順**: `['watcher-stop', 'temp-dir-remove']`
+   - **Vite フェーズ期待順**: `['listener-remove', 'server-close', 'temp-dir-remove']`
+   - 先行する cleanup（watcher 停止、リスナー解除、サーバー終了）が例外をスローした場合でも、後続の一時ディレクトリ削除が必ず最後に試行され、実行順が維持されることを検証。
+   - 主処理タイムアウトと後処理失敗が重なった場合にも、AggregateError で両方のエラーが保持され、ディレクトリ削除が試行されることを検証。
+4. **実ディスク一時ディレクトリの後処理厳格化**:
+   - 実ディスク上の一時ディレクトリを作成するテストでは `createdTempDirs` に追跡し、`afterEach` 内で `fs.existsSync(dir)` による残存ゼロ確認を徹底（削除失敗時は例外スロー）。
+
+### 変更ファイル一覧
+- `scripts/verify-macos-fsevents-core.mjs` (`deps.tempDir` 削除、JSDoc 更新、内部専用 `mkdtempSync` 統一)
+- `src/test/shogi.test.tsx` (安全性テスト、本番 cleanup 実行順序テストの追加)
+- `LOG.md` (本セクション 14 を末尾追記)
+
+### package-lock.json および UI の維持状況
+- **`package-lock.json`**: 変更なし（差分ゼロを完全維持）
+- **`package.json`**: 変更なし（差分ゼロを完全維持）
+- **`.npmrc` / `.nvmrc`**: 変更なし（差分ゼロを完全維持）
+- **`.github/workflows/ci.yml`**: 変更なし（差分ゼロを完全維持）
+- **UI・コンポーネント・CSS**: 将棋盤、駒、成駒、ARIA属性、roving tabindex 等のデザイン・レイアウト・動作仕様はすべて完全維持（差分ゼロ）
+
+### ローカル実行検証結果
+- `node --version`: `v24.19.0` (終了コード 0)
+- `npm --version`: `11.17.0` (終了コード 0)
+- `npm run verify:lock`: 正常終了 (終了コード 0, missingVersion: 0, missingResolved: 0, missingIntegrity: 0)
+- `npm run verify:macos-fsevents`: 正常終了 (終了コード 0, Linux環境として静的検査を通過)
+- `npm run lint` (`tsc --noEmit`): 型エラー 0件で正常終了 (終了コード 0)
+- `npm test` (`vitest run`): 全65テストすべて合格 (終了コード 0, 65 passed, 0 failed, 0 skipped on Linux)
+- `npm run build`: 本番ビルド正常完了 (終了コード 0, dist/ 出力)
+- `npm run clean`: 正常終了 (終了コード 0, dist/ 削除)
+- clean後の `npm run build`: 正常完了 (終了コード 0)
+- `npm run check`: 正常終了 (終了コード 0, lock検証 → lint → test 65件 → build 一括成功)
+
+### テスト結果内訳
+- **テスト総数**: 65
+- **成功数**: 65
+- **失敗数**: 0
+- **skipped数**: 0 (Linux環境。macOS環境では非macOS向け2テストがskipされ 63 passed / 2 skipped / 0 failed となる想定)
+
+### 確認・未確認・未解決事項
+- **リモートCI状況**: ローカル検証とワークフロー定義のみ確認。修正コミットのリモートCIは未確認。
+- **UI確認**: UI・CSS・コンポーネントコードの変更なし。UI 関連ファイルを変更していないためブラウザ目視確認は未実施。
+- **残存警告**: `node-domexception@1.0.0` の deprecated 警告が残存（jsdom 間接依存によるもの）
+- **未解決事項**: なし
+
+
 
 
 
