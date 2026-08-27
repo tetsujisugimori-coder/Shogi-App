@@ -927,6 +927,67 @@ Node.js 24系移行後に残っていたGitHub ActionsのNode.js 20 Action depre
 - デザインシステム（リアル調木製テクスチャ、駒台、駒の3D立体感、配色）: 完全維持
 - アクセシビリティ基盤（Roving Tabindex, ARIA属性）: 完全維持・強化
 
+---
+
+## 15. 合法手エンジン・王手安全判定・成駒移動・行き所のない駒・指し手検証・アシスト/厳格対局方式の実装
+
+### 概要
+コミット `73eca571ac2f8812fc5f7bf986ca511b1a31d0cc` で導入された駒移動機能に対し、「駒の幾何学的移動」と「将棋としての合法手」を厳格に分離し、王手放置や自殺手の排除、成駒移動、行き所のない駒の判定、および人間向け「アシスト方式」とAI/将棋エンジン向け「厳格対局方式」の二系統実行アーキテクチャを実装しました。
+
+### 主な実装内容
+
+1. **攻撃判定および王手判定モジュール (`src/domain/shogi/attacks.ts`)**:
+   - `getPieceAttackPattern`: 成駒を含む全駒種の幾何学的利きマスを生成。
+   - `isSquareAttackedBy`: 指定マスが敵の利きに晒されているかを判定（相手玉のマスも攻撃対象として扱う）。
+   - `findKingSquare`: 指定プレイヤーの玉将/王将の盤面座標を検索。
+   - `isKingInCheck`: 指定手番の玉が相手の駒から王手を受けているかを判定。
+   - **非再帰設計**: 攻撃マス判定と合法手生成を明確に分離し、再帰呼び出しによるコールスタック超過や無限ループを防止。
+
+2. **成駒・行き所のない駒・合法手生成 (`src/domain/shogi/moves.ts`)**:
+   - **成駒の移動**:
+     - と金・成香・成桂・成銀: 金将と同一の動き（縦横4方向＋前斜め2方向）
+     - 竜王: 飛車の十字レイ＋斜め1マス
+     - 竜馬: 角行の斜めレイ＋縦横1マス
+   - **行き所のない駒 (`dead_piece`)**:
+     - 先手: 1段目の歩兵・香車、1〜2段目の桂馬
+     - 後手: 9段目の歩兵・香車、8〜9段目の桂馬
+   - **自玉安全確認**:
+     - 仮想盤面上で着手をシミュレーション（`simulateMoveSquares`）し、自玉が王手状態に残る着手（王手放置、ピンされた駒の離脱、玉自身の自殺手）を合法手から除外。
+     - `getLegalMoves`: 幾何学的移動から味方マス重複、行き所のない駒、玉将捕獲、自玉王手残存を除外した完全な合法手を返却。
+
+3. **指し手検証および反則理由の識別 (`src/domain/shogi/validation.ts`)**:
+   - `validateMove`: 提案された移動を検証し、詳細な不正理由（`IllegalMoveReason`）と人間可読メッセージを返却。
+   - 識別理由: `out_of_bounds`, `no_piece_at_source`, `not_current_turn`, `not_own_piece`, `invalid_piece_move`, `occupied_by_own_piece`, `captured_king`, `dead_piece`, `king_suicide`, `self_check_unresolved`
+
+4. **二系統の着手実行方式 (`src/domain/shogi/gameState.ts`)**:
+   - **アシスト方式 (`mode: 'assist'`)**:
+     - 人間の通常UI操作用。
+     - 合法手のみを候補表示し、不正手は盤面を変更せず安全に拒否（終局せず対局継続）。
+   - **厳格対局方式 (`mode: 'strict'`)**:
+     - AI・将棋エンジンの実験対局用。
+     - 禁じ手を指し手提案として受け取り、盤面・持ち駒・手番・手数・合法手履歴・直前着手を一切変更せず、反則負け（`foul_loss`）として終局。
+     - `foulHistory` に提案元（`human` / `local_ai` / `shogi_engine`、エンジン名、タイムスタンプ）を記録。
+     - `GameResult`（勝者、敗者、終局理由 `foul_loss`、反則理由）を生成。
+
+5. **初期状態とUIステータス表示の統一 (`src/types/shogi.ts`, `src/components/shogi/ShogiResearchScreen.tsx`)**:
+   - `createInitialBoardState` の初期ステータスを `status: 'active'` に統一。
+   - 固定文字列管理を廃止し、`BoardState.status`、手番、終局結果からステータスバッジの表示（「対局中 / 先手番」「終局 / 先手勝ち（後手反則負け）」等）を動的導出。
+
+6. **自動テストスイートの拡充 (`src/test/shogi.test.tsx`)**:
+   - 王手・自玉安全判定・ピン・合駒・玉退避・自殺手防止（セクション10）
+   - 成駒移動ルール（セクション11）
+   - 行き所のない駒の境界段判定（セクション12）
+   - 指し手検証API・反則理由識別・アシスト/厳格方式の分岐挙動・反則履歴記録（セクション13）
+   - UI統合・ステータス表示・アクセシビリティ回帰検証（セクション14）
+   - 全テスト数: **110/110 passed** (全通過)
+
+### 検証結果 (`npm run check`)
+- `npm run verify:lock`: **SUCCESS** (398パッケージ検証、欠落ゼロ、完全一致)
+- `npm run lint`: **SUCCESS** (`tsc --noEmit` 型エラーなし)
+- `npm test`: **SUCCESS** (110テスト全件合格)
+- `npm run build`: **SUCCESS** (Vite production build 正常完了)
+
+
 
 
 

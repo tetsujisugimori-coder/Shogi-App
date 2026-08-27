@@ -46,6 +46,33 @@ export type BoardStatus = 'preparation' | 'active' | 'check' | 'blunder' | 'eval
 
 export type TableViewMode = 'research' | 'spectator' | 'analysis';
 
+export type ExecutionMode = 'assist' | 'strict';
+
+export type ProposerType = 'human' | 'local_ai' | 'shogi_engine';
+
+/**
+ * Standardized English identifiers for illegal move reasons.
+ */
+export type IllegalMoveReason =
+  | 'out_of_bounds'
+  | 'no_piece_at_source'
+  | 'not_current_turn'
+  | 'not_own_piece'
+  | 'invalid_piece_move'
+  | 'occupied_by_own_piece'
+  | 'captured_king'
+  | 'dead_piece'
+  | 'king_suicide'
+  | 'self_check_unresolved';
+
+export type MoveValidationResult =
+  | { isValid: true }
+  | {
+      isValid: false;
+      reason: IllegalMoveReason;
+      message: string;
+    };
+
 export interface MoveRecord {
   moveNumber: number;
   player: Player;
@@ -54,6 +81,29 @@ export interface MoveRecord {
   pieceType: PieceType;
   capturedPieceType?: PieceType | null;
   notation: string;
+}
+
+export interface FoulRecord {
+  moveNumber: number;
+  player: Player;
+  from: { row: number; col: number };
+  to: { row: number; col: number };
+  pieceType: PieceType;
+  reason: IllegalMoveReason;
+  message: string;
+  proposer: ProposerType;
+  engineName?: string;
+  timestamp?: number;
+}
+
+export type GameEndReason = 'foul_loss' | 'resignation' | 'checkmate' | 'draw';
+
+export interface GameResult {
+  winner: Player;
+  loser: Player;
+  endReason: GameEndReason;
+  foulReason?: IllegalMoveReason;
+  details?: string;
 }
 
 export interface BoardState {
@@ -66,6 +116,8 @@ export interface BoardState {
   viewMode: TableViewMode;
   history: MoveRecord[];
   lastMove?: MoveRecord | null;
+  result?: GameResult | null;
+  foulHistory?: FoulRecord[];
 }
 
 export const RANK_KANJI = ['一', '二', '三', '四', '五', '六', '七', '八', '九'] as const;
@@ -344,10 +396,12 @@ export function createInitialBoardState(): BoardState {
     goteHand: [],
     turn: 'sente',
     moveNumber: 1,
-    status: 'preparation',
+    status: 'active',
     viewMode: 'research',
     history: [],
     lastMove: null,
+    result: null,
+    foulHistory: [],
   };
 }
 

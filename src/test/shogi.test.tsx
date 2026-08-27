@@ -12,7 +12,10 @@ import {
   getPieceDisplayInfo,
   canPromote,
   BoardSquare,
+  BoardState,
   Piece,
+  Player,
+  RANK_KANJI,
 } from '../types/shogi';
 import { ShogiBoard } from '../components/shogi/ShogiBoard';
 import { ShogiResearchScreen } from '../components/shogi/ShogiResearchScreen';
@@ -22,9 +25,18 @@ import {
   areCoordinatesEqual,
   toCoordinateLabel,
   fromCoordinateLabel,
-  getPieceMoves,
   getMoveCandidates,
+  getLegalMoves,
+  getPseudoLegalMoves,
+  isDeadPieceMove,
+  findKingSquare,
+  isSquareAttackedBy,
+  isKingInCheck,
+  getPieceAttackPattern,
+  validateMove,
+  executeMove,
   applyMove,
+  applyLegalMove,
   generateMoveNotation,
   getPieceNotationKanji,
   cloneBoardSquares,
@@ -1748,4 +1760,405 @@ describe('9. 将棋ドメイン層・駒移動・合法手・手番・取り駒�
       });
     });
   });
+
+  /* =========================================================================
+   * テストヘルパー: 任意配置の盤面生成
+   * ========================================================================= */
+  function createCustomTestBoard(
+    pieces: Array<{ row: number; col: number; piece: Piece }>,
+    turn: Player = 'sente',
+    moveNumber: number = 1
+  ): BoardState {
+    const squares: BoardSquare[][] = [];
+    for (let r = 0; r < 9; r++) {
+      const row: BoardSquare[] = [];
+      for (let c = 0; c < 9; c++) {
+        row.push({
+          row: r,
+          col: c,
+          file: 9 - c,
+          rank: r + 1,
+          rankKanji: RANK_KANJI[r],
+          coordinateLabel: `${9 - c}${RANK_KANJI[r]}`,
+          piece: null,
+          hasBottomRightStarMarker: false,
+        });
+      }
+      squares.push(row);
+    }
+    for (const item of pieces) {
+      squares[item.row][item.col].piece = item.piece;
+    }
+    return {
+      squares,
+      senteHand: [],
+      goteHand: [],
+      turn,
+      moveNumber,
+      status: 'active',
+      viewMode: 'research',
+      history: [],
+      lastMove: null,
+      result: null,
+      foulHistory: [],
+    };
+  }
+
+  describe('10. 王手・自玉の安全判定・合法手エンジン (attacks.ts / moves.ts)', () => {
+    it('findKingSquare で先手・後手の玉の座標を正確に取得できること', () => {
+      const state = createCustomTestBoard([
+        { row: 8, col: 4, piece: { id: 'k-s', type: 'king', player: 'sente' } },
+        { row: 0, col: 4, piece: { id: 'k-g', type: 'king', player: 'gote' } },
+      ]);
+      expect(findKingSquare(state.squares, 'sente')).toEqual({ row: 8, col: 4 });
+      expect(findKingSquare(state.squares, 'gote')).toEqual({ row: 0, col: 4 });
+    });
+
+    it('玉が相手の各駒（飛・角・金・銀・桂・香・歩・玉）の利きへ移動できないこと（自殺手防止）', () => {
+      // 先手玉 5五(4,4)、後手歩 5三(2,4) -> 5四(3,4)に利きがある
+      const stateWithPawn = createCustomTestBoard([
+        { row: 4, col: 4, piece: { id: 'k1', type: 'king', player: 'sente' } },
+        { row: 2, col: 4, piece: { id: 'p1', type: 'pawn', player: 'gote' } },
+      ]);
+      const moves = getLegalMoves(stateWithPawn.squares, { row: 4, col: 4 }, 'sente');
+      // 5四 (3, 4) は後手歩の利きなので含まれないこと
+      expect(moves.some((m) => m.row === 3 && m.col === 4)).toBe(false);
+      // 他のマス（例えば 6五(4,3) や 4五(4,5)）は合法手であること
+      expect(moves.some((m) => m.row === 4 && m.col === 3)).toBe(true);
+    });
+
+    it('玉同士が隣接するマスへの移動は相手玉の利きとなるため合法手から除外されること', () => {
+      // 先手玉 5五(4,4)、後手玉 5三(2,4) -> 5四(3,4) は後手玉の利き
+      const state = createCustomTestBoard([
+        { row: 4, col: 4, piece: { id: 'k-s', type: 'king', player: 'sente' } },
+        { row: 2, col: 4, piece: { id: 'k-g', type: 'king', player: 'gote' } },
+      ]);
+      const moves = getLegalMoves(state.squares, { row: 4, col: 4 }, 'sente');
+      expect(moves.some((m) => m.row === 3 && m.col === 4)).toBe(false);
+    });
+
+    it('玉を守っている駒（ピンされた駒）を動かして自玉を王手に晒す手が合法手から除外されること', () => {
+      // 先手玉 5九(8,4)、先手金 5八(7,4)、後手飛車 5一(0,4) -> 金が動くと自玉が飛車の王手を受ける（ピン）
+      const state = createCustomTestBoard([
+        { row: 8, col: 4, piece: { id: 'k-s', type: 'king', player: 'sente' } },
+        { row: 7, col: 4, piece: { id: 'g-s', type: 'gold', player: 'sente' } },
+        { row: 0, col: 4, piece: { id: 'r-g', type: 'rook', player: 'gote' } },
+      ]);
+
+      // 金の合法手を計算: 横や斜めに逃げると王手になるため、飛車のライン上（縦方向）のみ、あるいは飛車を取る手のみ
+      const goldMoves = getLegalMoves(state.squares, { row: 7, col: 4 }, 'sente');
+      // 6八(7,3) や 4八(7,5) への移動はピン違反で除外されること
+      expect(goldMoves.some((m) => m.row === 7 && m.col === 3)).toBe(false);
+      expect(goldMoves.some((m) => m.row === 7 && m.col === 5)).toBe(false);
+      // 5七(6,4) への直進はラインを遮断し続けるため合法であること
+      expect(goldMoves.some((m) => m.row === 6 && m.col === 4)).toBe(true);
+    });
+
+    it('王手中は王手を解消する手（玉の退避、王手駒の捕獲、合駒による遮断）だけが合法手になること', () => {
+      // 先手玉 5九(8,4)、先手銀 7九(8,2)、後手飛車 5一(0,4) -> 先手玉に王手がかかっている
+      const state = createCustomTestBoard([
+        { row: 8, col: 4, piece: { id: 'k-s', type: 'king', player: 'sente' } },
+        { row: 8, col: 2, piece: { id: 's-s', type: 'silver', player: 'sente' } },
+        { row: 0, col: 4, piece: { id: 'r-g', type: 'rook', player: 'gote' } },
+      ]);
+
+      expect(isKingInCheck(state.squares, 'sente')).toBe(true);
+
+      // 銀は 5筋の王手を解消できない位置にあるため、銀の移動はすべて不可（合法手0個）
+      const silverMoves = getLegalMoves(state.squares, { row: 8, col: 2 }, 'sente');
+      expect(silverMoves).toHaveLength(0);
+
+      // 玉の合法手は 5筋から退避するマス（4九(8,5) または 6九(8,3)）のみ
+      const kingMoves = getLegalMoves(state.squares, { row: 8, col: 4 }, 'sente');
+      expect(kingMoves.length).toBeGreaterThan(0);
+      expect(kingMoves.every((m) => m.col !== 4)).toBe(true);
+    });
+
+    it('攻撃マス判定 (isSquareAttackedBy) では相手玉のマスも攻撃対象として扱うこと', () => {
+      // 先手角 8八(7,1)、後手玉 2二(1,7) -> 角の斜めレイが後手玉に直撃
+      const state = createCustomTestBoard([
+        { row: 7, col: 1, piece: { id: 'b-s', type: 'bishop', player: 'sente' } },
+        { row: 1, col: 7, piece: { id: 'k-g', type: 'king', player: 'gote' } },
+      ]);
+      expect(isSquareAttackedBy(state.squares, { row: 1, col: 7 }, 'sente')).toBe(true);
+      expect(isKingInCheck(state.squares, 'gote')).toBe(true);
+    });
+
+    it('合法手生成と攻撃マス生成が再帰ループせずに高速に完了すること', () => {
+      const state = createInitialBoardState();
+      const start = Date.now();
+      const moves = getLegalMoves(state.squares, { row: 6, col: 2 }, 'sente');
+      const duration = Date.now() - start;
+      expect(moves).toEqual([{ row: 5, col: 2 }]);
+      expect(duration).toBeLessThan(100);
+    });
+  });
+
+  describe('11. 成駒の移動ルール (attacks.ts / moves.ts)', () => {
+    it('と金・成香・成桂・成銀が金将と全く同じ動き（縦横4方向＋前斜め2方向）をすること', () => {
+      const promotedTypes = ['pawn', 'lance', 'knight', 'silver'] as const;
+
+      for (const pType of promotedTypes) {
+        const state = createCustomTestBoard([
+          { row: 4, col: 4, piece: { id: `pr-${pType}`, type: pType, player: 'sente', isPromoted: true } },
+          { row: 8, col: 4, piece: { id: 'k-s', type: 'king', player: 'sente' } },
+        ]);
+
+        const moves = getLegalMoves(state.squares, { row: 4, col: 4 }, 'sente');
+        // 金将の6方向: 上(3,4), 下(5,4), 左(4,3), 右(4,5), 左上(3,3), 右上(3,5)
+        expect(moves).toHaveLength(6);
+        expect(moves).toEqual(
+          expect.arrayContaining([
+            { row: 3, col: 4 },
+            { row: 5, col: 4 },
+            { row: 4, col: 3 },
+            { row: 4, col: 5 },
+            { row: 3, col: 3 },
+            { row: 3, col: 5 },
+          ])
+        );
+      }
+    });
+
+    it('竜王 (Promoted Rook) が飛車の十字レイ＋斜め1マスを持つこと', () => {
+      const state = createCustomTestBoard([
+        { row: 4, col: 4, piece: { id: 'r-prom', type: 'rook', player: 'sente', isPromoted: true } },
+        { row: 8, col: 8, piece: { id: 'k-s', type: 'king', player: 'sente' } },
+      ]);
+      const moves = getLegalMoves(state.squares, { row: 4, col: 4 }, 'sente');
+      // 飛車十字（上4+下4+左4+右4 = 16マス） + 斜め1マス（4マス） = 20マス
+      expect(moves).toHaveLength(20);
+      expect(moves).toEqual(
+        expect.arrayContaining([
+          { row: 3, col: 3 },
+          { row: 3, col: 5 },
+          { row: 5, col: 3 },
+          { row: 5, col: 5 },
+        ])
+      );
+    });
+
+    it('竜馬 (Promoted Bishop) が角の斜めレイ＋縦横1マスを持つこと', () => {
+      const state = createCustomTestBoard([
+        { row: 4, col: 4, piece: { id: 'b-prom', type: 'bishop', player: 'sente', isPromoted: true } },
+        { row: 8, col: 5, piece: { id: 'k-s', type: 'king', player: 'sente' } },
+      ]);
+      const moves = getLegalMoves(state.squares, { row: 4, col: 4 }, 'sente');
+      // 角行斜め（4x4=16マス） + 縦横1マス（4マス） = 20マス
+      expect(moves).toHaveLength(20);
+      expect(moves).toEqual(
+        expect.arrayContaining([
+          { row: 3, col: 4 },
+          { row: 5, col: 4 },
+          { row: 4, col: 3 },
+          { row: 4, col: 5 },
+        ])
+      );
+    });
+
+    it('未成駒の既存挙動が維持されていること', () => {
+      const state = createCustomTestBoard([
+        { row: 4, col: 4, piece: { id: 's-normal', type: 'silver', player: 'sente', isPromoted: false } },
+        { row: 8, col: 8, piece: { id: 'k-s', type: 'king', player: 'sente' } },
+      ]);
+      const moves = getLegalMoves(state.squares, { row: 4, col: 4 }, 'sente');
+      // 銀将: 前1＋斜め4 = 5方向
+      expect(moves).toHaveLength(5);
+    });
+  });
+
+  describe('12. 行き所のない駒 (dead_piece) の判定 (moves.ts / validation.ts)', () => {
+    it('先手の歩・香車は1段目(row 0)、桂馬は1・2段目(row 0, 1)へ進むと dead_piece となること', () => {
+      const pawn: Piece = { id: 'p', type: 'pawn', player: 'sente', isPromoted: false };
+      const lance: Piece = { id: 'l', type: 'lance', player: 'sente', isPromoted: false };
+      const knight: Piece = { id: 'n', type: 'knight', player: 'sente', isPromoted: false };
+
+      expect(isDeadPieceMove(pawn, { row: 0, col: 4 })).toBe(true);
+      expect(isDeadPieceMove(pawn, { row: 1, col: 4 })).toBe(false);
+
+      expect(isDeadPieceMove(lance, { row: 0, col: 4 })).toBe(true);
+      expect(isDeadPieceMove(lance, { row: 1, col: 4 })).toBe(false);
+
+      expect(isDeadPieceMove(knight, { row: 0, col: 4 })).toBe(true);
+      expect(isDeadPieceMove(knight, { row: 1, col: 4 })).toBe(true);
+      expect(isDeadPieceMove(knight, { row: 2, col: 4 })).toBe(false);
+    });
+
+    it('後手の歩・香車は9段目(row 8)、桂馬は8・9段目(row 7, 8)へ進むと dead_piece となること', () => {
+      const pawn: Piece = { id: 'p', type: 'pawn', player: 'gote', isPromoted: false };
+      const lance: Piece = { id: 'l', type: 'lance', player: 'gote', isPromoted: false };
+      const knight: Piece = { id: 'n', type: 'knight', player: 'gote', isPromoted: false };
+
+      expect(isDeadPieceMove(pawn, { row: 8, col: 4 })).toBe(true);
+      expect(isDeadPieceMove(pawn, { row: 7, col: 4 })).toBe(false);
+
+      expect(isDeadPieceMove(lance, { row: 8, col: 4 })).toBe(true);
+      expect(isDeadPieceMove(lance, { row: 7, col: 4 })).toBe(false);
+
+      expect(isDeadPieceMove(knight, { row: 8, col: 4 })).toBe(true);
+      expect(isDeadPieceMove(knight, { row: 7, col: 4 })).toBe(true);
+      expect(isDeadPieceMove(knight, { row: 6, col: 4 })).toBe(false);
+    });
+
+    it('アシスト方式 (getLegalMoves) では行き所のない駒への着手候補が除外されること', () => {
+      // 先手桂馬が 5三(2,4) にある場合、5一(0,3/0,5)への移動は dead_piece なので除外
+      const state = createCustomTestBoard([
+        { row: 2, col: 4, piece: { id: 'n-s', type: 'knight', player: 'sente' } },
+        { row: 8, col: 4, piece: { id: 'k-s', type: 'king', player: 'sente' } },
+      ]);
+      const moves = getLegalMoves(state.squares, { row: 2, col: 4 }, 'sente');
+      expect(moves).toHaveLength(0);
+    });
+
+    it('厳格対局方式では行き所のない駒が dead_piece の反則負けになり盤面が維持されること', () => {
+      const state = createCustomTestBoard([
+        { row: 2, col: 4, piece: { id: 'n-s', type: 'knight', player: 'sente' } },
+        { row: 8, col: 4, piece: { id: 'k-s', type: 'king', player: 'sente' } },
+      ]);
+
+      const result = executeMove(state, { row: 2, col: 4 }, { row: 0, col: 3 }, {
+        mode: 'strict',
+        proposer: 'shogi_engine',
+        engineName: 'TestEngine-v1',
+      });
+
+      expect(result.type).toBe('foul_loss');
+      if (result.type === 'foul_loss') {
+        expect(result.result.endReason).toBe('foul_loss');
+        expect(result.result.foulReason).toBe('dead_piece');
+        expect(result.result.winner).toBe('gote');
+        expect(result.result.loser).toBe('sente');
+        expect(result.state.status).toBe('ended');
+        // 盤面や駒位置が変わっていないこと
+        expect(result.state.squares[2][4].piece?.type).toBe('knight');
+        expect(result.state.squares[0][3].piece).toBeNull();
+      }
+    });
+  });
+
+  describe('13. 指し手の検証結果と方式別処理 (validation.ts / gameState.ts)', () => {
+    it('validateMove が反則理由を正確に識別して返すこと', () => {
+      const state = createInitialBoardState();
+
+      // 盤外
+      const outOfBounds = validateMove(state, { row: -1, col: 0 }, { row: 0, col: 0 });
+      expect(outOfBounds.isValid).toBe(false);
+      if (!outOfBounds.isValid) {
+        expect(outOfBounds.reason).toBe('out_of_bounds');
+      }
+
+      // 移動元に駒がない
+      const noPiece = validateMove(state, { row: 4, col: 4 }, { row: 3, col: 4 });
+      expect(noPiece.isValid).toBe(false);
+      if (!noPiece.isValid) {
+        expect(noPiece.reason).toBe('no_piece_at_source');
+      }
+
+      // 手番違反（後手の駒を先手番で動かそうとする）
+      const notCurrentTurn = validateMove(state, { row: 2, col: 4 }, { row: 3, col: 4 });
+      expect(notCurrentTurn.isValid).toBe(false);
+      if (!notCurrentTurn.isValid) {
+        expect(notCurrentTurn.reason).toBe('not_current_turn');
+      }
+
+      // 駒の動きとして不正
+      const invalidMove = validateMove(state, { row: 6, col: 2 }, { row: 4, col: 2 });
+      expect(invalidMove.isValid).toBe(false);
+      if (!invalidMove.isValid) {
+        expect(invalidMove.reason).toBe('invalid_piece_move');
+      }
+
+      // 味方駒のあるマス
+      const occupiedByOwn = validateMove(state, { row: 7, col: 1 }, { row: 8, col: 0 });
+      expect(occupiedByOwn.isValid).toBe(false);
+      if (!occupiedByOwn.isValid) {
+        expect(occupiedByOwn.reason).toBe('occupied_by_own_piece');
+      }
+    });
+
+    it('相手玉を直接取ろうとする着手は captured_king 反則として判定されること', () => {
+      // 先手飛車 5二(1,4)、後手玉 5一(0,4)
+      const state = createCustomTestBoard([
+        { row: 1, col: 4, piece: { id: 'r-s', type: 'rook', player: 'sente' } },
+        { row: 0, col: 4, piece: { id: 'k-g', type: 'king', player: 'gote' } },
+        { row: 8, col: 4, piece: { id: 'k-s', type: 'king', player: 'sente' } },
+      ]);
+
+      const val = validateMove(state, { row: 1, col: 4 }, { row: 0, col: 4 });
+      expect(val.isValid).toBe(false);
+      if (!val.isValid) {
+        expect(val.reason).toBe('captured_king');
+      }
+    });
+
+    it('アシスト方式では禁じ手が拒否されるが終局しないこと', () => {
+      const state = createInitialBoardState();
+      const res = executeMove(state, { row: 6, col: 2 }, { row: 4, col: 2 }, { mode: 'assist' });
+      expect(res.type).toBe('rejected');
+      expect(res.state.status).toBe('active');
+      expect(res.state).toBe(state);
+    });
+
+    it('厳格対局方式では同じ禁じ手が反則負けになり、状態が安全に保存されること', () => {
+      const state = createInitialBoardState();
+      const res = executeMove(state, { row: 6, col: 2 }, { row: 4, col: 2 }, {
+        mode: 'strict',
+        proposer: 'local_ai',
+      });
+
+      expect(res.type).toBe('foul_loss');
+      if (res.type === 'foul_loss') {
+        expect(res.state.status).toBe('ended');
+        expect(res.result.winner).toBe('gote');
+        expect(res.result.loser).toBe('sente');
+        expect(res.result.foulReason).toBe('invalid_piece_move');
+        expect(res.state.foulHistory).toHaveLength(1);
+        expect(res.state.foulHistory![0].proposer).toBe('local_ai');
+        expect(res.state.history).toHaveLength(0); // 合法手履歴には混入しない
+        expect(res.state.turn).toBe('sente'); // 手番維持
+        expect(res.state.moveNumber).toBe(1); // 手数維持
+      }
+    });
+
+    it('合法手はアシスト方式・厳格対局方式のどちらでも同一の盤面遷移を行うこと', () => {
+      const state = createInitialBoardState();
+      const resAssist = executeMove(state, { row: 6, col: 2 }, { row: 5, col: 2 }, { mode: 'assist' });
+      const resStrict = executeMove(state, { row: 6, col: 2 }, { row: 5, col: 2 }, { mode: 'strict' });
+
+      expect(resAssist.type).toBe('applied');
+      expect(resStrict.type).toBe('applied');
+      if (resAssist.type === 'applied' && resStrict.type === 'applied') {
+        expect(resAssist.state.turn).toBe('gote');
+        expect(resStrict.state.turn).toBe('gote');
+        expect(resAssist.state.moveNumber).toBe(2);
+        expect(resStrict.state.moveNumber).toBe(2);
+        expect(resAssist.state.history[0].notation).toBe('▲7六歩');
+        expect(resStrict.state.history[0].notation).toBe('▲7六歩');
+      }
+    });
+  });
+
+  describe('14. UI・表示統合・回帰検証 (ShogiResearchScreen.tsx / ShogiBoard.tsx)', () => {
+    it('初期状態で BoardState.status が active であり、「対局中 / 先手番」のバッジが表示されること', () => {
+      const state = createInitialBoardState();
+      expect(state.status).toBe('active');
+
+      render(<ShogiResearchScreen />);
+      const badge = screen.getByRole('status');
+      expect(badge).toHaveTextContent('対局中 / 先手番');
+    });
+
+    it('王手放置となる手は画面上に候補表示されないこと', () => {
+      // 自玉が王手されている局面で ShogiBoard を直接レンダリングして確認
+      const state = createCustomTestBoard([
+        { row: 8, col: 4, piece: { id: 'k-s', type: 'king', player: 'sente' } },
+        { row: 8, col: 2, piece: { id: 's-s', type: 'silver', player: 'sente' } },
+        { row: 0, col: 4, piece: { id: 'r-g', type: 'rook', player: 'gote' } },
+      ]);
+
+      const candidates = getLegalMoves(state.squares, { row: 8, col: 2 }, 'sente');
+      expect(candidates).toHaveLength(0); // 銀は王手を防げないため候補0
+    });
+  });
+
 

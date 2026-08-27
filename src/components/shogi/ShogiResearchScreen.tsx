@@ -54,7 +54,34 @@ export const ShogiResearchScreen: React.FC = () => {
   };
 
   const turnLabel = boardState.turn === 'sente' ? '先手番' : '後手番';
-  const statusBadgeText = `対局中 / ${turnLabel}`;
+
+  const statusBadgeInfo = useMemo(() => {
+    if (boardState.status === 'ended' && boardState.result) {
+      const winnerName = boardState.result.winner === 'sente' ? '先手' : '後手';
+      const loserName = boardState.result.loser === 'sente' ? '先手' : '後手';
+      if (boardState.result.endReason === 'foul_loss') {
+        return {
+          text: `終局 / ${winnerName}勝ち（${loserName}反則負け）`,
+          isLive: false,
+          bgColor: 'bg-rose-950/80 text-rose-300 border-rose-800/60',
+          dotColor: 'bg-rose-500',
+        };
+      }
+      return {
+        text: `終局 / ${winnerName}勝ち`,
+        isLive: false,
+        bgColor: 'bg-stone-900/80 text-stone-300 border-stone-700/60',
+        dotColor: 'bg-stone-500',
+      };
+    }
+
+    return {
+      text: `対局中 / ${turnLabel}`,
+      isLive: true,
+      bgColor: 'bg-amber-950/70 text-amber-300 border-amber-800/50',
+      dotColor: 'bg-amber-400',
+    };
+  }, [boardState.status, boardState.result, turnLabel]);
 
   return (
     <div
@@ -76,12 +103,14 @@ export const ShogiResearchScreen: React.FC = () => {
           </h1>
           <span
             id="shogi-status-badge"
-            className="inline-flex items-center gap-1.5 px-3 py-0.5 rounded-full text-xs font-medium bg-amber-950/70 text-amber-300 border border-amber-800/50 shadow-inner"
+            className={`inline-flex items-center gap-1.5 px-3 py-0.5 rounded-full text-xs font-medium ${statusBadgeInfo.bgColor} border shadow-inner`}
             role="status"
             aria-live="polite"
           >
-            <span className="w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse" />
-            {statusBadgeText}
+            <span
+              className={`w-1.5 h-1.5 rounded-full ${statusBadgeInfo.dotColor} ${statusBadgeInfo.isLive ? 'animate-pulse' : ''}`}
+            />
+            {statusBadgeInfo.text}
           </span>
         </div>
 

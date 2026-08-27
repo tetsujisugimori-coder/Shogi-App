@@ -1,16 +1,53 @@
 /**
- * Shogi Game State Transitions
- * Pure functions to advance board state upon piece moves, handling captures, turns, and move history.
+ * Shogi Game State Transitions & Execution API
+ * Pure functions to advance board state upon piece moves, handling captures, turns, move history,
+ * and dual execution modes (Assist mode for UI / Strict mode for AI & engine experiments).
  */
 
-import { BoardSquare, BoardState, MoveRecord, Piece, PieceType, Player } from '../../types/shogi';
-import { Coordinate, isWithinBoard, toCoordinateLabel } from './coordinates';
-import { getMoveCandidates } from './moves';
+import {
+  BoardSquare,
+  BoardState,
+  ExecutionMode,
+  FoulRecord,
+  GameResult,
+  IllegalMoveReason,
+  MoveRecord,
+  Piece,
+  PieceType,
+  Player,
+  ProposerType,
+} from '../../types/shogi';
+import { Coordinate, toCoordinateLabel } from './coordinates';
+import { validateMove } from './validation';
 
 /**
- * Returns the traditional single kanji representation of a piece type for move notations.
+ * Returns the traditional kanji representation of a piece for move notations.
+ * Handles both unpromoted and promoted pieces.
  */
-export function getPieceNotationKanji(type: PieceType, player: Player): string {
+export function getPieceNotationKanji(
+  type: PieceType,
+  player: Player,
+  isPromoted: boolean = false
+): string {
+  if (isPromoted) {
+    switch (type) {
+      case 'pawn':
+        return 'と';
+      case 'lance':
+        return '成香';
+      case 'knight':
+        return '成桂';
+      case 'silver':
+        return '成銀';
+      case 'rook':
+        return '竜';
+      case 'bishop':
+        return '馬';
+      default:
+        break;
+    }
+  }
+
   switch (type) {
     case 'king':
       return player === 'sente' ? '王' : '玉';
@@ -34,7 +71,7 @@ export function getPieceNotationKanji(type: PieceType, player: Player): string {
 }
 
 /**
- * Generates a human-readable and structured Japanese move notation (e.g. "▲7六歩", "△3四歩").
+ * Generates a human-readable and structured Japanese move notation (e.g. "▲7六歩", "△3四歩", "▲5三成銀").
  */
 export function generateMoveNotation(
   player: Player,
@@ -43,7 +80,11 @@ export function generateMoveNotation(
 ): string {
   const symbol = player === 'sente' ? '▲' : '△';
   const destCoord = toCoordinateLabel(to.row, to.col);
-  const pieceKanji = getPieceNotationKanji(piece.type, player);
+  const pieceKanji = getPieceNotationKanji(
+    piece.type,
+    player,
+    piece.isPromoted ?? false
+  );
   return `${symbol}${destCoord}${pieceKanji}`;
 }
 
@@ -60,63 +101,34 @@ export function cloneBoardSquares(squares: BoardSquare[][]): BoardSquare[][] {
 }
 
 /**
- * Applies a move from `from` to `to` on the given board state.
- * Returns a new BoardState if valid, or the original state if the move is invalid.
- *
- * Operations executed:
- * 1. Validates that `from` has the current player's piece.
- * 2. Validates that `to` is in the legal move candidates.
- * 3. Handles piece capture:
- *    - Removes opponent piece from board
- *    - Updates player of captured piece to capturer
- *    - Resets isPromoted to false
- *    - Adds to capturer's hand preserving id and type
- * 4. Moves the piece to the destination square.
- * 5. Advances turn (sente <-> gote).
- * 6. Increments moveNumber.
- * 7. Records the structured move into history and updates lastMove.
+ * Applies a verified legal move to the board state.
+ * Returns a newly constructed immutable BoardState.
  */
-export function applyMove(
+export function applyLegalMove(
   state: BoardState,
   from: Coordinate,
   to: Coordinate
 ): BoardState {
-  if (!isWithinBoard(from.row, from.col) || !isWithinBoard(to.row, to.col)) {
-    return state;
-  }
-
   const originSquare = state.squares[from.row]?.[from.col];
   if (!originSquare || !originSquare.piece) {
     return state;
   }
 
   const movingPiece = originSquare.piece;
-  if (movingPiece.player !== state.turn) {
-    return state;
-  }
-
-  // Validate destination against legal move candidates
-  const candidates = getMoveCandidates(state.squares, from);
-  const isLegal = candidates.some((c) => c.row === to.row && c.col === to.col);
-  if (!isLegal) {
-    return state;
-  }
-
-  // Deep clone squares for immutable state update
   const newSquares = cloneBoardSquares(state.squares);
   const targetSquare = newSquares[to.row][to.col];
   const targetPiece = targetSquare.piece;
 
-  let nextSenteHand = [...state.senteHand];
-  let nextGoteHand = [...state.goteHand];
+  const nextSenteHand = [...state.senteHand];
+  const nextGoteHand = [...state.goteHand];
 
   // If opponent piece is captured
   if (targetPiece) {
     const capturedPiece: Piece = {
       id: targetPiece.id,
       type: targetPiece.type,
-      player: state.turn, // Becomes capturer's piece
-      isPromoted: false,  // Reset promotion status
+      player: state.turn, // Transferred to capturer
+      isPromoted: false,  // Promotion reset on capture
     };
 
     if (state.turn === 'sente') {
@@ -154,5 +166,141 @@ export function applyMove(
     viewMode: state.viewMode,
     history: [...state.history, moveRecord],
     lastMove: moveRecord,
+    result: state.result ?? null,
+    foulHistory: state.foulHistory ? [...state.foulHistory] : [],
   };
+}
+
+export interface ExecuteMoveOptions {
+  mode?: ExecutionMode; // Default: 'assist'
+  proposer?: ProposerType; // Default: 'human'
+  engineName?: string;
+}
+
+export type MoveExecutionResult =
+  | {
+      type: 'applied';
+      state: BoardState;
+      move: MoveRecord;
+    }
+  | {
+      type: 'rejected';
+      state: BoardState;
+      reason: IllegalMoveReason;
+      message: string;
+    }
+  | {
+      type: 'foul_loss';
+      state: BoardState;
+      foul: FoulRecord;
+      result: GameResult;
+    };
+
+/**
+ * Public API to execute a proposed move on the board state.
+ *
+ * Supports two distinct execution policies:
+ * 1. Assist Mode (Human UI):
+ *    - Rejects illegal moves cleanly without modifying the board or causing foul loss.
+ * 2. Strict Mode (AI & Engine experiments):
+ *    - Receives illegal moves as proposals and immediately triggers foul loss (反則負け).
+ *    - Preserves squares, hands, turn, moveNumber, legal history, and lastMove intact.
+ *    - Records foul in foulHistory and sets status: 'ended' with game result.
+ */
+export function executeMove(
+  state: BoardState,
+  from: Coordinate,
+  to: Coordinate,
+  options: ExecuteMoveOptions = {}
+): MoveExecutionResult {
+  const mode = options.mode ?? 'assist';
+  const proposer = options.proposer ?? 'human';
+
+  // If game is already ended, reject further moves
+  if (state.status === 'ended') {
+    return {
+      type: 'rejected',
+      state,
+      reason: 'out_of_bounds',
+      message: '対局は既に終局しています。',
+    };
+  }
+
+  const validation = validateMove(state, from, to);
+
+  // If move is legal, apply it
+  if (validation.isValid) {
+    const nextState = applyLegalMove(state, from, to);
+    return {
+      type: 'applied',
+      state: nextState,
+      move: nextState.lastMove!,
+    };
+  }
+
+  // If move is illegal:
+  const originSquare = state.squares[from?.row]?.[from?.col];
+  const pieceType = originSquare?.piece?.type ?? 'pawn';
+
+  const foulRecord: FoulRecord = {
+    moveNumber: state.moveNumber,
+    player: state.turn,
+    from: { row: from?.row ?? -1, col: from?.col ?? -1 },
+    to: { row: to?.row ?? -1, col: to?.col ?? -1 },
+    pieceType,
+    reason: validation.reason,
+    message: validation.message,
+    proposer,
+    engineName: options.engineName,
+    timestamp: Date.now(),
+  };
+
+  if (mode === 'strict') {
+    const winner: Player = state.turn === 'sente' ? 'gote' : 'sente';
+    const loser: Player = state.turn;
+
+    const gameResult: GameResult = {
+      winner,
+      loser,
+      endReason: 'foul_loss',
+      foulReason: validation.reason,
+      details: validation.message,
+    };
+
+    // Strict mode: Keep squares, hands, turn, moveNumber, history, lastMove UNCHANGED.
+    // Set status to 'ended', attach result, and append to foulHistory.
+    const endedState: BoardState = {
+      ...state,
+      status: 'ended',
+      result: gameResult,
+      foulHistory: [...(state.foulHistory ?? []), foulRecord],
+    };
+
+    return {
+      type: 'foul_loss',
+      state: endedState,
+      foul: foulRecord,
+      result: gameResult,
+    };
+  }
+
+  // Assist mode: Reject without altering state
+  return {
+    type: 'rejected',
+    state,
+    reason: validation.reason,
+    message: validation.message,
+  };
+}
+
+/**
+ * Backward compatible wrapper for applyMove (defaults to Assist mode).
+ */
+export function applyMove(
+  state: BoardState,
+  from: Coordinate,
+  to: Coordinate
+): BoardState {
+  const result = executeMove(state, from, to, { mode: 'assist' });
+  return result.state;
 }
