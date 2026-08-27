@@ -778,6 +778,70 @@ Node.js 24系移行後に残っていたGitHub ActionsのNode.js 20 Action depre
 - **残存警告**: `node-domexception@1.0.0` の deprecated 警告が残存（jsdom 間接依存によるもの）
 - **未解決事項**: なし
 
+## 15. node-domexception の依存経路訂正および成功済み CI (Run ID: 33030156088) の記録
+
+### 基準コミットと対象
+- **対象リポジトリ**: `tetsujisugimori-coder/Shogi-App`
+- **基準コミット**: `6d24529549116ee85fbff711eb21e6f2c182905e`
+- **修正目的**: 過去記録における `node-domexception@1.0.0` の依存経路の不正確な記述（「jsdom 間接依存」）を訂正し、正確な依存グラフと現状の影響範囲を記録すること。あわせて、基準コミットに対する成功済み GitHub Actions (Run ID: `33030156088`) の詳細結果を記録すること。本作業でのコード・設定・テストの変更は一切行わず、`LOG.md` の記録更新のみを対象とする。
+
+### node-domexception@1.0.0 の依存経路の訂正
+- **過去記録の不正確な点**: 過去のセクションにおいて「jsdom 間接依存によるもの」と記載していたが、これは不正確であった。
+- **実際の依存経路 (`package-lock.json`)**:
+  ```text
+  @google/genai
+  └── google-auth-library
+      └── gaxios
+          └── node-fetch
+              └── fetch-blob
+                  └── node-domexception@1.0.0
+  ```
+- **現状と影響範囲の評価**:
+  - `node-domexception@1.0.0` 自体が deprecated となっているため、npm install / CI 実行時に Linux および macOS の両方で警告が出力される。
+  - 現時点において、この警告がテスト実行 (`vitest`) や本番ビルド (`vite build` / `tsc`) を失敗させるなどの悪影響は確認されていない。
+  - ただし、「実害なし」と断定はせず、確認できた範囲（テスト・ビルド・検証スクリプトがすべて正常終了すること）のみを事実として記録する。
+  - 今回の作業では依存パッケージの更新は行わず、`package-lock.json` の変更もしない（差分ゼロを維持）。
+  - 将来的に上流ライブラリ（`@google/genai` や `google-auth-library` など）のアップデートにより当該 deprecated パッケージへの依存が解消されるか確認する余地がある。
+
+### 成功済み GitHub Actions の記録
+- **Workflow URL**: `https://github.com/tetsujisugimori-coder/Shogi-App/actions/runs/33030156088`
+- **Run ID**: `33030156088`
+- **対象コミット**: `6d24529549116ee85fbff711eb21e6f2c182905e`
+- **Event**: `push`
+- **Conclusion**: `success` (Linux / macOS 両ジョブとも完全成功)
+- **Linux Job ID**: `98380574161` (成功: 65/65 テスト成功、型チェック成功、ビルド成功)
+- **macOS Job ID**: `98380574355` (成功: 63成功・2 skipped・0失敗、型チェック成功、ビルド成功)
+- **実行環境**:
+  - Node.js: `24.19.0`
+  - npm: `11.17.0`
+- **検証詳細**:
+  - Linux: 65/65 テスト成功、0 失敗、0 skipped
+  - macOS: 63 成功、0 失敗、2 skipped（非macOS向けテスト）、総数 65
+  - Linux / macOS ともに TypeScript 型チェック (`tsc --noEmit`) 成功
+  - Linux / macOS ともに Vite 本番ビルド (`vite build`) 成功
+  - macOS の実 `fsevents` ネイティブイベント受信成功 (`npm run verify:macos-fsevents`)
+  - macOS の Vite ファイル変更検知成功 (`npm run verify:macos-fsevents`)
+  - install script 未審査警告なし
+  - `node-domexception@1.0.0` の deprecated 警告が両 OS で残存
+- **UI確認状況**: UI 関連ファイルの変更がないためブラウザ目視確認は未実施
+
+### 変更ファイル一覧
+- `LOG.md` (本セクション 15 を末尾追記)
+
+### 各種ファイルの維持状況
+- `package.json`, `package-lock.json`, `.npmrc`, `.nvmrc`, `.github/workflows/ci.yml`: 変更なし（差分ゼロ）
+- `scripts/verify-macos-fsevents-core.mjs`, `scripts/verify-macos-fsevents.mjs`: 変更なし（差分ゼロ）
+- `src/test/shogi.test.tsx`: 変更なし（差分ゼロ）
+- UI・CSS・コンポーネント関連ファイル: 変更なし（差分ゼロ）
+
+### 確認・未確認・未解決事項
+- **ローカルテストの実行について**: 今回は記録の訂正のみでコードやテストに変更がないため、新規のローカルテスト実行は行わず、基準コミットの CI 実行結果（Run ID: `33030156088`）の事実関係を記録。
+- **リモートCI状況**: 本追記コミットのリモートCIは未確認。
+- **UI確認**: UI・CSS・コンポーネントコードの変更なし。UI 関連ファイルを変更していないためブラウザ目視確認は未実施。
+- **残存警告**: `node-domexception@1.0.0` の deprecated 警告が両 OS で残存（上記依存経路によるもの）
+- **未解決事項**: なし
+
+
 
 
 
