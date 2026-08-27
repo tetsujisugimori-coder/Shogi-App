@@ -32,6 +32,13 @@ export const ILLEGAL_MOVE_MESSAGES: Record<IllegalMoveReason, string> = {
   promotion_required: 'この指し手では成りが必須です。',
   king_suicide: '王将・玉将を相手の利きがあるマスへ移動することはできません（自滅手）。',
   self_check_unresolved: '自玉が王手を受ける状態になる着手、または王手放置は反則です。',
+  hand_piece_not_found: '指定されたIDの駒が持ち駒に存在しません。',
+  not_own_hand_piece: '相手側の持ち駒を打つことはできません。',
+  occupied_drop_square: '駒が存在するマスへ持ち駒を打つことはできません。',
+  undroppable_piece: '王将・玉将は持ち駒から打つことができません。',
+  invalid_hand_piece_state: '成った状態など不正な持ち駒は打つことができません。',
+  dead_piece_drop: 'これ以上進めない段へ持ち駒を打つことはできません（行き所のない駒）。',
+  nifu: '同じ筋に未成の歩があるため、二歩となる歩打ちはできません。',
   game_already_ended: '対局は既に終局しています。',
 };
 

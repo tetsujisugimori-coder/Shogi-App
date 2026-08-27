@@ -1,5 +1,5 @@
 import React from 'react';
-import { BoardSquare, BoardStatus, Piece as PieceModel, TableViewMode } from '../../types/shogi';
+import { BoardSquare, BoardStatus, MoveRecord, Piece as PieceModel, PieceType, Player, TableViewMode } from '../../types/shogi';
 import { ShogiBoard } from './ShogiBoard';
 import { PieceStand } from './PieceStand';
 
@@ -12,8 +12,14 @@ interface ShogiTableProps {
   className?: string;
   selectedSquare?: { row: number; col: number } | null;
   candidateSquares?: Array<{ row: number; col: number }>;
-  lastMove?: { from: { row: number; col: number }; to: { row: number; col: number } } | null;
+  candidateKind?: 'move' | 'drop' | null;
+  dropPieceType?: PieceType | null;
+  lastMove?: MoveRecord | null;
   onSquareClick?: (square: BoardSquare) => void;
+  turn?: Player;
+  selectedHandPieceId?: string | null;
+  onHandPieceSelect?: (piece: PieceModel) => void;
+  pieceStandsDisabled?: boolean;
   focusRequest?: { row: number; col: number; requestId: number } | null;
   topPlayerSlot?: React.ReactNode;
   bottomPlayerSlot?: React.ReactNode;
@@ -30,8 +36,14 @@ export const ShogiTable: React.FC<ShogiTableProps> = ({
   className = '',
   selectedSquare = null,
   candidateSquares = [],
+  candidateKind = null,
+  dropPieceType = null,
   lastMove = null,
   onSquareClick,
+  turn = 'sente',
+  selectedHandPieceId = null,
+  onHandPieceSelect,
+  pieceStandsDisabled = false,
   focusRequest = null,
   topPlayerSlot,
   bottomPlayerSlot,
@@ -73,7 +85,13 @@ export const ShogiTable: React.FC<ShogiTableProps> = ({
       <div className="relative z-10 flex flex-col items-center gap-5 sm:gap-7">
         {/* Top: Gote's Piece Stand (Centered above the board as in the image) */}
         <div className="w-full flex justify-center">
-          <PieceStand player="gote" pieces={goteHand} isActive={false} />
+          <PieceStand
+            player="gote"
+            pieces={goteHand}
+            isActive={!pieceStandsDisabled && turn === 'gote' && Boolean(onHandPieceSelect)}
+            selectedPieceId={selectedHandPieceId}
+            onPieceSelect={onHandPieceSelect}
+          />
         </div>
 
         {/* Center: The Shogi Board (Slight top-down perspective, high clarity) */}
@@ -101,6 +119,8 @@ export const ShogiTable: React.FC<ShogiTableProps> = ({
               status={status}
               selectedSquare={selectedSquare}
               candidateSquares={candidateSquares}
+              candidateKind={candidateKind}
+              dropPieceType={dropPieceType}
               lastMove={lastMove}
               onSquareClick={onSquareClick}
               focusRequest={focusRequest}
@@ -110,7 +130,13 @@ export const ShogiTable: React.FC<ShogiTableProps> = ({
 
         {/* Bottom: Sente's Piece Stand (Centered below the board as in the image) */}
         <div className="w-full flex justify-center">
-          <PieceStand player="sente" pieces={senteHand} isActive={true} />
+          <PieceStand
+            player="sente"
+            pieces={senteHand}
+            isActive={!pieceStandsDisabled && turn === 'sente' && Boolean(onHandPieceSelect)}
+            selectedPieceId={selectedHandPieceId}
+            onPieceSelect={onHandPieceSelect}
+          />
         </div>
       </div>
 

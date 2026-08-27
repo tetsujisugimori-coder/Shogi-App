@@ -8,10 +8,9 @@ import {
   BoardSquare,
   BoardState,
   ExecutionMode,
-  FoulRecord,
-  GameResult,
+  MoveFoulRecord,
   IllegalMoveReason,
-  MoveRecord,
+  NormalMoveRecord,
   MovePromotion,
   MoveValidationResult,
   Piece,
@@ -24,6 +23,13 @@ import { Coordinate, toCoordinateLabel } from './coordinates';
 import { getPromotionStatus } from './promotion';
 import { validateMove } from './validation';
 import { ILLEGAL_MOVE_MESSAGES } from './validation';
+import {
+  finalizeIllegalProposal,
+  FoulLossExecutionResult,
+  RejectedExecutionResult,
+} from './executionPolicy';
+
+export type { FoulLossExecutionResult, RejectedExecutionResult } from './executionPolicy';
 
 /**
  * Returns the traditional kanji representation of a piece for move notations.
@@ -118,10 +124,10 @@ function internalApplyLegalMove(
   from: Coordinate,
   to: Coordinate,
   promotion: MovePromotion
-): BoardState {
+): { state: BoardState; move: NormalMoveRecord } | null {
   const originSquare = state.squares[from.row]?.[from.col];
   if (!originSquare || !originSquare.piece) {
-    return state;
+    return null;
   }
 
   const movingPiece = originSquare.piece;
@@ -157,7 +163,8 @@ function internalApplyLegalMove(
 
   const notation = generateMoveNotation(state.turn, movingPiece, to, promotion);
 
-  const moveRecord: MoveRecord = {
+  const moveRecord: NormalMoveRecord = {
+    kind: 'move',
     moveNumber: state.moveNumber,
     player: state.turn,
     from: { row: from.row, col: from.col },
@@ -171,17 +178,20 @@ function internalApplyLegalMove(
   const nextTurn: Player = state.turn === 'sente' ? 'gote' : 'sente';
 
   return {
-    squares: newSquares,
-    senteHand: nextSenteHand,
-    goteHand: nextGoteHand,
-    turn: nextTurn,
-    moveNumber: state.moveNumber + 1,
-    status: 'active',
-    viewMode: state.viewMode,
-    history: [...state.history, moveRecord],
-    lastMove: moveRecord,
-    result: state.result ?? null,
-    foulHistory: state.foulHistory ? [...state.foulHistory] : [],
+    move: moveRecord,
+    state: {
+      squares: newSquares,
+      senteHand: nextSenteHand,
+      goteHand: nextGoteHand,
+      turn: nextTurn,
+      moveNumber: state.moveNumber + 1,
+      status: 'active',
+      viewMode: state.viewMode,
+      history: [...state.history, moveRecord],
+      lastMove: moveRecord,
+      result: state.result ?? null,
+      foulHistory: state.foulHistory ? [...state.foulHistory] : [],
+    },
   };
 }
 
@@ -214,20 +224,10 @@ export type MoveExecutionResult =
   | {
       type: 'applied';
       state: BoardState;
-      move: MoveRecord;
+      move: NormalMoveRecord;
     }
-  | {
-      type: 'rejected';
-      state: BoardState;
-      reason: IllegalMoveReason;
-      message: string;
-    }
-  | {
-      type: 'foul_loss';
-      state: BoardState;
-      foul: FoulRecord;
-      result: GameResult;
-    };
+  | RejectedExecutionResult
+  | FoulLossExecutionResult;
 
 /**
  * Public API to execute a proposed move on the board state.
@@ -297,11 +297,19 @@ export function executeMove(
 
   // If move is legal, apply it through the internal helper
   if (validation.isValid) {
-    const nextState = internalApplyLegalMove(state, from, to, movePromotion);
+    const applied = internalApplyLegalMove(state, from, to, movePromotion);
+    if (!applied) {
+      return {
+        type: 'rejected',
+        state,
+        reason: 'no_piece_at_source',
+        message: ILLEGAL_MOVE_MESSAGES.no_piece_at_source,
+      };
+    }
     return {
       type: 'applied',
-      state: nextState,
-      move: nextState.lastMove!,
+      state: applied.state,
+      move: applied.move,
     };
   }
 
@@ -319,7 +327,8 @@ export function executeMove(
   const originSquare = isFromInBounds ? state.squares[from.row]?.[from.col] : undefined;
   const pieceType = originSquare?.piece?.type ?? null;
 
-  const foulRecord: FoulRecord = {
+  const foulRecord: MoveFoulRecord = {
+    kind: 'move',
     moveNumber: state.moveNumber,
     player: state.turn,
     from: { row: from?.row ?? -1, col: from?.col ?? -1 },
@@ -332,42 +341,7 @@ export function executeMove(
     timestamp: Date.now(),
   };
 
-  if (mode === 'strict') {
-    const winner: Player = state.turn === 'sente' ? 'gote' : 'sente';
-    const loser: Player = state.turn;
-
-    const gameResult: GameResult = {
-      winner,
-      loser,
-      endReason: 'foul_loss',
-      foulReason: validation.reason,
-      details: validation.message,
-    };
-
-    // Strict mode: Keep squares, hands, turn, moveNumber, history, lastMove UNCHANGED.
-    // Set status to 'ended', attach result, and append to foulHistory.
-    const endedState: BoardState = {
-      ...state,
-      status: 'ended',
-      result: gameResult,
-      foulHistory: [...(state.foulHistory ?? []), foulRecord],
-    };
-
-    return {
-      type: 'foul_loss',
-      state: endedState,
-      foul: foulRecord,
-      result: gameResult,
-    };
-  }
-
-  // Assist mode: Reject without altering state
-  return {
-    type: 'rejected',
-    state,
-    reason: validation.reason,
-    message: validation.message,
-  };
+  return finalizeIllegalProposal(state, mode, foulRecord);
 }
 
 /**
