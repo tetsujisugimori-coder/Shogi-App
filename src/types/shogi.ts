@@ -46,6 +46,16 @@ export type BoardStatus = 'preparation' | 'active' | 'check' | 'blunder' | 'eval
 
 export type TableViewMode = 'research' | 'spectator' | 'analysis';
 
+export interface MoveRecord {
+  moveNumber: number;
+  player: Player;
+  from: { row: number; col: number };
+  to: { row: number; col: number };
+  pieceType: PieceType;
+  capturedPieceType?: PieceType | null;
+  notation: string;
+}
+
 export interface BoardState {
   squares: BoardSquare[][]; // 9x9 grid
   senteHand: Piece[];
@@ -54,6 +64,8 @@ export interface BoardState {
   moveNumber: number;
   status: BoardStatus;
   viewMode: TableViewMode;
+  history: MoveRecord[];
+  lastMove?: MoveRecord | null;
 }
 
 export const RANK_KANJI = ['一', '二', '三', '四', '五', '六', '七', '八', '九'] as const;
@@ -334,6 +346,8 @@ export function createInitialBoardState(): BoardState {
     moveNumber: 1,
     status: 'preparation',
     viewMode: 'research',
+    history: [],
+    lastMove: null,
   };
 }
 

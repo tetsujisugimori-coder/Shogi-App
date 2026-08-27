@@ -841,6 +841,92 @@ Node.js 24系移行後に残っていたGitHub ActionsのNode.js 20 Action depre
 - **残存警告**: `node-domexception@1.0.0` の deprecated 警告が両 OS で残存（上記依存経路によるもの）
 - **未解決事項**: なし
 
+---
+
+## 16. 将棋の駒操作・移動候補・着手・取り駒・手番・履歴の実装および検証記録
+
+### 実施日時
+- **実施日**: 2026-08-27
+- **対象環境**: Linux x86_64, Node.js `24.19.0`, npm `11.17.0`
+
+### 目的と概要
+将棋研究画面において、既存のリアル調な高級感・アクセシビリティ基盤（Roving Tabindex・スクリーンリーダー対応）を損なわずに、ユーザーが駒を選択・移動・駒取りでき、手番と着手履歴が進行する基盤を構築した。将棋ルールを表示コンポーネントに直接記述せず、テスト容易な純粋関数群としてドメイン層 (`src/domain/shogi/`) へ分離実装した。
+
+### 実装の詳細
+
+1. **ドメイン層の構築 (`src/domain/shogi/`)**:
+   - `coordinates.ts`:
+     - `isWithinBoard`: 9x9 盤面の内外境界判定
+     - `areCoordinatesEqual`: 座標の一致判定
+     - `toCoordinateLabel` / `fromCoordinateLabel`: 漢数字段・アラビア数字筋による将棋座標文字列相互変換（例: 7七, 5一）
+   - `moves.ts`:
+     - 歩兵（Pawn）: 前方1マス
+     - 香車（Lance）: 前方への直進レイ（味方駒で遮断、敵駒で捕獲停止）
+     - 桂馬（Knight）: 前方2マス左右1マスのジャンプ移動
+     - 銀将（Silver）: 前方1マスおよび斜め4方向（計5方向）
+     - 金将（Gold）: 縦横4方向および前斜め2方向（計6方向）
+     - 玉将／王将（King）: 周囲8方向
+     - 飛車（Rook）: 十字4方向への直進レイ
+     - 角行（Bishop）: 斜め4方向への直進レイ
+     - **制約遵守**: 盤外移動不可、味方駒マス移動不可、飛び越え不可（香・飛・角）、敵駒捕獲可能、王将/玉将を取る手は移動候補から除外
+   - `gameState.ts`:
+     - `applyMove`: イミュータブルに新 `BoardState` を生成・返却する純粋関数
+     - 敵駒捕獲処理: 相手の駒を盤面から除去、所有者を手番プレイヤーに変更、成りをリセット (`isPromoted: false`)、駒台用配列 (`senteHand` / `goteHand`) に追加（ID・種類を保持）
+     - 手番交代（`sente` ⇔ `gote`）および手数の加算（1手目から順次進行）
+     - 棋譜表記の自動生成（例: `▲7六歩`, `△3四歩`, `▲6四角`）
+     - `history` (`MoveRecord[]`) への記録追加および `lastMove` の更新
+   - `index.ts`: ドメインAPIの公開エントリポイント
+
+2. **型定義の拡張 (`src/types/shogi.ts`)**:
+   - `MoveRecord` インターフェースの追加（`moveNumber`, `player`, `from`, `to`, `pieceType`, `capturedPieceType`, `notation`）
+   - `BoardState` に `history: MoveRecord[]` と `lastMove?: MoveRecord | null` を追加
+   - `createInitialBoardState()` で `history: []`, `lastMove: null` を初期化
+
+3. **UI / コンポーネントの連携 (`src/components/shogi/`)**:
+   - `ShogiBoard.tsx`:
+     - 移動候補マス (`candidateSquares`) の表示: 空マスにはパルスする金色のドットインジケータ、敵駒マスには捕獲ハイライト枠
+     - 直前着手 (`lastMove`) の移動元・移動先ハイライト
+     - 既存の Roving Tabindex（フォーカス可能なセルは1つのみ）とキーボード操作（Space / Enter で選択・着手）を完全維持
+     - アクセシビリティラベルの強化（移動可能マスでは `aria-label` に「移動可能」「相手の駒を取る」を付与）
+   - `ShogiTable.tsx`: 候補マスおよび直前着手情報を `ShogiBoard` へ透過的に伝達
+   - `ShogiResearchScreen.tsx`:
+     - 局面状態、選択マス、移動候補マスの管理
+     - 自駒クリックで選択・選択解除・自駒間切り替え
+     - 候補マス選択で着手実行・手番更新
+     - ステータスバッジのリアルタイム更新（「対局中 / 先手番」 ⇔ 「対局中 / 後手番」）
+     - フッター文言の更新（「駒の選択・移動・駒取りが可能です（成駒・駒打ちは準備中）。」）
+
+4. **テストスイートの拡充 (`src/test/shogi.test.tsx`)**:
+   - セクション 9 を追加し、全23項目の新規テストを網羅:
+     - 座標ヘルパーの境界・一致・変換検証
+     - 8種類の駒（歩・香・桂・銀・金・王・飛・角）の先手・後手双方における移動ルール・障害物遮断・玉将捕獲禁止の検証
+     - `applyMove` によるイミュータブル局面更新・手番交代・手数加算・取り駒の駒台追加・成りリセット・棋譜生成・非合法手防御の検証
+     - マウスクリックおよびキーボード操作による駒選択・解除・切り替え・着手・ステータスバッジ更新・駒台アクセシビリティの統合検証
+   - 総テスト数: **88/88 passed** (全通過)
+
+### 検証結果 (`npm run check`)
+- `npm run verify:lock`: **SUCCESS** (398パッケージ検証、禁止ロックファイルなし、完全一致)
+- `npm run lint`: **SUCCESS** (`tsc --noEmit` 型エラーなし)
+- `npm test`: **SUCCESS** (88テスト全成功)
+- `npm run build`: **SUCCESS** (Vite production build 正常完了)
+
+### 変更ファイル一覧
+- `src/domain/shogi/coordinates.ts` (新規作成)
+- `src/domain/shogi/moves.ts` (新規作成)
+- `src/domain/shogi/gameState.ts` (新規作成)
+- `src/domain/shogi/index.ts` (新規作成)
+- `src/types/shogi.ts` (型拡張・初期状態更新)
+- `src/components/shogi/ShogiBoard.tsx` (候補マス・直前着手・ARIA対応)
+- `src/components/shogi/ShogiTable.tsx` (Props伝達)
+- `src/components/shogi/ShogiResearchScreen.tsx` (状態管理・操作統合・バッジ更新)
+- `src/test/shogi.test.tsx` (ドメイン・UIテスト追加)
+- `LOG.md` (本記録の追記)
+
+### 各種ファイルの維持状況
+- `package.json`, `package-lock.json`, `.npmrc`, `.nvmrc`, `.github/workflows/ci.yml`: 変更なし（差分ゼロ）
+- デザインシステム（リアル調木製テクスチャ、駒台、駒の3D立体感、配色）: 完全維持
+- アクセシビリティ基盤（Roving Tabindex, ARIA属性）: 完全維持・強化
+
 
 
 

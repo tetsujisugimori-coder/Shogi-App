@@ -11,6 +11,8 @@ interface ShogiTableProps {
   viewMode?: TableViewMode;
   className?: string;
   selectedSquare?: { row: number; col: number } | null;
+  candidateSquares?: Array<{ row: number; col: number }>;
+  lastMove?: { from: { row: number; col: number }; to: { row: number; col: number } } | null;
   onSquareClick?: (square: BoardSquare) => void;
   topPlayerSlot?: React.ReactNode;
   bottomPlayerSlot?: React.ReactNode;
@@ -26,6 +28,8 @@ export const ShogiTable: React.FC<ShogiTableProps> = ({
   viewMode = 'research',
   className = '',
   selectedSquare = null,
+  candidateSquares = [],
+  lastMove = null,
   onSquareClick,
   topPlayerSlot,
   bottomPlayerSlot,
@@ -94,6 +98,8 @@ export const ShogiTable: React.FC<ShogiTableProps> = ({
               squares={squares}
               status={status}
               selectedSquare={selectedSquare}
+              candidateSquares={candidateSquares}
+              lastMove={lastMove}
               onSquareClick={onSquareClick}
             />
           </div>

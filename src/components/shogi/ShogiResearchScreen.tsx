@@ -1,9 +1,60 @@
-import React, { useState } from 'react';
-import { createInitialBoardState, BoardState } from '../../types/shogi';
+import React, { useState, useMemo } from 'react';
+import { createInitialBoardState, BoardState, BoardSquare } from '../../types/shogi';
+import { getMoveCandidates, applyMove } from '../../domain/shogi';
 import { ShogiTable } from './ShogiTable';
 
 export const ShogiResearchScreen: React.FC = () => {
-  const [boardState] = useState<BoardState>(() => createInitialBoardState());
+  const [boardState, setBoardState] = useState<BoardState>(() => createInitialBoardState());
+  const [selectedSquare, setSelectedSquare] = useState<{ row: number; col: number } | null>(null);
+
+  // Compute move candidates for currently selected square
+  const candidateSquares = useMemo(() => {
+    if (!selectedSquare) return [];
+    return getMoveCandidates(boardState.squares, selectedSquare);
+  }, [boardState.squares, selectedSquare]);
+
+  const handleSquareClick = (square: BoardSquare) => {
+    // Case 1: No square currently selected
+    if (!selectedSquare) {
+      if (square.piece && square.piece.player === boardState.turn) {
+        setSelectedSquare({ row: square.row, col: square.col });
+      }
+      return;
+    }
+
+    // Case 2: Clicked on already selected square -> Deselect
+    if (selectedSquare.row === square.row && selectedSquare.col === square.col) {
+      setSelectedSquare(null);
+      return;
+    }
+
+    // Case 3: Clicked on another own piece -> Switch selection
+    if (square.piece && square.piece.player === boardState.turn) {
+      setSelectedSquare({ row: square.row, col: square.col });
+      return;
+    }
+
+    // Case 4: Clicked on a legal move candidate square -> Execute move
+    const isCandidate = candidateSquares.some(
+      (c) => c.row === square.row && c.col === square.col
+    );
+
+    if (isCandidate) {
+      const nextBoardState = applyMove(
+        boardState,
+        selectedSquare,
+        { row: square.row, col: square.col }
+      );
+      setBoardState(nextBoardState);
+      setSelectedSquare(null);
+      return;
+    }
+
+    // Case 5: Clicked on an invalid square (opponent piece, empty non-candidate, etc.) -> Do nothing
+  };
+
+  const turnLabel = boardState.turn === 'sente' ? '先手番' : '後手番';
+  const statusBadgeText = `対局中 / ${turnLabel}`;
 
   return (
     <div
@@ -30,7 +81,7 @@ export const ShogiResearchScreen: React.FC = () => {
             aria-live="polite"
           >
             <span className="w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse" />
-            準備中 / 先手番
+            {statusBadgeText}
           </span>
         </div>
 
@@ -50,6 +101,10 @@ export const ShogiResearchScreen: React.FC = () => {
           goteHand={boardState.goteHand}
           status={boardState.status}
           viewMode={boardState.viewMode}
+          selectedSquare={selectedSquare}
+          candidateSquares={candidateSquares}
+          lastMove={boardState.lastMove}
+          onSquareClick={handleSquareClick}
         />
       </main>
 
@@ -59,7 +114,7 @@ export const ShogiResearchScreen: React.FC = () => {
           id="shogi-footer-notice"
           className="text-xs text-stone-400 font-sans tracking-wide select-none"
         >
-          盤面表示の初期実装です。駒移動・対局機能は準備中です。
+          駒の選択・移動・駒取りが可能です（成駒・駒打ちは準備中）。
         </p>
       </footer>
     </div>

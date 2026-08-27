@@ -12,8 +12,23 @@ import {
   getPieceDisplayInfo,
   canPromote,
   BoardSquare,
+  Piece,
 } from '../types/shogi';
 import { ShogiBoard } from '../components/shogi/ShogiBoard';
+import { ShogiResearchScreen } from '../components/shogi/ShogiResearchScreen';
+import { PieceStand } from '../components/shogi/PieceStand';
+import {
+  isWithinBoard,
+  areCoordinatesEqual,
+  toCoordinateLabel,
+  fromCoordinateLabel,
+  getPieceMoves,
+  getMoveCandidates,
+  applyMove,
+  generateMoveNotation,
+  getPieceNotationKanji,
+  cloneBoardSquares,
+} from '../domain/shogi';
 import { validateLockfile } from '../../scripts/verify-lockfile.mjs';
 import {
   runCleanups,
@@ -1331,3 +1346,406 @@ describe('6. macOS 検証スクリプトの公開API・内部処理・本番clea
     });
   });
 });
+
+describe('9. 将棋ドメイン層・駒移動・合法手・手番・取り駒・着手履歴・UI操作の検証', () => {
+    describe('9.1 座標ヘルパー (coordinates.ts)', () => {
+      it('盤面内外の判定 (isWithinBoard) が正しく機能すること', () => {
+        expect(isWithinBoard(0, 0)).toBe(true);
+        expect(isWithinBoard(8, 8)).toBe(true);
+        expect(isWithinBoard(4, 4)).toBe(true);
+        expect(isWithinBoard(-1, 0)).toBe(false);
+        expect(isWithinBoard(0, 9)).toBe(false);
+        expect(isWithinBoard(9, 0)).toBe(false);
+        expect(isWithinBoard(0, -1)).toBe(false);
+      });
+
+      it('座標一致判定 (areCoordinatesEqual) が正しく機能すること', () => {
+        expect(areCoordinatesEqual({ row: 6, col: 2 }, { row: 6, col: 2 })).toBe(true);
+        expect(areCoordinatesEqual({ row: 6, col: 2 }, { row: 5, col: 2 })).toBe(false);
+        expect(areCoordinatesEqual(null, { row: 6, col: 2 })).toBe(false);
+        expect(areCoordinatesEqual(undefined, undefined)).toBe(false);
+      });
+
+      it('座標文字列変換 (toCoordinateLabel / fromCoordinateLabel) が正確であること', () => {
+        expect(toCoordinateLabel(6, 2)).toBe('7七');
+        expect(toCoordinateLabel(2, 6)).toBe('3三');
+        expect(toCoordinateLabel(0, 0)).toBe('9一');
+        expect(toCoordinateLabel(8, 8)).toBe('1九');
+
+        expect(fromCoordinateLabel('7七')).toEqual({ row: 6, col: 2 });
+        expect(fromCoordinateLabel('3三')).toEqual({ row: 2, col: 6 });
+        expect(fromCoordinateLabel('9一')).toEqual({ row: 0, col: 0 });
+        expect(fromCoordinateLabel('1九')).toEqual({ row: 8, col: 8 });
+        expect(fromCoordinateLabel('')).toBeNull();
+        expect(fromCoordinateLabel('0零')).toBeNull();
+      });
+    });
+
+    describe('9.2 駒の移動ルール・候補手生成 (moves.ts)', () => {
+      it('先手の歩兵 (Pawn) は1マス前進 (row - 1) のみ可能であること', () => {
+        const state = createInitialBoardState();
+        // 7七 (row 6, col 2) の歩兵
+        const moves = getMoveCandidates(state.squares, { row: 6, col: 2 });
+        expect(moves).toEqual([{ row: 5, col: 2 }]); // 7六 (row 5, col 2)
+      });
+
+      it('後手の歩兵 (Pawn) は1マス前進 (row + 1) のみ可能であること', () => {
+        const state = createInitialBoardState();
+        // 3三 (row 2, col 6) の歩兵
+        const moves = getMoveCandidates(state.squares, { row: 2, col: 6 });
+        expect(moves).toEqual([{ row: 3, col: 6 }]); // 3四 (row 3, col 6)
+      });
+
+      it('香車 (Lance) は前方に遮る駒がある場合、その手前までしか進めず飛び越えられないこと', () => {
+        const state = createInitialBoardState();
+        // 1九 (row 8, col 8) の先手香車。前方の 1七 (row 6, col 8) に先手の歩があるため、1八 (row 7, col 8) のみ
+        const moves = getMoveCandidates(state.squares, { row: 8, col: 8 });
+        expect(moves).toEqual([{ row: 7, col: 8 }]);
+      });
+
+      it('桂馬 (Knight) は前方に遮る駒があっても飛び越え移動 (row ± 2, col ± 1) できること', () => {
+        const state = createInitialBoardState();
+        // 8九 (row 8, col 1) の先手桂馬。前方 8七(row 6) に歩があるが、7七(row 6, col 2) と 9七(row 6, col 0) に飛べる
+        // ただし初期配置では 7七 と 9七 に先手歩兵が存在するため、自身の駒の上には移動不可となり 0 手
+        const initialMoves = getMoveCandidates(state.squares, { row: 8, col: 1 });
+        expect(initialMoves).toEqual([]);
+
+        // 7七の歩を 7六 に進めた状態をつくる
+        const movedState = applyMove(state, { row: 6, col: 2 }, { row: 5, col: 2 });
+        // 8九の桂馬は 7七 (row 6, col 2) が空いたため移動可能になる
+        const movesAfter = getMoveCandidates(movedState.squares, { row: 8, col: 1 });
+        expect(movesAfter).toEqual([{ row: 6, col: 2 }]);
+      });
+
+      it('銀将 (Silver) は前方1マスおよび斜め4方向 (計5方向) に移動可能であること', () => {
+        // 盤面中央 5五 (row 4, col 4) に単独の先手銀を配置
+        const squares = cloneBoardSquares(createInitialBoardState().squares);
+        // 全マスの駒をクリア
+        for (let r = 0; r < 9; r++) {
+          for (let c = 0; c < 9; c++) {
+            squares[r][c].piece = null;
+          }
+        }
+        const silverPiece: Piece = { id: 'test-silver', type: 'silver', player: 'sente' };
+        squares[4][4].piece = silverPiece;
+
+        const candidates = getMoveCandidates(squares, { row: 4, col: 4 });
+        // 先手銀: 前(3,4), 左上(3,3), 右上(3,5), 左下(5,3), 右下(5,5)
+        expect(candidates).toHaveLength(5);
+        expect(candidates).toContainEqual({ row: 3, col: 4 });
+        expect(candidates).toContainEqual({ row: 3, col: 3 });
+        expect(candidates).toContainEqual({ row: 3, col: 5 });
+        expect(candidates).toContainEqual({ row: 5, col: 3 });
+        expect(candidates).toContainEqual({ row: 5, col: 5 });
+        // 後ろ (5,4) や 左右 (4,3), (4,5) は含まれないこと
+        expect(candidates).not.toContainEqual({ row: 5, col: 4 });
+        expect(candidates).not.toContainEqual({ row: 4, col: 3 });
+        expect(candidates).not.toContainEqual({ row: 4, col: 5 });
+      });
+
+      it('金将 (Gold) は縦横4方向および前斜め2方向 (計6方向) に移動可能であること', () => {
+        const squares = cloneBoardSquares(createInitialBoardState().squares);
+        for (let r = 0; r < 9; r++) {
+          for (let c = 0; c < 9; c++) {
+            squares[r][c].piece = null;
+          }
+        }
+        const goldPiece: Piece = { id: 'test-gold', type: 'gold', player: 'sente' };
+        squares[4][4].piece = goldPiece;
+
+        const candidates = getMoveCandidates(squares, { row: 4, col: 4 });
+        expect(candidates).toHaveLength(6);
+        expect(candidates).toContainEqual({ row: 3, col: 4 }); // 前
+        expect(candidates).toContainEqual({ row: 5, col: 4 }); // 後
+        expect(candidates).toContainEqual({ row: 4, col: 3 }); // 左
+        expect(candidates).toContainEqual({ row: 4, col: 5 }); // 右
+        expect(candidates).toContainEqual({ row: 3, col: 3 }); // 前左
+        expect(candidates).toContainEqual({ row: 3, col: 5 }); // 前右
+        // 後ろ斜め (5,3), (5,5) は含まれないこと
+        expect(candidates).not.toContainEqual({ row: 5, col: 3 });
+        expect(candidates).not.toContainEqual({ row: 5, col: 5 });
+      });
+
+      it('玉将 / 王将 (King) は周囲8方向に移動可能であること', () => {
+        const squares = cloneBoardSquares(createInitialBoardState().squares);
+        for (let r = 0; r < 9; r++) {
+          for (let c = 0; c < 9; c++) {
+            squares[r][c].piece = null;
+          }
+        }
+        const kingPiece: Piece = { id: 'test-king', type: 'king', player: 'sente' };
+        squares[4][4].piece = kingPiece;
+
+        const candidates = getMoveCandidates(squares, { row: 4, col: 4 });
+        expect(candidates).toHaveLength(8);
+      });
+
+      it('飛車 (Rook) は十字4方向に遮られるまで直進でき、敵駒マスで止まり、味方駒の手前で止まること', () => {
+        const squares = cloneBoardSquares(createInitialBoardState().squares);
+        for (let r = 0; r < 9; r++) {
+          for (let c = 0; c < 9; c++) {
+            squares[r][c].piece = null;
+          }
+        }
+        const rookPiece: Piece = { id: 'test-rook', type: 'rook', player: 'sente' };
+        squares[4][4].piece = rookPiece;
+        // 上方向 (2, 4) に敵の歩兵を配置
+        squares[2][4].piece = { id: 'enemy-pawn', type: 'pawn', player: 'gote' };
+        // 下方向 (6, 4) に味方の歩兵を配置
+        squares[6][4].piece = { id: 'ally-pawn', type: 'pawn', player: 'sente' };
+
+        const candidates = getMoveCandidates(squares, { row: 4, col: 4 });
+        // 上: (3,4), (2,4: 敵駒取れる) まで。(1,4), (0,4) は進めない
+        expect(candidates).toContainEqual({ row: 3, col: 4 });
+        expect(candidates).toContainEqual({ row: 2, col: 4 });
+        expect(candidates).not.toContainEqual({ row: 1, col: 4 });
+        expect(candidates).not.toContainEqual({ row: 0, col: 4 });
+
+        // 下: (5,4) まで。(6,4) は味方駒のため進めない
+        expect(candidates).toContainEqual({ row: 5, col: 4 });
+        expect(candidates).not.toContainEqual({ row: 6, col: 4 });
+        expect(candidates).not.toContainEqual({ row: 7, col: 4 });
+
+        // 左: (4,3), (4,2), (4,1), (4,0)
+        expect(candidates).toContainEqual({ row: 4, col: 3 });
+        expect(candidates).toContainEqual({ row: 4, col: 0 });
+
+        // 右: (4,5), (4,6), (4,7), (4,8)
+        expect(candidates).toContainEqual({ row: 4, col: 5 });
+        expect(candidates).toContainEqual({ row: 4, col: 8 });
+      });
+
+      it('角行 (Bishop) は斜め4方向に遮られるまで直進できること', () => {
+        const squares = cloneBoardSquares(createInitialBoardState().squares);
+        for (let r = 0; r < 9; r++) {
+          for (let c = 0; c < 9; c++) {
+            squares[r][c].piece = null;
+          }
+        }
+        const bishopPiece: Piece = { id: 'test-bishop', type: 'bishop', player: 'sente' };
+        squares[4][4].piece = bishopPiece;
+
+        const candidates = getMoveCandidates(squares, { row: 4, col: 4 });
+        // 斜め4方向の端まで行ける
+        expect(candidates).toContainEqual({ row: 0, col: 0 });
+        expect(candidates).toContainEqual({ row: 0, col: 8 });
+        expect(candidates).toContainEqual({ row: 8, col: 0 });
+        expect(candidates).toContainEqual({ row: 8, col: 8 });
+      });
+
+      it('王将 / 玉将を取る手は移動候補に含まれないこと', () => {
+        const squares = cloneBoardSquares(createInitialBoardState().squares);
+        for (let r = 0; r < 9; r++) {
+          for (let c = 0; c < 9; c++) {
+            squares[r][c].piece = null;
+          }
+        }
+        const rookPiece: Piece = { id: 'test-rook', type: 'rook', player: 'sente' };
+        squares[4][4].piece = rookPiece;
+        // 上に敵玉 (2,4) を配置
+        squares[2][4].piece = { id: 'enemy-king', type: 'king', player: 'gote' };
+
+        const candidates = getMoveCandidates(squares, { row: 4, col: 4 });
+        // (3,4) は行けるが、(2,4) は王将のため移動候補に含まれない
+        expect(candidates).toContainEqual({ row: 3, col: 4 });
+        expect(candidates).not.toContainEqual({ row: 2, col: 4 });
+      });
+    });
+
+    describe('9.3 局面進行・着手適用・取り駒・履歴 (gameState.ts)', () => {
+      it('applyMove で駒が移動し、手番が交代し、手数が加算され、履歴が記録されること', () => {
+        const state = createInitialBoardState();
+        expect(state.turn).toBe('sente');
+        expect(state.moveNumber).toBe(1);
+        expect(state.history).toHaveLength(0);
+
+        // 1手目: ▲7六歩 (from: 7七(6,2) -> to: 7六(5,2))
+        const nextState = applyMove(state, { row: 6, col: 2 }, { row: 5, col: 2 });
+
+        expect(nextState.squares[6][2].piece).toBeNull();
+        expect(nextState.squares[5][2].piece?.type).toBe('pawn');
+        expect(nextState.squares[5][2].piece?.player).toBe('sente');
+        expect(nextState.turn).toBe('gote');
+        expect(nextState.moveNumber).toBe(2);
+        expect(nextState.history).toHaveLength(1);
+        expect(nextState.history[0]).toEqual({
+          moveNumber: 1,
+          player: 'sente',
+          from: { row: 6, col: 2 },
+          to: { row: 5, col: 2 },
+          pieceType: 'pawn',
+          capturedPieceType: null,
+          notation: '▲7六歩',
+        });
+        expect(nextState.lastMove).toEqual(nextState.history[0]);
+      });
+
+      it('敵の駒を取った場合、盤面から除去され、所有者が移り、成りが解除されて持ち駒に追加されること', () => {
+        const squares = cloneBoardSquares(createInitialBoardState().squares);
+        for (let r = 0; r < 9; r++) {
+          for (let c = 0; c < 9; c++) {
+            squares[r][c].piece = null;
+          }
+        }
+        // 先手角 (4,4) と 後手銀 (3,3)
+        const senteBishop: Piece = { id: 'sente-bishop', type: 'bishop', player: 'sente' };
+        const goteSilver: Piece = { id: 'gote-silver', type: 'silver', player: 'gote', isPromoted: true };
+        squares[4][4].piece = senteBishop;
+        squares[3][3].piece = goteSilver;
+
+        const customState = {
+          squares,
+          senteHand: [],
+          goteHand: [],
+          turn: 'sente' as const,
+          moveNumber: 15,
+          status: 'active' as const,
+          viewMode: 'research' as const,
+          history: [],
+          lastMove: null,
+        };
+
+        // 先手角で後手銀を取る (4,4 -> 3,3)
+        const afterCapture = applyMove(customState, { row: 4, col: 4 }, { row: 3, col: 3 });
+
+        expect(afterCapture.squares[4][4].piece).toBeNull();
+        expect(afterCapture.squares[3][3].piece?.id).toBe('sente-bishop');
+        expect(afterCapture.senteHand).toHaveLength(1);
+        expect(afterCapture.senteHand[0]).toEqual({
+          id: 'gote-silver',
+          type: 'silver',
+          player: 'sente', // 捕獲した先手の駒になる
+          isPromoted: false, // 成りはリセットされる
+        });
+        expect(afterCapture.goteHand).toHaveLength(0);
+        expect(afterCapture.history[0].capturedPieceType).toBe('silver');
+        expect(afterCapture.history[0].notation).toBe('▲6四角');
+      });
+
+      it('手番でないプレイヤーの駒を動かそうとした場合、局面は変化しないこと', () => {
+        const state = createInitialBoardState();
+        // 先手番のときに後手歩 (2,6) を動かそうとする
+        const unchangedState = applyMove(state, { row: 2, col: 6 }, { row: 3, col: 6 });
+        expect(unchangedState).toBe(state);
+      });
+
+      it('非合法手を指定した場合、局面は変化しないこと', () => {
+        const state = createInitialBoardState();
+        // 7七歩を 7五 にワープさせようとする
+        const unchangedState = applyMove(state, { row: 6, col: 2 }, { row: 4, col: 2 });
+        expect(unchangedState).toBe(state);
+      });
+    });
+
+    describe('9.4 UI 操作・アクセシビリティ・駒台連携', () => {
+      it('ShogiResearchScreen で先手歩兵をクリックすると選択状態となり候補手が表示されること', async () => {
+        const user = userEvent.setup();
+        render(<ShogiResearchScreen />);
+
+        const pawnSquare = screen.getByRole('gridcell', { name: /7筋 7段、先手の歩兵/ });
+        expect(pawnSquare).toBeInTheDocument();
+        expect(pawnSquare).not.toHaveAttribute('aria-selected');
+
+        await user.click(pawnSquare);
+
+        // 選択状態の検証
+        expect(pawnSquare).toHaveAttribute('aria-selected', 'true');
+        expect(pawnSquare).toHaveAttribute('data-selected', 'true');
+
+        // 移動候補マス 7六 (row 5, col 2) にドットが表示されること
+        const targetSquare = screen.getByRole('gridcell', { name: /7筋 6段、空のマス、移動可能/ });
+        expect(targetSquare).toBeInTheDocument();
+        expect(targetSquare).toHaveAttribute('data-candidate', 'true');
+        expect(targetSquare.querySelector('[data-testid="move-candidate-dot"]')).toBeInTheDocument();
+      });
+
+      it('選択中の駒を再度クリックすると選択解除されること', async () => {
+        const user = userEvent.setup();
+        render(<ShogiResearchScreen />);
+
+        const pawnSquare = screen.getByRole('gridcell', { name: /7筋 7段、先手の歩兵/ });
+        await user.click(pawnSquare);
+        expect(pawnSquare).toHaveAttribute('aria-selected', 'true');
+
+        await user.click(pawnSquare);
+        expect(pawnSquare).not.toHaveAttribute('aria-selected');
+      });
+
+      it('別の自駒をクリックすると選択対象が切り替わること', async () => {
+        const user = userEvent.setup();
+        render(<ShogiResearchScreen />);
+
+        const pawn77 = screen.getByRole('gridcell', { name: /7筋 7段、先手の歩兵/ });
+        const pawn27 = screen.getByRole('gridcell', { name: /2筋 7段、先手の歩兵/ });
+
+        await user.click(pawn77);
+        expect(pawn77).toHaveAttribute('aria-selected', 'true');
+        expect(pawn27).not.toHaveAttribute('aria-selected');
+
+        await user.click(pawn27);
+        expect(pawn77).not.toHaveAttribute('aria-selected');
+        expect(pawn27).toHaveAttribute('aria-selected', 'true');
+      });
+
+      it('候補マスをクリックすると駒が移動し、手番が後手に変わり、バッジが更新されること', async () => {
+        const user = userEvent.setup();
+        render(<ShogiResearchScreen />);
+
+        // 初期バッジ表示
+        const statusBadge = screen.getByRole('status');
+        expect(statusBadge).toHaveTextContent('対局中 / 先手番');
+
+        // 7七歩を選択
+        const pawn77 = screen.getByRole('gridcell', { name: /7筋 7段、先手の歩兵/ });
+        await user.click(pawn77);
+
+        // 7六候補マスをクリック
+        const targetSquare = screen.getByRole('gridcell', { name: /7筋 6段、空のマス、移動可能/ });
+        await user.click(targetSquare);
+
+        // 駒が移動したこと
+        expect(screen.getByRole('gridcell', { name: /7筋 6段、先手の歩兵/ })).toBeInTheDocument();
+        expect(screen.getByRole('gridcell', { name: /7筋 7段、空のマス/ })).toBeInTheDocument();
+
+        // 手番が後手に変わり、バッジが更新されること
+        expect(statusBadge).toHaveTextContent('対局中 / 後手番');
+
+        // フッター文言が正しく更新されていること
+        expect(screen.getByText('駒の選択・移動・駒取りが可能です（成駒・駒打ちは準備中）。')).toBeInTheDocument();
+      });
+
+      it('キーボード操作 (Space / Enter) でも駒選択および移動が可能であること', async () => {
+        const user = userEvent.setup();
+        render(<ShogiResearchScreen />);
+
+        const pawn77 = screen.getByRole('gridcell', { name: /7筋 7段、先手の歩兵/ });
+        pawn77.focus();
+
+        await user.keyboard(' ');
+        expect(pawn77).toHaveAttribute('aria-selected', 'true');
+
+        const targetSquare = screen.getByRole('gridcell', { name: /7筋 6段、空のマス、移動可能/ });
+        targetSquare.focus();
+
+        await user.keyboard('{Enter}');
+        expect(screen.getByRole('gridcell', { name: /7筋 6段、先手の歩兵/ })).toBeInTheDocument();
+      });
+
+      it('PieceStand は持ち駒の増減をリアルタイムに正しく表示し、アクセシブルであること', () => {
+        const capturedPiece: Piece = {
+          id: 'cap-1',
+          type: 'pawn',
+          player: 'sente',
+        };
+
+        const { rerender } = render(<PieceStand player="sente" pieces={[]} />);
+        expect(screen.getByRole('region', { name: /先手の持ち駒 \(現在 0 枚\)/ })).toBeInTheDocument();
+        expect(screen.getByText('持駒なし')).toBeInTheDocument();
+
+        rerender(<PieceStand player="sente" pieces={[capturedPiece]} />);
+        expect(screen.getByRole('region', { name: /先手の持ち駒 \(現在 1 枚\)/ })).toBeInTheDocument();
+        expect(screen.getByText('1枚')).toBeInTheDocument();
+      });
+    });
+  });
+

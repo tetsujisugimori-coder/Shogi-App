@@ -7,6 +7,8 @@ interface ShogiBoardProps {
   status?: BoardStatus;
   className?: string;
   selectedSquare?: { row: number; col: number } | null;
+  candidateSquares?: Array<{ row: number; col: number }>;
+  lastMove?: { from: { row: number; col: number }; to: { row: number; col: number } } | null;
   onSquareClick?: (square: BoardSquare) => void;
 }
 
@@ -19,6 +21,8 @@ export const ShogiBoard: React.FC<ShogiBoardProps> = ({
   status = 'preparation',
   className = '',
   selectedSquare = null,
+  candidateSquares = [],
+  lastMove = null,
   onSquareClick,
 }) => {
   const isInteractive = typeof onSquareClick === 'function';
@@ -209,10 +213,24 @@ export const ShogiBoard: React.FC<ShogiBoardProps> = ({
                       {rowSquares.map((square, colIndex) => {
                         const isSelected =
                           selectedSquare?.row === rowIndex && selectedSquare?.col === colIndex;
+                        const isCandidate = candidateSquares.some(
+                          (c) => c.row === rowIndex && c.col === colIndex
+                        );
+                        const isLastMoveSource =
+                          lastMove?.from.row === rowIndex && lastMove?.from.col === colIndex;
+                        const isLastMoveDest =
+                          lastMove?.to.row === rowIndex && lastMove?.to.col === colIndex;
                         const isRovingTabTarget =
                           isInteractive &&
                           focusedSquare.row === rowIndex &&
                           focusedSquare.col === colIndex;
+
+                        const baseAriaLabel = getSquareAriaLabel(square);
+                        const ariaLabel = isCandidate
+                          ? square.piece
+                            ? `${baseAriaLabel}、移動可能（相手の駒を取る）`
+                            : `${baseAriaLabel}、移動可能`
+                          : baseAriaLabel;
 
                         return (
                           <div
@@ -229,10 +247,13 @@ export const ShogiBoard: React.FC<ShogiBoardProps> = ({
                             role="gridcell"
                             tabIndex={isInteractive ? (isRovingTabTarget ? 0 : -1) : undefined}
                             aria-selected={isSelected ? true : undefined}
-                            aria-label={getSquareAriaLabel(square)}
+                            aria-label={ariaLabel}
                             data-file={square.file}
                             data-rank={square.rank}
                             data-coordinate={square.coordinateLabel}
+                            data-candidate={isCandidate ? 'true' : undefined}
+                            data-selected={isSelected ? 'true' : undefined}
+                            data-last-move={isLastMoveDest ? 'dest' : isLastMoveSource ? 'source' : undefined}
                             onClick={isInteractive ? () => handleCellClick(square) : undefined}
                             onKeyDown={isInteractive ? (e) => handleKeyDown(e, square) : undefined}
                             className={`relative flex items-center justify-center aspect-square select-none outline-none ${
@@ -241,7 +262,15 @@ export const ShogiBoard: React.FC<ShogiBoardProps> = ({
                                 : 'cursor-default'
                             } ${
                               isSelected
-                                ? 'bg-amber-400/30 ring-1 ring-amber-300 z-20'
+                                ? 'bg-amber-400/35 ring-2 ring-amber-300 z-20'
+                                : isCandidate
+                                ? square.piece
+                                  ? 'bg-rose-500/25 ring-2 ring-rose-400/70 z-20'
+                                  : 'bg-amber-300/15'
+                                : isLastMoveDest
+                                ? 'bg-amber-400/20 ring-1 ring-amber-300/50'
+                                : isLastMoveSource
+                                ? 'bg-amber-800/20'
                                 : ''
                             }`}
                             style={{
@@ -260,12 +289,23 @@ export const ShogiBoard: React.FC<ShogiBoardProps> = ({
                               />
                             )}
 
+                            {/* Move Candidate Indicator for Empty Square */}
+                            {isCandidate && !square.piece && (
+                              <div
+                                aria-hidden="true"
+                                data-testid="move-candidate-dot"
+                                className="w-3.5 h-3.5 sm:w-4 sm:h-4 rounded-full bg-amber-300/60 ring-2 ring-amber-400/80 shadow-[0_0_8px_rgba(251,191,36,0.6)] z-20 pointer-events-none transition-transform animate-pulse"
+                              />
+                            )}
+
                             {/* Piece Display */}
                             {square.piece && (
                               <Piece
                                 piece={square.piece}
                                 squareCoordinate={square.coordinateLabel}
                                 isSelected={isSelected}
+                                isLegalTarget={isCandidate && square.piece.player !== (isSelected ? square.piece.player : undefined)}
+                                isLastMove={isLastMoveDest}
                               />
                             )}
                           </div>
