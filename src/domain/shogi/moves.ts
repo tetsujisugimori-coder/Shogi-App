@@ -10,6 +10,7 @@ import {
   getPieceAttackPattern,
   isKingInCheck,
 } from './attacks';
+import { isPromotionRequired } from './promotion';
 
 /**
  * Checks if a move results in a piece having no legal forward moves ("行き所のない駒").
@@ -17,28 +18,7 @@ import {
  * and Knights (cannot reach ranks 1-2 for Sente / ranks 8-9 for Gote).
  */
 export function isDeadPieceMove(piece: Piece, to: Coordinate): boolean {
-  if (piece.isPromoted) {
-    return false; // Promoted pieces (と金, 成香, 成桂) move like Gold and can retreat
-  }
-
-  if (piece.player === 'sente') {
-    if (piece.type === 'pawn' || piece.type === 'lance') {
-      return to.row === 0; // Rank 1 (top line)
-    }
-    if (piece.type === 'knight') {
-      return to.row === 0 || to.row === 1; // Rank 1 or Rank 2
-    }
-  } else {
-    // Gote
-    if (piece.type === 'pawn' || piece.type === 'lance') {
-      return to.row === 8; // Rank 9 (bottom line)
-    }
-    if (piece.type === 'knight') {
-      return to.row === 7 || to.row === 8; // Rank 8 or Rank 9
-    }
-  }
-
-  return false;
+  return isPromotionRequired(piece, to);
 }
 
 /**
@@ -130,7 +110,7 @@ export function simulateMoveSquares(
  * 1. Piece exists and belongs to current turn (if specified).
  * 2. Basic geometric movements.
  * 3. Does NOT leave own King in check (resolves checks, prevents self-check & pinned piece violations).
- * 4. Does NOT create a dead piece (行き所のない駒).
+ * Mandatory-promotion destinations remain legal candidates; executeMove validates the choice.
  */
 export function getLegalMoves(
   squares: BoardSquare[][],
@@ -155,12 +135,7 @@ export function getLegalMoves(
   const legalMoves: Coordinate[] = [];
 
   for (const dest of pseudoMoves) {
-    // 1. Dead piece check
-    if (isDeadPieceMove(piece, dest)) {
-      continue;
-    }
-
-    // 2. Simulate move and check if own king is left in check
+    // Simulate move and check if own king is left in check
     const simulatedSquares = simulateMoveSquares(squares, from, dest);
     if (isKingInCheck(simulatedSquares, piece.player)) {
       continue;
