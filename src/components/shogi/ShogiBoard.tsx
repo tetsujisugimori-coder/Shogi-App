@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { BoardSquare, BoardStatus, FILE_NUMBERS, RANK_KANJI, getSquareAriaLabel } from '../../types/shogi';
+import { BoardSquare, BoardStatus, FILE_NUMBERS, MoveRecord, PieceType, RANK_KANJI, getPieceDisplayInfo, getSquareAriaLabel } from '../../types/shogi';
 import { Piece } from './Piece';
 
 interface ShogiBoardProps {
@@ -8,7 +8,9 @@ interface ShogiBoardProps {
   className?: string;
   selectedSquare?: { row: number; col: number } | null;
   candidateSquares?: Array<{ row: number; col: number }>;
-  lastMove?: { from: { row: number; col: number }; to: { row: number; col: number } } | null;
+  candidateKind?: 'move' | 'drop' | null;
+  dropPieceType?: PieceType | null;
+  lastMove?: MoveRecord | null;
   onSquareClick?: (square: BoardSquare) => void;
   focusRequest?: { row: number; col: number; requestId: number } | null;
 }
@@ -23,11 +25,16 @@ export const ShogiBoard: React.FC<ShogiBoardProps> = ({
   className = '',
   selectedSquare = null,
   candidateSquares = [],
+  candidateKind = null,
+  dropPieceType = null,
   lastMove = null,
   onSquareClick,
   focusRequest = null,
 }) => {
   const isInteractive = typeof onSquareClick === 'function';
+  const dropPieceName = dropPieceType
+    ? getPieceDisplayInfo(dropPieceType, 'sente', false).fullName
+    : '持ち駒';
 
   // Roving tabindex position management
   // Priority: 1. selectedSquare if provided and within bounds, 2. DEFAULT_INITIAL_FOCUS (7七: row 6, col 2)
@@ -225,7 +232,9 @@ export const ShogiBoard: React.FC<ShogiBoardProps> = ({
                           (c) => c.row === rowIndex && c.col === colIndex
                         );
                         const isLastMoveSource =
-                          lastMove?.from.row === rowIndex && lastMove?.from.col === colIndex;
+                          lastMove?.kind === 'move' &&
+                          lastMove.from.row === rowIndex &&
+                          lastMove.from.col === colIndex;
                         const isLastMoveDest =
                           lastMove?.to.row === rowIndex && lastMove?.to.col === colIndex;
                         const isRovingTabTarget =
@@ -235,9 +244,11 @@ export const ShogiBoard: React.FC<ShogiBoardProps> = ({
 
                         const baseAriaLabel = getSquareAriaLabel(square);
                         const ariaLabel = isCandidate
-                          ? square.piece
-                            ? `${baseAriaLabel}、移動可能（相手の駒を取る）`
-                            : `${baseAriaLabel}、移動可能`
+                          ? candidateKind === 'drop'
+                            ? `${baseAriaLabel}、${dropPieceName}を打てる`
+                            : square.piece
+                              ? `${baseAriaLabel}、移動可能（相手の駒を取る）`
+                              : `${baseAriaLabel}、移動可能`
                           : baseAriaLabel;
 
                         return (
@@ -260,6 +271,7 @@ export const ShogiBoard: React.FC<ShogiBoardProps> = ({
                             data-rank={square.rank}
                             data-coordinate={square.coordinateLabel}
                             data-candidate={isCandidate ? 'true' : undefined}
+                            data-candidate-kind={isCandidate ? candidateKind ?? undefined : undefined}
                             data-selected={isSelected ? 'true' : undefined}
                             data-last-move={isLastMoveDest ? 'dest' : isLastMoveSource ? 'source' : undefined}
                             onClick={isInteractive ? () => handleCellClick(square) : undefined}

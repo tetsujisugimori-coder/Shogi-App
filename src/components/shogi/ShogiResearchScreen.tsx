@@ -1,7 +1,9 @@
 import React, { useCallback, useMemo, useRef, useState } from 'react';
-import { createInitialBoardState, BoardState, BoardSquare } from '../../types/shogi';
+import { createInitialBoardState, BoardState, BoardSquare, Piece, PieceType } from '../../types/shogi';
 import {
+  executeDrop,
   executeMove,
+  getLegalDropSquares,
   getMoveCandidates,
   getPromotionStatus,
   PromotionStatus,
@@ -19,9 +21,14 @@ interface PendingPromotion {
   status: Exclude<PromotionStatus, 'none'>;
 }
 
+type SelectionState =
+  | { kind: 'none' }
+  | { kind: 'board'; square: { row: number; col: number } }
+  | { kind: 'hand'; pieceId: string; pieceType: PieceType };
+
 export const ShogiResearchScreen: React.FC<ShogiResearchScreenProps> = ({ initialState }) => {
   const [boardState, setBoardState] = useState<BoardState>(() => initialState ?? createInitialBoardState());
-  const [selectedSquare, setSelectedSquare] = useState<{ row: number; col: number } | null>(null);
+  const [selection, setSelection] = useState<SelectionState>({ kind: 'none' });
   const [pendingPromotion, setPendingPromotion] = useState<PendingPromotion | null>(null);
   const [focusRequest, setFocusRequest] = useState<{
     row: number;
@@ -30,11 +37,19 @@ export const ShogiResearchScreen: React.FC<ShogiResearchScreenProps> = ({ initia
   } | null>(null);
   const focusRequestId = useRef(0);
 
-  // Compute move candidates for currently selected square
+  const selectedSquare = selection.kind === 'board' ? selection.square : null;
+  const selectedHandPieceId = selection.kind === 'hand' ? selection.pieceId : null;
+
+  // Compute candidates for the mutually exclusive board/hand selection.
   const candidateSquares = useMemo(() => {
-    if (!selectedSquare) return [];
-    return getMoveCandidates(boardState.squares, selectedSquare, boardState.turn);
-  }, [boardState.squares, boardState.turn, selectedSquare]);
+    if (selection.kind === 'board') {
+      return getMoveCandidates(boardState.squares, selection.square, boardState.turn);
+    }
+    if (selection.kind === 'hand') {
+      return getLegalDropSquares(boardState, selection.pieceId);
+    }
+    return [];
+  }, [boardState, selection]);
 
   const restoreBoardFocus = useCallback((square: { row: number; col: number }) => {
     focusRequestId.current += 1;
@@ -45,7 +60,7 @@ export const ShogiResearchScreen: React.FC<ShogiResearchScreenProps> = ({ initia
     if (!pendingPromotion) return;
     const restoreSquare = pendingPromotion.from;
     setPendingPromotion(null);
-    setSelectedSquare(null);
+    setSelection({ kind: 'none' });
     restoreBoardFocus(restoreSquare);
   }, [pendingPromotion, restoreBoardFocus]);
 
@@ -64,29 +79,54 @@ export const ShogiResearchScreen: React.FC<ShogiResearchScreenProps> = ({ initia
 
     const restoreSquare = result.type === 'applied' ? pendingPromotion.to : pendingPromotion.from;
     setPendingPromotion(null);
-    setSelectedSquare(null);
+    setSelection({ kind: 'none' });
     restoreBoardFocus(restoreSquare);
   };
 
   const handleSquareClick = (square: BoardSquare) => {
     if (pendingPromotion) return;
+    if (selection.kind === 'hand') {
+      if (square.piece?.player === boardState.turn) {
+        setSelection({ kind: 'board', square: { row: square.row, col: square.col } });
+        return;
+      }
+
+      const isDropCandidate = candidateSquares.some(
+        (candidate) => candidate.row === square.row && candidate.col === square.col
+      );
+      if (!isDropCandidate) return;
+
+      const result = executeDrop(
+        boardState,
+        selection.pieceId,
+        { row: square.row, col: square.col },
+        { mode: 'assist', proposer: 'human' }
+      );
+      if (result.type === 'applied') {
+        setBoardState(result.state);
+        setSelection({ kind: 'none' });
+        restoreBoardFocus({ row: square.row, col: square.col });
+      }
+      return;
+    }
+
     // Case 1: No square currently selected
     if (!selectedSquare) {
       if (square.piece && square.piece.player === boardState.turn) {
-        setSelectedSquare({ row: square.row, col: square.col });
+        setSelection({ kind: 'board', square: { row: square.row, col: square.col } });
       }
       return;
     }
 
     // Case 2: Clicked on already selected square -> Deselect
     if (selectedSquare.row === square.row && selectedSquare.col === square.col) {
-      setSelectedSquare(null);
+      setSelection({ kind: 'none' });
       return;
     }
 
     // Case 3: Clicked on another own piece -> Switch selection
     if (square.piece && square.piece.player === boardState.turn) {
-      setSelectedSquare({ row: square.row, col: square.col });
+      setSelection({ kind: 'board', square: { row: square.row, col: square.col } });
       return;
     }
 
@@ -98,7 +138,8 @@ export const ShogiResearchScreen: React.FC<ShogiResearchScreenProps> = ({ initia
     if (isCandidate) {
       const from = selectedSquare;
       const to = { row: square.row, col: square.col };
-      const movingPiece = boardState.squares[from.row][from.col].piece!;
+      const movingPiece = boardState.squares[from.row][from.col].piece;
+      if (!movingPiece) return;
       const promotionStatus = getPromotionStatus(movingPiece, from, to);
 
       if (promotionStatus !== 'none') {
@@ -113,11 +154,29 @@ export const ShogiResearchScreen: React.FC<ShogiResearchScreenProps> = ({ initia
       if (result.type === 'applied') {
         setBoardState(result.state);
       }
-      setSelectedSquare(null);
+      setSelection({ kind: 'none' });
       return;
     }
 
     // Case 5: Clicked on an invalid square (opponent piece, empty non-candidate, etc.) -> Do nothing
+  };
+
+  const handleHandPieceSelect = (piece: Piece) => {
+    if (pendingPromotion || boardState.status === 'ended' || piece.player !== boardState.turn) {
+      return;
+    }
+    setSelection((current) =>
+      current.kind === 'hand' && current.pieceId === piece.id
+        ? { kind: 'none' }
+        : { kind: 'hand', pieceId: piece.id, pieceType: piece.type }
+    );
+  };
+
+  const handleScreenKeyDown = (event: React.KeyboardEvent<HTMLDivElement>) => {
+    if (event.key === 'Escape' && selection.kind === 'hand') {
+      event.preventDefault();
+      setSelection({ kind: 'none' });
+    }
   };
 
   const turnLabel = boardState.turn === 'sente' ? '先手番' : '後手番';
@@ -156,6 +215,7 @@ export const ShogiResearchScreen: React.FC<ShogiResearchScreenProps> = ({ initia
       data-turn={boardState.turn}
       data-move-number={boardState.moveNumber}
       data-history-count={boardState.history.length}
+      onKeyDown={handleScreenKeyDown}
       className="min-h-full w-full flex flex-col items-center justify-between py-6 px-3 sm:px-6 bg-[#0f1115] text-stone-200"
     >
       {/* Top Header Section */}
@@ -202,9 +262,15 @@ export const ShogiResearchScreen: React.FC<ShogiResearchScreenProps> = ({ initia
           viewMode={boardState.viewMode}
           selectedSquare={selectedSquare}
           candidateSquares={candidateSquares}
+          candidateKind={selection.kind === 'none' ? null : selection.kind === 'hand' ? 'drop' : 'move'}
+          dropPieceType={selection.kind === 'hand' ? selection.pieceType : null}
           lastMove={boardState.lastMove}
           onSquareClick={pendingPromotion ? undefined : handleSquareClick}
           focusRequest={focusRequest}
+          turn={boardState.turn}
+          selectedHandPieceId={selectedHandPieceId}
+          onHandPieceSelect={handleHandPieceSelect}
+          pieceStandsDisabled={boardState.status === 'ended' || pendingPromotion !== null}
         />
       </main>
 
@@ -223,7 +289,7 @@ export const ShogiResearchScreen: React.FC<ShogiResearchScreenProps> = ({ initia
           id="shogi-footer-notice"
           className="text-xs text-stone-400 font-sans tracking-wide select-none"
         >
-          駒の選択・移動・駒取り・成り選択が可能です（駒打ちは準備中）。
+          駒の選択・移動・駒取り・成り選択・持ち駒からの駒打ちが可能です（打ち歩詰め判定は準備中）。
         </p>
       </footer>
     </div>

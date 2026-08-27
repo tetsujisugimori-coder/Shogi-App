@@ -1934,6 +1934,7 @@ describe('9. 将棋ドメイン層・駒移動・合法手・手番・取り駒�
         expect(nextState.moveNumber).toBe(2);
         expect(nextState.history).toHaveLength(1);
         expect(nextState.history[0]).toEqual({
+          kind: 'move',
           moveNumber: 1,
           player: 'sente',
           from: { row: 6, col: 2 },
@@ -2077,7 +2078,7 @@ describe('9. 将棋ドメイン層・駒移動・合法手・手番・取り駒�
         expect(statusBadge).toHaveTextContent('対局中 / 後手番');
 
         // フッター文言が正しく更新されていること
-        expect(screen.getByText('駒の選択・移動・駒取り・成り選択が可能です（駒打ちは準備中）。')).toBeInTheDocument();
+        expect(screen.getByText('駒の選択・移動・駒取り・成り選択・持ち駒からの駒打ちが可能です（打ち歩詰め判定は準備中）。')).toBeInTheDocument();
       });
 
       it('キーボード操作 (Space / Enter) でも駒選択および移動が可能であること', async () => {
@@ -2672,6 +2673,7 @@ describe('9. 将棋ドメイン層・駒移動・合法手・手番・取り駒�
           },
           foulHistory: [
             {
+              kind: 'move',
               moveNumber: 1,
               player: 'sente',
               from: { row: 6, col: 2 },

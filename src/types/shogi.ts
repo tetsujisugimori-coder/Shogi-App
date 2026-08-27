@@ -71,6 +71,13 @@ export type IllegalMoveReason =
   | 'promotion_required'
   | 'king_suicide'
   | 'self_check_unresolved'
+  | 'hand_piece_not_found'
+  | 'not_own_hand_piece'
+  | 'occupied_drop_square'
+  | 'undroppable_piece'
+  | 'invalid_hand_piece_state'
+  | 'dead_piece_drop'
+  | 'nifu'
   | 'game_already_ended';
 
 export type MoveValidationResult =
@@ -81,27 +88,35 @@ export type MoveValidationResult =
       message: string;
     };
 
-export interface MoveRecord {
+interface MoveRecordBase {
   moveNumber: number;
   player: Player;
-  from: { row: number; col: number };
   to: { row: number; col: number };
   pieceType: PieceType;
-  capturedPieceType?: PieceType | null;
   promotion: MovePromotion;
   notation: string;
 }
 
-export interface FoulRecord {
+export interface NormalMoveRecord extends MoveRecordBase {
+  kind: 'move';
+  from: { row: number; col: number };
+  capturedPieceType: PieceType | null;
+}
+
+export interface DropMoveRecord extends MoveRecordBase {
+  kind: 'drop';
+  from: null;
+  pieceId: string;
+  capturedPieceType: null;
+  promotion: 'none';
+}
+
+export type MoveRecord = NormalMoveRecord | DropMoveRecord;
+
+interface FoulRecordBase {
   moveNumber: number;
   player: Player;
-  from: { row: number; col: number };
   to: { row: number; col: number };
-  /**
-   * Type of piece at source coordinate if a piece existed.
-   * `null` explicitly indicates that no piece was identified at the source coordinate
-   * (e.g. source was empty or out of bounds), NOT a default/fallback piece like pawn.
-   */
   pieceType: PieceType | null;
   reason: IllegalMoveReason;
   message: string;
@@ -109,6 +124,19 @@ export interface FoulRecord {
   engineName?: string;
   timestamp?: number;
 }
+
+export interface MoveFoulRecord extends FoulRecordBase {
+  kind: 'move';
+  from: { row: number; col: number };
+}
+
+export interface DropFoulRecord extends FoulRecordBase {
+  kind: 'drop';
+  from: null;
+  pieceId: string;
+}
+
+export type FoulRecord = MoveFoulRecord | DropFoulRecord;
 
 export type GameEndReason = 'foul_loss' | 'resignation' | 'checkmate' | 'draw';
 

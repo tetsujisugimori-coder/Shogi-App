@@ -1,11 +1,13 @@
 import React from 'react';
-import { Piece as PieceModel, Player } from '../../types/shogi';
+import { Piece as PieceModel, Player, getPieceDisplayInfo } from '../../types/shogi';
 import { Piece } from './Piece';
 
 interface PieceStandProps {
   player: Player;
   pieces: PieceModel[];
   isActive?: boolean;
+  selectedPieceId?: string | null;
+  onPieceSelect?: (piece: PieceModel) => void;
   className?: string;
 }
 
@@ -13,10 +15,13 @@ export const PieceStand: React.FC<PieceStandProps> = ({
   player,
   pieces = [],
   isActive = false,
+  selectedPieceId = null,
+  onPieceSelect,
   className = '',
 }) => {
   const isGote = player === 'gote';
   const label = isGote ? '後手の持ち駒' : '先手の持ち駒';
+  const interactionLabel = isActive ? '操作可能' : '操作不可';
 
   return (
     <div
@@ -24,7 +29,8 @@ export const PieceStand: React.FC<PieceStandProps> = ({
       data-player={player}
       className={`relative flex flex-col items-center select-none transition-all duration-200 ${className}`}
       role="region"
-      aria-label={`${label} (現在 ${pieces.length} 枚)`}
+      aria-label={`${label} (現在 ${pieces.length} 枚)・${interactionLabel}`}
+      data-active={isActive ? 'true' : 'false'}
     >
       {/* 3D Realistic Wooden Komadai Tray (高級桑・欅造り駒台) */}
       <div
@@ -54,7 +60,7 @@ export const PieceStand: React.FC<PieceStandProps> = ({
             <div className="flex items-center gap-1.5">
               <span
                 className={`w-1.5 h-1.5 rounded-full ${
-                  player === 'sente'
+                  isActive
                     ? 'bg-amber-300 shadow-[0_0_4px_rgba(251,191,36,0.6)]'
                     : 'bg-stone-500'
                 }`}
@@ -76,11 +82,32 @@ export const PieceStand: React.FC<PieceStandProps> = ({
               </div>
             ) : (
               <div className="grid grid-cols-4 gap-1 w-full">
-                {pieces.map((piece) => (
-                  <div key={piece.id} className="flex justify-center items-center aspect-square">
-                    <Piece piece={piece} />
-                  </div>
-                ))}
+                {pieces.map((piece) => {
+                  const isSelected = selectedPieceId === piece.id;
+                  const pieceName = getPieceDisplayInfo(piece.type, player, false).fullName;
+                  return (
+                    <button
+                      key={piece.id}
+                      type="button"
+                      disabled={!isActive}
+                      aria-pressed={isSelected}
+                      aria-label={`${label}の${pieceName}を${isSelected ? '選択解除' : '選択'}`}
+                      data-hand-piece-id={piece.id}
+                      onClick={() => onPieceSelect?.(piece)}
+                      className={`flex justify-center items-center aspect-square rounded-sm outline-none transition-all ${
+                        isActive
+                          ? 'cursor-pointer hover:bg-amber-300/10 focus-visible:ring-2 focus-visible:ring-amber-300'
+                          : 'cursor-not-allowed opacity-55'
+                      } ${
+                        isSelected
+                          ? 'bg-amber-300/15 ring-2 ring-amber-300 shadow-[0_0_10px_rgba(251,191,36,0.45)]'
+                          : ''
+                      }`}
+                    >
+                      <Piece piece={piece} isSelected={isSelected} />
+                    </button>
+                  );
+                })}
               </div>
             )}
           </div>

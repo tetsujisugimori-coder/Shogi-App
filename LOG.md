@@ -1094,3 +1094,85 @@ PR #1のレビュー指摘を受け、簡易APIの`applyMove`と合法手候補�
 - `npm run build`: 成功
 - `npm run check`: 成功
 - `git diff --check`: 成功
+
+## [2026-08-27] 基本的な駒打ちと二歩検証の実装
+
+### 基準と実装目的
+
+- 基準コミット: `34da0543b42bcc9b6759b711da40c04d93ba12c1`
+- 作業ブランチ: `feat/piece-drop-basic`
+- 持ち駒をIDで選択し、合法な空きマスへ打つためのドメインAPI、履歴、UI、アクセシビリティを追加。
+
+### ドメインAPIと局面更新
+
+- `src/domain/shogi/drops.ts` に `validateDrop`、`getLegalDropSquares`、`simulateDropSquares`、`executeDrop` を追加。
+- 候補生成は各マスを `validateDrop` で検証し、実行時と同じルールを共有。候補を同じ局面の `executeDrop` へ渡せば適用できる構造とした。
+- 検証済み局面を更新する `internalApplyLegalDrop` はモジュール内部専用とし、外部公開しない。
+- 現在の手番側の持ち駒から指定 `Piece.id` の配列位置を特定し、コピーした配列から1枚だけ削除。同種の別IDは維持する。
+- 盤上の駒は捕獲前からの `id` と `type` を維持し、`player` を現在の手番、`isPromoted: false` として新しい盤面へ配置。元の局面・盤面・持ち駒・駒オブジェクトは変更しない。
+
+### 禁じ手と王手放置
+
+- 行き所のない駒打ちを次の境界で拒否: 先手の歩・香は row 0、桂は row 0/1。後手の歩・香は row 8、桂は row 7/8。
+- 二歩は同じ筋（同じ `col`）を row 方向に走査し、現在のプレイヤーの未成歩だけを数える。と金、相手の歩、駒台内の複数歩は数えない。
+- `simulateDropSquares` で駒打ち後の盤面を作り、既存の `isKingInCheck` で自玉の王手が残らないことを確認。飛車・角・香の直線王手に対する合駒を合法候補に含め、無関係な場所への駒打ちは除外する。
+- 駒打ちで相手玉へ王手をかけることは許可。打ち歩詰め判定は実装していない。
+
+### assist / strict方式と履歴
+
+- `src/domain/shogi/executionPolicy.ts` に不正提案の共有内部ポリシーを追加し、`executeMove` と `executeDrop` の拒否・反則負け生成を統一。
+- assist方式は不正な駒打ちを入力 `state` と同じ参照で拒否し、局面・履歴・終局状態を変更しない。
+- strict方式は盤面、持ち駒、手番、手数、合法手履歴、直前着手を維持し、駒打ち用 `foulHistory` だけを追加して反則負けにする。終局後は追加反則を生成しない。
+- `MoveRecord` と `FoulRecord` を `kind: 'move' | 'drop'` のdiscriminated unionへ変更。駒打ちは `from: null`、`pieceId`、特定可能な `pieceType` を記録し、通常移動は従来情報と `kind: 'move'` を維持する。
+- 駒打ち棋譜は `▲5五歩打` / `△4四角打` のように末尾へ「打」を付ける。
+
+### UIとアクセシビリティ
+
+- 盤上駒・持ち駒の選択を単一の排他的な選択stateで管理。持ち駒選択中に盤上の自駒を選ぶと通常移動へ切り替わる。
+- 現在の手番側だけの持ち駒を標準 `button type="button"` で操作可能にし、クリック、Enter、Space、Escapeによる選択・切替・解除へ対応。
+- 選択中の駒へ金色の枠・発光と `aria-pressed` を付与。駒台の所有者・枚数・操作可否、持ち駒ボタンの所有者・駒名・操作内容をARIAで通知し、視覚用の駒は二重読み上げを防止。
+- 駒打ち候補を通常移動候補と区別し、「金将を打てる」等の文言で通知。成功後は着手先へフォーカスし、駒打ちの `lastMove` は移動先だけを強調する。
+- 終局後と成り選択ダイアログ中は駒台を無効化。フッターは基本的な駒打ち対応と打ち歩詰め判定準備中を明記。
+
+### 打ち歩詰めを対象外とした理由
+
+打ち歩詰めは、歩打ちによる王手だけでなく相手玉の全退避・応手可能性を判定する詰み判定が必要である。今回の基本的な駒打ちへ不完全な簡易判定を混在させないため対象外とし、歩打ちで王手をかける手自体は合法としている。
+
+### 追加・修正ファイル
+
+- 追加: `src/domain/shogi/drops.ts`, `src/domain/shogi/executionPolicy.ts`, `src/test/shogi-drop.test.tsx`
+- 修正: `src/types/shogi.ts`, `src/domain/shogi/gameState.ts`, `src/domain/shogi/validation.ts`, `src/domain/shogi/index.ts`
+- 修正: `src/components/shogi/PieceStand.tsx`, `src/components/shogi/ShogiTable.tsx`, `src/components/shogi/ShogiBoard.tsx`, `src/components/shogi/ShogiResearchScreen.tsx`
+- 修正: `src/test/shogi.test.tsx`, `README.md`, `LOG.md`
+- `package.json`, `package-lock.json`, CI設定の変更: なし
+
+### テスト
+
+- `src/test/shogi-drop.test.tsx` に48件を追加。基本7駒・後手・ID単位消費・イミュータビリティ・履歴・棋譜、行き所境界、二歩、飛角香への合駒、候補/API整合、assist/strict、反則履歴、終局後拒否を検証。
+- UIでは手番側だけの操作、同種駒のID識別、選択切替、合法候補、二歩・行き所・occupied square除外、駒打ち適用、直前着手、フォーカス、Enter/Space/Escape、ARIA、終局後無効化を検証。
+- 既存152件を維持し、最終テスト総数: **200/200 passed**。
+
+### 検証結果
+
+- Node.js: `v24.19.0`（`.nvmrc` 指定版）
+- npm: `11.17.0`（`packageManager` 指定版。一時実行キャッシュを使用し、リポジトリ依存関係は変更なし）
+- `npm run verify:lock`: 成功（399エントリ、registry package 398件、欠落ゼロ）
+- `npm run verify:macos-fsevents`: 成功（Windowsで静的検査成功、macOSネイティブ監視はプラットフォーム理由で未実行）
+- `npm run lint`: 成功（TypeScriptエラーなし）
+- `npm test`: 成功（2ファイル、200件）
+- `npm run build`: 成功（Vite production build）
+- `npm run check`: 成功（lock / lint / test / build）
+- `git diff --check`: 成功
+
+### ブラウザ目視確認
+
+- 実施あり。Vite開発サーバーを起動し、既存Chromeのheadless表示をPC幅 1440pxと狭幅 500pxで画像確認。
+- 駒台・盤面・フッターのレイアウト、手番側インジケーター、選択中の金枠、候補ドット、駒打ち後の正しい向き、移動先だけの直前着手、後手番への切替を確認。
+- DOMでも候補ARIA「金将を打てる」、着手先の `data-last-move="dest"`、エラーオーバーレイなしを確認。
+- 持ち駒を含む確認専用の一時局面差分は確認後に完全に戻し、成果物へ含めていない。
+
+### 既知の未実装事項
+
+- 打ち歩詰め、一般的な詰み・終局判定、千日手、連続王手の千日手、投了。
+- KIF / CSA / USI入出力、AI対局・将棋エンジン接続、Undo / Redo / 待った / 局面リセット。
+- 駒台上の同種駒集約表示、ドラッグ＆ドロップ。
