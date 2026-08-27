@@ -10,6 +10,7 @@ interface ShogiBoardProps {
   candidateSquares?: Array<{ row: number; col: number }>;
   lastMove?: { from: { row: number; col: number }; to: { row: number; col: number } } | null;
   onSquareClick?: (square: BoardSquare) => void;
+  focusRequest?: { row: number; col: number; requestId: number } | null;
 }
 
 // Default initial focus position: 7七 (row 6, col 2 -> 7筋 7段)
@@ -24,6 +25,7 @@ export const ShogiBoard: React.FC<ShogiBoardProps> = ({
   candidateSquares = [],
   lastMove = null,
   onSquareClick,
+  focusRequest = null,
 }) => {
   const isInteractive = typeof onSquareClick === 'function';
 
@@ -66,6 +68,12 @@ export const ShogiBoard: React.FC<ShogiBoardProps> = ({
       el.focus();
     }
   };
+
+  useEffect(() => {
+    if (!focusRequest) return;
+    setFocusedSquare({ row: focusRequest.row, col: focusRequest.col });
+    focusCell(focusRequest.row, focusRequest.col);
+  }, [focusRequest]);
 
   const handleKeyDown = (e: React.KeyboardEvent, square: BoardSquare) => {
     if (!isInteractive) return;

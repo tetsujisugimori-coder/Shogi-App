@@ -1,19 +1,75 @@
-import React, { useState, useMemo } from 'react';
+import React, { useCallback, useMemo, useRef, useState } from 'react';
 import { createInitialBoardState, BoardState, BoardSquare } from '../../types/shogi';
-import { getMoveCandidates, applyMove } from '../../domain/shogi';
+import {
+  executeMove,
+  getMoveCandidates,
+  getPromotionStatus,
+  PromotionStatus,
+} from '../../domain/shogi';
 import { ShogiTable } from './ShogiTable';
+import { PromotionDialog } from './PromotionDialog';
 
-export const ShogiResearchScreen: React.FC = () => {
-  const [boardState, setBoardState] = useState<BoardState>(() => createInitialBoardState());
+interface ShogiResearchScreenProps {
+  initialState?: BoardState;
+}
+
+interface PendingPromotion {
+  from: { row: number; col: number };
+  to: { row: number; col: number };
+  status: Exclude<PromotionStatus, 'none'>;
+}
+
+export const ShogiResearchScreen: React.FC<ShogiResearchScreenProps> = ({ initialState }) => {
+  const [boardState, setBoardState] = useState<BoardState>(() => initialState ?? createInitialBoardState());
   const [selectedSquare, setSelectedSquare] = useState<{ row: number; col: number } | null>(null);
+  const [pendingPromotion, setPendingPromotion] = useState<PendingPromotion | null>(null);
+  const [focusRequest, setFocusRequest] = useState<{
+    row: number;
+    col: number;
+    requestId: number;
+  } | null>(null);
+  const focusRequestId = useRef(0);
 
   // Compute move candidates for currently selected square
   const candidateSquares = useMemo(() => {
     if (!selectedSquare) return [];
-    return getMoveCandidates(boardState.squares, selectedSquare);
-  }, [boardState.squares, selectedSquare]);
+    return getMoveCandidates(boardState.squares, selectedSquare, boardState.turn);
+  }, [boardState.squares, boardState.turn, selectedSquare]);
+
+  const restoreBoardFocus = useCallback((square: { row: number; col: number }) => {
+    focusRequestId.current += 1;
+    setFocusRequest({ ...square, requestId: focusRequestId.current });
+  }, []);
+
+  const cancelPromotion = useCallback(() => {
+    if (!pendingPromotion) return;
+    const restoreSquare = pendingPromotion.from;
+    setPendingPromotion(null);
+    setSelectedSquare(null);
+    restoreBoardFocus(restoreSquare);
+  }, [pendingPromotion, restoreBoardFocus]);
+
+  const completePromotionChoice = (promotion: 'promote' | 'decline') => {
+    if (!pendingPromotion) return;
+
+    const result = executeMove(boardState, pendingPromotion.from, pendingPromotion.to, {
+      mode: 'assist',
+      proposer: 'human',
+      promotion,
+    });
+
+    if (result.type === 'applied') {
+      setBoardState(result.state);
+    }
+
+    const restoreSquare = result.type === 'applied' ? pendingPromotion.to : pendingPromotion.from;
+    setPendingPromotion(null);
+    setSelectedSquare(null);
+    restoreBoardFocus(restoreSquare);
+  };
 
   const handleSquareClick = (square: BoardSquare) => {
+    if (pendingPromotion) return;
     // Case 1: No square currently selected
     if (!selectedSquare) {
       if (square.piece && square.piece.player === boardState.turn) {
@@ -40,12 +96,23 @@ export const ShogiResearchScreen: React.FC = () => {
     );
 
     if (isCandidate) {
-      const nextBoardState = applyMove(
-        boardState,
-        selectedSquare,
-        { row: square.row, col: square.col }
-      );
-      setBoardState(nextBoardState);
+      const from = selectedSquare;
+      const to = { row: square.row, col: square.col };
+      const movingPiece = boardState.squares[from.row][from.col].piece!;
+      const promotionStatus = getPromotionStatus(movingPiece, from, to);
+
+      if (promotionStatus !== 'none') {
+        setPendingPromotion({ from, to, status: promotionStatus });
+        return;
+      }
+
+      const result = executeMove(boardState, from, to, {
+        mode: 'assist',
+        proposer: 'human',
+      });
+      if (result.type === 'applied') {
+        setBoardState(result.state);
+      }
       setSelectedSquare(null);
       return;
     }
@@ -86,6 +153,9 @@ export const ShogiResearchScreen: React.FC = () => {
   return (
     <div
       id="shogi-research-screen"
+      data-turn={boardState.turn}
+      data-move-number={boardState.moveNumber}
+      data-history-count={boardState.history.length}
       className="min-h-full w-full flex flex-col items-center justify-between py-6 px-3 sm:px-6 bg-[#0f1115] text-stone-200"
     >
       {/* Top Header Section */}
@@ -133,9 +203,19 @@ export const ShogiResearchScreen: React.FC = () => {
           selectedSquare={selectedSquare}
           candidateSquares={candidateSquares}
           lastMove={boardState.lastMove}
-          onSquareClick={handleSquareClick}
+          onSquareClick={pendingPromotion ? undefined : handleSquareClick}
+          focusRequest={focusRequest}
         />
       </main>
+
+      {pendingPromotion && (
+        <PromotionDialog
+          status={pendingPromotion.status}
+          onPromote={() => completePromotionChoice('promote')}
+          onDecline={() => completePromotionChoice('decline')}
+          onCancel={cancelPromotion}
+        />
+      )}
 
       {/* Bottom Footer Notice */}
       <footer className="w-full max-w-4xl mt-8 pt-4 border-t border-stone-800/60 text-center">
@@ -143,7 +223,7 @@ export const ShogiResearchScreen: React.FC = () => {
           id="shogi-footer-notice"
           className="text-xs text-stone-400 font-sans tracking-wide select-none"
         >
-          駒の選択・移動・駒取りが可能です（成駒・駒打ちは準備中）。
+          駒の選択・移動・駒取り・成り選択が可能です（駒打ちは準備中）。
         </p>
       </footer>
     </div>

@@ -12,7 +12,6 @@ import { Coordinate, isWithinBoard } from './coordinates';
 import { isKingInCheck } from './attacks';
 import {
   getPseudoLegalMoves,
-  isDeadPieceMove,
   simulateMoveSquares,
 } from './moves';
 
@@ -28,6 +27,9 @@ export const ILLEGAL_MOVE_MESSAGES: Record<IllegalMoveReason, string> = {
   occupied_by_own_piece: '味方の駒が存在するマスには移動できません。',
   captured_king: '相手の王将・玉将を直接取ることはできません。',
   dead_piece: 'これ以上進めない段への未成駒の移動は禁止されています（行き所のない駒）。',
+  promotion_choice_required: '成るか不成かを選択してください。',
+  invalid_promotion: 'この指し手では成ることができません。',
+  promotion_required: 'この指し手では成りが必須です。',
   king_suicide: '王将・玉将を相手の利きがあるマスへ移動することはできません（自滅手）。',
   self_check_unresolved: '自玉が王手を受ける状態になる着手、または王手放置は反則です。',
   game_already_ended: '対局は既に終局しています。',
@@ -104,16 +106,7 @@ export function validateMove(
     };
   }
 
-  // 7. Dead piece check (行き所のない駒)
-  if (isDeadPieceMove(piece, to)) {
-    return {
-      isValid: false,
-      reason: 'dead_piece',
-      message: ILLEGAL_MOVE_MESSAGES.dead_piece,
-    };
-  }
-
-  // 8. Self-check / King safety check
+  // 7. Self-check / King safety check
   const simulatedSquares = simulateMoveSquares(state.squares, from, to);
   if (isKingInCheck(simulatedSquares, piece.player)) {
     if (piece.type === 'king') {

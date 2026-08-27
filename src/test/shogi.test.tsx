@@ -40,6 +40,12 @@ import {
   generateMoveNotation,
   getPieceNotationKanji,
   cloneBoardSquares,
+  canPiecePromote,
+  canPromoteMove,
+  getPromotionStatus,
+  isPromotablePieceType,
+  isPromotionRequired,
+  isPromotionZone,
 } from '../domain/shogi';
 import * as ShogiDomainModule from '../domain/shogi';
 import { validateLockfile } from '../../scripts/verify-lockfile.mjs';
@@ -63,6 +69,352 @@ describe('1. Node.js 24系・npm・環境・設定ファイルの検証', () => 
   it('package.json の名前が shogi-app であること', () => {
     expect(packageJson.name).toBe('shogi-app');
   });
+
+describe('16. 成り・不成選択と必須成り', () => {
+  const createPromotionTestBoard = (
+    pieces: Array<{ row: number; col: number; piece: Piece }>,
+    turn: Player = 'sente'
+  ): BoardState => {
+    const state = createInitialBoardState();
+    const squares = cloneBoardSquares(state.squares);
+    for (const row of squares) {
+      for (const square of row) square.piece = null;
+    }
+    for (const item of pieces) squares[item.row][item.col].piece = item.piece;
+    return { ...state, squares, turn };
+  };
+
+  describe('16.1 成り判定の純粋関数', () => {
+    it('先手・後手それぞれの成りゾーンを判定すること', () => {
+      expect([0, 1, 2].every((row) => isPromotionZone('sente', row))).toBe(true);
+      expect([3, 6, 8].map((row) => isPromotionZone('sente', row))).toEqual([false, false, false]);
+      expect([6, 7, 8].every((row) => isPromotionZone('gote', row))).toBe(true);
+      expect([0, 5, 9].map((row) => isPromotionZone('gote', row))).toEqual([false, false, false]);
+    });
+
+    it('歩・香・桂・銀・角・飛だけが成れ、成駒は再度成れないこと', () => {
+      for (const type of ['pawn', 'lance', 'knight', 'silver', 'bishop', 'rook'] as const) {
+        expect(isPromotablePieceType(type)).toBe(true);
+        expect(canPiecePromote({ id: type, type, player: 'sente' })).toBe(true);
+        expect(canPiecePromote({ id: `promoted-${type}`, type, player: 'sente', isPromoted: true })).toBe(false);
+      }
+      for (const type of ['king', 'gold'] as const) {
+        expect(isPromotablePieceType(type)).toBe(false);
+        expect(canPiecePromote({ id: type, type, player: 'sente' })).toBe(false);
+      }
+    });
+
+    it('移動元だけ・移動先だけが成りゾーンなら任意成り、無関係なら成れないこと', () => {
+      const silver: Piece = { id: 'silver', type: 'silver', player: 'sente' };
+      expect(canPromoteMove(silver, { row: 2, col: 4 }, { row: 3, col: 4 })).toBe(true);
+      expect(getPromotionStatus(silver, { row: 2, col: 4 }, { row: 3, col: 4 })).toBe('optional');
+      expect(getPromotionStatus(silver, { row: 3, col: 4 }, { row: 2, col: 4 })).toBe('optional');
+      expect(getPromotionStatus(silver, { row: 4, col: 4 }, { row: 3, col: 4 })).toBe('none');
+    });
+
+    it('歩・香・桂の先手・後手それぞれの行き所のない段を必須成りとすること', () => {
+      for (const type of ['pawn', 'lance'] as const) {
+        expect(isPromotionRequired({ id: `s-${type}`, type, player: 'sente' }, { row: 0, col: 4 })).toBe(true);
+        expect(isPromotionRequired({ id: `g-${type}`, type, player: 'gote' }, { row: 8, col: 4 })).toBe(true);
+      }
+      const senteKnight: Piece = { id: 's-knight', type: 'knight', player: 'sente' };
+      const goteKnight: Piece = { id: 'g-knight', type: 'knight', player: 'gote' };
+      expect([0, 1].every((row) => isPromotionRequired(senteKnight, { row, col: 4 }))).toBe(true);
+      expect([7, 8].every((row) => isPromotionRequired(goteKnight, { row, col: 4 }))).toBe(true);
+      expect(isPromotionRequired(senteKnight, { row: 2, col: 4 })).toBe(false);
+      expect(isPromotionRequired(goteKnight, { row: 6, col: 4 })).toBe(false);
+    });
+  });
+
+  describe('16.2 executeMove・局面・棋譜', () => {
+    const optionalSilverState = () => createPromotionTestBoard([
+      { row: 3, col: 4, piece: { id: 'silver-s', type: 'silver', player: 'sente' } },
+      { row: 8, col: 4, piece: { id: 'king-s', type: 'king', player: 'sente' } },
+      { row: 0, col: 0, piece: { id: 'king-g', type: 'king', player: 'gote' } },
+    ]);
+
+    const requiredPromotionCases = [
+      { label: '先手の歩 row 0', type: 'pawn', player: 'sente', from: { row: 1, col: 4 }, to: { row: 0, col: 4 } },
+      { label: '先手の香 row 0', type: 'lance', player: 'sente', from: { row: 1, col: 4 }, to: { row: 0, col: 4 } },
+      { label: '先手の桂 row 0', type: 'knight', player: 'sente', from: { row: 2, col: 4 }, to: { row: 0, col: 3 } },
+      { label: '先手の桂 row 1', type: 'knight', player: 'sente', from: { row: 3, col: 4 }, to: { row: 1, col: 3 } },
+      { label: '後手の歩 row 8', type: 'pawn', player: 'gote', from: { row: 7, col: 4 }, to: { row: 8, col: 4 } },
+      { label: '後手の香 row 8', type: 'lance', player: 'gote', from: { row: 7, col: 4 }, to: { row: 8, col: 4 } },
+      { label: '後手の桂 row 7', type: 'knight', player: 'gote', from: { row: 5, col: 4 }, to: { row: 7, col: 3 } },
+      { label: '後手の桂 row 8', type: 'knight', player: 'gote', from: { row: 6, col: 4 }, to: { row: 8, col: 3 } },
+    ] as const;
+
+    it('任意成りは指定なしを拒否し、promote と decline を履歴込みで区別すること', () => {
+      const state = optionalSilverState();
+      const missing = executeMove(state, { row: 3, col: 4 }, { row: 2, col: 4 });
+      expect(missing.type).toBe('rejected');
+      if (missing.type === 'rejected') expect(missing.reason).toBe('promotion_choice_required');
+
+      const promoted = executeMove(state, { row: 3, col: 4 }, { row: 2, col: 4 }, { promotion: 'promote' });
+      expect(promoted.type).toBe('applied');
+      if (promoted.type === 'applied') {
+        expect(promoted.state.squares[2][4].piece?.isPromoted).toBe(true);
+        expect(promoted.move.promotion).toBe('promote');
+        expect(promoted.move.notation).toBe('▲5三銀成');
+      }
+
+      const declined = executeMove(state, { row: 3, col: 4 }, { row: 2, col: 4 }, { promotion: 'decline' });
+      expect(declined.type).toBe('applied');
+      if (declined.type === 'applied') {
+        expect(declined.state.squares[2][4].piece?.isPromoted).toBeFalsy();
+        expect(declined.move.promotion).toBe('decline');
+        expect(declined.move.notation).toBe('▲5三銀不成');
+      }
+    });
+
+    it('必須成りは候補に残り、指定なし・decline を拒否して promote だけを適用すること', () => {
+      const state = createPromotionTestBoard([
+        { row: 1, col: 4, piece: { id: 'pawn-s', type: 'pawn', player: 'sente' } },
+        { row: 8, col: 4, piece: { id: 'king-s', type: 'king', player: 'sente' } },
+        { row: 0, col: 0, piece: { id: 'king-g', type: 'king', player: 'gote' } },
+      ]);
+      expect(getLegalMoves(state.squares, { row: 1, col: 4 }, 'sente')).toContainEqual({ row: 0, col: 4 });
+
+      for (const options of [{}, { promotion: 'decline' as const }]) {
+        const rejected = executeMove(state, { row: 1, col: 4 }, { row: 0, col: 4 }, options);
+        expect(rejected.type).toBe('rejected');
+        if (rejected.type === 'rejected') expect(rejected.reason).toBe('promotion_required');
+        expect(rejected.state).toBe(state);
+      }
+
+      const applied = executeMove(state, { row: 1, col: 4 }, { row: 0, col: 4 }, { promotion: 'promote' });
+      expect(applied.type).toBe('applied');
+      if (applied.type === 'applied') expect(applied.state.squares[0][4].piece?.isPromoted).toBe(true);
+    });
+
+    it('成れない駒への promote を拒否し、strict 方式では反則負けにすること', () => {
+      const state = createPromotionTestBoard([
+        { row: 4, col: 4, piece: { id: 'gold-s', type: 'gold', player: 'sente' } },
+        { row: 8, col: 8, piece: { id: 'king-s', type: 'king', player: 'sente' } },
+      ]);
+      const assist = executeMove(state, { row: 4, col: 4 }, { row: 3, col: 4 }, { promotion: 'promote' });
+      expect(assist.type).toBe('rejected');
+      if (assist.type === 'rejected') expect(assist.reason).toBe('invalid_promotion');
+
+      const strict = executeMove(state, { row: 4, col: 4 }, { row: 3, col: 4 }, {
+        promotion: 'promote',
+        proposer: 'shogi_engine',
+      });
+      expect(strict.type).toBe('foul_loss');
+      if (strict.type === 'foul_loss') expect(strict.result.foulReason).toBe('invalid_promotion');
+    });
+
+    it('成った駒を取ると持ち駒では未成へ戻ること', () => {
+      const state = createPromotionTestBoard([
+        { row: 4, col: 4, piece: { id: 'gold-s', type: 'gold', player: 'sente' } },
+        { row: 3, col: 4, piece: { id: 'silver-g', type: 'silver', player: 'gote', isPromoted: true } },
+        { row: 8, col: 8, piece: { id: 'king-s', type: 'king', player: 'sente' } },
+      ]);
+      const result = executeMove(state, { row: 4, col: 4 }, { row: 3, col: 4 });
+      expect(result.type).toBe('applied');
+      if (result.type === 'applied') {
+        expect(result.state.senteHand[0]).toMatchObject({ type: 'silver', player: 'sente', isPromoted: false });
+      }
+    });
+
+    it('角の成る手に「成」が付き、applyMove の既存非成り手は継続して適用されること', () => {
+      const state = createPromotionTestBoard([
+        { row: 3, col: 5, piece: { id: 'bishop-s', type: 'bishop', player: 'sente' } },
+        { row: 8, col: 4, piece: { id: 'king-s', type: 'king', player: 'sente' } },
+      ]);
+      const promoted = executeMove(state, { row: 3, col: 5 }, { row: 1, col: 7 }, { promotion: 'promote' });
+      expect(promoted.type).toBe('applied');
+      if (promoted.type === 'applied') expect(promoted.move.notation).toBe('▲2二角成');
+
+      const initial = createInitialBoardState();
+      const moved = applyMove(initial, { row: 6, col: 2 }, { row: 5, col: 2 });
+      expect(moved.squares[5][2].piece?.type).toBe('pawn');
+      expect(moved.history[0].promotion).toBe('none');
+    });
+
+    it('applyMove は先手の歩を2段目から1段目へ自動的に成って適用すること', () => {
+      const state = createPromotionTestBoard([
+        { row: 1, col: 4, piece: { id: 'required-pawn-s', type: 'pawn', player: 'sente' } },
+      ]);
+
+      const moved = applyMove(state, { row: 1, col: 4 }, { row: 0, col: 4 });
+
+      expect(moved).not.toBe(state);
+      expect(moved.squares[1][4].piece).toBeNull();
+      expect(moved.squares[0][4].piece).toMatchObject({
+        id: 'required-pawn-s',
+        type: 'pawn',
+        player: 'sente',
+        isPromoted: true,
+      });
+      expect(moved.turn).toBe('gote');
+      expect(moved.moveNumber).toBe(state.moveNumber + 1);
+      expect(moved.history).toHaveLength(1);
+      expect(moved.history[0].promotion).toBe('promote');
+      expect(moved.history[0].notation).toBe('▲5一歩成');
+    });
+
+    it.each(requiredPromotionCases)(
+      'applyMove は必須成り境界（$label）を成駒として適用すること',
+      ({ type, player, from, to }) => {
+        const state = createPromotionTestBoard([
+          { row: from.row, col: from.col, piece: { id: `required-${player}-${type}-${to.row}`, type, player } },
+        ], player);
+
+        const moved = applyMove(state, from, to);
+
+        expect(moved).not.toBe(state);
+        expect(moved.squares[from.row][from.col].piece).toBeNull();
+        expect(moved.squares[to.row][to.col].piece).toMatchObject({ type, player, isPromoted: true });
+        expect(moved.history).toHaveLength(1);
+        expect(moved.history[0].promotion).toBe('promote');
+        expect(moved.history[0].notation).toMatch(/成$/);
+      }
+    );
+
+    it('getLegalMoves の必須成り候補を applyMove へ渡すと成駒として着手できること', () => {
+      const from = { row: 2, col: 4 };
+      const to = { row: 0, col: 3 };
+      const state = createPromotionTestBoard([
+        { row: from.row, col: from.col, piece: { id: 'candidate-knight-s', type: 'knight', player: 'sente' } },
+      ]);
+
+      expect(getLegalMoves(state.squares, from, state.turn)).toContainEqual(to);
+      const moved = applyMove(state, from, to);
+
+      expect(moved.squares[from.row][from.col].piece).toBeNull();
+      expect(moved.squares[to.row][to.col].piece).toMatchObject({
+        id: 'candidate-knight-s',
+        isPromoted: true,
+      });
+    });
+
+    it('applyMove は任意成りを後方互換の不成として適用し棋譜へ「不成」を付けること', () => {
+      const state = optionalSilverState();
+      const moved = applyMove(state, { row: 3, col: 4 }, { row: 2, col: 4 });
+
+      expect(moved).not.toBe(state);
+      expect(moved.squares[2][4].piece?.type).toBe('silver');
+      expect(moved.squares[2][4].piece?.isPromoted).toBeFalsy();
+      expect(moved.history[0].promotion).toBe('decline');
+      expect(moved.history[0].notation).toBe('▲5三銀不成');
+    });
+
+    it('generateMoveNotation は promote に「成」を付けること', () => {
+      const silver: Piece = { id: 'notation-silver', type: 'silver', player: 'sente' };
+      expect(generateMoveNotation('sente', silver, { row: 2, col: 4 }, 'promote')).toBe('▲5三銀成');
+    });
+
+    it('generateMoveNotation は decline に「不成」を付けること', () => {
+      const silver: Piece = { id: 'notation-silver', type: 'silver', player: 'sente' };
+      expect(generateMoveNotation('sente', silver, { row: 2, col: 4 }, 'decline')).toBe('▲5三銀不成');
+    });
+
+    it('generateMoveNotation は none に接尾辞を付けないこと', () => {
+      const pawn: Piece = { id: 'notation-pawn', type: 'pawn', player: 'sente' };
+      expect(generateMoveNotation('sente', pawn, { row: 5, col: 2 }, 'none')).toBe('▲7六歩');
+    });
+
+    it('すでに成っている銀・飛・角の通常移動は成駒名だけを表示すること', () => {
+      expect(generateMoveNotation(
+        'sente',
+        { id: 'promoted-silver', type: 'silver', player: 'sente', isPromoted: true },
+        { row: 2, col: 4 },
+        'none'
+      )).toBe('▲5三成銀');
+      expect(generateMoveNotation(
+        'sente',
+        { id: 'promoted-rook', type: 'rook', player: 'sente', isPromoted: true },
+        { row: 4, col: 4 },
+        'none'
+      )).toBe('▲5五竜');
+      expect(generateMoveNotation(
+        'sente',
+        { id: 'promoted-bishop', type: 'bishop', player: 'sente', isPromoted: true },
+        { row: 4, col: 4 },
+        'none'
+      )).toBe('▲5五馬');
+    });
+  });
+
+  describe('16.3 成り選択UI', () => {
+    const optionalUiState = () => createPromotionTestBoard([
+      { row: 3, col: 4, piece: { id: 'ui-silver', type: 'silver', player: 'sente' } },
+      { row: 8, col: 4, piece: { id: 'ui-king-s', type: 'king', player: 'sente' } },
+      { row: 0, col: 0, piece: { id: 'ui-king-g', type: 'king', player: 'gote' } },
+    ]);
+
+    const openOptionalDialog = async () => {
+      const user = userEvent.setup();
+      render(<ShogiResearchScreen initialState={optionalUiState()} />);
+      await user.click(screen.getByRole('gridcell', { name: /5筋 4段、先手の銀将/ }));
+      await user.click(screen.getByRole('gridcell', { name: /5筋 3段、空のマス、移動可能/ }));
+      return user;
+    };
+
+    it('任意成り先でARIA付きダイアログを開き、ダイアログ内へフォーカスすること', async () => {
+      await openOptionalDialog();
+      const dialog = screen.getByRole('dialog', { name: '成り選択' });
+      expect(dialog).toHaveAttribute('aria-modal', 'true');
+      expect(dialog).toHaveAttribute('aria-describedby', 'promotion-dialog-description');
+      expect(screen.getByRole('button', { name: '成る' })).toHaveFocus();
+      expect(screen.getByRole('button', { name: '不成' })).toBeInTheDocument();
+      expect(screen.getByRole('button', { name: 'キャンセル' })).toBeInTheDocument();
+    });
+
+    it('「成る」で成駒、「不成」で未成駒として着手すること', async () => {
+      const user = await openOptionalDialog();
+      await user.click(screen.getByRole('button', { name: '成る' }));
+      expect(screen.getByRole('gridcell', { name: /5筋 3段、先手の成銀/ })).toBeInTheDocument();
+
+      render(<ShogiResearchScreen initialState={optionalUiState()} />);
+      const boards = screen.getAllByRole('grid', { name: '将棋盤 9×9マス' });
+      const secondBoard = boards[1];
+      const source = secondBoard.querySelector('[data-coordinate="5四"]') as HTMLElement;
+      await user.click(source);
+      const target = secondBoard.querySelector('[data-coordinate="5三"]') as HTMLElement;
+      await user.click(target);
+      await user.click(screen.getByRole('button', { name: '不成' }));
+      expect(target).toHaveAttribute('aria-label', expect.stringContaining('先手の銀将'));
+    });
+
+    it('必須成りでは不成を表示しないこと', async () => {
+      const user = userEvent.setup();
+      const state = createPromotionTestBoard([
+        { row: 1, col: 4, piece: { id: 'ui-pawn', type: 'pawn', player: 'sente' } },
+        { row: 8, col: 4, piece: { id: 'ui-king', type: 'king', player: 'sente' } },
+      ]);
+      render(<ShogiResearchScreen initialState={state} />);
+      await user.click(screen.getByRole('gridcell', { name: /5筋 2段、先手の歩兵/ }));
+      await user.click(screen.getByRole('gridcell', { name: /5筋 1段、空のマス、移動可能/ }));
+      expect(screen.getByRole('dialog', { name: '成り選択' })).toHaveTextContent('この手は成りが必須です。');
+      expect(screen.queryByRole('button', { name: '不成' })).not.toBeInTheDocument();
+    });
+
+    it('キャンセルは盤面・手番・手数・履歴を変えず、ダイアログ中の盤面操作を抑止すること', async () => {
+      const user = await openOptionalDialog();
+      const screenRoot = document.getElementById('shogi-research-screen')!;
+      const source = screen.getByRole('gridcell', { name: /5筋 4段、先手の銀将/ });
+      const otherPiece = screen.getByRole('gridcell', { name: /5筋 9段、先手の王将/ });
+      await user.click(otherPiece);
+      expect(source).toHaveAttribute('data-selected', 'true');
+      await user.click(screen.getByRole('button', { name: 'キャンセル' }));
+      expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+      expect(source).toHaveAttribute('aria-label', expect.stringContaining('先手の銀将'));
+      expect(screenRoot).toHaveAttribute('data-turn', 'sente');
+      expect(screenRoot).toHaveAttribute('data-move-number', '1');
+      expect(screenRoot).toHaveAttribute('data-history-count', '0');
+      expect(source).toHaveFocus();
+    });
+
+    it('Escapeで盤面を変更せずダイアログを閉じること', async () => {
+      const user = await openOptionalDialog();
+      await user.keyboard('{Escape}');
+      expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+      expect(screen.getByRole('gridcell', { name: /5筋 4段、先手の銀将/ })).toBeInTheDocument();
+    });
+  });
+});
 
   it('packageManager が npm を指定し完全なSemVerであること', () => {
     expect(packageJson.packageManager).toMatch(/^npm@\d+\.\d+\.\d+$/);
@@ -740,7 +1092,7 @@ describe('6. macOS 検証スクリプトの公開API・内部処理・本番clea
         timeoutMs: 1000,
       });
 
-      expect(result.filepath).toBe('/virtual/temp/fsevents-success/watch-trigger.txt');
+      expect(result.filepath).toBe(path.join('/virtual/temp/fsevents-success', 'watch-trigger.txt'));
       expect(virtualFs.mkdtempSync).toHaveBeenCalledTimes(1);
       expect(createdDirPrefix).toContain('shogi-fsevents-test-');
       expect(stopWatcherFn).toHaveBeenCalledTimes(1);
@@ -787,7 +1139,7 @@ describe('6. macOS 検証スクリプトの公開API・内部処理・本番clea
 
       expect(virtualFs.mkdtempSync).toHaveBeenCalledTimes(1);
       expect(mkdtempArg).toContain('shogi-fsevents-test-');
-      expect(result.filepath).toBe('/virtual/owned-by-fsevents-phase/watch-trigger.txt');
+      expect(result.filepath).toBe(path.join('/virtual/owned-by-fsevents-phase', 'watch-trigger.txt'));
       expect(deletedDirs).toEqual(['/virtual/owned-by-fsevents-phase']);
       expect(deletedDirs).not.toContain(sentinelPath);
       expect(checkedPaths).not.toContain(sentinelPath);
@@ -1588,6 +1940,7 @@ describe('9. 将棋ドメイン層・駒移動・合法手・手番・取り駒�
           to: { row: 5, col: 2 },
           pieceType: 'pawn',
           capturedPieceType: null,
+          promotion: 'none',
           notation: '▲7六歩',
         });
         expect(nextState.lastMove).toEqual(nextState.history[0]);
@@ -1724,7 +2077,7 @@ describe('9. 将棋ドメイン層・駒移動・合法手・手番・取り駒�
         expect(statusBadge).toHaveTextContent('対局中 / 後手番');
 
         // フッター文言が正しく更新されていること
-        expect(screen.getByText('駒の選択・移動・駒取りが可能です（成駒・駒打ちは準備中）。')).toBeInTheDocument();
+        expect(screen.getByText('駒の選択・移動・駒取り・成り選択が可能です（駒打ちは準備中）。')).toBeInTheDocument();
       });
 
       it('キーボード操作 (Space / Enter) でも駒選択および移動が可能であること', async () => {
@@ -1968,8 +2321,8 @@ describe('9. 将棋ドメイン層・駒移動・合法手・手番・取り駒�
     });
   });
 
-  describe('12. 行き所のない駒 (dead_piece) の判定 (moves.ts / validation.ts)', () => {
-    it('先手の歩・香車は1段目(row 0)、桂馬は1・2段目(row 0, 1)へ進むと dead_piece となること', () => {
+  describe('12. 行き所のない駒を必須成りとして扱う判定', () => {
+    it('先手の歩・香車は1段目(row 0)、桂馬は1・2段目(row 0, 1)で必須成りとなること', () => {
       const pawn: Piece = { id: 'p', type: 'pawn', player: 'sente', isPromoted: false };
       const lance: Piece = { id: 'l', type: 'lance', player: 'sente', isPromoted: false };
       const knight: Piece = { id: 'n', type: 'knight', player: 'sente', isPromoted: false };
@@ -1985,7 +2338,7 @@ describe('9. 将棋ドメイン層・駒移動・合法手・手番・取り駒�
       expect(isDeadPieceMove(knight, { row: 2, col: 4 })).toBe(false);
     });
 
-    it('後手の歩・香車は9段目(row 8)、桂馬は8・9段目(row 7, 8)へ進むと dead_piece となること', () => {
+    it('後手の歩・香車は9段目(row 8)、桂馬は8・9段目(row 7, 8)で必須成りとなること', () => {
       const pawn: Piece = { id: 'p', type: 'pawn', player: 'gote', isPromoted: false };
       const lance: Piece = { id: 'l', type: 'lance', player: 'gote', isPromoted: false };
       const knight: Piece = { id: 'n', type: 'knight', player: 'gote', isPromoted: false };
@@ -2001,17 +2354,16 @@ describe('9. 将棋ドメイン層・駒移動・合法手・手番・取り駒�
       expect(isDeadPieceMove(knight, { row: 6, col: 4 })).toBe(false);
     });
 
-    it('アシスト方式 (getLegalMoves) では行き所のない駒への着手候補が除外されること', () => {
-      // 先手桂馬が 5三(2,4) にある場合、5一(0,3/0,5)への移動は dead_piece なので除外
+    it('必須成りの着手先も合法手候補から除外されないこと', () => {
       const state = createCustomTestBoard([
         { row: 2, col: 4, piece: { id: 'n-s', type: 'knight', player: 'sente' } },
         { row: 8, col: 4, piece: { id: 'k-s', type: 'king', player: 'sente' } },
       ]);
       const moves = getLegalMoves(state.squares, { row: 2, col: 4 }, 'sente');
-      expect(moves).toHaveLength(0);
+      expect(moves).toEqual(expect.arrayContaining([{ row: 0, col: 3 }, { row: 0, col: 5 }]));
     });
 
-    it('厳格対局方式では行き所のない駒が dead_piece の反則負けになり盤面が維持されること', () => {
+    it('厳格対局方式で必須成り指定がない場合は promotion_required の反則負けになること', () => {
       const state = createCustomTestBoard([
         { row: 2, col: 4, piece: { id: 'n-s', type: 'knight', player: 'sente' } },
         { row: 8, col: 4, piece: { id: 'k-s', type: 'king', player: 'sente' } },
@@ -2026,7 +2378,7 @@ describe('9. 将棋ドメイン層・駒移動・合法手・手番・取り駒�
       expect(result.type).toBe('foul_loss');
       if (result.type === 'foul_loss') {
         expect(result.result.endReason).toBe('foul_loss');
-        expect(result.result.foulReason).toBe('dead_piece');
+        expect(result.result.foulReason).toBe('promotion_required');
         expect(result.result.winner).toBe('gote');
         expect(result.result.loser).toBe('sente');
         expect(result.state.status).toBe('ended');

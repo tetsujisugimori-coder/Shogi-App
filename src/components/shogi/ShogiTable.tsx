@@ -14,6 +14,7 @@ interface ShogiTableProps {
   candidateSquares?: Array<{ row: number; col: number }>;
   lastMove?: { from: { row: number; col: number }; to: { row: number; col: number } } | null;
   onSquareClick?: (square: BoardSquare) => void;
+  focusRequest?: { row: number; col: number; requestId: number } | null;
   topPlayerSlot?: React.ReactNode;
   bottomPlayerSlot?: React.ReactNode;
   leftPanelSlot?: React.ReactNode;
@@ -31,6 +32,7 @@ export const ShogiTable: React.FC<ShogiTableProps> = ({
   candidateSquares = [],
   lastMove = null,
   onSquareClick,
+  focusRequest = null,
   topPlayerSlot,
   bottomPlayerSlot,
   leftPanelSlot,
@@ -101,6 +103,7 @@ export const ShogiTable: React.FC<ShogiTableProps> = ({
               candidateSquares={candidateSquares}
               lastMove={lastMove}
               onSquareClick={onSquareClick}
+              focusRequest={focusRequest}
             />
           </div>
         </div>

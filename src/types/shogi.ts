@@ -50,6 +50,10 @@ export type ExecutionMode = 'assist' | 'strict';
 
 export type ProposerType = 'human' | 'local_ai' | 'shogi_engine';
 
+export type PromotionChoice = 'promote' | 'decline';
+
+export type MovePromotion = 'none' | PromotionChoice;
+
 /**
  * Standardized English identifiers for illegal move reasons.
  */
@@ -62,6 +66,9 @@ export type IllegalMoveReason =
   | 'occupied_by_own_piece'
   | 'captured_king'
   | 'dead_piece'
+  | 'promotion_choice_required'
+  | 'invalid_promotion'
+  | 'promotion_required'
   | 'king_suicide'
   | 'self_check_unresolved'
   | 'game_already_ended';
@@ -81,6 +88,7 @@ export interface MoveRecord {
   to: { row: number; col: number };
   pieceType: PieceType;
   capturedPieceType?: PieceType | null;
+  promotion: MovePromotion;
   notation: string;
 }
 

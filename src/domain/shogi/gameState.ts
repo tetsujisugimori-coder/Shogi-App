@@ -12,13 +12,18 @@ import {
   GameResult,
   IllegalMoveReason,
   MoveRecord,
+  MovePromotion,
+  MoveValidationResult,
   Piece,
   PieceType,
   Player,
   ProposerType,
+  PromotionChoice,
 } from '../../types/shogi';
 import { Coordinate, toCoordinateLabel } from './coordinates';
+import { getPromotionStatus } from './promotion';
 import { validateMove } from './validation';
+import { ILLEGAL_MOVE_MESSAGES } from './validation';
 
 /**
  * Returns the traditional kanji representation of a piece for move notations.
@@ -71,12 +76,14 @@ export function getPieceNotationKanji(
 }
 
 /**
- * Generates a human-readable and structured Japanese move notation (e.g. "▲7六歩", "△3四歩", "▲5三成銀").
+ * Generates Japanese move notation for normal moves, promotion choices, and promoted pieces.
+ * Examples: "▲7六歩", "▲5三銀成", "▲5三銀不成", "▲5三成銀".
  */
 export function generateMoveNotation(
   player: Player,
   piece: Piece,
-  to: Coordinate
+  to: Coordinate,
+  promotion: MovePromotion = 'none'
 ): string {
   const symbol = player === 'sente' ? '▲' : '△';
   const destCoord = toCoordinateLabel(to.row, to.col);
@@ -85,7 +92,9 @@ export function generateMoveNotation(
     player,
     piece.isPromoted ?? false
   );
-  return `${symbol}${destCoord}${pieceKanji}`;
+  const promotionSuffix =
+    promotion === 'promote' ? '成' : promotion === 'decline' ? '不成' : '';
+  return `${symbol}${destCoord}${pieceKanji}${promotionSuffix}`;
 }
 
 /**
@@ -107,7 +116,8 @@ export function cloneBoardSquares(squares: BoardSquare[][]): BoardSquare[][] {
 function internalApplyLegalMove(
   state: BoardState,
   from: Coordinate,
-  to: Coordinate
+  to: Coordinate,
+  promotion: MovePromotion
 ): BoardState {
   const originSquare = state.squares[from.row]?.[from.col];
   if (!originSquare || !originSquare.piece) {
@@ -140,9 +150,12 @@ function internalApplyLegalMove(
 
   // Move the piece to destination
   newSquares[from.row][from.col].piece = null;
-  newSquares[to.row][to.col].piece = { ...movingPiece };
+  newSquares[to.row][to.col].piece = {
+    ...movingPiece,
+    isPromoted: promotion === 'promote' ? true : movingPiece.isPromoted,
+  };
 
-  const notation = generateMoveNotation(state.turn, movingPiece, to);
+  const notation = generateMoveNotation(state.turn, movingPiece, to, promotion);
 
   const moveRecord: MoveRecord = {
     moveNumber: state.moveNumber,
@@ -151,6 +164,7 @@ function internalApplyLegalMove(
     to: { row: to.row, col: to.col },
     pieceType: movingPiece.type,
     capturedPieceType: targetPiece ? targetPiece.type : null,
+    promotion,
     notation,
   };
 
@@ -193,6 +207,7 @@ export interface ExecuteMoveOptions {
   mode?: ExecutionMode; // If omitted, defaults according to proposer
   proposer?: ProposerType; // Default: 'human'
   engineName?: string;
+  promotion?: PromotionChoice;
 }
 
 export type MoveExecutionResult =
@@ -244,11 +259,45 @@ export function executeMove(
     };
   }
 
-  const validation = validateMove(state, from, to);
+  let validation: MoveValidationResult = validateMove(state, from, to);
+  let movePromotion: MovePromotion = 'none';
+
+  if (validation.isValid) {
+    const movingPiece = state.squares[from.row][from.col].piece!;
+    const promotionStatus = getPromotionStatus(movingPiece, from, to);
+
+    if (promotionStatus === 'none') {
+      if (options.promotion === 'promote') {
+        validation = {
+          isValid: false,
+          reason: 'invalid_promotion',
+          message: ILLEGAL_MOVE_MESSAGES.invalid_promotion,
+        };
+      }
+    } else if (promotionStatus === 'optional') {
+      if (!options.promotion) {
+        validation = {
+          isValid: false,
+          reason: 'promotion_choice_required',
+          message: ILLEGAL_MOVE_MESSAGES.promotion_choice_required,
+        };
+      } else {
+        movePromotion = options.promotion;
+      }
+    } else if (options.promotion !== 'promote') {
+      validation = {
+        isValid: false,
+        reason: 'promotion_required',
+        message: ILLEGAL_MOVE_MESSAGES.promotion_required,
+      };
+    } else {
+      movePromotion = 'promote';
+    }
+  }
 
   // If move is legal, apply it through the internal helper
   if (validation.isValid) {
-    const nextState = internalApplyLegalMove(state, from, to);
+    const nextState = internalApplyLegalMove(state, from, to, movePromotion);
     return {
       type: 'applied',
       state: nextState,
@@ -329,6 +378,14 @@ export function applyMove(
   from: Coordinate,
   to: Coordinate
 ): BoardState {
-  const result = executeMove(state, from, to, { mode: 'assist' });
+  const piece = state.squares[from.row]?.[from.col]?.piece;
+  const promotionStatus = piece ? getPromotionStatus(piece, from, to) : 'none';
+  const promotion: PromotionChoice | undefined =
+    promotionStatus === 'required'
+      ? 'promote'
+      : promotionStatus === 'optional'
+        ? 'decline'
+        : undefined;
+  const result = executeMove(state, from, to, { mode: 'assist', promotion });
   return result.state;
 }
