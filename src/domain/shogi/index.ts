@@ -5,3 +5,4 @@ export * from './validation';
 export * from './promotion';
 export * from './gameState';
 export * from './drops';
+export * from './checkmate';

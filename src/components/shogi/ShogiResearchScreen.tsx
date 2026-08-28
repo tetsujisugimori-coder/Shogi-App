@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { createInitialBoardState, BoardState, BoardSquare, Piece, PieceType } from '../../types/shogi';
 import {
   executeDrop,
@@ -37,11 +37,13 @@ export const ShogiResearchScreen: React.FC<ShogiResearchScreenProps> = ({ initia
   } | null>(null);
   const focusRequestId = useRef(0);
 
-  const selectedSquare = selection.kind === 'board' ? selection.square : null;
-  const selectedHandPieceId = selection.kind === 'hand' ? selection.pieceId : null;
+  const isEnded = boardState.status === 'ended';
+  const selectedSquare = !isEnded && selection.kind === 'board' ? selection.square : null;
+  const selectedHandPieceId = !isEnded && selection.kind === 'hand' ? selection.pieceId : null;
 
   // Compute candidates for the mutually exclusive board/hand selection.
   const candidateSquares = useMemo(() => {
+    if (boardState.status === 'ended') return [];
     if (selection.kind === 'board') {
       return getMoveCandidates(boardState.squares, selection.square, boardState.turn);
     }
@@ -50,6 +52,12 @@ export const ShogiResearchScreen: React.FC<ShogiResearchScreenProps> = ({ initia
     }
     return [];
   }, [boardState, selection]);
+
+  useEffect(() => {
+    if (boardState.status !== 'ended') return;
+    setSelection({ kind: 'none' });
+    setPendingPromotion(null);
+  }, [boardState.status]);
 
   const restoreBoardFocus = useCallback((square: { row: number; col: number }) => {
     focusRequestId.current += 1;
@@ -84,7 +92,7 @@ export const ShogiResearchScreen: React.FC<ShogiResearchScreenProps> = ({ initia
   };
 
   const handleSquareClick = (square: BoardSquare) => {
-    if (pendingPromotion) return;
+    if (pendingPromotion || boardState.status === 'ended') return;
     if (selection.kind === 'hand') {
       if (square.piece?.player === boardState.turn) {
         setSelection({ kind: 'board', square: { row: square.row, col: square.col } });
@@ -193,11 +201,28 @@ export const ShogiResearchScreen: React.FC<ShogiResearchScreenProps> = ({ initia
           dotColor: 'bg-rose-500',
         };
       }
+      if (boardState.result.endReason === 'checkmate') {
+        return {
+          text: `終局 / ${winnerName}勝ち（詰み）`,
+          isLive: false,
+          bgColor: 'bg-rose-950/80 text-rose-300 border-rose-800/60',
+          dotColor: 'bg-rose-500',
+        };
+      }
       return {
         text: `終局 / ${winnerName}勝ち`,
         isLive: false,
         bgColor: 'bg-stone-900/80 text-stone-300 border-stone-700/60',
         dotColor: 'bg-stone-500',
+      };
+    }
+
+    if (boardState.status === 'check') {
+      return {
+        text: `王手 / ${turnLabel}`,
+        isLive: true,
+        bgColor: 'bg-rose-950/70 text-rose-300 border-rose-800/50',
+        dotColor: 'bg-rose-400',
       };
     }
 
@@ -265,16 +290,16 @@ export const ShogiResearchScreen: React.FC<ShogiResearchScreenProps> = ({ initia
           candidateKind={selection.kind === 'none' ? null : selection.kind === 'hand' ? 'drop' : 'move'}
           dropPieceType={selection.kind === 'hand' ? selection.pieceType : null}
           lastMove={boardState.lastMove}
-          onSquareClick={pendingPromotion ? undefined : handleSquareClick}
+          onSquareClick={pendingPromotion || isEnded ? undefined : handleSquareClick}
           focusRequest={focusRequest}
           turn={boardState.turn}
           selectedHandPieceId={selectedHandPieceId}
           onHandPieceSelect={handleHandPieceSelect}
-          pieceStandsDisabled={boardState.status === 'ended' || pendingPromotion !== null}
+          pieceStandsDisabled={isEnded || pendingPromotion !== null}
         />
       </main>
 
-      {pendingPromotion && (
+      {pendingPromotion && !isEnded && (
         <PromotionDialog
           status={pendingPromotion.status}
           onPromote={() => completePromotionChoice('promote')}
@@ -289,7 +314,7 @@ export const ShogiResearchScreen: React.FC<ShogiResearchScreenProps> = ({ initia
           id="shogi-footer-notice"
           className="text-xs text-stone-400 font-sans tracking-wide select-none"
         >
-          駒の選択・移動・駒取り・成り選択・持ち駒からの駒打ちが可能です（打ち歩詰め判定に対応）。
+          駒の移動・成り・駒打ちに加え、王手表示・一般的な詰み判定・終局処理に対応しています。
         </p>
       </footer>
     </div>

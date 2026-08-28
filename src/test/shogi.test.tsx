@@ -2078,7 +2078,7 @@ describe('9. 将棋ドメイン層・駒移動・合法手・手番・取り駒�
         expect(statusBadge).toHaveTextContent('対局中 / 後手番');
 
         // フッター文言が正しく更新されていること
-        expect(screen.getByText('駒の選択・移動・駒取り・成り選択・持ち駒からの駒打ちが可能です（打ち歩詰め判定に対応）。')).toBeInTheDocument();
+        expect(screen.getByText(/王手表示・一般的な詰み判定・終局処理に対応/)).toBeInTheDocument();
       });
 
       it('キーボード操作 (Space / Enter) でも駒選択および移動が可能であること', async () => {
