@@ -25,6 +25,7 @@ import {
 } from './dropRules';
 import { ILLEGAL_MOVE_MESSAGES } from './validation';
 import { adjudicateAfterLegalMove } from './adjudication';
+import { normalizePositionHistory } from './repetition';
 
 export { getLegalDropSquares, simulateDropSquares, validateDrop } from './dropRules';
 
@@ -114,8 +115,9 @@ export function executeDrop(
         message: ILLEGAL_MOVE_MESSAGES.hand_piece_not_found,
       };
     }
+    const normalizedState = normalizePositionHistory(state);
     const nextState = adjudicateAfterLegalMove(
-      internalApplyLegalDrop(state, piece, to),
+      internalApplyLegalDrop(normalizedState, piece, to),
       state.turn
     );
     const move = nextState.lastMove;

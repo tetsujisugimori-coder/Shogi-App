@@ -3,6 +3,8 @@
  * Fully unified piece definitions, accessible screen-reader labels, and symmetric board geometry.
  */
 
+import { createPositionKey } from '../domain/shogi/repetition';
+
 export type Player = 'sente' | 'gote';
 
 export type PieceType =
@@ -139,14 +141,45 @@ export interface DropFoulRecord extends FoulRecordBase {
 
 export type FoulRecord = MoveFoulRecord | DropFoulRecord;
 
-export type GameEndReason = 'foul_loss' | 'resignation' | 'checkmate' | 'draw';
+export type GameEndReason = 'foul_loss' | 'resignation' | 'checkmate' | 'repetition';
 
-export interface GameResult {
+interface DecisiveGameResultBase {
   winner: Player;
   loser: Player;
-  endReason: GameEndReason;
-  foulReason?: IllegalMoveReason;
   details?: string;
+}
+
+export interface FoulLossGameResult extends DecisiveGameResultBase {
+  endReason: 'foul_loss';
+  foulReason: IllegalMoveReason | 'perpetual_check_repetition';
+}
+
+export interface CheckmateGameResult extends DecisiveGameResultBase {
+  endReason: 'checkmate';
+}
+
+export interface ResignationGameResult extends DecisiveGameResultBase {
+  endReason: 'resignation';
+}
+
+export interface RepetitionGameResult {
+  winner: null;
+  loser: null;
+  endReason: 'repetition';
+  details?: string;
+}
+
+export type GameResult =
+  | FoulLossGameResult
+  | CheckmateGameResult
+  | ResignationGameResult
+  | RepetitionGameResult;
+
+export interface PositionRecord {
+  key: string;
+  historyIndex: number;
+  movedBy: Player | null;
+  gaveCheck: boolean;
 }
 
 export interface BoardState {
@@ -161,6 +194,7 @@ export interface BoardState {
   lastMove?: MoveRecord | null;
   result?: GameResult | null;
   foulHistory?: FoulRecord[];
+  positionHistory?: PositionRecord[];
 }
 
 export const RANK_KANJI = ['一', '二', '三', '四', '五', '六', '七', '八', '九'] as const;
@@ -433,7 +467,7 @@ export function createInitialBoardState(): BoardState {
     squares.push(rowSquares);
   }
 
-  return {
+  const state: BoardState = {
     squares,
     senteHand: [],
     goteHand: [],
@@ -446,6 +480,16 @@ export function createInitialBoardState(): BoardState {
     result: null,
     foulHistory: [],
   };
+
+  state.positionHistory = [
+    {
+      key: createPositionKey(state),
+      historyIndex: 0,
+      movedBy: null,
+      gaveCheck: false,
+    },
+  ];
+  return state;
 }
 
 /**

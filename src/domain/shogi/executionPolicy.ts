@@ -2,7 +2,7 @@ import {
   BoardState,
   ExecutionMode,
   FoulRecord,
-  GameResult,
+  FoulLossGameResult,
   IllegalMoveReason,
   Player,
 } from '../../types/shogi';
@@ -18,7 +18,7 @@ export type FoulLossExecutionResult = {
   type: 'foul_loss';
   state: BoardState;
   foul: FoulRecord;
-  result: GameResult;
+  result: FoulLossGameResult;
 };
 
 /** Shared internal policy for assist rejection and strict foul-loss transitions. */
@@ -37,7 +37,7 @@ export function finalizeIllegalProposal(
   }
 
   const winner: Player = state.turn === 'sente' ? 'gote' : 'sente';
-  const gameResult: GameResult = {
+  const gameResult: FoulLossGameResult = {
     winner,
     loser: state.turn,
     endReason: 'foul_loss',
