@@ -191,9 +191,26 @@ export const ShogiResearchScreen: React.FC<ShogiResearchScreenProps> = ({ initia
 
   const statusBadgeInfo = useMemo(() => {
     if (boardState.status === 'ended' && boardState.result) {
+      if (boardState.result.endReason === 'repetition') {
+        return {
+          text: '終局 / 千日手（無勝負）',
+          isLive: false,
+          bgColor: 'bg-stone-900/80 text-stone-300 border-stone-700/60',
+          dotColor: 'bg-stone-500',
+        };
+      }
+
       const winnerName = boardState.result.winner === 'sente' ? '先手' : '後手';
       const loserName = boardState.result.loser === 'sente' ? '先手' : '後手';
       if (boardState.result.endReason === 'foul_loss') {
+        if (boardState.result.foulReason === 'perpetual_check_repetition') {
+          return {
+            text: `終局 / ${loserName}反則負け（連続王手の千日手）`,
+            isLive: false,
+            bgColor: 'bg-rose-950/80 text-rose-300 border-rose-800/60',
+            dotColor: 'bg-rose-500',
+          };
+        }
         return {
           text: `終局 / ${winnerName}勝ち（${loserName}反則負け）`,
           isLive: false,
@@ -314,7 +331,7 @@ export const ShogiResearchScreen: React.FC<ShogiResearchScreenProps> = ({ initia
           id="shogi-footer-notice"
           className="text-xs text-stone-400 font-sans tracking-wide select-none"
         >
-          駒の移動・成り・駒打ちに加え、王手表示・一般的な詰み判定・終局処理に対応しています。
+          駒の移動・成り・駒打ち、王手表示・一般的な詰み判定・終局処理に対応しています。千日手・連続王手の千日手の終局処理に対応しています。
         </p>
       </footer>
     </div>

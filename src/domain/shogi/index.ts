@@ -6,3 +6,4 @@ export * from './promotion';
 export * from './gameState';
 export * from './drops';
 export * from './checkmate';
+export * from './repetition';

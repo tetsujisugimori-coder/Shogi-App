@@ -308,7 +308,7 @@ describe('一般的な詰み判定と着手後の終局処理', () => {
   it('王手でない合法手の後はactive・result:nullに戻す', () => {
     const state = createInitialBoardState();
     state.status = 'check';
-    state.result = { winner: 'gote', loser: 'sente', endReason: 'draw' };
+    state.result = { winner: 'gote', loser: 'sente', endReason: 'checkmate' };
     const result = executeMove(state, { row: 6, col: 2 }, { row: 5, col: 2 });
     expect(result.type).toBe('applied');
     if (result.type !== 'applied') return;

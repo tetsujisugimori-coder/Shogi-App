@@ -1309,3 +1309,72 @@ PR #1のレビュー指摘を受け、簡易APIの`applyMove`と合法手候補�
 - 千日手、連続王手の千日手、投了、入玉宣言、持将棋。
 - KIF / CSA / USI入出力、Undo / Redo、待った、局面リセット。
 - AI対局・将棋エンジン接続、形勢評価グラフ。
+
+## [2026-08-28] 通常の千日手・連続王手の千日手の実装
+
+### 基準と実装目的
+
+- 基準コミット: `c670ac226cc59b107096360b7b14b313d9f56ee1`（作業開始時の最新 `main`、`origin/main` と一致。PR #6マージ済み）
+- 作業ブランチ: `feat/repetition-adjudication`
+- 日本将棋連盟の対局規則を基準に、同一局面4回で通常の千日手を無勝負として終局し、4出現の循環中に一方が全着手で王手を続けていた場合は王手側の反則負けとして終局・記録することを目的とした。
+- 千日手成立後に先後を交代して自動的に指し直す処理は対象外とした。
+
+### 同一局面キーと局面履歴
+
+- `src/domain/shogi/repetition.ts` に純粋関数 `createPositionKey` を追加し、ドメイン公開APIから利用可能にした。
+- キーは固定バージョン、次の手番、row 0→8 / col 0→8の固定順で並べた81マス、先手・後手別に固定駒種順で数えた持ち駒枚数をJSON配列化する。盤上駒は所有者・駒種・成り状態だけを含め、個体IDを除外する。持ち駒も個体IDと配列順を除外する。
+- 手数、棋譜、`history`、`foulHistory`、`lastMove`、`status`、`result`、UI状態などのメタデータはキーへ含めない。入力state・盤面・持ち駒・駒オブジェクトを変更しない。
+- `BoardState.positionHistory?: PositionRecord[]` を追加した。各記録は局面キー、合法手履歴位置 `historyIndex`、直前着手者 `movedBy`（基準局面は `null`）、着手後に相手玉へ王手したかを示す `gaveCheck` だけを保持する。
+- `createInitialBoardState()` は初期局面を1回目として記録する。通常移動・駒打ちとも、合法手の適用前に履歴末尾キーと現在局面キーを照合する。履歴なし／不一致なら過去を推測せず現在局面1件へ再初期化し、既存テストや `initialState` で盤面だけを組み替えた外部局面との互換性を維持する。
+- 合法手後は手番交代済み局面をイミュータブルに1件追加する。不正提案、assist拒否、strictの着手前反則、終局後拒否では追加しない。
+
+### 千日手と連続王手の裁定
+
+- 新しい局面記録後、現在キーの出現位置を調べ、4回未満なら終局しない。4回目では該当4出現の1回目直後から4回目までを判定区間とする。
+- 区間内でプレイヤー本人の着手が1手以上あり、その全件の `gaveCheck` が真の場合だけ連続王手側の候補とする。先手・後手を同じ処理で判定し、一部だけの王手や途中に非王手がある側は候補にしない。
+- 候補が一方だけなら `endReason: 'foul_loss'` / `foulReason: 'perpetual_check_repetition'` とし、王手側を敗者、相手側を勝者にする。これは合法な4回目を適用後に成立する裁定であり、着手前反則の `FoulRecord` には追加しない。
+- 候補なし、または不整合データで両者が候補になる場合は安全側で通常の千日手とし、`endReason: 'repetition'`、`winner: null`、`loser: null` の無勝負にする。
+- 共通の `adjudicateAfterLegalMove` で、合法手反映→局面・王手記録→詰み→連続王手の千日手→通常の千日手→王手→通常状態の順に処理する。通常移動と駒打ちで判定を重複させず、assist / strictの合法手は同じ裁定を通る。
+
+### GameResult型とUI
+
+- 勝敗ありと無勝負を型安全に区別するため、`GameResult` を `FoulLossGameResult | CheckmateGameResult | ResignationGameResult | RepetitionGameResult` の判別可能unionへ変更した。
+- 通常の千日手だけは `winner` / `loser` が `null`。詰み・投了・反則負けは従来どおり先後の勝者・敗者を必須とし、反則負けでは `foulReason` も必須にした。
+- `ShogiResearchScreen` は通常の千日手を「終局 / 千日手（無勝負）」、連続王手を「終局 / 先手反則負け（連続王手の千日手）」または後手向きで表示する。既存の対局中、王手、詰み、着手前反則表示と `role="status"` / `aria-live="polite"` を維持する。
+- 終局時は選択、候補、成りダイアログを解除し、盤のクリック・キーボード操作と両駒台を無効化する既存経路を再利用した。フッターを千日手・連続王手の千日手まで対応済みの文言へ更新した。
+
+### 変更ファイル
+
+- 追加: `src/domain/shogi/repetition.ts`, `src/test/shogi-repetition.test.tsx`
+- 変更: `src/types/shogi.ts`, `src/domain/shogi/adjudication.ts`, `src/domain/shogi/gameState.ts`, `src/domain/shogi/drops.ts`, `src/domain/shogi/executionPolicy.ts`, `src/domain/shogi/index.ts`
+- 変更: `src/components/shogi/ShogiResearchScreen.tsx`, `src/test/shogi-checkmate.test.tsx`, `README.md`, `LOG.md`
+- `package.json`、`package-lock.json`、Node/npm設定、CI設定、依存パッケージの変更: なし
+
+### 追加テストと検証結果
+
+- `src/test/shogi-repetition.test.tsx` に30件を追加した。局面キーの同値・差分・メタデータ除外・イミュータビリティ、初期局面を含む2～4回目、手番・持ち駒差分、王手を一部含む通常千日手、駒打ち経路を検証した。
+- 先手／後手の合法な飛車・玉の循環手順を `executeMove` へ通し、4回目前の継続、王手状態／解除状態から始まる循環、非王手による中断、相手の一部王手、両者候補の安全処理、assist / strict一致を検証した。
+- 4回目の合法手が盤面、持ち駒、手番、手数、棋譜、`lastMove`、合法手履歴、局面履歴へ記録され差し戻されないこと、外部局面の履歴なし／末尾不一致、不正提案・strict反則・終局後拒否、UIの先後表示・無勝負・操作停止も検証した。
+- 既存246件を維持し、最終テスト総数: **276/276 passed**（4 test files）。
+- 実行環境: Node.js `v24.14.1` / npm `11.11.0`。リポジトリ指定の Node.js `>=24.15.0 <25` / npm `>=11.17.0 <12` より古いため、その設定・ロックファイルは変更していない。
+- `node --version`: `v24.14.1`
+- `npm --version`: `11.11.0`
+- `npm run verify:lock`: 成功（399エントリ、registry package 398件、欠落ゼロ）
+- `npm run lint`: 成功（TypeScriptエラーなし）
+- `npm test`: 成功（4ファイル、276件）
+- `npm run build`: 成功（1695 modules transformed）
+- `npm run check`: 成功（lock / lint / 276 tests / build）
+- `git diff --check`: 成功
+- npm `11.11.0` では `.npmrc` の `strict-allow-scripts` に将来互換性警告が出たが、全検証コマンドの終了コードは0だった。
+
+### ブラウザ目視確認
+
+- 実施あり。Vite開発サーバーと接続済みEdgeを使用し、PC幅の通常状態と狭幅500×1000を確認した。通常状態は「対局中 / 先手番」、81マス、更新後フッターを表示し、狭幅では `scrollWidth === innerWidth === 500` で横スクロールや盤・駒台・バッジ・フッターの崩れがないことを画像確認した。
+- 一時的な初期stateで通常の千日手「終局 / 千日手（無勝負）」と先手連続王手「終局 / 先手反則負け（連続王手の千日手）」を確認した。両状態で盤のTab停止0件、選択0件、候補0件、両駒台 `data-active="false"` を確認した。
+- 全状態でViteエラーオーバーレイなし、ブラウザコンソールエラーなし。一時的な初期state差分は確認後に完全に戻し、成果物へ含めていない。
+
+### 残る未実装事項
+
+- 千日手成立後の先後交代・自動指し直し、投了、入玉宣言、持将棋。
+- KIF / CSA / USI入出力、Undo / Redo、待った、局面リセット。
+- AI対局・将棋エンジン接続、形勢評価グラフ。

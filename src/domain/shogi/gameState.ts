@@ -28,6 +28,7 @@ import {
 } from './executionPolicy';
 import { adjudicateAfterLegalMove } from './adjudication';
 import { cloneBoardSquares } from './boardStateUtils';
+import { normalizePositionHistory } from './repetition';
 
 export type { FoulLossExecutionResult, RejectedExecutionResult } from './executionPolicy';
 
@@ -184,6 +185,7 @@ function internalApplyLegalMove(
       lastMove: moveRecord,
       result: state.result ?? null,
       foulHistory: state.foulHistory ? [...state.foulHistory] : [],
+      positionHistory: state.positionHistory ? [...state.positionHistory] : [],
     },
   };
 }
@@ -290,7 +292,8 @@ export function executeMove(
 
   // If move is legal, apply it through the internal helper
   if (validation.isValid) {
-    const applied = internalApplyLegalMove(state, from, to, movePromotion);
+    const normalizedState = normalizePositionHistory(state);
+    const applied = internalApplyLegalMove(normalizedState, from, to, movePromotion);
     if (!applied) {
       return {
         type: 'rejected',
