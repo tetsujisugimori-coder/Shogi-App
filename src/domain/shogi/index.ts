@@ -10,3 +10,5 @@ export * from './repetition';
 export * from './resignation';
 export * from './enteringKing';
 export * from './moveLimitJishogi';
+export * from './jishogiPoints';
+export * from './agreedJishogi';
