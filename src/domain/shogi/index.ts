@@ -8,3 +8,4 @@ export * from './drops';
 export * from './checkmate';
 export * from './repetition';
 export * from './resignation';
+export * from './enteringKing';

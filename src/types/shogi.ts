@@ -141,7 +141,14 @@ export interface DropFoulRecord extends FoulRecordBase {
 
 export type FoulRecord = MoveFoulRecord | DropFoulRecord;
 
-export type GameEndReason = 'foul_loss' | 'resignation' | 'checkmate' | 'repetition';
+export type GameEndReason =
+  | 'foul_loss'
+  | 'resignation'
+  | 'checkmate'
+  | 'repetition'
+  | 'entering_king_win'
+  | 'entering_king_draw'
+  | 'entering_king_declaration_failure';
 
 interface DecisiveGameResultBase {
   winner: Player;
@@ -169,11 +176,30 @@ export interface RepetitionGameResult {
   details?: string;
 }
 
+export interface EnteringKingWinGameResult extends DecisiveGameResultBase {
+  endReason: 'entering_king_win';
+}
+
+export interface EnteringKingDrawGameResult {
+  winner: null;
+  loser: null;
+  endReason: 'entering_king_draw';
+  details?: string;
+}
+
+export interface EnteringKingDeclarationFailureGameResult
+  extends DecisiveGameResultBase {
+  endReason: 'entering_king_declaration_failure';
+}
+
 export type GameResult =
   | FoulLossGameResult
   | CheckmateGameResult
   | ResignationGameResult
-  | RepetitionGameResult;
+  | RepetitionGameResult
+  | EnteringKingWinGameResult
+  | EnteringKingDrawGameResult
+  | EnteringKingDeclarationFailureGameResult;
 
 export interface PositionRecord {
   key: string;
