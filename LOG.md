@@ -1378,3 +1378,61 @@ PR #1のレビュー指摘を受け、簡易APIの`applyMove`と合法手候補�
 - 千日手成立後の先後交代・自動指し直し、投了、入玉宣言、持将棋。
 - KIF / CSA / USI入出力、Undo / Redo、待った、局面リセット。
 - AI対局・将棋エンジン接続、形勢評価グラフ。
+
+## [2026-08-29] 投了機能の実装
+
+### 基準と実装目的
+
+- 基準コミット: `4bec5330ea4da026580cff143e1eedd6e5bbb815`（作業開始時の最新 `main`）
+- 作業ブランチ: `feat/resignation`
+- 既存の詰み・反則負け・千日手の終局設計を再利用し、現在の手番側による投了、確認UI、勝敗表示、終局後の操作停止を追加した。
+- 投了は盤面を変化させる着手ではないため、通常移動や駒打ちを偽装せず、`MoveRecord` と `FoulRecord` のどちらにも追加しない。将来の棋譜出力では `result.endReason` と `result.loser` から終局表記を生成できる設計を維持した。
+
+### 投了ドメインAPI
+
+- `src/domain/shogi/resignation.ts` に純粋関数 `executeResignation` を追加し、`src/domain/shogi/index.ts` から公開した。
+- `active` または `check` のときだけ、実行前の `state.turn` を投了者、その相手を勝者として `status: 'ended'` / `endReason: 'resignation'` の結果を返す。
+- 成功と拒否を判別可能unionで区別する。終局済みは `game_already_ended`、対局中ではない状態は `resignation_not_available` とし、入力stateと既存結果をそのまま返して上書きしない。
+- 成功時も元stateを直接変更せず、`squares`、両持ち駒、`turn`、`moveNumber`、`history`、`lastMove`、`foulHistory`、`positionHistory` の参照と内容を維持する。
+
+### 確認ダイアログ、アクセシビリティ、終局表示
+
+- `ShogiResearchScreen` の対局状態表示付近へ木製・金色系の既存デザインに馴染む「投了」ボタンを追加した。`active` / `check` のみ実行可能で、成り選択中、確認中、終局後、その他の非対局状態では無効化する。
+- `ResignationDialog` は現在の手番から投了者と勝者候補を動的に表示し、確定前には終局しない。背景クリックはキャンセルとして扱い、投了を確定しない。
+- `role="dialog"`、`aria-modal="true"`、見出し・説明のARIA関連付け、キャンセルへの初期フォーカス、Tab / Shift+Tabのフォーカストラップ、Escapeキャンセル、キャンセル後の投了ボタンへのフォーカス復元に対応した。
+- 確認中は盤・駒台・投了ボタンを操作不可にし、確定後は選択・候補・成り選択を消去して既存の終局停止経路へ接続した。
+- 既存の `role="status"` / `aria-live="polite"` 領域へ、先手投了は「終局 / 後手勝ち（先手投了）」、後手投了は「終局 / 先手勝ち（後手投了）」と文字で表示する。
+
+### 変更ファイル
+
+- 追加: `src/domain/shogi/resignation.ts`, `src/components/shogi/ResignationDialog.tsx`, `src/test/shogi-resignation.test.tsx`
+- 変更: `src/domain/shogi/index.ts`, `src/components/shogi/ShogiResearchScreen.tsx`, `README.md`, `LOG.md`
+- `package.json`、`package-lock.json`、Node/npm設定、CI設定、依存パッケージの変更: なし
+
+### 追加テストと検証結果
+
+- `src/test/shogi-resignation.test.tsx` に34件を追加した。先手・後手・王手中の投了、勝敗と終局理由、イミュータブル更新と参照維持、盤面・持ち駒・手番・手数・全履歴の不変、Move/Foul履歴への非追加、終局済みと非対局状態の拒否、公開APIを検証した。
+- UIでは確認前の継続、動的説明、キャンセル・Escape・背景クリック、フォーカス復元とトラップ、先後の結果表示、確認中・終局後の盤と駒台の停止、選択・候補の解除、成り選択との排他、既存の詰み・反則負け・通常千日手・連続王手表示、フッターを検証した。
+- 既存276件を維持し、最終テスト総数: **310/310 passed**（5 test files）。
+- 実行環境: Node.js `v24.20.0` / npm `11.17.0`。リポジトリ指定の Node.js `>=24.15.0 <25` / npm `>=11.17.0 <12` を満たす。
+- `node -v`: `v24.20.0`
+- `npm -v`: `11.17.0`
+- `npm run verify:lock`: 成功（399エントリ、registry package 398件、欠落ゼロ）
+- `npm run lint`: 成功（TypeScriptエラーなし）
+- `npm test`: 成功（5ファイル、310件）
+- `npm run build`: 成功（1697 modules transformed）
+- `npm run check`: 成功（lock / lint / 310 tests / build）
+- `git diff --check`: 成功
+
+### ブラウザ目視確認
+
+- 実施あり。Vite開発サーバーと接続済みEdgeを使用し、PC幅と狭幅500×1000を確認した。
+- 通常状態で投了ボタン、81マス、roving tabindex 1件、更新後フッターを確認した。確認ダイアログでは先手投了・後手勝ちの説明、キャンセルへの初期フォーカス、盤のTab停止0件、駒台と投了ボタンの無効化を確認した。
+- キャンセル後は「対局中 / 先手番」を維持して投了ボタンへフォーカスが戻り、投了確定後は「終局 / 後手勝ち（先手投了）」、盤のTab停止0件、両駒台と投了ボタンの無効化、棋譜0件の維持を確認した。
+- 狭幅は横スクロールなし、ダイアログが画面内に収まり、盤・駒台・ボタンを押し広げないことを画像確認した。Viteエラーオーバーレイとブラウザコンソールエラーはともに0件だった。
+
+### 残る未実装事項
+
+- 千日手成立後の先後交代・自動指し直し、入玉宣言、持将棋。
+- KIF / CSA / USI入出力、Undo / Redo、待った、局面リセット。
+- AI対局・将棋エンジン接続、形勢評価グラフ。
