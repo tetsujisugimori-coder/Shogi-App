@@ -5,6 +5,7 @@ import {
   createPositionKey,
   recordPositionAfterLegalMove,
 } from './repetition';
+import { classifyMoveLimitJishogi } from './moveLimitJishogi';
 
 /** Applies the common check/checkmate status after one already-legal move or drop. */
 export function adjudicateAfterLegalMove(
@@ -24,6 +25,7 @@ export function adjudicateAfterLegalMove(
         loser: respondingPlayer,
         endReason: 'checkmate',
       },
+      moveLimitJishogi: null,
     };
   }
 
@@ -45,6 +47,7 @@ export function adjudicateAfterLegalMove(
         foulReason: 'perpetual_check_repetition',
         details: '連続王手の千日手による反則負け',
       },
+      moveLimitJishogi: null,
     };
   }
 
@@ -58,19 +61,45 @@ export function adjudicateAfterLegalMove(
         endReason: 'repetition',
         details: '千日手による無勝負',
       },
+      moveLimitJishogi: null,
     };
   }
 
-  if (gaveCheck) {
+  const moveLimitJishogi = classifyMoveLimitJishogi(
+    recordedState,
+    movingPlayer,
+    gaveCheck
+  );
+
+  if (moveLimitJishogi.kind === 'draw') {
     return {
       ...recordedState,
+      status: 'ended',
+      result: {
+        winner: null,
+        loser: null,
+        endReason: 'five_hundred_move_jishogi',
+        details: '500手規定による持将棋・無勝負',
+      },
+      moveLimitJishogi: null,
+    };
+  }
+
+  const stateAfterMoveLimit =
+    moveLimitJishogi.kind === 'waiting'
+      ? { ...recordedState, moveLimitJishogi: moveLimitJishogi.state }
+      : recordedState;
+
+  if (gaveCheck) {
+    return {
+      ...stateAfterMoveLimit,
       status: 'check',
       result: null,
     };
   }
 
   return {
-    ...recordedState,
+    ...stateAfterMoveLimit,
     status: 'active',
     result: null,
   };

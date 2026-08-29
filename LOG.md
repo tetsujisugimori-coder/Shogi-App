@@ -1502,3 +1502,80 @@ PR #1のレビュー指摘を受け、簡易APIの`applyMove`と合法手候補�
 - 合意による持将棋、500手到達時の持将棋、持将棋・千日手成立後の先後交代と自動指し直し。
 - 対局時計、持ち時間、秒読み、KIF / CSA / USI入出力。
 - Undo / Redo、待った、局面リセット、AI対局・将棋エンジン接続、形勢評価グラフ。
+
+## [2026-08-29] 500手到達時の持将棋の実装
+
+### 基準・公式規則・対象範囲
+
+- 実装日: 2026-08-29
+- 基準コミット: `eea2f85dc9cbc2bbd3a7b749b53620a448df91ae`（作業開始時の `main` / `origin/main`。PR #13の入玉宣言法を含む）
+- 作業ブランチ: `feat/500-move-jishogi`
+- 日本将棋連盟「対局規則」第9条第6項を参照した: https://www.shogi.or.jp/match/taikyoku_rules/
+- 合法手が500手へ到達した場合、双方の点数を問わず、勝者・敗者のない `five_hundred_move_jishogi` の無勝負として一局を終了する処理を追加した。
+- 今回は合意持将棋、成立後の先後交代、自動指し直し、指し直し局の時間調整、対局時計、棋譜入出力、Undo / Redo、AI・エンジン接続を実装していない。
+
+### 手数・500手目が王手だった場合の状態遷移
+
+- 既存仕様どおり `moveNumber` を「次に指す手の番号」とし、完了手数は `moveNumber - 1` とした。`history.length` から推測・補正していない。
+- 通常移動と駒打ちは、盤面、持ち駒、手番、`moveNumber`、着手履歴、`lastMove`、局面履歴を更新した後、同じ `adjudicateAfterLegalMove` へ通す。成りを伴う手も同じ経路を使用する。
+- 500手目が非王手なら、優先条件の判定後に即時に500手持将棋を成立させる。
+- 500手目が王手なら `moveLimitJishogi: { kind: 'awaiting_continuous_check_end', checkingPlayer }` を保持し、終局させない。
+- 501手目の応手後も開始側を保持して継続する。開始側の次の合法手が王手なら待機を継続し、非王手ならその手を全履歴へ反映した後に持将棋を成立させる。複数回の連続王手も同じ遷移を繰り返す。
+- 不正手・拒否された操作は手数と待機状態を変更しない。投了・入玉宣言も着手として数えず、別理由で終局した場合は待機状態を解除する。
+- 新フィールドが未指定の外部stateも安全に扱い、500手を超えた外部局面では次の合法手後に同じ規則で判定する。
+
+### 終局判定の優先順位
+
+1. 合法手をstate・着手履歴・最終着手・局面履歴へ反映する。
+2. 詰みを判定する。
+3. 連続王手の千日手による反則負けを判定する。
+4. 通常の千日手を判定する。
+5. 500手規定による持将棋を判定する。
+6. 王手なら `check`、それ以外は `active` とする。
+
+終局済みstateへの通常移動・駒打ち・投了・入玉宣言は既存の拒否経路を維持し、結果を上書きしない。
+
+### 変更ファイル
+
+- 追加: `src/domain/shogi/moveLimitJishogi.ts`
+- 追加: `src/test/shogi-move-limit-jishogi.test.tsx`
+- 変更: `src/types/shogi.ts`
+- 変更: `src/domain/shogi/adjudication.ts`, `src/domain/shogi/gameState.ts`, `src/domain/shogi/index.ts`
+- 変更: `src/domain/shogi/executionPolicy.ts`, `src/domain/shogi/resignation.ts`, `src/domain/shogi/enteringKing.ts`
+- 変更: `src/components/shogi/ShogiResearchScreen.tsx`
+- 変更: `README.md`, `LOG.md`
+- `package.json`、`package-lock.json`、Node/npm要件、依存関係、CI設定の変更: なし
+
+### 追加テスト
+
+- `src/test/shogi-move-limit-jishogi.test.tsx` に27件を追加した。
+- 完了499手と500手、`moveNumber` の1手境界、500手超の外部局面、先手・後手対称、通常移動、駒打ち、成り、全着手情報と局面履歴、入力イミュータビリティ、不正手を検証した。
+- 500手目の王手、501手目の応手、開始側の王手継続・非王手終了、複数回継続、開始側の先後対称性、駒打ち王手、待機中の不正手、フィールド未指定stateと純粋判定公開APIを検証した。
+- 500手目と待機中の詰み、連続王手の千日手、通常の千日手、終局済み結果、投了・入玉宣言、勝者・敗者なしの結果型を検証した。
+- UIは専用終局表示、`aria-live`、盤・駒台・投了・入玉宣言の停止、500手目王手後の501手目応手、待機中の操作継続、フッターを実DOMテストで検証した。
+- 既存392件を維持し、最終テスト総数: **419/419 passed**（7 test files）。
+
+### 実行環境・検証結果
+
+- 実行環境: Windows / PowerShell、Node.js `v24.20.0`、npm `11.17.0`。リポジトリ指定範囲を満たす。
+- `node -v`: `v24.20.0`
+- `npm -v`: `11.17.0`
+- `npm run verify:lock`: 成功（399エントリ、registry package 398件、欠落ゼロ）
+- `npm run lint`: 成功（TypeScriptエラーなし）
+- `npm test`: 成功（7ファイル、419件）
+- `npm run build`: 成功（Vite 6.4.3、1700 modules transformed）
+- `npm run check`: 成功（lock / lint / 419 tests / build）
+- `git diff --check`: 成功
+
+### ブラウザ確認結果
+
+- `npm run dev` はVite 6.4.3で起動し、`http://localhost:3000/` の待受開始まで確認した。
+- ブラウザ目視確認は未実施。`agent-browser` CLIがPATHになく、一時取得も利用可能なCLIを起動できなかった。代替のWindows Computer Useは、開いているEdgeの現在URLを安全に確定できずポリシー上停止したため、ブラウザへの入力を行わなかった。
+- したがって、PC幅・500px前後の狭幅の画像確認、横スクロール、Viteエラーオーバーレイ、ブラウザコンソール警告・エラーは未確認。これらを成功・確認済みとは扱わない。
+- 自動テストでは通常状態、500手持将棋の終局表示と全操作停止、500手目王手後の待機状態と501手目の応手継続をjsdom上で確認した。本番コードへ確認専用の一時局面は追加していない。
+
+### 対象外・残課題
+
+- 合意による持将棋、持将棋・千日手成立後の先後交代、自動指し直し、指し直し局の持ち時間調整。
+- 対局時計、秒読み、時間切れ、KIF / CSA / USI入出力、Undo / Redo、待った、AI・将棋エンジン接続、手数上限設定UI。
+- ブラウザ自動化環境が利用可能な状態で、PC幅と500px前後の狭幅について上記の未確認項目を目視確認すること。

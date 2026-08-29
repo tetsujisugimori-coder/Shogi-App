@@ -288,6 +288,15 @@ export const ShogiResearchScreen: React.FC<ShogiResearchScreenProps> = ({ initia
         };
       }
 
+      if (boardState.result.endReason === 'five_hundred_move_jishogi') {
+        return {
+          text: '終局 / 500手規定による持将棋・無勝負',
+          isLive: false,
+          bgColor: 'bg-stone-900/80 text-stone-300 border-stone-700/60',
+          dotColor: 'bg-stone-500',
+        };
+      }
+
       if (boardState.result.endReason === 'entering_king_draw') {
         return {
           text: '終局 / 入玉宣言による無勝負',
@@ -492,7 +501,7 @@ export const ShogiResearchScreen: React.FC<ShogiResearchScreenProps> = ({ initia
           id="shogi-footer-notice"
           className="text-xs text-stone-400 font-sans tracking-wide select-none"
         >
-          駒の移動・成り・駒打ち、王手表示・一般的な詰み判定・終局処理に対応しています。千日手・連続王手の千日手の終局処理に対応しています。投了による終局処理に対応しています。入玉宣言による終局処理に対応しています。
+          駒の移動・成り・駒打ち、王手表示・一般的な詰み判定・終局処理に対応しています。千日手・連続王手の千日手の終局処理に対応しています。500手規定による持将棋の終局処理に対応しています。投了による終局処理に対応しています。入玉宣言による終局処理に対応しています。
         </p>
       </footer>
     </div>

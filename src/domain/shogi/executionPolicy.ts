@@ -49,6 +49,7 @@ export function finalizeIllegalProposal(
     status: 'ended',
     result: gameResult,
     foulHistory: [...(state.foulHistory ?? []), foulRecord],
+    moveLimitJishogi: null,
   };
 
   return {
