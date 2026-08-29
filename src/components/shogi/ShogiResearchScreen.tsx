@@ -44,6 +44,7 @@ export const ShogiResearchScreen: React.FC<ShogiResearchScreenProps> = ({ initia
   const [isEnteringKingDialogOpen, setIsEnteringKingDialogOpen] = useState(false);
   const [isAgreedJishogiDialogOpen, setIsAgreedJishogiDialogOpen] = useState(false);
   const [agreedJishogiProposal, setAgreedJishogiProposal] = useState<AgreedJishogiProposal | null>(null);
+  const [agreedJishogiError, setAgreedJishogiError] = useState<string | null>(null);
   const [focusRequest, setFocusRequest] = useState<{
     row: number;
     col: number;
@@ -94,6 +95,7 @@ export const ShogiResearchScreen: React.FC<ShogiResearchScreenProps> = ({ initia
     setIsEnteringKingDialogOpen(false);
     setIsAgreedJishogiDialogOpen(false);
     setAgreedJishogiProposal(null);
+    setAgreedJishogiError(null);
   }, [boardState.status]);
 
   useEffect(() => {
@@ -210,18 +212,25 @@ export const ShogiResearchScreen: React.FC<ShogiResearchScreenProps> = ({ initia
       isAgreedJishogiDialogOpen
     ) return;
     setAgreedJishogiProposal(null);
+    setAgreedJishogiError(null);
     setIsAgreedJishogiDialogOpen(true);
   };
 
   const closeAgreedJishogiDialog = useCallback(() => {
     shouldRestoreAgreedJishogiFocus.current = true;
     setAgreedJishogiProposal(null);
+    setAgreedJishogiError(null);
     setIsAgreedJishogiDialogOpen(false);
   }, []);
 
   const confirmAgreedJishogiProposal = () => {
     const execution = proposeAgreedJishogi(boardState, boardState.turn);
-    if (execution.type === 'proposed') setAgreedJishogiProposal(execution.proposal);
+    if (execution.type === 'proposed') {
+      setAgreedJishogiProposal(execution.proposal);
+      setAgreedJishogiError(null);
+      return;
+    }
+    setAgreedJishogiError(execution.message);
   };
 
   const rejectAgreedJishogiProposal = () => {
@@ -244,9 +253,16 @@ export const ShogiResearchScreen: React.FC<ShogiResearchScreenProps> = ({ initia
       agreedJishogiProposal.responder,
       'accept'
     );
-    if (execution.type === 'accepted') setBoardState(execution.state);
-    setAgreedJishogiProposal(null);
-    setIsAgreedJishogiDialogOpen(false);
+    if (execution.type === 'accepted') {
+      setBoardState(execution.state);
+      setAgreedJishogiProposal(null);
+      setAgreedJishogiError(null);
+      setIsAgreedJishogiDialogOpen(false);
+      return;
+    }
+    if (execution.type === 'rejected') {
+      setAgreedJishogiError(execution.message);
+    }
   };
 
   const handleSquareClick = (square: BoardSquare) => {
@@ -598,6 +614,7 @@ export const ShogiResearchScreen: React.FC<ShogiResearchScreenProps> = ({ initia
         <AgreedJishogiDialog
           evaluation={agreedJishogiEvaluation}
           proposal={agreedJishogiProposal}
+          errorMessage={agreedJishogiError}
           onPropose={confirmAgreedJishogiProposal}
           onCancel={closeAgreedJishogiDialog}
           onAccept={acceptAgreedJishogiProposal}

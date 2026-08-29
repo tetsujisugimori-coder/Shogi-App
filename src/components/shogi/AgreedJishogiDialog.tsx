@@ -8,6 +8,7 @@ import {
 interface AgreedJishogiDialogProps {
   evaluation: AgreedJishogiEvaluation;
   proposal: AgreedJishogiProposal | null;
+  errorMessage: string | null;
   onPropose: () => void;
   onCancel: () => void;
   onAccept: () => void;
@@ -29,6 +30,7 @@ function plannedResultLabel(evaluation: AgreedJishogiEvaluation): string {
 export const AgreedJishogiDialog: React.FC<AgreedJishogiDialogProps> = ({
   evaluation,
   proposal,
+  errorMessage,
   onPropose,
   onCancel,
   onAccept,
@@ -71,7 +73,10 @@ export const AgreedJishogiDialog: React.FC<AgreedJishogiDialogProps> = ({
     <div
       className="fixed inset-0 z-50 flex items-center justify-center overflow-y-auto bg-black/70 px-3 py-4 backdrop-blur-[2px]"
       onMouseDown={(event) => {
-        if (event.target === event.currentTarget) dismiss();
+        if (event.target === event.currentTarget) {
+          event.preventDefault();
+          dismiss();
+        }
       }}
     >
       <div
@@ -79,7 +84,7 @@ export const AgreedJishogiDialog: React.FC<AgreedJishogiDialogProps> = ({
         role="dialog"
         aria-modal="true"
         aria-labelledby="agreed-jishogi-dialog-title"
-        aria-describedby="agreed-jishogi-dialog-description agreed-jishogi-dialog-result"
+        aria-describedby={`agreed-jishogi-dialog-description agreed-jishogi-dialog-result${errorMessage ? ' agreed-jishogi-dialog-error' : ''}`}
         onKeyDown={handleKeyDown}
         className="w-full max-w-md rounded-md border border-sky-700/60 bg-[#151d22] p-4 text-left shadow-[0_24px_80px_rgba(0,0,0,0.78),inset_0_1px_rgba(255,255,255,0.05)] sm:p-5"
       >
@@ -121,6 +126,16 @@ export const AgreedJishogiDialog: React.FC<AgreedJishogiDialogProps> = ({
               ))}
             </ul>
           </div>
+        )}
+
+        {errorMessage && (
+          <p
+            id="agreed-jishogi-dialog-error"
+            role="alert"
+            className="mt-3 break-words rounded border border-rose-800/70 bg-rose-950/40 p-3 text-sm leading-6 text-rose-100"
+          >
+            {errorMessage}
+          </p>
         )}
 
         <div className="mt-5 flex flex-wrap justify-center gap-3">
