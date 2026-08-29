@@ -3,6 +3,7 @@ import { createInitialBoardState, BoardState, BoardSquare, Piece, PieceType } fr
 import {
   executeDrop,
   executeMove,
+  executeResignation,
   getLegalDropSquares,
   getMoveCandidates,
   getPromotionStatus,
@@ -10,6 +11,7 @@ import {
 } from '../../domain/shogi';
 import { ShogiTable } from './ShogiTable';
 import { PromotionDialog } from './PromotionDialog';
+import { ResignationDialog } from './ResignationDialog';
 
 interface ShogiResearchScreenProps {
   initialState?: BoardState;
@@ -30,14 +32,19 @@ export const ShogiResearchScreen: React.FC<ShogiResearchScreenProps> = ({ initia
   const [boardState, setBoardState] = useState<BoardState>(() => initialState ?? createInitialBoardState());
   const [selection, setSelection] = useState<SelectionState>({ kind: 'none' });
   const [pendingPromotion, setPendingPromotion] = useState<PendingPromotion | null>(null);
+  const [isResignationDialogOpen, setIsResignationDialogOpen] = useState(false);
   const [focusRequest, setFocusRequest] = useState<{
     row: number;
     col: number;
     requestId: number;
   } | null>(null);
   const focusRequestId = useRef(0);
+  const resignationButtonRef = useRef<HTMLButtonElement>(null);
+  const shouldRestoreResignationFocus = useRef(false);
 
   const isEnded = boardState.status === 'ended';
+  const isResignationAvailable = boardState.status === 'active' || boardState.status === 'check';
+  const isInteractionBlocked = isEnded || pendingPromotion !== null || isResignationDialogOpen;
   const selectedSquare = !isEnded && selection.kind === 'board' ? selection.square : null;
   const selectedHandPieceId = !isEnded && selection.kind === 'hand' ? selection.pieceId : null;
 
@@ -57,7 +64,14 @@ export const ShogiResearchScreen: React.FC<ShogiResearchScreenProps> = ({ initia
     if (boardState.status !== 'ended') return;
     setSelection({ kind: 'none' });
     setPendingPromotion(null);
+    setIsResignationDialogOpen(false);
   }, [boardState.status]);
+
+  useEffect(() => {
+    if (isResignationDialogOpen || !shouldRestoreResignationFocus.current) return;
+    shouldRestoreResignationFocus.current = false;
+    resignationButtonRef.current?.focus();
+  }, [isResignationDialogOpen]);
 
   const restoreBoardFocus = useCallback((square: { row: number; col: number }) => {
     focusRequestId.current += 1;
@@ -91,8 +105,28 @@ export const ShogiResearchScreen: React.FC<ShogiResearchScreenProps> = ({ initia
     restoreBoardFocus(restoreSquare);
   };
 
+  const openResignationDialog = () => {
+    if (!isResignationAvailable || pendingPromotion || isResignationDialogOpen) return;
+    setIsResignationDialogOpen(true);
+  };
+
+  const cancelResignation = useCallback(() => {
+    shouldRestoreResignationFocus.current = true;
+    setIsResignationDialogOpen(false);
+  }, []);
+
+  const confirmResignation = () => {
+    const result = executeResignation(boardState);
+    if (result.type === 'applied') {
+      setBoardState(result.state);
+      setSelection({ kind: 'none' });
+      setPendingPromotion(null);
+    }
+    setIsResignationDialogOpen(false);
+  };
+
   const handleSquareClick = (square: BoardSquare) => {
-    if (pendingPromotion || boardState.status === 'ended') return;
+    if (isInteractionBlocked) return;
     if (selection.kind === 'hand') {
       if (square.piece?.player === boardState.turn) {
         setSelection({ kind: 'board', square: { row: square.row, col: square.col } });
@@ -170,7 +204,7 @@ export const ShogiResearchScreen: React.FC<ShogiResearchScreenProps> = ({ initia
   };
 
   const handleHandPieceSelect = (piece: Piece) => {
-    if (pendingPromotion || boardState.status === 'ended' || piece.player !== boardState.turn) {
+    if (isInteractionBlocked || piece.player !== boardState.turn) {
       return;
     }
     setSelection((current) =>
@@ -181,6 +215,7 @@ export const ShogiResearchScreen: React.FC<ShogiResearchScreenProps> = ({ initia
   };
 
   const handleScreenKeyDown = (event: React.KeyboardEvent<HTMLDivElement>) => {
+    if (isResignationDialogOpen) return;
     if (event.key === 'Escape' && selection.kind === 'hand') {
       event.preventDefault();
       setSelection({ kind: 'none' });
@@ -221,6 +256,14 @@ export const ShogiResearchScreen: React.FC<ShogiResearchScreenProps> = ({ initia
       if (boardState.result.endReason === 'checkmate') {
         return {
           text: `終局 / ${winnerName}勝ち（詰み）`,
+          isLive: false,
+          bgColor: 'bg-rose-950/80 text-rose-300 border-rose-800/60',
+          dotColor: 'bg-rose-500',
+        };
+      }
+      if (boardState.result.endReason === 'resignation') {
+        return {
+          text: `終局 / ${winnerName}勝ち（${loserName}投了）`,
           isLive: false,
           bgColor: 'bg-rose-950/80 text-rose-300 border-rose-800/60',
           dotColor: 'bg-rose-500',
@@ -292,6 +335,17 @@ export const ShogiResearchScreen: React.FC<ShogiResearchScreenProps> = ({ initia
         >
           AIとの対局・棋譜・判断ログを記録する研究画面です。
         </p>
+        <button
+          ref={resignationButtonRef}
+          type="button"
+          onClick={openResignationDialog}
+          disabled={!isResignationAvailable || pendingPromotion !== null || isResignationDialogOpen}
+          aria-haspopup="dialog"
+          aria-expanded={isResignationDialogOpen}
+          className="mt-2 rounded border border-rose-900/70 bg-stone-900/80 px-4 py-1.5 font-serif text-sm tracking-[0.14em] text-rose-200 shadow-inner outline-none transition hover:border-rose-700 hover:bg-rose-950/55 focus-visible:ring-2 focus-visible:ring-amber-300 disabled:cursor-not-allowed disabled:border-stone-800 disabled:text-stone-600 disabled:opacity-65"
+        >
+          投了
+        </button>
       </header>
 
       {/* Main Table Section */}
@@ -307,12 +361,12 @@ export const ShogiResearchScreen: React.FC<ShogiResearchScreenProps> = ({ initia
           candidateKind={selection.kind === 'none' ? null : selection.kind === 'hand' ? 'drop' : 'move'}
           dropPieceType={selection.kind === 'hand' ? selection.pieceType : null}
           lastMove={boardState.lastMove}
-          onSquareClick={pendingPromotion || isEnded ? undefined : handleSquareClick}
+          onSquareClick={isInteractionBlocked ? undefined : handleSquareClick}
           focusRequest={focusRequest}
           turn={boardState.turn}
           selectedHandPieceId={selectedHandPieceId}
           onHandPieceSelect={handleHandPieceSelect}
-          pieceStandsDisabled={isEnded || pendingPromotion !== null}
+          pieceStandsDisabled={isInteractionBlocked}
         />
       </main>
 
@@ -325,13 +379,21 @@ export const ShogiResearchScreen: React.FC<ShogiResearchScreenProps> = ({ initia
         />
       )}
 
+      {isResignationDialogOpen && !isEnded && (
+        <ResignationDialog
+          resigningPlayer={boardState.turn}
+          onConfirm={confirmResignation}
+          onCancel={cancelResignation}
+        />
+      )}
+
       {/* Bottom Footer Notice */}
       <footer className="w-full max-w-4xl mt-8 pt-4 border-t border-stone-800/60 text-center">
         <p
           id="shogi-footer-notice"
           className="text-xs text-stone-400 font-sans tracking-wide select-none"
         >
-          駒の移動・成り・駒打ち、王手表示・一般的な詰み判定・終局処理に対応しています。千日手・連続王手の千日手の終局処理に対応しています。
+          駒の移動・成り・駒打ち、王手表示・一般的な詰み判定・終局処理に対応しています。千日手・連続王手の千日手の終局処理に対応しています。投了による終局処理に対応しています。
         </p>
       </footer>
     </div>
