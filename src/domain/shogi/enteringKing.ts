@@ -4,13 +4,13 @@ import type {
   EnteringKingDrawGameResult,
   EnteringKingWinGameResult,
   ExecutionMode,
-  Piece,
   Player,
   ProposerType,
 } from '../../types/shogi';
 import { findKingSquare, isKingInCheck } from './attacks';
 import { determineDefaultExecutionMode } from './gameState';
 import { JISHOGI_MOVE_LIMIT } from './moveLimitJishogi';
+import { getJishogiPiecePoints } from './jishogiPoints';
 
 export const ENTERING_KING_REQUIRED_CAMP_PIECES = 10;
 export const ENTERING_KING_DRAW_POINTS = 24;
@@ -95,11 +95,6 @@ export function isInEnemyCamp(player: Player, row: number): boolean {
   return player === 'sente' ? row >= 0 && row <= 2 : row >= 6 && row <= 8;
 }
 
-function getPiecePoints(piece: Piece): number {
-  if (piece.type === 'king') return 0;
-  return piece.type === 'rook' || piece.type === 'bishop' ? 5 : 1;
-}
-
 /** Counts the declarer's non-king board pieces in the opponent's camp. */
 export function countEnteringKingCampPieces(
   state: BoardState,
@@ -129,14 +124,14 @@ export function calculateEnteringKingPoints(
 ): number {
   const hand = player === 'sente' ? state.senteHand : state.goteHand;
   let points = hand.reduce((total, piece) => {
-    return piece.player === player ? total + getPiecePoints(piece) : total;
+    return piece.player === player ? total + getJishogiPiecePoints(piece) : total;
   }, 0);
 
   for (const row of state.squares) {
     for (const square of row) {
       const piece = square.piece;
       if (piece?.player === player && isInEnemyCamp(player, square.row)) {
-        points += getPiecePoints(piece);
+        points += getJishogiPiecePoints(piece);
       }
     }
   }

@@ -147,6 +147,8 @@ export type GameEndReason =
   | 'checkmate'
   | 'repetition'
   | 'five_hundred_move_jishogi'
+  | 'agreed_jishogi_draw'
+  | 'agreed_jishogi_point_loss'
   | 'entering_king_win'
   | 'entering_king_draw'
   | 'entering_king_declaration_failure';
@@ -184,6 +186,24 @@ export interface FiveHundredMoveJishogiGameResult {
   details?: string;
 }
 
+interface AgreedJishogiPoints {
+  sentePoints: number;
+  gotePoints: number;
+}
+
+export interface AgreedJishogiDrawGameResult extends AgreedJishogiPoints {
+  winner: null;
+  loser: null;
+  endReason: 'agreed_jishogi_draw';
+  details?: string;
+}
+
+export interface AgreedJishogiPointLossGameResult
+  extends DecisiveGameResultBase,
+    AgreedJishogiPoints {
+  endReason: 'agreed_jishogi_point_loss';
+}
+
 export interface EnteringKingWinGameResult extends DecisiveGameResultBase {
   endReason: 'entering_king_win';
 }
@@ -206,6 +226,8 @@ export type GameResult =
   | ResignationGameResult
   | RepetitionGameResult
   | FiveHundredMoveJishogiGameResult
+  | AgreedJishogiDrawGameResult
+  | AgreedJishogiPointLossGameResult
   | EnteringKingWinGameResult
   | EnteringKingDrawGameResult
   | EnteringKingDeclarationFailureGameResult;
