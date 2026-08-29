@@ -20,7 +20,8 @@ export type AgreedJishogiIneligibilityReason =
   | 'game_not_in_progress'
   | 'sente_king_missing'
   | 'gote_king_missing'
-  | 'no_king_in_enemy_camp';
+  | 'no_king_in_enemy_camp'
+  | 'invalid_point_distribution';
 
 export interface AgreedJishogiEvaluation {
   proposer: Player;
@@ -91,7 +92,6 @@ export type AgreedJishogiResponseRejectionReason =
   | 'responder_mismatch'
   | 'self_acceptance'
   | 'invalid_response'
-  | 'invalid_point_distribution'
   | AgreedJishogiIneligibilityReason;
 
 export type AgreedJishogiResponseResult =
@@ -119,6 +119,8 @@ const REASON_MESSAGES: Record<AgreedJishogiIneligibilityReason, string> = {
   sente_king_missing: '先手玉が盤上に存在しません。',
   gote_king_missing: '後手玉が盤上に存在しません。',
   no_king_in_enemy_camp: '先手玉・後手玉のどちらも敵陣3段目以内に入っていません。',
+  invalid_point_distribution:
+    '双方が24点未満のため、点数不足側を一意に確定できず提案できません。',
 };
 
 function opponentOf(player: Player): Player {
@@ -186,12 +188,16 @@ export function evaluateAgreedJishogi(
   const hasEnteringKing = senteKingInEnemyCamp || goteKingInEnemyCamp;
   const sentePoints = calculateAgreedJishogiPoints(state, 'sente');
   const gotePoints = calculateAgreedJishogiPoints(state, 'gote');
+  const outcome = determineAgreedJishogiOutcome(sentePoints, gotePoints);
   const reasons: AgreedJishogiIneligibilityReason[] = [];
   if (!isGameInProgress) reasons.push('game_not_in_progress');
   if (!senteKingExists) reasons.push('sente_king_missing');
   if (!goteKingExists) reasons.push('gote_king_missing');
   if (senteKingExists && goteKingExists && !hasEnteringKing) {
     reasons.push('no_king_in_enemy_camp');
+  }
+  if (outcome.kind === 'invalid_point_distribution') {
+    reasons.push('invalid_point_distribution');
   }
 
   return {
@@ -205,7 +211,7 @@ export function evaluateAgreedJishogi(
     hasEnteringKing,
     sentePoints,
     gotePoints,
-    outcome: determineAgreedJishogiOutcome(sentePoints, gotePoints),
+    outcome,
     reasons,
     canPropose: proposer === state.turn && reasons.length === 0,
   };
@@ -213,14 +219,20 @@ export function evaluateAgreedJishogi(
 
 function proposalMatchesState(
   state: BoardState,
-  proposal: AgreedJishogiProposal
+  proposal: AgreedJishogiProposal,
+  points: Pick<AgreedJishogiEvaluation, 'sentePoints' | 'gotePoints'> = {
+    sentePoints: calculateAgreedJishogiPoints(state, 'sente'),
+    gotePoints: calculateAgreedJishogiPoints(state, 'gote'),
+  }
 ): boolean {
   return (
     proposal.kind === 'agreed_jishogi_proposal' &&
     proposal.proposer === state.turn &&
     proposal.responder === opponentOf(proposal.proposer) &&
     proposal.positionKey === createPositionKey(state) &&
-    proposal.moveNumber === state.moveNumber
+    proposal.moveNumber === state.moveNumber &&
+    proposal.sentePoints === points.sentePoints &&
+    proposal.gotePoints === points.gotePoints
   );
 }
 
@@ -288,7 +300,7 @@ export function respondToAgreedJishogiProposal(
   if (state.status !== 'active' && state.status !== 'check') {
     return reject('agreed_jishogi_not_available', '現在の対局状態では持将棋へ応答できません。');
   }
-  if (!proposalMatchesState(state, proposal)) {
+  if (!proposalMatchesState(state, proposal, evaluation)) {
     return reject('proposal_mismatch', '提案時の局面と現在の局面が一致しません。');
   }
   if (responder === proposal.proposer) {
@@ -308,7 +320,10 @@ export function respondToAgreedJishogiProposal(
     return { type: 'declined', state, evaluation };
   }
   if (evaluation.outcome.kind === 'invalid_point_distribution') {
-    return reject('invalid_point_distribution', '双方が24点未満のため、点数不足側を一意に確定できません。');
+    return reject(
+      'invalid_point_distribution',
+      getAgreedJishogiReasonMessage('invalid_point_distribution')
+    );
   }
 
   const result: AgreedJishogiDrawGameResult | AgreedJishogiPointLossGameResult =

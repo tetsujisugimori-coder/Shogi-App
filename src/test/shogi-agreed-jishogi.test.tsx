@@ -154,6 +154,29 @@ describe('合意持将棋の24点判定と入玉条件', () => {
     expect(result).toMatchObject({ type: 'rejected', state, reason: 'no_king_in_enemy_camp' });
     expect(state.status).toBe('active');
   });
+
+  it('双方24点未満の不正stateは点数不足側を確定できず提案不可にする', () => {
+    const state = createJishogiState(23, 23);
+    const snapshot = JSON.stringify(state);
+    const evaluation = evaluateAgreedJishogi(state);
+    expect(evaluation).toMatchObject({
+      outcome: { kind: 'invalid_point_distribution' },
+      canPropose: false,
+      reasons: expect.arrayContaining(['invalid_point_distribution']),
+    });
+
+    const result = proposeAgreedJishogi(state);
+    expect(result).toMatchObject({
+      type: 'rejected',
+      state,
+      reason: 'invalid_point_distribution',
+      message: '双方が24点未満のため、点数不足側を一意に確定できず提案できません。',
+    });
+    expect(result.state).toBe(state);
+    expect(JSON.stringify(state)).toBe(snapshot);
+    expect(state.status).toBe('active');
+    expect(state.result).toBeNull();
+  });
 });
 
 describe('合意持将棋の提案・キャンセル・応答API', () => {
@@ -200,6 +223,88 @@ describe('合意持将棋の提案・キャンセル・応答API', () => {
     const invalidResponse = 'approve' as AgreedJishogiResponse;
     expect(respondToAgreedJishogiProposal(state, proposed(state), 'gote', invalidResponse)).toMatchObject({
       type: 'rejected', reason: 'invalid_response', state,
+    });
+  });
+
+  it.each(['sentePoints', 'gotePoints'] as const)(
+    '提案の%sを改変した承諾を局面不一致として拒否する',
+    (pointField) => {
+      const state = createJishogiState(24, 24);
+      const proposal = proposed(state);
+      const tamperedProposal = { ...proposal, [pointField]: proposal[pointField] + 1 };
+      expect(
+        respondToAgreedJishogiProposal(state, tamperedProposal, 'gote', 'accept')
+      ).toMatchObject({
+        type: 'rejected',
+        state,
+        reason: 'proposal_mismatch',
+      });
+    }
+  );
+
+  it('局面キーと手数が同じでも再計算点数が提案時点と違えば拒否し、全状態を維持する', () => {
+    const oldResult = { winner: null, loser: null, endReason: 'repetition' } satisfies GameResult;
+    const state = createJishogiState(24, 24, 'both', {
+      moveNumber: 501,
+      result: oldResult,
+      moveLimitJishogi: { kind: 'awaiting_continuous_check_end', checkingPlayer: 'gote' },
+    });
+    const proposal = proposed(state);
+    const changedState: BoardState = {
+      ...state,
+      senteHand: state.senteHand.map((handPiece, index) =>
+        index === 0 ? { ...handPiece, player: 'gote' } : handPiece
+      ),
+    };
+    expect(shogiDomain.createPositionKey(changedState)).toBe(proposal.positionKey);
+    expect(changedState.moveNumber).toBe(proposal.moveNumber);
+    expect(calculateAgreedJishogiPoints(changedState, 'sente')).not.toBe(proposal.sentePoints);
+
+    const snapshot = JSON.stringify(changedState);
+    const result = respondToAgreedJishogiProposal(
+      changedState,
+      proposal,
+      'gote',
+      'accept'
+    );
+    expect(result).toMatchObject({
+      type: 'rejected',
+      state: changedState,
+      reason: 'proposal_mismatch',
+    });
+    expect(result.state).toBe(changedState);
+    expect(JSON.stringify(changedState)).toBe(snapshot);
+    expect(result.state.squares).toBe(changedState.squares);
+    expect(result.state.senteHand).toBe(changedState.senteHand);
+    expect(result.state.goteHand).toBe(changedState.goteHand);
+    expect(result.state.turn).toBe(changedState.turn);
+    expect(result.state.moveNumber).toBe(changedState.moveNumber);
+    expect(result.state.history).toBe(changedState.history);
+    expect(result.state.lastMove).toBe(changedState.lastMove);
+    expect(result.state.foulHistory).toBe(changedState.foulHistory);
+    expect(result.state.positionHistory).toBe(changedState.positionHistory);
+    expect(result.state.moveLimitJishogi).toBe(changedState.moveLimitJishogi);
+    expect(result.state.result).toBe(oldResult);
+  });
+
+  it('駒IDと持ち駒順序だけの変更は同じ提案として承諾できる', () => {
+    const state = createJishogiState(24, 24);
+    const proposal = proposed(state);
+    const reorderedState: BoardState = {
+      ...state,
+      senteHand: [...state.senteHand]
+        .reverse()
+        .map((handPiece, index) => ({ ...handPiece, id: `sente-reordered-${index}` })),
+      goteHand: [...state.goteHand]
+        .reverse()
+        .map((handPiece, index) => ({ ...handPiece, id: `gote-reordered-${index}` })),
+    };
+    expect(shogiDomain.createPositionKey(reorderedState)).toBe(proposal.positionKey);
+    expect(
+      respondToAgreedJishogiProposal(reorderedState, proposal, 'gote', 'accept')
+    ).toMatchObject({
+      type: 'accepted',
+      result: { endReason: 'agreed_jishogi_draw', sentePoints: 24, gotePoints: 24 },
     });
   });
 
@@ -275,6 +380,16 @@ describe('合意持将棋の提案・キャンセル・応答API', () => {
 });
 
 describe('合意持将棋の二段階UI', () => {
+  it('双方24点未満では提案不可理由を表示して提案を無効化する', async () => {
+    const user = userEvent.setup();
+    render(<ShogiResearchScreen initialState={createJishogiState(23, 23)} />);
+    await user.click(screen.getByRole('button', { name: '持将棋を提案' }));
+    const dialog = screen.getByRole('dialog', { name: '持将棋の提案を確認' });
+    expect(within(dialog).getByText(/点数不足側を一意に確定できず提案できません/)).toBeInTheDocument();
+    expect(within(dialog).getByRole('button', { name: '提案する' })).toBeDisabled();
+    expect(screen.getByRole('status')).toHaveTextContent('対局中 / 先手番');
+  });
+
   it('初期局面では理由・双方点数・予定結果を示して提案確定を無効化する', async () => {
     const user = userEvent.setup();
     render(<ShogiResearchScreen />);
@@ -301,6 +416,49 @@ describe('合意持将棋の二段階UI', () => {
     expect(within(dialog).getByRole('button', { name: '拒否する' })).toHaveFocus();
     expect(screen.getByRole('status')).toHaveTextContent('対局中 / 先手番');
   });
+
+  it.each(['button', 'escape', 'backdrop'] as const)(
+    '承諾が拒否された後も理由と提案を維持し、%sで閉じて再表示時にエラーを残さない',
+    async (method) => {
+      const user = userEvent.setup();
+      const state = createJishogiState(24, 24);
+      render(<ShogiResearchScreen initialState={state} />);
+      const proposalButton = screen.getByRole('button', { name: '持将棋を提案' });
+      await user.click(proposalButton);
+      await user.click(screen.getByRole('button', { name: '提案する' }));
+
+      state.senteHand[0].player = 'gote';
+      const snapshotAfterExternalChange = JSON.stringify(state);
+      await user.click(screen.getByRole('button', { name: '承諾する' }));
+
+      const dialog = screen.getByRole('dialog', { name: '持将棋の提案へ応答' });
+      expect(within(dialog).getByRole('alert')).toHaveTextContent(
+        '提案時の局面と現在の局面が一致しません。'
+      );
+      expect(within(dialog).getByRole('button', { name: '承諾する' })).toBeInTheDocument();
+      expect(within(dialog).getByRole('button', { name: '拒否する' })).toBeInTheDocument();
+      expect(screen.getByRole('status')).toHaveTextContent('対局中 / 先手番');
+      expect(document.getElementById('shogi-research-screen')).toHaveAttribute('data-move-number', '1');
+      expect(document.getElementById('shogi-research-screen')).toHaveAttribute('data-history-count', '0');
+      expect(JSON.stringify(state)).toBe(snapshotAfterExternalChange);
+      expect(state.status).toBe('active');
+      expect(state.result).toBeNull();
+
+      if (method === 'button') {
+        await user.click(within(dialog).getByRole('button', { name: '拒否する' }));
+      } else if (method === 'escape') {
+        await user.keyboard('{Escape}');
+      } else {
+        fireEvent.mouseDown(dialog.parentElement!);
+      }
+      expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+      expect(proposalButton).toHaveFocus();
+
+      await user.click(proposalButton);
+      expect(screen.getByRole('dialog', { name: '持将棋の提案を確認' })).toBeInTheDocument();
+      expect(screen.queryByRole('alert')).not.toBeInTheDocument();
+    }
+  );
 
   it.each(['button', 'escape', 'backdrop'] as const)('%sで拒否し、選択を維持して提案ボタンへ戻る', async (method) => {
     const user = userEvent.setup();

@@ -1655,3 +1655,53 @@ PR #1のレビュー指摘を受け、簡易APIの`applyMove`と合法手候補�
 
 - 持将棋・千日手成立後の先後交代、自動指し直し、指し直し局の持ち時間調整。
 - 対局時計、秒読み、時間切れ、KIF / CSA / USI入出力、Undo / Redo、待った、AI・将棋エンジン接続、形勢評価グラフ。
+
+## [2026-08-30] PR #17 合意持将棋レビュー対応
+
+### 対象・原因
+
+- 対象PR: #17 `feat(shogi): agreed-jishogi-flow`。修正前HEAD: `3bc4028af047942f49da2bb2ea4ba4f28410fa6b`、作業ブランチ: `feat/agreed-jishogi`。
+- 作業開始時点でPR #17は既にマージ済み（`origin/main`: `437c3e435d0e4a4f2d76aa9b591d2c92b36b098c`）だったため、ユーザー確認に基づき同ブランチへ修正を追加し、最新`main`向けの新規PRを作成する方針へ変更した。
+- 原因は、`respondToAgreedJishogiProposal`が`rejected`を返しても、`ShogiResearchScreen`が提案を無条件に破棄してダイアログを閉じていたこと、および提案時点の双方点数を承諾時点に照合していなかったことだった。
+- `evaluateAgreedJishogi`は双方24点未満を安全側の`invalid_point_distribution`結果にはしていたが、提案不可理由へ含めていなかったため、不正な外部stateで提案可能になっていた。
+
+### 修正内容・設計判断
+
+- UIは`accepted`の場合だけ返却stateを反映して提案とダイアログを閉じ、`rejected`の場合は盤面・持ち駒・手番・手数・全履歴・提案・ダイアログを維持する状態遷移へ修正した。
+- 承諾拒否時はドメインが返した`execution.message`を`role="alert"`でダイアログ内に表示する。正常な再提案、拒否、キャンセル、正常承諾、終局時には古いエラーを消去する。
+- 拒否ボタンへの初期フォーカス、Tab / Shift+Tabトラップ、Escape、背景クリック、終了後のフォーカス復元を維持した。実ブラウザ確認で背景`mousedown`後にブラウザ既定動作がフォーカスを`body`へ移す事象を検出したため、背景操作時だけ既定動作を抑止して提案ボタンへの復元を確実にした。
+- `invalid_point_distribution`を`AgreedJishogiIneligibilityReason`へ統合し、双方24点未満では`canPropose: false`、型付き理由と共通メッセージを返す。反則・終局結果は生成しない。`determineAgreedJishogiOutcome`の安全側結果は維持した。
+- 承諾・拒否では一度計算した評価結果を利用し、キャンセルでは現在stateから再計算して、提案の`sentePoints` / `gotePoints`と一致することを局面キー・手数・提案者・応答者に加えて検証する。不一致は`proposal_mismatch`として同一state参照のまま拒否する。
+- `createPositionKey`の千日手判定仕様、入玉宣言法の集計範囲、24点境界、既存終局結果、承諾成功時だけの`moveLimitJishogi`解除は変更していない。
+
+### 変更ファイル・追加テスト
+
+- 変更: `src/domain/shogi/agreedJishogi.ts`
+- 変更: `src/components/shogi/ShogiResearchScreen.tsx`
+- 変更: `src/components/shogi/AgreedJishogiDialog.tsx`
+- 変更: `src/test/shogi-agreed-jishogi.test.tsx`
+- 追記: `LOG.md`
+- `package.json`、`package-lock.json`、Node/npm要件、依存パッケージ、CI設定は変更していない。
+- 回帰テストを9件追加し、双方23点の提案不可、型付き理由とstate不変、提案点数改変、局面キーと手数が同じまま再計算点数だけ変わるケース、全状態不変、駒ID・持ち駒順序だけの変更を許容するケースを検証した。
+- UIでは双方23点の理由表示・提案無効、承諾拒否後のダイアログ・提案・対局state・履歴維持、ドメインメッセージのalert表示、拒否・Escape・背景クリックでの安全な終了、再表示時のエラー消去を検証した。
+- 修正前は対象テスト65件中8件が失敗し、修正後は65/65件が成功した。最終テスト総数は484/484件。
+
+### 実行環境・検証結果
+
+- 実行環境: Windows、Node.js `v24.20.0`、npm `11.17.0`。リポジトリ指定のNode.js `>=24.15.0 <25` / npm `>=11.17.0 <12`を満たす。
+- `npm run check`: 成功（lockfile検証、TypeScript型検査、8ファイル484テスト、本番build）。
+- `git diff --check`: 成功（空白エラーなし。GitのLF→CRLF警告のみ）。
+- `git status --short`: 変更対象5ファイルのみを確認した。
+
+### ブラウザ確認
+
+- Vite 6.4.3の開発サーバーと接続済みEdgeを使用し、1280×1000と500×1000で通常状態と初期局面の提案確認画面を確認した。
+- 両幅で双方27点、入玉なしの提案不可理由、提案ボタン無効、キャンセルへの初期フォーカス、Tabトラップ、Escape、背景クリック、提案ボタンへのフォーカス復元を確認した。
+- 500×1000ではdocument幅485px、ダイアログ幅448pxで、横スクロールと画面外へのはみ出しはなかった。両幅でViteエラーオーバーレイなし、ブラウザコンソールの警告・エラー0件だった。
+- 通常UIには任意の外部stateを注入する経路がないため、入玉局面の応答・承諾、双方24点未満、承諾拒否alert、エラー後の終了、無勝負終局、点数不足終局は今回の実ブラウザでは未確認。これらはjsdom回帰テストで確認し、本番ソースへ一時局面やテスト専用分岐は追加していない。
+
+### 対象外・残課題
+
+- 持将棋・千日手成立後の先後交代、自動指し直し、指し直し局の持ち時間調整。
+- `local_ai` / `shogi_engine`からの提案・応答接続。
+- 実ブラウザで未確認とした任意局面の表示確認。
