@@ -10,11 +10,12 @@ import type {
 } from '../../types/shogi';
 import { findKingSquare, isKingInCheck } from './attacks';
 import { determineDefaultExecutionMode } from './gameState';
+import { JISHOGI_MOVE_LIMIT } from './moveLimitJishogi';
 
 export const ENTERING_KING_REQUIRED_CAMP_PIECES = 10;
 export const ENTERING_KING_DRAW_POINTS = 24;
 export const ENTERING_KING_WIN_POINTS = 31;
-export const ENTERING_KING_MOVE_LIMIT = 500;
+export const ENTERING_KING_MOVE_LIMIT = JISHOGI_MOVE_LIMIT;
 
 export type EnteringKingOutcome = 'win' | 'draw' | 'ineligible';
 
@@ -240,7 +241,7 @@ export function executeEnteringKingDeclaration(
     };
     return {
       type: 'declaration_failure',
-      state: { ...state, status: 'ended', result },
+      state: { ...state, status: 'ended', result, moveLimitJishogi: null },
       evaluation,
       result,
     };
@@ -263,7 +264,7 @@ export function executeEnteringKingDeclaration(
 
   return {
     type: 'applied',
-    state: { ...state, status: 'ended', result },
+    state: { ...state, status: 'ended', result, moveLimitJishogi: null },
     evaluation,
     result,
   };

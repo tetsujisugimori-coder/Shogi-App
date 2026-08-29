@@ -146,6 +146,7 @@ export type GameEndReason =
   | 'resignation'
   | 'checkmate'
   | 'repetition'
+  | 'five_hundred_move_jishogi'
   | 'entering_king_win'
   | 'entering_king_draw'
   | 'entering_king_declaration_failure';
@@ -176,6 +177,13 @@ export interface RepetitionGameResult {
   details?: string;
 }
 
+export interface FiveHundredMoveJishogiGameResult {
+  winner: null;
+  loser: null;
+  endReason: 'five_hundred_move_jishogi';
+  details?: string;
+}
+
 export interface EnteringKingWinGameResult extends DecisiveGameResultBase {
   endReason: 'entering_king_win';
 }
@@ -197,6 +205,7 @@ export type GameResult =
   | CheckmateGameResult
   | ResignationGameResult
   | RepetitionGameResult
+  | FiveHundredMoveJishogiGameResult
   | EnteringKingWinGameResult
   | EnteringKingDrawGameResult
   | EnteringKingDeclarationFailureGameResult;
@@ -206,6 +215,11 @@ export interface PositionRecord {
   historyIndex: number;
   movedBy: Player | null;
   gaveCheck: boolean;
+}
+
+export interface MoveLimitJishogiState {
+  kind: 'awaiting_continuous_check_end';
+  checkingPlayer: Player;
 }
 
 export interface BoardState {
@@ -221,6 +235,7 @@ export interface BoardState {
   result?: GameResult | null;
   foulHistory?: FoulRecord[];
   positionHistory?: PositionRecord[];
+  moveLimitJishogi?: MoveLimitJishogiState | null;
 }
 
 export const RANK_KANJI = ['一', '二', '三', '四', '五', '六', '七', '八', '九'] as const;

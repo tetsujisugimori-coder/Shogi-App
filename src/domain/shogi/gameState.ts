@@ -186,6 +186,7 @@ function internalApplyLegalMove(
       result: state.result ?? null,
       foulHistory: state.foulHistory ? [...state.foulHistory] : [],
       positionHistory: state.positionHistory ? [...state.positionHistory] : [],
+      moveLimitJishogi: state.moveLimitJishogi ?? null,
     },
   };
 }

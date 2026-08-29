@@ -53,6 +53,7 @@ export function executeResignation(state: BoardState): ResignationExecutionResul
       ...state,
       status: 'ended',
       result,
+      moveLimitJishogi: null,
     },
     result,
   };
