@@ -1767,3 +1767,64 @@ PR #1のレビュー指摘を受け、簡易APIの`applyMove`と合法手候補�
 - 前局の `result` / `lastMove` / `foulHistory` / `positionHistory` / `moveLimitJishogi` / `viewMode`、盤上・持ち駒選択、合法手候補、各ダイアログ・持将棋エラー・古いフォーカス要求が部分的に残らないことを重点確認した。
 - 確認を開く／キャンセルする段階で状態を破壊しないこと、既存4操作との相互排他、確定・キャンセル後の明確なフォーカス先、確定後の盤・駒台再開を重点確認した。
 - 対象外: 千日手・持将棋後の自動指し直し、先後交代、対局時計・持ち時間、棋譜保存・読み込み、Undo / Redo、待った、局面編集、AI・将棋エンジン接続。
+
+## [2026-09-01] 対局中の閲覧専用「棋譜一覧パネル」の実装
+
+### 基準・概要
+
+- `git fetch origin main` 後の `main` / `origin/main` は同一の `e017708ef6f5a1689d4bd302cfff2a2a626f1762` で、PR #20「新しい対局」のマージコミットを含むことを確認してから着手した。
+- 作業前テストは既存9ファイル、510/510件成功。サンドボックス内ではVite/esbuildの子プロセス起動が`spawn EPERM`になったため、同一コマンドを許可済み環境で再実行し、コード由来の既存失敗がないことを確認した。
+- `BoardState.history` を閲覧専用で表示する棋譜パネルを追加した。通常移動、成り、不成、駒打ちは既存 `MoveRecord.notation` を唯一の表記源として配列順に表示し、履歴データや表記生成ロジックをUI側へ複製していない。
+
+### 設計判断・表示仕様
+
+- `MoveHistoryPanel` は `history: readonly MoveRecord[]` と `result: GameResult | null | undefined` を受け取り、`BoardState` を更新しない。画面側は `boardState.history` と、`status === 'ended'` の場合だけ `boardState.result` を渡す。
+- 手数は `MoveRecord.moveNumber`、指し手は `MoveRecord.notation` をそのまま使用する。空履歴では「まだ着手はありません」を表示する。
+- 配列末尾だけを最新手として、琥珀色の背景・左境界線・文字色と「最新」ラベルで強調し、`aria-current="step"` と「N手目・指し手・最新手」のアクセシブル名を付けた。
+- 着手一覧は最大高さと縦スクロールを持つパネル内ログとし、履歴追加・終局結果追加・新しい対局による初期化時だけ `scrollTop` を更新する。`scrollIntoView()` は使用せず、ページ全体を移動させない。新しい対局ではスクロール位置を0へ戻し、モバイルの開閉状態も閉じる。
+- 10種類すべての `GameResult.endReason` を網羅する `getGameResultDisplay` 純粋ヘルパーを追加し、棋譜パネルと既存ステータスバッジの日本語変換を集約した。未処理unionは `never` で型エラーになる。
+- 終局結果は偽の `MoveRecord` にせず、着手一覧の末尾と区別した「対局結果」領域に表示する。勝敗ありでは勝者、通常千日手・500手持将棋・合意持将棋・入玉宣言の無勝負では勝者なし、合意持将棋では双方の確定点数を表示する。連続王手の千日手は勝者と反則負け側を明示する。
+- 幅1280px相当では盤の最大幅896pxを維持して棋譜を右側へ配置し、中間幅では盤の下へ移す。モバイルでは初期状態を閉じ、「棋譜を表示／棋譜を閉じる」ボタンを `aria-expanded` / `aria-controls` で実在パネルへ関連付ける。768px以上ではボタンを非表示にして棋譜を常時表示する。
+
+### アクセシビリティ
+
+- パネルを `aside`、見出しを「棋譜」、着手一覧を `ol` / `li`、スクロール領域を `role="log"` / `aria-live="polite"` / `aria-relevant="additions"` とした。
+- 空状態、最新手、終局結果に読み取り可能な文言と見出しを付けた。着手のライブリージョンは1か所だけとし、既存盤面のroving tabindex、成り選択、各確認ダイアログのフォーカス制御は変更していない。
+- モバイル開閉はネイティブbuttonでキーボード操作でき、開閉時に盤面選択、棋譜配列、最新手を変更しない。
+
+### 変更ファイル
+
+- 追加: `src/components/shogi/MoveHistoryPanel.tsx`
+- 追加: `src/components/shogi/gameResultDisplay.ts`
+- 追加: `src/test/shogi-move-history.test.tsx`
+- 変更: `src/components/shogi/ShogiResearchScreen.tsx`
+- 変更: `README.md`
+- 追記: `LOG.md`
+- `src/types/shogi.ts`、ドメインの合法手・終局処理、`package.json`、`package-lock.json`、依存パッケージ、CI設定の変更: なし。
+
+### テスト・検証結果
+
+- 棋譜パネル専用テストを19件追加。空状態、通常移動、配列順、成り、不成、駒打ち、`notation` の直接利用、最新手移動、パネル内スクロール、`scrollIntoView()` 非使用、全10終局結果、通常反則と連続王手の千日手、点数、モバイルARIA、新しい対局の開く・キャンセル・確定、盤面選択との非干渉を検証した。
+- 最終テスト: **10ファイル、529/529件成功**。実行環境: Windows / PowerShell、Node.js `v24.20.0`、npm `11.17.0`。
+- `npm run verify:lock`: 成功（399エントリ、registry package 398件、`version` / `resolved` / `integrity` 欠落0件）。
+- `npm run lint`: 成功（TypeScriptエラーなし）。
+- `npm test`: 成功（10ファイル、529件）。
+- `npm run build`: 成功（Vite 6.4.3、1706 modules transformed）。
+- `npm run check`: 成功（lock / lint / 529 tests / build）。
+- `git diff --check`: 成功（空白エラーなし。既存Git設定によるLF→CRLF警告のみ）。
+
+### ブラウザ確認結果
+
+- Vite 6.4.3の開発サーバーとCodex内蔵ブラウザを使用し、1280×1000と500×1000で確認した。
+- 1280×1000（実効client幅1265px）では盤幅896px、棋譜幅288pxで右側に並び、盤は不自然に縮小されなかった。モバイル開閉ボタンは非表示、documentのclient幅とscroll幅は1265pxで横スクロールなしだった。
+- 実際に双方9筋から1筋までの歩を進めて18手を作成し、18件が配列順に表示され、最新手が「18手目 △1四歩 最新手」へ移ることを確認した。長い棋譜ではパネルの`clientHeight: 544`、`scrollHeight: 740`、`scrollTop: 196`となり、最新手はパネル表示範囲内に追従した。
+- 18手後の投了で、着手履歴を維持したまま末尾に「対局結果 / 後手勝ち（先手投了）」が表示された。新しい対局ダイアログを開いた段階とキャンセル後は履歴18件・投了結果を維持し、確定後だけ履歴0件、「まだ着手はありません」、結果なし、パネル`scrollTop: 0`へ戻った。
+- 500×1000（実効client幅485px）では盤幅約461px、documentのclient幅とscroll幅は485pxで横スクロールなしだった。初期はパネル非表示・`aria-expanded="false"`、開くとパネル表示・`aria-expanded="true"`・「棋譜を閉じる」へ切り替わり、`aria-controls`先が実在した。
+- モバイルで1手進めると「1手目 ▲7六歩 最新手」を表示した。後手歩を選択したまま棋譜を閉じて再度開いても `aria-selected="true"`、履歴1件を維持し、開閉が盤面選択へ干渉しなかった。
+- 両幅・全操作でViteエラーオーバーレイなし、ブラウザコンソールのwarning / error 0件だった。本番コードへ確認専用局面、URL分岐、デバッグ表示は追加していない。
+
+### 対象外・残課題
+
+- 棋譜行から過去局面へ戻る操作、Undo / Redo、待った、局面スナップショット、局面再生、感想戦、分岐棋譜。
+- KIF / KI2 / CSA / USIの読み込み・保存、コピー、ダウンロード、共有。
+- 対局時計、AI・将棋エンジン・形勢評価との接続、反則履歴一覧。
