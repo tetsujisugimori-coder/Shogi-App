@@ -21,6 +21,8 @@ import { ResignationDialog } from './ResignationDialog';
 import { EnteringKingDeclarationDialog } from './EnteringKingDeclarationDialog';
 import { AgreedJishogiDialog } from './AgreedJishogiDialog';
 import { NewGameDialog } from './NewGameDialog';
+import { MoveHistoryPanel } from './MoveHistoryPanel';
+import { getGameResultDisplay } from './gameResultDisplay';
 
 interface ShogiResearchScreenProps {
   initialState?: BoardState;
@@ -37,6 +39,25 @@ type SelectionState =
   | { kind: 'board'; square: { row: number; col: number } }
   | { kind: 'hand'; pieceId: string; pieceType: PieceType };
 
+const STATUS_BADGE_COLORS = {
+  neutral: {
+    bgColor: 'bg-stone-900/80 text-stone-300 border-stone-700/60',
+    dotColor: 'bg-stone-500',
+  },
+  amber: {
+    bgColor: 'bg-amber-950/80 text-amber-200 border-amber-700/60',
+    dotColor: 'bg-amber-400',
+  },
+  sky: {
+    bgColor: 'bg-sky-950/80 text-sky-200 border-sky-700/60',
+    dotColor: 'bg-sky-400',
+  },
+  rose: {
+    bgColor: 'bg-rose-950/80 text-rose-300 border-rose-800/60',
+    dotColor: 'bg-rose-500',
+  },
+} as const;
+
 export const ShogiResearchScreen: React.FC<ShogiResearchScreenProps> = ({ initialState }) => {
   const [boardState, setBoardState] = useState<BoardState>(() => initialState ?? createInitialBoardState());
   const [selection, setSelection] = useState<SelectionState>({ kind: 'none' });
@@ -45,6 +66,7 @@ export const ShogiResearchScreen: React.FC<ShogiResearchScreenProps> = ({ initia
   const [isEnteringKingDialogOpen, setIsEnteringKingDialogOpen] = useState(false);
   const [isAgreedJishogiDialogOpen, setIsAgreedJishogiDialogOpen] = useState(false);
   const [isNewGameDialogOpen, setIsNewGameDialogOpen] = useState(false);
+  const [moveHistoryResetKey, setMoveHistoryResetKey] = useState(0);
   const [agreedJishogiProposal, setAgreedJishogiProposal] = useState<AgreedJishogiProposal | null>(null);
   const [agreedJishogiError, setAgreedJishogiError] = useState<string | null>(null);
   const [focusRequest, setFocusRequest] = useState<{
@@ -312,6 +334,7 @@ export const ShogiResearchScreen: React.FC<ShogiResearchScreenProps> = ({ initia
     setAgreedJishogiProposal(null);
     setAgreedJishogiError(null);
     setFocusRequest(null);
+    setMoveHistoryResetKey((current) => current + 1);
     setIsNewGameDialogOpen(false);
   };
 
@@ -416,105 +439,11 @@ export const ShogiResearchScreen: React.FC<ShogiResearchScreenProps> = ({ initia
 
   const statusBadgeInfo = useMemo(() => {
     if (boardState.status === 'ended' && boardState.result) {
-      if (boardState.result.endReason === 'repetition') {
-        return {
-          text: '終局 / 千日手（無勝負）',
-          isLive: false,
-          bgColor: 'bg-stone-900/80 text-stone-300 border-stone-700/60',
-          dotColor: 'bg-stone-500',
-        };
-      }
-
-      if (boardState.result.endReason === 'five_hundred_move_jishogi') {
-        return {
-          text: '終局 / 500手規定による持将棋・無勝負',
-          isLive: false,
-          bgColor: 'bg-stone-900/80 text-stone-300 border-stone-700/60',
-          dotColor: 'bg-stone-500',
-        };
-      }
-
-      if (boardState.result.endReason === 'entering_king_draw') {
-        return {
-          text: '終局 / 入玉宣言による無勝負',
-          isLive: false,
-          bgColor: 'bg-amber-950/80 text-amber-200 border-amber-700/60',
-          dotColor: 'bg-amber-400',
-        };
-      }
-
-      if (boardState.result.endReason === 'agreed_jishogi_draw') {
-        return {
-          text: `終局 / 合意による持将棋・無勝負（先手${boardState.result.sentePoints}点・後手${boardState.result.gotePoints}点）`,
-          isLive: false,
-          bgColor: 'bg-sky-950/80 text-sky-200 border-sky-700/60',
-          dotColor: 'bg-sky-400',
-        };
-      }
-
-      const winnerName = boardState.result.winner === 'sente' ? '先手' : '後手';
-      const loserName = boardState.result.loser === 'sente' ? '先手' : '後手';
-      if (boardState.result.endReason === 'entering_king_win') {
-        return {
-          text: `終局 / ${winnerName}勝ち（入玉宣言）`,
-          isLive: false,
-          bgColor: 'bg-amber-950/80 text-amber-200 border-amber-700/60',
-          dotColor: 'bg-amber-400',
-        };
-      }
-      if (boardState.result.endReason === 'agreed_jishogi_point_loss') {
-        return {
-          text: `終局 / ${winnerName}勝ち（${loserName}の点数不足・合意による持将棋、先手${boardState.result.sentePoints}点・後手${boardState.result.gotePoints}点）`,
-          isLive: false,
-          bgColor: 'bg-sky-950/80 text-sky-200 border-sky-700/60',
-          dotColor: 'bg-sky-400',
-        };
-      }
-      if (boardState.result.endReason === 'entering_king_declaration_failure') {
-        return {
-          text: `終局 / ${loserName}敗け（入玉宣言失敗）`,
-          isLive: false,
-          bgColor: 'bg-rose-950/80 text-rose-300 border-rose-800/60',
-          dotColor: 'bg-rose-500',
-        };
-      }
-      if (boardState.result.endReason === 'foul_loss') {
-        if (boardState.result.foulReason === 'perpetual_check_repetition') {
-          return {
-            text: `終局 / ${loserName}反則負け（連続王手の千日手）`,
-            isLive: false,
-            bgColor: 'bg-rose-950/80 text-rose-300 border-rose-800/60',
-            dotColor: 'bg-rose-500',
-          };
-        }
-        return {
-          text: `終局 / ${winnerName}勝ち（${loserName}反則負け）`,
-          isLive: false,
-          bgColor: 'bg-rose-950/80 text-rose-300 border-rose-800/60',
-          dotColor: 'bg-rose-500',
-        };
-      }
-      if (boardState.result.endReason === 'checkmate') {
-        return {
-          text: `終局 / ${winnerName}勝ち（詰み）`,
-          isLive: false,
-          bgColor: 'bg-rose-950/80 text-rose-300 border-rose-800/60',
-          dotColor: 'bg-rose-500',
-        };
-      }
-      if (boardState.result.endReason === 'resignation') {
-        return {
-          text: `終局 / ${winnerName}勝ち（${loserName}投了）`,
-          isLive: false,
-          bgColor: 'bg-rose-950/80 text-rose-300 border-rose-800/60',
-          dotColor: 'bg-rose-500',
-        };
-      }
+      const display = getGameResultDisplay(boardState.result);
       return {
-        text: `終局 / ${winnerName}勝ち`,
+        text: `終局 / ${display.statusText}`,
         isLive: false,
-        bgColor: 'bg-stone-900/80 text-stone-300 border-stone-700/60',
-        dotColor: 'bg-stone-500',
+        ...STATUS_BADGE_COLORS[display.tone],
       };
     }
 
@@ -632,24 +561,31 @@ export const ShogiResearchScreen: React.FC<ShogiResearchScreenProps> = ({ initia
       </header>
 
       {/* Main Table Section */}
-      <main className="w-full flex-1 flex flex-col items-center justify-center">
-        <ShogiTable
-          squares={boardState.squares}
-          senteHand={boardState.senteHand}
-          goteHand={boardState.goteHand}
-          status={boardState.status}
-          viewMode={boardState.viewMode}
-          selectedSquare={selectedSquare}
-          candidateSquares={candidateSquares}
-          candidateKind={selection.kind === 'none' ? null : selection.kind === 'hand' ? 'drop' : 'move'}
-          dropPieceType={selection.kind === 'hand' ? selection.pieceType : null}
-          lastMove={boardState.lastMove}
-          onSquareClick={isInteractionBlocked ? undefined : handleSquareClick}
-          focusRequest={focusRequest}
-          turn={boardState.turn}
-          selectedHandPieceId={selectedHandPieceId}
-          onHandPieceSelect={handleHandPieceSelect}
-          pieceStandsDisabled={isInteractionBlocked}
+      <main className="flex w-full max-w-[76rem] flex-1 min-w-0 flex-col items-center justify-center gap-4 md:gap-6 xl:flex-row xl:items-start">
+        <div className="w-full min-w-0 max-w-4xl xl:flex-1">
+          <ShogiTable
+            squares={boardState.squares}
+            senteHand={boardState.senteHand}
+            goteHand={boardState.goteHand}
+            status={boardState.status}
+            viewMode={boardState.viewMode}
+            selectedSquare={selectedSquare}
+            candidateSquares={candidateSquares}
+            candidateKind={selection.kind === 'none' ? null : selection.kind === 'hand' ? 'drop' : 'move'}
+            dropPieceType={selection.kind === 'hand' ? selection.pieceType : null}
+            lastMove={boardState.lastMove}
+            onSquareClick={isInteractionBlocked ? undefined : handleSquareClick}
+            focusRequest={focusRequest}
+            turn={boardState.turn}
+            selectedHandPieceId={selectedHandPieceId}
+            onHandPieceSelect={handleHandPieceSelect}
+            pieceStandsDisabled={isInteractionBlocked}
+          />
+        </div>
+        <MoveHistoryPanel
+          history={boardState.history}
+          result={boardState.status === 'ended' ? boardState.result : null}
+          resetKey={moveHistoryResetKey}
         />
       </main>
 
