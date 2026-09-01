@@ -4,6 +4,7 @@
  */
 
 import { createPositionKey } from '../domain/shogi/repetition';
+import { createPositionSnapshot } from '../domain/shogi/replay';
 
 export type Player = 'sente' | 'gote';
 
@@ -239,6 +240,19 @@ export interface PositionRecord {
   gaveCheck: boolean;
 }
 
+/** A self-contained, read-only replay baseline for one legal position. */
+export interface PositionSnapshot {
+  historyIndex: number;
+  squares: BoardSquare[][];
+  senteHand: Piece[];
+  goteHand: Piece[];
+  turn: Player;
+  moveNumber: number;
+  status: BoardStatus;
+  lastMove: MoveRecord | null;
+  result: GameResult | null;
+}
+
 export interface MoveLimitJishogiState {
   kind: 'awaiting_continuous_check_end';
   checkingPlayer: Player;
@@ -257,6 +271,7 @@ export interface BoardState {
   result?: GameResult | null;
   foulHistory?: FoulRecord[];
   positionHistory?: PositionRecord[];
+  positionSnapshots?: PositionSnapshot[];
   moveLimitJishogi?: MoveLimitJishogiState | null;
 }
 
@@ -552,6 +567,7 @@ export function createInitialBoardState(): BoardState {
       gaveCheck: false,
     },
   ];
+  state.positionSnapshots = [createPositionSnapshot(state)];
   return state;
 }
 

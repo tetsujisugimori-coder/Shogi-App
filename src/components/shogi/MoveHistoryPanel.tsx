@@ -6,6 +6,18 @@ export interface MoveHistoryPanelProps {
   history: readonly MoveRecord[];
   result: GameResult | null | undefined;
   resetKey?: number;
+  availableHistoryIndexes?: ReadonlySet<number>;
+  currentHistoryIndex?: number | null;
+  selectionDisabled?: boolean;
+  canGoToInitial?: boolean;
+  canGoToPrevious?: boolean;
+  canGoToNext?: boolean;
+  isViewingReplay?: boolean;
+  onSelectHistoryIndex?: (historyIndex: number) => void;
+  onGoToInitial?: () => void;
+  onGoToPrevious?: () => void;
+  onGoToNext?: () => void;
+  onReturnToCurrent?: () => void;
 }
 
 const PANEL_ID = 'shogi-move-history-panel';
@@ -14,12 +26,30 @@ export const MoveHistoryPanel: React.FC<MoveHistoryPanelProps> = ({
   history,
   result,
   resetKey = 0,
+  availableHistoryIndexes,
+  currentHistoryIndex,
+  selectionDisabled = false,
+  canGoToInitial = false,
+  canGoToPrevious = false,
+  canGoToNext = false,
+  isViewingReplay = false,
+  onSelectHistoryIndex,
+  onGoToInitial,
+  onGoToPrevious,
+  onGoToNext,
+  onReturnToCurrent,
 }) => {
   const [isMobileOpen, setIsMobileOpen] = useState(false);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const previousResetKeyRef = useRef(resetKey);
   const hasResult = Boolean(result);
   const resultDisplay = result ? getGameResultDisplay(result) : null;
+  const effectiveCurrentHistoryIndex =
+    currentHistoryIndex === undefined ? history.length || null : currentHistoryIndex;
+  const usesLegacyLatestSelection = currentHistoryIndex === undefined;
+  const hasReplayControls = Boolean(
+    onGoToInitial || onGoToPrevious || onGoToNext || onReturnToCurrent
+  );
 
   useLayoutEffect(() => {
     if (previousResetKeyRef.current === resetKey) return;
@@ -66,6 +96,45 @@ export const MoveHistoryPanel: React.FC<MoveHistoryPanelProps> = ({
             棋譜
           </h2>
           <p className="mt-0.5 text-xs text-stone-500">対局中の着手履歴</p>
+          {hasReplayControls && (
+            <div
+              className="mt-3 grid grid-cols-2 gap-2 sm:grid-cols-4 xl:grid-cols-2"
+              aria-label="局面再生操作"
+            >
+              <button
+                type="button"
+                onClick={onGoToInitial}
+                disabled={!canGoToInitial || selectionDisabled}
+                className="rounded border border-amber-800/60 bg-stone-950/70 px-2 py-1.5 text-xs text-amber-100 outline-none hover:border-amber-500 focus-visible:ring-2 focus-visible:ring-amber-300 disabled:cursor-not-allowed disabled:opacity-45"
+              >
+                初期局面
+              </button>
+              <button
+                type="button"
+                onClick={onGoToPrevious}
+                disabled={!canGoToPrevious || selectionDisabled}
+                className="rounded border border-amber-800/60 bg-stone-950/70 px-2 py-1.5 text-xs text-amber-100 outline-none hover:border-amber-500 focus-visible:ring-2 focus-visible:ring-amber-300 disabled:cursor-not-allowed disabled:opacity-45"
+              >
+                前の手
+              </button>
+              <button
+                type="button"
+                onClick={onGoToNext}
+                disabled={!canGoToNext || selectionDisabled}
+                className="rounded border border-amber-800/60 bg-stone-950/70 px-2 py-1.5 text-xs text-amber-100 outline-none hover:border-amber-500 focus-visible:ring-2 focus-visible:ring-amber-300 disabled:cursor-not-allowed disabled:opacity-45"
+              >
+                次の手
+              </button>
+              <button
+                type="button"
+                onClick={onReturnToCurrent}
+                disabled={!isViewingReplay || selectionDisabled}
+                className="rounded border border-emerald-800/60 bg-emerald-950/40 px-2 py-1.5 text-xs text-emerald-100 outline-none hover:border-emerald-500 focus-visible:ring-2 focus-visible:ring-amber-300 disabled:cursor-not-allowed disabled:opacity-45"
+              >
+                現在局面へ戻る
+              </button>
+            </div>
+          )}
         </div>
 
         <div
@@ -85,31 +154,50 @@ export const MoveHistoryPanel: React.FC<MoveHistoryPanelProps> = ({
             <ol className="m-0 list-none space-y-1 p-0">
               {history.map((move, index) => {
                 const isLatest = index === history.length - 1;
+                const historyIndex = index + 1;
+                const isCurrent = effectiveCurrentHistoryIndex === historyIndex;
+                const isReplayAvailable =
+                  availableHistoryIndexes === undefined ||
+                  availableHistoryIndexes.has(historyIndex);
+                const isSelectable =
+                  isReplayAvailable && Boolean(onSelectHistoryIndex) && !selectionDisabled;
                 return (
                   <li
                     key={`${move.moveNumber}-${index}`}
-                    aria-current={isLatest ? 'step' : undefined}
-                    aria-label={`${move.moveNumber}手目 ${move.notation}${isLatest ? ' 最新手' : ''}`}
-                    className={`grid min-w-0 grid-cols-[2.5rem_minmax(0,1fr)_auto] items-center gap-2 rounded-md border-l-2 px-2 py-2 font-serif text-sm ${
-                      isLatest
+                    aria-current={isCurrent ? 'step' : undefined}
+                    aria-label={`${move.moveNumber}手目 ${move.notation}${isCurrent && !usesLegacyLatestSelection ? ' 現在表示中' : ''}${isLatest ? ' 最新手' : ''}${!isReplayAvailable ? ' 再生不可' : ''}`}
+                    className={`min-w-0 rounded-md border-l-2 font-serif text-sm ${
+                      isCurrent
                         ? 'border-amber-400 bg-amber-900/35 text-amber-100'
                         : 'border-transparent text-stone-300'
                     }`}
                   >
-                    <span className="text-right tabular-nums text-stone-500" aria-hidden="true">
-                      {move.moveNumber}
-                    </span>
-                    <span className="min-w-0 truncate" aria-hidden="true">
-                      {move.notation}
-                    </span>
-                    {isLatest && (
-                      <span
-                        className="rounded border border-amber-700/60 bg-amber-950/70 px-1.5 py-0.5 text-[0.65rem] font-sans tracking-wide text-amber-300"
-                        aria-hidden="true"
-                      >
-                        最新
+                    <button
+                      type="button"
+                      disabled={!isSelectable}
+                      onClick={() => onSelectHistoryIndex?.(historyIndex)}
+                      aria-label={`${move.moveNumber}手目 ${move.notation}の局面を表示${!isReplayAvailable ? '（再生データなし）' : ''}`}
+                      className="grid w-full min-w-0 grid-cols-[2.5rem_minmax(0,1fr)_auto] items-center gap-2 rounded-md px-2 py-2 text-left outline-none hover:bg-amber-900/20 focus-visible:ring-2 focus-visible:ring-amber-300 disabled:cursor-not-allowed disabled:opacity-60"
+                    >
+                      <span className="text-right tabular-nums text-stone-500" aria-hidden="true">
+                        {move.moveNumber}
                       </span>
-                    )}
+                      <span className="min-w-0 truncate" aria-hidden="true">
+                        {move.notation}
+                      </span>
+                      <span className="flex flex-wrap justify-end gap-1" aria-hidden="true">
+                        {isCurrent && !usesLegacyLatestSelection && (
+                          <span className="rounded border border-amber-500/70 bg-amber-900/60 px-1.5 py-0.5 text-[0.62rem] font-sans text-amber-100">
+                            表示中
+                          </span>
+                        )}
+                        {isLatest && (
+                          <span className="rounded border border-stone-600 bg-stone-900/80 px-1.5 py-0.5 text-[0.62rem] font-sans text-stone-300">
+                            最新
+                          </span>
+                        )}
+                      </span>
+                    </button>
                   </li>
                 );
               })}

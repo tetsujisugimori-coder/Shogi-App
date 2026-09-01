@@ -26,6 +26,10 @@ import {
 import { ILLEGAL_MOVE_MESSAGES } from './validation';
 import { adjudicateAfterLegalMove } from './adjudication';
 import { normalizePositionHistory } from './repetition';
+import {
+  normalizePositionSnapshots,
+  recordPositionSnapshotAfterLegalMove,
+} from './replay';
 
 export { getLegalDropSquares, simulateDropSquares, validateDrop } from './dropRules';
 
@@ -115,11 +119,12 @@ export function executeDrop(
         message: ILLEGAL_MOVE_MESSAGES.hand_piece_not_found,
       };
     }
-    const normalizedState = normalizePositionHistory(state);
-    const nextState = adjudicateAfterLegalMove(
+    const normalizedState = normalizePositionSnapshots(normalizePositionHistory(state));
+    const adjudicatedState = adjudicateAfterLegalMove(
       internalApplyLegalDrop(normalizedState, piece, to),
       state.turn
     );
+    const nextState = recordPositionSnapshotAfterLegalMove(adjudicatedState);
     const move = nextState.lastMove;
     if (!move || move.kind !== 'drop') {
       return {

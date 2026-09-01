@@ -1,4 +1,4 @@
-import { BoardSquare, Player } from '../../types/shogi';
+import type { BoardSquare, Player } from '../../types/shogi';
 
 /** Deep-clones board squares and their pieces without mutating the source. */
 export function cloneBoardSquares(squares: BoardSquare[][]): BoardSquare[][] {

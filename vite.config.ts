@@ -16,6 +16,8 @@ export default defineConfig(() => {
       globals: true,
       environment: 'jsdom',
       setupFiles: './src/test/setup.ts',
+      // Keep jsdom-heavy UI suites below the 5-second per-test timeout on shared runners.
+      maxWorkers: 2,
     },
     server: {
       // HMR is disabled in AI Studio via DISABLE_HMR env var.
