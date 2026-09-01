@@ -20,6 +20,7 @@ import { PromotionDialog } from './PromotionDialog';
 import { ResignationDialog } from './ResignationDialog';
 import { EnteringKingDeclarationDialog } from './EnteringKingDeclarationDialog';
 import { AgreedJishogiDialog } from './AgreedJishogiDialog';
+import { NewGameDialog } from './NewGameDialog';
 
 interface ShogiResearchScreenProps {
   initialState?: BoardState;
@@ -43,6 +44,7 @@ export const ShogiResearchScreen: React.FC<ShogiResearchScreenProps> = ({ initia
   const [isResignationDialogOpen, setIsResignationDialogOpen] = useState(false);
   const [isEnteringKingDialogOpen, setIsEnteringKingDialogOpen] = useState(false);
   const [isAgreedJishogiDialogOpen, setIsAgreedJishogiDialogOpen] = useState(false);
+  const [isNewGameDialogOpen, setIsNewGameDialogOpen] = useState(false);
   const [agreedJishogiProposal, setAgreedJishogiProposal] = useState<AgreedJishogiProposal | null>(null);
   const [agreedJishogiError, setAgreedJishogiError] = useState<string | null>(null);
   const [focusRequest, setFocusRequest] = useState<{
@@ -57,12 +59,15 @@ export const ShogiResearchScreen: React.FC<ShogiResearchScreenProps> = ({ initia
   const shouldRestoreEnteringKingFocus = useRef(false);
   const agreedJishogiButtonRef = useRef<HTMLButtonElement>(null);
   const shouldRestoreAgreedJishogiFocus = useRef(false);
+  const newGameButtonRef = useRef<HTMLButtonElement>(null);
+  const shouldRestoreNewGameFocus = useRef(false);
 
   const isEnded = boardState.status === 'ended';
   const isResignationAvailable = boardState.status === 'active' || boardState.status === 'check';
   const isEnteringKingAvailable = boardState.status === 'active' || boardState.status === 'check';
+  const isNewGameAvailable = isEnteringKingAvailable || isEnded;
   const isInteractionBlocked =
-    isEnded || pendingPromotion !== null || isResignationDialogOpen || isEnteringKingDialogOpen || isAgreedJishogiDialogOpen;
+    isEnded || pendingPromotion !== null || isResignationDialogOpen || isEnteringKingDialogOpen || isAgreedJishogiDialogOpen || isNewGameDialogOpen;
   const selectedSquare = !isEnded && selection.kind === 'board' ? selection.square : null;
   const selectedHandPieceId = !isEnded && selection.kind === 'hand' ? selection.pieceId : null;
 
@@ -116,6 +121,12 @@ export const ShogiResearchScreen: React.FC<ShogiResearchScreenProps> = ({ initia
     agreedJishogiButtonRef.current?.focus();
   }, [isAgreedJishogiDialogOpen]);
 
+  useEffect(() => {
+    if (isNewGameDialogOpen || !shouldRestoreNewGameFocus.current) return;
+    shouldRestoreNewGameFocus.current = false;
+    newGameButtonRef.current?.focus();
+  }, [isNewGameDialogOpen]);
+
   const restoreBoardFocus = useCallback((square: { row: number; col: number }) => {
     focusRequestId.current += 1;
     setFocusRequest({ ...square, requestId: focusRequestId.current });
@@ -154,7 +165,8 @@ export const ShogiResearchScreen: React.FC<ShogiResearchScreenProps> = ({ initia
       pendingPromotion ||
       isResignationDialogOpen ||
       isEnteringKingDialogOpen ||
-      isAgreedJishogiDialogOpen
+      isAgreedJishogiDialogOpen ||
+      isNewGameDialogOpen
     ) return;
     setIsResignationDialogOpen(true);
   };
@@ -180,7 +192,8 @@ export const ShogiResearchScreen: React.FC<ShogiResearchScreenProps> = ({ initia
       pendingPromotion ||
       isResignationDialogOpen ||
       isEnteringKingDialogOpen ||
-      isAgreedJishogiDialogOpen
+      isAgreedJishogiDialogOpen ||
+      isNewGameDialogOpen
     ) return;
     setIsEnteringKingDialogOpen(true);
   };
@@ -209,7 +222,8 @@ export const ShogiResearchScreen: React.FC<ShogiResearchScreenProps> = ({ initia
       pendingPromotion ||
       isResignationDialogOpen ||
       isEnteringKingDialogOpen ||
-      isAgreedJishogiDialogOpen
+      isAgreedJishogiDialogOpen ||
+      isNewGameDialogOpen
     ) return;
     setAgreedJishogiProposal(null);
     setAgreedJishogiError(null);
@@ -263,6 +277,42 @@ export const ShogiResearchScreen: React.FC<ShogiResearchScreenProps> = ({ initia
     if (execution.type === 'rejected') {
       setAgreedJishogiError(execution.message);
     }
+  };
+
+  const openNewGameDialog = () => {
+    if (
+      !isNewGameAvailable ||
+      pendingPromotion ||
+      isResignationDialogOpen ||
+      isEnteringKingDialogOpen ||
+      isAgreedJishogiDialogOpen ||
+      isNewGameDialogOpen
+    ) return;
+    setIsNewGameDialogOpen(true);
+  };
+
+  const cancelNewGame = useCallback(() => {
+    shouldRestoreNewGameFocus.current = true;
+    setIsNewGameDialogOpen(false);
+  }, []);
+
+  const confirmNewGame = () => {
+    shouldRestoreResignationFocus.current = false;
+    shouldRestoreEnteringKingFocus.current = false;
+    shouldRestoreAgreedJishogiFocus.current = false;
+    shouldRestoreNewGameFocus.current = true;
+    focusRequestId.current = 0;
+
+    setBoardState(createInitialBoardState());
+    setSelection({ kind: 'none' });
+    setPendingPromotion(null);
+    setIsResignationDialogOpen(false);
+    setIsEnteringKingDialogOpen(false);
+    setIsAgreedJishogiDialogOpen(false);
+    setAgreedJishogiProposal(null);
+    setAgreedJishogiError(null);
+    setFocusRequest(null);
+    setIsNewGameDialogOpen(false);
   };
 
   const handleSquareClick = (square: BoardSquare) => {
@@ -355,7 +405,7 @@ export const ShogiResearchScreen: React.FC<ShogiResearchScreenProps> = ({ initia
   };
 
   const handleScreenKeyDown = (event: React.KeyboardEvent<HTMLDivElement>) => {
-    if (isResignationDialogOpen || isEnteringKingDialogOpen || isAgreedJishogiDialogOpen) return;
+    if (isResignationDialogOpen || isEnteringKingDialogOpen || isAgreedJishogiDialogOpen || isNewGameDialogOpen) return;
     if (event.key === 'Escape' && selection.kind === 'hand') {
       event.preventDefault();
       setSelection({ kind: 'none' });
@@ -491,6 +541,13 @@ export const ShogiResearchScreen: React.FC<ShogiResearchScreenProps> = ({ initia
       data-turn={boardState.turn}
       data-move-number={boardState.moveNumber}
       data-history-count={boardState.history.length}
+      data-foul-history-count={boardState.foulHistory?.length ?? 0}
+      data-position-history-count={boardState.positionHistory?.length ?? 0}
+      data-sente-hand-count={boardState.senteHand.length}
+      data-gote-hand-count={boardState.goteHand.length}
+      data-last-move={boardState.lastMove?.notation ?? ''}
+      data-result={boardState.result?.endReason ?? ''}
+      data-move-limit-jishogi={boardState.moveLimitJishogi?.kind ?? ''}
       onKeyDown={handleScreenKeyDown}
       className="min-h-full w-full flex flex-col items-center justify-between py-6 px-3 sm:px-6 bg-[#0f1115] text-stone-200"
     >
@@ -531,7 +588,7 @@ export const ShogiResearchScreen: React.FC<ShogiResearchScreenProps> = ({ initia
             ref={enteringKingButtonRef}
             type="button"
             onClick={openEnteringKingDialog}
-            disabled={!isEnteringKingAvailable || pendingPromotion !== null || isResignationDialogOpen || isEnteringKingDialogOpen || isAgreedJishogiDialogOpen}
+            disabled={!isEnteringKingAvailable || pendingPromotion !== null || isResignationDialogOpen || isEnteringKingDialogOpen || isAgreedJishogiDialogOpen || isNewGameDialogOpen}
             aria-haspopup="dialog"
             aria-expanded={isEnteringKingDialogOpen}
             className="rounded border border-amber-700/70 bg-amber-950/45 px-4 py-1.5 font-serif text-sm tracking-[0.12em] text-amber-100 shadow-inner outline-none transition hover:border-amber-500 hover:bg-amber-900/55 focus-visible:ring-2 focus-visible:ring-amber-300 disabled:cursor-not-allowed disabled:border-stone-800 disabled:text-stone-600 disabled:opacity-65"
@@ -542,7 +599,7 @@ export const ShogiResearchScreen: React.FC<ShogiResearchScreenProps> = ({ initia
             ref={agreedJishogiButtonRef}
             type="button"
             onClick={openAgreedJishogiDialog}
-            disabled={!isEnteringKingAvailable || pendingPromotion !== null || isResignationDialogOpen || isEnteringKingDialogOpen || isAgreedJishogiDialogOpen}
+            disabled={!isEnteringKingAvailable || pendingPromotion !== null || isResignationDialogOpen || isEnteringKingDialogOpen || isAgreedJishogiDialogOpen || isNewGameDialogOpen}
             aria-haspopup="dialog"
             aria-expanded={isAgreedJishogiDialogOpen}
             className="rounded border border-sky-800/70 bg-sky-950/45 px-4 py-1.5 font-serif text-sm tracking-[0.1em] text-sky-100 shadow-inner outline-none transition hover:border-sky-600 hover:bg-sky-900/55 focus-visible:ring-2 focus-visible:ring-amber-300 disabled:cursor-not-allowed disabled:border-stone-800 disabled:text-stone-600 disabled:opacity-65"
@@ -553,12 +610,23 @@ export const ShogiResearchScreen: React.FC<ShogiResearchScreenProps> = ({ initia
             ref={resignationButtonRef}
             type="button"
             onClick={openResignationDialog}
-            disabled={!isResignationAvailable || pendingPromotion !== null || isResignationDialogOpen || isEnteringKingDialogOpen || isAgreedJishogiDialogOpen}
+            disabled={!isResignationAvailable || pendingPromotion !== null || isResignationDialogOpen || isEnteringKingDialogOpen || isAgreedJishogiDialogOpen || isNewGameDialogOpen}
             aria-haspopup="dialog"
             aria-expanded={isResignationDialogOpen}
             className="rounded border border-rose-900/70 bg-stone-900/80 px-4 py-1.5 font-serif text-sm tracking-[0.14em] text-rose-200 shadow-inner outline-none transition hover:border-rose-700 hover:bg-rose-950/55 focus-visible:ring-2 focus-visible:ring-amber-300 disabled:cursor-not-allowed disabled:border-stone-800 disabled:text-stone-600 disabled:opacity-65"
           >
             投了
+          </button>
+          <button
+            ref={newGameButtonRef}
+            type="button"
+            onClick={openNewGameDialog}
+            disabled={!isNewGameAvailable || pendingPromotion !== null || isResignationDialogOpen || isEnteringKingDialogOpen || isAgreedJishogiDialogOpen || isNewGameDialogOpen}
+            aria-haspopup="dialog"
+            aria-expanded={isNewGameDialogOpen}
+            className="rounded border border-emerald-800/70 bg-emerald-950/45 px-4 py-1.5 font-serif text-sm tracking-[0.1em] text-emerald-100 shadow-inner outline-none transition hover:border-emerald-600 hover:bg-emerald-900/55 focus-visible:ring-2 focus-visible:ring-amber-300 disabled:cursor-not-allowed disabled:border-stone-800 disabled:text-stone-600 disabled:opacity-65"
+          >
+            新しい対局
           </button>
         </div>
       </header>
@@ -622,13 +690,17 @@ export const ShogiResearchScreen: React.FC<ShogiResearchScreenProps> = ({ initia
         />
       )}
 
+      {isNewGameDialogOpen && (
+        <NewGameDialog onConfirm={confirmNewGame} onCancel={cancelNewGame} />
+      )}
+
       {/* Bottom Footer Notice */}
       <footer className="w-full max-w-4xl mt-8 pt-4 border-t border-stone-800/60 text-center">
         <p
           id="shogi-footer-notice"
           className="text-xs text-stone-400 font-sans tracking-wide select-none"
         >
-          駒の移動・成り・駒打ち、王手表示・一般的な詰み判定・終局処理に対応しています。千日手・連続王手の千日手の終局処理に対応しています。500手規定による持将棋の終局処理に対応しています。合意による持将棋の終局処理に対応しています。投了による終局処理に対応しています。入玉宣言による終局処理に対応しています。
+          駒の移動・成り・駒打ち、王手表示・一般的な詰み判定・終局処理に対応しています。千日手・連続王手の千日手の終局処理に対応しています。500手規定による持将棋の終局処理に対応しています。合意による持将棋の終局処理に対応しています。投了による終局処理に対応しています。入玉宣言による終局処理に対応しています。確認後に平手初期局面から新しい対局を始められます。
         </p>
       </footer>
     </div>
