@@ -66,6 +66,7 @@ export const ShogiResearchScreen: React.FC<ShogiResearchScreenProps> = ({ initia
   const [isEnteringKingDialogOpen, setIsEnteringKingDialogOpen] = useState(false);
   const [isAgreedJishogiDialogOpen, setIsAgreedJishogiDialogOpen] = useState(false);
   const [isNewGameDialogOpen, setIsNewGameDialogOpen] = useState(false);
+  const [moveHistoryResetKey, setMoveHistoryResetKey] = useState(0);
   const [agreedJishogiProposal, setAgreedJishogiProposal] = useState<AgreedJishogiProposal | null>(null);
   const [agreedJishogiError, setAgreedJishogiError] = useState<string | null>(null);
   const [focusRequest, setFocusRequest] = useState<{
@@ -333,6 +334,7 @@ export const ShogiResearchScreen: React.FC<ShogiResearchScreenProps> = ({ initia
     setAgreedJishogiProposal(null);
     setAgreedJishogiError(null);
     setFocusRequest(null);
+    setMoveHistoryResetKey((current) => current + 1);
     setIsNewGameDialogOpen(false);
   };
 
@@ -583,6 +585,7 @@ export const ShogiResearchScreen: React.FC<ShogiResearchScreenProps> = ({ initia
         <MoveHistoryPanel
           history={boardState.history}
           result={boardState.status === 'ended' ? boardState.result : null}
+          resetKey={moveHistoryResetKey}
         />
       </main>
 

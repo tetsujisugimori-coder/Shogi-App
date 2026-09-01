@@ -1,40 +1,48 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useLayoutEffect, useRef, useState } from 'react';
 import type { GameResult, MoveRecord } from '../../types/shogi';
 import { getGameResultDisplay } from './gameResultDisplay';
 
 export interface MoveHistoryPanelProps {
   history: readonly MoveRecord[];
   result: GameResult | null | undefined;
+  resetKey?: number;
 }
 
 const PANEL_ID = 'shogi-move-history-panel';
 
-export const MoveHistoryPanel: React.FC<MoveHistoryPanelProps> = ({ history, result }) => {
+export const MoveHistoryPanel: React.FC<MoveHistoryPanelProps> = ({
+  history,
+  result,
+  resetKey = 0,
+}) => {
   const [isMobileOpen, setIsMobileOpen] = useState(false);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
-  const previousHistoryLengthRef = useRef(history.length);
-  const previousHadResultRef = useRef(Boolean(result));
+  const previousResetKeyRef = useRef(resetKey);
   const hasResult = Boolean(result);
   const resultDisplay = result ? getGameResultDisplay(result) : null;
 
-  useEffect(() => {
+  useLayoutEffect(() => {
+    if (previousResetKeyRef.current === resetKey) return;
+    previousResetKeyRef.current = resetKey;
+    const container = scrollContainerRef.current;
+    if (container) {
+      container.scrollTop = 0;
+    }
+    setIsMobileOpen(false);
+  }, [resetKey]);
+
+  useLayoutEffect(() => {
     const container = scrollContainerRef.current;
     if (container) {
       container.scrollTop = history.length === 0 && !hasResult ? 0 : container.scrollHeight;
     }
-
-    if (
-      (history.length === 0 && previousHistoryLengthRef.current > 0) ||
-      (!hasResult && previousHadResultRef.current)
-    ) {
-      setIsMobileOpen(false);
-    }
-    previousHistoryLengthRef.current = history.length;
-    previousHadResultRef.current = hasResult;
-  }, [history.length, hasResult]);
+  }, [history.length, hasResult, isMobileOpen]);
 
   return (
-    <aside className="w-full min-w-0 xl:w-72 xl:flex-none" aria-label="棋譜パネル">
+    <aside
+      className="w-full min-w-0 xl:w-72 xl:flex-none"
+      aria-label="棋譜パネル"
+    >
       <button
         type="button"
         className="mb-3 w-full rounded-lg border border-amber-800/70 bg-stone-950/80 px-4 py-2 font-serif text-sm tracking-[0.12em] text-amber-100 shadow-inner outline-none transition hover:border-amber-600 hover:bg-amber-950/60 focus-visible:ring-2 focus-visible:ring-amber-300 md:hidden"

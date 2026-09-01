@@ -54,6 +54,33 @@ function createHistory(): MoveRecord[] {
   ];
 }
 
+function mockMoveHistoryScrollHeight(value: number) {
+  const scrollIntoView = vi.fn();
+  const originalScrollIntoView = Object.getOwnPropertyDescriptor(
+    Element.prototype,
+    'scrollIntoView'
+  );
+  Object.defineProperty(Element.prototype, 'scrollIntoView', {
+    configurable: true,
+    value: scrollIntoView,
+  });
+  const scrollHeight = vi
+    .spyOn(HTMLElement.prototype, 'scrollHeight', 'get')
+    .mockReturnValue(value);
+
+  return {
+    scrollIntoView,
+    restore: () => {
+      scrollHeight.mockRestore();
+      if (originalScrollIntoView) {
+        Object.defineProperty(Element.prototype, 'scrollIntoView', originalScrollIntoView);
+      } else {
+        Reflect.deleteProperty(Element.prototype, 'scrollIntoView');
+      }
+    },
+  };
+}
+
 describe('閲覧専用の棋譜一覧', () => {
   it('初期局面では見出し、ログ、空状態を意味的に表示する', () => {
     render(<MoveHistoryPanel history={[]} result={null} />);
@@ -101,43 +128,70 @@ describe('閲覧専用の棋譜一覧', () => {
   });
 
   it('履歴追加と結果追加時にパネル内部のscrollTopだけを末尾へ追従させる', () => {
-    const scrollIntoView = vi.fn();
-    const originalScrollIntoView = Object.getOwnPropertyDescriptor(
-      Element.prototype,
-      'scrollIntoView'
-    );
-    Object.defineProperty(Element.prototype, 'scrollIntoView', {
-      configurable: true,
-      value: scrollIntoView,
-    });
-    const scrollHeight = vi.spyOn(HTMLElement.prototype, 'scrollHeight', 'get');
-    scrollHeight.mockReturnValue(640);
+    const scrollMock = mockMoveHistoryScrollHeight(640);
+    try {
+      const first = createMove(1, '▲7六歩');
+      const second = createMove(2, '△3四歩');
+      const { rerender } = render(<MoveHistoryPanel history={[first]} result={null} />);
+      const container = screen.getByTestId('move-history-scroll-container');
+      expect(container.scrollTop).toBe(640);
 
-    const first = createMove(1, '▲7六歩');
-    const second = createMove(2, '△3四歩');
-    const { rerender } = render(<MoveHistoryPanel history={[first]} result={null} />);
-    const container = screen.getByTestId('move-history-scroll-container');
-    expect(container.scrollTop).toBe(640);
+      container.scrollTop = 20;
+      rerender(<MoveHistoryPanel history={[first, second]} result={null} />);
+      expect(container.scrollTop).toBe(640);
 
-    container.scrollTop = 20;
-    rerender(<MoveHistoryPanel history={[first, second]} result={null} />);
-    expect(container.scrollTop).toBe(640);
+      container.scrollTop = 10;
+      rerender(
+        <MoveHistoryPanel
+          history={[first, second]}
+          result={{ winner: 'sente', loser: 'gote', endReason: 'checkmate' }}
+        />
+      );
+      expect(container.scrollTop).toBe(640);
+      expect(scrollMock.scrollIntoView).not.toHaveBeenCalled();
+    } finally {
+      scrollMock.restore();
+    }
+  });
 
-    container.scrollTop = 10;
-    rerender(
-      <MoveHistoryPanel
-        history={[first, second]}
-        result={{ winner: 'sente', loser: 'gote', endReason: 'checkmate' }}
-      />
-    );
-    expect(container.scrollTop).toBe(640);
-    expect(scrollIntoView).not.toHaveBeenCalled();
+  it('閉じたモバイル棋譜を開く操作で長い履歴の末尾へ再追従する', async () => {
+    const user = userEvent.setup();
+    const scrollMock = mockMoveHistoryScrollHeight(720);
+    try {
+      render(<MoveHistoryPanel history={createHistory()} result={null} />);
+      const container = screen.getByTestId('move-history-scroll-container');
 
-    scrollHeight.mockRestore();
-    if (originalScrollIntoView) {
-      Object.defineProperty(Element.prototype, 'scrollIntoView', originalScrollIntoView);
-    } else {
-      Reflect.deleteProperty(Element.prototype, 'scrollIntoView');
+      await user.click(screen.getByRole('button', { name: '棋譜を表示' }));
+      await user.click(screen.getByRole('button', { name: '棋譜を閉じる' }));
+      container.scrollTop = 0;
+
+      await user.click(screen.getByRole('button', { name: '棋譜を表示' }));
+      expect(container.scrollTop).toBe(720);
+      expect(scrollMock.scrollIntoView).not.toHaveBeenCalled();
+    } finally {
+      scrollMock.restore();
+    }
+  });
+
+  it('終局結果があるモバイル棋譜も開く操作で末尾へ再追従する', async () => {
+    const user = userEvent.setup();
+    const scrollMock = mockMoveHistoryScrollHeight(840);
+    try {
+      render(
+        <MoveHistoryPanel
+          history={createHistory()}
+          result={{ winner: 'sente', loser: 'gote', endReason: 'checkmate' }}
+        />
+      );
+      const container = screen.getByTestId('move-history-scroll-container');
+      container.scrollTop = 0;
+
+      await user.click(screen.getByRole('button', { name: '棋譜を表示' }));
+      expect(container.scrollTop).toBe(840);
+      expect(screen.getByText('先手勝ち（詰み）')).toBeInTheDocument();
+      expect(scrollMock.scrollIntoView).not.toHaveBeenCalled();
+    } finally {
+      scrollMock.restore();
     }
   });
 
@@ -274,18 +328,63 @@ describe('新しい対局との棋譜連携', () => {
     render(<ShogiResearchScreen initialState={state} />);
 
     const panel = document.getElementById('shogi-move-history-panel') as HTMLElement;
+    const scrollContainer = screen.getByTestId('move-history-scroll-container');
     expect(within(panel).getByText('▲7六歩')).toBeInTheDocument();
     expect(within(panel).getByText('先手勝ち（詰み）')).toBeInTheDocument();
+    await user.click(screen.getByRole('button', { name: '棋譜を表示' }));
+    scrollContainer.scrollTop = 90;
 
     await user.click(screen.getByRole('button', { name: '新しい対局' }));
     expect(within(panel).getByText('▲7六歩')).toBeInTheDocument();
     await user.click(screen.getByRole('button', { name: 'キャンセル' }));
     expect(within(panel).getByText('▲7六歩')).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: '棋譜を閉じる' })).toHaveAttribute(
+      'aria-expanded',
+      'true'
+    );
+    expect(scrollContainer.scrollTop).toBe(90);
 
     await user.click(screen.getByRole('button', { name: '新しい対局' }));
     await user.click(screen.getByRole('button', { name: '新しい対局を始める' }));
+    expect(screen.getByRole('button', { name: '棋譜を表示' })).toHaveAttribute(
+      'aria-expanded',
+      'false'
+    );
     expect(within(panel).getByText('まだ着手はありません')).toBeInTheDocument();
     expect(within(panel).queryByRole('heading', { name: '対局結果' })).not.toBeInTheDocument();
+    expect(scrollContainer.scrollTop).toBe(0);
+  });
+
+  it('空の初期局面でもキャンセルは開閉を維持し、確定だけ棋譜を閉じる', async () => {
+    const user = userEvent.setup();
+    render(<ShogiResearchScreen />);
+    const panel = document.getElementById('shogi-move-history-panel') as HTMLElement;
+    const scrollContainer = screen.getByTestId('move-history-scroll-container');
+
+    await user.click(screen.getByRole('button', { name: '棋譜を表示' }));
+    scrollContainer.scrollTop = 120;
+    await user.click(screen.getByRole('button', { name: '新しい対局' }));
+    expect(screen.getByRole('button', { name: '棋譜を閉じる' })).toHaveAttribute(
+      'aria-expanded',
+      'true'
+    );
+    await user.click(screen.getByRole('button', { name: 'キャンセル' }));
+    expect(screen.getByRole('button', { name: '棋譜を閉じる' })).toHaveAttribute(
+      'aria-expanded',
+      'true'
+    );
+    expect(within(panel).getByText('まだ着手はありません')).toBeInTheDocument();
+    expect(scrollContainer.scrollTop).toBe(120);
+
+    await user.click(screen.getByRole('button', { name: '新しい対局' }));
+    await user.click(screen.getByRole('button', { name: '新しい対局を始める' }));
+    expect(screen.getByRole('button', { name: '棋譜を表示' })).toHaveAttribute(
+      'aria-expanded',
+      'false'
+    );
+    expect(within(panel).getByText('まだ着手はありません')).toBeInTheDocument();
+    expect(within(panel).queryByRole('heading', { name: '対局結果' })).not.toBeInTheDocument();
+    expect(scrollContainer.scrollTop).toBe(0);
   });
 
   it('棋譜の開閉は盤面選択と棋譜内容を変更しない', async () => {

@@ -1828,3 +1828,51 @@ PR #1のレビュー指摘を受け、簡易APIの`applyMove`と合法手候補�
 - 棋譜行から過去局面へ戻る操作、Undo / Redo、待った、局面スナップショット、局面再生、感想戦、分岐棋譜。
 - KIF / KI2 / CSA / USIの読み込み・保存、コピー、ダウンロード、共有。
 - 対局時計、AI・将棋エンジン・形勢評価との接続、反則履歴一覧。
+
+## [2026-09-02] PR #22 棋譜一覧パネルのモバイル追従・新規対局リセット修正
+
+### レビュー指摘と修正内容
+
+- 修正前HEADは `485e069c7fac2241e932f9c47a7fccee708bc17d`、作業ブランチは `feat/move-history-panel`。作業開始時の作業ツリーがクリーンであることを確認し、既存変更を破棄せず修正した。
+- モバイルで棋譜が `display: none` の間は `scrollHeight` が0になり得る一方、開閉状態が既存スクロールeffectの依存値に含まれていなかったため、閉じた長い棋譜を開いても最新手・対局結果へ再追従しない問題を修正した。
+- `isMobileOpen` を末尾スクロールの明示的な依存値へ追加した。描画前にパネル実寸を反映する `useLayoutEffect` で、履歴・結果・開閉状態の変化時にパネル自身の `scrollTop` だけを更新する。空状態は0、それ以外は `scrollHeight` へ移動し、`scrollIntoView()`、`window.innerWidth`、ページスクロールAPIは使用しない。
+- モバイルでパネルを展開すると研究画面の高さが増え、documentのスクロールアンカー補正によってページ位置が移動することを実ブラウザで確認した。`src/index.css` の `html` へ `overflow-anchor: none` を設定し、JSでページ位置を戻さず、パネル内部だけを末尾へ追従させた。
+- 空履歴・結果なしの初期局面から新しい対局を確定すると、履歴件数と結果有無が変わらずパネルが閉じない問題を修正した。`ShogiResearchScreen` に `moveHistoryResetKey` を追加し、「新しい対局を始める」の確定処理だけでインクリメントする。
+- `MoveHistoryPanel` は読み取り専用 `resetKey` の変化を初期表示と区別して検出し、変化時だけ `isMobileOpen: false` と `scrollTop: 0` を適用する。履歴件数・結果有無から新規対局を推測していた旧条件と参照値を削除した。
+- ダイアログを開く、キャンセル、Escape、背景クリックでは `resetKey` を変更しない。既存の `BoardState.history` / `MoveRecord.notation`、GameResult表示、盤面選択、合法手候補、デスクトップの常時表示CSS、ARIA構造は変更していない。
+
+### 変更ファイル・回帰テスト
+
+- 変更: `src/components/shogi/MoveHistoryPanel.tsx`
+- 変更: `src/components/shogi/ShogiResearchScreen.tsx`
+- 変更: `src/index.css`
+- 変更: `src/test/shogi-move-history.test.tsx`
+- 追記: `LOG.md`
+- `README.md` は、最新手追従、新しい対局確定時の初期化、モバイル折り畳みという既存記述が修正後の実挙動と一致するため変更していない。
+- 回帰テストを3件追加し、棋譜を閉じて `scrollTop` を0へ戻した後の再オープンで末尾へ移動すること、終局結果がある場合の再オープンでも末尾へ移動すること、空の初期局面では新しい対局のキャンセルが開状態を維持し、確定だけが閉鎖・空状態・結果なし・`scrollTop: 0`へ戻すことを検証した。
+- 既存の履歴・結果ありからの新しい対局テストも、開状態と任意スクロール位置を作り、キャンセル時の維持と確定時の閉鎖・初期化まで検証するよう強化した。
+- テストで変更する `Element.prototype.scrollIntoView` と `HTMLElement.prototype.scrollHeight` は共通ヘルパーと `try/finally` で、アサーション失敗時も必ず元へ復元する。
+
+### 検証結果
+
+- `npm run lint`: 成功（TypeScriptエラーなし）。
+- 対象テスト: `src/test/shogi-move-history.test.tsx` 22/22件成功。
+- `npm test`: 成功（10ファイル、532/532件）。
+- `npm run check`: 成功（lockfile検証、TypeScript型検査、532テスト、本番build）。
+- 本番build: Vite 6.4.3、1706 modules transformed。
+- `git diff --check`: 成功（空白エラーなし。既存Git設定によるLF→CRLF警告のみ）。
+
+### ブラウザ確認結果
+
+- Vite 6.4.3の開発サーバーとCodex内蔵ブラウザを使用し、500×1000（実効client幅485px）で確認した。
+- 棋譜を閉じたまま18手進めた状態では、閉鎖中の `scrollHeight` / `scrollTop` は0だった。開くと `scrollHeight: 740`、`clientHeight: 288`、`scrollTop: 452`となり、「18手目 △1四歩 最新手」がパネル表示範囲内へ追従した。
+- 18手後に投了し、閉じた棋譜を開くと `scrollHeight: 837`、`scrollTop: 548.67`となり、「対局結果 / 後手勝ち（先手投了）」が表示範囲内へ追従した。
+- documentのアンカー補正無効後は、座標クリックによる開く操作の前後で `window.scrollY` が136のまま変化せず、ページ全体を移動させずにパネル内部だけが末尾へ移動した。
+- 履歴18件・投了結果ありの状態では、新しい対局ダイアログを開く／キャンセル後も `aria-expanded="true"`、履歴18件、投了結果を維持し、確定後だけ `aria-expanded="false"`、履歴0件、結果なし、`scrollTop: 0`へ戻った。
+- 空の初期局面でも、ダイアログを開く／キャンセル後は「棋譜を閉じる」と `aria-expanded="true"` を維持し、確定後だけ「棋譜を表示」、`aria-expanded="false"`、空状態、結果なし、`scrollTop: 0`へ戻った。
+- documentのclient幅・scroll幅はともに485pxで横スクロールなし。Viteエラーオーバーレイなし、ブラウザコンソールのwarning / error 0件だった。
+
+### 対象外・残課題
+
+- 棋譜行から過去局面へ戻る操作、Undo / Redo、待った、局面再生、分岐棋譜、棋譜入出力は引き続き対象外。
+- 依存パッケージ、`package.json`、`package-lock.json`、CI設定は変更していない。
