@@ -12,6 +12,8 @@ import {
   getLegalDropSquares,
   getMoveCandidates,
   getPromotionStatus,
+  getPositionSnapshot,
+  normalizePositionSnapshots,
   PromotionStatus,
   type AgreedJishogiProposal,
 } from '../../domain/shogi';
@@ -59,7 +61,10 @@ const STATUS_BADGE_COLORS = {
 } as const;
 
 export const ShogiResearchScreen: React.FC<ShogiResearchScreenProps> = ({ initialState }) => {
-  const [boardState, setBoardState] = useState<BoardState>(() => initialState ?? createInitialBoardState());
+  const [boardState, setBoardState] = useState<BoardState>(() =>
+    normalizePositionSnapshots(initialState ?? createInitialBoardState())
+  );
+  const [replayHistoryIndex, setReplayHistoryIndex] = useState<number | null>(null);
   const [selection, setSelection] = useState<SelectionState>({ kind: 'none' });
   const [pendingPromotion, setPendingPromotion] = useState<PendingPromotion | null>(null);
   const [isResignationDialogOpen, setIsResignationDialogOpen] = useState(false);
@@ -84,18 +89,48 @@ export const ShogiResearchScreen: React.FC<ShogiResearchScreenProps> = ({ initia
   const newGameButtonRef = useRef<HTMLButtonElement>(null);
   const shouldRestoreNewGameFocus = useRef(false);
 
+  const replaySnapshot =
+    replayHistoryIndex === null
+      ? null
+      : getPositionSnapshot(boardState, replayHistoryIndex);
+  const isViewingReplay = replaySnapshot !== null;
+  const dialogsAreOpen =
+    pendingPromotion !== null ||
+    isResignationDialogOpen ||
+    isEnteringKingDialogOpen ||
+    isAgreedJishogiDialogOpen ||
+    isNewGameDialogOpen;
   const isEnded = boardState.status === 'ended';
   const isResignationAvailable = boardState.status === 'active' || boardState.status === 'check';
   const isEnteringKingAvailable = boardState.status === 'active' || boardState.status === 'check';
   const isNewGameAvailable = isEnteringKingAvailable || isEnded;
   const isInteractionBlocked =
-    isEnded || pendingPromotion !== null || isResignationDialogOpen || isEnteringKingDialogOpen || isAgreedJishogiDialogOpen || isNewGameDialogOpen;
-  const selectedSquare = !isEnded && selection.kind === 'board' ? selection.square : null;
-  const selectedHandPieceId = !isEnded && selection.kind === 'hand' ? selection.pieceId : null;
+    isEnded || isViewingReplay || dialogsAreOpen;
+  const selectedSquare =
+    !isEnded && !isViewingReplay && selection.kind === 'board' ? selection.square : null;
+  const selectedHandPieceId =
+    !isEnded && !isViewingReplay && selection.kind === 'hand' ? selection.pieceId : null;
+
+  const replayIndexes = useMemo(
+    () =>
+      [...new Set((boardState.positionSnapshots ?? []).map((snapshot) => snapshot.historyIndex))]
+        .filter((index) => getPositionSnapshot(boardState, index) !== null)
+        .sort((left, right) => left - right),
+    [boardState]
+  );
+  const replayIndexSet = useMemo(() => new Set(replayIndexes), [replayIndexes]);
+  const replayPosition = replayHistoryIndex === null ? -1 : replayIndexes.indexOf(replayHistoryIndex);
+  const replayBaselineIndex = replayHistoryIndex ?? boardState.history.length;
+  const previousReplayIndex =
+    replayIndexes.filter((index) => index < replayBaselineIndex).at(-1) ?? null;
+  const nextReplayIndex =
+    replayPosition >= 0 && replayPosition < replayIndexes.length - 1
+      ? replayIndexes[replayPosition + 1]
+      : null;
 
   // Compute candidates for the mutually exclusive board/hand selection.
   const candidateSquares = useMemo(() => {
-    if (boardState.status === 'ended') return [];
+    if (boardState.status === 'ended' || isViewingReplay) return [];
     if (selection.kind === 'board') {
       return getMoveCandidates(boardState.squares, selection.square, boardState.turn);
     }
@@ -103,7 +138,7 @@ export const ShogiResearchScreen: React.FC<ShogiResearchScreenProps> = ({ initia
       return getLegalDropSquares(boardState, selection.pieceId);
     }
     return [];
-  }, [boardState, selection]);
+  }, [boardState, isViewingReplay, selection]);
 
   const enteringKingEvaluation = useMemo(
     () => evaluateEnteringKingDeclaration(boardState),
@@ -152,6 +187,22 @@ export const ShogiResearchScreen: React.FC<ShogiResearchScreenProps> = ({ initia
   const restoreBoardFocus = useCallback((square: { row: number; col: number }) => {
     focusRequestId.current += 1;
     setFocusRequest({ ...square, requestId: focusRequestId.current });
+  }, []);
+
+  const selectReplayPosition = useCallback(
+    (historyIndex: number) => {
+      if (dialogsAreOpen || !getPositionSnapshot(boardState, historyIndex)) return;
+      setSelection({ kind: 'none' });
+      setFocusRequest(null);
+      setReplayHistoryIndex(historyIndex);
+    },
+    [boardState, dialogsAreOpen]
+  );
+
+  const returnToCurrentPosition = useCallback(() => {
+    setReplayHistoryIndex(null);
+    setSelection({ kind: 'none' });
+    setFocusRequest(null);
   }, []);
 
   const cancelPromotion = useCallback(() => {
@@ -326,6 +377,7 @@ export const ShogiResearchScreen: React.FC<ShogiResearchScreenProps> = ({ initia
     focusRequestId.current = 0;
 
     setBoardState(createInitialBoardState());
+    setReplayHistoryIndex(null);
     setSelection({ kind: 'none' });
     setPendingPromotion(null);
     setIsResignationDialogOpen(false);
@@ -435,9 +487,23 @@ export const ShogiResearchScreen: React.FC<ShogiResearchScreenProps> = ({ initia
     }
   };
 
-  const turnLabel = boardState.turn === 'sente' ? '先手番' : '後手番';
+  const displayedTurn = replaySnapshot?.turn ?? boardState.turn;
+  const turnLabel = displayedTurn === 'sente' ? '先手番' : '後手番';
 
   const statusBadgeInfo = useMemo(() => {
+    if (replaySnapshot) {
+      const positionLabel =
+        replaySnapshot.historyIndex === 0
+          ? '初期局面を閲覧中'
+          : `${replaySnapshot.historyIndex}手目終了局面を閲覧中`;
+      return {
+        text: `${positionLabel} / 次は${turnLabel}${replaySnapshot.status === 'check' ? ' / 王手' : ''}`,
+        isLive: false,
+        bgColor: 'bg-sky-950/80 text-sky-200 border-sky-700/60',
+        dotColor: 'bg-sky-400',
+      };
+    }
+
     if (boardState.status === 'ended' && boardState.result) {
       const display = getGameResultDisplay(boardState.result);
       return {
@@ -462,7 +528,7 @@ export const ShogiResearchScreen: React.FC<ShogiResearchScreenProps> = ({ initia
       bgColor: 'bg-amber-950/70 text-amber-300 border-amber-800/50',
       dotColor: 'bg-amber-400',
     };
-  }, [boardState.status, boardState.result, turnLabel]);
+  }, [boardState.status, boardState.result, replaySnapshot, turnLabel]);
 
   return (
     <div
@@ -477,6 +543,8 @@ export const ShogiResearchScreen: React.FC<ShogiResearchScreenProps> = ({ initia
       data-last-move={boardState.lastMove?.notation ?? ''}
       data-result={boardState.result?.endReason ?? ''}
       data-move-limit-jishogi={boardState.moveLimitJishogi?.kind ?? ''}
+      data-position-snapshot-count={boardState.positionSnapshots?.length ?? 0}
+      data-replay-history-index={replayHistoryIndex ?? ''}
       onKeyDown={handleScreenKeyDown}
       className="min-h-full w-full flex flex-col items-center justify-between py-6 px-3 sm:px-6 bg-[#0f1115] text-stone-200"
     >
@@ -517,7 +585,7 @@ export const ShogiResearchScreen: React.FC<ShogiResearchScreenProps> = ({ initia
             ref={enteringKingButtonRef}
             type="button"
             onClick={openEnteringKingDialog}
-            disabled={!isEnteringKingAvailable || pendingPromotion !== null || isResignationDialogOpen || isEnteringKingDialogOpen || isAgreedJishogiDialogOpen || isNewGameDialogOpen}
+            disabled={!isEnteringKingAvailable || isViewingReplay || dialogsAreOpen}
             aria-haspopup="dialog"
             aria-expanded={isEnteringKingDialogOpen}
             className="rounded border border-amber-700/70 bg-amber-950/45 px-4 py-1.5 font-serif text-sm tracking-[0.12em] text-amber-100 shadow-inner outline-none transition hover:border-amber-500 hover:bg-amber-900/55 focus-visible:ring-2 focus-visible:ring-amber-300 disabled:cursor-not-allowed disabled:border-stone-800 disabled:text-stone-600 disabled:opacity-65"
@@ -528,7 +596,7 @@ export const ShogiResearchScreen: React.FC<ShogiResearchScreenProps> = ({ initia
             ref={agreedJishogiButtonRef}
             type="button"
             onClick={openAgreedJishogiDialog}
-            disabled={!isEnteringKingAvailable || pendingPromotion !== null || isResignationDialogOpen || isEnteringKingDialogOpen || isAgreedJishogiDialogOpen || isNewGameDialogOpen}
+            disabled={!isEnteringKingAvailable || isViewingReplay || dialogsAreOpen}
             aria-haspopup="dialog"
             aria-expanded={isAgreedJishogiDialogOpen}
             className="rounded border border-sky-800/70 bg-sky-950/45 px-4 py-1.5 font-serif text-sm tracking-[0.1em] text-sky-100 shadow-inner outline-none transition hover:border-sky-600 hover:bg-sky-900/55 focus-visible:ring-2 focus-visible:ring-amber-300 disabled:cursor-not-allowed disabled:border-stone-800 disabled:text-stone-600 disabled:opacity-65"
@@ -539,7 +607,7 @@ export const ShogiResearchScreen: React.FC<ShogiResearchScreenProps> = ({ initia
             ref={resignationButtonRef}
             type="button"
             onClick={openResignationDialog}
-            disabled={!isResignationAvailable || pendingPromotion !== null || isResignationDialogOpen || isEnteringKingDialogOpen || isAgreedJishogiDialogOpen || isNewGameDialogOpen}
+            disabled={!isResignationAvailable || isViewingReplay || dialogsAreOpen}
             aria-haspopup="dialog"
             aria-expanded={isResignationDialogOpen}
             className="rounded border border-rose-900/70 bg-stone-900/80 px-4 py-1.5 font-serif text-sm tracking-[0.14em] text-rose-200 shadow-inner outline-none transition hover:border-rose-700 hover:bg-rose-950/55 focus-visible:ring-2 focus-visible:ring-amber-300 disabled:cursor-not-allowed disabled:border-stone-800 disabled:text-stone-600 disabled:opacity-65"
@@ -550,7 +618,7 @@ export const ShogiResearchScreen: React.FC<ShogiResearchScreenProps> = ({ initia
             ref={newGameButtonRef}
             type="button"
             onClick={openNewGameDialog}
-            disabled={!isNewGameAvailable || pendingPromotion !== null || isResignationDialogOpen || isEnteringKingDialogOpen || isAgreedJishogiDialogOpen || isNewGameDialogOpen}
+            disabled={!isNewGameAvailable || isViewingReplay || dialogsAreOpen}
             aria-haspopup="dialog"
             aria-expanded={isNewGameDialogOpen}
             className="rounded border border-emerald-800/70 bg-emerald-950/45 px-4 py-1.5 font-serif text-sm tracking-[0.1em] text-emerald-100 shadow-inner outline-none transition hover:border-emerald-600 hover:bg-emerald-900/55 focus-visible:ring-2 focus-visible:ring-amber-300 disabled:cursor-not-allowed disabled:border-stone-800 disabled:text-stone-600 disabled:opacity-65"
@@ -564,19 +632,19 @@ export const ShogiResearchScreen: React.FC<ShogiResearchScreenProps> = ({ initia
       <main className="flex w-full max-w-[76rem] flex-1 min-w-0 flex-col items-center justify-center gap-4 md:gap-6 xl:flex-row xl:items-start">
         <div className="w-full min-w-0 max-w-4xl xl:flex-1">
           <ShogiTable
-            squares={boardState.squares}
-            senteHand={boardState.senteHand}
-            goteHand={boardState.goteHand}
-            status={boardState.status}
+            squares={replaySnapshot?.squares ?? boardState.squares}
+            senteHand={replaySnapshot?.senteHand ?? boardState.senteHand}
+            goteHand={replaySnapshot?.goteHand ?? boardState.goteHand}
+            status={replaySnapshot?.status ?? boardState.status}
             viewMode={boardState.viewMode}
             selectedSquare={selectedSquare}
             candidateSquares={candidateSquares}
             candidateKind={selection.kind === 'none' ? null : selection.kind === 'hand' ? 'drop' : 'move'}
             dropPieceType={selection.kind === 'hand' ? selection.pieceType : null}
-            lastMove={boardState.lastMove}
+            lastMove={replaySnapshot ? replaySnapshot.lastMove : boardState.lastMove}
             onSquareClick={isInteractionBlocked ? undefined : handleSquareClick}
             focusRequest={focusRequest}
-            turn={boardState.turn}
+            turn={displayedTurn}
             selectedHandPieceId={selectedHandPieceId}
             onHandPieceSelect={handleHandPieceSelect}
             pieceStandsDisabled={isInteractionBlocked}
@@ -584,8 +652,24 @@ export const ShogiResearchScreen: React.FC<ShogiResearchScreenProps> = ({ initia
         </div>
         <MoveHistoryPanel
           history={boardState.history}
-          result={boardState.status === 'ended' ? boardState.result : null}
+          result={!isViewingReplay && boardState.status === 'ended' ? boardState.result : null}
           resetKey={moveHistoryResetKey}
+          availableHistoryIndexes={replayIndexSet}
+          currentHistoryIndex={replayHistoryIndex}
+          selectionDisabled={dialogsAreOpen}
+          canGoToInitial={replayIndexSet.has(0) && replayHistoryIndex !== 0}
+          canGoToPrevious={previousReplayIndex !== null}
+          canGoToNext={nextReplayIndex !== null}
+          isViewingReplay={isViewingReplay}
+          onSelectHistoryIndex={selectReplayPosition}
+          onGoToInitial={() => selectReplayPosition(0)}
+          onGoToPrevious={() => {
+            if (previousReplayIndex !== null) selectReplayPosition(previousReplayIndex);
+          }}
+          onGoToNext={() => {
+            if (nextReplayIndex !== null) selectReplayPosition(nextReplayIndex);
+          }}
+          onReturnToCurrent={returnToCurrentPosition}
         />
       </main>
 

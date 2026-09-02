@@ -29,6 +29,10 @@ import {
 import { adjudicateAfterLegalMove } from './adjudication';
 import { cloneBoardSquares } from './boardStateUtils';
 import { normalizePositionHistory } from './repetition';
+import {
+  normalizePositionSnapshots,
+  recordPositionSnapshotAfterLegalMove,
+} from './replay';
 
 export type { FoulLossExecutionResult, RejectedExecutionResult } from './executionPolicy';
 
@@ -186,6 +190,7 @@ function internalApplyLegalMove(
       result: state.result ?? null,
       foulHistory: state.foulHistory ? [...state.foulHistory] : [],
       positionHistory: state.positionHistory ? [...state.positionHistory] : [],
+      positionSnapshots: state.positionSnapshots ? [...state.positionSnapshots] : [],
       moveLimitJishogi: state.moveLimitJishogi ?? null,
     },
   };
@@ -293,7 +298,7 @@ export function executeMove(
 
   // If move is legal, apply it through the internal helper
   if (validation.isValid) {
-    const normalizedState = normalizePositionHistory(state);
+    const normalizedState = normalizePositionSnapshots(normalizePositionHistory(state));
     const applied = internalApplyLegalMove(normalizedState, from, to, movePromotion);
     if (!applied) {
       return {
@@ -303,9 +308,10 @@ export function executeMove(
         message: ILLEGAL_MOVE_MESSAGES.no_piece_at_source,
       };
     }
+    const adjudicatedState = adjudicateAfterLegalMove(applied.state, state.turn);
     return {
       type: 'applied',
-      state: adjudicateAfterLegalMove(applied.state, state.turn),
+      state: recordPositionSnapshotAfterLegalMove(adjudicatedState),
       move: applied.move,
     };
   }

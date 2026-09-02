@@ -1876,3 +1876,129 @@ PR #1のレビュー指摘を受け、簡易APIの`applyMove`と合法手候補�
 
 - 棋譜行から過去局面へ戻る操作、Undo / Redo、待った、局面再生、分岐棋譜、棋譜入出力は引き続き対象外。
 - 依存パッケージ、`package.json`、`package-lock.json`、CI設定は変更していない。
+
+## [2026-09-02] 棋譜から過去局面を閲覧する「局面再生」の実装
+
+### 基準・ブランチ・目的
+
+- 作業前の `git status --short` は空で、既存変更なし。`git fetch origin main` 後の `main` / `origin/main` は同一の `202cae4087d4e66ff1853b1caa74543eaabd90f4` で、PR #22「対局中の棋譜一覧パネル」のマージコミットであることを確認した。
+- 作業ブランチは `feat/kifu-position-replay`。棋譜表示をUndoや待ったにせず、将来の感想戦・解析機能が参照できる読み取り専用の局面再生基盤を追加した。
+- 作業前の既知基準は10テストファイル、532/532件成功。サンドボックス内ではVite/esbuildの子プロセス起動が `spawn EPERM` になったため、同一テストを許可済み環境で実行した。
+
+### 再生スナップショットとドメイン設計
+
+- `PositionSnapshot` と `BoardState.positionSnapshots` を追加した。保持項目は `historyIndex`、9×9の `squares`、`senteHand`、`goteHand`、`turn`、次に指す `moveNumber`、`status`、`lastMove`、必要な `result`。
+- 千日手用 `positionHistory` は局面キー、合法手履歴位置、着手者、王手情報だけを保持する軽量な判定履歴のままとした。画面再現用の盤・持ち駒を `positionHistory` へ追加せず、判定仕様とキー形式を変更していない。
+- `src/domain/shogi/replay.ts` に純粋ヘルパーを集約した。`createPositionSnapshot` は独立スナップショットを生成し、`normalizePositionSnapshots` は外部stateの末尾が現在局面と整合するときだけ維持し、欠落・空・不整合時は `history.length` を基準とする現在局面1件へ正規化する。存在しない過去局面は推測しない。
+- `getPositionSnapshot` は同じ `historyIndex` の一致がちょうど1件ある場合だけ返し、欠落・重複・不正indexでは `null` を返す。配列位置と `MoveRecord.moveNumber` は局面対応に使用しない。
+- `createInitialBoardState()` は初期局面の `historyIndex: 0` スナップショットを1件作る。通常移動と駒打ちは、千日手・連続王手の千日手・詰み・500手持将棋を含む `adjudicateAfterLegalMove` の完了後に、同じ `recordPositionSnapshotAfterLegalMove` で確定局面を1件だけ追加する。判定前ではなく判定後に保存することで、その合法手で成立した `status` / `result` も再現できる。
+- assist方式の拒否、strict方式の反則負け、終局後の拒否、投了、入玉宣言、合意持将棋、新しい対局ダイアログの開閉では追加しない。新しい対局の確定は `createInitialBoardState()` により前局の全スナップショットを破棄し、初期局面1件へ戻す。
+
+### 複製・不変性
+
+- 盤は既存 `cloneBoardSquares` を再利用し、行配列、各マス、盤上の各 `Piece` を複製する。両持ち駒は配列と各 `Piece` を複製し、通常移動の `lastMove.from` / `to`、駒打ちの `to` も新しいオブジェクトへ複製する。`result` はプリミティブ項目だけの型付きunionを新しいオブジェクトへ複製する。
+- スナップショットへ `history`、`foulHistory`、`positionHistory`、`positionSnapshots`、500手待機状態などを格納せず、再帰構造と不要な履歴共有を避けた。後続手またはスナップショット側の盤変更が、過去・現在の別局面へ波及しないことをテストした。
+- 通常移動、成り、不成、必須成り、成駒の捕獲と成解除、指定IDの駒打ちは、合法手適用後の実データをスナップショットへ複製するため、UI側で棋譜表記や局面を再計算していない。
+
+### UI・操作停止・アクセシビリティ
+
+- `ShogiResearchScreen` は実際の `boardState` とUI専用の `replayHistoryIndex: number | null` を分離した。過去表示では `setBoardState(snapshot)` を呼ばず、盤、両持ち駒、手番、状態、直前手だけを選択スナップショットから描画する。`null` へ戻すと棋譜、反則履歴、千日手履歴、結果、500手待機を含む元stateをそのまま再表示する。
+- 棋譜行をネイティブ `button type="button"` にし、クリック・Enter・Spaceで配列上の `historyIndex` を選択できる。選択行は「表示中」ラベルと `aria-current="step"`、配列末尾は独立した「最新」ラベルで区別し、再生データがない行は表示したままdisabledにする。`MoveRecord.notation` をそのまま使用する。
+- 「初期局面」「前の手」「次の手」「現在局面へ戻る」を追加し、利用可能スナップショットだけを前後移動する。最新合法手スナップショットへ到達しても再生状態を維持し、投了など非着手終局後の本来の現在局面へは「現在局面へ戻る」だけで復帰する。
+- 再生中は1か所の `role="status"` / `aria-live="polite"` で「初期局面」または「N手目終了局面」、次の手番、王手を通知する。盤へ `aria-readonly="true"` を設定し、盤上移動、持ち駒選択・駒打ち、成り開始、投了、入玉宣言、合意持将棋、新しい対局を停止する。盤・持ち駒選択、候補、保留中フォーカス要求は再生開始時に解除する。
+- 成り選択や各確認ダイアログ中は棋譜行と再生操作をdisabledにし、同時成立を防ぐ。再生ボタン自身へフォーカスを保ち、「現在局面へ戻る」後も不自然に `body` へ失わせない。現在へ戻った後は進行中なら盤・駒台を再開し、終局済みなら従来どおり停止する。
+- 既存のモバイル開閉、`aria-expanded` / `aria-controls`、パネル内 `scrollTop` 追従、`overflow-anchor: none` を維持した。再生操作は狭い幅で2列へ折り返し、横スクロールを発生させない。
+- 新しい対局確定時は実state、スナップショット、再生位置、選択、直前手、棋譜パネルの開閉・スクロールを同時初期化する。再生中は新しい対局をdisabledにし、まず現在局面へ戻す方針とした。
+
+### 変更ファイル
+
+- 追加: `src/domain/shogi/replay.ts`
+- 追加: `src/test/shogi-replay.cases.tsx`（`shogi-move-history.test.tsx` から同じVitestワーカーへ読み込む専用ケース）
+- 変更: `src/types/shogi.ts`
+- 変更: `src/domain/shogi/boardStateUtils.ts`
+- 変更: `src/domain/shogi/gameState.ts`
+- 変更: `src/domain/shogi/drops.ts`
+- 変更: `src/domain/shogi/index.ts`
+- 変更: `src/components/shogi/ShogiResearchScreen.tsx`
+- 変更: `src/components/shogi/MoveHistoryPanel.tsx`
+- 変更: `src/components/shogi/ShogiBoard.tsx`
+- 変更: `src/test/shogi-move-history.test.tsx`
+- 変更: `vite.config.ts`
+- 変更: `README.md`
+- 追記: `LOG.md`
+- `package.json`、`package-lock.json`、依存パッケージ、GitHub ActionsなどCI設定の変更: なし。
+
+### テスト・検証結果
+
+- 再生ケース13件を追加し、初期局面、連続移動、成駒捕獲、成り・不成・必須成り、指定IDの駒打ち、不変性、不正手・反則負け・投了での非追加、外部stateの正規化、棋譜行・初期・前後・現在復帰、読み取り専用、欠落データ、ダイアログ排他を検証した。
+- 全ファイルを無制限並列にすると共有Windows環境で既存jsdom UIテストが5秒制限へ到達したため、期待値やタイムアウトを緩めず `vite.config.ts` の `maxWorkers: 2` だけを設定した。標準 `npm test` と `npm run check` は最終的に **10テストファイル、545/545件成功**。
+- 実行環境: Windows / PowerShell、Node.js `v24.20.0`、npm `11.17.0`。リポジトリのNode.js 24系 / npm 11.17系要件を満たす。
+- `npm run verify:lock`: 成功（399エントリ、registry package 398件、欠落0件）。
+- `npm run verify:macos-fsevents`: Windowsで静的検査成功。macOS固有のネイティブwatch実行は対象OS外のため未実施。
+- `npm run lint`: 成功（TypeScriptエラーなし）。
+- `npm test`: 成功（10ファイル、545件）。
+- `npm run build`: 成功（Vite 6.4.3、1707 modules transformed）。
+- `npm run check`: 成功（lock / lint / 545 tests / build）。
+
+### ブラウザ確認結果
+
+- Vite開発サーバーとCodex内蔵ブラウザを使用し、1280×1000指定（実効client幅1265px）と500×1000指定（実効client幅485px）で確認した。
+- PC幅で7六歩、3四歩の2手を実際に進め、スナップショット3件、棋譜2件を確認した。1手目の選択で7六だけが直前手として強調され、「1手目終了局面を閲覧中 / 次は後手番」、盤 `aria-readonly="true"`、全対局操作disabledとなった。
+- 「次の手」で最新の2手目スナップショットへ進んでも再生状態と「表示中 / 最新」の区別を維持し、「現在局面へ戻る」で `history: 2`、`positionHistory: 3`、`positionSnapshots: 3` のまま対局中・先手番・盤操作可能へ戻った。
+- モバイル幅では初期折り畳み、開閉、選択局面の維持、再生操作2列折り返しを確認した。全ボタンは左右28.7～456px内に収まり、documentのclient幅・scroll幅はともに485pxで横スクロールなし。棋譜を閉じて再度開いても1手目の選択を維持した。
+- 両幅で盤の最大サイズ、木目・立体表現、駒台を維持し、Viteエラーオーバーレイなし、ブラウザconsoleのwarning / error 0件だった。
+
+### 対象外・残課題
+
+- Undo / Redo、待った、過去局面からの指し直し、分岐棋譜、任意局面編集。
+- KIF / KI2 / CSA / USIの読み込み・保存、コピー、ダウンロード、共有。
+- 対局時計・持ち時間、AI・ローカルAI・将棋エンジン・形勢評価・解析接続、反則提案の再生。
+
+## [2026-09-02] PR #24 レビュー指摘（直前手表示・「前の手」移動）の修正
+
+### 作業開始時の状態
+
+- 対象ブランチは `feat/kifu-position-replay`。作業開始時のローカルHEADと `origin/feat/kifu-position-replay` はともに `ec94e4dc976344f6107cb0696b1776fc6ee2d141` で、`git status --short` は空だった。リモートに追加コミットがないことを確認し、この最新状態を基準にした。
+
+### 原因と修正
+
+- 再生中の盤へ渡す `lastMove` が `replaySnapshot?.lastMove ?? boardState.lastMove` となっていたため、初期局面が正しく保持する意図的な `lastMove: null` まで欠落値として扱われ、実際の現在局面の最終手へ置き換えられていた。再生スナップショットが選択されているときはその `lastMove` を `null` のまま渡し、再生中でないときだけ `boardState.lastMove` を渡す明示的な条件分岐へ変更した。
+- 再生開始前の「前の手」は利用可能な `replayIndexes` の末尾を移動先にしていたため、実際の現在局面と同じ最新スナップショットを再選択し、最初の1回では盤面が変わらなかった。基準位置を、再生中は表示中の `replayHistoryIndex`、現在局面では実際の合法手履歴位置 `boardState.history.length` とし、その基準より小さい実在インデックスの最大値だけへ移動する規則に変更した。
+- 欠落したインデックスを補完・推測せず、正規化済みスナップショットに実在するインデックスだけを候補にする。候補がなければ「前の手」をdisabledにする。「次の手」、棋譜行選択、「現在局面へ戻る」、最新スナップショットの再生状態と実際の現在局面の区別は維持した。
+- 盤、実際の `BoardState`、棋譜、持ち駒、手番、終局状態、`positionSnapshots` を再生操作で変更・巻き戻ししない既存設計を維持した。
+
+### 追加・変更した回帰テスト
+
+- 2手指した現在局面から「前の手」を1回押すと1手目終了局面へ移動するケースを追加した。
+- 1手指した現在局面から「前の手」を1回押すと初期局面へ移動し、「前の手」がdisabledになるケースを追加した。
+- 複数手後に初期局面を表示すると盤上の `data-last-move="source"` / `"dest"` が0件になり、「次の手」で進むとその局面自身の7七→7六だけが強調されることを検証した。
+- 投了後の過去局面から「現在局面へ戻る」と、棋譜、盤、持ち駒、手番、終局状態、`positionHistory`、`positionSnapshots` が元のまま維持される検証を強化した。
+- 外部stateで中間スナップショットが欠けるケースを追加し、現在位置より前に実在する局面だけを降順に選び、欠落局面を生成せず、該当棋譜行をdisabledのままにすることを検証した。
+- 局面再生テストは35件から39件、全体は545件から549件になった。期待値やタイムアウトは緩和していない。
+
+### 変更ファイル
+
+- 変更: `src/components/shogi/ShogiResearchScreen.tsx`
+- 変更: `src/test/shogi-replay.cases.tsx`
+- 追記: `LOG.md`
+- `README.md`、`package.json`、`package-lock.json`、`vite.config.ts`、CI設定、依存パッケージは変更していない。
+
+### 検証結果
+
+- `npm run lint`: 成功（TypeScriptエラーなし）。
+- 対象テスト `npm test -- --run src/test/shogi-move-history.test.tsx --reporter=dot`: 成功（1ファイル、39件）。
+- `npm test`: 成功（10ファイル、549件）。
+- `npm run build`: 成功（Vite 6.4.3、1707 modules transformed）。
+- `npm run check`: 成功（lock / lint / 549 tests / build）。
+- `git diff --check`: 成功（空白エラーなし）。
+
+### ブラウザ確認結果
+
+- Codex内蔵ブラウザでPC幅1280×1000（実効client幅1265px）を確認した。7六歩、3四歩の2手後に「前の手」を1回押すと1手目終了局面となり、7七→7六だけが強調された。初期局面では盤上の `source` / `dest` 強調が0件になり、「次の手」で7七→7六だけが再び強調された。「現在局面へ戻る」で対局中・先手番へ戻り、最新手3三→3四の強調を復元した。横スクロールは発生しなかった。
+- モバイル幅500×1000（実効client幅485px）を確認した。7六歩の1手後に棋譜を開き、「前の手」を1回押すと初期局面となり、盤上強調0件かつ「前の手」disabledになった。「次の手」で7七→7六だけが強調され、「現在局面へ戻る」で対局中・後手番、盤操作可能へ復帰した。横スクロールは発生しなかった。
+- 両幅の操作後にブラウザconsoleのwarning / errorは0件だった。
+
+### 残っている制約
+
+- Undo / Redo、待った、過去局面からの指し直し、分岐棋譜、棋譜の入出力は引き続き対象外。
+- 欠落した再生スナップショットは設計どおり復元・推測しないため、その局面の棋譜行選択はdisabledとなり、前後操作では次に実在する局面まで移動する。

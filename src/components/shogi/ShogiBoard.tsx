@@ -212,6 +212,7 @@ export const ShogiBoard: React.FC<ShogiBoardProps> = ({
                   id="shogi-grid"
                   role="grid"
                   aria-label="将棋盤 9×9マス"
+                  aria-readonly={!isInteractive}
                   className="relative flex flex-col w-[min(78vw,480px)] h-[min(78vw,480px)] sm:w-[480px] sm:h-[480px] rounded-[1px] overflow-hidden"
                   style={{
                     border: '1.5px solid rgba(40, 20, 5, 0.95)',

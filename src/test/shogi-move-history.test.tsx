@@ -6,6 +6,7 @@ import { MoveHistoryPanel } from '../components/shogi/MoveHistoryPanel';
 import { ShogiResearchScreen } from '../components/shogi/ShogiResearchScreen';
 import type { GameResult, MoveRecord, NormalMoveRecord } from '../types/shogi';
 import { createInitialBoardState } from '../types/shogi';
+import './shogi-replay.cases';
 
 function createMove(
   moveNumber: number,

@@ -12,3 +12,9 @@ export * from './enteringKing';
 export * from './moveLimitJishogi';
 export * from './jishogiPoints';
 export * from './agreedJishogi';
+export {
+  createPositionSnapshot,
+  normalizePositionSnapshots,
+  recordPositionSnapshotAfterLegalMove,
+  getPositionSnapshot,
+} from './replay';
