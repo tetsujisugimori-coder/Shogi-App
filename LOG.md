@@ -1989,7 +1989,7 @@ PR #1のレビュー指摘を受け、簡易APIの`applyMove`と合法手候補�
 - 対象テスト `npm test -- --run src/test/shogi-move-history.test.tsx --reporter=dot`: 成功（1ファイル、39件）。
 - `npm test`: 成功（10ファイル、549件）。
 - `npm run build`: 成功（Vite 6.4.3、1707 modules transformed）。
-- `npm run check`: 成功（lock / macOS fsevents静的検査 / lint / 549 tests / build）。
+- `npm run check`: 成功（lock / lint / 549 tests / build）。
 - `git diff --check`: 成功（空白エラーなし）。
 
 ### ブラウザ確認結果
