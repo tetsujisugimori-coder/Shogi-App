@@ -4,6 +4,7 @@ interface KifImportDialogProps {
   filename: string;
   moveCount: number;
   isEnded: boolean;
+  encoding: 'utf-8' | 'shift_jis' | null;
   onConfirm: () => void;
   onCancel: () => void;
 }
@@ -13,6 +14,7 @@ export const KifImportDialog: React.FC<KifImportDialogProps> = ({
   filename,
   moveCount,
   isEnded,
+  encoding,
   onConfirm,
   onCancel,
 }) => {
@@ -76,6 +78,8 @@ export const KifImportDialog: React.FC<KifImportDialogProps> = ({
           <dd className="text-stone-100">{moveCount}手</dd>
           <dt className="text-stone-400">状態</dt>
           <dd className="text-stone-100">{isEnded ? '終局済み' : '未終局（続行可能）'}</dd>
+          <dt className="text-stone-400">文字コード</dt>
+          <dd className="text-stone-100">{encoding === 'shift_jis' ? 'Shift_JIS' : 'UTF-8'}</dd>
         </dl>
         <div className="mt-5 flex flex-wrap justify-center gap-3">
           <button ref={cancelButtonRef} type="button" onClick={onCancel} className="min-w-24 rounded border border-stone-600 bg-stone-900/75 px-4 py-2 font-serif text-stone-100 outline-none transition hover:bg-stone-800 focus-visible:ring-2 focus-visible:ring-amber-300">

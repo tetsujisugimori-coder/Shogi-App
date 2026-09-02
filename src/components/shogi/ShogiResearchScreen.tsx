@@ -21,7 +21,7 @@ import {
   normalizePositionSnapshots,
   serializeShogiGameRecordV1,
   importShogiGameRecord,
-  importKifText,
+  importKifBytes,
   MAX_SHOGI_GAME_RECORD_FILE_BYTES,
   MAX_KIF_FILE_BYTES,
   PromotionStatus,
@@ -539,7 +539,8 @@ export const ShogiResearchScreen: React.FC<ShogiResearchScreenProps> = ({ initia
     setIsKifFileReading(true);
     setExportNotice(null);
     try {
-      const result = importKifText(await file.text());
+      const bytes = await file.arrayBuffer();
+      const result = importKifBytes(bytes);
       if (!result.ok) {
         setExportNotice({ kind: 'error', message: result.message });
         return;
@@ -1013,6 +1014,7 @@ export const ShogiResearchScreen: React.FC<ShogiResearchScreenProps> = ({ initia
           filename={pendingKifImport.filename}
           moveCount={pendingKifImport.metadata.moveCount}
           isEnded={pendingKifImport.metadata.isEnded}
+          encoding={pendingKifImport.metadata.encoding}
           onConfirm={confirmKifImport}
           onCancel={cancelKifImport}
         />
