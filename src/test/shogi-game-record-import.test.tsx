@@ -17,7 +17,7 @@ import { createInitialBoardState, type BoardState } from '../types/shogi';
 
 const EXPORTED_AT = new Date('2026-09-02T03:04:05.678Z');
 
-function createPlayedState(): BoardState {
+function createCapturedBishopState(): BoardState {
   const first = executeMove(
     createInitialBoardState(),
     { row: 6, col: 2 },
@@ -36,13 +36,57 @@ function createPlayedState(): BoardState {
   if (capture.type !== 'applied') throw new Error('capture failed');
   const fourth = executeMove(capture.state, { row: 2, col: 0 }, { row: 3, col: 0 });
   if (fourth.type !== 'applied') throw new Error('fourth move failed');
-  const drop = executeDrop(fourth.state, 'gote-bishop-2', { row: 4, col: 4 });
+  return fourth.state;
+}
+
+function createPlayedState(): BoardState {
+  const drop = executeDrop(createCapturedBishopState(), 'gote-bishop-2', { row: 4, col: 4 });
   if (drop.type !== 'applied') throw new Error('drop failed');
   return drop.state;
 }
 
 function importState(state: BoardState) {
   return importShogiGameRecord(serializeShogiGameRecordV1(state, EXPORTED_AT));
+}
+
+function createRepetitionState(): BoardState {
+  let state = createInitialBoardState();
+  const cycle = [
+    [{ row: 8, col: 3 }, { row: 7, col: 3 }],
+    [{ row: 0, col: 3 }, { row: 1, col: 3 }],
+    [{ row: 7, col: 3 }, { row: 8, col: 3 }],
+    [{ row: 1, col: 3 }, { row: 0, col: 3 }],
+  ] as const;
+  for (let repetition = 0; repetition < 3; repetition += 1) {
+    for (const [from, to] of cycle) {
+      const execution = executeMove(state, from, to);
+      if (execution.type !== 'applied') throw new Error('repetition fixture failed');
+      state = execution.state;
+    }
+  }
+  return state;
+}
+
+function createStrictInvalidMoveState(): BoardState {
+  const foul = executeMove(
+    createInitialBoardState(),
+    { row: 6, col: 2 },
+    { row: 4, col: 2 },
+    { mode: 'strict', proposer: 'shogi_engine', engineName: 'strict-test-engine' }
+  );
+  if (foul.type !== 'foul_loss') throw new Error('strict foul fixture failed');
+  return foul.state;
+}
+
+function createStrictInvalidDropState(): BoardState {
+  const foul = executeDrop(
+    createCapturedBishopState(),
+    'gote-bishop-2',
+    { row: 8, col: 4 },
+    { mode: 'strict', proposer: 'shogi_engine', engineName: 'strict-drop-engine' }
+  );
+  if (foul.type !== 'foul_loss') throw new Error('strict drop fixture failed');
+  return foul.state;
 }
 
 describe('v1対局記録の安全な読み込み', () => {
@@ -114,20 +158,7 @@ describe('v1対局記録の安全な読み込み', () => {
   });
 
   it('合法な往復手順で成立した千日手結果を棋譜から再現する', () => {
-    let state = createInitialBoardState();
-    const cycle = [
-      [{ row: 8, col: 3 }, { row: 7, col: 3 }],
-      [{ row: 0, col: 3 }, { row: 1, col: 3 }],
-      [{ row: 7, col: 3 }, { row: 8, col: 3 }],
-      [{ row: 1, col: 3 }, { row: 0, col: 3 }],
-    ] as const;
-    for (let repetition = 0; repetition < 3; repetition += 1) {
-      for (const [from, to] of cycle) {
-        const execution = executeMove(state, from, to);
-        if (execution.type !== 'applied') throw new Error('repetition fixture failed');
-        state = execution.state;
-      }
-    }
+    const state = createRepetitionState();
     expect(state.result?.endReason).toBe('repetition');
 
     const result = importState(state);
@@ -166,6 +197,197 @@ describe('v1対局記録の安全な読み込み', () => {
         );
       }
     }
+  });
+
+  it('strict方式の盤外移動による反則負けをv1 JSONで往復できる', () => {
+    const foul = executeMove(
+      createInitialBoardState(),
+      { row: 6, col: 2 },
+      { row: -1, col: 2 },
+      { mode: 'strict', proposer: 'shogi_engine', engineName: 'out-of-bounds-engine' }
+    );
+    expect(foul.type).toBe('foul_loss');
+    if (foul.type !== 'foul_loss') return;
+
+    const result = importState(foul.state);
+    expect(result.ok).toBe(true);
+    if (!result.ok) return;
+    const restoredFouls = result.state.foulHistory ?? [];
+    expect(restoredFouls).toEqual(foul.state.foulHistory);
+    expect(restoredFouls[0]).toMatchObject({
+      reason: 'out_of_bounds',
+      from: { row: 6, col: 2 },
+      to: { row: -1, col: 2 },
+    });
+    expect(result.state.status).toBe('ended');
+    expect(result.state.result).toEqual(foul.state.result);
+  });
+
+  it('strict方式の盤外駒打ちによる反則負けをv1 JSONで往復できる', () => {
+    const foul = executeDrop(
+      createCapturedBishopState(),
+      'gote-bishop-2',
+      { row: 9, col: 4 },
+      { mode: 'strict', proposer: 'local_ai', engineName: 'drop-engine' }
+    );
+    expect(foul.type).toBe('foul_loss');
+    if (foul.type !== 'foul_loss') return;
+
+    const result = importState(foul.state);
+    expect(result.ok).toBe(true);
+    if (!result.ok) return;
+    const restoredFouls = result.state.foulHistory ?? [];
+    expect(restoredFouls).toEqual(foul.state.foulHistory);
+    expect(restoredFouls[0]).toMatchObject({
+      kind: 'drop',
+      reason: 'out_of_bounds',
+      from: null,
+      to: { row: 9, col: 4 },
+      pieceId: 'gote-bishop-2',
+    });
+    expect(result.state.result).toEqual(foul.state.result);
+  });
+
+  it('未終局の初期局面へ架空の反則履歴を追加した記録を拒否する', () => {
+    const foul = executeMove(
+      createInitialBoardState(),
+      { row: 4, col: 4 },
+      { row: 3, col: 4 },
+      { mode: 'strict', proposer: 'shogi_engine' }
+    );
+    if (foul.type !== 'foul_loss') throw new Error('foul fixture failed');
+    const record = createShogiGameRecordV1(createInitialBoardState(), EXPORTED_AT);
+    record.foulHistory.push(structuredClone(foul.foul));
+
+    expect(importShogiGameRecord(JSON.stringify(record))).toMatchObject({
+      ok: false,
+      code: 'inconsistent_record',
+    });
+  });
+
+  it('正規の終端反則を複製した記録を拒否する', () => {
+    const foul = executeMove(
+      createInitialBoardState(),
+      { row: 4, col: 4 },
+      { row: 3, col: 4 },
+      { mode: 'strict', proposer: 'shogi_engine' }
+    );
+    if (foul.type !== 'foul_loss') throw new Error('foul fixture failed');
+    const record = createShogiGameRecordV1(foul.state, EXPORTED_AT);
+    record.foulHistory.push(structuredClone(record.foulHistory[0]));
+
+    expect(importShogiGameRecord(JSON.stringify(record))).toMatchObject({
+      ok: false,
+      code: 'inconsistent_record',
+    });
+  });
+
+  it.each([
+    ['小数', 9.5],
+    ['文字列', '9'],
+    ['null', null],
+    ['NaN', Number.NaN],
+    ['Infinity', Number.POSITIVE_INFINITY],
+    ['明示上限を超える巨大整数', 1_000_001],
+  ])('反則提案座標の%sを拒否する', (_label, value) => {
+    const record = createShogiGameRecordV1(createStrictInvalidMoveState(), EXPORTED_AT);
+    Reflect.set(record.foulHistory[0].to, 'row', value);
+    expect(importShogiGameRecord(JSON.stringify(record))).toMatchObject({
+      ok: false,
+      code: 'invalid_value',
+    });
+  });
+
+  it('通常棋譜の盤外座標は反則提案座標と区別して拒否する', () => {
+    const execution = executeMove(createInitialBoardState(), { row: 6, col: 2 }, { row: 5, col: 2 });
+    if (execution.type !== 'applied') throw new Error('move fixture failed');
+    const record = createShogiGameRecordV1(execution.state, EXPORTED_AT);
+    record.history[0].to.row = 9;
+
+    expect(importShogiGameRecord(JSON.stringify(record))).toMatchObject({
+      ok: false,
+      code: 'invalid_value',
+    });
+  });
+
+  it.each([
+    ['投了', () => {
+      const execution = executeResignation(createInitialBoardState());
+      if (execution.type !== 'applied') throw new Error('resignation fixture failed');
+      return execution.state;
+    }],
+    ['通常の千日手', createRepetitionState],
+  ])('%s記録へ架空の反則履歴を追加すると拒否する', (_label, createState) => {
+    const fakeFoul = createShogiGameRecordV1(createStrictInvalidMoveState(), EXPORTED_AT).foulHistory[0];
+    const record = createShogiGameRecordV1(createState(), EXPORTED_AT);
+    record.foulHistory.push(structuredClone(fakeFoul));
+
+    expect(importShogiGameRecord(JSON.stringify(record))).toMatchObject({
+      ok: false,
+      code: 'inconsistent_record',
+    });
+  });
+
+  it.each([
+    ['reason', (record: ReturnType<typeof createShogiGameRecordV1>) => {
+      record.foulHistory[0].reason = 'no_piece_at_source';
+    }],
+    ['from', (record: ReturnType<typeof createShogiGameRecordV1>) => {
+      if (record.foulHistory[0].kind === 'move') record.foulHistory[0].from = { row: 4, col: 4 };
+    }],
+    ['to', (record: ReturnType<typeof createShogiGameRecordV1>) => {
+      record.foulHistory[0].to = { row: 5, col: 2 };
+    }],
+    ['pieceType', (record: ReturnType<typeof createShogiGameRecordV1>) => {
+      record.foulHistory[0].pieceType = null;
+    }],
+    ['message', (record: ReturnType<typeof createShogiGameRecordV1>) => {
+      record.foulHistory[0].message = '改ざんされたメッセージ';
+    }],
+  ])('終端反則の%s改ざんを再実行結果との不整合として拒否する', (_label, mutate) => {
+    const record = createShogiGameRecordV1(createStrictInvalidMoveState(), EXPORTED_AT);
+    mutate(record);
+    expect(importShogiGameRecord(JSON.stringify(record))).toMatchObject({
+      ok: false,
+      code: 'inconsistent_record',
+    });
+  });
+
+  it('駒打ち終端反則のpieceId改ざんを再実行結果との不整合として拒否する', () => {
+    const record = createShogiGameRecordV1(createStrictInvalidDropState(), EXPORTED_AT);
+    const foul = record.foulHistory[0];
+    if (foul.kind !== 'drop') throw new Error('drop foul fixture failed');
+    foul.pieceId = 'tampered-piece-id';
+
+    expect(importShogiGameRecord(JSON.stringify(record))).toMatchObject({
+      ok: false,
+      code: 'inconsistent_record',
+    });
+  });
+
+  it.each([
+    ['kind', 'future_kind'],
+    ['proposer', 'future_proposer'],
+    ['engineName', 123],
+  ])('終端反則の%sをv1未定義値へ改ざんすると拒否する', (key, value) => {
+    const record = createShogiGameRecordV1(createStrictInvalidMoveState(), EXPORTED_AT);
+    Reflect.set(record.foulHistory[0], key, value);
+    expect(importShogiGameRecord(JSON.stringify(record))).toMatchObject({ ok: false });
+  });
+
+  it('反則履歴のtimestampは保存値を維持し、入力JSONと可変参照を共有しない', () => {
+    const source = createShogiGameRecordV1(createStrictInvalidMoveState(), EXPORTED_AT);
+    source.foulHistory[0].timestamp = 123_456;
+    const result = importShogiGameRecord(JSON.stringify(source));
+    expect(result.ok).toBe(true);
+    if (!result.ok) return;
+    const restoredFouls = result.state.foulHistory ?? [];
+    expect(restoredFouls[0].timestamp).toBe(123_456);
+
+    source.foulHistory[0].to.row = 999;
+    expect(restoredFouls[0].to.row).toBe(4);
+    restoredFouls[0].to.col = 999;
+    expect(source.foulHistory[0].to.col).toBe(2);
   });
 
   it('入力JSONと盤・持ち駒・棋譜・履歴の可変参照を共有しない', () => {

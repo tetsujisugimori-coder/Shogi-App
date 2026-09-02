@@ -50,6 +50,9 @@ export const MAX_SHOGI_GAME_RECORD_FILE_BYTES = 32 * 1024 * 1024;
 
 const MAX_COLLECTION_ITEMS = 10_000;
 const MAX_SHORT_STRING_LENGTH = 10_000;
+// 盤外反則の提案値は保持するが、外部入力として実用上不要な巨大整数は受理しない。
+// 公開APIで通常利用される盤座標と、その前後を十分に包含する明示的なv1上限とする。
+const MAX_FOUL_PROPOSAL_COORDINATE_ABS = 1_000_000;
 const ISO_8601_UTC_PATTERN = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/;
 
 export type ShogiGameRecordImportErrorCode =
@@ -263,11 +266,29 @@ function readProposer(value: unknown, path: string): SavedProposerTypeV1 {
   return fail('invalid_value', `${path}の提案者が不正です。`);
 }
 
-function readCoordinate(value: unknown, path: string): { row: number; col: number } {
+function readBoardCoordinate(value: unknown, path: string): { row: number; col: number } {
   const object = exactKeys(value, ['row', 'col'], [], path);
   return {
     row: readInteger(object.row, `${path}.row`, 0, 8),
     col: readInteger(object.col, `${path}.col`, 0, 8),
+  };
+}
+
+function readFoulProposalCoordinate(value: unknown, path: string): { row: number; col: number } {
+  const object = exactKeys(value, ['row', 'col'], [], path);
+  return {
+    row: readInteger(
+      object.row,
+      `${path}.row`,
+      -MAX_FOUL_PROPOSAL_COORDINATE_ABS,
+      MAX_FOUL_PROPOSAL_COORDINATE_ABS
+    ),
+    col: readInteger(
+      object.col,
+      `${path}.col`,
+      -MAX_FOUL_PROPOSAL_COORDINATE_ABS,
+      MAX_FOUL_PROPOSAL_COORDINATE_ABS
+    ),
   };
 }
 
@@ -358,8 +379,8 @@ function readMove(value: unknown, path: string): SavedMoveRecordV1 {
       kind: 'move',
       moveNumber: readInteger(object.moveNumber, `${path}.moveNumber`, 1, MAX_COLLECTION_ITEMS),
       player: readPlayer(object.player, `${path}.player`),
-      from: readCoordinate(object.from, `${path}.from`),
-      to: readCoordinate(object.to, `${path}.to`),
+      from: readBoardCoordinate(object.from, `${path}.from`),
+      to: readBoardCoordinate(object.to, `${path}.to`),
       pieceType: readPieceType(object.pieceType, `${path}.pieceType`),
       capturedPieceType: readNullablePieceType(object.capturedPieceType, `${path}.capturedPieceType`),
       promotion: readPromotion(object.promotion, `${path}.promotion`),
@@ -376,7 +397,7 @@ function readMove(value: unknown, path: string): SavedMoveRecordV1 {
       moveNumber: readInteger(object.moveNumber, `${path}.moveNumber`, 1, MAX_COLLECTION_ITEMS),
       player: readPlayer(object.player, `${path}.player`),
       from: null,
-      to: readCoordinate(object.to, `${path}.to`),
+      to: readBoardCoordinate(object.to, `${path}.to`),
       pieceId: readString(object.pieceId, `${path}.pieceId`, { nonEmpty: true, maxLength: 256 }),
       pieceType: readPieceType(object.pieceType, `${path}.pieceType`),
       capturedPieceType: null,
@@ -410,7 +431,7 @@ function readFoul(value: unknown, path: string): SavedFoulRecordV1 {
   const commonValues = {
     moveNumber: readInteger(object.moveNumber, `${path}.moveNumber`, 1, MAX_COLLECTION_ITEMS),
     player: readPlayer(object.player, `${path}.player`),
-    to: readCoordinate(object.to, `${path}.to`),
+    to: readFoulProposalCoordinate(object.to, `${path}.to`),
     pieceType: readNullablePieceType(object.pieceType, `${path}.pieceType`),
     reason: readIllegalMoveReason(object.reason, `${path}.reason`),
     message: readString(object.message, `${path}.message`),
@@ -424,7 +445,7 @@ function readFoul(value: unknown, path: string): SavedFoulRecordV1 {
     const foul: SavedFoulRecordV1 = {
       kind: 'move',
       ...commonValues,
-      from: readCoordinate(object.from, `${path}.from`),
+      from: readFoulProposalCoordinate(object.from, `${path}.from`),
     };
     if (engineName !== undefined) foul.engineName = engineName;
     if (timestamp !== undefined) foul.timestamp = timestamp;
@@ -802,6 +823,32 @@ function validateFouls(fouls: readonly SavedFoulRecordV1[], latestMoveNumber: nu
   }
 }
 
+function validateFoulHistorySemantics(
+  savedResult: SavedGameResultV1 | null,
+  fouls: readonly SavedFoulRecordV1[],
+  isNonMoveEnding: boolean
+): void {
+  if (savedResult?.endReason !== 'foul_loss') {
+    if (fouls.length !== 0) {
+      fail('inconsistent_record', '反則負けではない対局に反則履歴が含まれています。');
+    }
+    return;
+  }
+
+  // 連続王手の千日手は着手の再実行中に判定され、既存ドメインはfoulHistoryを追加しない。
+  if (savedResult.foulReason === 'perpetual_check_repetition') {
+    if (fouls.length !== 0) {
+      fail('inconsistent_record', '連続王手の千日手結果に終端反則履歴を含めることはできません。');
+    }
+    return;
+  }
+
+  // strict方式は最初の不正提案で即時終局するため、新規対局から生成可能なのは終端反則1件だけ。
+  if (!isNonMoveEnding || fouls.length !== 1) {
+    fail('inconsistent_record', 'strict方式の反則負けには終端反則履歴が1件必要です。');
+  }
+}
+
 function validateNonMoveResult(
   saved: SavedGameResultV1,
   replayed: BoardState,
@@ -819,7 +866,10 @@ function validateNonMoveResult(
     if (saved.foulReason === 'perpetual_check_repetition') {
       fail('inconsistent_record', '連続王手の千日手結果を棋譜から再現できません。');
     }
-    const lastFoul = fouls.at(-1);
+    if (fouls.length !== 1) {
+      fail('inconsistent_record', 'strict方式の反則負けには終端反則履歴が1件必要です。');
+    }
+    const lastFoul = fouls[0];
     if (
       saved.loser !== replayed.turn || saved.winner !== expectedOpponent || !lastFoul ||
       lastFoul.moveNumber !== replayed.moveNumber || lastFoul.player !== replayed.turn ||
@@ -982,6 +1032,7 @@ function replayAndRestore(record: ShogiGameRecordV1): BoardState {
   if (record.latestState.status === 'ended' !== (record.result !== null)) {
     fail('inconsistent_record', '終局状態とresultの有無が不整合です。');
   }
+  validateFoulHistorySemantics(record.result, record.foulHistory, isNonMoveEnding);
   if (isNonMoveEnding && record.result) validateNonMoveResult(record.result, replayed, record.foulHistory);
   const expectedMoveLimit = isNonMoveEnding ? null : replayRecord.moveLimitJishogi;
   if (!same(record.moveLimitJishogi, expectedMoveLimit)) {
