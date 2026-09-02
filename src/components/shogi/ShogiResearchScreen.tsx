@@ -9,11 +9,14 @@ import {
   proposeAgreedJishogi,
   respondToAgreedJishogiProposal,
   executeResignation,
+  createShogiGameRecordFilename,
+  downloadShogiGameRecord,
   getLegalDropSquares,
   getMoveCandidates,
   getPromotionStatus,
   getPositionSnapshot,
   normalizePositionSnapshots,
+  serializeShogiGameRecordV1,
   PromotionStatus,
   type AgreedJishogiProposal,
 } from '../../domain/shogi';
@@ -74,6 +77,9 @@ export const ShogiResearchScreen: React.FC<ShogiResearchScreenProps> = ({ initia
   const [moveHistoryResetKey, setMoveHistoryResetKey] = useState(0);
   const [agreedJishogiProposal, setAgreedJishogiProposal] = useState<AgreedJishogiProposal | null>(null);
   const [agreedJishogiError, setAgreedJishogiError] = useState<string | null>(null);
+  const [exportNotice, setExportNotice] = useState<
+    { kind: 'success' | 'error'; message: string } | null
+  >(null);
   const [focusRequest, setFocusRequest] = useState<{
     row: number;
     col: number;
@@ -390,6 +396,21 @@ export const ShogiResearchScreen: React.FC<ShogiResearchScreenProps> = ({ initia
     setIsNewGameDialogOpen(false);
   };
 
+  const saveGameRecord = () => {
+    const exportedAt = new Date();
+    try {
+      const json = serializeShogiGameRecordV1(boardState, exportedAt);
+      const filename = createShogiGameRecordFilename(exportedAt);
+      downloadShogiGameRecord(json, filename);
+      setExportNotice({ kind: 'success', message: `対局記録を保存しました（${filename}）` });
+    } catch {
+      setExportNotice({
+        kind: 'error',
+        message: '対局記録を保存できませんでした。時間をおいてもう一度お試しください。',
+      });
+    }
+  };
+
   const handleSquareClick = (square: BoardSquare) => {
     if (isInteractionBlocked) return;
     if (selection.kind === 'hand') {
@@ -615,6 +636,14 @@ export const ShogiResearchScreen: React.FC<ShogiResearchScreenProps> = ({ initia
             投了
           </button>
           <button
+            type="button"
+            onClick={saveGameRecord}
+            disabled={dialogsAreOpen}
+            className="rounded border border-violet-800/70 bg-violet-950/45 px-4 py-1.5 font-serif text-sm tracking-[0.1em] text-violet-100 shadow-inner outline-none transition hover:border-violet-600 hover:bg-violet-900/55 focus-visible:ring-2 focus-visible:ring-amber-300 disabled:cursor-not-allowed disabled:border-stone-800 disabled:text-stone-600 disabled:opacity-65"
+          >
+            対局記録を保存
+          </button>
+          <button
             ref={newGameButtonRef}
             type="button"
             onClick={openNewGameDialog}
@@ -626,6 +655,17 @@ export const ShogiResearchScreen: React.FC<ShogiResearchScreenProps> = ({ initia
             新しい対局
           </button>
         </div>
+        {exportNotice && (
+          <p
+            role={exportNotice.kind === 'error' ? 'alert' : 'status'}
+            aria-live={exportNotice.kind === 'error' ? 'assertive' : 'polite'}
+            className={`mt-1 max-w-full break-words text-xs ${
+              exportNotice.kind === 'error' ? 'text-rose-300' : 'text-emerald-300'
+            }`}
+          >
+            {exportNotice.message}
+          </p>
+        )}
       </header>
 
       {/* Main Table Section */}
