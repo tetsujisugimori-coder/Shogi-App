@@ -49,7 +49,9 @@ describe('KIF棋譜読み込みUI', () => {
   it('不正なKIFはダイアログを開かずalertを表示し現在局面を維持する', async () => {
     const user = userEvent.setup();
     render(<ShogiResearchScreen />);
-    await user.upload(input(), new File(['1 同歩(77)'], 'bad.kif', { type: 'text/plain' }));
+    await user.upload(input(), new File([
+      '#KIF version=2.0 encoding=UTF-8\n手数----指手---------消費時間--\n1 同歩(77)\n',
+    ], 'bad.kif', { type: 'text/plain' }));
     await waitFor(() => expect(screen.getByRole('alert')).toHaveTextContent('直前の合法手'));
     expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
     expect(document.getElementById('shogi-research-screen')).toHaveAttribute('data-history-count', '0');

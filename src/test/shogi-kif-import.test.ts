@@ -42,13 +42,13 @@ describe('KIF 2.0 import', () => {
     expect(imported.state.squares[2][7].piece).toMatchObject({ type: 'bishop', isPromoted: true });
   });
 
-  it('「同」、時間表記、BOM、CRLF、投了を処理する', () => {
+  it('「同」、時間表記、BOM、CRLF、消費時間付き投了を処理する', () => {
     const imported = importKifText('\uFEFF' + standardKif([
       '1 ７六歩(77) ( 0:00/00:00:00)',
       '2 ３四歩(33)',
       '3 ２二角成(88)',
       '4 同銀(31) ( 0:01/00:00:01)',
-      '5 投了',
+      '5 投了 ( 0:01/00:00:05)',
     ], '\r\n'));
     expect(imported.ok).toBe(true);
     if (!imported.ok) return;
@@ -85,6 +85,18 @@ describe('KIF 2.0 import', () => {
     const mate = importKifText(standardKif(['1 ７六歩(77)', '2 詰み']));
     expect(foul.ok).toBe(false);
     expect(mate.ok).toBe(false);
+  });
+
+  it.each([
+    ['バージョン宣言なし', '手数----指手---------消費時間--\n1 ７六歩(77)\n', 'バージョン宣言'],
+    ['未対応バージョン', '#KIF version=2.1 encoding=UTF-8\n手数----指手---------消費時間--\n', '対応していないKIFバージョン'],
+    ['未対応文字コード', '#KIF version=2.0 encoding=Shift_JIS\n手数----指手---------消費時間--\n', '対応していないKIFバージョン'],
+    ['指し手表なし', '#KIF version=2.0 encoding=UTF-8\n1 ７六歩(77)\n', '指し手表ヘッダー'],
+    ['KIFではない内容', 'これは将棋棋譜ではありません。\n', 'バージョン宣言'],
+  ])('%sをKIF 2.0の基本構造エラーとして拒否する', (_label, kif, message) => {
+    const imported = importKifText(kif);
+    expect(imported.ok).toBe(false);
+    if (!imported.ok) expect(imported.message).toContain(message);
   });
 
   it('既存ドメインが再実行で確定した千日手終局行を照合して復元する', () => {

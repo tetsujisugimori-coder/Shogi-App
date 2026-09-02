@@ -12,6 +12,8 @@ export const MAX_KIF_FILE_BYTES = 32 * 1024 * 1024;
 type KifImportErrorCode =
   | 'file_too_large'
   | 'invalid_encoding'
+  | 'unsupported_kif_version'
+  | 'invalid_kif_structure'
   | 'unsupported_position'
   | 'invalid_move'
   | 'illegal_move'
@@ -46,6 +48,8 @@ const PIECES: Record<string, KifPiece> = {
   竜: { type: 'rook', isPromoted: true }, 龍: { type: 'rook', isPromoted: true },
 };
 const PIECE_PATTERN = '(成香|成桂|成銀|玉|王|飛|角|金|銀|桂|香|歩|と|馬|竜|龍)';
+const KIF_VERSION_DECLARATION = '#KIF version=2.0 encoding=UTF-8';
+const MOVE_TABLE_HEADER = '手数----指手---------消費時間--';
 
 function utf8ByteLength(text: string): number {
   return new TextEncoder().encode(text).byteLength;
@@ -69,8 +73,12 @@ function coordinateFromSource(fileCharacter: string, rankCharacter: string): Coo
     : null;
 }
 
+function removeConsumedTime(text: string): string {
+  return text.replace(/\s+\(\s*\d+(?::\d+){1,2}\s*\/\s*\d+(?::\d+){1,2}\s*\)\s*$/, '').trim();
+}
+
 function parseMoveNotation(text: string, previousMove: MoveRecord | null): ParsedMove | string {
-  const withoutTime = text.replace(/\s+\([^()]*[:/]\s*[^()]*\)\s*$/, '').trim();
+  const withoutTime = removeConsumedTime(text);
   if (withoutTime.includes('不成')) return 'KIF 2.0では「不成」修飾子を使用しません。';
   const match = new RegExp(`^(同|[１２３４５６７８９][一二三四五六七八九])\\s*${PIECE_PATTERN}(成|打)?(?:\\(([1-9])([1-9])\\))?$`).exec(withoutTime);
   if (!match) return '指し手の表記がKIF 2.0として読み取れません。';
@@ -177,8 +185,7 @@ function applyTerminal(state: BoardState, terminal: Terminal, lineNumber: number
 
 function isInformationalLine(line: string): boolean {
   return (
-    line === '手数----指手---------消費時間--' ||
-    line.startsWith('#') || line.startsWith('*') || line.startsWith('まで') ||
+    line.startsWith('*') || line.startsWith('まで') ||
     /^(開始日時|終了日時|棋戦|場所|持ち時間|消費時間|先手|後手)\s*[：:]/.test(line)
   );
 }
@@ -190,12 +197,37 @@ export function importKifText(text: string): KifImportResult {
   if (text.includes('\uFFFD')) return fail('invalid_encoding', 'KIFをUTF-8として正しく読み取れませんでした。');
   const lines = text.replace(/^\uFEFF/, '').replace(/\r\n?/g, '\n').split('\n');
   let state = createInitialBoardState();
+  let hasVersionDeclaration = false;
+  let hasMoveTableHeader = false;
   let terminalSeen = false;
 
   for (let index = 0; index < lines.length; index += 1) {
     const lineNumber = index + 1;
     const line = lines[index].trim();
-    if (!line || isInformationalLine(line)) continue;
+    if (!line) continue;
+    if (line.startsWith('#KIF')) {
+      if (line !== KIF_VERSION_DECLARATION) {
+        return fail('unsupported_kif_version', `${lineNumber}行目: 対応していないKIFバージョンまたは文字コードです。KIF 2.0 UTF-8を指定してください。`);
+      }
+      if (hasVersionDeclaration) {
+        return fail('invalid_kif_structure', `${lineNumber}行目: KIFバージョン宣言が重複しています。`);
+      }
+      if (hasMoveTableHeader) {
+        return fail('invalid_kif_structure', `${lineNumber}行目: KIFバージョン宣言は指し手表より前に必要です。`);
+      }
+      hasVersionDeclaration = true;
+      continue;
+    }
+    if (line.startsWith('#')) continue;
+    if (line === MOVE_TABLE_HEADER) {
+      if (!hasVersionDeclaration) {
+        return fail('invalid_kif_structure', `${lineNumber}行目: KIF 2.0のバージョン宣言がありません。`);
+      }
+      if (hasMoveTableHeader) return fail('invalid_kif_structure', `${lineNumber}行目: 指し手表ヘッダーが重複しています。`);
+      hasMoveTableHeader = true;
+      continue;
+    }
+    if (isInformationalLine(line)) continue;
     if (/^(手合割|手合|開始局面)\s*[：:]/.test(line)) {
       if (!/(平手|なし)$/.test(line)) return fail('unsupported_position', `${lineNumber}行目: 平手以外の開始局面には対応していません。`);
       continue;
@@ -203,13 +235,19 @@ export function importKifText(text: string): KifImportResult {
     if (line.startsWith('|') || /^(先手|後手)の持駒/.test(line) || /^変化[：:]/.test(line)) {
       return fail('unsupported_position', `${lineNumber}行目: 駒落ち・任意局面・変化手順には対応していません。`);
     }
+    if (!hasVersionDeclaration) {
+      return fail('invalid_kif_structure', `${lineNumber}行目: KIF 2.0のバージョン宣言がありません。`);
+    }
+    if (!hasMoveTableHeader) {
+      return fail('invalid_kif_structure', `${lineNumber}行目: 指し手表ヘッダー「${MOVE_TABLE_HEADER}」がありません。`);
+    }
     const numbered = /^(\d+)\s+(.+?)\s*$/.exec(line);
     if (!numbered) return fail('invalid_move', `${lineNumber}行目: 対局情報でも指し手でもない行があります。`);
     const moveNumber = Number(numbered[1]);
     const value = numbered[2].trim();
     if (!Number.isSafeInteger(moveNumber) || moveNumber < 1) return fail('invalid_move', `${lineNumber}行目: 手数が不正です。`);
     if (moveNumber !== state.moveNumber) return fail('invalid_move', `${lineNumber}行目: 手数${moveNumber}は連番ではありません（${state.moveNumber}手目が必要です）。`);
-    const terminal = parseTerminal(value);
+    const terminal = parseTerminal(removeConsumedTime(value));
     if (terminal) {
       if (terminalSeen) return fail('invalid_result', `${lineNumber}行目: 終局行が重複しています。`);
       const result = applyTerminal(state, terminal, lineNumber);
@@ -229,5 +267,7 @@ export function importKifText(text: string): KifImportResult {
   if (state.status === 'ended' && !terminalSeen) {
     return fail('invalid_result', '再実行により終局していますが、KIFに対応する終局行がありません。');
   }
+  if (!hasVersionDeclaration) return fail('invalid_kif_structure', 'KIF 2.0のバージョン宣言がありません。');
+  if (!hasMoveTableHeader) return fail('invalid_kif_structure', `指し手表ヘッダー「${MOVE_TABLE_HEADER}」がありません。`);
   return { ok: true, state, metadata: { moveCount: state.history.length, isEnded: state.status === 'ended' } };
 }
