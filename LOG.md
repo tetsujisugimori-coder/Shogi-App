@@ -2063,3 +2063,57 @@ PR #1のレビュー指摘を受け、簡易APIの`applyMove`と合法手候補�
 - v1 JSONの読み込み、ドラッグ＆ドロップ、LocalStorage / IndexedDB / クラウドへの自動保存は未実装。
 - KIF / KI2 / CSA / USI入出力、PDF / 画像 / CSV出力、Undo / Redo、待った、分岐棋譜、任意局面編集、対局時計、AI・エンジン・評価・解析コメントは未実装。
 - macOS固有のfseventsネイティブwatch動作はWindows環境では実行していない。
+
+## [2026-09-02] PR #26 レビュー指摘（v1保存型の内部ドメイン型からの独立）の修正
+
+### 原因と互換性方針
+
+- PR #26の初回実装では、`SavedPieceV1` などのv1保存型が内部の `Player`、`PieceType`、`BoardStatus`、`MovePromotion`、`IllegalMoveReason`、`ProposerType` を直接参照していた。このため、将来内部unionへ値を追加しただけで `version: 1` の許容値まで暗黙に広がる余地があった。
+- `positionHistory` と `moveLimitJishogi` は入力オブジェクトをスプレッドしていたため、内部型へ将来プロパティを追加するとv1 JSONへ自動混入する余地があった。`cloneGameResult` にも複数の終局理由をまとめた広い型キャストがあり、変換漏れの検出が弱かった。
+- 固定識別子、`version: 1`、トップレベル構造、フィールド順、正常値の出力、整形・末尾改行、ファイル名、ダウンロード、UI動作は変更しない。内部型の拡張はv1形式の拡張を意味せず、非互換変更には将来別versionを定義する方針を明確化した。
+
+### 固定したv1型と明示変換
+
+- v1専用の `SavedPlayerV1`、`SavedPieceTypeV1`、`SavedBoardStatusV1`、`SavedMovePromotionV1`、`SavedIllegalMoveReasonV1`、`SavedProposerTypeV1`、`SavedFoulReasonV1` を現在のリテラルだけで定義した。v1出力型から内部ドメインunionへの参照を除去した。
+- 内部値からv1値へ変換する関数を値種別ごとに分離し、現在値を `switch` で全列挙した。内部unionへ値が追加されると `assertNever` の引数が `never` にならずTypeScriptエラーになるため、変換追加漏れをコンパイル時に検出する。
+- 型を迂回して未知値が実行時に渡された場合も、各switchのdefaultから値種別と未知値を含む `TypeError` を投げ、未知値をv1 JSONへ通さない。着手・反則記録の判別種別、500手待機種別、全終局理由も同じ方式で網羅した。
+- 盤、持ち駒、着手、反則、再生スナップショット、最新局面のプレイヤー・駒種・状態・成り・理由・提案者はすべてv1変換関数を経由する。捕獲駒種やnullable値も、値がある場合だけ明示変換する。
+- `cloneGameResult` は反則負け、詰み、投了、通常千日手、500手持将棋、合意持将棋2種、入玉宣言3種を終局理由ごとの個別caseで生成する。広い `as SavedGameResultV1` を削除し、勝者・敗者・反則理由もv1変換を通す。内部 `GameResult` に新しい判別種別が増えた場合は `assertNever` でコンパイルエラーになる。
+
+### 入力オブジェクトのスプレッド廃止
+
+- `positionHistory` は `key`、`historyIndex`、`movedBy`、`gaveCheck`だけを新しいオブジェクトへ列挙し、`movedBy` はnullableなv1プレイヤー変換を通す。
+- `moveLimitJishogi` は `kind` と `checkingPlayer`だけを列挙し、待機種別とプレイヤーをそれぞれ明示変換する。
+- そのほかの変換も確認し、入力ドメインオブジェクト全体をv1へ展開するスプレッドは残していない。着手・反則の共通v1オブジェクトの合成と、任意の `engineName` / `timestamp` / `details` を条件付きで出力オブジェクトへ追加する処理だけを維持した。
+
+### 追加した回帰テスト
+
+- `positionHistory` と `moveLimitJishogi` の入力へ型外の将来プロパティを実行時追加しても、v1生成物とJSONの双方へ混入しないことを追加した。
+- トップレベル、最新局面、盤マス、駒、通常移動、駒打ち、反則、千日手履歴、再生スナップショット、500手待機、終局結果のキー集合が定義済み項目だけであることを追加した。
+- 型を迂回した未知の駒種、盤面状態、反則理由、プレイヤー、成り状態、提案者、500手待機種別、終局理由が、それぞれ未知値を含む明確な例外となりJSONを生成しないことを追加した。
+- 現在の8駒種、6盤面状態、3成り状態、22反則理由、3提案者種別を正常に従来値のまま出力できることを追加した。既存の全終局結果、JSON構造、決定性、ファイル名、Blob/MIME/後始末、再生中の最新state保存、成功・失敗通知テストも変更せず維持した。
+- 対象テストは30件から41件、全体は579件から590件になった。既存期待値やタイムアウトは緩和していない。
+
+### 変更ファイル
+
+- 変更: `src/domain/shogi/gameRecord.ts`
+- 変更: `src/test/shogi-game-record.test.tsx`
+- 変更: `README.md`
+- 追記: `LOG.md`
+- UIコンポーネント、対局ルール、`package.json`、`package-lock.json`、依存パッケージ、CI設定の変更: なし。
+
+### 検証結果
+
+- `npm run verify:lock`: 成功（399エントリ、registry package 398件、欠落0件）。
+- `npm run verify:macos-fsevents`: Windows上の静的検査成功。macOSネイティブwatchとVite watcher経路は対象OS外のため未実施。
+- `npm run lint`: 成功（TypeScriptエラーなし）。
+- 対象テスト `npm test -- --run src/test/shogi-game-record.test.tsx`: 成功（1ファイル、41/41件）。
+- `npm test`: 成功（11テストファイル、590/590件）。
+- `npm run build`: 成功（Vite 6.4.3、1708 modules transformed）。
+- `npm run check`: 成功（lock / lint / 590 tests / build）。
+- `git diff --check`: 成功（空白エラーなし）。
+
+### 残っている制約
+
+- v1 JSONの読み込み、新しいJSON version、KIF / KI2 / CSA / USI入出力は未実装。
+- macOS固有のfseventsネイティブwatch動作はWindows環境では実行していない。

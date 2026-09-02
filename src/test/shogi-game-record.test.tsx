@@ -15,15 +15,52 @@ import {
 import { applyMove } from '../domain/shogi/gameState';
 import {
   createInitialBoardState,
+  type BoardStatus,
   type BoardSquare,
   type BoardState,
   type FoulRecord,
   type GameResult,
+  type IllegalMoveReason,
+  type MoveLimitJishogiState,
+  type MovePromotion,
   type MoveRecord,
   type Piece,
+  type PieceType,
+  type Player,
+  type PositionRecord,
+  type ProposerType,
 } from '../types/shogi';
 
 const EXPORTED_AT = new Date('2026-09-02T03:04:05.678Z');
+
+const ALL_ILLEGAL_MOVE_REASONS: IllegalMoveReason[] = [
+  'out_of_bounds',
+  'no_piece_at_source',
+  'not_current_turn',
+  'not_own_piece',
+  'invalid_piece_move',
+  'occupied_by_own_piece',
+  'captured_king',
+  'dead_piece',
+  'promotion_choice_required',
+  'invalid_promotion',
+  'promotion_required',
+  'king_suicide',
+  'self_check_unresolved',
+  'hand_piece_not_found',
+  'not_own_hand_piece',
+  'occupied_drop_square',
+  'undroppable_piece',
+  'invalid_hand_piece_state',
+  'dead_piece_drop',
+  'nifu',
+  'pawn_drop_mate',
+  'game_already_ended',
+];
+
+function sortedKeys(value: object): string[] {
+  return Object.keys(value).sort();
+}
 
 function createRichState(): BoardState {
   const state = createInitialBoardState();
@@ -338,6 +375,265 @@ describe('バージョン付き対局記録JSON', () => {
     expect(json).not.toContain('selection');
     expect(json).not.toContain('dialog');
     expect(json).not.toContain('focusRequest');
+  });
+
+  it('positionHistoryと500手待機へ追加された型外プロパティをv1へ混入させない', () => {
+    const state = createRichState();
+    const position = state.positionHistory?.[0] as PositionRecord & {
+      futurePositionMetadata: string;
+    };
+    const moveLimit = state.moveLimitJishogi as MoveLimitJishogiState & {
+      futureWaitingMetadata: string;
+    };
+    position.futurePositionMetadata = 'must-not-be-saved';
+    moveLimit.futureWaitingMetadata = 'must-not-be-saved';
+
+    const record = createShogiGameRecordV1(state, EXPORTED_AT);
+    const json = serializeShogiGameRecordV1(state, EXPORTED_AT);
+
+    expect(record.positionHistory[0]).toEqual({
+      key: 'initial-key',
+      historyIndex: 0,
+      movedBy: null,
+      gaveCheck: false,
+    });
+    expect(record.moveLimitJishogi).toEqual({
+      kind: 'awaiting_continuous_check_end',
+      checkingPlayer: 'sente',
+    });
+    expect(record.positionHistory[0]).not.toHaveProperty('futurePositionMetadata');
+    expect(record.moveLimitJishogi).not.toHaveProperty('futureWaitingMetadata');
+    expect(json).not.toContain('futurePositionMetadata');
+    expect(json).not.toContain('futureWaitingMetadata');
+  });
+
+  it('v1の主要オブジェクトを定義済みキーだけで生成する', () => {
+    const state = createRichState();
+    state.result = { winner: 'sente', loser: 'gote', endReason: 'checkmate' };
+    const record = createShogiGameRecordV1(state, EXPORTED_AT);
+
+    expect(sortedKeys(record)).toEqual(
+      [
+        'format',
+        'version',
+        'exportedAt',
+        'initialPosition',
+        'latestState',
+        'history',
+        'lastMove',
+        'result',
+        'foulHistory',
+        'positionHistory',
+        'positionSnapshots',
+        'moveLimitJishogi',
+      ].sort()
+    );
+    expect(sortedKeys(record.latestState)).toEqual(
+      ['squares', 'senteHand', 'goteHand', 'turn', 'moveNumber', 'status'].sort()
+    );
+    expect(sortedKeys(record.latestState.squares[0][0])).toEqual(['row', 'col', 'piece'].sort());
+    expect(sortedKeys(record.latestState.squares[0][0].piece as object)).toEqual(
+      ['id', 'type', 'player', 'isPromoted'].sort()
+    );
+    expect(sortedKeys(record.history[0])).toEqual(
+      [
+        'kind',
+        'moveNumber',
+        'player',
+        'from',
+        'to',
+        'pieceType',
+        'capturedPieceType',
+        'promotion',
+        'notation',
+      ].sort()
+    );
+    expect(sortedKeys(record.history[3])).toEqual(
+      [
+        'kind',
+        'moveNumber',
+        'player',
+        'from',
+        'to',
+        'pieceId',
+        'pieceType',
+        'capturedPieceType',
+        'promotion',
+        'notation',
+      ].sort()
+    );
+    expect(sortedKeys(record.foulHistory[0])).toEqual(
+      [
+        'kind',
+        'moveNumber',
+        'player',
+        'from',
+        'to',
+        'pieceId',
+        'pieceType',
+        'reason',
+        'message',
+        'proposer',
+        'engineName',
+        'timestamp',
+      ].sort()
+    );
+    expect(sortedKeys(record.positionHistory[0])).toEqual(
+      ['key', 'historyIndex', 'movedBy', 'gaveCheck'].sort()
+    );
+    expect(sortedKeys(record.positionSnapshots[0])).toEqual(
+      [
+        'historyIndex',
+        'squares',
+        'senteHand',
+        'goteHand',
+        'turn',
+        'moveNumber',
+        'status',
+        'lastMove',
+        'result',
+      ].sort()
+    );
+    expect(sortedKeys(record.moveLimitJishogi as object)).toEqual(
+      ['kind', 'checkingPlayer'].sort()
+    );
+    expect(sortedKeys(record.result as object)).toEqual(
+      ['winner', 'loser', 'endReason'].sort()
+    );
+  });
+
+  const unknownValueCases: ReadonlyArray<{
+    label: string;
+    expected: RegExp;
+    mutate: (state: BoardState) => void;
+  }> = [
+    {
+      label: '駒種',
+      expected: /駒種.*future_piece/,
+      mutate: (state) => {
+        const piece = state.squares[0][0].piece as Piece;
+        piece.type = 'future_piece' as unknown as PieceType;
+      },
+    },
+    {
+      label: '盤面状態',
+      expected: /盤面状態.*future_status/,
+      mutate: (state) => {
+        state.status = 'future_status' as unknown as BoardStatus;
+      },
+    },
+    {
+      label: '反則理由',
+      expected: /反則理由.*future_reason/,
+      mutate: (state) => {
+        const foul = state.foulHistory?.[0] as FoulRecord;
+        foul.reason = 'future_reason' as unknown as IllegalMoveReason;
+      },
+    },
+    {
+      label: 'プレイヤー',
+      expected: /プレイヤー.*future_player/,
+      mutate: (state) => {
+        state.turn = 'future_player' as unknown as Player;
+      },
+    },
+    {
+      label: '成り状態',
+      expected: /成り状態.*future_promotion/,
+      mutate: (state) => {
+        state.history[0].promotion = 'future_promotion' as unknown as MovePromotion;
+      },
+    },
+    {
+      label: '提案者種別',
+      expected: /提案者種別.*future_proposer/,
+      mutate: (state) => {
+        const foul = state.foulHistory?.[0] as FoulRecord;
+        foul.proposer = 'future_proposer' as unknown as ProposerType;
+      },
+    },
+    {
+      label: '500手持将棋待機種別',
+      expected: /500手持将棋待機種別.*future_waiting/,
+      mutate: (state) => {
+        const waiting = state.moveLimitJishogi as MoveLimitJishogiState;
+        waiting.kind = 'future_waiting' as unknown as MoveLimitJishogiState['kind'];
+      },
+    },
+    {
+      label: '終局結果',
+      expected: /終局結果.*future_result/,
+      mutate: (state) => {
+        state.result = {
+          winner: null,
+          loser: null,
+          endReason: 'future_result',
+        } as unknown as GameResult;
+      },
+    },
+  ];
+
+  it.each(unknownValueCases)('$label の未知値をv1へ出力せず例外にする', ({ mutate, expected }) => {
+    const state = createRichState();
+    mutate(state);
+    expect(() => serializeShogiGameRecordV1(state, EXPORTED_AT)).toThrow(expected);
+  });
+
+  it('現在サポートする固定値を従来どおりすべて出力できる', () => {
+    const pieceState = createInitialBoardState();
+    const pieceTypes = [
+      ...new Set(
+        createShogiGameRecordV1(pieceState, EXPORTED_AT).latestState.squares
+          .flat()
+          .flatMap((square) => (square.piece ? [square.piece.type] : []))
+      ),
+    ].sort();
+    expect(pieceTypes).toEqual(
+      ['king', 'rook', 'bishop', 'gold', 'silver', 'knight', 'lance', 'pawn'].sort()
+    );
+
+    const statuses: BoardStatus[] = [
+      'preparation',
+      'active',
+      'check',
+      'blunder',
+      'evaluating',
+      'ended',
+    ];
+    expect(
+      statuses.map((status) => {
+        const state = createInitialBoardState();
+        state.status = status;
+        return createShogiGameRecordV1(state, EXPORTED_AT).latestState.status;
+      })
+    ).toEqual(statuses);
+
+    const proposers: ProposerType[] = ['human', 'local_ai', 'shogi_engine'];
+    const foulState = createInitialBoardState();
+    foulState.foulHistory = ALL_ILLEGAL_MOVE_REASONS.map((reason, index) => ({
+      kind: 'move',
+      moveNumber: index + 1,
+      player: index % 2 === 0 ? 'sente' : 'gote',
+      from: { row: 6, col: 0 },
+      to: { row: 5, col: 0 },
+      pieceType: 'pawn',
+      reason,
+      message: reason,
+      proposer: proposers[index % proposers.length],
+    }));
+    const foulRecord = createShogiGameRecordV1(foulState, EXPORTED_AT);
+    expect(foulRecord.foulHistory.map((foul) => foul.reason)).toEqual(
+      ALL_ILLEGAL_MOVE_REASONS
+    );
+    expect([...new Set(foulRecord.foulHistory.map((foul) => foul.proposer))]).toEqual(
+      proposers
+    );
+    expect(createShogiGameRecordV1(createRichState(), EXPORTED_AT).history.map((move) => move.promotion)).toEqual([
+      'none',
+      'promote',
+      'decline',
+      'none',
+    ]);
   });
 
   it.each([Number.NaN, Number.POSITIVE_INFINITY])('正しくない数値 %s を安全に拒否する', (value) => {
