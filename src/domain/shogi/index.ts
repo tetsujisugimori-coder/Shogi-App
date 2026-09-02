@@ -21,3 +21,4 @@ export {
 export * from './gameRecord';
 export * from './gameRecordImport';
 export * from './kifExport';
+export * from './kifImport';

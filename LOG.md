@@ -2284,3 +2284,29 @@ PR #1のレビュー指摘を受け、簡易APIの`applyMove`と合法手候補�
 - UTF-8ヘッダー、CRLF、入玉各分岐、strict反則2種、連続王手の千日手、既存の終局・成駒・成不成・駒打ち・Blob URL遅延解放テストを更新または追加した。
 - npm run checkはlockfile検証、lint、672テスト、本番ビルドまで成功した。
 - git diff --checkは空白エラーなしで成功した。
+
+## [2026-09-02] KIF 2.0棋譜読み込み初期版
+
+### 設計判断
+
+- `src/domain/shogi/kifImport.ts` をUIから分離した純粋関数として追加した。UTF-8文字列のBOM、CRLF/LF、32 MiB、ヘッダー・対局情報・手数行・終局行を段階的に検証し、平手初期局面から `executeMove` / `executeDrop` / `executeResignation` / `executeEnteringKingDeclaration` だけで一手ずつ再実行する。盤面配列を直接組み立てたり書き換えたりしない。
+- 成りは移動元の実駒と `getPromotionStatus` で判定する。`成`は`promote`、任意成りで`成`がない手は`decline`、成れない手・既成駒の移動は`none`として既存APIへ渡す。必須成りの省略、成れない「成」、駒名・成駒状態・移動元の不一致、非合法手は行番号・手数付きで拒否する。
+- KIF 2.0の仕様どおり、書き出しは`promotion: 'decline'`に「不成」を出力しない。移動元座標を残して曖昧さを解消する。
+- 終局語は再実行済み状態と照合できるものだけを受理する。KIFに反則理由や合意持将棋の点数がないため、情報を捏造できない`反則負け`等は日本語エラーで拒否する。途中でエラーになってもUI状態は置換せず、確認ダイアログの確定時だけ独立した復元状態を反映する。
+
+### 変更ファイル
+
+- `src/domain/shogi/kifImport.ts`、`src/domain/shogi/index.ts`、`src/domain/shogi/kifExport.ts`
+- `src/components/shogi/ShogiResearchScreen.tsx`、`src/components/shogi/KifImportDialog.tsx`
+- `src/test/shogi-kif-import.test.ts`、`src/test/shogi-kif-import-ui.test.tsx`、`src/test/shogi-kif-export.test.ts`
+- `README.md`
+
+### テスト
+
+- KIF書き出しからの往復、成・不成省略、成駒移動、駒取り・駒打ち・`同`、BOM/CRLF/時間表記、投了、手数・駒名・成り・駒打ち・`同`・局面の不正、32 MiB超過を追加。
+- UIでは確認、キャンセル、Escape、背景キャンセル、同一ファイル再選択、確定時の原子的置換、失敗時の`role="alert"`を追加。
+
+### 検証結果
+
+- `npm run verify:lock`、`npm run verify:macos-fsevents`、`npm run lint`、KIF対象テスト（3ファイル・33件）、`npm test`（15ファイル・687件）、`npm run build`、`npm run check`、`git diff --check`を実行し成功した。WindowsのmacOS fsevents検証は静的検査として成功し、ネイティブwatchは対象OS外のため未実施。
+- 実ブラウザではPC幅1280px（実効1265px）とモバイル幅500px（実効485px）でKIF読み込み操作を表示し、いずれも`scrollWidth === clientWidth`、console warning/error 0件を確認した。ブラウザのローカルfile chooserはこの環境でタイムアウトしたため、正常読み込み・不正ファイル時の状態維持・確認ダイアログの実操作はDOMテストで確認した。
