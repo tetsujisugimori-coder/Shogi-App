@@ -2064,6 +2064,75 @@ PR #1のレビュー指摘を受け、簡易APIの`applyMove`と合法手候補�
 - KIF / KI2 / CSA / USI入出力、PDF / 画像 / CSV出力、Undo / Redo、待った、分岐棋譜、任意局面編集、対局時計、AI・エンジン・評価・解析コメントは未実装。
 - macOS固有のfseventsネイティブwatch動作はWindows環境では実行していない。
 
+## [2026-09-02] v1対局記録JSONの読み込み・完全復元
+
+### 基準・ブランチ・対象
+
+- 作業開始時の `main` はクリーンで、ユーザーの未コミット変更がないことを確認した。`git pull --ff-only origin main` は成功し、`main` が最新であることを確認して `feat/game-record-json-import` を作成した。
+- 対象はPR #26で固定した `shogi-app-game-record` / `version: 1` / `initialPosition: "hirate"` の単一対局JSONだけとした。KIF / KI2 / CSA / USI、別version、ドラッグ＆ドロップ、自動保存、複数対局、Undo / Redo、任意局面編集、AI・エンジン接続は追加していない。
+- 新しい依存パッケージ、install script、`package.json`、`package-lock.json`、Node.js / npm要件、Vite・CI設定は変更していない。
+
+### 解析・実行時検証・明示変換
+
+- `src/domain/shogi/gameRecordImport.ts` に、文字列サイズ確認、JSON解析、形式とversionの識別、v1スキーマ検証、意味的整合性検証、内部 `BoardState` への変換をReactから独立した純粋処理として追加した。成功・失敗は `ok` で判別できるunionとし、失敗を `invalid_json`、`wrong_format`、`unsupported_version`、`missing_required`、`invalid_value`、`inconsistent_record`、`file_too_large` に分類して短い日本語メッセージを返す。
+- トップレベルと全ネストオブジェクトは必須・任意キーを列挙し、未知キーを拒否する。入力全体のスプレッド、`as BoardState`、`as ShogiGameRecordV1`、二重キャストは使用せず、プレイヤー、駒種、盤面状態、成り、反則理由、提案者、終局理由をv1値ごとに明示検証・変換する。
+- 有限整数と範囲、9×9盤、マス座標と配列位置、非空の駒ID、同一局面内の駒ID重複、持ち駒所有者、玉・成駒の持ち駒混入、通常移動と駒打ちのフィールド組み合わせ、ISO 8601 UTC日時を検証する。勝者・敗者、無勝負、点数、理由別必須フィールド、status / resultも終局種別ごとに検証する。
+- `__proto__`を含む未知キーや不必要に深い未知構造は定義済みキー検査で内部へ入れない。入力値やスタックをエラー表示へ含めず、盤、持ち駒、棋譜、結果、反則、千日手履歴、再生スナップショット、500手待機状態を新しい配列・オブジェクトとして生成する。
+- ファイル上限は32 MiBとした。再生スナップショットを全手分持つ通常の500手規模に余裕を持たせつつ極端な入力を制限する値で、UIの `File.size` と解析前のUTF-8バイト数の両方を確認する。
+
+### 棋譜再実行と終局復元
+
+- 保存された最新盤面を正解とせず、`createInitialBoardState()` の平手初期局面から `history` を順番に再実行する。通常移動は公開 `executeMove`、駒打ちは公開 `executeDrop` をassist方式で使用し、保存された成り・不成をそのまま指定する。
+- 各手の手数、手番、移動元の駒、駒種、持ち駒ID、捕獲駒種、成り、生成された `notation` を実行結果と比較する。終局後の余分な手、違法手、存在しない駒、駒種・表記改ざんを拒否する。
+- 再計算した盤、両持ち駒、手番、手数、全棋譜、`lastMove`、`positionHistory`、`positionSnapshots`、`moveLimitJishogi` を保存内容と比較する。いずれかの欠落、順序変更、値改ざん、最新局面との相違があれば `inconsistent_record` とする。
+- 合法手で成立する詰み、千日手、連続王手の千日手、500手持将棋は再実行結果を基準にする。投了、strict方式の通常反則負け、合意持将棋、入玉宣言は、再実行した終局直前局面と既存ドメイン判定・反則履歴に整合する場合だけ終局状態を復元する。
+- 着手外終局では最後の再生スナップショットが終局直前を表す既存設計を維持し、トップレベルと末尾スナップショットのstatus / resultが常に同一だとは仮定しない。復元後に同じ日時でv1へ再変換し、保存構造全体が一致することも最終確認する。
+- `viewMode` は標準の `research` とし、選択、合法手候補、ダイアログ、フォーカス要求、棋譜パネル開閉、再生位置は復元しない。成功結果だけをUIへ渡し、入力JSONと復元stateの可変参照を共有しない。
+
+### UI・アクセシビリティ
+
+- 上部の常時到達可能な操作群へ「対局記録を読み込む」と関連付け済みの `.json,application/json` ファイル入力を追加した。ファイル未選択では何もせず、処理開始時にinput値を空へ戻して同一ファイルを続けて選び直せるようにした。
+- 読取・検証成功時も現在局面を直ちに変更せず、ファイル名、書き出し日時、着手数、未終局／終局済みを示す専用確認ダイアログを表示する。「読み込む」の確定時だけ、検証済み `BoardState` を一度に設定して再生位置を最新へ戻し、棋譜パネルを最新内容へ更新する。
+- キャンセル、Escape、背景クリック、読取失敗、空ファイル、不正JSON、別形式、未対応version、改ざんデータでは現在局面を維持する。成功は `role="status"`、失敗は日本語の `role="alert"` とした。
+- ダイアログは `role="dialog"`、`aria-modal`、見出し・説明とのARIA関連付け、キャンセルへの初期フォーカス、Tab / Shift+Tabのフォーカストラップ、終了後の読み込みボタンへのフォーカス復元を持つ。読取中と確認中は盤、駒台、棋譜再生、成り、投了、入玉宣言、合意持将棋、新しい対局、保存、重複読み込みを停止し、既存ダイアログと相互排他にした。
+- React品質確認ではダイアログを独立コンポーネントに保ち、派生状態をrender時に計算し、成功確定時の更新をイベント内に集約した。非同期読取中も競合操作を停止し、不要なeffectや外部ライブラリを追加していない。
+
+### 追加テスト
+
+- `src/test/shogi-game-record-import.test.tsx` に33件を追加した。初期局面の往復、通常移動、駒取り、成り・不成、駒打ち、未終局続行、合法な千日手、投了、strict反則負け、入玉宣言失敗、履歴・再生スナップショット、同一日時の再書き出し、可変参照非共有を検証した。
+- 不正JSON、空、`null` / 配列 / 文字列、形式不一致、version欠落・型不正・未対応、未知キー、盤サイズ、座標ずれ、小数手数、重複ID、玉・成駒・所有者違いの持ち駒、表記・最新盤面・lastMove・両局面履歴・500手待機の改ざん、32 MiB境界を検証した。
+- UIではボタンとinputの関連、正常選択後の確認表示、確定前の状態維持、読み込み確定、Escape・背景・ボタンキャンセル、同一ファイル再選択、不正JSON、読取失敗、終局済み閲覧、成功・失敗通知、競合操作停止、フォーカストラップと復元を検証した。既存期待値・タイムアウトは緩和していない。
+
+### 検証結果
+
+- `npm run verify:lock`: 成功（399エントリ、registry package 398件、欠落0件）。
+- `npm run verify:macos-fsevents`: Windows上の静的検査成功。macOS固有のネイティブwatchとVite watcher経路は対象OS外のため未実施。
+- `npm run lint`: 成功（TypeScriptエラーなし）。
+- 対象テスト `npx vitest run src/test/shogi-game-record-import.test.tsx`: 成功（1ファイル、33/33件）。
+- `npm test`: 成功（12テストファイル、623/623件）。
+- `npm run build`: 成功（Vite 6.4.3、1710 modules transformed）。
+- `npm run check`: 成功（lock / lint / 623 tests / build）。
+- `git diff --check`: 成功（空白エラーなし）。
+
+### 実ブラウザ確認
+
+- `agent-browser` CLIは環境のPATHになかったため、ローカルViteサーバーとGoogle Chrome headlessのDevTools Protocolを使って実操作した。PCはwindow幅1280px（実効client幅1265px）、モバイルは500pxで確認した。
+- PCで未終局1手の実v1 JSONをFileとして選択し、確認ダイアログの内容、確定前の履歴0件維持、キャンセル初期フォーカス、背景キャンセル、読み込みボタンへのフォーカス復元を確認した。再選択後に確定すると最新局面・後手番・履歴1件となり、盤操作で「△3四歩」を続行して履歴2件・先手番になった。
+- 投了済みv1を読み込むと `resignation`、履歴0件、終局結果表示、操作可能な盤マス0件となった。その後に不正JSONを選択しても投了結果と履歴を維持し、日本語alertを表示した。
+- PC・モバイルとも読み込みボタンを表示でき、Viteエラーオーバーレイなし。PCのclient幅 / scroll幅は1265 / 1265、モバイルは500 / 500で横スクロールなし。スクリーンショットでも盤・上部操作・棋譜の重なりや欠落は見られなかった。
+- アプリのconsole warning / errorと実行時例外は0件。アプリ処理と無関係な既存の `/favicon.ico` 404ネットワークログだけを確認した。
+
+### 変更ファイルと対象外
+
+- 追加: `src/domain/shogi/gameRecordImport.ts`
+- 追加: `src/components/shogi/GameRecordImportDialog.tsx`
+- 追加: `src/test/shogi-game-record-import.test.tsx`
+- 変更: `src/domain/shogi/index.ts`
+- 変更: `src/components/shogi/ShogiResearchScreen.tsx`
+- 変更: `README.md`
+- 追記: `LOG.md`
+- KIF / KI2 / CSA / USI、v2以降、ドラッグ＆ドロップ、複数対局、自動保存・自動読込、Undo / Redo、待った、過去局面からの分岐、任意局面編集、AI・エンジン・評価は引き続き対象外。
+
 ## [2026-09-02] PR #26 レビュー指摘（v1保存型の内部ドメイン型からの独立）の修正
 
 ### 原因と互換性方針
@@ -2117,3 +2186,45 @@ PR #1のレビュー指摘を受け、簡易APIの`applyMove`と合法手候補�
 
 - v1 JSONの読み込み、新しいJSON version、KIF / KI2 / CSA / USI入出力は未実装。
 - macOS固有のfseventsネイティブwatch動作はWindows環境では実行していない。
+
+## [2026-09-02] v1対局記録JSON読み込み実装の完了追記
+
+- 上記「v1対局記録JSONの読み込み・完全復元」に記載した実装、33件の専用テスト、全623件のテスト、ビルド、PC・モバイル実ブラウザ確認を完了した。
+- `feat/game-record-json-import` から `main` 向けPRを作成し、マージは行わない。
+
+## [2026-09-02] PR #28 盤外反則JSON互換性と反則履歴整合性の修正
+
+### 原因と修正方針
+
+- v1読込処理が合法着手と反則提案に同じ座標readerを使い、双方を0〜8へ制限していた。このため、`executeMove` / `executeDrop` のstrict方式が正規に記録した `out_of_bounds` の盤外座標を、アプリ自身の書き出し後に再読込できなかった。
+- 通常棋譜・盤・局面スナップショットには従来どおり0〜8専用の `readBoardCoordinate` を使い、反則提案の `from` / `to` だけを `readFoulProposalCoordinate` へ分離した。反則座標は整数かつ有限で、v1の明示範囲 `-1,000,000`〜`1,000,000` のみ受理する。小数、文字列、`null`、非数、無限大、過大値は拒否し、反則座標を盤配列の添字として直接参照しない。
+- 既存の反則履歴検証は手数上限と手番偶奇だけで、未終局・投了・通常千日手などへ架空の反則を追加でき、strict終端反則を複製しても通過した。
+- 終局理由と `foulHistory` の関係を明示した。未終局と反則負け以外の結果は空、連続王手の千日手による反則負けも既存ドメイン仕様どおり空、通常のstrict反則負けは終局直前局面から再実行できる終端反則1件だけを許可する。不一致は `inconsistent_record` とする。
+- strict終端反則は、既存ドメインAPIで再実行し、`reason`、`kind`、`from`、`to`、`pieceId`、`pieceType`、`player`、`moveNumber`、`proposer`、`engineName`、`message` と終局結果を比較する。再生成不能な `timestamp` は既存の整数・範囲検証後に保存値を維持し、入力JSONとの可変参照非共有も維持した。v1の `format` / `version`、保存構造、UI、依存関係は変更していない。
+- `README.md` の未実装範囲で重複していた KIF / KI2 / CSA / USI の行を、v1以外のJSONと併記する1行へ整理した。
+
+### テスト先行と追加テスト
+
+- 実装修正前に、strict盤外移動、strict盤外駒打ち、未終局初期局面への架空反則、正規終端反則の複製の4件を追加した。現行実装で前2件は読込拒否、後2件は誤受理となり、4/4件が意図どおり失敗することを確認してから修正した。
+- strict盤外移動・駒打ちのJSON往復で、反則理由・座標・駒ID・勝敗・終局状態を検証した。通常棋譜の盤外座標が引き続き拒否されること、反則座標の小数・文字列・`null`・`NaN`・`Infinity`・明示上限超過も検証した。
+- 未終局、投了、通常千日手への架空履歴、終端反則2件、通常移動反則の理由・移動元・移動先・駒種・メッセージ改ざん、駒打ち反則の駒ID改ざん、v1未定義の種別・提案者・エンジン名型を拒否することを追加した。正規のstrict反則、timestamp保存、可変参照非共有も確認した。
+- 専用読込テストは33件から56件、全体は623件から646件になった。既存の連続王手千日手を含む期待値・タイムアウトは緩和していない。
+
+### 検証結果
+
+- 再現テスト追加直後: 4件失敗（想定どおり）。修正後の読込専用テスト: 56/56件成功。
+- 対局記録保存・読込関連テスト: 2ファイル、97/97件成功。
+- `npm run verify:lock`: 成功（399エントリ、registry package 398件、欠落0件）。
+- `npm run verify:macos-fsevents`: Windows上の静的検査成功。macOSネイティブwatchとVite watcher経路は対象OS外のため未実施。
+- `npm run lint`: 成功（TypeScriptエラーなし）。
+- `npm test`: 成功（12ファイル、646/646件）。
+- `npm run build`: 成功（Vite 6.4.3、1710 modules transformed）。サンドボックス内ではesbuildのspawnがEPERMとなったため、同一コマンドを許可済み環境で再実行した。
+- `npm run check`: 成功（lock / lint / 646 tests / build）。
+- `git diff --check`: 成功（空白エラーなし）。
+
+### 実ブラウザ確認
+
+- `agent-browser` CLIは環境のPATHになかったため、ローカルViteサーバーとheadless ChromeのDevTools Protocolで実操作した。
+- 正常な未終局1手記録は確認ダイアログを経て履歴1件・後手番として読み込めた。strict盤外反則記録は `foul_loss`、後手勝ち（先手反則負け）として読み込めた。
+- 初期局面へ架空の反則履歴を追加したJSONは確認ダイアログを出さず日本語alertで拒否し、直前の反則負け局面と履歴数を維持した。
+- PC幅1280px（実効1265px）とモバイル幅500px（実効485px）でclient幅とscroll幅が一致し、読み込みボタンを表示できた。Viteエラーオーバーレイとconsole errorは0件だった。

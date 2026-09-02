@@ -17,7 +17,10 @@ import {
   getPositionSnapshot,
   normalizePositionSnapshots,
   serializeShogiGameRecordV1,
+  importShogiGameRecord,
+  MAX_SHOGI_GAME_RECORD_FILE_BYTES,
   PromotionStatus,
+  type ShogiGameRecordImportResult,
   type AgreedJishogiProposal,
 } from '../../domain/shogi';
 import { ShogiTable } from './ShogiTable';
@@ -28,6 +31,7 @@ import { AgreedJishogiDialog } from './AgreedJishogiDialog';
 import { NewGameDialog } from './NewGameDialog';
 import { MoveHistoryPanel } from './MoveHistoryPanel';
 import { getGameResultDisplay } from './gameResultDisplay';
+import { GameRecordImportDialog } from './GameRecordImportDialog';
 
 interface ShogiResearchScreenProps {
   initialState?: BoardState;
@@ -37,6 +41,12 @@ interface PendingPromotion {
   from: { row: number; col: number };
   to: { row: number; col: number };
   status: Exclude<PromotionStatus, 'none'>;
+}
+
+interface PendingGameRecordImport {
+  filename: string;
+  state: BoardState;
+  metadata: Extract<ShogiGameRecordImportResult, { ok: true }>['metadata'];
 }
 
 type SelectionState =
@@ -74,6 +84,9 @@ export const ShogiResearchScreen: React.FC<ShogiResearchScreenProps> = ({ initia
   const [isEnteringKingDialogOpen, setIsEnteringKingDialogOpen] = useState(false);
   const [isAgreedJishogiDialogOpen, setIsAgreedJishogiDialogOpen] = useState(false);
   const [isNewGameDialogOpen, setIsNewGameDialogOpen] = useState(false);
+  const [pendingGameRecordImport, setPendingGameRecordImport] =
+    useState<PendingGameRecordImport | null>(null);
+  const [isGameRecordFileReading, setIsGameRecordFileReading] = useState(false);
   const [moveHistoryResetKey, setMoveHistoryResetKey] = useState(0);
   const [agreedJishogiProposal, setAgreedJishogiProposal] = useState<AgreedJishogiProposal | null>(null);
   const [agreedJishogiError, setAgreedJishogiError] = useState<string | null>(null);
@@ -94,6 +107,9 @@ export const ShogiResearchScreen: React.FC<ShogiResearchScreenProps> = ({ initia
   const shouldRestoreAgreedJishogiFocus = useRef(false);
   const newGameButtonRef = useRef<HTMLButtonElement>(null);
   const shouldRestoreNewGameFocus = useRef(false);
+  const gameRecordImportButtonRef = useRef<HTMLButtonElement>(null);
+  const gameRecordFileInputRef = useRef<HTMLInputElement>(null);
+  const shouldRestoreGameRecordImportFocus = useRef(false);
 
   const replaySnapshot =
     replayHistoryIndex === null
@@ -105,13 +121,14 @@ export const ShogiResearchScreen: React.FC<ShogiResearchScreenProps> = ({ initia
     isResignationDialogOpen ||
     isEnteringKingDialogOpen ||
     isAgreedJishogiDialogOpen ||
-    isNewGameDialogOpen;
+    isNewGameDialogOpen ||
+    pendingGameRecordImport !== null ||
+    isGameRecordFileReading;
   const isEnded = boardState.status === 'ended';
   const isResignationAvailable = boardState.status === 'active' || boardState.status === 'check';
   const isEnteringKingAvailable = boardState.status === 'active' || boardState.status === 'check';
   const isNewGameAvailable = isEnteringKingAvailable || isEnded;
-  const isInteractionBlocked =
-    isEnded || isViewingReplay || dialogsAreOpen;
+  const isInteractionBlocked = isEnded || isViewingReplay || dialogsAreOpen;
   const selectedSquare =
     !isEnded && !isViewingReplay && selection.kind === 'board' ? selection.square : null;
   const selectedHandPieceId =
@@ -189,6 +206,12 @@ export const ShogiResearchScreen: React.FC<ShogiResearchScreenProps> = ({ initia
     shouldRestoreNewGameFocus.current = false;
     newGameButtonRef.current?.focus();
   }, [isNewGameDialogOpen]);
+
+  useEffect(() => {
+    if (pendingGameRecordImport || !shouldRestoreGameRecordImportFocus.current) return;
+    shouldRestoreGameRecordImportFocus.current = false;
+    gameRecordImportButtonRef.current?.focus();
+  }, [pendingGameRecordImport]);
 
   const restoreBoardFocus = useCallback((square: { row: number; col: number }) => {
     focusRequestId.current += 1;
@@ -411,6 +434,79 @@ export const ShogiResearchScreen: React.FC<ShogiResearchScreenProps> = ({ initia
     }
   };
 
+  const selectGameRecordFile = () => {
+    if (dialogsAreOpen || isGameRecordFileReading) return;
+    gameRecordFileInputRef.current?.click();
+  };
+
+  const handleGameRecordFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const input = event.currentTarget;
+    const file = input.files?.[0];
+    input.value = '';
+    if (!file || dialogsAreOpen || isGameRecordFileReading) return;
+    if (file.size > MAX_SHOGI_GAME_RECORD_FILE_BYTES) {
+      setExportNotice({
+        kind: 'error',
+        message: '対局記録ファイルが大きすぎます（上限32 MiB）。',
+      });
+      return;
+    }
+    setIsGameRecordFileReading(true);
+    setExportNotice(null);
+    try {
+      const json = await file.text();
+      const result = importShogiGameRecord(json);
+      if (!result.ok) {
+        setExportNotice({ kind: 'error', message: result.message });
+        return;
+      }
+      setPendingGameRecordImport({
+        filename: file.name,
+        state: result.state,
+        metadata: result.metadata,
+      });
+    } catch {
+      setExportNotice({
+        kind: 'error',
+        message: '対局記録ファイルを読み取れませんでした。別のファイルを選択してください。',
+      });
+    } finally {
+      setIsGameRecordFileReading(false);
+    }
+  };
+
+  const cancelGameRecordImport = useCallback(() => {
+    shouldRestoreGameRecordImportFocus.current = true;
+    setPendingGameRecordImport(null);
+  }, []);
+
+  const confirmGameRecordImport = () => {
+    if (!pendingGameRecordImport) return;
+    shouldRestoreResignationFocus.current = false;
+    shouldRestoreEnteringKingFocus.current = false;
+    shouldRestoreAgreedJishogiFocus.current = false;
+    shouldRestoreNewGameFocus.current = false;
+    shouldRestoreGameRecordImportFocus.current = true;
+    focusRequestId.current = 0;
+    setBoardState(pendingGameRecordImport.state);
+    setReplayHistoryIndex(null);
+    setSelection({ kind: 'none' });
+    setPendingPromotion(null);
+    setIsResignationDialogOpen(false);
+    setIsEnteringKingDialogOpen(false);
+    setIsAgreedJishogiDialogOpen(false);
+    setIsNewGameDialogOpen(false);
+    setAgreedJishogiProposal(null);
+    setAgreedJishogiError(null);
+    setFocusRequest(null);
+    setMoveHistoryResetKey((current) => current + 1);
+    setExportNotice({
+      kind: 'success',
+      message: `対局記録を読み込みました（${pendingGameRecordImport.filename}）`,
+    });
+    setPendingGameRecordImport(null);
+  };
+
   const handleSquareClick = (square: BoardSquare) => {
     if (isInteractionBlocked) return;
     if (selection.kind === 'hand') {
@@ -501,7 +597,7 @@ export const ShogiResearchScreen: React.FC<ShogiResearchScreenProps> = ({ initia
   };
 
   const handleScreenKeyDown = (event: React.KeyboardEvent<HTMLDivElement>) => {
-    if (isResignationDialogOpen || isEnteringKingDialogOpen || isAgreedJishogiDialogOpen || isNewGameDialogOpen) return;
+    if (dialogsAreOpen) return;
     if (event.key === 'Escape' && selection.kind === 'hand') {
       event.preventDefault();
       setSelection({ kind: 'none' });
@@ -643,6 +739,29 @@ export const ShogiResearchScreen: React.FC<ShogiResearchScreenProps> = ({ initia
           >
             対局記録を保存
           </button>
+          <input
+            ref={gameRecordFileInputRef}
+            id="shogi-game-record-file-input"
+            type="file"
+            accept=".json,application/json"
+            className="sr-only"
+            tabIndex={-1}
+            aria-labelledby="shogi-game-record-import-button"
+            onChange={handleGameRecordFileChange}
+          />
+          <button
+            ref={gameRecordImportButtonRef}
+            id="shogi-game-record-import-button"
+            type="button"
+            onClick={selectGameRecordFile}
+            disabled={dialogsAreOpen || isGameRecordFileReading}
+            aria-controls="shogi-game-record-file-input"
+            aria-haspopup="dialog"
+            aria-expanded={pendingGameRecordImport !== null}
+            className="rounded border border-violet-800/70 bg-violet-950/45 px-4 py-1.5 font-serif text-sm tracking-[0.1em] text-violet-100 shadow-inner outline-none transition hover:border-violet-600 hover:bg-violet-900/55 focus-visible:ring-2 focus-visible:ring-amber-300 disabled:cursor-not-allowed disabled:border-stone-800 disabled:text-stone-600 disabled:opacity-65"
+          >
+            {isGameRecordFileReading ? '対局記録を検証中' : '対局記録を読み込む'}
+          </button>
           <button
             ref={newGameButtonRef}
             type="button"
@@ -752,6 +871,17 @@ export const ShogiResearchScreen: React.FC<ShogiResearchScreenProps> = ({ initia
 
       {isNewGameDialogOpen && (
         <NewGameDialog onConfirm={confirmNewGame} onCancel={cancelNewGame} />
+      )}
+
+      {pendingGameRecordImport && (
+        <GameRecordImportDialog
+          filename={pendingGameRecordImport.filename}
+          exportedAt={pendingGameRecordImport.metadata.exportedAt}
+          moveCount={pendingGameRecordImport.metadata.moveCount}
+          isEnded={pendingGameRecordImport.metadata.isEnded}
+          onConfirm={confirmGameRecordImport}
+          onCancel={cancelGameRecordImport}
+        />
       )}
 
       {/* Bottom Footer Notice */}
