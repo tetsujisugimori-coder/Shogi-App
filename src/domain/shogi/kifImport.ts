@@ -78,19 +78,23 @@ function startsWithBytes(bytes: Uint8Array, expected: number[]): boolean {
   return expected.every((value, index) => bytes[index] === value);
 }
 
+function getDeclaredEncoding(line: string): KifEncoding | 'unsupported' | null {
+  if (line === KIF_VERSION_DECLARATION) return 'utf-8';
+  if (line === KIF_SHIFT_JIS_DECLARATION) return 'shift_jis';
+  return line.startsWith('#KIF') ? 'unsupported' : null;
+}
+
 function findDeclaredEncoding(bytes: Uint8Array): KifEncoding | 'unsupported' | null {
-  // KIF declarations are ASCII. Non-ASCII bytes are deliberately replaced so this
-  // inspection never attempts to decode a potentially malformed file.
+  // KIF declarations are ASCII. Non-ASCII bytes are deliberately replaced so the
+  // byte-level check matches the parser without decoding malformed input.
   const sample = Array.from(bytes.subarray(0, Math.min(bytes.byteLength, 4_096)), (byte) =>
     byte < 0x80 ? String.fromCharCode(byte) : ' '
   ).join('');
-  const declaration = /#KIF\s+version\s*=\s*([^\s]+)\s+encoding\s*=\s*([^\s\r\n]+)/i.exec(sample);
-  if (!declaration) return null;
-  const [, version, encoding] = declaration;
-  if (version !== '2.0') return 'unsupported';
-  if (/^utf-8$/i.test(encoding)) return 'utf-8';
-  if (/^shift_jis$/i.test(encoding)) return 'shift_jis';
-  return 'unsupported';
+  for (const line of sample.replace(/\r\n?/g, '\n').split('\n')) {
+    const declaration = getDeclaredEncoding(line.trim());
+    if (declaration !== null) return declaration;
+  }
+  return null;
 }
 
 function decodeStrict(bytes: Uint8Array, encoding: KifEncoding): string | null {
@@ -298,7 +302,6 @@ function isInformationalLine(line: string): boolean {
 
 /** Parses decoded KIF text and replays it through the public legal-move APIs. */
 function importDecodedKifText(text: string, encoding: KifEncoding | null): KifImportResult {
-  if (utf8ByteLength(text) > MAX_KIF_FILE_BYTES) return fail('file_too_large', 'KIFファイルが大きすぎます（上限32 MiB）。');
   if (text.trim().length === 0) return fail('empty_file', 'KIFファイルが空です。');
   if (text.includes('\uFFFD')) return fail('invalid_byte_sequence', 'KIFを置換文字を含む文字列として受理できません。');
   const lines = text.replace(/^\uFEFF/, '').replace(/\r\n?/g, '\n').split('\n');
@@ -312,9 +315,8 @@ function importDecodedKifText(text: string, encoding: KifEncoding | null): KifIm
     const line = lines[index].trim();
     if (!line) continue;
     if (line.startsWith('#KIF')) {
-      const lineEncoding = line === KIF_VERSION_DECLARATION ? 'utf-8'
-        : line === KIF_SHIFT_JIS_DECLARATION ? 'shift_jis' : null;
-      if (!lineEncoding) {
+      const lineEncoding = getDeclaredEncoding(line);
+      if (lineEncoding === 'unsupported' || lineEncoding === null) {
         return fail('unsupported_kif_version', `${lineNumber}行目: 対応していないKIFバージョンまたは文字コードです。KIF 2.0のUTF-8またはShift_JISを指定してください。`);
       }
       if (declaredEncoding !== null) {
@@ -378,6 +380,9 @@ function importDecodedKifText(text: string, encoding: KifEncoding | null): KifIm
 
 /** Keeps the string-based API for callers that already own decoded KIF text. */
 export function importKifText(text: string): KifImportResult {
+  if (utf8ByteLength(text) > MAX_KIF_FILE_BYTES) {
+    return fail('file_too_large', 'KIFファイルが大きすぎます（上限32 MiB）。');
+  }
   return importDecodedKifText(text, null);
 }
 

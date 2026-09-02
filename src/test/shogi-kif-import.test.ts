@@ -12,6 +12,27 @@ function standardKif(lines: string[], newline = '\n'): string {
   return ['#KIF version=2.0 encoding=UTF-8', '手数----指手---------消費時間--', ...lines].join(newline) + newline;
 }
 
+function createShiftJisKifThatExpandsBeyondUtf8Limit(): Uint8Array {
+  const encoder = new TextEncoder();
+  const prefix = encoder.encode('#KIF version=2.0 encoding=Shift_JIS\n*');
+  const suffix = new Uint8Array([
+    0x0a, 0x8e, 0xe8, 0x90, 0x94, 0x2d, 0x2d, 0x2d, 0x2d, 0x8e, 0x77, 0x8e, 0xe8,
+    0x2d, 0x2d, 0x2d, 0x2d, 0x2d, 0x2d, 0x2d, 0x2d, 0x2d, 0x8f, 0xc1, 0x94, 0xef,
+    0x8e, 0x9e, 0x8a, 0xd4, 0x2d, 0x2d, 0x0a,
+  ]);
+  // Shift_JIS「あ」is two bytes and UTF-8「あ」is three bytes. This is only
+  // about 22.4 MiB on disk, but becomes just over 32 MiB after UTF-8 decoding.
+  const characterCount = Math.floor((MAX_KIF_FILE_BYTES - prefix.byteLength - suffix.byteLength) / 3) + 1;
+  const bytes = new Uint8Array(prefix.byteLength + characterCount * 2 + suffix.byteLength);
+  bytes.set(prefix);
+  for (let index = prefix.byteLength; index < prefix.byteLength + characterCount * 2; index += 2) {
+    bytes[index] = 0x82;
+    bytes[index + 1] = 0xa0;
+  }
+  bytes.set(suffix, prefix.byteLength + characterCount * 2);
+  return bytes;
+}
+
 // Fixed CP932/Shift_JIS fixtures. They deliberately use real encoded bytes, not
 // strings passed directly to the text parser, so browser TextDecoder is exercised.
 const SHIFT_JIS_DECLARED_KIF = new Uint8Array([
@@ -22,6 +43,37 @@ const SHIFT_JIS_LEGACY_KIF = new Uint8Array([
 ]);
 
 describe('KIF 2.0 import', () => {
+  it('コメント内の疑似宣言を無視し、本物のUTF-8宣言を採用する', () => {
+    const bytes = new TextEncoder().encode([
+      '* #KIF version=2.0 encoding=Shift_JIS',
+      '* #KIF version=9.0 encoding=UTF-16',
+      '# comment #KIF version=9.0 encoding=UTF-16',
+      '#KIF version=2.0 encoding=UTF-8',
+      '手数----指手---------消費時間--',
+      '1 ７六歩(77)',
+    ].join('\n') + '\n');
+
+    expect(importKifBytes(bytes)).toMatchObject({ ok: true, metadata: { encoding: 'utf-8', moveCount: 1 } });
+  });
+
+  it('行頭の未対応宣言はコメントと区別して引き続き拒否する', () => {
+    const bytes = new TextEncoder().encode('#KIF version=2.1 encoding=UTF-8\n手数----指手---------消費時間--\n');
+    expect(importKifBytes(bytes)).toMatchObject({ ok: false, code: 'unsupported_encoding' });
+  });
+
+  it('元バイト数が上限内のShift_JISをUTF-8換算サイズで拒否しない', () => {
+    const bytes = createShiftJisKifThatExpandsBeyondUtf8Limit();
+    expect(bytes.byteLength).toBeLessThanOrEqual(MAX_KIF_FILE_BYTES);
+    const imported = importKifBytes(bytes);
+    if (!imported.ok) throw new Error(imported.message);
+    expect(imported.metadata).toMatchObject({ encoding: 'shift_jis', moveCount: 0 });
+  });
+
+  it('文字列APIにはUTF-8換算で引き続き32 MiB上限を適用する', () => {
+    const text = 'あ'.repeat(Math.floor(MAX_KIF_FILE_BYTES / 3) + 1);
+    expect(importKifText(text)).toMatchObject({ ok: false, code: 'file_too_large' });
+  });
+
   it('UTF-8 BOM付きKIFを元バイト列から復元し、採用文字コードを記録する', () => {
     const bytes = new TextEncoder().encode('\uFEFF' + standardKif(['1 ７六歩(77)'], '\r\n'));
     const imported = importKifBytes(bytes.buffer);

@@ -2338,3 +2338,11 @@ PR #1のレビュー指摘を受け、簡易APIの`applyMove`と合法手候補�
 - `npm run verify:macos-fsevents`: Windows上の静的検査成功。macOSネイティブwatchとVite watcher経路は対象OS外のため未実施。
 - `npm run lint`: 成功。KIF対象テストは3ファイル・54/54件、全テストは15ファイル・709/709件を分割実行および`npm run check`で成功。`npm run build`: 成功（Vite 6.4.3、1713 modules transformed）。`npm run check`: lockfile検証・lint・全テスト・buildを成功。
 - 依存関係ファイル、`package.json`、`package-lock.json`、CI設定の変更はない。実ブラウザのファイル選択は自動化せず、確認ダイアログ、原子性、再選択、alert、`File.arrayBuffer()`はDOMテストで確認した。
+
+## [2026-09-03] PR #35 Shift_JIS KIF読み込みレビュー修正
+
+- `importKifBytes`の32 MiB上限を元の`ArrayBuffer`／`Uint8Array`のバイト数だけで判定するよう統一した。`decodeKifBytes`の元バイト数検査とUIの`File.size`事前検査は維持し、内部のデコード済み文字列解析ではUTF-8再エンコードによる再判定を廃止した。
+- 文字列公開APIの`importKifText`には従来どおりUTF-8換算バイト数の上限を適用する。Shift_JIS宣言とUTF-8内容の不一致を確認する内部フォールバックにも、デコード後サイズによる誤拒否はない。
+- 文字コードの事前検出とKIFパーサーで、trim後の行頭が`#KIF`となる完全に対応した宣言行だけを共通判定にした。`* #KIF ...`や`# comment #KIF ...`は宣言ではなくコメントとして無視する一方、行頭の未対応宣言、UTF-8 BOMとの矛盾は従来どおり拒否する。
+- コメント内の疑似宣言、行頭の未対応宣言、UTF-8換算時だけ32 MiBを超える約22.4 MiBの生成Shift_JIS入力、`importKifText`のUTF-8換算上限、既存の元バイト数超過を回帰テストで確認した。巨大な固定配列は追加していない。
+- KIF関連テストは3ファイル・58/58件、`npm run lint`、`npm run build`、`npm run check`、`git diff --check`はすべて成功した。全テストは15ファイル・713/713件成功。依存関係、CI、UI、KIF書き出し、JSON読み込みへの変更はない。
