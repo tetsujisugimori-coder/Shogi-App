@@ -21,6 +21,7 @@ import { executeEnteringKingDeclaration } from './enteringKing';
 import { executeMove } from './gameState';
 import {
   createShogiGameRecordV1,
+  isShogiGameRecordV1FoulCoordinateValue,
   SHOGI_GAME_RECORD_FORMAT,
   SHOGI_GAME_RECORD_VERSION,
   type SavedBoardStatusV1,
@@ -50,9 +51,6 @@ export const MAX_SHOGI_GAME_RECORD_FILE_BYTES = 32 * 1024 * 1024;
 
 const MAX_COLLECTION_ITEMS = 10_000;
 const MAX_SHORT_STRING_LENGTH = 10_000;
-// 盤外反則の提案値は保持するが、外部入力として実用上不要な巨大整数は受理しない。
-// 公開APIで通常利用される盤座標と、その前後を十分に包含する明示的なv1上限とする。
-const MAX_FOUL_PROPOSAL_COORDINATE_ABS = 1_000_000;
 const ISO_8601_UTC_PATTERN = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/;
 
 export type ShogiGameRecordImportErrorCode =
@@ -276,20 +274,13 @@ function readBoardCoordinate(value: unknown, path: string): { row: number; col: 
 
 function readFoulProposalCoordinate(value: unknown, path: string): { row: number; col: number } {
   const object = exactKeys(value, ['row', 'col'], [], path);
-  return {
-    row: readInteger(
-      object.row,
-      `${path}.row`,
-      -MAX_FOUL_PROPOSAL_COORDINATE_ABS,
-      MAX_FOUL_PROPOSAL_COORDINATE_ABS
-    ),
-    col: readInteger(
-      object.col,
-      `${path}.col`,
-      -MAX_FOUL_PROPOSAL_COORDINATE_ABS,
-      MAX_FOUL_PROPOSAL_COORDINATE_ABS
-    ),
-  };
+  if (
+    !isShogiGameRecordV1FoulCoordinateValue(object.row) ||
+    !isShogiGameRecordV1FoulCoordinateValue(object.col)
+  ) {
+    return fail('invalid_value', `${path}のrowとcolは安全な整数である必要があります。`);
+  }
+  return { row: object.row, col: object.col };
 }
 
 function readPiece(value: unknown, path: string): SavedPieceV1 {

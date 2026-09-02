@@ -7,6 +7,7 @@ import {
   createShogiGameRecordFilename,
   createShogiGameRecordV1,
   downloadShogiGameRecord,
+  executeMove,
   serializeShogiGameRecordV1,
   SHOGI_GAME_RECORD_FORMAT,
   SHOGI_GAME_RECORD_MIME_TYPE,
@@ -640,6 +641,24 @@ describe('バージョン付き対局記録JSON', () => {
     const state = createInitialBoardState();
     state.moveNumber = value;
     expect(() => serializeShogiGameRecordV1(state, EXPORTED_AT)).toThrow(/有限でない数値/);
+  });
+
+  it.each([
+    ['MAX_SAFE_INTEGER超過', { row: 6, col: 2 }, { row: Number.MAX_SAFE_INTEGER + 1, col: 2 }],
+    ['MIN_SAFE_INTEGER未満', { row: Number.MIN_SAFE_INTEGER - 1, col: 2 }, { row: 5, col: 2 }],
+    ['小数', { row: 6, col: 2 }, { row: 9.5, col: 2 }],
+    ['NaN', { row: 6, col: 2 }, { row: Number.NaN, col: 2 }],
+    ['Infinity', { row: 6, col: 2 }, { row: Number.POSITIVE_INFINITY, col: 2 }],
+  ])('v1で表現不能な反則提案座標（%s）を保存時に拒否する', (_label, from, to) => {
+    const execution = executeMove(createInitialBoardState(), from, to, {
+      mode: 'strict',
+      proposer: 'shogi_engine',
+    });
+    if (execution.type !== 'foul_loss') throw new Error('foul fixture failed');
+
+    expect(() => serializeShogiGameRecordV1(execution.state, EXPORTED_AT)).toThrow(
+      /反則提案座標(?:from|to).*安全な整数/
+    );
   });
 
   it('循環した盤配列を黙ってJSON化しない', () => {

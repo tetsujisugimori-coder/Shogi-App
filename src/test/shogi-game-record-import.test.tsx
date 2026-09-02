@@ -248,6 +248,97 @@ describe('v1対局記録の安全な読み込み', () => {
     expect(result.state.result).toEqual(foul.state.result);
   });
 
+  it('1,000,001を含むstrict盤外移動反則をv1 JSONで往復できる', () => {
+    const foul = executeMove(
+      createInitialBoardState(),
+      { row: 6, col: 2 },
+      { row: 1_000_001, col: 2 },
+      { mode: 'strict', proposer: 'shogi_engine', engineName: 'large-coordinate-engine' }
+    );
+    expect(foul.type).toBe('foul_loss');
+    if (foul.type !== 'foul_loss') return;
+
+    const result = importState(foul.state);
+    expect(result.ok).toBe(true);
+    if (!result.ok) return;
+    expect(result.state.foulHistory).toEqual(foul.state.foulHistory);
+    expect(result.state.result).toEqual(foul.state.result);
+  });
+
+  it('-1,000,001を含むstrict盤外移動反則をv1 JSONで往復できる', () => {
+    const foul = executeMove(
+      createInitialBoardState(),
+      { row: -1_000_001, col: 2 },
+      { row: 5, col: 2 },
+      { mode: 'strict', proposer: 'local_ai' }
+    );
+    expect(foul.type).toBe('foul_loss');
+    if (foul.type !== 'foul_loss') return;
+
+    const result = importState(foul.state);
+    expect(result.ok).toBe(true);
+    if (!result.ok) return;
+    expect(result.state.foulHistory).toEqual(foul.state.foulHistory);
+    expect(result.state.result).toEqual(foul.state.result);
+  });
+
+  it('1,000,001を含むstrict盤外駒打ち反則をv1 JSONで往復できる', () => {
+    const foul = executeDrop(
+      createCapturedBishopState(),
+      'gote-bishop-2',
+      { row: 1_000_001, col: 4 },
+      { mode: 'strict', proposer: 'shogi_engine', engineName: 'large-drop-engine' }
+    );
+    expect(foul.type).toBe('foul_loss');
+    if (foul.type !== 'foul_loss') return;
+
+    const result = importState(foul.state);
+    expect(result.ok).toBe(true);
+    if (!result.ok) return;
+    expect(result.state.foulHistory).toEqual(foul.state.foulHistory);
+    expect(result.state.foulHistory?.[0]).toMatchObject({
+      kind: 'drop',
+      reason: 'out_of_bounds',
+      to: { row: 1_000_001, col: 4 },
+      pieceId: 'gote-bishop-2',
+      proposer: 'shogi_engine',
+      engineName: 'large-drop-engine',
+    });
+    expect(result.state.result).toEqual(foul.state.result);
+    expect(result.state.status).toBe('ended');
+  });
+
+  it.each([
+    ['MAX_SAFE_INTEGER', Number.MAX_SAFE_INTEGER],
+    ['MIN_SAFE_INTEGER', Number.MIN_SAFE_INTEGER],
+  ])('%sを含むstrict反則記録を全フィールド維持して往復できる', (_label, row) => {
+    const foul = executeMove(
+      createInitialBoardState(),
+      { row: 6, col: 2 },
+      { row, col: 2 },
+      { mode: 'strict', proposer: 'shogi_engine', engineName: 'safe-integer-engine' }
+    );
+    expect(foul.type).toBe('foul_loss');
+    if (foul.type !== 'foul_loss') return;
+
+    const result = importState(foul.state);
+    expect(result.ok).toBe(true);
+    if (!result.ok) return;
+    expect(result.state.foulHistory).toEqual(foul.state.foulHistory);
+    expect(result.state.foulHistory?.[0]).toMatchObject({
+      kind: 'move',
+      reason: 'out_of_bounds',
+      from: { row: 6, col: 2 },
+      to: { row, col: 2 },
+      pieceType: 'pawn',
+      proposer: 'shogi_engine',
+      engineName: 'safe-integer-engine',
+    });
+    expect(result.state.result).toEqual(foul.state.result);
+    expect(result.state.result).toMatchObject({ winner: 'gote', loser: 'sente' });
+    expect(result.state.status).toBe('ended');
+  });
+
   it('未終局の初期局面へ架空の反則履歴を追加した記録を拒否する', () => {
     const foul = executeMove(
       createInitialBoardState(),
@@ -286,9 +377,8 @@ describe('v1対局記録の安全な読み込み', () => {
     ['小数', 9.5],
     ['文字列', '9'],
     ['null', null],
-    ['NaN', Number.NaN],
-    ['Infinity', Number.POSITIVE_INFINITY],
-    ['明示上限を超える巨大整数', 1_000_001],
+    ['MAX_SAFE_INTEGERを超える数値', Number.MAX_SAFE_INTEGER + 1],
+    ['MIN_SAFE_INTEGERを下回る数値', Number.MIN_SAFE_INTEGER - 1],
   ])('反則提案座標の%sを拒否する', (_label, value) => {
     const record = createShogiGameRecordV1(createStrictInvalidMoveState(), EXPORTED_AT);
     Reflect.set(record.foulHistory[0].to, 'row', value);
