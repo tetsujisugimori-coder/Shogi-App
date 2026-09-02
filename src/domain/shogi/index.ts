@@ -19,3 +19,4 @@ export {
   getPositionSnapshot,
 } from './replay';
 export * from './gameRecord';
+export * from './gameRecordImport';
