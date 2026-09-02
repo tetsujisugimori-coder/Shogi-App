@@ -43,6 +43,20 @@ const SHIFT_JIS_LEGACY_KIF = new Uint8Array([
 ]);
 
 describe('KIF 2.0 import', () => {
+  it('日本語メタデータとコメント内の疑似宣言を無視し、BOM後の本物のUTF-8宣言を採用する', () => {
+    const bytes = new TextEncoder().encode([
+      '\uFEFF先手：山田 #KIF version=2.0 encoding=Shift_JIS',
+      '棋戦：テスト戦 #KIF version=9.0 encoding=UTF-16',
+      '後手：佐藤 #KIF version=2.0 encoding=Shift_JIS',
+      '* 日本語 #KIF version=2.0 encoding=Shift_JIS',
+      ' \t#KIF version=2.0 encoding=UTF-8',
+      '手数----指手---------消費時間--',
+      '1 ７六歩(77)',
+    ].join('\n') + '\n');
+
+    expect(importKifBytes(bytes)).toMatchObject({ ok: true, metadata: { encoding: 'utf-8', moveCount: 1 } });
+  });
+
   it('コメント内の疑似宣言を無視し、本物のUTF-8宣言を採用する', () => {
     const bytes = new TextEncoder().encode([
       '* #KIF version=2.0 encoding=Shift_JIS',
