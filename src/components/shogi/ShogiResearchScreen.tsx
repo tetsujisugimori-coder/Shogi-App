@@ -10,7 +10,10 @@ import {
   respondToAgreedJishogiProposal,
   executeResignation,
   createShogiGameRecordFilename,
+  createKifFileName,
+  createKifText,
   downloadShogiGameRecord,
+  downloadKifText,
   getLegalDropSquares,
   getMoveCandidates,
   getPromotionStatus,
@@ -920,4 +923,3 @@ export const ShogiResearchScreen: React.FC<ShogiResearchScreenProps> = ({ initia
     </div>
   );
 };
-import { createKifFileName, createKifText, downloadKifText } from '../../domain/shogi';
