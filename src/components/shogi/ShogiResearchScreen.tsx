@@ -120,12 +120,9 @@ export const ShogiResearchScreen: React.FC<ShogiResearchScreenProps> = ({ initia
   );
   const replayIndexSet = useMemo(() => new Set(replayIndexes), [replayIndexes]);
   const replayPosition = replayHistoryIndex === null ? -1 : replayIndexes.indexOf(replayHistoryIndex);
+  const replayBaselineIndex = replayHistoryIndex ?? boardState.history.length;
   const previousReplayIndex =
-    replayHistoryIndex === null
-      ? replayIndexes.filter((index) => index > 0).at(-1) ?? null
-      : replayPosition > 0
-        ? replayIndexes[replayPosition - 1]
-        : null;
+    replayIndexes.filter((index) => index < replayBaselineIndex).at(-1) ?? null;
   const nextReplayIndex =
     replayPosition >= 0 && replayPosition < replayIndexes.length - 1
       ? replayIndexes[replayPosition + 1]
@@ -644,7 +641,7 @@ export const ShogiResearchScreen: React.FC<ShogiResearchScreenProps> = ({ initia
             candidateSquares={candidateSquares}
             candidateKind={selection.kind === 'none' ? null : selection.kind === 'hand' ? 'drop' : 'move'}
             dropPieceType={selection.kind === 'hand' ? selection.pieceType : null}
-            lastMove={replaySnapshot?.lastMove ?? boardState.lastMove}
+            lastMove={replaySnapshot ? replaySnapshot.lastMove : boardState.lastMove}
             onSquareClick={isInteractionBlocked ? undefined : handleSquareClick}
             focusRequest={focusRequest}
             turn={displayedTurn}

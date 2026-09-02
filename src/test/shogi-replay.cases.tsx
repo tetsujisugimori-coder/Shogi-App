@@ -188,6 +188,44 @@ describe('局面再生ドメイン', () => {
 });
 
 describe('局面再生UI', () => {
+  it('2手指した現在局面から前の手を1回押すと1手目終了局面へ戻る', async () => {
+    const user = userEvent.setup();
+    const afterFirst = applyMove(
+      createInitialBoardState(),
+      { row: 6, col: 2 },
+      { row: 5, col: 2 }
+    );
+    const state = applyMove(afterFirst, { row: 2, col: 6 }, { row: 3, col: 6 });
+    render(<ShogiResearchScreen initialState={state} />);
+
+    await user.click(screen.getByRole('button', { name: '前の手' }));
+
+    expect(screen.getByRole('status')).toHaveTextContent('1手目終了局面を閲覧中');
+    expect(screen.getByRole('gridcell', { name: '7筋 6段、先手の歩兵' })).toHaveAttribute(
+      'data-last-move',
+      'dest'
+    );
+    expect(screen.getByRole('gridcell', { name: '3筋 3段、後手の歩兵' })).not.toHaveAttribute(
+      'data-last-move'
+    );
+  });
+
+  it('1手指した現在局面から前の手を1回押すと初期局面へ戻る', async () => {
+    const user = userEvent.setup();
+    const state = applyMove(
+      createInitialBoardState(),
+      { row: 6, col: 2 },
+      { row: 5, col: 2 }
+    );
+    render(<ShogiResearchScreen initialState={state} />);
+
+    await user.click(screen.getByRole('button', { name: '前の手' }));
+
+    expect(screen.getByRole('status')).toHaveTextContent('初期局面を閲覧中');
+    expect(screen.getByRole('button', { name: '前の手' })).toBeDisabled();
+    expect(document.querySelectorAll('[data-last-move="source"], [data-last-move="dest"]')).toHaveLength(0);
+  });
+
   it('棋譜行、初期局面、前後移動、現在局面復帰を読み取り専用で切り替える', async () => {
     const user = userEvent.setup();
     const afterFirst = applyMove(
@@ -204,6 +242,7 @@ describe('局面再生UI', () => {
     expect(screen.getByRole('grid')).toHaveAttribute('aria-readonly', 'true');
     expect(screen.getByRole('button', { name: '前の手' })).toBeDisabled();
     expect(screen.getByRole('gridcell', { name: '7筋 7段、先手の歩兵' })).toBeInTheDocument();
+    expect(document.querySelectorAll('[data-last-move="source"], [data-last-move="dest"]')).toHaveLength(0);
 
     await user.click(screen.getByRole('button', { name: '次の手' }));
     expect(screen.getByRole('status')).toHaveTextContent('1手目終了局面を閲覧中');
@@ -214,6 +253,10 @@ describe('局面再生UI', () => {
     expect(screen.getByRole('gridcell', { name: '7筋 6段、先手の歩兵' })).toHaveAttribute(
       'data-last-move',
       'dest'
+    );
+    expect(screen.getByRole('gridcell', { name: '7筋 7段、空のマス' })).toHaveAttribute(
+      'data-last-move',
+      'source'
     );
 
     await user.click(screen.getByRole('button', { name: '次の手' }));
@@ -231,6 +274,70 @@ describe('局面再生UI', () => {
     expect(screen.getByRole('status')).toHaveTextContent('対局中 / 先手番');
     expect(screen.getByRole('grid')).toHaveAttribute('aria-readonly', 'false');
     expect(screen.getByRole('button', { name: '投了' })).toBeEnabled();
+  });
+
+  it('現在局面へ戻ると元の棋譜・盤・持ち駒・手番・終局状態・スナップショットを維持する', async () => {
+    const user = userEvent.setup();
+    const afterFirst = applyMove(
+      createInitialBoardState(),
+      { row: 6, col: 2 },
+      { row: 5, col: 2 }
+    );
+    const afterSecond = applyMove(afterFirst, { row: 2, col: 6 }, { row: 3, col: 6 });
+    const resignation = executeResignation(afterSecond);
+    expect(resignation.type).toBe('applied');
+    const state = resignation.state;
+    render(<ShogiResearchScreen initialState={state} />);
+
+    await user.click(screen.getByRole('button', { name: '初期局面' }));
+    await user.click(screen.getByRole('button', { name: '現在局面へ戻る' }));
+
+    const root = document.getElementById('shogi-research-screen');
+    expect(root).toHaveAttribute('data-history-count', '2');
+    expect(root).toHaveAttribute('data-position-history-count', '3');
+    expect(root).toHaveAttribute('data-position-snapshot-count', '3');
+    expect(root).toHaveAttribute('data-sente-hand-count', '0');
+    expect(root).toHaveAttribute('data-gote-hand-count', '0');
+    expect(root).toHaveAttribute('data-turn', 'sente');
+    expect(root).toHaveAttribute('data-result', 'resignation');
+    expect(screen.getByRole('status')).toHaveTextContent('終局 / 後手勝ち（先手投了）');
+    expect(screen.getByRole('gridcell', { name: '7筋 6段、先手の歩兵' })).toBeInTheDocument();
+    expect(screen.getByRole('gridcell', { name: '3筋 4段、後手の歩兵' })).toHaveAttribute(
+      'data-last-move',
+      'dest'
+    );
+    expect(screen.getByRole('grid')).toHaveAttribute('aria-readonly', 'true');
+  });
+
+  it('部分的に欠けた再生履歴では現在位置より小さい実在局面だけへ移動する', async () => {
+    const user = userEvent.setup();
+    const afterFirst = applyMove(
+      createInitialBoardState(),
+      { row: 6, col: 2 },
+      { row: 5, col: 2 }
+    );
+    const afterSecond = applyMove(afterFirst, { row: 2, col: 6 }, { row: 3, col: 6 });
+    const state = applyMove(afterSecond, { row: 6, col: 7 }, { row: 5, col: 7 });
+    state.positionSnapshots = state.positionSnapshots?.filter(
+      (snapshot) => snapshot.historyIndex !== 1
+    );
+    render(<ShogiResearchScreen initialState={state} />);
+
+    expect(document.getElementById('shogi-research-screen')).toHaveAttribute(
+      'data-position-snapshot-count',
+      '3'
+    );
+    expect(screen.getByRole('button', { name: /1手目 ▲7六歩の局面を表示/ })).toBeDisabled();
+
+    await user.click(screen.getByRole('button', { name: '前の手' }));
+    expect(screen.getByRole('status')).toHaveTextContent('2手目終了局面を閲覧中');
+    await user.click(screen.getByRole('button', { name: '前の手' }));
+    expect(screen.getByRole('status')).toHaveTextContent('初期局面を閲覧中');
+    expect(screen.getByRole('button', { name: '前の手' })).toBeDisabled();
+    expect(document.getElementById('shogi-research-screen')).toHaveAttribute(
+      'data-position-snapshot-count',
+      '3'
+    );
   });
 
   it('再生データがない外部棋譜行を表示したまま選択不可にする', () => {
