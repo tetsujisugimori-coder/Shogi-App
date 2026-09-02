@@ -2310,3 +2310,10 @@ PR #1のレビュー指摘を受け、簡易APIの`applyMove`と合法手候補�
 
 - `npm run verify:lock`、`npm run verify:macos-fsevents`、`npm run lint`、KIF対象テスト（3ファイル・33件）、`npm test`（15ファイル・687件）、`npm run build`、`npm run check`、`git diff --check`を実行し成功した。WindowsのmacOS fsevents検証は静的検査として成功し、ネイティブwatchは対象OS外のため未実施。
 - 実ブラウザではPC幅1280px（実効1265px）とモバイル幅500px（実効485px）でKIF読み込み操作を表示し、いずれも`scrollWidth === clientWidth`、console warning/error 0件を確認した。ブラウザのローカルfile chooserはこの環境でタイムアウトしたため、正常読み込み・不正ファイル時の状態維持・確認ダイアログの実操作はDOMテストで確認した。
+
+## [2026-09-02] KIF読み込みの時間付き終局行・構造検証の補強
+
+- 終局語の照合前にも通常指し手と共通の消費時間除去関数を使用し、`投了 ( 0:01/00:00:05)`などを既存の投了判定へ渡すようにした。移動元座標`(77)`は時間形式と区別し、削除しない。
+- `#KIF version=2.0 encoding=UTF-8`と標準手数見出しを必須化した。未対応バージョン、Shift_JISなどの未対応文字コード、壊れた・重複・位置不正な宣言、重複または欠落した見出し、コメント・メタデータだけ、KIFでない内容を日本語エラーで拒否する。
+- 時間付き終局、不正な終局語と不正な括弧表記、空の指し手、KIF構造の全分岐、正式な0手KIF、コメント、UIで指し手エラーへ到達する不正KIFを回帰テストへ追加した。時間付き投了の実形式fixtureも追加した。
+- `npm run verify:lock`、`npm run verify:macos-fsevents`、`npm run lint`、`npm test -- src/test/shogi-kif-import.test.ts src/test/shogi-kif-import-ui.test.tsx src/test/shogi-kif-export.test.ts`（3ファイル・50件）、`npm test`（15ファイル・705件）、`npm run build`、`npm run check`、`git diff --check`が成功した。WindowsではmacOSネイティブwatchを実行できないため、`verify:macos-fsevents`の静的検査で確認した。

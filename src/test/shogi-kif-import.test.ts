@@ -55,6 +55,18 @@ describe('KIF 2.0 import', () => {
     expect(imported.state.history).toHaveLength(4);
     expect(imported.state.status).toBe('ended');
     expect(imported.state.result?.endReason).toBe('resignation');
+    expect(imported.state.result).toMatchObject({ winner: 'gote', loser: 'sente' });
+  });
+
+  it.each([
+    ['不明な終局語', '1 中断 ( 0:01/00:00:05)'],
+    ['不正な消費時間の括弧表記', '1 投了 ( 0:01)'],
+    ['移動元座標だけを付けた終局語', '1 投了 (77)'],
+    ['時間を除くと空になる指し手', '1 ( 0:01/00:00:05)'],
+  ])('%sを時間表記として誤受理しない', (_label, line) => {
+    const imported = importKifText(standardKif([line]));
+    expect(imported.ok).toBe(false);
+    if (!imported.ok) expect('state' in imported).toBe(false);
   });
 
   it('駒取りと駒打ちを既存の合法手APIで復元する', () => {
@@ -90,13 +102,52 @@ describe('KIF 2.0 import', () => {
   it.each([
     ['バージョン宣言なし', '手数----指手---------消費時間--\n1 ７六歩(77)\n', 'バージョン宣言'],
     ['未対応バージョン', '#KIF version=2.1 encoding=UTF-8\n手数----指手---------消費時間--\n', '対応していないKIFバージョン'],
+    ['未対応バージョン9.0', '#KIF version=9.0 encoding=UTF-8\n手数----指手---------消費時間--\n', '対応していないKIFバージョン'],
     ['未対応文字コード', '#KIF version=2.0 encoding=Shift_JIS\n手数----指手---------消費時間--\n', '対応していないKIFバージョン'],
+    ['壊れたKIF宣言', '#KIF version=2.0\n手数----指手---------消費時間--\n', '対応していないKIFバージョン'],
     ['指し手表なし', '#KIF version=2.0 encoding=UTF-8\n1 ７六歩(77)\n', '指し手表ヘッダー'],
+    ['コメントだけ', '# KIF comment\n', 'バージョン宣言'],
+    ['メタデータだけ', '先手：先手太郎\n後手：後手花子\n', 'バージョン宣言'],
     ['KIFではない内容', 'これは将棋棋譜ではありません。\n', 'バージョン宣言'],
   ])('%sをKIF 2.0の基本構造エラーとして拒否する', (_label, kif, message) => {
     const imported = importKifText(kif);
     expect(imported.ok).toBe(false);
     if (!imported.ok) expect(imported.message).toContain(message);
+  });
+
+  it.each([
+    ['バージョン宣言の重複', [
+      '#KIF version=2.0 encoding=UTF-8',
+      '#KIF version=2.0 encoding=UTF-8',
+      '手数----指手---------消費時間--',
+    ], 'バージョン宣言が重複'],
+    ['バージョン宣言が手数見出しより後', [
+      '手数----指手---------消費時間--',
+      '#KIF version=2.0 encoding=UTF-8',
+    ], 'バージョン宣言がありません'],
+    ['手数見出しの重複', [
+      '#KIF version=2.0 encoding=UTF-8',
+      '手数----指手---------消費時間--',
+      '手数----指手---------消費時間--',
+    ], '指し手表ヘッダーが重複'],
+  ])('%sを行番号付きで拒否する', (_label, lines, message) => {
+    const imported = importKifText(lines.join('\n') + '\n');
+    expect(imported).toMatchObject({ ok: false, message: expect.stringContaining(message) });
+    if (!imported.ok) expect(imported.message).toContain('行目');
+  });
+
+  it('正式な宣言と標準手数見出しを持つ0手KIF、および宣言後のコメントを受理する', () => {
+    const imported = importKifText([
+      '#KIF version=2.0 encoding=UTF-8',
+      '# 任意のコメント',
+      '手数----指手---------消費時間--',
+      '# 指し手表後のコメント',
+    ].join('\n') + '\n');
+    expect(imported).toMatchObject({ ok: true, metadata: { moveCount: 0, isEnded: false } });
+    if (imported.ok) {
+      expect(imported.state.status).toBe('active');
+      expect(imported.state.history).toHaveLength(0);
+    }
   });
 
   it('既存ドメインが再実行で確定した千日手終局行を照合して復元する', () => {
