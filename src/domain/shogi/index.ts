@@ -18,3 +18,4 @@ export {
   recordPositionSnapshotAfterLegalMove,
   getPositionSnapshot,
 } from './replay';
+export * from './gameRecord';

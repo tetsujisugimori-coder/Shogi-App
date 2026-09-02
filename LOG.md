@@ -2002,3 +2002,64 @@ PR #1のレビュー指摘を受け、簡易APIの`applyMove`と合法手候補�
 
 - Undo / Redo、待った、過去局面からの指し直し、分岐棋譜、棋譜の入出力は引き続き対象外。
 - 欠落した再生スナップショットは設計どおり復元・推測しないため、その局面の棋譜行選択はdisabledとなり、前後操作では次に実在する局面まで移動する。
+
+## [2026-09-02] バージョン付き対局記録JSONの書き出し
+
+### 基準・ブランチ・目的
+
+- 作業前の `git status --short` は空で、既存変更はなかった。ローカルの `main` / `origin/main` はPR #24のマージコミット `409d460` を指していることを確認した。
+- `git fetch origin main` / `git pull --ff-only origin main` はWindows資格情報を取得できず `SEC_E_NO_CREDENTIALS` で失敗したため、確認できたPR #24マージ済みのローカル `main` を基準に `feat/game-record-json-export` を作成した。
+- 今回はアプリ独自JSONの書き出しだけを実装し、JSON読み込み、KIF / KI2 / CSA / USI入出力、自動保存、既存の将棋ルール変更、依存追加は行っていない。
+
+### 保存形式と互換性方針
+
+- `src/domain/shogi/gameRecord.ts` にReact UIから独立した `ShogiGameRecordV1` とv1専用の保存型、純粋変換、整形JSON生成、ファイル名生成、ブラウザダウンロードを集約した。
+- トップレベル識別子は `format: "shogi-app-game-record"`、整数バージョンは `version: 1`。ほかにISO 8601 UTCの `exportedAt`、`initialPosition: "hirate"` と全対局フィールドを直接持つ。将来非互換な変更が必要な場合は既存v1を変更せず新バージョンを追加し、読み込み側が識別子とversionで分岐できる構造とした。
+- トップレベルの `latestState` は最新の盤上配置、両持ち駒、手番、次の手数、状態を保持する。全着手 `history`、`lastMove`、全 `GameResult` を保持できる `result`、`foulHistory`、千日手判定用 `positionHistory`、再生用 `positionSnapshots`、500手持将棋の連続王手待機 `moveLimitJishogi` も同じトップレベルへ保存する。
+- 盤マスは復元に必要な `row` / `col` / `piece` に正規化し、表示用の筋・段ラベルや星印は除外した。駒の省略可能な成り状態は常にbooleanへ正規化し、欠落値を出力しない。
+- `viewMode` は盤の表示用途・向きの選択であり対局進行に必要なデータではないため保存しない。再生位置、選択、ダイアログ、フォーカス要求、モバイル棋譜開閉、通知もUI一時状態として保存しない。
+- 盤、各駒、持ち駒、着手座標、反則座標、結果、千日手履歴、再生スナップショット、500手待機状態を明示的に複製し、元の `BoardState` と可変参照を共有しない。
+- 日時は純粋変換へ外部注入し、同じstateと日時から同じJSONを生成する。2空白インデント、UTF-8 JSON、末尾改行を採用し、`NaN` / `Infinity` などJSONで表せない値は例外で拒否する。循環した異常入力も出力せず失敗する。
+
+### UI・ダウンロード
+
+- 「対局記録を保存」を上部の対局操作群へ追加した。モバイルで棋譜パネルが閉じていても利用でき、対局開始直後、進行中、王手中、再生中、終局後に保存できる。ダイアログ表示中だけ背景操作として無効化する。
+- 保存処理は表示用 `replaySnapshot` ではなく実際の `boardState` を直接変換する。保存前後に盤、持ち駒、手番、手数、履歴、結果、再生位置、選択を更新せず、「現在局面へ戻る」も呼ばない。
+- ファイル名は `shogi-game-YYYYMMDD-HHmmss.SSSZ.json`。Windowsの無効文字を使わずUTC日時とミリ秒を含める。
+- Blob MIMEは `application/json;charset=utf-8`。一時リンクはクリック後の `finally` で除去し、Object URLはダウンロード開始から1秒の猶予を置いて解放する。成功時は `role="status"`、失敗時は日本語の `role="alert"` で通知する。
+
+### 変更ファイル
+
+- 追加: `src/domain/shogi/gameRecord.ts`
+- 追加: `src/test/shogi-game-record.test.tsx`
+- 変更: `src/domain/shogi/index.ts`
+- 変更: `src/components/shogi/ShogiResearchScreen.tsx`
+- 変更: `README.md`
+- 追記: `LOG.md`
+- `package.json`、`package-lock.json`、`vite.config.ts`、CI設定、依存パッケージの変更: なし。
+
+### テスト・検証結果
+
+- 保存形式・純粋関数・ダウンロード・UIの30件を追加した。固定識別子/version/ISO日時/平手、通常移動、成り、不成、駒取り、駒打ち、両持ち駒、王手、全11種の既存 `GameResult`、反則、両局面履歴、500手待機の有無、不変性と非共有、決定性、parse、末尾改行、UI状態除外、不正数値と循環入力、Windows安全ファイル名、Blob/MIME/リンク/URL後始末、4段階の対局状態、再生中の最新state保存と位置維持、成功・失敗通知を検証した。
+- `npm run verify:lock`: 成功（399エントリ、registry package 398件、欠落0件）。
+- `npm run verify:macos-fsevents`: Windows上の静的検査成功。macOS固有のネイティブwatchとVite watcher経路は対象OS外のため未実施。
+- `npm run lint`: 成功（TypeScriptエラーなし）。
+- `npm test`: 成功（11テストファイル、579/579件）。既存期待値・タイムアウトは変更していない。
+- `npm run build`: 成功（Vite 6.4.3、1708 modules transformed）。
+- `npm run check`: 成功（lock / lint / 579 tests / build）。
+- `git diff --check`: 成功（空白エラーなし）。
+
+### ブラウザ確認結果
+
+- Vite開発サーバーとCodex内蔵ブラウザでPC幅1280×1000（実効client幅1265px）とモバイル幅500×1000（実効client幅485px）を確認した。agent-browser CLIは環境のPATHになかったため内蔵ブラウザを使用した。
+- PC幅では初期局面を保存後、7六歩・3四歩を実際に指し、1手目終了局面を再生したまま保存した。保存前後とも `replayHistoryIndex: 1`、実stateの履歴2件、直前手「△3四歩」を維持し、保存ボタンは再生中も有効だった。
+- 再生中に取得した実JSONは `history` 2件、`lastMove: △3四歩`、最新局面の3四に後手歩、先手番、第3手を保持し、表示中の1手目スナップショットではなく最新stateを保存したことを確認した。
+- 現在局面へ戻って先手が投了した後にも保存でき、終局理由 `resignation`、履歴2件、再生スナップショット3件、末尾改行を持つJSONをテキストとしてparseできた。実ダウンロード4件を `C:\Users\tetsu\Downloads` へ取得し、最終v1では `latestState`、`history`、`lastMove`、`result`、両局面履歴、500手待機を含む全主要フィールドがトップレベルにあることも確認した。
+- モバイル幅では棋譜を閉じた状態でも保存ボタンが表示・操作可能で、上部操作は折り返した。棋譜を開いた状態も含めdocumentのclient幅とscroll幅はともに485pxで横スクロールなし。盤・棋譜を圧迫する重なりはなかった。
+- 両幅でViteエラーオーバーレイなし、ブラウザconsoleのwarning / error 0件。Object URL解放は単体テストで確認した（ブラウザのdownloadイベント待機APIは標準Blobダウンロードを捕捉せずタイムアウトしたが、実ファイル生成はファイルシステムで確認できた）。
+
+### 残っている制約
+
+- v1 JSONの読み込み、ドラッグ＆ドロップ、LocalStorage / IndexedDB / クラウドへの自動保存は未実装。
+- KIF / KI2 / CSA / USI入出力、PDF / 画像 / CSV出力、Undo / Redo、待った、分岐棋譜、任意局面編集、対局時計、AI・エンジン・評価・解析コメントは未実装。
+- macOS固有のfseventsネイティブwatch動作はWindows環境では実行していない。
