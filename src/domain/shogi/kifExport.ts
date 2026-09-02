@@ -174,7 +174,9 @@ function formatMoveNotation(state: BoardState, historyIndex: number, move: MoveR
     case 'move': {
       const movingPiece = getMovingPiece(state, historyIndex, move);
       const piece = formatPiece(move.pieceType, movingPiece?.isPromoted === true);
-      const promotion = move.promotion === 'promote' ? '成' : move.promotion === 'decline' ? '不成' : '';
+      // KIF 2.0 omits the modifier when an optional promotion is declined.
+      // The source coordinate still disambiguates the otherwise identical move.
+      const promotion = move.promotion === 'promote' ? '成' : '';
       return destination + piece + promotion + '(' + formatSource(move.from) + ')';
     }
     case 'drop':

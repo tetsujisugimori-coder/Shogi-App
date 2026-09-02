@@ -132,7 +132,7 @@ describe('KIF export', () => {
     const kif = createKifText(state);
 
     expect(kif).toContain('２二角成(88)\r\n');
-    expect(kif).toContain('８八角不成(22)\r\n');
+    expect(kif).toContain('８八角(22)\r\n');
     expect(kif).toContain('５五歩打\r\n');
   });
 

@@ -21,9 +21,12 @@ import {
   normalizePositionSnapshots,
   serializeShogiGameRecordV1,
   importShogiGameRecord,
+  importKifText,
   MAX_SHOGI_GAME_RECORD_FILE_BYTES,
+  MAX_KIF_FILE_BYTES,
   PromotionStatus,
   type ShogiGameRecordImportResult,
+  type KifImportResult,
   type AgreedJishogiProposal,
 } from '../../domain/shogi';
 import { ShogiTable } from './ShogiTable';
@@ -35,6 +38,7 @@ import { NewGameDialog } from './NewGameDialog';
 import { MoveHistoryPanel } from './MoveHistoryPanel';
 import { getGameResultDisplay } from './gameResultDisplay';
 import { GameRecordImportDialog } from './GameRecordImportDialog';
+import { KifImportDialog } from './KifImportDialog';
 
 interface ShogiResearchScreenProps {
   initialState?: BoardState;
@@ -50,6 +54,12 @@ interface PendingGameRecordImport {
   filename: string;
   state: BoardState;
   metadata: Extract<ShogiGameRecordImportResult, { ok: true }>['metadata'];
+}
+
+interface PendingKifImport {
+  filename: string;
+  state: BoardState;
+  metadata: Extract<KifImportResult, { ok: true }>['metadata'];
 }
 
 type SelectionState =
@@ -90,6 +100,8 @@ export const ShogiResearchScreen: React.FC<ShogiResearchScreenProps> = ({ initia
   const [pendingGameRecordImport, setPendingGameRecordImport] =
     useState<PendingGameRecordImport | null>(null);
   const [isGameRecordFileReading, setIsGameRecordFileReading] = useState(false);
+  const [pendingKifImport, setPendingKifImport] = useState<PendingKifImport | null>(null);
+  const [isKifFileReading, setIsKifFileReading] = useState(false);
   const [moveHistoryResetKey, setMoveHistoryResetKey] = useState(0);
   const [agreedJishogiProposal, setAgreedJishogiProposal] = useState<AgreedJishogiProposal | null>(null);
   const [agreedJishogiError, setAgreedJishogiError] = useState<string | null>(null);
@@ -113,6 +125,9 @@ export const ShogiResearchScreen: React.FC<ShogiResearchScreenProps> = ({ initia
   const gameRecordImportButtonRef = useRef<HTMLButtonElement>(null);
   const gameRecordFileInputRef = useRef<HTMLInputElement>(null);
   const shouldRestoreGameRecordImportFocus = useRef(false);
+  const kifImportButtonRef = useRef<HTMLButtonElement>(null);
+  const kifFileInputRef = useRef<HTMLInputElement>(null);
+  const shouldRestoreKifImportFocus = useRef(false);
 
   const replaySnapshot =
     replayHistoryIndex === null
@@ -126,7 +141,9 @@ export const ShogiResearchScreen: React.FC<ShogiResearchScreenProps> = ({ initia
     isAgreedJishogiDialogOpen ||
     isNewGameDialogOpen ||
     pendingGameRecordImport !== null ||
-    isGameRecordFileReading;
+    isGameRecordFileReading ||
+    pendingKifImport !== null ||
+    isKifFileReading;
   const isEnded = boardState.status === 'ended';
   const isResignationAvailable = boardState.status === 'active' || boardState.status === 'check';
   const isEnteringKingAvailable = boardState.status === 'active' || boardState.status === 'check';
@@ -215,6 +232,12 @@ export const ShogiResearchScreen: React.FC<ShogiResearchScreenProps> = ({ initia
     shouldRestoreGameRecordImportFocus.current = false;
     gameRecordImportButtonRef.current?.focus();
   }, [pendingGameRecordImport]);
+
+  useEffect(() => {
+    if (pendingKifImport || !shouldRestoreKifImportFocus.current) return;
+    shouldRestoreKifImportFocus.current = false;
+    kifImportButtonRef.current?.focus();
+  }, [pendingKifImport]);
 
   const restoreBoardFocus = useCallback((square: { row: number; col: number }) => {
     focusRequestId.current += 1;
@@ -499,6 +522,57 @@ export const ShogiResearchScreen: React.FC<ShogiResearchScreenProps> = ({ initia
     setPendingGameRecordImport(null);
   }, []);
 
+  const selectKifFile = () => {
+    if (dialogsAreOpen || isKifFileReading) return;
+    kifFileInputRef.current?.click();
+  };
+
+  const handleKifFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const input = event.currentTarget;
+    const file = input.files?.[0];
+    input.value = '';
+    if (!file || dialogsAreOpen || isKifFileReading) return;
+    if (file.size > MAX_KIF_FILE_BYTES) {
+      setExportNotice({ kind: 'error', message: 'KIFファイルが大きすぎます（上限32 MiB）。' });
+      return;
+    }
+    setIsKifFileReading(true);
+    setExportNotice(null);
+    try {
+      const result = importKifText(await file.text());
+      if (!result.ok) {
+        setExportNotice({ kind: 'error', message: result.message });
+        return;
+      }
+      setPendingKifImport({ filename: file.name, state: result.state, metadata: result.metadata });
+    } catch {
+      setExportNotice({ kind: 'error', message: 'KIFファイルを読み取れませんでした。別のファイルを選択してください。' });
+    } finally {
+      setIsKifFileReading(false);
+    }
+  };
+
+  const cancelKifImport = useCallback(() => {
+    shouldRestoreKifImportFocus.current = true;
+    setPendingKifImport(null);
+  }, []);
+
+  const confirmKifImport = () => {
+    if (!pendingKifImport) return;
+    focusRequestId.current = 0;
+    setBoardState(pendingKifImport.state);
+    setReplayHistoryIndex(null);
+    setSelection({ kind: 'none' });
+    setPendingPromotion(null);
+    setAgreedJishogiProposal(null);
+    setAgreedJishogiError(null);
+    setFocusRequest(null);
+    setMoveHistoryResetKey((current) => current + 1);
+    shouldRestoreKifImportFocus.current = true;
+    setExportNotice({ kind: 'success', message: `KIF棋譜を読み込みました（${pendingKifImport.filename}）` });
+    setPendingKifImport(null);
+  };
+
   const confirmGameRecordImport = () => {
     if (!pendingGameRecordImport) return;
     shouldRestoreResignationFocus.current = false;
@@ -767,6 +841,29 @@ export const ShogiResearchScreen: React.FC<ShogiResearchScreenProps> = ({ initia
               KIF棋譜を保存
             </button>
           <input
+            ref={kifFileInputRef}
+            id="shogi-kif-file-input"
+            type="file"
+            accept=".kif,text/plain"
+            className="sr-only"
+            tabIndex={-1}
+            aria-labelledby="shogi-kif-import-button"
+            onChange={handleKifFileChange}
+          />
+          <button
+            ref={kifImportButtonRef}
+            id="shogi-kif-import-button"
+            type="button"
+            onClick={selectKifFile}
+            disabled={dialogsAreOpen || isKifFileReading}
+            aria-controls="shogi-kif-file-input"
+            aria-haspopup="dialog"
+            aria-expanded={pendingKifImport !== null}
+            className="rounded border border-amber-700/70 bg-amber-950/45 px-4 py-1.5 font-serif text-sm tracking-[0.1em] text-amber-100 shadow-inner outline-none transition hover:border-amber-500 hover:bg-amber-900/55 focus-visible:ring-2 focus-visible:ring-amber-300 disabled:cursor-not-allowed disabled:border-stone-800 disabled:text-stone-600 disabled:opacity-65"
+          >
+            {isKifFileReading ? 'KIF棋譜を検証中' : 'KIF棋譜を読み込む'}
+          </button>
+          <input
             ref={gameRecordFileInputRef}
             id="shogi-game-record-file-input"
             type="file"
@@ -908,6 +1005,16 @@ export const ShogiResearchScreen: React.FC<ShogiResearchScreenProps> = ({ initia
           isEnded={pendingGameRecordImport.metadata.isEnded}
           onConfirm={confirmGameRecordImport}
           onCancel={cancelGameRecordImport}
+        />
+      )}
+
+      {pendingKifImport && (
+        <KifImportDialog
+          filename={pendingKifImport.filename}
+          moveCount={pendingKifImport.metadata.moveCount}
+          isEnded={pendingKifImport.metadata.isEnded}
+          onConfirm={confirmKifImport}
+          onCancel={cancelKifImport}
         />
       )}
 
