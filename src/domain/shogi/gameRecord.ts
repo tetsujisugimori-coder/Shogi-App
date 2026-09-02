@@ -20,6 +20,11 @@ export const SHOGI_GAME_RECORD_FORMAT = 'shogi-app-game-record' as const;
 export const SHOGI_GAME_RECORD_VERSION = 1 as const;
 export const SHOGI_GAME_RECORD_MIME_TYPE = 'application/json;charset=utf-8' as const;
 
+/** v1反則提案座標の各成分は、JSONで精度を失わないJavaScriptの安全な整数とする。 */
+export function isShogiGameRecordV1FoulCoordinateValue(value: unknown): value is number {
+  return typeof value === 'number' && Number.isSafeInteger(value);
+}
+
 export type SavedPlayerV1 = 'sente' | 'gote';
 
 export type SavedPieceTypeV1 =
@@ -402,11 +407,26 @@ function cloneOptionalMoveRecord(move: MoveRecord | null | undefined): SavedMove
   return move ? cloneMoveRecord(move) : null;
 }
 
+function cloneFoulProposalCoordinate(
+  coordinate: { row: number; col: number },
+  path: string
+): { row: number; col: number } {
+  if (
+    !isShogiGameRecordV1FoulCoordinateValue(coordinate.row) ||
+    !isShogiGameRecordV1FoulCoordinateValue(coordinate.col)
+  ) {
+    throw new TypeError(
+      `${path}のrowとcolはv1で表現可能なJavaScriptの安全な整数である必要があります。`
+    );
+  }
+  return { row: coordinate.row, col: coordinate.col };
+}
+
 function cloneFoulRecord(foul: FoulRecord): SavedFoulRecordV1 {
   const common: SavedFoulRecordBaseV1 = {
     moveNumber: foul.moveNumber,
     player: toSavedPlayerV1(foul.player),
-    to: { row: foul.to.row, col: foul.to.col },
+    to: cloneFoulProposalCoordinate(foul.to, '反則提案座標to'),
     pieceType: foul.pieceType === null ? null : toSavedPieceTypeV1(foul.pieceType),
     reason: toSavedIllegalMoveReasonV1(foul.reason),
     message: foul.message,
@@ -418,7 +438,11 @@ function cloneFoulRecord(foul: FoulRecord): SavedFoulRecordV1 {
   const kind = foul.kind;
   switch (kind) {
     case 'move':
-      return { ...common, kind: 'move', from: { row: foul.from.row, col: foul.from.col } };
+      return {
+        ...common,
+        kind: 'move',
+        from: cloneFoulProposalCoordinate(foul.from, '反則提案座標from'),
+      };
     case 'drop':
       return { ...common, kind: 'drop', from: null, pieceId: foul.pieceId };
     default:

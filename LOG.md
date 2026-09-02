@@ -2228,3 +2228,37 @@ PR #1のレビュー指摘を受け、簡易APIの`applyMove`と合法手候補�
 - 正常な未終局1手記録は確認ダイアログを経て履歴1件・後手番として読み込めた。strict盤外反則記録は `foul_loss`、後手勝ち（先手反則負け）として読み込めた。
 - 初期局面へ架空の反則履歴を追加したJSONは確認ダイアログを出さず日本語alertで拒否し、直前の反則負け局面と履歴数を維持した。
 - PC幅1280px（実効1265px）とモバイル幅500px（実効485px）でclient幅とscroll幅が一致し、読み込みボタンを表示できた。Viteエラーオーバーレイとconsole errorは0件だった。
+
+## [2026-09-02] v1反則提案座標の保存・読込契約統一
+
+### 原因と契約の決定
+
+- PR #28後の実装では、読込側だけに反則提案座標の独自上限±1,000,000があり、保存側の `createShogiGameRecordV1` / `serializeShogiGameRecordV1` には対応する制約がなかった。そのため、公開APIが生成・保存できる `1,000,001` などの正規な `out_of_bounds` 反則記録を同じv1読込処理が拒否していた。
+- v1反則提案座標の各 `row` / `col` は、JSON往復で精度を失わないJavaScriptの安全な整数、すなわち `Number.MIN_SAFE_INTEGER` 以上 `Number.MAX_SAFE_INTEGER` 以下と決定した。通常棋譜・盤・局面スナップショットの0〜8制限は変更しない。
+
+### 保存側と読込側の修正
+
+- `gameRecord.ts` に `isShogiGameRecordV1FoulCoordinateValue` を定義し、`typeof value === 'number' && Number.isSafeInteger(value)` をv1共通判定とした。読込側の恣意的な±1,000,000定数を削除し、反則提案の `from` / `to` だけがこの共通判定を使う。
+- 保存側の反則記録複製でも同じ判定を通し、安全な整数範囲外、小数、`NaN`、`Infinity`を含むstateは、有効なv1 JSONとして黙って出力せず、対象が反則提案座標であることを示す `TypeError` にした。
+- 読込側では安全な整数でないJSON値を `invalid_value` として拒否する。`NaN` / `Infinity` はJSON値ではなく `JSON.stringify` で `null` になるため、保存stateの検証とJSON入力の `null` 検証を別テストにした。
+- 反則座標を盤配列の添字として直接参照せず、通常座標と反則座標のreader分離、`foulHistory`意味的整合性検証、v1のformat / version、UI、依存関係を維持した。
+
+### テスト先行と追加・変更テスト
+
+- 実装修正前に、`1,000,001`の盤外移動、`-1,000,001`の盤外移動、`1,000,001`の盤外駒打ちをstrict反則負けにして保存・読込する3件を追加した。現行mainで3/3件が読込拒否となり、意図どおり失敗することを確認してから修正した。
+- `Number.MAX_SAFE_INTEGER` / `Number.MIN_SAFE_INTEGER`の往復と、理由、from / to、駒種、pieceId、proposer、engineName、勝者・敗者、終局状態の維持を追加した。
+- JSON入力では安全整数範囲外、小数、文字列、`null`を拒否し、保存処理では安全整数範囲外、小数、`NaN`、`Infinity`を原因の分かる例外で拒否することを追加した。
+- 通常棋譜の0〜8制限、架空 `foulHistory`、strict終端反則の複製・フィールド改ざん、timestamp、入力JSONとの可変参照非共有に関する既存テストを変更せず維持した。期待値やタイムアウトは緩和していない。
+
+### 検証結果
+
+- 追加再現テスト: 修正前3/3件失敗（想定どおり）、修正後3/3件成功。
+- `npx vitest run src/test/shogi-game-record-import.test.tsx`: 成功（1ファイル、60/60件）。
+- 対局記録保存・読込関連テスト: 成功（2ファイル、106/106件）。
+- `npm run verify:lock`: 成功（399エントリ、registry package 398件、欠落0件）。
+- `npm run verify:macos-fsevents`: Windows上の静的検査成功。macOSネイティブwatchとVite watcher経路は対象OS外のため未実施。
+- `npm run lint`: 成功（TypeScriptエラーなし）。
+- `npm test`: 成功（12ファイル、655/655件）。
+- `npm run build`: 成功（Vite 6.4.3、1710 modules transformed）。
+- `npm run check`: 成功（lock / lint / 655 tests / build）。
+- `git diff --check`: 成功（空白エラーなし）。
