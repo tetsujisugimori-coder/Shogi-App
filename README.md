@@ -239,3 +239,6 @@ GitHub Actions（`.github/workflows/ci.yml`）により、main/master ブラン�
 - `npm run lint`（TypeScript 型チェック）
 - `npm test`（Vitest テストスイート）
 - `npm run build`（本番ビルド）
+# KIF棋譜の書き出し
+
+対局中・終局後の局面を、KIF 2.0形式の .kif ファイルとして保存できます。JSON形式の対局記録保存・読込とは別機能で、KIFは他の将棋ソフトで参照しやすい棋譜出力用です。
