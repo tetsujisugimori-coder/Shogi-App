@@ -2262,3 +2262,7 @@ PR #1のレビュー指摘を受け、簡易APIの`applyMove`と合法手候補�
 - `npm run build`: 成功（Vite 6.4.3、1710 modules transformed）。
 - `npm run check`: 成功（lock / lint / 655 tests / build）。
 - `git diff --check`: 成功（空白エラーなし）。
+# 2026-09-02
+
+- 現在の対局をKIF 2.0（.kif）として書き出す機能を追加。
+- KIF保存ボタン、終局結果の変換、Blobダウンロード、KIF出力テストを追加。

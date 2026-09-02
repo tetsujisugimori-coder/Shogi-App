@@ -434,6 +434,22 @@ export const ShogiResearchScreen: React.FC<ShogiResearchScreenProps> = ({ initia
     }
   };
 
+  const saveKifRecord = () => {
+    const exportedAt = new Date();
+
+    try {
+      const kifText = createKifText(boardState);
+      const filename = createKifFileName(exportedAt);
+      downloadKifText(kifText, filename);
+      setExportNotice({ kind: 'success', message: 'KIF棋譜を保存しました（' + filename + '）' });
+    } catch {
+      setExportNotice({
+        kind: 'error',
+        message: 'KIF棋譜を保存できませんでした。時間をおいてもう一度お試しください。',
+      });
+    }
+  };
+
   const selectGameRecordFile = () => {
     if (dialogsAreOpen || isGameRecordFileReading) return;
     gameRecordFileInputRef.current?.click();
@@ -737,8 +753,16 @@ export const ShogiResearchScreen: React.FC<ShogiResearchScreenProps> = ({ initia
             disabled={dialogsAreOpen}
             className="rounded border border-violet-800/70 bg-violet-950/45 px-4 py-1.5 font-serif text-sm tracking-[0.1em] text-violet-100 shadow-inner outline-none transition hover:border-violet-600 hover:bg-violet-900/55 focus-visible:ring-2 focus-visible:ring-amber-300 disabled:cursor-not-allowed disabled:border-stone-800 disabled:text-stone-600 disabled:opacity-65"
           >
-            対局記録を保存
-          </button>
+              対局記録を保存
+            </button>
+            <button
+              type="button"
+              onClick={saveKifRecord}
+              disabled={dialogsAreOpen}
+              className="rounded-md border border-amber-400 bg-amber-50 px-3 py-2 text-sm font-semibold text-amber-900 transition hover:bg-amber-100 disabled:cursor-not-allowed disabled:opacity-50"
+            >
+              KIF棋譜を保存
+            </button>
           <input
             ref={gameRecordFileInputRef}
             id="shogi-game-record-file-input"
@@ -896,3 +920,4 @@ export const ShogiResearchScreen: React.FC<ShogiResearchScreenProps> = ({ initia
     </div>
   );
 };
+import { createKifFileName, createKifText, downloadKifText } from '../../domain/shogi';
