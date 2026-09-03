@@ -2317,3 +2317,47 @@ PR #1のレビュー指摘を受け、簡易APIの`applyMove`と合法手候補�
 - `#KIF version=2.0 encoding=UTF-8`と標準手数見出しを必須化した。未対応バージョン、Shift_JISなどの未対応文字コード、壊れた・重複・位置不正な宣言、重複または欠落した見出し、コメント・メタデータだけ、KIFでない内容を日本語エラーで拒否する。
 - 時間付き終局、不正な終局語と不正な括弧表記、空の指し手、KIF構造の全分岐、正式な0手KIF、コメント、UIで指し手エラーへ到達する不正KIFを回帰テストへ追加した。時間付き投了の実形式fixtureも追加した。
 - `npm run verify:lock`、`npm run verify:macos-fsevents`、`npm run lint`、`npm test -- src/test/shogi-kif-import.test.ts src/test/shogi-kif-import-ui.test.tsx src/test/shogi-kif-export.test.ts`（3ファイル・50件）、`npm test`（15ファイル・705件）、`npm run build`、`npm run check`、`git diff --check`が成功した。WindowsではmacOSネイティブwatchを実行できないため、`verify:macos-fsevents`の静的検査で確認した。
+
+## [2026-09-02] Shift_JIS KIF読み込み対応
+
+### 実装
+
+- PR #33を含む最新`main`（`466f038`）を基準に、UTF-8専用だったKIF読み込みをUTF-8とShift_JISの元バイト列読み込みへ拡張した。
+- KIF UIは`File.text()`を使わず、`File.size`の事前確認、`File.arrayBuffer()`、バイト長の再確認、`importKifBytes`の順に処理する。32 MiB上限は文字列の再エンコード長ではなく、選択ファイル・`ArrayBuffer`・公開API入力の元バイト数に適用する。
+- `decodeKifBytes`と既存KIF構造／合法手再生を分離した。UTF-8 BOMはUTF-8固定、宣言ありはUTF-8またはShift_JISの宣言どおりに`TextDecoder(..., { fatal: true })`で厳格にデコードし、宣言とバイト列が矛盾する場合は別文字コードへフォールバックせず日本語エラーで拒否する。UTF-16/UTF-32 BOM、未対応宣言、不正・途中切れバイト列も明確に拒否する。
+- 宣言なしの従来型KIFはUTF-8を先に厳格デコードし、不正な場合だけShift_JISを試す。いずれも標準手数見出し、平手開始情報、連番、KIF表記、既存`executeMove`／`executeDrop`等による合法手再実行を通過しなければ受理しない。
+- 成功時のmetadataへ実際に採用した`utf-8`または`shift_jis`を記録し、KIF確認ダイアログで利用者向け文字コード名を表示する。確認前、キャンセル、失敗時には盤面を置換せず、確定時だけ独立した復元`BoardState`を反映する。
+- 書き出しは従来どおりUTF-8 KIF 2.0のままで、JSON読み込みの`File.text()`は変更していない。駒落ち、盤面図・任意局面、詰将棋、変化手順、コメント保存、KI2/CSA/USI/SFEN、UTF-16などは対象外のままとした。
+
+### 変更とテスト
+
+- 変更: `src/domain/shogi/kifImport.ts`、`src/components/shogi/ShogiResearchScreen.tsx`、`src/components/shogi/KifImportDialog.tsx`、`src/test/shogi-kif-import.test.ts`、`src/test/shogi-kif-import-ui.test.tsx`、`README.md`。
+- Shift_JISテストは固定CP932バイト列を使用し、宣言付き／なし、対局情報、CRLF、通常移動、駒取り、駒打ち、成り、`同`、時間、投了、metadataを確認した。UTF-8 BOM、宣言不一致、UTF-16 LE/BE BOM、不正バイト列、元バイト列の32 MiB上限、`File.arrayBuffer()` UIフローと文字コード表示も追加した。
+- `node --version`: v24.20.0、`npm --version`: 11.17.0。
+- `npm run verify:lock`: 成功（399エントリ、registry package 398件、欠落0件）。
+- `npm run verify:macos-fsevents`: Windows上の静的検査成功。macOSネイティブwatchとVite watcher経路は対象OS外のため未実施。
+- `npm run lint`: 成功。KIF対象テストは3ファイル・54/54件、全テストは15ファイル・709/709件を分割実行および`npm run check`で成功。`npm run build`: 成功（Vite 6.4.3、1713 modules transformed）。`npm run check`: lockfile検証・lint・全テスト・buildを成功。
+- 依存関係ファイル、`package.json`、`package-lock.json`、CI設定の変更はない。実ブラウザのファイル選択は自動化せず、確認ダイアログ、原子性、再選択、alert、`File.arrayBuffer()`はDOMテストで確認した。
+
+## [2026-09-03] PR #35 Shift_JIS KIF読み込みレビュー修正
+
+- `importKifBytes`の32 MiB上限を元の`ArrayBuffer`／`Uint8Array`のバイト数だけで判定するよう統一した。`decodeKifBytes`の元バイト数検査とUIの`File.size`事前検査は維持し、内部のデコード済み文字列解析ではUTF-8再エンコードによる再判定を廃止した。
+- 文字列公開APIの`importKifText`には従来どおりUTF-8換算バイト数の上限を適用する。Shift_JIS宣言とUTF-8内容の不一致を確認する内部フォールバックにも、デコード後サイズによる誤拒否はない。
+- 文字コードの事前検出とKIFパーサーで、trim後の行頭が`#KIF`となる完全に対応した宣言行だけを共通判定にした。`* #KIF ...`や`# comment #KIF ...`は宣言ではなくコメントとして無視する一方、行頭の未対応宣言、UTF-8 BOMとの矛盾は従来どおり拒否する。
+- コメント内の疑似宣言、行頭の未対応宣言、UTF-8換算時だけ32 MiBを超える約22.4 MiBの生成Shift_JIS入力、`importKifText`のUTF-8換算上限、既存の元バイト数超過を回帰テストで確認した。巨大な固定配列は追加していない。
+- KIF関連テストは3ファイル・58/58件、`npm run lint`、`npm run build`、`npm run check`、`git diff --check`はすべて成功した。全テストは15ファイル・713/713件成功。依存関係、CI、UI、KIF書き出し、JSON読み込みへの変更はない。
+
+## [2026-09-03] PR #35 文字コード宣言の日本語メタデータ誤検出修正
+
+- バイト段階の宣言検出が非ASCIIバイトを半角空白へ置換してから`trim()`していたため、`先手：山田 #KIF ...`のように日本語メタデータ後ろにある疑似宣言を行頭の本物の宣言として誤認していた。
+- 元バイト列を行単位で走査し、半角空白・タブなど実際のASCII先頭空白だけを除外する方式へ変更した。非ASCIIバイトは空白化しないため、非ASCII文字が`#KIF`より前にある行を宣言として扱わない。UTF-8 BOMはファイル先頭の行だけで個別に除外する。
+- UTF-8 BOM、日本語の先手・後手・棋戦情報、`* 日本語 #KIF ...`、空白・タブ付きの本物のUTF-8宣言を含むバイト列が、`importKifBytes`でUTF-8・1手として正常に読み込まれることを追加した。既存の未対応宣言拒否、Shift_JIS、疑似宣言、32 MiB境界テストも維持した。
+- KIF関連テストは3ファイル・59/59件、`npm run lint`、`npm run build`、`npm run check`、`git diff --check`はすべて成功した。全テストは15ファイル・714/714件成功。
+
+## [2026-09-03] PR #35 KIF宣言行の末尾空白・4,096バイト境界修正
+
+- デコード後パーサーは各行を`trim()`してから宣言を判定する一方、デコード前のバイト段階では先頭ASCII空白だけを除去して末尾を残していたため、末尾の半角空白やタブを持つ正式な宣言が未対応宣言として拒否されていた。
+- 宣言候補の先頭・末尾について、半角空白、タブ、CRなど実際のASCII空白を共通関数で除去してから既存の完全一致判定へ渡すよう統一した。非ASCII文字を余白扱いせず、正式な宣言形式や余分な非空白文字の拒否は維持した。
+- 4,096バイトを超える入力では、調査範囲の末尾で改行まで収まらない途中行を宣言候補として判定しない。4,096バイト以下の入力は最終改行がなくても最終行を判定し、範囲内に完全に収まる未対応宣言は従来どおり拒否する。
+- UTF-8／Shift_JIS宣言末尾の半角空白・タブ、末尾余剰文字、末尾空白付き未対応宣言、4,096バイト途中へ置いた正式宣言、短い最終行の未対応宣言を追加した。境界テストでは宣言開始位置と4,096バイト超過を明示検証し、既存のBOM・Shift_JIS・32 MiB・疑似宣言テストを維持した。
+- KIF関連テストは3ファイル・66/66件、`npm run lint`、`npm run build`、`npm run check`、`git diff --check`はすべて成功した。全テストは15ファイル・721/721件成功。

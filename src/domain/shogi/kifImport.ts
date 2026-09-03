@@ -9,9 +9,12 @@ import { executeResignation } from './resignation';
 
 export const MAX_KIF_FILE_BYTES = 32 * 1024 * 1024;
 
-type KifImportErrorCode =
+export type KifImportErrorCode =
   | 'file_too_large'
-  | 'invalid_encoding'
+  | 'empty_file'
+  | 'unsupported_encoding'
+  | 'invalid_byte_sequence'
+  | 'encoding_mismatch'
   | 'unsupported_kif_version'
   | 'invalid_kif_structure'
   | 'unsupported_position'
@@ -20,8 +23,15 @@ type KifImportErrorCode =
   | 'invalid_result'
   | 'unsupported_result';
 
+export type KifEncoding = 'utf-8' | 'shift_jis';
+type KifMetadata = { moveCount: number; isEnded: boolean; encoding: KifEncoding | null };
+
 export type KifImportResult =
-  | { ok: true; state: BoardState; metadata: { moveCount: number; isEnded: boolean } }
+  | { ok: true; state: BoardState; metadata: KifMetadata }
+  | { ok: false; code: KifImportErrorCode; message: string };
+
+export type KifDecodeResult =
+  | { ok: true; text: string; encoding: KifEncoding; declaration: KifEncoding | null }
   | { ok: false; code: KifImportErrorCode; message: string };
 
 type Coordinate = { row: number; col: number };
@@ -49,6 +59,7 @@ const PIECES: Record<string, KifPiece> = {
 };
 const PIECE_PATTERN = '(成香|成桂|成銀|玉|王|飛|角|金|銀|桂|香|歩|と|馬|竜|龍)';
 const KIF_VERSION_DECLARATION = '#KIF version=2.0 encoding=UTF-8';
+const KIF_SHIFT_JIS_DECLARATION = '#KIF version=2.0 encoding=Shift_JIS';
 const MOVE_TABLE_HEADER = '手数----指手---------消費時間--';
 
 function utf8ByteLength(text: string): number {
@@ -57,6 +68,139 @@ function utf8ByteLength(text: string): number {
 
 function fail(code: KifImportErrorCode, message: string): KifImportResult {
   return { ok: false, code, message };
+}
+
+function decodeFail(code: KifImportErrorCode, message: string): KifDecodeResult {
+  return { ok: false, code, message };
+}
+
+function startsWithBytes(bytes: Uint8Array, expected: number[]): boolean {
+  return expected.every((value, index) => bytes[index] === value);
+}
+
+function getDeclaredEncoding(line: string): KifEncoding | 'unsupported' | null {
+  if (line === KIF_VERSION_DECLARATION) return 'utf-8';
+  if (line === KIF_SHIFT_JIS_DECLARATION) return 'shift_jis';
+  return line.startsWith('#KIF') ? 'unsupported' : null;
+}
+
+function isAsciiWhitespace(byte: number): boolean {
+  return byte === 0x09 || byte === 0x0b || byte === 0x0c || byte === 0x0d || byte === 0x20;
+}
+
+function findDeclaredEncoding(bytes: Uint8Array): KifEncoding | 'unsupported' | null {
+  // Examine original bytes line by line. In particular, never turn non-ASCII
+  // text into trim-able spaces: metadata such as "先手：山田 #KIF ..." is not
+  // a declaration line. The UTF-8 BOM is special only at the beginning.
+  const sampleLength = Math.min(bytes.byteLength, 4_096);
+  let lineStart = 0;
+  const inspectLine = (lineEnd: number): KifEncoding | 'unsupported' | null => {
+    let declarationStart = lineStart;
+    if (
+      lineStart === 0 &&
+      startsWithBytes(bytes, [0xef, 0xbb, 0xbf]) &&
+      declarationStart + 3 <= lineEnd
+    ) {
+      declarationStart += 3;
+    }
+    while (declarationStart < lineEnd && isAsciiWhitespace(bytes[declarationStart])) {
+      declarationStart += 1;
+    }
+    while (lineEnd > declarationStart && isAsciiWhitespace(bytes[lineEnd - 1])) {
+      lineEnd -= 1;
+    }
+    if (bytes[declarationStart] === 0x23) {
+      const line = Array.from(bytes.subarray(declarationStart, lineEnd), (byte) => String.fromCharCode(byte)).join('');
+      return getDeclaredEncoding(line);
+    }
+    return null;
+  };
+
+  for (let index = 0; index < sampleLength; index += 1) {
+    if (bytes[index] !== 0x0a) continue;
+    const declaration = inspectLine(index);
+    if (declaration !== null) return declaration;
+    lineStart = index + 1;
+  }
+  // A file no longer than the inspection window has no unobserved suffix, so its
+  // final line is complete even without a trailing newline. Larger files may end
+  // the sample mid-line; defer that incomplete candidate to the decoded parser.
+  if (sampleLength === bytes.byteLength && lineStart < sampleLength) {
+    return inspectLine(sampleLength);
+  }
+  return null;
+}
+
+function decodeStrict(bytes: Uint8Array, encoding: KifEncoding): string | null {
+  try {
+    return new TextDecoder(encoding, { fatal: true }).decode(bytes);
+  } catch (error) {
+    // A RangeError here means the runtime has no Shift_JIS decoder; that must not
+    // be confused with a damaged input file.
+    if (error instanceof RangeError && encoding === 'shift_jis') throw error;
+    return null;
+  }
+}
+
+/**
+ * Decodes original KIF bytes without accepting replacement characters or guessing
+ * against an explicit declaration. Parsing and legal-move replay stay separate in
+ * importKifBytes below.
+ */
+export function decodeKifBytes(input: ArrayBuffer | Uint8Array): KifDecodeResult {
+  const bytes = input instanceof Uint8Array ? input : new Uint8Array(input);
+  if (bytes.byteLength > MAX_KIF_FILE_BYTES) {
+    return decodeFail('file_too_large', 'KIFファイルが大きすぎます（上限32 MiB）。');
+  }
+  if (bytes.byteLength === 0) return decodeFail('empty_file', 'KIFファイルが空です。');
+  if (
+    startsWithBytes(bytes, [0x00, 0x00, 0xfe, 0xff]) ||
+    startsWithBytes(bytes, [0xff, 0xfe, 0x00, 0x00]) ||
+    startsWithBytes(bytes, [0xff, 0xfe]) ||
+    startsWithBytes(bytes, [0xfe, 0xff])
+  ) {
+    return decodeFail('unsupported_encoding', 'UTF-16またはUTF-32のKIFファイルには対応していません。UTF-8またはShift_JISを使用してください。');
+  }
+
+  const hasUtf8Bom = startsWithBytes(bytes, [0xef, 0xbb, 0xbf]);
+  const declaration = findDeclaredEncoding(bytes);
+  if (declaration === 'unsupported') {
+    return decodeFail('unsupported_encoding', 'KIFのバージョンまたは文字コード宣言に対応していません。KIF 2.0のUTF-8またはShift_JISを指定してください。');
+  }
+  if (hasUtf8Bom && declaration === 'shift_jis') {
+    return decodeFail('encoding_mismatch', 'UTF-8 BOMとShift_JISの文字コード宣言が一致しません。');
+  }
+
+  const selectedEncoding = hasUtf8Bom ? 'utf-8' : declaration;
+  if (selectedEncoding) {
+    let text: string | null;
+    try {
+      text = decodeStrict(bytes, selectedEncoding);
+    } catch {
+      return decodeFail('unsupported_encoding', 'この実行環境はShift_JISのKIFデコードに対応していません。');
+    }
+    if (text === null) {
+      return decodeFail(
+        'encoding_mismatch',
+        `文字コード宣言（${selectedEncoding === 'utf-8' ? 'UTF-8' : 'Shift_JIS'}）とファイル内容が一致しないか、バイト列が不正です。`
+      );
+    }
+    return { ok: true, text: text.replace(/^\uFEFF/, ''), encoding: selectedEncoding, declaration };
+  }
+
+  const utf8Text = decodeStrict(bytes, 'utf-8');
+  if (utf8Text !== null) {
+    return { ok: true, text: utf8Text.replace(/^\uFEFF/, ''), encoding: 'utf-8', declaration: null };
+  }
+  try {
+    const shiftJisText = decodeStrict(bytes, 'shift_jis');
+    if (shiftJisText === null) {
+      return decodeFail('invalid_byte_sequence', 'KIFファイルのUTF-8またはShift_JISバイト列が不正です。');
+    }
+    return { ok: true, text: shiftJisText, encoding: 'shift_jis', declaration: null };
+  } catch {
+    return decodeFail('unsupported_encoding', 'この実行環境はShift_JISのKIFデコードに対応していません。');
+  }
 }
 
 function coordinateFromDestination(fileCharacter: string, rankCharacter: string): Coordinate | null {
@@ -190,14 +334,13 @@ function isInformationalLine(line: string): boolean {
   );
 }
 
-/** Parses one UTF-8 KIF 2.0 text and returns an independent replayed board state on success. */
-export function importKifText(text: string): KifImportResult {
-  if (utf8ByteLength(text) > MAX_KIF_FILE_BYTES) return fail('file_too_large', 'KIFファイルが大きすぎます（上限32 MiB）。');
-  if (text.trim().length === 0) return fail('invalid_encoding', 'KIFファイルが空です。');
-  if (text.includes('\uFFFD')) return fail('invalid_encoding', 'KIFをUTF-8として正しく読み取れませんでした。');
+/** Parses decoded KIF text and replays it through the public legal-move APIs. */
+function importDecodedKifText(text: string, encoding: KifEncoding | null): KifImportResult {
+  if (text.trim().length === 0) return fail('empty_file', 'KIFファイルが空です。');
+  if (text.includes('\uFFFD')) return fail('invalid_byte_sequence', 'KIFを置換文字を含む文字列として受理できません。');
   const lines = text.replace(/^\uFEFF/, '').replace(/\r\n?/g, '\n').split('\n');
   let state = createInitialBoardState();
-  let hasVersionDeclaration = false;
+  let declaredEncoding: KifEncoding | null = null;
   let hasMoveTableHeader = false;
   let terminalSeen = false;
 
@@ -206,23 +349,24 @@ export function importKifText(text: string): KifImportResult {
     const line = lines[index].trim();
     if (!line) continue;
     if (line.startsWith('#KIF')) {
-      if (line !== KIF_VERSION_DECLARATION) {
-        return fail('unsupported_kif_version', `${lineNumber}行目: 対応していないKIFバージョンまたは文字コードです。KIF 2.0 UTF-8を指定してください。`);
+      const lineEncoding = getDeclaredEncoding(line);
+      if (lineEncoding === 'unsupported' || lineEncoding === null) {
+        return fail('unsupported_kif_version', `${lineNumber}行目: 対応していないKIFバージョンまたは文字コードです。KIF 2.0のUTF-8またはShift_JISを指定してください。`);
       }
-      if (hasVersionDeclaration) {
+      if (declaredEncoding !== null) {
         return fail('invalid_kif_structure', `${lineNumber}行目: KIFバージョン宣言が重複しています。`);
       }
       if (hasMoveTableHeader) {
         return fail('invalid_kif_structure', `${lineNumber}行目: KIFバージョン宣言は指し手表より前に必要です。`);
       }
-      hasVersionDeclaration = true;
+      if (encoding !== null && lineEncoding !== encoding) {
+        return fail('encoding_mismatch', `${lineNumber}行目: 文字コード宣言とデコードしたファイル内容が一致しません。`);
+      }
+      declaredEncoding = lineEncoding;
       continue;
     }
     if (line.startsWith('#')) continue;
     if (line === MOVE_TABLE_HEADER) {
-      if (!hasVersionDeclaration) {
-        return fail('invalid_kif_structure', `${lineNumber}行目: KIF 2.0のバージョン宣言がありません。`);
-      }
       if (hasMoveTableHeader) return fail('invalid_kif_structure', `${lineNumber}行目: 指し手表ヘッダーが重複しています。`);
       hasMoveTableHeader = true;
       continue;
@@ -234,9 +378,6 @@ export function importKifText(text: string): KifImportResult {
     }
     if (line.startsWith('|') || /^(先手|後手)の持駒/.test(line) || /^変化[：:]/.test(line)) {
       return fail('unsupported_position', `${lineNumber}行目: 駒落ち・任意局面・変化手順には対応していません。`);
-    }
-    if (!hasVersionDeclaration) {
-      return fail('invalid_kif_structure', `${lineNumber}行目: KIF 2.0のバージョン宣言がありません。`);
     }
     if (!hasMoveTableHeader) {
       return fail('invalid_kif_structure', `${lineNumber}行目: 指し手表ヘッダー「${MOVE_TABLE_HEADER}」がありません。`);
@@ -267,7 +408,36 @@ export function importKifText(text: string): KifImportResult {
   if (state.status === 'ended' && !terminalSeen) {
     return fail('invalid_result', '再実行により終局していますが、KIFに対応する終局行がありません。');
   }
-  if (!hasVersionDeclaration) return fail('invalid_kif_structure', 'KIF 2.0のバージョン宣言がありません。');
   if (!hasMoveTableHeader) return fail('invalid_kif_structure', `指し手表ヘッダー「${MOVE_TABLE_HEADER}」がありません。`);
-  return { ok: true, state, metadata: { moveCount: state.history.length, isEnded: state.status === 'ended' } };
+  return { ok: true, state, metadata: { moveCount: state.history.length, isEnded: state.status === 'ended', encoding } };
+}
+
+/** Keeps the string-based API for callers that already own decoded KIF text. */
+export function importKifText(text: string): KifImportResult {
+  if (utf8ByteLength(text) > MAX_KIF_FILE_BYTES) {
+    return fail('file_too_large', 'KIFファイルが大きすぎます（上限32 MiB）。');
+  }
+  return importDecodedKifText(text, null);
+}
+
+/**
+ * Imports KIF from its original bytes. A successful decode is still not enough:
+ * the same structural checks and legal-move replay as importKifText must pass.
+ */
+export function importKifBytes(input: ArrayBuffer | Uint8Array): KifImportResult {
+  const decoded = decodeKifBytes(input);
+  if (!decoded.ok) return decoded;
+  const imported = importDecodedKifText(decoded.text, decoded.encoding);
+  if (imported.ok) return imported;
+
+  // A Shift_JIS declaration followed by valid UTF-8 is particularly easy to
+  // misdecode into mojibake. Report the declaration contradiction, never accept
+  // it through the structural parser as a different encoding.
+  if (decoded.declaration === 'shift_jis') {
+    const utf8Text = decodeStrict(input instanceof Uint8Array ? input : new Uint8Array(input), 'utf-8');
+    if (utf8Text !== null && importDecodedKifText(utf8Text.replace(/^\uFEFF/, ''), 'utf-8').ok) {
+      return fail('encoding_mismatch', '文字コード宣言はShift_JISですが、ファイル内容はUTF-8のKIFです。');
+    }
+  }
+  return imported;
 }

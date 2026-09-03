@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { createInitialBoardState } from '../types/shogi';
-import { createKifText, executeMove, importKifText, MAX_KIF_FILE_BYTES } from '../domain/shogi';
+import { createKifText, executeMove, importKifBytes, importKifText, MAX_KIF_FILE_BYTES } from '../domain/shogi';
 
 function applied(state: ReturnType<typeof createInitialBoardState>, from: { row: number; col: number }, to: { row: number; col: number }, promotion?: 'promote' | 'decline') {
   const result = executeMove(state, from, to, { mode: 'assist', proposer: 'human', promotion });
@@ -12,7 +12,170 @@ function standardKif(lines: string[], newline = '\n'): string {
   return ['#KIF version=2.0 encoding=UTF-8', '手数----指手---------消費時間--', ...lines].join(newline) + newline;
 }
 
+function createShiftJisKifThatExpandsBeyondUtf8Limit(): Uint8Array {
+  const encoder = new TextEncoder();
+  const prefix = encoder.encode('#KIF version=2.0 encoding=Shift_JIS\n*');
+  const suffix = new Uint8Array([
+    0x0a, 0x8e, 0xe8, 0x90, 0x94, 0x2d, 0x2d, 0x2d, 0x2d, 0x8e, 0x77, 0x8e, 0xe8,
+    0x2d, 0x2d, 0x2d, 0x2d, 0x2d, 0x2d, 0x2d, 0x2d, 0x2d, 0x8f, 0xc1, 0x94, 0xef,
+    0x8e, 0x9e, 0x8a, 0xd4, 0x2d, 0x2d, 0x0a,
+  ]);
+  // Shift_JIS「あ」is two bytes and UTF-8「あ」is three bytes. This is only
+  // about 22.4 MiB on disk, but becomes just over 32 MiB after UTF-8 decoding.
+  const characterCount = Math.floor((MAX_KIF_FILE_BYTES - prefix.byteLength - suffix.byteLength) / 3) + 1;
+  const bytes = new Uint8Array(prefix.byteLength + characterCount * 2 + suffix.byteLength);
+  bytes.set(prefix);
+  for (let index = prefix.byteLength; index < prefix.byteLength + characterCount * 2; index += 2) {
+    bytes[index] = 0x82;
+    bytes[index + 1] = 0xa0;
+  }
+  bytes.set(suffix, prefix.byteLength + characterCount * 2);
+  return bytes;
+}
+
+function withDeclarationTrailingWhitespace(bytes: Uint8Array, whitespace: number): Uint8Array {
+  const declarationEnd = bytes.indexOf(0x0d);
+  if (declarationEnd < 0) throw new Error('テスト用Shift_JIS宣言の行末がありません。');
+  const result = new Uint8Array(bytes.byteLength + 1);
+  result.set(bytes.subarray(0, declarationEnd));
+  result[declarationEnd] = whitespace;
+  result.set(bytes.subarray(declarationEnd), declarationEnd + 1);
+  return result;
+}
+
+// Fixed CP932/Shift_JIS fixtures. They deliberately use real encoded bytes, not
+// strings passed directly to the text parser, so browser TextDecoder is exercised.
+const SHIFT_JIS_DECLARED_KIF = new Uint8Array([
+  0x23, 0x4b, 0x49, 0x46, 0x20, 0x76, 0x65, 0x72, 0x73, 0x69, 0x6f, 0x6e, 0x3d, 0x32, 0x2e, 0x30, 0x20, 0x65, 0x6e, 0x63, 0x6f, 0x64, 0x69, 0x6e, 0x67, 0x3d, 0x53, 0x68, 0x69, 0x66, 0x74, 0x5f, 0x4a, 0x49, 0x53, 0x0d, 0x0a, 0x90, 0xe6, 0x8e, 0xe8, 0x81, 0x46, 0x83, 0x65, 0x83, 0x58, 0x83, 0x67, 0x91, 0xbe, 0x98, 0x59, 0x0d, 0x0a, 0x8c, 0xe3, 0x8e, 0xe8, 0x81, 0x46, 0x83, 0x65, 0x83, 0x58, 0x83, 0x67, 0x89, 0xd4, 0x8e, 0x71, 0x0d, 0x0a, 0x8e, 0xe8, 0x90, 0x94, 0x2d, 0x2d, 0x2d, 0x2d, 0x8e, 0x77, 0x8e, 0xe8, 0x2d, 0x2d, 0x2d, 0x2d, 0x2d, 0x2d, 0x2d, 0x2d, 0x2d, 0x8f, 0xc1, 0x94, 0xef, 0x8e, 0x9e, 0x8a, 0xd4, 0x2d, 0x2d, 0x0d, 0x0a, 0x31, 0x20, 0x82, 0x56, 0x98, 0x5a, 0x95, 0xe0, 0x28, 0x37, 0x37, 0x29, 0x20, 0x28, 0x20, 0x30, 0x3a, 0x30, 0x31, 0x2f, 0x30, 0x30, 0x3a, 0x30, 0x30, 0x3a, 0x30, 0x31, 0x29, 0x0d, 0x0a, 0x32, 0x20, 0x82, 0x52, 0x8e, 0x6c, 0x95, 0xe0, 0x28, 0x33, 0x33, 0x29, 0x0d, 0x0a, 0x33, 0x20, 0x82, 0x51, 0x93, 0xf1, 0x8a, 0x70, 0x90, 0xac, 0x28, 0x38, 0x38, 0x29, 0x0d, 0x0a, 0x34, 0x20, 0x93, 0xaf, 0x8b, 0xe2, 0x28, 0x33, 0x31, 0x29, 0x0d, 0x0a, 0x35, 0x20, 0x93, 0x8a, 0x97, 0xb9, 0x0d, 0x0a,
+]);
+const SHIFT_JIS_LEGACY_KIF = new Uint8Array([
+  0x90, 0xe6, 0x8e, 0xe8, 0x81, 0x46, 0x8b, 0x8c, 0x8c, 0x60, 0x8e, 0xae, 0x0d, 0x0a, 0x8e, 0xe8, 0x90, 0x94, 0x2d, 0x2d, 0x2d, 0x2d, 0x8e, 0x77, 0x8e, 0xe8, 0x2d, 0x2d, 0x2d, 0x2d, 0x2d, 0x2d, 0x2d, 0x2d, 0x2d, 0x8f, 0xc1, 0x94, 0xef, 0x8e, 0x9e, 0x8a, 0xd4, 0x2d, 0x2d, 0x0d, 0x0a, 0x31, 0x20, 0x82, 0x56, 0x98, 0x5a, 0x95, 0xe0, 0x28, 0x37, 0x37, 0x29, 0x0d, 0x0a, 0x32, 0x20, 0x82, 0x52, 0x8e, 0x6c, 0x95, 0xe0, 0x28, 0x33, 0x33, 0x29, 0x0d, 0x0a, 0x33, 0x20, 0x82, 0x51, 0x93, 0xf1, 0x8a, 0x70, 0x90, 0xac, 0x28, 0x38, 0x38, 0x29, 0x0d, 0x0a, 0x34, 0x20, 0x82, 0x51, 0x8e, 0x6c, 0x95, 0xe0, 0x28, 0x32, 0x33, 0x29, 0x0d, 0x0a, 0x35, 0x20, 0x82, 0x54, 0x8c, 0xdc, 0x8a, 0x70, 0x91, 0xc5, 0x0d, 0x0a,
+]);
+
 describe('KIF 2.0 import', () => {
+  it.each([
+    ['半角空白', '#KIF version=2.0 encoding=UTF-8   '],
+    ['タブ', '#KIF version=2.0 encoding=UTF-8\t'],
+  ])('UTF-8宣言末尾の%sをパーサーと同様に除去して読み込む', (_label, declaration) => {
+    const bytes = new TextEncoder().encode([
+      declaration,
+      '手数----指手---------消費時間--',
+      '1 ７六歩(77)',
+    ].join('\n') + '\n');
+    expect(importKifBytes(bytes)).toMatchObject({ ok: true, metadata: { encoding: 'utf-8', moveCount: 1 } });
+  });
+
+  it.each([
+    ['半角空白', 0x20],
+    ['タブ', 0x09],
+  ])('Shift_JIS宣言末尾の%sをパーサーと同様に除去して読み込む', (_label, whitespace) => {
+    const imported = importKifBytes(withDeclarationTrailingWhitespace(SHIFT_JIS_DECLARED_KIF, whitespace));
+    expect(imported).toMatchObject({ ok: true, metadata: { encoding: 'shift_jis', moveCount: 4 } });
+  });
+
+  it('宣言末尾の非空白文字と完全な未対応宣言を引き続き拒否する', () => {
+    const encoder = new TextEncoder();
+    const extraCharacter = encoder.encode('#KIF version=2.0 encoding=UTF-8 x\n手数----指手---------消費時間--\n');
+    const unsupportedWithWhitespace = encoder.encode('#KIF version=2.1 encoding=UTF-8  \n手数----指手---------消費時間--\n');
+    expect(importKifBytes(extraCharacter)).toMatchObject({ ok: false, code: 'unsupported_encoding' });
+    expect(importKifBytes(unsupportedWithWhitespace)).toMatchObject({ ok: false, code: 'unsupported_encoding' });
+  });
+
+  it('4,096バイト境界で途切れた宣言候補を未対応宣言と決めつけず、デコード後に読む', () => {
+    const declaration = '#KIF version=2.0 encoding=UTF-8';
+    const declarationStart = 4_090;
+    const bytes = new TextEncoder().encode([
+      ' '.repeat(declarationStart) + declaration,
+      '手数----指手---------消費時間--',
+      '1 ７六歩(77)',
+    ].join('\n') + '\n');
+    expect(bytes.indexOf(0x23)).toBe(declarationStart);
+    expect(declarationStart + declaration.length).toBeGreaterThan(4_096);
+    expect(bytes.byteLength).toBeGreaterThan(4_096);
+    expect(importKifBytes(bytes)).toMatchObject({ ok: true, metadata: { encoding: 'utf-8', moveCount: 1 } });
+  });
+
+  it('4,096バイト以下で改行のない最後の完全な未対応宣言は引き続き拒否する', () => {
+    const bytes = new TextEncoder().encode('#KIF version=2.1 encoding=UTF-8');
+    expect(bytes.byteLength).toBeLessThan(4_096);
+    expect(importKifBytes(bytes)).toMatchObject({ ok: false, code: 'unsupported_encoding' });
+  });
+
+  it('日本語メタデータとコメント内の疑似宣言を無視し、BOM後の本物のUTF-8宣言を採用する', () => {
+    const bytes = new TextEncoder().encode([
+      '\uFEFF先手：山田 #KIF version=2.0 encoding=Shift_JIS',
+      '棋戦：テスト戦 #KIF version=9.0 encoding=UTF-16',
+      '後手：佐藤 #KIF version=2.0 encoding=Shift_JIS',
+      '* 日本語 #KIF version=2.0 encoding=Shift_JIS',
+      ' \t#KIF version=2.0 encoding=UTF-8',
+      '手数----指手---------消費時間--',
+      '1 ７六歩(77)',
+    ].join('\n') + '\n');
+
+    expect(importKifBytes(bytes)).toMatchObject({ ok: true, metadata: { encoding: 'utf-8', moveCount: 1 } });
+  });
+
+  it('コメント内の疑似宣言を無視し、本物のUTF-8宣言を採用する', () => {
+    const bytes = new TextEncoder().encode([
+      '* #KIF version=2.0 encoding=Shift_JIS',
+      '* #KIF version=9.0 encoding=UTF-16',
+      '# comment #KIF version=9.0 encoding=UTF-16',
+      '#KIF version=2.0 encoding=UTF-8',
+      '手数----指手---------消費時間--',
+      '1 ７六歩(77)',
+    ].join('\n') + '\n');
+
+    expect(importKifBytes(bytes)).toMatchObject({ ok: true, metadata: { encoding: 'utf-8', moveCount: 1 } });
+  });
+
+  it('行頭の未対応宣言はコメントと区別して引き続き拒否する', () => {
+    const bytes = new TextEncoder().encode('#KIF version=2.1 encoding=UTF-8\n手数----指手---------消費時間--\n');
+    expect(importKifBytes(bytes)).toMatchObject({ ok: false, code: 'unsupported_encoding' });
+  });
+
+  it('元バイト数が上限内のShift_JISをUTF-8換算サイズで拒否しない', () => {
+    const bytes = createShiftJisKifThatExpandsBeyondUtf8Limit();
+    expect(bytes.byteLength).toBeLessThanOrEqual(MAX_KIF_FILE_BYTES);
+    const imported = importKifBytes(bytes);
+    if (!imported.ok) throw new Error(imported.message);
+    expect(imported.metadata).toMatchObject({ encoding: 'shift_jis', moveCount: 0 });
+  });
+
+  it('文字列APIにはUTF-8換算で引き続き32 MiB上限を適用する', () => {
+    const text = 'あ'.repeat(Math.floor(MAX_KIF_FILE_BYTES / 3) + 1);
+    expect(importKifText(text)).toMatchObject({ ok: false, code: 'file_too_large' });
+  });
+
+  it('UTF-8 BOM付きKIFを元バイト列から復元し、採用文字コードを記録する', () => {
+    const bytes = new TextEncoder().encode('\uFEFF' + standardKif(['1 ７六歩(77)'], '\r\n'));
+    const imported = importKifBytes(bytes.buffer);
+    expect(imported).toMatchObject({ ok: true, metadata: { encoding: 'utf-8', moveCount: 1 } });
+  });
+
+  it('宣言付き・宣言なしの実際のShift_JISバイト列を安全に再生する', () => {
+    const declared = importKifBytes(SHIFT_JIS_DECLARED_KIF);
+    expect(declared).toMatchObject({ ok: true, metadata: { encoding: 'shift_jis', moveCount: 4, isEnded: true } });
+    if (declared.ok) expect(declared.state.result?.endReason).toBe('resignation');
+
+    const legacy = importKifBytes(SHIFT_JIS_LEGACY_KIF);
+    expect(legacy).toMatchObject({ ok: true, metadata: { encoding: 'shift_jis', moveCount: 5 } });
+    if (legacy.ok) expect(legacy.state.history.at(-1)).toMatchObject({ kind: 'drop', pieceType: 'bishop' });
+  });
+
+  it('宣言とバイト列の不一致、未対応BOM、不正バイト列を文字コードエラーとして拒否する', () => {
+    const utf8AsShiftJis = new TextEncoder().encode(standardKif(['1 ７六歩(77)']).replace('UTF-8', 'Shift_JIS'));
+    const shiftJisAsUtf8 = new Uint8Array(SHIFT_JIS_DECLARED_KIF);
+    const utf8Header = new TextEncoder().encode('#KIF version=2.0 encoding=UTF-8\n');
+    shiftJisAsUtf8.set(utf8Header, 0);
+
+    expect(importKifBytes(utf8AsShiftJis)).toMatchObject({ ok: false, code: 'encoding_mismatch' });
+    expect(importKifBytes(shiftJisAsUtf8)).toMatchObject({ ok: false, code: 'encoding_mismatch' });
+    expect(importKifBytes(new Uint8Array([0xff, 0xfe, 0x23, 0x00]))).toMatchObject({ ok: false, code: 'unsupported_encoding' });
+    expect(importKifBytes(new Uint8Array([0xfe, 0xff, 0x00, 0x23]))).toMatchObject({ ok: false, code: 'unsupported_encoding' });
+    expect(importKifBytes(new Uint8Array([0x82]))).toMatchObject({ ok: false, code: 'invalid_byte_sequence' });
+    expect(importKifBytes(new Uint8Array(MAX_KIF_FILE_BYTES + 1))).toMatchObject({ ok: false, code: 'file_too_large' });
+  });
+
   it('書き出した未終局棋譜を既存APIで再実行して往復できる', () => {
     let state = createInitialBoardState();
     state = applied(state, { row: 6, col: 2 }, { row: 5, col: 2 });
@@ -100,19 +263,23 @@ describe('KIF 2.0 import', () => {
   });
 
   it.each([
-    ['バージョン宣言なし', '手数----指手---------消費時間--\n1 ７六歩(77)\n', 'バージョン宣言'],
     ['未対応バージョン', '#KIF version=2.1 encoding=UTF-8\n手数----指手---------消費時間--\n', '対応していないKIFバージョン'],
     ['未対応バージョン9.0', '#KIF version=9.0 encoding=UTF-8\n手数----指手---------消費時間--\n', '対応していないKIFバージョン'],
-    ['未対応文字コード', '#KIF version=2.0 encoding=Shift_JIS\n手数----指手---------消費時間--\n', '対応していないKIFバージョン'],
+    ['未対応文字コード', '#KIF version=2.0 encoding=UTF-16\n手数----指手---------消費時間--\n', '対応していないKIFバージョン'],
     ['壊れたKIF宣言', '#KIF version=2.0\n手数----指手---------消費時間--\n', '対応していないKIFバージョン'],
     ['指し手表なし', '#KIF version=2.0 encoding=UTF-8\n1 ７六歩(77)\n', '指し手表ヘッダー'],
-    ['コメントだけ', '# KIF comment\n', 'バージョン宣言'],
-    ['メタデータだけ', '先手：先手太郎\n後手：後手花子\n', 'バージョン宣言'],
-    ['KIFではない内容', 'これは将棋棋譜ではありません。\n', 'バージョン宣言'],
+    ['コメントだけ', '# KIF comment\n', '指し手表ヘッダー'],
+    ['メタデータだけ', '先手：先手太郎\n後手：後手花子\n', '指し手表ヘッダー'],
+    ['KIFではない内容', 'これは将棋棋譜ではありません。\n', '指し手表ヘッダー'],
   ])('%sをKIF 2.0の基本構造エラーとして拒否する', (_label, kif, message) => {
     const imported = importKifText(kif);
     expect(imported.ok).toBe(false);
     if (!imported.ok) expect(imported.message).toContain(message);
+  });
+
+  it('文字コード宣言なしでも標準手数見出しと連番・合法手を必須にして受理する', () => {
+    const imported = importKifText('先手：旧式棋譜\n手数----指手---------消費時間--\n1 ７六歩(77)\n');
+    expect(imported).toMatchObject({ ok: true, metadata: { moveCount: 1, encoding: null } });
   });
 
   it.each([
@@ -124,7 +291,7 @@ describe('KIF 2.0 import', () => {
     ['バージョン宣言が手数見出しより後', [
       '手数----指手---------消費時間--',
       '#KIF version=2.0 encoding=UTF-8',
-    ], 'バージョン宣言がありません'],
+    ], 'バージョン宣言は指し手表より前'],
     ['手数見出しの重複', [
       '#KIF version=2.0 encoding=UTF-8',
       '手数----指手---------消費時間--',
