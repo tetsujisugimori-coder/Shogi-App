@@ -70,7 +70,7 @@ export const BranchReplayDialog: React.FC<BranchReplayDialogProps> = ({
         <p id="branch-replay-dialog-description" className="mt-2 text-sm leading-6 text-stone-300">
           {isStart
             ? `${positionLabel}から指し直します。本譜は変更されません。`
-            : '現在の検討手順は破棄され、本譜の現在局面へ戻ります。'}
+            : '現在の検討手順はこのセッション内に保持したまま、本譜の現在局面へ切り替えます。'}
         </p>
         <div className="mt-5 flex flex-wrap justify-center gap-3">
           <button

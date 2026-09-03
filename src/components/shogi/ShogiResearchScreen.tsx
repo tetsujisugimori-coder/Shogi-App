@@ -19,7 +19,7 @@ import {
   getPromotionStatus,
   getPositionSnapshot,
   createBranchFromReplayPosition,
-  restoreMainlineFromBranch,
+  cloneBoardState,
   normalizePositionSnapshots,
   serializeShogiGameRecordV1,
   importShogiGameRecord,
@@ -30,7 +30,6 @@ import {
   type ShogiGameRecordImportResult,
   type KifImportResult,
   type AgreedJishogiProposal,
-  type GameRecordBranch,
 } from '../../domain/shogi';
 import { ShogiTable } from './ShogiTable';
 import { PromotionDialog } from './PromotionDialog';
@@ -66,6 +65,13 @@ interface PendingKifImport {
   metadata: Extract<KifImportResult, { ok: true }>['metadata'];
 }
 
+/** A sibling variation retained only while this screen remains open. */
+interface SessionBranch {
+  id: string;
+  originHistoryIndex: number;
+  state: BoardState;
+}
+
 type SelectionState =
   | { kind: 'none' }
   | { kind: 'board'; square: { row: number; col: number } }
@@ -95,7 +101,9 @@ export const ShogiResearchScreen: React.FC<ShogiResearchScreenProps> = ({ initia
     normalizePositionSnapshots(initialState ?? createInitialBoardState())
   );
   const [replayHistoryIndex, setReplayHistoryIndex] = useState<number | null>(null);
-  const [gameRecordBranch, setGameRecordBranch] = useState<GameRecordBranch | null>(null);
+  const [sessionMainline, setSessionMainline] = useState<BoardState | null>(null);
+  const [sessionBranches, setSessionBranches] = useState<SessionBranch[]>([]);
+  const [activeSessionBranchId, setActiveSessionBranchId] = useState<string | null>(null);
   const [pendingBranchHistoryIndex, setPendingBranchHistoryIndex] = useState<number | null>(null);
   const [isReturnToMainlineDialogOpen, setIsReturnToMainlineDialogOpen] = useState(false);
   const [selection, setSelection] = useState<SelectionState>({ kind: 'none' });
@@ -145,6 +153,10 @@ export const ShogiResearchScreen: React.FC<ShogiResearchScreenProps> = ({ initia
       ? null
       : getPositionSnapshot(boardState, replayHistoryIndex);
   const isViewingReplay = replaySnapshot !== null;
+  const activeSessionBranch =
+    activeSessionBranchId === null
+      ? null
+      : sessionBranches.find((branch) => branch.id === activeSessionBranchId) ?? null;
   const dialogsAreOpen =
     pendingPromotion !== null ||
     isResignationDialogOpen ||
@@ -184,7 +196,7 @@ export const ShogiResearchScreen: React.FC<ShogiResearchScreenProps> = ({ initia
       ? replayIndexes[replayPosition + 1]
       : null;
   const canStartBranch =
-    gameRecordBranch === null &&
+    activeSessionBranchId === null &&
     !boardState.branchFrom &&
     isViewingReplay &&
     replayHistoryIndex !== null &&
@@ -298,7 +310,7 @@ export const ShogiResearchScreen: React.FC<ShogiResearchScreenProps> = ({ initia
 
   const openBranchStartDialog = useCallback(() => {
     if (
-      gameRecordBranch ||
+      activeSessionBranchId !== null ||
       boardState.branchFrom ||
       !canStartBranch ||
       replayHistoryIndex === null ||
@@ -307,10 +319,14 @@ export const ShogiResearchScreen: React.FC<ShogiResearchScreenProps> = ({ initia
       return;
     }
     setPendingBranchHistoryIndex(replayHistoryIndex);
-  }, [boardState.branchFrom, canStartBranch, dialogsAreOpen, gameRecordBranch, replayHistoryIndex]);
+  }, [activeSessionBranchId, boardState.branchFrom, canStartBranch, dialogsAreOpen, replayHistoryIndex]);
 
   const confirmBranchStart = () => {
-    if (gameRecordBranch || boardState.branchFrom || pendingBranchHistoryIndex === null) {
+    if (
+      activeSessionBranchId !== null ||
+      boardState.branchFrom ||
+      pendingBranchHistoryIndex === null
+    ) {
       setPendingBranchHistoryIndex(null);
       return;
     }
@@ -319,9 +335,21 @@ export const ShogiResearchScreen: React.FC<ShogiResearchScreenProps> = ({ initia
       setPendingBranchHistoryIndex(null);
       return;
     }
+    const branchId = started.state.recordId;
+    if (!branchId) {
+      setPendingBranchHistoryIndex(null);
+      return;
+    }
+    const sessionBranch: SessionBranch = {
+      id: branchId,
+      originHistoryIndex: pendingBranchHistoryIndex,
+      state: cloneBoardState(started.state),
+    };
     focusRequestId.current = 0;
-    setBoardState(started.state);
-    setGameRecordBranch(started.branch);
+    setSessionMainline(cloneBoardState(boardState));
+    setSessionBranches((current) => [...current, sessionBranch]);
+    setActiveSessionBranchId(branchId);
+    setBoardState(cloneBoardState(sessionBranch.state));
     setReplayHistoryIndex(null);
     setSelection({ kind: 'none' });
     setPendingPromotion(null);
@@ -341,10 +369,17 @@ export const ShogiResearchScreen: React.FC<ShogiResearchScreenProps> = ({ initia
   }, []);
 
   const confirmReturnToMainline = () => {
-    if (!gameRecordBranch) return;
+    if (!activeSessionBranch || !sessionMainline) return;
     focusRequestId.current = 0;
-    setBoardState(restoreMainlineFromBranch(gameRecordBranch));
-    setGameRecordBranch(null);
+    setSessionBranches((current) =>
+      current.map((branch) =>
+        branch.id === activeSessionBranch.id
+          ? { ...branch, state: cloneBoardState(boardState) }
+          : branch
+      )
+    );
+    setBoardState(cloneBoardState(sessionMainline));
+    setActiveSessionBranchId(null);
     setReplayHistoryIndex(null);
     setSelection({ kind: 'none' });
     setPendingPromotion(null);
@@ -356,6 +391,38 @@ export const ShogiResearchScreen: React.FC<ShogiResearchScreenProps> = ({ initia
     setFocusRequest(null);
     setMoveHistoryResetKey((current) => current + 1);
     setIsReturnToMainlineDialogOpen(false);
+  };
+
+  const openReturnToMainlineDialog = () => {
+    if (activeSessionBranch && !dialogsAreOpen) setIsReturnToMainlineDialogOpen(true);
+  };
+
+  const switchToSessionBranch = (branchId: string) => {
+    const target = sessionBranches.find((branch) => branch.id === branchId);
+    if (!target || target.id === activeSessionBranchId || dialogsAreOpen) return;
+
+    if (activeSessionBranch) {
+      setSessionBranches((current) =>
+        current.map((branch) =>
+          branch.id === activeSessionBranch.id
+            ? { ...branch, state: cloneBoardState(boardState) }
+            : branch
+        )
+      );
+    } else {
+      setSessionMainline(cloneBoardState(boardState));
+    }
+
+    focusRequestId.current = 0;
+    setBoardState(cloneBoardState(target.state));
+    setActiveSessionBranchId(target.id);
+    setReplayHistoryIndex(null);
+    setSelection({ kind: 'none' });
+    setPendingPromotion(null);
+    setAgreedJishogiProposal(null);
+    setAgreedJishogiError(null);
+    setFocusRequest(null);
+    setMoveHistoryResetKey((current) => current + 1);
   };
 
   const cancelPromotion = useCallback(() => {
@@ -530,7 +597,9 @@ export const ShogiResearchScreen: React.FC<ShogiResearchScreenProps> = ({ initia
     focusRequestId.current = 0;
 
     setBoardState(createInitialBoardState());
-    setGameRecordBranch(null);
+    setSessionMainline(null);
+    setSessionBranches([]);
+    setActiveSessionBranchId(null);
     setReplayHistoryIndex(null);
     setSelection({ kind: 'none' });
     setPendingPromotion(null);
@@ -661,7 +730,9 @@ export const ShogiResearchScreen: React.FC<ShogiResearchScreenProps> = ({ initia
     if (!pendingKifImport) return;
     focusRequestId.current = 0;
     setBoardState(pendingKifImport.state);
-    setGameRecordBranch(null);
+    setSessionMainline(null);
+    setSessionBranches([]);
+    setActiveSessionBranchId(null);
     setReplayHistoryIndex(null);
     setSelection({ kind: 'none' });
     setPendingPromotion(null);
@@ -683,7 +754,9 @@ export const ShogiResearchScreen: React.FC<ShogiResearchScreenProps> = ({ initia
     shouldRestoreGameRecordImportFocus.current = true;
     focusRequestId.current = 0;
     setBoardState(pendingGameRecordImport.state);
-    setGameRecordBranch(null);
+    setSessionMainline(null);
+    setSessionBranches([]);
+    setActiveSessionBranchId(null);
     setReplayHistoryIndex(null);
     setSelection({ kind: 'none' });
     setPendingPromotion(null);
@@ -857,7 +930,11 @@ export const ShogiResearchScreen: React.FC<ShogiResearchScreenProps> = ({ initia
       data-move-limit-jishogi={boardState.moveLimitJishogi?.kind ?? ''}
       data-position-snapshot-count={boardState.positionSnapshots?.length ?? 0}
       data-replay-history-index={replayHistoryIndex ?? ''}
-      data-branch-origin-history-index={gameRecordBranch?.originHistoryIndex ?? ''}
+      data-branch-origin-history-index={activeSessionBranch?.originHistoryIndex ?? ''}
+      data-session-branch-count={sessionBranches.length}
+      data-active-session-record={
+        activeSessionBranch?.id ?? (boardState.branchFrom ? 'standalone-branch' : 'mainline')
+      }
       onKeyDown={handleScreenKeyDown}
       className="min-h-full w-full flex flex-col items-center justify-between py-6 px-3 sm:px-6 bg-[#0f1115] text-stone-200"
     >
@@ -894,13 +971,11 @@ export const ShogiResearchScreen: React.FC<ShogiResearchScreenProps> = ({ initia
           AIとの対局・棋譜・判断ログを記録する研究画面です。
         </p>
         <div className="mt-2 flex max-w-full flex-wrap justify-center gap-2">
-          {gameRecordBranch && (
+          {activeSessionBranch && (
             <button
               ref={returnToMainlineButtonRef}
               type="button"
-              onClick={() => {
-                if (!dialogsAreOpen) setIsReturnToMainlineDialogOpen(true);
-              }}
+              onClick={openReturnToMainlineDialog}
               disabled={dialogsAreOpen}
               aria-haspopup="dialog"
               aria-expanded={isReturnToMainlineDialogOpen}
@@ -1016,12 +1091,54 @@ export const ShogiResearchScreen: React.FC<ShogiResearchScreenProps> = ({ initia
             新しい対局
           </button>
         </div>
-        {gameRecordBranch && (
+        {activeSessionBranch && (
           <p className="mt-1 text-xs text-sky-200" role="status">
-            検討手順: {gameRecordBranch.originHistoryIndex === 0
+            検討手順: {activeSessionBranch.originHistoryIndex === 0
               ? '初期局面から指し直し'
-              : `第${gameRecordBranch.originHistoryIndex}手後から指し直し`}
+              : `第${activeSessionBranch.originHistoryIndex}手後から指し直し`}
           </p>
+        )}
+        {sessionBranches.length > 0 && (
+          <section
+            className="mt-2 w-full max-w-2xl rounded border border-sky-900/70 bg-sky-950/20 px-3 py-2 text-left"
+            aria-labelledby="session-records-title"
+            aria-describedby="session-records-description"
+          >
+            <div className="flex flex-wrap items-baseline justify-between gap-x-3 gap-y-1">
+              <h2 id="session-records-title" className="font-serif text-sm tracking-[0.1em] text-sky-100">
+                本譜と検討手順
+              </h2>
+              <p id="session-records-description" className="text-xs text-stone-400">
+                このセッションの検討手順は現在のセッション内に保持されています。ページを再読み込みすると一覧は失われます。
+              </p>
+            </div>
+            <div className="mt-2 flex flex-wrap gap-2" role="list">
+              <div role="listitem">
+                <button
+                  type="button"
+                  onClick={openReturnToMainlineDialog}
+                  disabled={activeSessionBranch === null || dialogsAreOpen}
+                  aria-current={activeSessionBranch === null ? 'page' : undefined}
+                  className="rounded border border-amber-700/70 bg-amber-950/35 px-3 py-1 text-sm text-amber-100 outline-none transition hover:bg-amber-900/50 focus-visible:ring-2 focus-visible:ring-amber-300 disabled:cursor-not-allowed disabled:opacity-65"
+                >
+                  本譜
+                </button>
+              </div>
+              {sessionBranches.map((branch, index) => (
+                <div key={branch.id} role="listitem">
+                  <button
+                    type="button"
+                    onClick={() => switchToSessionBranch(branch.id)}
+                    disabled={branch.id === activeSessionBranchId || dialogsAreOpen}
+                    aria-current={branch.id === activeSessionBranchId ? 'page' : undefined}
+                    className="rounded border border-sky-700/70 bg-sky-950/45 px-3 py-1 text-sm text-sky-100 outline-none transition hover:bg-sky-900/60 focus-visible:ring-2 focus-visible:ring-amber-300 disabled:cursor-not-allowed disabled:opacity-65"
+                  >
+                    検討手順 {index + 1}（{branch.originHistoryIndex === 0 ? '初期局面' : `第${branch.originHistoryIndex}手後`}）
+                  </button>
+                </div>
+              ))}
+            </div>
+          </section>
         )}
         {exportNotice && (
           <p
@@ -1134,7 +1251,7 @@ export const ShogiResearchScreen: React.FC<ShogiResearchScreenProps> = ({ initia
         />
       )}
 
-      {isReturnToMainlineDialogOpen && gameRecordBranch && (
+      {isReturnToMainlineDialogOpen && activeSessionBranch && (
         <BranchReplayDialog
           kind="return"
           onConfirm={confirmReturnToMainline}
