@@ -184,7 +184,10 @@ export const ShogiResearchScreen: React.FC<ShogiResearchScreenProps> = ({ initia
       ? replayIndexes[replayPosition + 1]
       : null;
   const canStartBranch =
-    isViewingReplay && replayHistoryIndex !== null && replayHistoryIndex < boardState.history.length;
+    gameRecordBranch === null &&
+    isViewingReplay &&
+    replayHistoryIndex !== null &&
+    replayHistoryIndex < boardState.history.length;
 
   // Compute candidates for the mutually exclusive board/hand selection.
   const candidateSquares = useMemo(() => {
@@ -293,12 +296,15 @@ export const ShogiResearchScreen: React.FC<ShogiResearchScreenProps> = ({ initia
   }, []);
 
   const openBranchStartDialog = useCallback(() => {
-    if (!canStartBranch || replayHistoryIndex === null || dialogsAreOpen) return;
+    if (gameRecordBranch || !canStartBranch || replayHistoryIndex === null || dialogsAreOpen) return;
     setPendingBranchHistoryIndex(replayHistoryIndex);
-  }, [canStartBranch, dialogsAreOpen, replayHistoryIndex]);
+  }, [canStartBranch, dialogsAreOpen, gameRecordBranch, replayHistoryIndex]);
 
   const confirmBranchStart = () => {
-    if (pendingBranchHistoryIndex === null) return;
+    if (gameRecordBranch || pendingBranchHistoryIndex === null) {
+      setPendingBranchHistoryIndex(null);
+      return;
+    }
     const started = createBranchFromReplayPosition(boardState, pendingBranchHistoryIndex);
     if (!started) {
       setPendingBranchHistoryIndex(null);

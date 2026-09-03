@@ -2376,3 +2376,10 @@ PR #1のレビュー指摘を受け、簡易APIの`applyMove`と合法手候補�
 
 - `src/test/shogi-branch-replay.test.ts` に、初期・途中・終局済み本譜からの分岐、履歴・局面履歴・スナップショットの切り出し、可変参照非共有、通常移動・駒打ち、JSON/KIFの一本道保存、本譜復帰、確認のキャンセル/Escape/背景クリック、新しい対局によるバックアップ破棄を追加した。
 - 追加対象テストは9/9件、全テストは16ファイル・730/730件成功。`npm run verify:lock`、`npm run verify:macos-fsevents`（Windows上の静的検査）、`npm run lint`、`npm run build`、`npm run check`、`git diff --check`も成功した。
+
+## [2026-09-03] PR #37 指し直し中の二重ブランチ防止
+
+- 原因: `canStartBranch` が再生中かつ最新局面より前かだけを判定しており、`gameRecordBranch` が保持する本譜バックアップの存在を確認していなかった。そのため検討手順中の過去局面から再び確定でき、`setGameRecordBranch(started.branch)` が最初の本譜バックアップを検討手順で上書きし得た。
+- 修正: `gameRecordBranch === null` を指し直し可否の必須条件とし、検討手順中はボタンを無効化した。さらにダイアログを開く処理と確定処理の両方で `gameRecordBranch` を防御的に拒否し、確定処理は保留中の開始要求も閉じる。本譜復帰、新しい対局、JSON/KIF読み込み、JSON v1/KIFの一本道保存形式は変更していない。
+- 回帰テスト: 本譜の途中局面から検討手順を開始して1手指した後、その検討手順の過去局面を閲覧できること、二重の「ここから指し直す」が無効で確認ダイアログを開かないこと、本譜へ戻ると元の履歴、最終手、盤面、終局結果、局面履歴、再生スナップショット、500手規定状態、分岐状態を復元することを追加した。
+- 検証: 追加対象テストは10/10件、`npm run check` は16ファイル・731/731件のテスト、lockfile検証、lint、buildを成功した。`npm run verify:macos-fsevents` はWindows上の静的検査に成功し、macOSネイティブwatchおよびVite watcherのmacOS経路は対象OS外のため未実施。`git diff --check` も成功した。

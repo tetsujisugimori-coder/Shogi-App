@@ -169,6 +169,47 @@ describe('過去局面からの指し直しUI', () => {
     expect(screen.queryByRole('button', { name: '本譜へ戻る' })).not.toBeInTheDocument();
   });
 
+  it('検討手順中の過去局面は閲覧できるが、二重の指し直しで本譜バックアップを上書きしない', async () => {
+    const user = userEvent.setup();
+    const mainline = createFourMoveState();
+    mainline.status = 'ended';
+    mainline.result = { endReason: 'resignation', winner: 'gote', loser: 'sente' };
+    mainline.moveLimitJishogi = {
+      kind: 'awaiting_continuous_check_end',
+      checkingPlayer: 'sente',
+    };
+    render(React.createElement(ShogiResearchScreen, { initialState: mainline }));
+
+    const root = document.getElementById('shogi-research-screen')!;
+    await user.click(screen.getByRole('button', { name: /2手目 △3四歩の局面を表示/ }));
+    await user.click(screen.getByRole('button', { name: 'ここから指し直す' }));
+    await user.click(within(screen.getByRole('dialog')).getByRole('button', { name: 'ここから指し直す' }));
+    await user.click(document.querySelector('[data-coordinate="6七"]') as HTMLElement);
+    await user.click(document.querySelector('[data-coordinate="6六"]') as HTMLElement);
+    expect(root).toHaveAttribute('data-history-count', '3');
+
+    await user.click(screen.getByRole('button', { name: /2手目 △3四歩の局面を表示/ }));
+    expect(root).toHaveAttribute('data-replay-history-index', '2');
+    const nestedStart = screen.getByRole('button', { name: 'ここから指し直す' });
+    expect(nestedStart).toBeDisabled();
+    await user.click(nestedStart);
+    expect(screen.queryByRole('dialog', { name: 'ここから指し直しますか？' })).not.toBeInTheDocument();
+
+    await user.click(screen.getByRole('button', { name: '本譜へ戻る' }));
+    await user.click(within(screen.getByRole('dialog')).getByRole('button', { name: '本譜へ戻る' }));
+    expect(root).toHaveAttribute('data-history-count', '4');
+    expect(root).toHaveAttribute('data-last-move', '△4四歩');
+    expect(root).toHaveAttribute('data-result', 'resignation');
+    expect(root).toHaveAttribute('data-position-history-count', '5');
+    expect(root).toHaveAttribute('data-position-snapshot-count', '5');
+    expect(root).toHaveAttribute('data-move-limit-jishogi', 'awaiting_continuous_check_end');
+    expect(root).toHaveAttribute('data-branch-origin-history-index', '');
+    expect(document.querySelector('[data-coordinate="4四"]')).toHaveAttribute(
+      'aria-label',
+      '4筋 4段、後手の歩兵'
+    );
+  });
+
   it('初期局面からも開始でき、新しい対局で本譜バックアップを破棄する', async () => {
     const user = userEvent.setup();
     render(React.createElement(ShogiResearchScreen, { initialState: createFourMoveState() }));
