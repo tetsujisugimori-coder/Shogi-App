@@ -417,6 +417,7 @@ describe('バージョン付き対局記録JSON', () => {
       [
         'format',
         'version',
+        'recordId',
         'exportedAt',
         'initialPosition',
         'latestState',

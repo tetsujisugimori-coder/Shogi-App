@@ -17,8 +17,11 @@ export {
   normalizePositionSnapshots,
   recordPositionSnapshotAfterLegalMove,
   getPositionSnapshot,
+  cloneBoardState,
+  restoreBoardStateAtHistoryIndex,
 } from './replay';
 export * from './branchReplay';
+export * from './recordIdentity';
 export * from './gameRecord';
 export * from './gameRecordImport';
 export * from './kifExport';

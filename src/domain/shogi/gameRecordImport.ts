@@ -25,6 +25,7 @@ import {
   SHOGI_GAME_RECORD_FORMAT,
   SHOGI_GAME_RECORD_VERSION,
   type SavedBoardStatusV1,
+  type SavedGameRecordBranchFromV1,
   type SavedFoulRecordV1,
   type SavedGameResultV1,
   type SavedIllegalMoveReasonV1,
@@ -41,6 +42,7 @@ import {
   type SavedSquareV1,
   type ShogiGameRecordV1,
 } from './gameRecord';
+import { createShogiGameRecordId } from './recordIdentity';
 import { executeResignation } from './resignation';
 
 /**
@@ -610,6 +612,14 @@ function readMoveLimit(value: unknown, path: string): SavedMoveLimitJishogiState
   };
 }
 
+function readBranchFrom(value: unknown, path: string): SavedGameRecordBranchFromV1 {
+  const object = exactKeys(value, ['recordId', 'ply'], [], path);
+  return {
+    recordId: readString(object.recordId, `${path}.recordId`, { nonEmpty: true, maxLength: 256 }),
+    ply: readInteger(object.ply, `${path}.ply`, 0, MAX_COLLECTION_ITEMS),
+  };
+}
+
 function readTopLevel(value: unknown): ShogiGameRecordV1 {
   if (value === null || typeof value !== 'object' || Array.isArray(value)) {
     fail('invalid_value', 'トップレベルはJSONオブジェクトである必要があります。');
@@ -646,7 +656,7 @@ function readTopLevel(value: unknown): ShogiGameRecordV1 {
       'positionSnapshots',
       'moveLimitJishogi',
     ],
-    [],
+    ['recordId', 'branchFrom'],
     '$'
   );
   const exportedAt = readString(object.exportedAt, '$.exportedAt', { nonEmpty: true, maxLength: 64 });
@@ -663,6 +673,12 @@ function readTopLevel(value: unknown): ShogiGameRecordV1 {
   return {
     format: SHOGI_GAME_RECORD_FORMAT,
     version: SHOGI_GAME_RECORD_VERSION,
+    recordId: Object.hasOwn(object, 'recordId')
+      ? readString(object.recordId, '$.recordId', { nonEmpty: true, maxLength: 256 })
+      : createShogiGameRecordId(),
+    ...(Object.hasOwn(object, 'branchFrom')
+      ? { branchFrom: readBranchFrom(object.branchFrom, '$.branchFrom') }
+      : {}),
     exportedAt,
     initialPosition: 'hirate',
     latestState: readLatestState(object.latestState, '$.latestState'),
@@ -934,6 +950,14 @@ function validateNonMoveResult(
 }
 
 function replayAndRestore(record: ShogiGameRecordV1): BoardState {
+  if (record.branchFrom) {
+    if (record.branchFrom.recordId === record.recordId) {
+      fail('inconsistent_record', '分岐元棋譜IDは分岐棋譜自身と同一にできません。');
+    }
+    if (record.branchFrom.ply > record.history.length) {
+      fail('inconsistent_record', '分岐元手数が分岐棋譜の手数を超えています。');
+    }
+  }
   if (record.history.length + 1 !== record.latestState.moveNumber) {
     fail('inconsistent_record', '棋譜の手数と現在の手数が不整合です。');
   }
@@ -947,7 +971,11 @@ function replayAndRestore(record: ShogiGameRecordV1): BoardState {
   }
   validateFouls(record.foulHistory, record.latestState.moveNumber);
 
-  let replayed = createInitialBoardState();
+  let replayed: BoardState = {
+    ...createInitialBoardState(),
+    recordId: record.recordId,
+    ...(record.branchFrom ? { branchFrom: { ...record.branchFrom } } : {}),
+  };
   for (let index = 0; index < record.history.length; index += 1) {
     const savedMove = record.history[index];
     const moveNumber = index + 1;
@@ -1031,6 +1059,8 @@ function replayAndRestore(record: ShogiGameRecordV1): BoardState {
   }
 
   const restored: BoardState = {
+    recordId: record.recordId,
+    ...(record.branchFrom ? { branchFrom: { ...record.branchFrom } } : {}),
     squares: toSquares(record.latestState.squares),
     senteHand: record.latestState.senteHand.map(toPiece),
     goteHand: record.latestState.goteHand.map(toPiece),

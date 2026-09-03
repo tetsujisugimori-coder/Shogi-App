@@ -9,7 +9,11 @@ import {
   createShogiGameRecordV1,
   executeDrop,
   executeMove,
+  importShogiGameRecord,
+  executeResignation,
+  restoreBoardStateAtHistoryIndex,
   restoreMainlineFromBranch,
+  serializeShogiGameRecordV1,
 } from '../domain/shogi';
 import { createInitialBoardState, type BoardState } from '../types/shogi';
 
@@ -33,13 +37,61 @@ function createFourMoveState(): BoardState {
   return applyMove(state, { row: 2, col: 5 }, { row: 3, col: 5 }); // △4四歩
 }
 
+function createPromotionAndDropState(): BoardState {
+  let state = createInitialBoardState();
+  state = applyMove(state, { row: 6, col: 2 }, { row: 5, col: 2 });
+  state = applyMove(state, { row: 2, col: 6 }, { row: 3, col: 6 });
+  state = applyMove(state, { row: 7, col: 1 }, { row: 1, col: 7 }, 'promote');
+  state = applyMove(state, { row: 2, col: 0 }, { row: 3, col: 0 });
+  const drop = executeDrop(state, 'gote-bishop-2', { row: 4, col: 4 });
+  expect(drop.type).toBe('applied');
+  if (drop.type !== 'applied') throw new Error('fixture drop failed');
+  return drop.state;
+}
+
 describe('過去局面からの一本道ブランチ', () => {
+  it('0手目・中間手・最終手を完全な独立状態として復元し、範囲外を拒否する', () => {
+    const mainline = createPromotionAndDropState();
+    const initial = restoreBoardStateAtHistoryIndex(mainline, 0);
+    const middle = restoreBoardStateAtHistoryIndex(mainline, 3);
+    const final = restoreBoardStateAtHistoryIndex(mainline, mainline.history.length);
+
+    expect(initial).toMatchObject({ moveNumber: 1, turn: 'sente', history: [], senteHand: [], goteHand: [] });
+    expect(initial?.squares[6][2].piece).toMatchObject({ type: 'pawn', player: 'sente' });
+    expect(middle).toMatchObject({ moveNumber: 4, turn: 'gote' });
+    expect(middle?.squares[1][7].piece).toMatchObject({ type: 'bishop', isPromoted: true });
+    expect(middle?.senteHand).toEqual([{ id: 'gote-bishop-2', type: 'bishop', player: 'sente', isPromoted: false }]);
+    expect(final).toMatchObject({ moveNumber: 6, turn: 'gote' });
+    expect(final?.squares[4][4].piece).toMatchObject({ id: 'gote-bishop-2', type: 'bishop', player: 'sente' });
+    expect(restoreBoardStateAtHistoryIndex(mainline, -1)).toBeNull();
+    expect(restoreBoardStateAtHistoryIndex(mainline, mainline.history.length + 1)).toBeNull();
+
+    if (!middle) return;
+    middle.squares[1][7].piece = null;
+    middle.senteHand[0].id = 'changed';
+    expect(mainline.squares[1][7].piece?.isPromoted).toBe(true);
+    expect(mainline.positionSnapshots?.[3].senteHand[0].id).toBe('gote-bishop-2');
+  });
+
+  it('着手外で終局した最終手数は終局状態を含めて復元する', () => {
+    const resignation = executeResignation(createInitialBoardState());
+    expect(resignation.type).toBe('applied');
+    if (resignation.type !== 'applied') return;
+
+    const restored = restoreBoardStateAtHistoryIndex(
+      resignation.state,
+      resignation.state.history.length
+    );
+    expect(restored).toMatchObject({ status: 'ended', result: resignation.state.result });
+  });
+
   it('初期局面から独立した通常の対局状態を開始できる', () => {
     const mainline = applyMove(createInitialBoardState(), { row: 6, col: 2 }, { row: 5, col: 2 });
     const started = createBranchFromReplayPosition(mainline, 0);
 
     expect(started).not.toBeNull();
     if (!started) return;
+    expect(createBranchFromReplayPosition(started.state, 0)).toBeNull();
     expect(started.state.history).toEqual([]);
     expect(started.state.positionHistory).toHaveLength(1);
     expect(started.state.positionSnapshots?.map((snapshot) => snapshot.historyIndex)).toEqual([0]);
@@ -65,6 +117,7 @@ describe('過去局面からの一本道ブランチ', () => {
 
   it('分岐側の通常移動・駒打ちを本譜へ波及させない', () => {
     const mainline = createFourMoveState();
+    const before = structuredClone(mainline);
     const started = createBranchFromReplayPosition(mainline, 2);
     expect(started).not.toBeNull();
     if (!started) return;
@@ -79,6 +132,13 @@ describe('過去局面からの一本道ブランチ', () => {
     expect(started.branch.mainline.history).toHaveLength(4);
     expect(started.branch.mainline.goteHand).toEqual(mainline.goteHand);
     expect(mainline.squares[4][4].piece).toBeNull();
+    expect(mainline).toEqual(before);
+  });
+
+  it('親棋譜IDがない状態は安全に分岐開始を拒否する', () => {
+    const mainline = createFourMoveState();
+    delete mainline.recordId;
+    expect(createBranchFromReplayPosition(mainline, 2)).toBeNull();
   });
 
   it('終局済み本譜の途中局面では未来の終局結果を引き継がない', () => {
@@ -115,9 +175,46 @@ describe('過去局面からの一本道ブランチ', () => {
     if (!started) return;
     const branch = applyMove(started.state, { row: 6, col: 3 }, { row: 5, col: 3 });
 
-    expect(createShogiGameRecordV1(branch, new Date('2026-09-03T00:00:00.000Z')).history)
+    const record = createShogiGameRecordV1(branch, new Date('2026-09-03T00:00:00.000Z'));
+    expect(record.history)
       .toHaveLength(3);
+    expect(record.branchFrom).toEqual({ recordId: started.branch.mainline.recordId, ply: 2 });
     expect(createKifText(branch)).toContain('   3 ６六歩(67)');
+  });
+
+  it('分岐元IDと手数をJSONへ保存・再読み込みし、旧JSONも読み込める', () => {
+    const mainline = createFourMoveState();
+    const started = createBranchFromReplayPosition(mainline, 2);
+    expect(started).not.toBeNull();
+    if (!started) return;
+    const continued = applyMove(started.state, { row: 6, col: 3 }, { row: 5, col: 3 });
+    const json = serializeShogiGameRecordV1(continued, new Date('2026-09-03T00:00:00.000Z'));
+    const restored = importShogiGameRecord(json);
+
+    expect(restored.ok).toBe(true);
+    if (restored.ok) {
+      expect(restored.state.branchFrom).toEqual({ recordId: mainline.recordId, ply: 2 });
+      expect(restored.state.recordId).toBe(continued.recordId);
+      expect(createBranchFromReplayPosition(restored.state, 0)).toBeNull();
+    }
+
+    const reloadedMainline = importShogiGameRecord(
+      serializeShogiGameRecordV1(mainline, new Date('2026-09-03T00:00:00.000Z'))
+    );
+    expect(reloadedMainline.ok).toBe(true);
+    if (reloadedMainline.ok) {
+      expect(reloadedMainline.state.branchFrom).toBeUndefined();
+      expect(createBranchFromReplayPosition(reloadedMainline.state, 2)).not.toBeNull();
+    }
+
+    const oldRecord = createShogiGameRecordV1(mainline, new Date('2026-09-03T00:00:00.000Z'));
+    const { recordId: _recordId, branchFrom: _branchFrom, ...oldJson } = oldRecord;
+    const oldImported = importShogiGameRecord(JSON.stringify(oldJson));
+    expect(oldImported.ok).toBe(true);
+    if (oldImported.ok) {
+      expect(oldImported.state.branchFrom).toBeUndefined();
+      expect(oldImported.state.recordId).toMatch(/^shogi-game-/);
+    }
   });
 });
 
@@ -208,6 +305,38 @@ describe('過去局面からの指し直しUI', () => {
       'aria-label',
       '4筋 4段、後手の歩兵'
     );
+  });
+
+  it('再読み込みした分岐JSONでは本譜へ戻れず、過去局面からの指し直しも開始できない', async () => {
+    const user = userEvent.setup();
+    const mainline = createFourMoveState();
+    const started = createBranchFromReplayPosition(mainline, 2);
+    expect(started).not.toBeNull();
+    if (!started) return;
+
+    render(React.createElement(ShogiResearchScreen, { initialState: mainline }));
+    const input = document.getElementById('shogi-game-record-file-input');
+    expect(input).toBeInstanceOf(HTMLInputElement);
+    await user.upload(
+      input as HTMLInputElement,
+      new File(
+        [serializeShogiGameRecordV1(started.state, new Date('2026-09-03T00:00:00.000Z'))],
+        'branch.json',
+        { type: 'application/json' }
+      )
+    );
+    await user.click(await screen.findByRole('button', { name: '読み込む' }));
+
+    const root = document.getElementById('shogi-research-screen')!;
+    expect(root).toHaveAttribute('data-history-count', '2');
+    expect(screen.queryByRole('button', { name: '本譜へ戻る' })).not.toBeInTheDocument();
+    await user.click(screen.getByRole('button', { name: /1手目 ▲7六歩の局面を表示/ }));
+    const nestedStart = screen.getByRole('button', { name: 'ここから指し直す' });
+    expect(nestedStart).toBeDisabled();
+    await user.click(nestedStart);
+    expect(screen.queryByRole('dialog', { name: 'ここから指し直しますか？' })).not.toBeInTheDocument();
+    expect(root).toHaveAttribute('data-history-count', '2');
+    expect(root).toHaveAttribute('data-branch-origin-history-index', '');
   });
 
   it('初期局面からも開始でき、新しい対局で本譜バックアップを破棄する', async () => {
