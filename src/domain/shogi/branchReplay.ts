@@ -24,6 +24,7 @@ export function createBranchFromReplayPosition(
   historyIndex: number
 ): BranchReplayStart | null {
   if (
+    mainline.branchFrom ||
     !mainline.recordId ||
     mainline.recordId.trim().length === 0 ||
     !Number.isInteger(historyIndex) ||

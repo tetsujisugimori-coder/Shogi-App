@@ -185,6 +185,7 @@ export const ShogiResearchScreen: React.FC<ShogiResearchScreenProps> = ({ initia
       : null;
   const canStartBranch =
     gameRecordBranch === null &&
+    !boardState.branchFrom &&
     isViewingReplay &&
     replayHistoryIndex !== null &&
     replayHistoryIndex < boardState.history.length;
@@ -296,12 +297,20 @@ export const ShogiResearchScreen: React.FC<ShogiResearchScreenProps> = ({ initia
   }, []);
 
   const openBranchStartDialog = useCallback(() => {
-    if (gameRecordBranch || !canStartBranch || replayHistoryIndex === null || dialogsAreOpen) return;
+    if (
+      gameRecordBranch ||
+      boardState.branchFrom ||
+      !canStartBranch ||
+      replayHistoryIndex === null ||
+      dialogsAreOpen
+    ) {
+      return;
+    }
     setPendingBranchHistoryIndex(replayHistoryIndex);
-  }, [canStartBranch, dialogsAreOpen, gameRecordBranch, replayHistoryIndex]);
+  }, [boardState.branchFrom, canStartBranch, dialogsAreOpen, gameRecordBranch, replayHistoryIndex]);
 
   const confirmBranchStart = () => {
-    if (gameRecordBranch || pendingBranchHistoryIndex === null) {
+    if (gameRecordBranch || boardState.branchFrom || pendingBranchHistoryIndex === null) {
       setPendingBranchHistoryIndex(null);
       return;
     }

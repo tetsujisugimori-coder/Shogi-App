@@ -91,6 +91,7 @@ describe('過去局面からの一本道ブランチ', () => {
 
     expect(started).not.toBeNull();
     if (!started) return;
+    expect(createBranchFromReplayPosition(started.state, 0)).toBeNull();
     expect(started.state.history).toEqual([]);
     expect(started.state.positionHistory).toHaveLength(1);
     expect(started.state.positionSnapshots?.map((snapshot) => snapshot.historyIndex)).toEqual([0]);
@@ -194,6 +195,16 @@ describe('過去局面からの一本道ブランチ', () => {
     if (restored.ok) {
       expect(restored.state.branchFrom).toEqual({ recordId: mainline.recordId, ply: 2 });
       expect(restored.state.recordId).toBe(continued.recordId);
+      expect(createBranchFromReplayPosition(restored.state, 0)).toBeNull();
+    }
+
+    const reloadedMainline = importShogiGameRecord(
+      serializeShogiGameRecordV1(mainline, new Date('2026-09-03T00:00:00.000Z'))
+    );
+    expect(reloadedMainline.ok).toBe(true);
+    if (reloadedMainline.ok) {
+      expect(reloadedMainline.state.branchFrom).toBeUndefined();
+      expect(createBranchFromReplayPosition(reloadedMainline.state, 2)).not.toBeNull();
     }
 
     const oldRecord = createShogiGameRecordV1(mainline, new Date('2026-09-03T00:00:00.000Z'));
@@ -294,6 +305,38 @@ describe('過去局面からの指し直しUI', () => {
       'aria-label',
       '4筋 4段、後手の歩兵'
     );
+  });
+
+  it('再読み込みした分岐JSONでは本譜へ戻れず、過去局面からの指し直しも開始できない', async () => {
+    const user = userEvent.setup();
+    const mainline = createFourMoveState();
+    const started = createBranchFromReplayPosition(mainline, 2);
+    expect(started).not.toBeNull();
+    if (!started) return;
+
+    render(React.createElement(ShogiResearchScreen, { initialState: mainline }));
+    const input = document.getElementById('shogi-game-record-file-input');
+    expect(input).toBeInstanceOf(HTMLInputElement);
+    await user.upload(
+      input as HTMLInputElement,
+      new File(
+        [serializeShogiGameRecordV1(started.state, new Date('2026-09-03T00:00:00.000Z'))],
+        'branch.json',
+        { type: 'application/json' }
+      )
+    );
+    await user.click(await screen.findByRole('button', { name: '読み込む' }));
+
+    const root = document.getElementById('shogi-research-screen')!;
+    expect(root).toHaveAttribute('data-history-count', '2');
+    expect(screen.queryByRole('button', { name: '本譜へ戻る' })).not.toBeInTheDocument();
+    await user.click(screen.getByRole('button', { name: /1手目 ▲7六歩の局面を表示/ }));
+    const nestedStart = screen.getByRole('button', { name: 'ここから指し直す' });
+    expect(nestedStart).toBeDisabled();
+    await user.click(nestedStart);
+    expect(screen.queryByRole('dialog', { name: 'ここから指し直しますか？' })).not.toBeInTheDocument();
+    expect(root).toHaveAttribute('data-history-count', '2');
+    expect(root).toHaveAttribute('data-branch-origin-history-index', '');
   });
 
   it('初期局面からも開始でき、新しい対局で本譜バックアップを破棄する', async () => {
