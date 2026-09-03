@@ -1,7 +1,7 @@
 import React from 'react';
 import { fireEvent, render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 import { ShogiResearchScreen } from '../components/shogi/ShogiResearchScreen';
 import {
   createBranchFromReplayPosition,
@@ -307,6 +307,105 @@ describe('過去局面からの指し直しUI', () => {
     );
   });
 
+  it('同じ本譜から作った兄弟分岐をセッション内に保持し、独立した続きへ切り替えられる', async () => {
+    const user = userEvent.setup();
+    render(React.createElement(ShogiResearchScreen, { initialState: createFourMoveState() }));
+    const root = document.getElementById('shogi-research-screen')!;
+
+    await user.click(screen.getByRole('button', { name: /2手目 △3四歩の局面を表示/ }));
+    await user.click(screen.getByRole('button', { name: 'ここから指し直す' }));
+    await user.click(within(screen.getByRole('dialog')).getByRole('button', { name: 'ここから指し直す' }));
+    await user.click(document.querySelector('[data-coordinate="6七"]') as HTMLElement);
+    await user.click(document.querySelector('[data-coordinate="6六"]') as HTMLElement);
+    expect(root).toHaveAttribute('data-last-move', '▲6六歩');
+
+    await user.click(screen.getByRole('button', { name: '本譜へ戻る' }));
+    await user.click(within(screen.getByRole('dialog')).getByRole('button', { name: '本譜へ戻る' }));
+    expect(root).toHaveAttribute('data-history-count', '4');
+    expect(root).toHaveAttribute('data-session-branch-count', '1');
+    expect(screen.getByRole('button', { name: '本譜' })).toHaveAttribute('aria-current', 'page');
+
+    await user.click(screen.getByRole('button', { name: /2手目 △3四歩の局面を表示/ }));
+    await user.click(screen.getByRole('button', { name: 'ここから指し直す' }));
+    await user.click(within(screen.getByRole('dialog')).getByRole('button', { name: 'ここから指し直す' }));
+    await user.click(document.querySelector('[data-coordinate="2七"]') as HTMLElement);
+    await user.click(document.querySelector('[data-coordinate="2六"]') as HTMLElement);
+    expect(root).toHaveAttribute('data-last-move', '▲2六歩');
+    expect(root).toHaveAttribute('data-session-branch-count', '2');
+
+    await user.click(screen.getByRole('button', { name: '本譜へ戻る' }));
+    await user.click(within(screen.getByRole('dialog')).getByRole('button', { name: '本譜へ戻る' }));
+    await user.click(screen.getByRole('button', { name: '検討手順 1（第2手後）' }));
+    expect(root).toHaveAttribute('data-history-count', '3');
+    expect(root).toHaveAttribute('data-last-move', '▲6六歩');
+    await user.click(document.querySelector('[data-coordinate="4三"]') as HTMLElement);
+    await user.click(document.querySelector('[data-coordinate="4四"]') as HTMLElement);
+    expect(root).toHaveAttribute('data-last-move', '△4四歩');
+
+    await user.click(screen.getByRole('button', { name: '検討手順 2（第2手後）' }));
+    expect(root).toHaveAttribute('data-history-count', '3');
+    expect(root).toHaveAttribute('data-last-move', '▲2六歩');
+    await user.click(screen.getByRole('button', { name: '本譜へ戻る' }));
+    await user.click(within(screen.getByRole('dialog')).getByRole('button', { name: '本譜へ戻る' }));
+    expect(root).toHaveAttribute('data-last-move', '△4四歩');
+
+    await user.click(screen.getByRole('button', { name: '検討手順 1（第2手後）' }));
+    expect(root).toHaveAttribute('data-history-count', '4');
+    expect(root).toHaveAttribute('data-last-move', '△4四歩');
+    expect(screen.getByRole('button', { name: '検討手順 1（第2手後）' })).toHaveAttribute(
+      'aria-current',
+      'page'
+    );
+  });
+
+  it('選択中の本譜または分岐だけをJSON・KIFとして個別に書き出す', async () => {
+    const user = userEvent.setup();
+    render(React.createElement(ShogiResearchScreen, { initialState: createFourMoveState() }));
+    await user.click(screen.getByRole('button', { name: /2手目 △3四歩の局面を表示/ }));
+    await user.click(screen.getByRole('button', { name: 'ここから指し直す' }));
+    await user.click(within(screen.getByRole('dialog')).getByRole('button', { name: 'ここから指し直す' }));
+    await user.click(document.querySelector('[data-coordinate="6七"]') as HTMLElement);
+    await user.click(document.querySelector('[data-coordinate="6六"]') as HTMLElement);
+    await user.click(screen.getByRole('button', { name: '本譜へ戻る' }));
+    await user.click(within(screen.getByRole('dialog')).getByRole('button', { name: '本譜へ戻る' }));
+
+    const blobs: Blob[] = [];
+    const originalCreateElement = document.createElement.bind(document);
+    const createObjectURL = vi.fn((blob: Blob) => {
+      blobs.push(blob);
+      return `blob:session-${blobs.length}`;
+    });
+    vi.stubGlobal('URL', { createObjectURL, revokeObjectURL: vi.fn() });
+    vi.spyOn(document, 'createElement').mockImplementation((tagName, options) => {
+      const element = originalCreateElement(tagName, options);
+      if (tagName.toLowerCase() === 'a') vi.spyOn(element as HTMLAnchorElement, 'click').mockImplementation(() => {});
+      return element;
+    });
+
+    try {
+      await user.click(screen.getByRole('button', { name: '対局記録を保存' }));
+      const mainlineRecord = JSON.parse(await blobs[0].text());
+      expect(mainlineRecord.history).toHaveLength(4);
+      expect(mainlineRecord.branchFrom).toBeUndefined();
+      expect(mainlineRecord).not.toHaveProperty('branches');
+
+      await user.click(screen.getByRole('button', { name: '検討手順 1（第2手後）' }));
+      await user.click(screen.getByRole('button', { name: '対局記録を保存' }));
+      const branchRecord = JSON.parse(await blobs[1].text());
+      expect(branchRecord.history).toHaveLength(3);
+      expect(branchRecord.recordId).not.toBe(mainlineRecord.recordId);
+      expect(branchRecord.branchFrom).toEqual({ recordId: mainlineRecord.recordId, ply: 2 });
+      expect(branchRecord).not.toHaveProperty('branches');
+
+      await user.click(screen.getByRole('button', { name: 'KIF棋譜を保存' }));
+      expect(await blobs[2].text()).toContain('   3 ６六歩(67)');
+      expect(await blobs[2].text()).not.toContain('branchFrom');
+    } finally {
+      vi.restoreAllMocks();
+      vi.unstubAllGlobals();
+    }
+  });
+
   it('再読み込みした分岐JSONでは本譜へ戻れず、過去局面からの指し直しも開始できない', async () => {
     const user = userEvent.setup();
     const mainline = createFourMoveState();
@@ -339,7 +438,68 @@ describe('過去局面からの指し直しUI', () => {
     expect(root).toHaveAttribute('data-branch-origin-history-index', '');
   });
 
-  it('初期局面からも開始でき、新しい対局で本譜バックアップを破棄する', async () => {
+  it('JSON読み込みは確定時だけセッション内の検討手順を破棄する', async () => {
+    const user = userEvent.setup();
+    const mainline = createFourMoveState();
+    render(React.createElement(ShogiResearchScreen, { initialState: mainline }));
+    const root = document.getElementById('shogi-research-screen')!;
+
+    await user.click(screen.getByRole('button', { name: /2手目 △3四歩の局面を表示/ }));
+    await user.click(screen.getByRole('button', { name: 'ここから指し直す' }));
+    await user.click(within(screen.getByRole('dialog')).getByRole('button', { name: 'ここから指し直す' }));
+    await user.click(screen.getByRole('button', { name: '本譜へ戻る' }));
+    await user.click(within(screen.getByRole('dialog')).getByRole('button', { name: '本譜へ戻る' }));
+    expect(root).toHaveAttribute('data-session-branch-count', '1');
+
+    const jsonInput = document.getElementById('shogi-game-record-file-input') as HTMLInputElement;
+    await user.upload(
+      jsonInput,
+      new File([serializeShogiGameRecordV1(mainline, new Date('2026-09-03T00:00:00.000Z'))], 'mainline.json', {
+        type: 'application/json',
+      })
+    );
+    await user.click(await screen.findByRole('button', { name: 'キャンセル' }));
+    expect(root).toHaveAttribute('data-session-branch-count', '1');
+
+    await user.upload(jsonInput, new File(['not-json'], 'broken.json', { type: 'application/json' }));
+    await screen.findByRole('alert');
+    expect(root).toHaveAttribute('data-session-branch-count', '1');
+
+    await user.upload(
+      jsonInput,
+      new File([serializeShogiGameRecordV1(mainline, new Date('2026-09-03T00:00:00.000Z'))], 'mainline.json', {
+        type: 'application/json',
+      })
+    );
+    await user.click(await screen.findByRole('button', { name: '読み込む' }));
+    expect(root).toHaveAttribute('data-session-branch-count', '0');
+  });
+
+  it('KIF読み込みは確定時だけセッション内の検討手順を破棄する', async () => {
+    const user = userEvent.setup();
+    const mainline = createFourMoveState();
+    render(React.createElement(ShogiResearchScreen, { initialState: mainline }));
+    const root = document.getElementById('shogi-research-screen')!;
+    await user.click(screen.getByRole('button', { name: /2手目 △3四歩の局面を表示/ }));
+    await user.click(screen.getByRole('button', { name: 'ここから指し直す' }));
+    await user.click(within(screen.getByRole('dialog')).getByRole('button', { name: 'ここから指し直す' }));
+    await user.click(screen.getByRole('button', { name: '本譜へ戻る' }));
+    await user.click(within(screen.getByRole('dialog')).getByRole('button', { name: '本譜へ戻る' }));
+    expect(root).toHaveAttribute('data-session-branch-count', '1');
+
+    const kifInput = document.getElementById('shogi-kif-file-input') as HTMLInputElement;
+    await user.upload(kifInput, new File([createKifText(mainline)], 'mainline.kif', { type: 'text/plain' }));
+    await user.click(await screen.findByRole('button', { name: 'キャンセル' }));
+    expect(root).toHaveAttribute('data-session-branch-count', '1');
+    await user.upload(kifInput, new File(['broken'], 'broken.kif', { type: 'text/plain' }));
+    await screen.findByRole('alert');
+    expect(root).toHaveAttribute('data-session-branch-count', '1');
+    await user.upload(kifInput, new File([createKifText(mainline)], 'mainline.kif', { type: 'text/plain' }));
+    await user.click(await screen.findByRole('button', { name: '読み込む' }));
+    expect(root).toHaveAttribute('data-session-branch-count', '0');
+  });
+
+  it('初期局面からも開始でき、新しい対局の確定時だけセッション内の検討手順を破棄する', async () => {
     const user = userEvent.setup();
     render(React.createElement(ShogiResearchScreen, { initialState: createFourMoveState() }));
     await user.click(screen.getByRole('button', { name: '初期局面' }));
@@ -349,10 +509,15 @@ describe('過去局面からの指し直しUI', () => {
     const root = document.getElementById('shogi-research-screen')!;
     expect(root).toHaveAttribute('data-branch-origin-history-index', '0');
     expect(root).toHaveAttribute('data-history-count', '0');
+    expect(root).toHaveAttribute('data-session-branch-count', '1');
 
+    await user.click(screen.getByRole('button', { name: '新しい対局' }));
+    await user.click(screen.getByRole('button', { name: 'キャンセル' }));
+    expect(root).toHaveAttribute('data-session-branch-count', '1');
     await user.click(screen.getByRole('button', { name: '新しい対局' }));
     await user.click(screen.getByRole('button', { name: '新しい対局を始める' }));
     expect(root).toHaveAttribute('data-branch-origin-history-index', '');
+    expect(root).toHaveAttribute('data-session-branch-count', '0');
     expect(screen.queryByRole('button', { name: '本譜へ戻る' })).not.toBeInTheDocument();
   });
 });
