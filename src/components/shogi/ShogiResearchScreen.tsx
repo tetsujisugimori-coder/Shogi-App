@@ -21,16 +21,17 @@ import {
   addGameRecordSessionBranch,
   createGameRecordSession,
   discardGameRecordSession,
+  storeGameRecordSessionState,
   switchGameRecordSessionToBranch,
   switchGameRecordSessionToMainline,
   normalizePositionSnapshots,
-  serializeShogiGameRecordV1,
-  importShogiGameRecord,
+  serializeShogiGameRecordSessionV1,
+  importShogiGameRecordSession,
   importKifBytes,
-  MAX_SHOGI_GAME_RECORD_FILE_BYTES,
+  MAX_SHOGI_GAME_RECORD_SESSION_FILE_BYTES,
   MAX_KIF_FILE_BYTES,
   PromotionStatus,
-  type ShogiGameRecordImportResult,
+  type ShogiGameRecordSessionImportResult,
   type KifImportResult,
   type AgreedJishogiProposal,
   type GameRecordSession,
@@ -59,8 +60,9 @@ interface PendingPromotion {
 
 interface PendingGameRecordImport {
   filename: string;
+  session: GameRecordSession;
   state: BoardState;
-  metadata: Extract<ShogiGameRecordImportResult, { ok: true }>['metadata'];
+  metadata: Extract<ShogiGameRecordSessionImportResult, { ok: true }>['metadata'];
 }
 
 interface PendingKifImport {
@@ -583,7 +585,11 @@ export const ShogiResearchScreen: React.FC<ShogiResearchScreenProps> = ({ initia
   const saveGameRecord = () => {
     const exportedAt = new Date();
     try {
-      const json = serializeShogiGameRecordV1(boardState, exportedAt);
+      const session = storeGameRecordSessionState(
+        gameRecordSession ?? createGameRecordSession(boardState),
+        boardState
+      );
+      const json = serializeShogiGameRecordSessionV1(session, exportedAt);
       const filename = createShogiGameRecordFilename(exportedAt);
       downloadShogiGameRecord(json, filename);
       setExportNotice({ kind: 'success', message: `対局記録を保存しました（${filename}）` });
@@ -621,10 +627,10 @@ export const ShogiResearchScreen: React.FC<ShogiResearchScreenProps> = ({ initia
     const file = input.files?.[0];
     input.value = '';
     if (!file || dialogsAreOpen || isGameRecordFileReading) return;
-    if (file.size > MAX_SHOGI_GAME_RECORD_FILE_BYTES) {
+    if (file.size > MAX_SHOGI_GAME_RECORD_SESSION_FILE_BYTES) {
       setExportNotice({
         kind: 'error',
-        message: '対局記録ファイルが大きすぎます（上限32 MiB）。',
+        message: '研究セッションファイルが大きすぎます（上限128 MiB）。',
       });
       return;
     }
@@ -632,13 +638,14 @@ export const ShogiResearchScreen: React.FC<ShogiResearchScreenProps> = ({ initia
     setExportNotice(null);
     try {
       const json = await file.text();
-      const result = importShogiGameRecord(json);
+      const result = importShogiGameRecordSession(json);
       if (!result.ok) {
         setExportNotice({ kind: 'error', message: result.message });
         return;
       }
       setPendingGameRecordImport({
         filename: file.name,
+        session: result.session,
         state: result.state,
         metadata: result.metadata,
       });
@@ -719,7 +726,7 @@ export const ShogiResearchScreen: React.FC<ShogiResearchScreenProps> = ({ initia
     shouldRestoreGameRecordImportFocus.current = true;
     focusRequestId.current = 0;
     setBoardState(pendingGameRecordImport.state);
-    setGameRecordSession(discardGameRecordSession());
+    setGameRecordSession(pendingGameRecordImport.session);
     setReplayHistoryIndex(null);
     setSelection({ kind: 'none' });
     setPendingPromotion(null);
@@ -1070,7 +1077,7 @@ export const ShogiResearchScreen: React.FC<ShogiResearchScreenProps> = ({ initia
                 本譜と検討手順
               </h2>
               <p id="session-records-description" className="text-xs text-stone-400">
-                このセッションの検討手順は現在のセッション内に保持されています。ページを再読み込みすると一覧は失われます。
+                このセッションの検討手順はJSONの対局記録としてまとめて保存・再読込できます。
               </p>
             </div>
             <div className="mt-2 flex flex-wrap gap-2" role="list">

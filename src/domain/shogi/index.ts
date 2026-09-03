@@ -25,5 +25,6 @@ export * from './branchSession';
 export * from './recordIdentity';
 export * from './gameRecord';
 export * from './gameRecordImport';
+export * from './gameRecordSession';
 export * from './kifExport';
 export * from './kifImport';

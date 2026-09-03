@@ -1,10 +1,12 @@
 import React from 'react';
-import { fireEvent, render, screen, waitFor } from '@testing-library/react';
+import { fireEvent, render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { describe, expect, it, vi } from 'vitest';
 import { ShogiResearchScreen } from '../components/shogi/ShogiResearchScreen';
 import {
   createShogiGameRecordV1,
+  addGameRecordSessionBranch,
+  createGameRecordSession,
   executeDrop,
   executeEnteringKingDeclaration,
   executeMove,
@@ -12,6 +14,8 @@ import {
   importShogiGameRecord,
   MAX_SHOGI_GAME_RECORD_FILE_BYTES,
   serializeShogiGameRecordV1,
+  serializeShogiGameRecordSessionV1,
+  storeGameRecordSessionState,
 } from '../domain/shogi';
 import { createInitialBoardState, type BoardState } from '../types/shogi';
 
@@ -613,6 +617,45 @@ describe('対局記録読み込みUI', () => {
     expect(document.getElementById('shogi-research-screen')).toHaveAttribute('data-history-count', '0');
     expect(screen.getByText(/対局記録を読み込みました/)).toHaveAttribute('role', 'status');
     expect(button).toHaveFocus();
+  });
+
+  it('研究セッションJSONは全分岐と選択中の分岐を復元し、本譜・分岐を切り替えられる', async () => {
+    const user = userEvent.setup();
+    const first = executeMove(createInitialBoardState(), { row: 6, col: 2 }, { row: 5, col: 2 });
+    if (first.type !== 'applied') throw new Error('first move failed');
+    const second = executeMove(first.state, { row: 2, col: 6 }, { row: 3, col: 6 });
+    if (second.type !== 'applied') throw new Error('second move failed');
+    const started = addGameRecordSessionBranch(createGameRecordSession(second.state), second.state, 1);
+    if (!started.ok || !started.boardState) throw new Error('branch fixture failed');
+    const branchMove = executeMove(started.boardState, { row: 2, col: 5 }, { row: 3, col: 5 });
+    if (branchMove.type !== 'applied') throw new Error('branch move failed');
+    const session = storeGameRecordSessionState(started.session, branchMove.state);
+    const branchId = session.branches[0].state.recordId!;
+
+    render(<ShogiResearchScreen initialState={createInitialBoardState()} />);
+    await user.upload(
+      getFileInput(),
+      new File([serializeShogiGameRecordSessionV1(session, EXPORTED_AT)], 'research-session.json', {
+        type: 'application/json',
+      })
+    );
+    await user.click(await screen.findByRole('button', { name: '読み込む' }));
+
+    const root = document.getElementById('shogi-research-screen');
+    expect(root).toHaveAttribute('data-session-branch-count', '1');
+    expect(root).toHaveAttribute('data-active-session-record', branchId);
+    const branchButton = screen.getByRole('button', { name: '第1手後からの分岐 1' });
+    expect(branchButton).toHaveAttribute('aria-current', 'page');
+    expect(root).toHaveAttribute('data-last-move', '△4四歩');
+
+    await user.click(screen.getByRole('button', { name: '本譜へ戻る' }));
+    await user.click(within(screen.getByRole('dialog')).getByRole('button', { name: '本譜へ戻る' }));
+    expect(root).toHaveAttribute('data-active-session-record', 'mainline');
+    expect(root).toHaveAttribute('data-last-move', '△3四歩');
+
+    await user.click(branchButton);
+    expect(root).toHaveAttribute('data-active-session-record', branchId);
+    expect(root).toHaveAttribute('data-last-move', '△4四歩');
   });
 
   it('Escape、背景クリック、キャンセルでは現在局面を維持し、同じファイルを再選択できる', async () => {
