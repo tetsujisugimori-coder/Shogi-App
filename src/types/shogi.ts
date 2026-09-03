@@ -5,6 +5,7 @@
 
 import { createPositionKey } from '../domain/shogi/repetition';
 import { createPositionSnapshot } from '../domain/shogi/replay';
+import { createShogiGameRecordId } from '../domain/shogi/recordIdentity';
 
 export type Player = 'sente' | 'gote';
 
@@ -240,6 +241,12 @@ export interface PositionRecord {
   gaveCheck: boolean;
 }
 
+/** Identifies the main record and position from which a variation was made. */
+export interface GameRecordBranchFrom {
+  recordId: string;
+  ply: number;
+}
+
 /** A self-contained, read-only replay baseline for one legal position. */
 export interface PositionSnapshot {
   historyIndex: number;
@@ -265,6 +272,10 @@ export interface MoveLimitJishogiState {
 }
 
 export interface BoardState {
+  /** Stable identity persisted with a JSON game record. */
+  recordId?: string;
+  /** Present only for a game started by replaying a parent record position. */
+  branchFrom?: GameRecordBranchFrom;
   squares: BoardSquare[][]; // 9x9 grid
   senteHand: Piece[];
   goteHand: Piece[];
@@ -552,6 +563,7 @@ export function createInitialBoardState(): BoardState {
   }
 
   const state: BoardState = {
+    recordId: createShogiGameRecordId(),
     squares,
     senteHand: [],
     goteHand: [],

@@ -3,6 +3,7 @@ import type {
   BoardState,
   BoardStatus,
   FoulRecord,
+  GameRecordBranchFrom,
   GameResult,
   IllegalMoveReason,
   MovePromotion,
@@ -15,6 +16,7 @@ import type {
   PositionSnapshot,
   ProposerType,
 } from '../../types/shogi';
+import { createShogiGameRecordId } from './recordIdentity';
 
 export const SHOGI_GAME_RECORD_FORMAT = 'shogi-app-game-record' as const;
 export const SHOGI_GAME_RECORD_VERSION = 1 as const;
@@ -188,6 +190,11 @@ export interface SavedMoveLimitJishogiStateV1 {
   checkingPlayer: SavedPlayerV1;
 }
 
+export interface SavedGameRecordBranchFromV1 {
+  recordId: string;
+  ply: number;
+}
+
 export interface SavedPositionSnapshotV1 {
   historyIndex: number;
   squares: SavedSquareV1[][];
@@ -212,6 +219,8 @@ export interface SavedLatestStateV1 {
 export interface ShogiGameRecordV1 {
   format: typeof SHOGI_GAME_RECORD_FORMAT;
   version: typeof SHOGI_GAME_RECORD_VERSION;
+  recordId: string;
+  branchFrom?: SavedGameRecordBranchFromV1;
   exportedAt: string;
   initialPosition: 'hirate';
   latestState: SavedLatestStateV1;
@@ -566,6 +575,16 @@ function cloneMoveLimitJishogiState(
   };
 }
 
+function cloneBranchFrom(branchFrom: GameRecordBranchFrom): SavedGameRecordBranchFromV1 {
+  if (!Number.isSafeInteger(branchFrom.ply) || branchFrom.ply < 0) {
+    throw new TypeError('分岐元手数は0以上の安全な整数である必要があります。');
+  }
+  if (branchFrom.recordId.trim().length === 0) {
+    throw new TypeError('分岐元棋譜IDは空文字列にできません。');
+  }
+  return { recordId: branchFrom.recordId, ply: branchFrom.ply };
+}
+
 function assertJsonSafe(value: unknown, path = '$', ancestors = new Set<object>()): void {
   if (value === null || typeof value === 'string' || typeof value === 'boolean') return;
   if (typeof value === 'number') {
@@ -593,9 +612,15 @@ export function createShogiGameRecordV1(
   state: BoardState,
   exportedAt: Date
 ): ShogiGameRecordV1 {
+  const recordId = state.recordId ?? createShogiGameRecordId();
+  if (recordId.trim().length === 0) {
+    throw new TypeError('棋譜IDは空文字列にできません。');
+  }
   const record: ShogiGameRecordV1 = {
     format: SHOGI_GAME_RECORD_FORMAT,
     version: SHOGI_GAME_RECORD_VERSION,
+    recordId,
+    ...(state.branchFrom ? { branchFrom: cloneBranchFrom(state.branchFrom) } : {}),
     exportedAt: exportedAt.toISOString(),
     initialPosition: 'hirate',
     latestState: {

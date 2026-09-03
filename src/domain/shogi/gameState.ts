@@ -178,6 +178,8 @@ function internalApplyLegalMove(
   return {
     move: moveRecord,
     state: {
+      recordId: state.recordId,
+      branchFrom: state.branchFrom ? { ...state.branchFrom } : undefined,
       squares: newSquares,
       senteHand: nextSenteHand,
       goteHand: nextGoteHand,
