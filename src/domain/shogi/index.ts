@@ -21,6 +21,7 @@ export {
   restoreBoardStateAtHistoryIndex,
 } from './replay';
 export * from './branchReplay';
+export * from './branchSession';
 export * from './recordIdentity';
 export * from './gameRecord';
 export * from './gameRecordImport';

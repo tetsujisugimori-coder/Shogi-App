@@ -252,7 +252,7 @@ describe('過去局面からの指し直しUI', () => {
     const root = document.getElementById('shogi-research-screen')!;
     expect(root).toHaveAttribute('data-history-count', '2');
     expect(root).toHaveAttribute('data-branch-origin-history-index', '2');
-    expect(screen.getByText('検討手順: 第2手後から指し直し')).toHaveAttribute('role', 'status');
+    expect(screen.getByText('検討手順: 第2手後からの分岐 1')).toHaveAttribute('role', 'status');
     await user.click(document.querySelector('[data-coordinate="6七"]') as HTMLElement);
     await user.click(document.querySelector('[data-coordinate="6六"]') as HTMLElement);
     expect(root).toHaveAttribute('data-history-count', '3');
@@ -335,24 +335,24 @@ describe('過去局面からの指し直しUI', () => {
 
     await user.click(screen.getByRole('button', { name: '本譜へ戻る' }));
     await user.click(within(screen.getByRole('dialog')).getByRole('button', { name: '本譜へ戻る' }));
-    await user.click(screen.getByRole('button', { name: '検討手順 1（第2手後）' }));
+    await user.click(screen.getByRole('button', { name: '第2手後からの分岐 1' }));
     expect(root).toHaveAttribute('data-history-count', '3');
     expect(root).toHaveAttribute('data-last-move', '▲6六歩');
     await user.click(document.querySelector('[data-coordinate="4三"]') as HTMLElement);
     await user.click(document.querySelector('[data-coordinate="4四"]') as HTMLElement);
     expect(root).toHaveAttribute('data-last-move', '△4四歩');
 
-    await user.click(screen.getByRole('button', { name: '検討手順 2（第2手後）' }));
+    await user.click(screen.getByRole('button', { name: '第2手後からの分岐 2' }));
     expect(root).toHaveAttribute('data-history-count', '3');
     expect(root).toHaveAttribute('data-last-move', '▲2六歩');
     await user.click(screen.getByRole('button', { name: '本譜へ戻る' }));
     await user.click(within(screen.getByRole('dialog')).getByRole('button', { name: '本譜へ戻る' }));
     expect(root).toHaveAttribute('data-last-move', '△4四歩');
 
-    await user.click(screen.getByRole('button', { name: '検討手順 1（第2手後）' }));
+    await user.click(screen.getByRole('button', { name: '第2手後からの分岐 1' }));
     expect(root).toHaveAttribute('data-history-count', '4');
     expect(root).toHaveAttribute('data-last-move', '△4四歩');
-    expect(screen.getByRole('button', { name: '検討手順 1（第2手後）' })).toHaveAttribute(
+    expect(screen.getByRole('button', { name: '第2手後からの分岐 1' })).toHaveAttribute(
       'aria-current',
       'page'
     );
@@ -389,7 +389,7 @@ describe('過去局面からの指し直しUI', () => {
       expect(mainlineRecord.branchFrom).toBeUndefined();
       expect(mainlineRecord).not.toHaveProperty('branches');
 
-      await user.click(screen.getByRole('button', { name: '検討手順 1（第2手後）' }));
+      await user.click(screen.getByRole('button', { name: '第2手後からの分岐 1' }));
       await user.click(screen.getByRole('button', { name: '対局記録を保存' }));
       const branchRecord = JSON.parse(await blobs[1].text());
       expect(branchRecord.history).toHaveLength(3);
@@ -510,6 +510,10 @@ describe('過去局面からの指し直しUI', () => {
     expect(root).toHaveAttribute('data-branch-origin-history-index', '0');
     expect(root).toHaveAttribute('data-history-count', '0');
     expect(root).toHaveAttribute('data-session-branch-count', '1');
+    expect(screen.getByRole('button', { name: '初期局面からの分岐 1' })).toHaveAttribute(
+      'aria-current',
+      'page'
+    );
 
     await user.click(screen.getByRole('button', { name: '新しい対局' }));
     await user.click(screen.getByRole('button', { name: 'キャンセル' }));
@@ -519,5 +523,26 @@ describe('過去局面からの指し直しUI', () => {
     expect(root).toHaveAttribute('data-branch-origin-history-index', '');
     expect(root).toHaveAttribute('data-session-branch-count', '0');
     expect(screen.queryByRole('button', { name: '本譜へ戻る' })).not.toBeInTheDocument();
+  });
+
+  it('分岐元ごとの表示名を保持し、別の手数では連番を1から開始する', async () => {
+    const user = userEvent.setup();
+    render(React.createElement(ShogiResearchScreen, { initialState: createFourMoveState() }));
+
+    await user.click(screen.getByRole('button', { name: '初期局面' }));
+    await user.click(screen.getByRole('button', { name: 'ここから指し直す' }));
+    await user.click(within(screen.getByRole('dialog')).getByRole('button', { name: 'ここから指し直す' }));
+    await user.click(screen.getByRole('button', { name: '本譜へ戻る' }));
+    await user.click(within(screen.getByRole('dialog')).getByRole('button', { name: '本譜へ戻る' }));
+
+    await user.click(screen.getByRole('button', { name: /2手目 △3四歩の局面を表示/ }));
+    await user.click(screen.getByRole('button', { name: 'ここから指し直す' }));
+    await user.click(within(screen.getByRole('dialog')).getByRole('button', { name: 'ここから指し直す' }));
+
+    expect(screen.getByRole('button', { name: '初期局面からの分岐 1' })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: '第2手後からの分岐 1' })).toHaveAttribute(
+      'aria-current',
+      'page'
+    );
   });
 });
