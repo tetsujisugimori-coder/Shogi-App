@@ -18,6 +18,7 @@ export {
   recordPositionSnapshotAfterLegalMove,
   getPositionSnapshot,
 } from './replay';
+export * from './branchReplay';
 export * from './gameRecord';
 export * from './gameRecordImport';
 export * from './kifExport';

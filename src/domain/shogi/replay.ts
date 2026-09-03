@@ -23,6 +23,12 @@ function cloneGameResult(result: GameResult | null | undefined): GameResult | nu
   return result ? { ...result } : null;
 }
 
+function cloneMoveLimitJishogi(
+  moveLimitJishogi: BoardState['moveLimitJishogi']
+): BoardState['moveLimitJishogi'] {
+  return moveLimitJishogi ? { ...moveLimitJishogi } : null;
+}
+
 /** Creates an independent display snapshot without copying any history collections. */
 export function createPositionSnapshot(state: BoardState): PositionSnapshot {
   return {
@@ -35,6 +41,7 @@ export function createPositionSnapshot(state: BoardState): PositionSnapshot {
     status: state.status,
     lastMove: cloneMoveRecord(state.lastMove),
     result: cloneGameResult(state.result),
+    moveLimitJishogi: cloneMoveLimitJishogi(state.moveLimitJishogi),
   };
 }
 
