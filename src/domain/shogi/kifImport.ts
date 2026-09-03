@@ -84,7 +84,7 @@ function getDeclaredEncoding(line: string): KifEncoding | 'unsupported' | null {
   return line.startsWith('#KIF') ? 'unsupported' : null;
 }
 
-function isLeadingAsciiWhitespace(byte: number): boolean {
+function isAsciiWhitespace(byte: number): boolean {
   return byte === 0x09 || byte === 0x0b || byte === 0x0c || byte === 0x0d || byte === 0x20;
 }
 
@@ -94,10 +94,7 @@ function findDeclaredEncoding(bytes: Uint8Array): KifEncoding | 'unsupported' | 
   // a declaration line. The UTF-8 BOM is special only at the beginning.
   const sampleLength = Math.min(bytes.byteLength, 4_096);
   let lineStart = 0;
-  for (let index = 0; index <= sampleLength; index += 1) {
-    if (index !== sampleLength && bytes[index] !== 0x0a) continue;
-    let lineEnd = index;
-    if (lineEnd > lineStart && bytes[lineEnd - 1] === 0x0d) lineEnd -= 1;
+  const inspectLine = (lineEnd: number): KifEncoding | 'unsupported' | null => {
     let declarationStart = lineStart;
     if (
       lineStart === 0 &&
@@ -106,15 +103,30 @@ function findDeclaredEncoding(bytes: Uint8Array): KifEncoding | 'unsupported' | 
     ) {
       declarationStart += 3;
     }
-    while (declarationStart < lineEnd && isLeadingAsciiWhitespace(bytes[declarationStart])) {
+    while (declarationStart < lineEnd && isAsciiWhitespace(bytes[declarationStart])) {
       declarationStart += 1;
+    }
+    while (lineEnd > declarationStart && isAsciiWhitespace(bytes[lineEnd - 1])) {
+      lineEnd -= 1;
     }
     if (bytes[declarationStart] === 0x23) {
       const line = Array.from(bytes.subarray(declarationStart, lineEnd), (byte) => String.fromCharCode(byte)).join('');
-      const declaration = getDeclaredEncoding(line);
-      if (declaration !== null) return declaration;
+      return getDeclaredEncoding(line);
     }
+    return null;
+  };
+
+  for (let index = 0; index < sampleLength; index += 1) {
+    if (bytes[index] !== 0x0a) continue;
+    const declaration = inspectLine(index);
+    if (declaration !== null) return declaration;
     lineStart = index + 1;
+  }
+  // A file no longer than the inspection window has no unobserved suffix, so its
+  // final line is complete even without a trailing newline. Larger files may end
+  // the sample mid-line; defer that incomplete candidate to the decoded parser.
+  if (sampleLength === bytes.byteLength && lineStart < sampleLength) {
+    return inspectLine(sampleLength);
   }
   return null;
 }

@@ -33,6 +33,16 @@ function createShiftJisKifThatExpandsBeyondUtf8Limit(): Uint8Array {
   return bytes;
 }
 
+function withDeclarationTrailingWhitespace(bytes: Uint8Array, whitespace: number): Uint8Array {
+  const declarationEnd = bytes.indexOf(0x0d);
+  if (declarationEnd < 0) throw new Error('テスト用Shift_JIS宣言の行末がありません。');
+  const result = new Uint8Array(bytes.byteLength + 1);
+  result.set(bytes.subarray(0, declarationEnd));
+  result[declarationEnd] = whitespace;
+  result.set(bytes.subarray(declarationEnd), declarationEnd + 1);
+  return result;
+}
+
 // Fixed CP932/Shift_JIS fixtures. They deliberately use real encoded bytes, not
 // strings passed directly to the text parser, so browser TextDecoder is exercised.
 const SHIFT_JIS_DECLARED_KIF = new Uint8Array([
@@ -43,6 +53,54 @@ const SHIFT_JIS_LEGACY_KIF = new Uint8Array([
 ]);
 
 describe('KIF 2.0 import', () => {
+  it.each([
+    ['半角空白', '#KIF version=2.0 encoding=UTF-8   '],
+    ['タブ', '#KIF version=2.0 encoding=UTF-8\t'],
+  ])('UTF-8宣言末尾の%sをパーサーと同様に除去して読み込む', (_label, declaration) => {
+    const bytes = new TextEncoder().encode([
+      declaration,
+      '手数----指手---------消費時間--',
+      '1 ７六歩(77)',
+    ].join('\n') + '\n');
+    expect(importKifBytes(bytes)).toMatchObject({ ok: true, metadata: { encoding: 'utf-8', moveCount: 1 } });
+  });
+
+  it.each([
+    ['半角空白', 0x20],
+    ['タブ', 0x09],
+  ])('Shift_JIS宣言末尾の%sをパーサーと同様に除去して読み込む', (_label, whitespace) => {
+    const imported = importKifBytes(withDeclarationTrailingWhitespace(SHIFT_JIS_DECLARED_KIF, whitespace));
+    expect(imported).toMatchObject({ ok: true, metadata: { encoding: 'shift_jis', moveCount: 4 } });
+  });
+
+  it('宣言末尾の非空白文字と完全な未対応宣言を引き続き拒否する', () => {
+    const encoder = new TextEncoder();
+    const extraCharacter = encoder.encode('#KIF version=2.0 encoding=UTF-8 x\n手数----指手---------消費時間--\n');
+    const unsupportedWithWhitespace = encoder.encode('#KIF version=2.1 encoding=UTF-8  \n手数----指手---------消費時間--\n');
+    expect(importKifBytes(extraCharacter)).toMatchObject({ ok: false, code: 'unsupported_encoding' });
+    expect(importKifBytes(unsupportedWithWhitespace)).toMatchObject({ ok: false, code: 'unsupported_encoding' });
+  });
+
+  it('4,096バイト境界で途切れた宣言候補を未対応宣言と決めつけず、デコード後に読む', () => {
+    const declaration = '#KIF version=2.0 encoding=UTF-8';
+    const declarationStart = 4_090;
+    const bytes = new TextEncoder().encode([
+      ' '.repeat(declarationStart) + declaration,
+      '手数----指手---------消費時間--',
+      '1 ７六歩(77)',
+    ].join('\n') + '\n');
+    expect(bytes.indexOf(0x23)).toBe(declarationStart);
+    expect(declarationStart + declaration.length).toBeGreaterThan(4_096);
+    expect(bytes.byteLength).toBeGreaterThan(4_096);
+    expect(importKifBytes(bytes)).toMatchObject({ ok: true, metadata: { encoding: 'utf-8', moveCount: 1 } });
+  });
+
+  it('4,096バイト以下で改行のない最後の完全な未対応宣言は引き続き拒否する', () => {
+    const bytes = new TextEncoder().encode('#KIF version=2.1 encoding=UTF-8');
+    expect(bytes.byteLength).toBeLessThan(4_096);
+    expect(importKifBytes(bytes)).toMatchObject({ ok: false, code: 'unsupported_encoding' });
+  });
+
   it('日本語メタデータとコメント内の疑似宣言を無視し、BOM後の本物のUTF-8宣言を採用する', () => {
     const bytes = new TextEncoder().encode([
       '\uFEFF先手：山田 #KIF version=2.0 encoding=Shift_JIS',
