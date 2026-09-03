@@ -18,6 +18,8 @@ import {
   getMoveCandidates,
   getPromotionStatus,
   getPositionSnapshot,
+  createBranchFromReplayPosition,
+  restoreMainlineFromBranch,
   normalizePositionSnapshots,
   serializeShogiGameRecordV1,
   importShogiGameRecord,
@@ -28,6 +30,7 @@ import {
   type ShogiGameRecordImportResult,
   type KifImportResult,
   type AgreedJishogiProposal,
+  type GameRecordBranch,
 } from '../../domain/shogi';
 import { ShogiTable } from './ShogiTable';
 import { PromotionDialog } from './PromotionDialog';
@@ -39,6 +42,7 @@ import { MoveHistoryPanel } from './MoveHistoryPanel';
 import { getGameResultDisplay } from './gameResultDisplay';
 import { GameRecordImportDialog } from './GameRecordImportDialog';
 import { KifImportDialog } from './KifImportDialog';
+import { BranchReplayDialog } from './BranchReplayDialog';
 
 interface ShogiResearchScreenProps {
   initialState?: BoardState;
@@ -91,6 +95,9 @@ export const ShogiResearchScreen: React.FC<ShogiResearchScreenProps> = ({ initia
     normalizePositionSnapshots(initialState ?? createInitialBoardState())
   );
   const [replayHistoryIndex, setReplayHistoryIndex] = useState<number | null>(null);
+  const [gameRecordBranch, setGameRecordBranch] = useState<GameRecordBranch | null>(null);
+  const [pendingBranchHistoryIndex, setPendingBranchHistoryIndex] = useState<number | null>(null);
+  const [isReturnToMainlineDialogOpen, setIsReturnToMainlineDialogOpen] = useState(false);
   const [selection, setSelection] = useState<SelectionState>({ kind: 'none' });
   const [pendingPromotion, setPendingPromotion] = useState<PendingPromotion | null>(null);
   const [isResignationDialogOpen, setIsResignationDialogOpen] = useState(false);
@@ -121,6 +128,10 @@ export const ShogiResearchScreen: React.FC<ShogiResearchScreenProps> = ({ initia
   const agreedJishogiButtonRef = useRef<HTMLButtonElement>(null);
   const shouldRestoreAgreedJishogiFocus = useRef(false);
   const newGameButtonRef = useRef<HTMLButtonElement>(null);
+  const branchStartButtonRef = useRef<HTMLButtonElement>(null);
+  const returnToMainlineButtonRef = useRef<HTMLButtonElement>(null);
+  const shouldRestoreBranchStartFocus = useRef(false);
+  const shouldRestoreMainlineFocus = useRef(false);
   const shouldRestoreNewGameFocus = useRef(false);
   const gameRecordImportButtonRef = useRef<HTMLButtonElement>(null);
   const gameRecordFileInputRef = useRef<HTMLInputElement>(null);
@@ -140,6 +151,8 @@ export const ShogiResearchScreen: React.FC<ShogiResearchScreenProps> = ({ initia
     isEnteringKingDialogOpen ||
     isAgreedJishogiDialogOpen ||
     isNewGameDialogOpen ||
+    pendingBranchHistoryIndex !== null ||
+    isReturnToMainlineDialogOpen ||
     pendingGameRecordImport !== null ||
     isGameRecordFileReading ||
     pendingKifImport !== null ||
@@ -170,6 +183,8 @@ export const ShogiResearchScreen: React.FC<ShogiResearchScreenProps> = ({ initia
     replayPosition >= 0 && replayPosition < replayIndexes.length - 1
       ? replayIndexes[replayPosition + 1]
       : null;
+  const canStartBranch =
+    isViewingReplay && replayHistoryIndex !== null && replayHistoryIndex < boardState.history.length;
 
   // Compute candidates for the mutually exclusive board/hand selection.
   const candidateSquares = useMemo(() => {
@@ -228,6 +243,18 @@ export const ShogiResearchScreen: React.FC<ShogiResearchScreenProps> = ({ initia
   }, [isNewGameDialogOpen]);
 
   useEffect(() => {
+    if (pendingBranchHistoryIndex !== null || !shouldRestoreBranchStartFocus.current) return;
+    shouldRestoreBranchStartFocus.current = false;
+    branchStartButtonRef.current?.focus();
+  }, [pendingBranchHistoryIndex]);
+
+  useEffect(() => {
+    if (isReturnToMainlineDialogOpen || !shouldRestoreMainlineFocus.current) return;
+    shouldRestoreMainlineFocus.current = false;
+    returnToMainlineButtonRef.current?.focus();
+  }, [isReturnToMainlineDialogOpen]);
+
+  useEffect(() => {
     if (pendingGameRecordImport || !shouldRestoreGameRecordImportFocus.current) return;
     shouldRestoreGameRecordImportFocus.current = false;
     gameRecordImportButtonRef.current?.focus();
@@ -259,6 +286,62 @@ export const ShogiResearchScreen: React.FC<ShogiResearchScreenProps> = ({ initia
     setSelection({ kind: 'none' });
     setFocusRequest(null);
   }, []);
+
+  const cancelBranchStart = useCallback(() => {
+    shouldRestoreBranchStartFocus.current = true;
+    setPendingBranchHistoryIndex(null);
+  }, []);
+
+  const openBranchStartDialog = useCallback(() => {
+    if (!canStartBranch || replayHistoryIndex === null || dialogsAreOpen) return;
+    setPendingBranchHistoryIndex(replayHistoryIndex);
+  }, [canStartBranch, dialogsAreOpen, replayHistoryIndex]);
+
+  const confirmBranchStart = () => {
+    if (pendingBranchHistoryIndex === null) return;
+    const started = createBranchFromReplayPosition(boardState, pendingBranchHistoryIndex);
+    if (!started) {
+      setPendingBranchHistoryIndex(null);
+      return;
+    }
+    focusRequestId.current = 0;
+    setBoardState(started.state);
+    setGameRecordBranch(started.branch);
+    setReplayHistoryIndex(null);
+    setSelection({ kind: 'none' });
+    setPendingPromotion(null);
+    setIsResignationDialogOpen(false);
+    setIsEnteringKingDialogOpen(false);
+    setIsAgreedJishogiDialogOpen(false);
+    setAgreedJishogiProposal(null);
+    setAgreedJishogiError(null);
+    setFocusRequest(null);
+    setMoveHistoryResetKey((current) => current + 1);
+    setPendingBranchHistoryIndex(null);
+  };
+
+  const cancelReturnToMainline = useCallback(() => {
+    shouldRestoreMainlineFocus.current = true;
+    setIsReturnToMainlineDialogOpen(false);
+  }, []);
+
+  const confirmReturnToMainline = () => {
+    if (!gameRecordBranch) return;
+    focusRequestId.current = 0;
+    setBoardState(restoreMainlineFromBranch(gameRecordBranch));
+    setGameRecordBranch(null);
+    setReplayHistoryIndex(null);
+    setSelection({ kind: 'none' });
+    setPendingPromotion(null);
+    setIsResignationDialogOpen(false);
+    setIsEnteringKingDialogOpen(false);
+    setIsAgreedJishogiDialogOpen(false);
+    setAgreedJishogiProposal(null);
+    setAgreedJishogiError(null);
+    setFocusRequest(null);
+    setMoveHistoryResetKey((current) => current + 1);
+    setIsReturnToMainlineDialogOpen(false);
+  };
 
   const cancelPromotion = useCallback(() => {
     if (!pendingPromotion) return;
@@ -432,6 +515,7 @@ export const ShogiResearchScreen: React.FC<ShogiResearchScreenProps> = ({ initia
     focusRequestId.current = 0;
 
     setBoardState(createInitialBoardState());
+    setGameRecordBranch(null);
     setReplayHistoryIndex(null);
     setSelection({ kind: 'none' });
     setPendingPromotion(null);
@@ -562,6 +646,7 @@ export const ShogiResearchScreen: React.FC<ShogiResearchScreenProps> = ({ initia
     if (!pendingKifImport) return;
     focusRequestId.current = 0;
     setBoardState(pendingKifImport.state);
+    setGameRecordBranch(null);
     setReplayHistoryIndex(null);
     setSelection({ kind: 'none' });
     setPendingPromotion(null);
@@ -583,6 +668,7 @@ export const ShogiResearchScreen: React.FC<ShogiResearchScreenProps> = ({ initia
     shouldRestoreGameRecordImportFocus.current = true;
     focusRequestId.current = 0;
     setBoardState(pendingGameRecordImport.state);
+    setGameRecordBranch(null);
     setReplayHistoryIndex(null);
     setSelection({ kind: 'none' });
     setPendingPromotion(null);
@@ -756,6 +842,7 @@ export const ShogiResearchScreen: React.FC<ShogiResearchScreenProps> = ({ initia
       data-move-limit-jishogi={boardState.moveLimitJishogi?.kind ?? ''}
       data-position-snapshot-count={boardState.positionSnapshots?.length ?? 0}
       data-replay-history-index={replayHistoryIndex ?? ''}
+      data-branch-origin-history-index={gameRecordBranch?.originHistoryIndex ?? ''}
       onKeyDown={handleScreenKeyDown}
       className="min-h-full w-full flex flex-col items-center justify-between py-6 px-3 sm:px-6 bg-[#0f1115] text-stone-200"
     >
@@ -792,6 +879,21 @@ export const ShogiResearchScreen: React.FC<ShogiResearchScreenProps> = ({ initia
           AIとの対局・棋譜・判断ログを記録する研究画面です。
         </p>
         <div className="mt-2 flex max-w-full flex-wrap justify-center gap-2">
+          {gameRecordBranch && (
+            <button
+              ref={returnToMainlineButtonRef}
+              type="button"
+              onClick={() => {
+                if (!dialogsAreOpen) setIsReturnToMainlineDialogOpen(true);
+              }}
+              disabled={dialogsAreOpen}
+              aria-haspopup="dialog"
+              aria-expanded={isReturnToMainlineDialogOpen}
+              className="rounded border border-sky-700/70 bg-sky-950/45 px-4 py-1.5 font-serif text-sm tracking-[0.1em] text-sky-100 shadow-inner outline-none transition hover:border-sky-500 hover:bg-sky-900/55 focus-visible:ring-2 focus-visible:ring-amber-300 disabled:cursor-not-allowed disabled:opacity-65"
+            >
+              本譜へ戻る
+            </button>
+          )}
           <button
             ref={enteringKingButtonRef}
             type="button"
@@ -899,6 +1001,13 @@ export const ShogiResearchScreen: React.FC<ShogiResearchScreenProps> = ({ initia
             新しい対局
           </button>
         </div>
+        {gameRecordBranch && (
+          <p className="mt-1 text-xs text-sky-200" role="status">
+            検討手順: {gameRecordBranch.originHistoryIndex === 0
+              ? '初期局面から指し直し'
+              : `第${gameRecordBranch.originHistoryIndex}手後から指し直し`}
+          </p>
+        )}
         {exportNotice && (
           <p
             role={exportNotice.kind === 'error' ? 'alert' : 'status'}
@@ -945,6 +1054,9 @@ export const ShogiResearchScreen: React.FC<ShogiResearchScreenProps> = ({ initia
           canGoToPrevious={previousReplayIndex !== null}
           canGoToNext={nextReplayIndex !== null}
           isViewingReplay={isViewingReplay}
+          canStartBranch={canStartBranch}
+          onStartBranch={openBranchStartDialog}
+          branchStartButtonRef={branchStartButtonRef}
           onSelectHistoryIndex={selectReplayPosition}
           onGoToInitial={() => selectReplayPosition(0)}
           onGoToPrevious={() => {
@@ -996,6 +1108,23 @@ export const ShogiResearchScreen: React.FC<ShogiResearchScreenProps> = ({ initia
 
       {isNewGameDialogOpen && (
         <NewGameDialog onConfirm={confirmNewGame} onCancel={cancelNewGame} />
+      )}
+
+      {pendingBranchHistoryIndex !== null && (
+        <BranchReplayDialog
+          kind="start"
+          historyIndex={pendingBranchHistoryIndex}
+          onConfirm={confirmBranchStart}
+          onCancel={cancelBranchStart}
+        />
+      )}
+
+      {isReturnToMainlineDialogOpen && gameRecordBranch && (
+        <BranchReplayDialog
+          kind="return"
+          onConfirm={confirmReturnToMainline}
+          onCancel={cancelReturnToMainline}
+        />
       )}
 
       {pendingGameRecordImport && (

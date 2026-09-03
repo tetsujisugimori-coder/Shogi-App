@@ -251,6 +251,12 @@ export interface PositionSnapshot {
   status: BoardStatus;
   lastMove: MoveRecord | null;
   result: GameResult | null;
+  /**
+   * The 500-move continuous-check wait state is part of a position, rather
+   * than display-only data. It is optional so v1 game records remain
+   * backwards compatible: v1 deliberately does not add this field.
+   */
+  moveLimitJishogi?: MoveLimitJishogiState | null;
 }
 
 export interface MoveLimitJishogiState {

@@ -18,6 +18,9 @@ export interface MoveHistoryPanelProps {
   onGoToPrevious?: () => void;
   onGoToNext?: () => void;
   onReturnToCurrent?: () => void;
+  canStartBranch?: boolean;
+  onStartBranch?: () => void;
+  branchStartButtonRef?: React.RefObject<HTMLButtonElement | null>;
 }
 
 const PANEL_ID = 'shogi-move-history-panel';
@@ -38,6 +41,9 @@ export const MoveHistoryPanel: React.FC<MoveHistoryPanelProps> = ({
   onGoToPrevious,
   onGoToNext,
   onReturnToCurrent,
+  canStartBranch = false,
+  onStartBranch,
+  branchStartButtonRef,
 }) => {
   const [isMobileOpen, setIsMobileOpen] = useState(false);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
@@ -133,6 +139,17 @@ export const MoveHistoryPanel: React.FC<MoveHistoryPanelProps> = ({
               >
                 現在局面へ戻る
               </button>
+              {onStartBranch && (
+                <button
+                  ref={branchStartButtonRef}
+                  type="button"
+                  onClick={onStartBranch}
+                  disabled={!canStartBranch || selectionDisabled}
+                  className="col-span-2 rounded border border-sky-700/60 bg-sky-950/40 px-2 py-1.5 text-xs text-sky-100 outline-none hover:border-sky-500 focus-visible:ring-2 focus-visible:ring-amber-300 disabled:cursor-not-allowed disabled:opacity-45 sm:col-span-4 xl:col-span-2"
+                >
+                  ここから指し直す
+                </button>
+              )}
             </div>
           )}
         </div>
