@@ -29,7 +29,7 @@ export interface GameRecordSessionTransition {
   boardState: BoardState | null;
 }
 
-function cloneSelection(selection: GameRecordSessionSelection): GameRecordSessionSelection {
+export function cloneSelection(selection: GameRecordSessionSelection): GameRecordSessionSelection {
   return selection.kind === 'mainline' ? selection : { ...selection };
 }
 

@@ -358,7 +358,7 @@ describe('過去局面からの指し直しUI', () => {
     );
   });
 
-  it('選択中の本譜または分岐だけをJSON・KIFとして個別に書き出す', async () => {
+  it('JSONでは本譜と兄弟分岐をセッション全体で、KIFでは選択中の一本道だけを書き出す', async () => {
     const user = userEvent.setup();
     render(React.createElement(ShogiResearchScreen, { initialState: createFourMoveState() }));
     await user.click(screen.getByRole('button', { name: /2手目 △3四歩の局面を表示/ }));
@@ -384,18 +384,20 @@ describe('過去局面からの指し直しUI', () => {
 
     try {
       await user.click(screen.getByRole('button', { name: '対局記録を保存' }));
-      const mainlineRecord = JSON.parse(await blobs[0].text());
-      expect(mainlineRecord.history).toHaveLength(4);
-      expect(mainlineRecord.branchFrom).toBeUndefined();
-      expect(mainlineRecord).not.toHaveProperty('branches');
+      const mainlineSession = JSON.parse(await blobs[0].text());
+      expect(mainlineSession.format).toBe('shogi-app-game-record-session');
+      expect(mainlineSession.mainline.history).toHaveLength(4);
+      expect(mainlineSession.mainline.branchFrom).toBeUndefined();
+      expect(mainlineSession.branches).toHaveLength(1);
 
       await user.click(screen.getByRole('button', { name: '第2手後からの分岐 1' }));
       await user.click(screen.getByRole('button', { name: '対局記録を保存' }));
-      const branchRecord = JSON.parse(await blobs[1].text());
-      expect(branchRecord.history).toHaveLength(3);
-      expect(branchRecord.recordId).not.toBe(mainlineRecord.recordId);
-      expect(branchRecord.branchFrom).toEqual({ recordId: mainlineRecord.recordId, ply: 2 });
-      expect(branchRecord).not.toHaveProperty('branches');
+      const branchSession = JSON.parse(await blobs[1].text());
+      expect(branchSession.mainline.history).toHaveLength(4);
+      expect(branchSession.branches[0].record.history).toHaveLength(3);
+      expect(branchSession.branches[0].record.recordId).not.toBe(branchSession.mainline.recordId);
+      expect(branchSession.branches[0].record.branchFrom).toEqual({ recordId: branchSession.mainline.recordId, ply: 2 });
+      expect(branchSession.selectedRecordId).toBe(branchSession.branches[0].record.recordId);
 
       await user.click(screen.getByRole('button', { name: 'KIF棋譜を保存' }));
       expect(await blobs[2].text()).toContain('   3 ６六歩(67)');

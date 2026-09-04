@@ -772,9 +772,10 @@ describe('対局記録を保存するUI', () => {
 
     const blob = mocks.createObjectURL.mock.calls[0][0] as Blob;
     const saved = JSON.parse(await blob.text());
-    expect(saved.history).toHaveLength(2);
-    expect(saved.lastMove.notation).toBe('△3四歩');
-    expect(saved.latestState.squares[3][6].piece).toMatchObject({
+    expect(saved.format).toBe('shogi-app-game-record-session');
+    expect(saved.mainline.history).toHaveLength(2);
+    expect(saved.mainline.lastMove.notation).toBe('△3四歩');
+    expect(saved.mainline.latestState.squares[3][6].piece).toMatchObject({
       type: 'pawn',
       player: 'gote',
     });
