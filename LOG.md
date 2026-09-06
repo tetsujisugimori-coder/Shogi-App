@@ -2408,3 +2408,10 @@ PR #1のレビュー指摘を受け、簡易APIの`applyMove`と合法手候補�
 - `npm run verify:lock`、`npm run verify:macos-fsevents`（Windows上の静的検査）、`npm run lint`、セッション／JSON UI対象テスト（69/69件）、保存・分岐回帰対象テスト（74/74件）、`npm run build`、`git diff --check`は成功した。`npm test`および`npm run check`は実行を開始してlockfile検証・lintまでは成功したが、この実行環境の30秒コマンド上限によりVitest全件の終了サマリーを取得できなかったため、全件完了としては記録しない。
 - 実ブラウザでは本譜を4手進め、第2手後の再生局面から分岐を作成し、`第2手後からの分岐 1`、本譜切替ボタン、セッション一括保存・再読込の案内、`data-session-branch-count="1"`、選択分岐のrecordIdを確認した。console warning/errorは0件だった。ローカルfile chooserを伴う保存／読込の往復はブラウザでは実施せず、前記DOMテストで確認した。
 - 対象外は入れ子分岐、棋譜ツリー、分岐名編集・削除、KIF変化手順、CSA等、AI解析、自動保存、クラウド同期、大規模UI再設計のままとした。
+## [2026-09-07] 外部連携向けJSON交換形式v1の固定
+
+- Memo-Nexus等の外部連携を想定し、既存の `shogi-app-game-record-session` / version 1 を研究セッション全体の正式なJSON交換形式としてコードコメントとREADMEで明文化した。新しい専用JSON形式やMemo-Nexus依存は追加していない。
+- 生成ベースfixtureとして、本譜のみ、分岐1件、投了で終局済みの3パターンを追加し、さらに本譜のみの静的JSON fixtureを追加した。
+- `format` / `version`、必須ルート項目、単局v1の埋め込み、recordId参照、分岐元整合性、入れ子分岐拒否、serialize/import往復、静的fixture読み込み、旧来単局v1のmainline-only互換を回帰テストで固定した。
+- format/versionは互換性契約として扱い、v1のフィールド変更・削除には新versionを定義する。入れ子分岐はv1で引き続き非対応。
+- 検証では新規契約テスト8/8件、全テストを2分割して17ファイル・764/764件、`npm run lint`、`npm run build`、`git diff --check`が成功した。`npm run check`も実行し、lockfile検証とlintの成功を確認したが、続く全件Vitestの終了サマリーはこの環境の30秒プロセス上限で回収できなかったため、全件結果は前記の分割実行で確認した。

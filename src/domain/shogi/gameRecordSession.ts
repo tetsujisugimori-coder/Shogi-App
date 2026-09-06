@@ -19,7 +19,12 @@ import {
 } from './branchSession';
 import { cloneBoardState } from './replay';
 
-/** A distinct envelope prevents a research session from being mistaken for a v1 game record. */
+/**
+ * 研究セッション全体の正式な外部交換形式。`format` と `version` は外部連携の
+ * 互換性契約であり、v1 のフィールド変更・削除、未知フィールドの無秩序な追加はしない。
+ * 互換性を壊す変更には新しい version を定義する。v1 は兄弟分岐だけを表し、
+ * 入れ子分岐には対応しない。
+ */
 export const SHOGI_GAME_RECORD_SESSION_FORMAT = 'shogi-app-game-record-session' as const;
 export const SHOGI_GAME_RECORD_SESSION_VERSION = 1 as const;
 export const MAX_SHOGI_GAME_RECORD_SESSION_FILE_BYTES = 128 * 1024 * 1024;

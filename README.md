@@ -7,6 +7,12 @@
 現在は平手初期局面の高精度・リアル調将棋盤表示およびアクセシビリティ・キーボード操作基盤の実装段階です。
 本黄楊彫駒の立体表現、二文字毛筆書体、本榧盤の木目・厚み・星の対称配置、およびWAI-ARIAに準拠したグリッド・roving tabindex操作を提供します。
 
+## Shogi-App JSON Exchange Format
+
+外部アプリとの交換には、研究セッション全体を表す `shogi-app-game-record-session` / `version: 1` を推奨します。これは本譜 `mainline` と兄弟分岐 `branches`、選択中の `selectedRecordId` を含みます。各 `mainline` と `branches[].record` は、単局形式 `shogi-app-game-record` / `version: 1` です。
+
+`format` と `version` は互換性判定の契約です。外部アプリは未知の version を推測して読み込まず、unsupported として扱ってください。v1 のフィールド変更・削除は互換性を壊すため、新しい version を定義します。v1 は入れ子分岐をサポートせず、未知フィールドを無秩序に追加しません。Memo-Nexusなどの外部連携でもこの既存形式を用い、Shogi-Appに連携先専用の依存は追加しません。
+
 ### 実装済みの範囲
 - 平手初期局面（40枚）の正確な配置
 - 本黄楊（ほんつげ）調3D立体彫駒（二文字縦書き、成駒赤文字切替）

@@ -18,6 +18,11 @@ import type {
 } from '../../types/shogi';
 import { createShogiGameRecordId } from './recordIdentity';
 
+/**
+ * 外部交換用の単一棋譜識別子。研究セッションでは
+ * `shogi-app-game-record-session` v1 の `mainline` / `branches[].record` に埋め込む。
+ * format と version は互換性判定の契約であり、v1 のフィールド変更・削除はしない。
+ */
 export const SHOGI_GAME_RECORD_FORMAT = 'shogi-app-game-record' as const;
 export const SHOGI_GAME_RECORD_VERSION = 1 as const;
 export const SHOGI_GAME_RECORD_MIME_TYPE = 'application/json;charset=utf-8' as const;
