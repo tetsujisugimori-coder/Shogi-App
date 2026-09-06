@@ -1,0 +1,3340 @@
+{
+  "format": "shogi-app-game-record-session",
+  "version": 1,
+  "exportedAt": "2026-09-07T00:00:00.000Z",
+  "mainline": {
+    "format": "shogi-app-game-record",
+    "version": 1,
+    "recordId": "fixture-mainline-v1",
+    "exportedAt": "2026-09-07T00:00:00.000Z",
+    "initialPosition": "hirate",
+    "latestState": {
+      "squares": [
+        [
+          {
+            "row": 0,
+            "col": 0,
+            "piece": {
+              "id": "gote-lance-9",
+              "type": "lance",
+              "player": "gote",
+              "isPromoted": false
+            }
+          },
+          {
+            "row": 0,
+            "col": 1,
+            "piece": {
+              "id": "gote-knight-8",
+              "type": "knight",
+              "player": "gote",
+              "isPromoted": false
+            }
+          },
+          {
+            "row": 0,
+            "col": 2,
+            "piece": {
+              "id": "gote-silver-7",
+              "type": "silver",
+              "player": "gote",
+              "isPromoted": false
+            }
+          },
+          {
+            "row": 0,
+            "col": 3,
+            "piece": {
+              "id": "gote-gold-6",
+              "type": "gold",
+              "player": "gote",
+              "isPromoted": false
+            }
+          },
+          {
+            "row": 0,
+            "col": 4,
+            "piece": {
+              "id": "gote-king-5",
+              "type": "king",
+              "player": "gote",
+              "isPromoted": false
+            }
+          },
+          {
+            "row": 0,
+            "col": 5,
+            "piece": {
+              "id": "gote-gold-4",
+              "type": "gold",
+              "player": "gote",
+              "isPromoted": false
+            }
+          },
+          {
+            "row": 0,
+            "col": 6,
+            "piece": {
+              "id": "gote-silver-3",
+              "type": "silver",
+              "player": "gote",
+              "isPromoted": false
+            }
+          },
+          {
+            "row": 0,
+            "col": 7,
+            "piece": {
+              "id": "gote-knight-2",
+              "type": "knight",
+              "player": "gote",
+              "isPromoted": false
+            }
+          },
+          {
+            "row": 0,
+            "col": 8,
+            "piece": {
+              "id": "gote-lance-1",
+              "type": "lance",
+              "player": "gote",
+              "isPromoted": false
+            }
+          }
+        ],
+        [
+          {
+            "row": 1,
+            "col": 0,
+            "piece": null
+          },
+          {
+            "row": 1,
+            "col": 1,
+            "piece": {
+              "id": "gote-rook-8",
+              "type": "rook",
+              "player": "gote",
+              "isPromoted": false
+            }
+          },
+          {
+            "row": 1,
+            "col": 2,
+            "piece": null
+          },
+          {
+            "row": 1,
+            "col": 3,
+            "piece": null
+          },
+          {
+            "row": 1,
+            "col": 4,
+            "piece": null
+          },
+          {
+            "row": 1,
+            "col": 5,
+            "piece": null
+          },
+          {
+            "row": 1,
+            "col": 6,
+            "piece": null
+          },
+          {
+            "row": 1,
+            "col": 7,
+            "piece": {
+              "id": "gote-bishop-2",
+              "type": "bishop",
+              "player": "gote",
+              "isPromoted": false
+            }
+          },
+          {
+            "row": 1,
+            "col": 8,
+            "piece": null
+          }
+        ],
+        [
+          {
+            "row": 2,
+            "col": 0,
+            "piece": {
+              "id": "gote-pawn-9",
+              "type": "pawn",
+              "player": "gote",
+              "isPromoted": false
+            }
+          },
+          {
+            "row": 2,
+            "col": 1,
+            "piece": {
+              "id": "gote-pawn-8",
+              "type": "pawn",
+              "player": "gote",
+              "isPromoted": false
+            }
+          },
+          {
+            "row": 2,
+            "col": 2,
+            "piece": {
+              "id": "gote-pawn-7",
+              "type": "pawn",
+              "player": "gote",
+              "isPromoted": false
+            }
+          },
+          {
+            "row": 2,
+            "col": 3,
+            "piece": {
+              "id": "gote-pawn-6",
+              "type": "pawn",
+              "player": "gote",
+              "isPromoted": false
+            }
+          },
+          {
+            "row": 2,
+            "col": 4,
+            "piece": {
+              "id": "gote-pawn-5",
+              "type": "pawn",
+              "player": "gote",
+              "isPromoted": false
+            }
+          },
+          {
+            "row": 2,
+            "col": 5,
+            "piece": {
+              "id": "gote-pawn-4",
+              "type": "pawn",
+              "player": "gote",
+              "isPromoted": false
+            }
+          },
+          {
+            "row": 2,
+            "col": 6,
+            "piece": null
+          },
+          {
+            "row": 2,
+            "col": 7,
+            "piece": {
+              "id": "gote-pawn-2",
+              "type": "pawn",
+              "player": "gote",
+              "isPromoted": false
+            }
+          },
+          {
+            "row": 2,
+            "col": 8,
+            "piece": {
+              "id": "gote-pawn-1",
+              "type": "pawn",
+              "player": "gote",
+              "isPromoted": false
+            }
+          }
+        ],
+        [
+          {
+            "row": 3,
+            "col": 0,
+            "piece": null
+          },
+          {
+            "row": 3,
+            "col": 1,
+            "piece": null
+          },
+          {
+            "row": 3,
+            "col": 2,
+            "piece": null
+          },
+          {
+            "row": 3,
+            "col": 3,
+            "piece": null
+          },
+          {
+            "row": 3,
+            "col": 4,
+            "piece": null
+          },
+          {
+            "row": 3,
+            "col": 5,
+            "piece": null
+          },
+          {
+            "row": 3,
+            "col": 6,
+            "piece": {
+              "id": "gote-pawn-3",
+              "type": "pawn",
+              "player": "gote",
+              "isPromoted": false
+            }
+          },
+          {
+            "row": 3,
+            "col": 7,
+            "piece": null
+          },
+          {
+            "row": 3,
+            "col": 8,
+            "piece": null
+          }
+        ],
+        [
+          {
+            "row": 4,
+            "col": 0,
+            "piece": null
+          },
+          {
+            "row": 4,
+            "col": 1,
+            "piece": null
+          },
+          {
+            "row": 4,
+            "col": 2,
+            "piece": null
+          },
+          {
+            "row": 4,
+            "col": 3,
+            "piece": null
+          },
+          {
+            "row": 4,
+            "col": 4,
+            "piece": null
+          },
+          {
+            "row": 4,
+            "col": 5,
+            "piece": null
+          },
+          {
+            "row": 4,
+            "col": 6,
+            "piece": null
+          },
+          {
+            "row": 4,
+            "col": 7,
+            "piece": null
+          },
+          {
+            "row": 4,
+            "col": 8,
+            "piece": null
+          }
+        ],
+        [
+          {
+            "row": 5,
+            "col": 0,
+            "piece": null
+          },
+          {
+            "row": 5,
+            "col": 1,
+            "piece": null
+          },
+          {
+            "row": 5,
+            "col": 2,
+            "piece": {
+              "id": "sente-pawn-7",
+              "type": "pawn",
+              "player": "sente",
+              "isPromoted": false
+            }
+          },
+          {
+            "row": 5,
+            "col": 3,
+            "piece": {
+              "id": "sente-pawn-6",
+              "type": "pawn",
+              "player": "sente",
+              "isPromoted": false
+            }
+          },
+          {
+            "row": 5,
+            "col": 4,
+            "piece": null
+          },
+          {
+            "row": 5,
+            "col": 5,
+            "piece": null
+          },
+          {
+            "row": 5,
+            "col": 6,
+            "piece": null
+          },
+          {
+            "row": 5,
+            "col": 7,
+            "piece": null
+          },
+          {
+            "row": 5,
+            "col": 8,
+            "piece": null
+          }
+        ],
+        [
+          {
+            "row": 6,
+            "col": 0,
+            "piece": {
+              "id": "sente-pawn-9",
+              "type": "pawn",
+              "player": "sente",
+              "isPromoted": false
+            }
+          },
+          {
+            "row": 6,
+            "col": 1,
+            "piece": {
+              "id": "sente-pawn-8",
+              "type": "pawn",
+              "player": "sente",
+              "isPromoted": false
+            }
+          },
+          {
+            "row": 6,
+            "col": 2,
+            "piece": null
+          },
+          {
+            "row": 6,
+            "col": 3,
+            "piece": null
+          },
+          {
+            "row": 6,
+            "col": 4,
+            "piece": {
+              "id": "sente-pawn-5",
+              "type": "pawn",
+              "player": "sente",
+              "isPromoted": false
+            }
+          },
+          {
+            "row": 6,
+            "col": 5,
+            "piece": {
+              "id": "sente-pawn-4",
+              "type": "pawn",
+              "player": "sente",
+              "isPromoted": false
+            }
+          },
+          {
+            "row": 6,
+            "col": 6,
+            "piece": {
+              "id": "sente-pawn-3",
+              "type": "pawn",
+              "player": "sente",
+              "isPromoted": false
+            }
+          },
+          {
+            "row": 6,
+            "col": 7,
+            "piece": {
+              "id": "sente-pawn-2",
+              "type": "pawn",
+              "player": "sente",
+              "isPromoted": false
+            }
+          },
+          {
+            "row": 6,
+            "col": 8,
+            "piece": {
+              "id": "sente-pawn-1",
+              "type": "pawn",
+              "player": "sente",
+              "isPromoted": false
+            }
+          }
+        ],
+        [
+          {
+            "row": 7,
+            "col": 0,
+            "piece": null
+          },
+          {
+            "row": 7,
+            "col": 1,
+            "piece": {
+              "id": "sente-bishop-8",
+              "type": "bishop",
+              "player": "sente",
+              "isPromoted": false
+            }
+          },
+          {
+            "row": 7,
+            "col": 2,
+            "piece": null
+          },
+          {
+            "row": 7,
+            "col": 3,
+            "piece": null
+          },
+          {
+            "row": 7,
+            "col": 4,
+            "piece": null
+          },
+          {
+            "row": 7,
+            "col": 5,
+            "piece": null
+          },
+          {
+            "row": 7,
+            "col": 6,
+            "piece": null
+          },
+          {
+            "row": 7,
+            "col": 7,
+            "piece": {
+              "id": "sente-rook-2",
+              "type": "rook",
+              "player": "sente",
+              "isPromoted": false
+            }
+          },
+          {
+            "row": 7,
+            "col": 8,
+            "piece": null
+          }
+        ],
+        [
+          {
+            "row": 8,
+            "col": 0,
+            "piece": {
+              "id": "sente-lance-9",
+              "type": "lance",
+              "player": "sente",
+              "isPromoted": false
+            }
+          },
+          {
+            "row": 8,
+            "col": 1,
+            "piece": {
+              "id": "sente-knight-8",
+              "type": "knight",
+              "player": "sente",
+              "isPromoted": false
+            }
+          },
+          {
+            "row": 8,
+            "col": 2,
+            "piece": {
+              "id": "sente-silver-7",
+              "type": "silver",
+              "player": "sente",
+              "isPromoted": false
+            }
+          },
+          {
+            "row": 8,
+            "col": 3,
+            "piece": {
+              "id": "sente-gold-6",
+              "type": "gold",
+              "player": "sente",
+              "isPromoted": false
+            }
+          },
+          {
+            "row": 8,
+            "col": 4,
+            "piece": {
+              "id": "sente-king-5",
+              "type": "king",
+              "player": "sente",
+              "isPromoted": false
+            }
+          },
+          {
+            "row": 8,
+            "col": 5,
+            "piece": {
+              "id": "sente-gold-4",
+              "type": "gold",
+              "player": "sente",
+              "isPromoted": false
+            }
+          },
+          {
+            "row": 8,
+            "col": 6,
+            "piece": {
+              "id": "sente-silver-3",
+              "type": "silver",
+              "player": "sente",
+              "isPromoted": false
+            }
+          },
+          {
+            "row": 8,
+            "col": 7,
+            "piece": {
+              "id": "sente-knight-2",
+              "type": "knight",
+              "player": "sente",
+              "isPromoted": false
+            }
+          },
+          {
+            "row": 8,
+            "col": 8,
+            "piece": {
+              "id": "sente-lance-1",
+              "type": "lance",
+              "player": "sente",
+              "isPromoted": false
+            }
+          }
+        ]
+      ],
+      "senteHand": [],
+      "goteHand": [],
+      "turn": "gote",
+      "moveNumber": 4,
+      "status": "ended"
+    },
+    "history": [
+      {
+        "moveNumber": 1,
+        "player": "sente",
+        "to": {
+          "row": 5,
+          "col": 2
+        },
+        "pieceType": "pawn",
+        "promotion": "none",
+        "notation": "▲7六歩",
+        "kind": "move",
+        "from": {
+          "row": 6,
+          "col": 2
+        },
+        "capturedPieceType": null
+      },
+      {
+        "moveNumber": 2,
+        "player": "gote",
+        "to": {
+          "row": 3,
+          "col": 6
+        },
+        "pieceType": "pawn",
+        "promotion": "none",
+        "notation": "△3四歩",
+        "kind": "move",
+        "from": {
+          "row": 2,
+          "col": 6
+        },
+        "capturedPieceType": null
+      },
+      {
+        "moveNumber": 3,
+        "player": "sente",
+        "to": {
+          "row": 5,
+          "col": 3
+        },
+        "pieceType": "pawn",
+        "promotion": "none",
+        "notation": "▲6六歩",
+        "kind": "move",
+        "from": {
+          "row": 6,
+          "col": 3
+        },
+        "capturedPieceType": null
+      }
+    ],
+    "lastMove": {
+      "moveNumber": 3,
+      "player": "sente",
+      "to": {
+        "row": 5,
+        "col": 3
+      },
+      "pieceType": "pawn",
+      "promotion": "none",
+      "notation": "▲6六歩",
+      "kind": "move",
+      "from": {
+        "row": 6,
+        "col": 3
+      },
+      "capturedPieceType": null
+    },
+    "result": {
+      "winner": "sente",
+      "loser": "gote",
+      "endReason": "resignation",
+      "details": "後手が投了"
+    },
+    "foulHistory": [],
+    "positionHistory": [
+      {
+        "key": "[\"shogi-position-v1\",\"sente\",[[\"gote\",\"lance\",0],[\"gote\",\"knight\",0],[\"gote\",\"silver\",0],[\"gote\",\"gold\",0],[\"gote\",\"king\",0],[\"gote\",\"gold\",0],[\"gote\",\"silver\",0],[\"gote\",\"knight\",0],[\"gote\",\"lance\",0],null,[\"gote\",\"rook\",0],null,null,null,null,null,[\"gote\",\"bishop\",0],null,[\"gote\",\"pawn\",0],[\"gote\",\"pawn\",0],[\"gote\",\"pawn\",0],[\"gote\",\"pawn\",0],[\"gote\",\"pawn\",0],[\"gote\",\"pawn\",0],[\"gote\",\"pawn\",0],[\"gote\",\"pawn\",0],[\"gote\",\"pawn\",0],null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,[\"sente\",\"pawn\",0],[\"sente\",\"pawn\",0],[\"sente\",\"pawn\",0],[\"sente\",\"pawn\",0],[\"sente\",\"pawn\",0],[\"sente\",\"pawn\",0],[\"sente\",\"pawn\",0],[\"sente\",\"pawn\",0],[\"sente\",\"pawn\",0],null,[\"sente\",\"bishop\",0],null,null,null,null,null,[\"sente\",\"rook\",0],null,[\"sente\",\"lance\",0],[\"sente\",\"knight\",0],[\"sente\",\"silver\",0],[\"sente\",\"gold\",0],[\"sente\",\"king\",0],[\"sente\",\"gold\",0],[\"sente\",\"silver\",0],[\"sente\",\"knight\",0],[\"sente\",\"lance\",0]],[0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0]]",
+        "historyIndex": 0,
+        "movedBy": null,
+        "gaveCheck": false
+      },
+      {
+        "key": "[\"shogi-position-v1\",\"gote\",[[\"gote\",\"lance\",0],[\"gote\",\"knight\",0],[\"gote\",\"silver\",0],[\"gote\",\"gold\",0],[\"gote\",\"king\",0],[\"gote\",\"gold\",0],[\"gote\",\"silver\",0],[\"gote\",\"knight\",0],[\"gote\",\"lance\",0],null,[\"gote\",\"rook\",0],null,null,null,null,null,[\"gote\",\"bishop\",0],null,[\"gote\",\"pawn\",0],[\"gote\",\"pawn\",0],[\"gote\",\"pawn\",0],[\"gote\",\"pawn\",0],[\"gote\",\"pawn\",0],[\"gote\",\"pawn\",0],[\"gote\",\"pawn\",0],[\"gote\",\"pawn\",0],[\"gote\",\"pawn\",0],null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,[\"sente\",\"pawn\",0],null,null,null,null,null,null,[\"sente\",\"pawn\",0],[\"sente\",\"pawn\",0],null,[\"sente\",\"pawn\",0],[\"sente\",\"pawn\",0],[\"sente\",\"pawn\",0],[\"sente\",\"pawn\",0],[\"sente\",\"pawn\",0],[\"sente\",\"pawn\",0],null,[\"sente\",\"bishop\",0],null,null,null,null,null,[\"sente\",\"rook\",0],null,[\"sente\",\"lance\",0],[\"sente\",\"knight\",0],[\"sente\",\"silver\",0],[\"sente\",\"gold\",0],[\"sente\",\"king\",0],[\"sente\",\"gold\",0],[\"sente\",\"silver\",0],[\"sente\",\"knight\",0],[\"sente\",\"lance\",0]],[0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0]]",
+        "historyIndex": 1,
+        "movedBy": "sente",
+        "gaveCheck": false
+      },
+      {
+        "key": "[\"shogi-position-v1\",\"sente\",[[\"gote\",\"lance\",0],[\"gote\",\"knight\",0],[\"gote\",\"silver\",0],[\"gote\",\"gold\",0],[\"gote\",\"king\",0],[\"gote\",\"gold\",0],[\"gote\",\"silver\",0],[\"gote\",\"knight\",0],[\"gote\",\"lance\",0],null,[\"gote\",\"rook\",0],null,null,null,null,null,[\"gote\",\"bishop\",0],null,[\"gote\",\"pawn\",0],[\"gote\",\"pawn\",0],[\"gote\",\"pawn\",0],[\"gote\",\"pawn\",0],[\"gote\",\"pawn\",0],[\"gote\",\"pawn\",0],null,[\"gote\",\"pawn\",0],[\"gote\",\"pawn\",0],null,null,null,null,null,null,[\"gote\",\"pawn\",0],null,null,null,null,null,null,null,null,null,null,null,null,null,[\"sente\",\"pawn\",0],null,null,null,null,null,null,[\"sente\",\"pawn\",0],[\"sente\",\"pawn\",0],null,[\"sente\",\"pawn\",0],[\"sente\",\"pawn\",0],[\"sente\",\"pawn\",0],[\"sente\",\"pawn\",0],[\"sente\",\"pawn\",0],[\"sente\",\"pawn\",0],null,[\"sente\",\"bishop\",0],null,null,null,null,null,[\"sente\",\"rook\",0],null,[\"sente\",\"lance\",0],[\"sente\",\"knight\",0],[\"sente\",\"silver\",0],[\"sente\",\"gold\",0],[\"sente\",\"king\",0],[\"sente\",\"gold\",0],[\"sente\",\"silver\",0],[\"sente\",\"knight\",0],[\"sente\",\"lance\",0]],[0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0]]",
+        "historyIndex": 2,
+        "movedBy": "gote",
+        "gaveCheck": false
+      },
+      {
+        "key": "[\"shogi-position-v1\",\"gote\",[[\"gote\",\"lance\",0],[\"gote\",\"knight\",0],[\"gote\",\"silver\",0],[\"gote\",\"gold\",0],[\"gote\",\"king\",0],[\"gote\",\"gold\",0],[\"gote\",\"silver\",0],[\"gote\",\"knight\",0],[\"gote\",\"lance\",0],null,[\"gote\",\"rook\",0],null,null,null,null,null,[\"gote\",\"bishop\",0],null,[\"gote\",\"pawn\",0],[\"gote\",\"pawn\",0],[\"gote\",\"pawn\",0],[\"gote\",\"pawn\",0],[\"gote\",\"pawn\",0],[\"gote\",\"pawn\",0],null,[\"gote\",\"pawn\",0],[\"gote\",\"pawn\",0],null,null,null,null,null,null,[\"gote\",\"pawn\",0],null,null,null,null,null,null,null,null,null,null,null,null,null,[\"sente\",\"pawn\",0],[\"sente\",\"pawn\",0],null,null,null,null,null,[\"sente\",\"pawn\",0],[\"sente\",\"pawn\",0],null,null,[\"sente\",\"pawn\",0],[\"sente\",\"pawn\",0],[\"sente\",\"pawn\",0],[\"sente\",\"pawn\",0],[\"sente\",\"pawn\",0],null,[\"sente\",\"bishop\",0],null,null,null,null,null,[\"sente\",\"rook\",0],null,[\"sente\",\"lance\",0],[\"sente\",\"knight\",0],[\"sente\",\"silver\",0],[\"sente\",\"gold\",0],[\"sente\",\"king\",0],[\"sente\",\"gold\",0],[\"sente\",\"silver\",0],[\"sente\",\"knight\",0],[\"sente\",\"lance\",0]],[0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0]]",
+        "historyIndex": 3,
+        "movedBy": "sente",
+        "gaveCheck": false
+      }
+    ],
+    "positionSnapshots": [
+      {
+        "historyIndex": 0,
+        "squares": [
+          [
+            {
+              "row": 0,
+              "col": 0,
+              "piece": {
+                "id": "gote-lance-9",
+                "type": "lance",
+                "player": "gote",
+                "isPromoted": false
+              }
+            },
+            {
+              "row": 0,
+              "col": 1,
+              "piece": {
+                "id": "gote-knight-8",
+                "type": "knight",
+                "player": "gote",
+                "isPromoted": false
+              }
+            },
+            {
+              "row": 0,
+              "col": 2,
+              "piece": {
+                "id": "gote-silver-7",
+                "type": "silver",
+                "player": "gote",
+                "isPromoted": false
+              }
+            },
+            {
+              "row": 0,
+              "col": 3,
+              "piece": {
+                "id": "gote-gold-6",
+                "type": "gold",
+                "player": "gote",
+                "isPromoted": false
+              }
+            },
+            {
+              "row": 0,
+              "col": 4,
+              "piece": {
+                "id": "gote-king-5",
+                "type": "king",
+                "player": "gote",
+                "isPromoted": false
+              }
+            },
+            {
+              "row": 0,
+              "col": 5,
+              "piece": {
+                "id": "gote-gold-4",
+                "type": "gold",
+                "player": "gote",
+                "isPromoted": false
+              }
+            },
+            {
+              "row": 0,
+              "col": 6,
+              "piece": {
+                "id": "gote-silver-3",
+                "type": "silver",
+                "player": "gote",
+                "isPromoted": false
+              }
+            },
+            {
+              "row": 0,
+              "col": 7,
+              "piece": {
+                "id": "gote-knight-2",
+                "type": "knight",
+                "player": "gote",
+                "isPromoted": false
+              }
+            },
+            {
+              "row": 0,
+              "col": 8,
+              "piece": {
+                "id": "gote-lance-1",
+                "type": "lance",
+                "player": "gote",
+                "isPromoted": false
+              }
+            }
+          ],
+          [
+            {
+              "row": 1,
+              "col": 0,
+              "piece": null
+            },
+            {
+              "row": 1,
+              "col": 1,
+              "piece": {
+                "id": "gote-rook-8",
+                "type": "rook",
+                "player": "gote",
+                "isPromoted": false
+              }
+            },
+            {
+              "row": 1,
+              "col": 2,
+              "piece": null
+            },
+            {
+              "row": 1,
+              "col": 3,
+              "piece": null
+            },
+            {
+              "row": 1,
+              "col": 4,
+              "piece": null
+            },
+            {
+              "row": 1,
+              "col": 5,
+              "piece": null
+            },
+            {
+              "row": 1,
+              "col": 6,
+              "piece": null
+            },
+            {
+              "row": 1,
+              "col": 7,
+              "piece": {
+                "id": "gote-bishop-2",
+                "type": "bishop",
+                "player": "gote",
+                "isPromoted": false
+              }
+            },
+            {
+              "row": 1,
+              "col": 8,
+              "piece": null
+            }
+          ],
+          [
+            {
+              "row": 2,
+              "col": 0,
+              "piece": {
+                "id": "gote-pawn-9",
+                "type": "pawn",
+                "player": "gote",
+                "isPromoted": false
+              }
+            },
+            {
+              "row": 2,
+              "col": 1,
+              "piece": {
+                "id": "gote-pawn-8",
+                "type": "pawn",
+                "player": "gote",
+                "isPromoted": false
+              }
+            },
+            {
+              "row": 2,
+              "col": 2,
+              "piece": {
+                "id": "gote-pawn-7",
+                "type": "pawn",
+                "player": "gote",
+                "isPromoted": false
+              }
+            },
+            {
+              "row": 2,
+              "col": 3,
+              "piece": {
+                "id": "gote-pawn-6",
+                "type": "pawn",
+                "player": "gote",
+                "isPromoted": false
+              }
+            },
+            {
+              "row": 2,
+              "col": 4,
+              "piece": {
+                "id": "gote-pawn-5",
+                "type": "pawn",
+                "player": "gote",
+                "isPromoted": false
+              }
+            },
+            {
+              "row": 2,
+              "col": 5,
+              "piece": {
+                "id": "gote-pawn-4",
+                "type": "pawn",
+                "player": "gote",
+                "isPromoted": false
+              }
+            },
+            {
+              "row": 2,
+              "col": 6,
+              "piece": {
+                "id": "gote-pawn-3",
+                "type": "pawn",
+                "player": "gote",
+                "isPromoted": false
+              }
+            },
+            {
+              "row": 2,
+              "col": 7,
+              "piece": {
+                "id": "gote-pawn-2",
+                "type": "pawn",
+                "player": "gote",
+                "isPromoted": false
+              }
+            },
+            {
+              "row": 2,
+              "col": 8,
+              "piece": {
+                "id": "gote-pawn-1",
+                "type": "pawn",
+                "player": "gote",
+                "isPromoted": false
+              }
+            }
+          ],
+          [
+            {
+              "row": 3,
+              "col": 0,
+              "piece": null
+            },
+            {
+              "row": 3,
+              "col": 1,
+              "piece": null
+            },
+            {
+              "row": 3,
+              "col": 2,
+              "piece": null
+            },
+            {
+              "row": 3,
+              "col": 3,
+              "piece": null
+            },
+            {
+              "row": 3,
+              "col": 4,
+              "piece": null
+            },
+            {
+              "row": 3,
+              "col": 5,
+              "piece": null
+            },
+            {
+              "row": 3,
+              "col": 6,
+              "piece": null
+            },
+            {
+              "row": 3,
+              "col": 7,
+              "piece": null
+            },
+            {
+              "row": 3,
+              "col": 8,
+              "piece": null
+            }
+          ],
+          [
+            {
+              "row": 4,
+              "col": 0,
+              "piece": null
+            },
+            {
+              "row": 4,
+              "col": 1,
+              "piece": null
+            },
+            {
+              "row": 4,
+              "col": 2,
+              "piece": null
+            },
+            {
+              "row": 4,
+              "col": 3,
+              "piece": null
+            },
+            {
+              "row": 4,
+              "col": 4,
+              "piece": null
+            },
+            {
+              "row": 4,
+              "col": 5,
+              "piece": null
+            },
+            {
+              "row": 4,
+              "col": 6,
+              "piece": null
+            },
+            {
+              "row": 4,
+              "col": 7,
+              "piece": null
+            },
+            {
+              "row": 4,
+              "col": 8,
+              "piece": null
+            }
+          ],
+          [
+            {
+              "row": 5,
+              "col": 0,
+              "piece": null
+            },
+            {
+              "row": 5,
+              "col": 1,
+              "piece": null
+            },
+            {
+              "row": 5,
+              "col": 2,
+              "piece": null
+            },
+            {
+              "row": 5,
+              "col": 3,
+              "piece": null
+            },
+            {
+              "row": 5,
+              "col": 4,
+              "piece": null
+            },
+            {
+              "row": 5,
+              "col": 5,
+              "piece": null
+            },
+            {
+              "row": 5,
+              "col": 6,
+              "piece": null
+            },
+            {
+              "row": 5,
+              "col": 7,
+              "piece": null
+            },
+            {
+              "row": 5,
+              "col": 8,
+              "piece": null
+            }
+          ],
+          [
+            {
+              "row": 6,
+              "col": 0,
+              "piece": {
+                "id": "sente-pawn-9",
+                "type": "pawn",
+                "player": "sente",
+                "isPromoted": false
+              }
+            },
+            {
+              "row": 6,
+              "col": 1,
+              "piece": {
+                "id": "sente-pawn-8",
+                "type": "pawn",
+                "player": "sente",
+                "isPromoted": false
+              }
+            },
+            {
+              "row": 6,
+              "col": 2,
+              "piece": {
+                "id": "sente-pawn-7",
+                "type": "pawn",
+                "player": "sente",
+                "isPromoted": false
+              }
+            },
+            {
+              "row": 6,
+              "col": 3,
+              "piece": {
+                "id": "sente-pawn-6",
+                "type": "pawn",
+                "player": "sente",
+                "isPromoted": false
+              }
+            },
+            {
+              "row": 6,
+              "col": 4,
+              "piece": {
+                "id": "sente-pawn-5",
+                "type": "pawn",
+                "player": "sente",
+                "isPromoted": false
+              }
+            },
+            {
+              "row": 6,
+              "col": 5,
+              "piece": {
+                "id": "sente-pawn-4",
+                "type": "pawn",
+                "player": "sente",
+                "isPromoted": false
+              }
+            },
+            {
+              "row": 6,
+              "col": 6,
+              "piece": {
+                "id": "sente-pawn-3",
+                "type": "pawn",
+                "player": "sente",
+                "isPromoted": false
+              }
+            },
+            {
+              "row": 6,
+              "col": 7,
+              "piece": {
+                "id": "sente-pawn-2",
+                "type": "pawn",
+                "player": "sente",
+                "isPromoted": false
+              }
+            },
+            {
+              "row": 6,
+              "col": 8,
+              "piece": {
+                "id": "sente-pawn-1",
+                "type": "pawn",
+                "player": "sente",
+                "isPromoted": false
+              }
+            }
+          ],
+          [
+            {
+              "row": 7,
+              "col": 0,
+              "piece": null
+            },
+            {
+              "row": 7,
+              "col": 1,
+              "piece": {
+                "id": "sente-bishop-8",
+                "type": "bishop",
+                "player": "sente",
+                "isPromoted": false
+              }
+            },
+            {
+              "row": 7,
+              "col": 2,
+              "piece": null
+            },
+            {
+              "row": 7,
+              "col": 3,
+              "piece": null
+            },
+            {
+              "row": 7,
+              "col": 4,
+              "piece": null
+            },
+            {
+              "row": 7,
+              "col": 5,
+              "piece": null
+            },
+            {
+              "row": 7,
+              "col": 6,
+              "piece": null
+            },
+            {
+              "row": 7,
+              "col": 7,
+              "piece": {
+                "id": "sente-rook-2",
+                "type": "rook",
+                "player": "sente",
+                "isPromoted": false
+              }
+            },
+            {
+              "row": 7,
+              "col": 8,
+              "piece": null
+            }
+          ],
+          [
+            {
+              "row": 8,
+              "col": 0,
+              "piece": {
+                "id": "sente-lance-9",
+                "type": "lance",
+                "player": "sente",
+                "isPromoted": false
+              }
+            },
+            {
+              "row": 8,
+              "col": 1,
+              "piece": {
+                "id": "sente-knight-8",
+                "type": "knight",
+                "player": "sente",
+                "isPromoted": false
+              }
+            },
+            {
+              "row": 8,
+              "col": 2,
+              "piece": {
+                "id": "sente-silver-7",
+                "type": "silver",
+                "player": "sente",
+                "isPromoted": false
+              }
+            },
+            {
+              "row": 8,
+              "col": 3,
+              "piece": {
+                "id": "sente-gold-6",
+                "type": "gold",
+                "player": "sente",
+                "isPromoted": false
+              }
+            },
+            {
+              "row": 8,
+              "col": 4,
+              "piece": {
+                "id": "sente-king-5",
+                "type": "king",
+                "player": "sente",
+                "isPromoted": false
+              }
+            },
+            {
+              "row": 8,
+              "col": 5,
+              "piece": {
+                "id": "sente-gold-4",
+                "type": "gold",
+                "player": "sente",
+                "isPromoted": false
+              }
+            },
+            {
+              "row": 8,
+              "col": 6,
+              "piece": {
+                "id": "sente-silver-3",
+                "type": "silver",
+                "player": "sente",
+                "isPromoted": false
+              }
+            },
+            {
+              "row": 8,
+              "col": 7,
+              "piece": {
+                "id": "sente-knight-2",
+                "type": "knight",
+                "player": "sente",
+                "isPromoted": false
+              }
+            },
+            {
+              "row": 8,
+              "col": 8,
+              "piece": {
+                "id": "sente-lance-1",
+                "type": "lance",
+                "player": "sente",
+                "isPromoted": false
+              }
+            }
+          ]
+        ],
+        "senteHand": [],
+        "goteHand": [],
+        "turn": "sente",
+        "moveNumber": 1,
+        "status": "active",
+        "lastMove": null,
+        "result": null
+      },
+      {
+        "historyIndex": 1,
+        "squares": [
+          [
+            {
+              "row": 0,
+              "col": 0,
+              "piece": {
+                "id": "gote-lance-9",
+                "type": "lance",
+                "player": "gote",
+                "isPromoted": false
+              }
+            },
+            {
+              "row": 0,
+              "col": 1,
+              "piece": {
+                "id": "gote-knight-8",
+                "type": "knight",
+                "player": "gote",
+                "isPromoted": false
+              }
+            },
+            {
+              "row": 0,
+              "col": 2,
+              "piece": {
+                "id": "gote-silver-7",
+                "type": "silver",
+                "player": "gote",
+                "isPromoted": false
+              }
+            },
+            {
+              "row": 0,
+              "col": 3,
+              "piece": {
+                "id": "gote-gold-6",
+                "type": "gold",
+                "player": "gote",
+                "isPromoted": false
+              }
+            },
+            {
+              "row": 0,
+              "col": 4,
+              "piece": {
+                "id": "gote-king-5",
+                "type": "king",
+                "player": "gote",
+                "isPromoted": false
+              }
+            },
+            {
+              "row": 0,
+              "col": 5,
+              "piece": {
+                "id": "gote-gold-4",
+                "type": "gold",
+                "player": "gote",
+                "isPromoted": false
+              }
+            },
+            {
+              "row": 0,
+              "col": 6,
+              "piece": {
+                "id": "gote-silver-3",
+                "type": "silver",
+                "player": "gote",
+                "isPromoted": false
+              }
+            },
+            {
+              "row": 0,
+              "col": 7,
+              "piece": {
+                "id": "gote-knight-2",
+                "type": "knight",
+                "player": "gote",
+                "isPromoted": false
+              }
+            },
+            {
+              "row": 0,
+              "col": 8,
+              "piece": {
+                "id": "gote-lance-1",
+                "type": "lance",
+                "player": "gote",
+                "isPromoted": false
+              }
+            }
+          ],
+          [
+            {
+              "row": 1,
+              "col": 0,
+              "piece": null
+            },
+            {
+              "row": 1,
+              "col": 1,
+              "piece": {
+                "id": "gote-rook-8",
+                "type": "rook",
+                "player": "gote",
+                "isPromoted": false
+              }
+            },
+            {
+              "row": 1,
+              "col": 2,
+              "piece": null
+            },
+            {
+              "row": 1,
+              "col": 3,
+              "piece": null
+            },
+            {
+              "row": 1,
+              "col": 4,
+              "piece": null
+            },
+            {
+              "row": 1,
+              "col": 5,
+              "piece": null
+            },
+            {
+              "row": 1,
+              "col": 6,
+              "piece": null
+            },
+            {
+              "row": 1,
+              "col": 7,
+              "piece": {
+                "id": "gote-bishop-2",
+                "type": "bishop",
+                "player": "gote",
+                "isPromoted": false
+              }
+            },
+            {
+              "row": 1,
+              "col": 8,
+              "piece": null
+            }
+          ],
+          [
+            {
+              "row": 2,
+              "col": 0,
+              "piece": {
+                "id": "gote-pawn-9",
+                "type": "pawn",
+                "player": "gote",
+                "isPromoted": false
+              }
+            },
+            {
+              "row": 2,
+              "col": 1,
+              "piece": {
+                "id": "gote-pawn-8",
+                "type": "pawn",
+                "player": "gote",
+                "isPromoted": false
+              }
+            },
+            {
+              "row": 2,
+              "col": 2,
+              "piece": {
+                "id": "gote-pawn-7",
+                "type": "pawn",
+                "player": "gote",
+                "isPromoted": false
+              }
+            },
+            {
+              "row": 2,
+              "col": 3,
+              "piece": {
+                "id": "gote-pawn-6",
+                "type": "pawn",
+                "player": "gote",
+                "isPromoted": false
+              }
+            },
+            {
+              "row": 2,
+              "col": 4,
+              "piece": {
+                "id": "gote-pawn-5",
+                "type": "pawn",
+                "player": "gote",
+                "isPromoted": false
+              }
+            },
+            {
+              "row": 2,
+              "col": 5,
+              "piece": {
+                "id": "gote-pawn-4",
+                "type": "pawn",
+                "player": "gote",
+                "isPromoted": false
+              }
+            },
+            {
+              "row": 2,
+              "col": 6,
+              "piece": {
+                "id": "gote-pawn-3",
+                "type": "pawn",
+                "player": "gote",
+                "isPromoted": false
+              }
+            },
+            {
+              "row": 2,
+              "col": 7,
+              "piece": {
+                "id": "gote-pawn-2",
+                "type": "pawn",
+                "player": "gote",
+                "isPromoted": false
+              }
+            },
+            {
+              "row": 2,
+              "col": 8,
+              "piece": {
+                "id": "gote-pawn-1",
+                "type": "pawn",
+                "player": "gote",
+                "isPromoted": false
+              }
+            }
+          ],
+          [
+            {
+              "row": 3,
+              "col": 0,
+              "piece": null
+            },
+            {
+              "row": 3,
+              "col": 1,
+              "piece": null
+            },
+            {
+              "row": 3,
+              "col": 2,
+              "piece": null
+            },
+            {
+              "row": 3,
+              "col": 3,
+              "piece": null
+            },
+            {
+              "row": 3,
+              "col": 4,
+              "piece": null
+            },
+            {
+              "row": 3,
+              "col": 5,
+              "piece": null
+            },
+            {
+              "row": 3,
+              "col": 6,
+              "piece": null
+            },
+            {
+              "row": 3,
+              "col": 7,
+              "piece": null
+            },
+            {
+              "row": 3,
+              "col": 8,
+              "piece": null
+            }
+          ],
+          [
+            {
+              "row": 4,
+              "col": 0,
+              "piece": null
+            },
+            {
+              "row": 4,
+              "col": 1,
+              "piece": null
+            },
+            {
+              "row": 4,
+              "col": 2,
+              "piece": null
+            },
+            {
+              "row": 4,
+              "col": 3,
+              "piece": null
+            },
+            {
+              "row": 4,
+              "col": 4,
+              "piece": null
+            },
+            {
+              "row": 4,
+              "col": 5,
+              "piece": null
+            },
+            {
+              "row": 4,
+              "col": 6,
+              "piece": null
+            },
+            {
+              "row": 4,
+              "col": 7,
+              "piece": null
+            },
+            {
+              "row": 4,
+              "col": 8,
+              "piece": null
+            }
+          ],
+          [
+            {
+              "row": 5,
+              "col": 0,
+              "piece": null
+            },
+            {
+              "row": 5,
+              "col": 1,
+              "piece": null
+            },
+            {
+              "row": 5,
+              "col": 2,
+              "piece": {
+                "id": "sente-pawn-7",
+                "type": "pawn",
+                "player": "sente",
+                "isPromoted": false
+              }
+            },
+            {
+              "row": 5,
+              "col": 3,
+              "piece": null
+            },
+            {
+              "row": 5,
+              "col": 4,
+              "piece": null
+            },
+            {
+              "row": 5,
+              "col": 5,
+              "piece": null
+            },
+            {
+              "row": 5,
+              "col": 6,
+              "piece": null
+            },
+            {
+              "row": 5,
+              "col": 7,
+              "piece": null
+            },
+            {
+              "row": 5,
+              "col": 8,
+              "piece": null
+            }
+          ],
+          [
+            {
+              "row": 6,
+              "col": 0,
+              "piece": {
+                "id": "sente-pawn-9",
+                "type": "pawn",
+                "player": "sente",
+                "isPromoted": false
+              }
+            },
+            {
+              "row": 6,
+              "col": 1,
+              "piece": {
+                "id": "sente-pawn-8",
+                "type": "pawn",
+                "player": "sente",
+                "isPromoted": false
+              }
+            },
+            {
+              "row": 6,
+              "col": 2,
+              "piece": null
+            },
+            {
+              "row": 6,
+              "col": 3,
+              "piece": {
+                "id": "sente-pawn-6",
+                "type": "pawn",
+                "player": "sente",
+                "isPromoted": false
+              }
+            },
+            {
+              "row": 6,
+              "col": 4,
+              "piece": {
+                "id": "sente-pawn-5",
+                "type": "pawn",
+                "player": "sente",
+                "isPromoted": false
+              }
+            },
+            {
+              "row": 6,
+              "col": 5,
+              "piece": {
+                "id": "sente-pawn-4",
+                "type": "pawn",
+                "player": "sente",
+                "isPromoted": false
+              }
+            },
+            {
+              "row": 6,
+              "col": 6,
+              "piece": {
+                "id": "sente-pawn-3",
+                "type": "pawn",
+                "player": "sente",
+                "isPromoted": false
+              }
+            },
+            {
+              "row": 6,
+              "col": 7,
+              "piece": {
+                "id": "sente-pawn-2",
+                "type": "pawn",
+                "player": "sente",
+                "isPromoted": false
+              }
+            },
+            {
+              "row": 6,
+              "col": 8,
+              "piece": {
+                "id": "sente-pawn-1",
+                "type": "pawn",
+                "player": "sente",
+                "isPromoted": false
+              }
+            }
+          ],
+          [
+            {
+              "row": 7,
+              "col": 0,
+              "piece": null
+            },
+            {
+              "row": 7,
+              "col": 1,
+              "piece": {
+                "id": "sente-bishop-8",
+                "type": "bishop",
+                "player": "sente",
+                "isPromoted": false
+              }
+            },
+            {
+              "row": 7,
+              "col": 2,
+              "piece": null
+            },
+            {
+              "row": 7,
+              "col": 3,
+              "piece": null
+            },
+            {
+              "row": 7,
+              "col": 4,
+              "piece": null
+            },
+            {
+              "row": 7,
+              "col": 5,
+              "piece": null
+            },
+            {
+              "row": 7,
+              "col": 6,
+              "piece": null
+            },
+            {
+              "row": 7,
+              "col": 7,
+              "piece": {
+                "id": "sente-rook-2",
+                "type": "rook",
+                "player": "sente",
+                "isPromoted": false
+              }
+            },
+            {
+              "row": 7,
+              "col": 8,
+              "piece": null
+            }
+          ],
+          [
+            {
+              "row": 8,
+              "col": 0,
+              "piece": {
+                "id": "sente-lance-9",
+                "type": "lance",
+                "player": "sente",
+                "isPromoted": false
+              }
+            },
+            {
+              "row": 8,
+              "col": 1,
+              "piece": {
+                "id": "sente-knight-8",
+                "type": "knight",
+                "player": "sente",
+                "isPromoted": false
+              }
+            },
+            {
+              "row": 8,
+              "col": 2,
+              "piece": {
+                "id": "sente-silver-7",
+                "type": "silver",
+                "player": "sente",
+                "isPromoted": false
+              }
+            },
+            {
+              "row": 8,
+              "col": 3,
+              "piece": {
+                "id": "sente-gold-6",
+                "type": "gold",
+                "player": "sente",
+                "isPromoted": false
+              }
+            },
+            {
+              "row": 8,
+              "col": 4,
+              "piece": {
+                "id": "sente-king-5",
+                "type": "king",
+                "player": "sente",
+                "isPromoted": false
+              }
+            },
+            {
+              "row": 8,
+              "col": 5,
+              "piece": {
+                "id": "sente-gold-4",
+                "type": "gold",
+                "player": "sente",
+                "isPromoted": false
+              }
+            },
+            {
+              "row": 8,
+              "col": 6,
+              "piece": {
+                "id": "sente-silver-3",
+                "type": "silver",
+                "player": "sente",
+                "isPromoted": false
+              }
+            },
+            {
+              "row": 8,
+              "col": 7,
+              "piece": {
+                "id": "sente-knight-2",
+                "type": "knight",
+                "player": "sente",
+                "isPromoted": false
+              }
+            },
+            {
+              "row": 8,
+              "col": 8,
+              "piece": {
+                "id": "sente-lance-1",
+                "type": "lance",
+                "player": "sente",
+                "isPromoted": false
+              }
+            }
+          ]
+        ],
+        "senteHand": [],
+        "goteHand": [],
+        "turn": "gote",
+        "moveNumber": 2,
+        "status": "active",
+        "lastMove": {
+          "moveNumber": 1,
+          "player": "sente",
+          "to": {
+            "row": 5,
+            "col": 2
+          },
+          "pieceType": "pawn",
+          "promotion": "none",
+          "notation": "▲7六歩",
+          "kind": "move",
+          "from": {
+            "row": 6,
+            "col": 2
+          },
+          "capturedPieceType": null
+        },
+        "result": null
+      },
+      {
+        "historyIndex": 2,
+        "squares": [
+          [
+            {
+              "row": 0,
+              "col": 0,
+              "piece": {
+                "id": "gote-lance-9",
+                "type": "lance",
+                "player": "gote",
+                "isPromoted": false
+              }
+            },
+            {
+              "row": 0,
+              "col": 1,
+              "piece": {
+                "id": "gote-knight-8",
+                "type": "knight",
+                "player": "gote",
+                "isPromoted": false
+              }
+            },
+            {
+              "row": 0,
+              "col": 2,
+              "piece": {
+                "id": "gote-silver-7",
+                "type": "silver",
+                "player": "gote",
+                "isPromoted": false
+              }
+            },
+            {
+              "row": 0,
+              "col": 3,
+              "piece": {
+                "id": "gote-gold-6",
+                "type": "gold",
+                "player": "gote",
+                "isPromoted": false
+              }
+            },
+            {
+              "row": 0,
+              "col": 4,
+              "piece": {
+                "id": "gote-king-5",
+                "type": "king",
+                "player": "gote",
+                "isPromoted": false
+              }
+            },
+            {
+              "row": 0,
+              "col": 5,
+              "piece": {
+                "id": "gote-gold-4",
+                "type": "gold",
+                "player": "gote",
+                "isPromoted": false
+              }
+            },
+            {
+              "row": 0,
+              "col": 6,
+              "piece": {
+                "id": "gote-silver-3",
+                "type": "silver",
+                "player": "gote",
+                "isPromoted": false
+              }
+            },
+            {
+              "row": 0,
+              "col": 7,
+              "piece": {
+                "id": "gote-knight-2",
+                "type": "knight",
+                "player": "gote",
+                "isPromoted": false
+              }
+            },
+            {
+              "row": 0,
+              "col": 8,
+              "piece": {
+                "id": "gote-lance-1",
+                "type": "lance",
+                "player": "gote",
+                "isPromoted": false
+              }
+            }
+          ],
+          [
+            {
+              "row": 1,
+              "col": 0,
+              "piece": null
+            },
+            {
+              "row": 1,
+              "col": 1,
+              "piece": {
+                "id": "gote-rook-8",
+                "type": "rook",
+                "player": "gote",
+                "isPromoted": false
+              }
+            },
+            {
+              "row": 1,
+              "col": 2,
+              "piece": null
+            },
+            {
+              "row": 1,
+              "col": 3,
+              "piece": null
+            },
+            {
+              "row": 1,
+              "col": 4,
+              "piece": null
+            },
+            {
+              "row": 1,
+              "col": 5,
+              "piece": null
+            },
+            {
+              "row": 1,
+              "col": 6,
+              "piece": null
+            },
+            {
+              "row": 1,
+              "col": 7,
+              "piece": {
+                "id": "gote-bishop-2",
+                "type": "bishop",
+                "player": "gote",
+                "isPromoted": false
+              }
+            },
+            {
+              "row": 1,
+              "col": 8,
+              "piece": null
+            }
+          ],
+          [
+            {
+              "row": 2,
+              "col": 0,
+              "piece": {
+                "id": "gote-pawn-9",
+                "type": "pawn",
+                "player": "gote",
+                "isPromoted": false
+              }
+            },
+            {
+              "row": 2,
+              "col": 1,
+              "piece": {
+                "id": "gote-pawn-8",
+                "type": "pawn",
+                "player": "gote",
+                "isPromoted": false
+              }
+            },
+            {
+              "row": 2,
+              "col": 2,
+              "piece": {
+                "id": "gote-pawn-7",
+                "type": "pawn",
+                "player": "gote",
+                "isPromoted": false
+              }
+            },
+            {
+              "row": 2,
+              "col": 3,
+              "piece": {
+                "id": "gote-pawn-6",
+                "type": "pawn",
+                "player": "gote",
+                "isPromoted": false
+              }
+            },
+            {
+              "row": 2,
+              "col": 4,
+              "piece": {
+                "id": "gote-pawn-5",
+                "type": "pawn",
+                "player": "gote",
+                "isPromoted": false
+              }
+            },
+            {
+              "row": 2,
+              "col": 5,
+              "piece": {
+                "id": "gote-pawn-4",
+                "type": "pawn",
+                "player": "gote",
+                "isPromoted": false
+              }
+            },
+            {
+              "row": 2,
+              "col": 6,
+              "piece": null
+            },
+            {
+              "row": 2,
+              "col": 7,
+              "piece": {
+                "id": "gote-pawn-2",
+                "type": "pawn",
+                "player": "gote",
+                "isPromoted": false
+              }
+            },
+            {
+              "row": 2,
+              "col": 8,
+              "piece": {
+                "id": "gote-pawn-1",
+                "type": "pawn",
+                "player": "gote",
+                "isPromoted": false
+              }
+            }
+          ],
+          [
+            {
+              "row": 3,
+              "col": 0,
+              "piece": null
+            },
+            {
+              "row": 3,
+              "col": 1,
+              "piece": null
+            },
+            {
+              "row": 3,
+              "col": 2,
+              "piece": null
+            },
+            {
+              "row": 3,
+              "col": 3,
+              "piece": null
+            },
+            {
+              "row": 3,
+              "col": 4,
+              "piece": null
+            },
+            {
+              "row": 3,
+              "col": 5,
+              "piece": null
+            },
+            {
+              "row": 3,
+              "col": 6,
+              "piece": {
+                "id": "gote-pawn-3",
+                "type": "pawn",
+                "player": "gote",
+                "isPromoted": false
+              }
+            },
+            {
+              "row": 3,
+              "col": 7,
+              "piece": null
+            },
+            {
+              "row": 3,
+              "col": 8,
+              "piece": null
+            }
+          ],
+          [
+            {
+              "row": 4,
+              "col": 0,
+              "piece": null
+            },
+            {
+              "row": 4,
+              "col": 1,
+              "piece": null
+            },
+            {
+              "row": 4,
+              "col": 2,
+              "piece": null
+            },
+            {
+              "row": 4,
+              "col": 3,
+              "piece": null
+            },
+            {
+              "row": 4,
+              "col": 4,
+              "piece": null
+            },
+            {
+              "row": 4,
+              "col": 5,
+              "piece": null
+            },
+            {
+              "row": 4,
+              "col": 6,
+              "piece": null
+            },
+            {
+              "row": 4,
+              "col": 7,
+              "piece": null
+            },
+            {
+              "row": 4,
+              "col": 8,
+              "piece": null
+            }
+          ],
+          [
+            {
+              "row": 5,
+              "col": 0,
+              "piece": null
+            },
+            {
+              "row": 5,
+              "col": 1,
+              "piece": null
+            },
+            {
+              "row": 5,
+              "col": 2,
+              "piece": {
+                "id": "sente-pawn-7",
+                "type": "pawn",
+                "player": "sente",
+                "isPromoted": false
+              }
+            },
+            {
+              "row": 5,
+              "col": 3,
+              "piece": null
+            },
+            {
+              "row": 5,
+              "col": 4,
+              "piece": null
+            },
+            {
+              "row": 5,
+              "col": 5,
+              "piece": null
+            },
+            {
+              "row": 5,
+              "col": 6,
+              "piece": null
+            },
+            {
+              "row": 5,
+              "col": 7,
+              "piece": null
+            },
+            {
+              "row": 5,
+              "col": 8,
+              "piece": null
+            }
+          ],
+          [
+            {
+              "row": 6,
+              "col": 0,
+              "piece": {
+                "id": "sente-pawn-9",
+                "type": "pawn",
+                "player": "sente",
+                "isPromoted": false
+              }
+            },
+            {
+              "row": 6,
+              "col": 1,
+              "piece": {
+                "id": "sente-pawn-8",
+                "type": "pawn",
+                "player": "sente",
+                "isPromoted": false
+              }
+            },
+            {
+              "row": 6,
+              "col": 2,
+              "piece": null
+            },
+            {
+              "row": 6,
+              "col": 3,
+              "piece": {
+                "id": "sente-pawn-6",
+                "type": "pawn",
+                "player": "sente",
+                "isPromoted": false
+              }
+            },
+            {
+              "row": 6,
+              "col": 4,
+              "piece": {
+                "id": "sente-pawn-5",
+                "type": "pawn",
+                "player": "sente",
+                "isPromoted": false
+              }
+            },
+            {
+              "row": 6,
+              "col": 5,
+              "piece": {
+                "id": "sente-pawn-4",
+                "type": "pawn",
+                "player": "sente",
+                "isPromoted": false
+              }
+            },
+            {
+              "row": 6,
+              "col": 6,
+              "piece": {
+                "id": "sente-pawn-3",
+                "type": "pawn",
+                "player": "sente",
+                "isPromoted": false
+              }
+            },
+            {
+              "row": 6,
+              "col": 7,
+              "piece": {
+                "id": "sente-pawn-2",
+                "type": "pawn",
+                "player": "sente",
+                "isPromoted": false
+              }
+            },
+            {
+              "row": 6,
+              "col": 8,
+              "piece": {
+                "id": "sente-pawn-1",
+                "type": "pawn",
+                "player": "sente",
+                "isPromoted": false
+              }
+            }
+          ],
+          [
+            {
+              "row": 7,
+              "col": 0,
+              "piece": null
+            },
+            {
+              "row": 7,
+              "col": 1,
+              "piece": {
+                "id": "sente-bishop-8",
+                "type": "bishop",
+                "player": "sente",
+                "isPromoted": false
+              }
+            },
+            {
+              "row": 7,
+              "col": 2,
+              "piece": null
+            },
+            {
+              "row": 7,
+              "col": 3,
+              "piece": null
+            },
+            {
+              "row": 7,
+              "col": 4,
+              "piece": null
+            },
+            {
+              "row": 7,
+              "col": 5,
+              "piece": null
+            },
+            {
+              "row": 7,
+              "col": 6,
+              "piece": null
+            },
+            {
+              "row": 7,
+              "col": 7,
+              "piece": {
+                "id": "sente-rook-2",
+                "type": "rook",
+                "player": "sente",
+                "isPromoted": false
+              }
+            },
+            {
+              "row": 7,
+              "col": 8,
+              "piece": null
+            }
+          ],
+          [
+            {
+              "row": 8,
+              "col": 0,
+              "piece": {
+                "id": "sente-lance-9",
+                "type": "lance",
+                "player": "sente",
+                "isPromoted": false
+              }
+            },
+            {
+              "row": 8,
+              "col": 1,
+              "piece": {
+                "id": "sente-knight-8",
+                "type": "knight",
+                "player": "sente",
+                "isPromoted": false
+              }
+            },
+            {
+              "row": 8,
+              "col": 2,
+              "piece": {
+                "id": "sente-silver-7",
+                "type": "silver",
+                "player": "sente",
+                "isPromoted": false
+              }
+            },
+            {
+              "row": 8,
+              "col": 3,
+              "piece": {
+                "id": "sente-gold-6",
+                "type": "gold",
+                "player": "sente",
+                "isPromoted": false
+              }
+            },
+            {
+              "row": 8,
+              "col": 4,
+              "piece": {
+                "id": "sente-king-5",
+                "type": "king",
+                "player": "sente",
+                "isPromoted": false
+              }
+            },
+            {
+              "row": 8,
+              "col": 5,
+              "piece": {
+                "id": "sente-gold-4",
+                "type": "gold",
+                "player": "sente",
+                "isPromoted": false
+              }
+            },
+            {
+              "row": 8,
+              "col": 6,
+              "piece": {
+                "id": "sente-silver-3",
+                "type": "silver",
+                "player": "sente",
+                "isPromoted": false
+              }
+            },
+            {
+              "row": 8,
+              "col": 7,
+              "piece": {
+                "id": "sente-knight-2",
+                "type": "knight",
+                "player": "sente",
+                "isPromoted": false
+              }
+            },
+            {
+              "row": 8,
+              "col": 8,
+              "piece": {
+                "id": "sente-lance-1",
+                "type": "lance",
+                "player": "sente",
+                "isPromoted": false
+              }
+            }
+          ]
+        ],
+        "senteHand": [],
+        "goteHand": [],
+        "turn": "sente",
+        "moveNumber": 3,
+        "status": "active",
+        "lastMove": {
+          "moveNumber": 2,
+          "player": "gote",
+          "to": {
+            "row": 3,
+            "col": 6
+          },
+          "pieceType": "pawn",
+          "promotion": "none",
+          "notation": "△3四歩",
+          "kind": "move",
+          "from": {
+            "row": 2,
+            "col": 6
+          },
+          "capturedPieceType": null
+        },
+        "result": null
+      },
+      {
+        "historyIndex": 3,
+        "squares": [
+          [
+            {
+              "row": 0,
+              "col": 0,
+              "piece": {
+                "id": "gote-lance-9",
+                "type": "lance",
+                "player": "gote",
+                "isPromoted": false
+              }
+            },
+            {
+              "row": 0,
+              "col": 1,
+              "piece": {
+                "id": "gote-knight-8",
+                "type": "knight",
+                "player": "gote",
+                "isPromoted": false
+              }
+            },
+            {
+              "row": 0,
+              "col": 2,
+              "piece": {
+                "id": "gote-silver-7",
+                "type": "silver",
+                "player": "gote",
+                "isPromoted": false
+              }
+            },
+            {
+              "row": 0,
+              "col": 3,
+              "piece": {
+                "id": "gote-gold-6",
+                "type": "gold",
+                "player": "gote",
+                "isPromoted": false
+              }
+            },
+            {
+              "row": 0,
+              "col": 4,
+              "piece": {
+                "id": "gote-king-5",
+                "type": "king",
+                "player": "gote",
+                "isPromoted": false
+              }
+            },
+            {
+              "row": 0,
+              "col": 5,
+              "piece": {
+                "id": "gote-gold-4",
+                "type": "gold",
+                "player": "gote",
+                "isPromoted": false
+              }
+            },
+            {
+              "row": 0,
+              "col": 6,
+              "piece": {
+                "id": "gote-silver-3",
+                "type": "silver",
+                "player": "gote",
+                "isPromoted": false
+              }
+            },
+            {
+              "row": 0,
+              "col": 7,
+              "piece": {
+                "id": "gote-knight-2",
+                "type": "knight",
+                "player": "gote",
+                "isPromoted": false
+              }
+            },
+            {
+              "row": 0,
+              "col": 8,
+              "piece": {
+                "id": "gote-lance-1",
+                "type": "lance",
+                "player": "gote",
+                "isPromoted": false
+              }
+            }
+          ],
+          [
+            {
+              "row": 1,
+              "col": 0,
+              "piece": null
+            },
+            {
+              "row": 1,
+              "col": 1,
+              "piece": {
+                "id": "gote-rook-8",
+                "type": "rook",
+                "player": "gote",
+                "isPromoted": false
+              }
+            },
+            {
+              "row": 1,
+              "col": 2,
+              "piece": null
+            },
+            {
+              "row": 1,
+              "col": 3,
+              "piece": null
+            },
+            {
+              "row": 1,
+              "col": 4,
+              "piece": null
+            },
+            {
+              "row": 1,
+              "col": 5,
+              "piece": null
+            },
+            {
+              "row": 1,
+              "col": 6,
+              "piece": null
+            },
+            {
+              "row": 1,
+              "col": 7,
+              "piece": {
+                "id": "gote-bishop-2",
+                "type": "bishop",
+                "player": "gote",
+                "isPromoted": false
+              }
+            },
+            {
+              "row": 1,
+              "col": 8,
+              "piece": null
+            }
+          ],
+          [
+            {
+              "row": 2,
+              "col": 0,
+              "piece": {
+                "id": "gote-pawn-9",
+                "type": "pawn",
+                "player": "gote",
+                "isPromoted": false
+              }
+            },
+            {
+              "row": 2,
+              "col": 1,
+              "piece": {
+                "id": "gote-pawn-8",
+                "type": "pawn",
+                "player": "gote",
+                "isPromoted": false
+              }
+            },
+            {
+              "row": 2,
+              "col": 2,
+              "piece": {
+                "id": "gote-pawn-7",
+                "type": "pawn",
+                "player": "gote",
+                "isPromoted": false
+              }
+            },
+            {
+              "row": 2,
+              "col": 3,
+              "piece": {
+                "id": "gote-pawn-6",
+                "type": "pawn",
+                "player": "gote",
+                "isPromoted": false
+              }
+            },
+            {
+              "row": 2,
+              "col": 4,
+              "piece": {
+                "id": "gote-pawn-5",
+                "type": "pawn",
+                "player": "gote",
+                "isPromoted": false
+              }
+            },
+            {
+              "row": 2,
+              "col": 5,
+              "piece": {
+                "id": "gote-pawn-4",
+                "type": "pawn",
+                "player": "gote",
+                "isPromoted": false
+              }
+            },
+            {
+              "row": 2,
+              "col": 6,
+              "piece": null
+            },
+            {
+              "row": 2,
+              "col": 7,
+              "piece": {
+                "id": "gote-pawn-2",
+                "type": "pawn",
+                "player": "gote",
+                "isPromoted": false
+              }
+            },
+            {
+              "row": 2,
+              "col": 8,
+              "piece": {
+                "id": "gote-pawn-1",
+                "type": "pawn",
+                "player": "gote",
+                "isPromoted": false
+              }
+            }
+          ],
+          [
+            {
+              "row": 3,
+              "col": 0,
+              "piece": null
+            },
+            {
+              "row": 3,
+              "col": 1,
+              "piece": null
+            },
+            {
+              "row": 3,
+              "col": 2,
+              "piece": null
+            },
+            {
+              "row": 3,
+              "col": 3,
+              "piece": null
+            },
+            {
+              "row": 3,
+              "col": 4,
+              "piece": null
+            },
+            {
+              "row": 3,
+              "col": 5,
+              "piece": null
+            },
+            {
+              "row": 3,
+              "col": 6,
+              "piece": {
+                "id": "gote-pawn-3",
+                "type": "pawn",
+                "player": "gote",
+                "isPromoted": false
+              }
+            },
+            {
+              "row": 3,
+              "col": 7,
+              "piece": null
+            },
+            {
+              "row": 3,
+              "col": 8,
+              "piece": null
+            }
+          ],
+          [
+            {
+              "row": 4,
+              "col": 0,
+              "piece": null
+            },
+            {
+              "row": 4,
+              "col": 1,
+              "piece": null
+            },
+            {
+              "row": 4,
+              "col": 2,
+              "piece": null
+            },
+            {
+              "row": 4,
+              "col": 3,
+              "piece": null
+            },
+            {
+              "row": 4,
+              "col": 4,
+              "piece": null
+            },
+            {
+              "row": 4,
+              "col": 5,
+              "piece": null
+            },
+            {
+              "row": 4,
+              "col": 6,
+              "piece": null
+            },
+            {
+              "row": 4,
+              "col": 7,
+              "piece": null
+            },
+            {
+              "row": 4,
+              "col": 8,
+              "piece": null
+            }
+          ],
+          [
+            {
+              "row": 5,
+              "col": 0,
+              "piece": null
+            },
+            {
+              "row": 5,
+              "col": 1,
+              "piece": null
+            },
+            {
+              "row": 5,
+              "col": 2,
+              "piece": {
+                "id": "sente-pawn-7",
+                "type": "pawn",
+                "player": "sente",
+                "isPromoted": false
+              }
+            },
+            {
+              "row": 5,
+              "col": 3,
+              "piece": {
+                "id": "sente-pawn-6",
+                "type": "pawn",
+                "player": "sente",
+                "isPromoted": false
+              }
+            },
+            {
+              "row": 5,
+              "col": 4,
+              "piece": null
+            },
+            {
+              "row": 5,
+              "col": 5,
+              "piece": null
+            },
+            {
+              "row": 5,
+              "col": 6,
+              "piece": null
+            },
+            {
+              "row": 5,
+              "col": 7,
+              "piece": null
+            },
+            {
+              "row": 5,
+              "col": 8,
+              "piece": null
+            }
+          ],
+          [
+            {
+              "row": 6,
+              "col": 0,
+              "piece": {
+                "id": "sente-pawn-9",
+                "type": "pawn",
+                "player": "sente",
+                "isPromoted": false
+              }
+            },
+            {
+              "row": 6,
+              "col": 1,
+              "piece": {
+                "id": "sente-pawn-8",
+                "type": "pawn",
+                "player": "sente",
+                "isPromoted": false
+              }
+            },
+            {
+              "row": 6,
+              "col": 2,
+              "piece": null
+            },
+            {
+              "row": 6,
+              "col": 3,
+              "piece": null
+            },
+            {
+              "row": 6,
+              "col": 4,
+              "piece": {
+                "id": "sente-pawn-5",
+                "type": "pawn",
+                "player": "sente",
+                "isPromoted": false
+              }
+            },
+            {
+              "row": 6,
+              "col": 5,
+              "piece": {
+                "id": "sente-pawn-4",
+                "type": "pawn",
+                "player": "sente",
+                "isPromoted": false
+              }
+            },
+            {
+              "row": 6,
+              "col": 6,
+              "piece": {
+                "id": "sente-pawn-3",
+                "type": "pawn",
+                "player": "sente",
+                "isPromoted": false
+              }
+            },
+            {
+              "row": 6,
+              "col": 7,
+              "piece": {
+                "id": "sente-pawn-2",
+                "type": "pawn",
+                "player": "sente",
+                "isPromoted": false
+              }
+            },
+            {
+              "row": 6,
+              "col": 8,
+              "piece": {
+                "id": "sente-pawn-1",
+                "type": "pawn",
+                "player": "sente",
+                "isPromoted": false
+              }
+            }
+          ],
+          [
+            {
+              "row": 7,
+              "col": 0,
+              "piece": null
+            },
+            {
+              "row": 7,
+              "col": 1,
+              "piece": {
+                "id": "sente-bishop-8",
+                "type": "bishop",
+                "player": "sente",
+                "isPromoted": false
+              }
+            },
+            {
+              "row": 7,
+              "col": 2,
+              "piece": null
+            },
+            {
+              "row": 7,
+              "col": 3,
+              "piece": null
+            },
+            {
+              "row": 7,
+              "col": 4,
+              "piece": null
+            },
+            {
+              "row": 7,
+              "col": 5,
+              "piece": null
+            },
+            {
+              "row": 7,
+              "col": 6,
+              "piece": null
+            },
+            {
+              "row": 7,
+              "col": 7,
+              "piece": {
+                "id": "sente-rook-2",
+                "type": "rook",
+                "player": "sente",
+                "isPromoted": false
+              }
+            },
+            {
+              "row": 7,
+              "col": 8,
+              "piece": null
+            }
+          ],
+          [
+            {
+              "row": 8,
+              "col": 0,
+              "piece": {
+                "id": "sente-lance-9",
+                "type": "lance",
+                "player": "sente",
+                "isPromoted": false
+              }
+            },
+            {
+              "row": 8,
+              "col": 1,
+              "piece": {
+                "id": "sente-knight-8",
+                "type": "knight",
+                "player": "sente",
+                "isPromoted": false
+              }
+            },
+            {
+              "row": 8,
+              "col": 2,
+              "piece": {
+                "id": "sente-silver-7",
+                "type": "silver",
+                "player": "sente",
+                "isPromoted": false
+              }
+            },
+            {
+              "row": 8,
+              "col": 3,
+              "piece": {
+                "id": "sente-gold-6",
+                "type": "gold",
+                "player": "sente",
+                "isPromoted": false
+              }
+            },
+            {
+              "row": 8,
+              "col": 4,
+              "piece": {
+                "id": "sente-king-5",
+                "type": "king",
+                "player": "sente",
+                "isPromoted": false
+              }
+            },
+            {
+              "row": 8,
+              "col": 5,
+              "piece": {
+                "id": "sente-gold-4",
+                "type": "gold",
+                "player": "sente",
+                "isPromoted": false
+              }
+            },
+            {
+              "row": 8,
+              "col": 6,
+              "piece": {
+                "id": "sente-silver-3",
+                "type": "silver",
+                "player": "sente",
+                "isPromoted": false
+              }
+            },
+            {
+              "row": 8,
+              "col": 7,
+              "piece": {
+                "id": "sente-knight-2",
+                "type": "knight",
+                "player": "sente",
+                "isPromoted": false
+              }
+            },
+            {
+              "row": 8,
+              "col": 8,
+              "piece": {
+                "id": "sente-lance-1",
+                "type": "lance",
+                "player": "sente",
+                "isPromoted": false
+              }
+            }
+          ]
+        ],
+        "senteHand": [],
+        "goteHand": [],
+        "turn": "gote",
+        "moveNumber": 4,
+        "status": "active",
+        "lastMove": {
+          "moveNumber": 3,
+          "player": "sente",
+          "to": {
+            "row": 5,
+            "col": 3
+          },
+          "pieceType": "pawn",
+          "promotion": "none",
+          "notation": "▲6六歩",
+          "kind": "move",
+          "from": {
+            "row": 6,
+            "col": 3
+          },
+          "capturedPieceType": null
+        },
+        "result": null
+      }
+    ],
+    "moveLimitJishogi": null
+  },
+  "branches": [],
+  "selectedRecordId": "fixture-mainline-v1"
+}

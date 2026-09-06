@@ -2415,3 +2415,11 @@ PR #1のレビュー指摘を受け、簡易APIの`applyMove`と合法手候補�
 - `format` / `version`、必須ルート項目、単局v1の埋め込み、recordId参照、分岐元整合性、入れ子分岐拒否、serialize/import往復、静的fixture読み込み、旧来単局v1のmainline-only互換を回帰テストで固定した。
 - format/versionは互換性契約として扱い、v1のフィールド変更・削除には新versionを定義する。入れ子分岐はv1で引き続き非対応。
 - 検証では新規契約テスト8/8件、全テストを2分割して17ファイル・764/764件、`npm run lint`、`npm run build`、`git diff --check`が成功した。`npm run check`も実行し、lockfile検証とlintの成功を確認したが、続く全件Vitestの終了サマリーはこの環境の30秒プロセス上限で回収できなかったため、全件結果は前記の分割実行で確認した。
+
+## [2026-09-07] JSON交換形式v1の静的fixture互換性強化
+
+- `single-branch-v1.json` と `ended-v1.json` を、既存の生成fixtureと固定日時を使った正式シリアライザの出力として追加した。テスト実行時にfixtureを更新する処理は持たない。
+- 生成fixtureは現在の出力動作の確認、3種類の静的fixtureは過去のv1契約との互換性確認として役割を分離した。各静的fixtureのJSON読込、format/version、import成功、固定日時での完全再シリアライズ一致を検証する。
+- 分岐fixtureでは分岐数、選択中recordId、起点手数・連番・表示名・branchFrom関係と復元後の分岐選択を、終局fixtureでは投了結果、`ended`状態、復元metadataと再シリアライズ後の結果を明示検証する。
+- v1のフィールド構造、import/export本体、format/version、入れ子分岐、Memo-Nexus固有の依存・形式は今回のスコープ外として変更しない。
+- 検証では契約テスト12/12件、全テストを2分割して17ファイル・768/768件、`npm run lint`、`npm run build`、`git diff --check`が成功した。`npm run check`はlockfile検証とlintの成功後、全件Vitestの終了サマリーがこの環境の30秒プロセス上限で回収できなかったため、全件結果は前記の分割実行で確認した。

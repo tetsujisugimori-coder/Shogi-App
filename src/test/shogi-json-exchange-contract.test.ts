@@ -19,15 +19,12 @@ import {
 } from './fixtures/game-record-session/sessionFixtures';
 
 const EXPORTED_AT = new Date('2026-09-07T00:00:00.000Z');
-const STATIC_MAINLINE_FIXTURE_PATH = resolve(
-  process.cwd(),
-  'src/test/fixtures/game-record-session/mainline-only-v1.json'
-);
-
-function normalizeExchangeJson(value: ShogiGameRecordSessionV1): Omit<ShogiGameRecordSessionV1, 'exportedAt'> {
-  const { exportedAt: _exportedAt, ...stable } = value;
-  return stable;
-}
+const STATIC_FIXTURE_DIRECTORY = resolve(process.cwd(), 'src/test/fixtures/game-record-session');
+const STATIC_FIXTURE_NAMES = [
+  'mainline-only-v1.json',
+  'single-branch-v1.json',
+  'ended-v1.json',
+] as const;
 
 function assertSessionContract(value: ShogiGameRecordSessionV1): void {
   expect(value.format).toBe(SHOGI_GAME_RECORD_SESSION_FORMAT);
@@ -60,6 +57,23 @@ function assertSessionContract(value: ShogiGameRecordSessionV1): void {
   }
 }
 
+function importStaticFixture(filename: typeof STATIC_FIXTURE_NAMES[number]) {
+  const json = readFileSync(resolve(STATIC_FIXTURE_DIRECTORY, filename), 'utf8');
+  const fixture = JSON.parse(json) as ShogiGameRecordSessionV1;
+  assertSessionContract(fixture);
+  const imported = importShogiGameRecordSession(json);
+  expect(imported.ok).toBe(true);
+  if (!imported.ok) throw new Error(imported.message);
+
+  // All fixture timestamps are fixed to EXPORTED_AT, so no contract field needs
+  // to be normalized out of this compatibility comparison.
+  const reserialized = JSON.parse(
+    serializeShogiGameRecordSessionV1(imported.session, EXPORTED_AT)
+  ) as ShogiGameRecordSessionV1;
+  expect(reserialized).toEqual(fixture);
+  return { fixture, imported };
+}
+
 describe('Shogi-App JSON Exchange Format v1', () => {
   it.each([
     ['本譜のみ', createMainlineOnlySessionFixture],
@@ -76,16 +90,39 @@ describe('Shogi-App JSON Exchange Format v1', () => {
     expect(value.mainline.result).toMatchObject({ endReason: 'resignation' });
   });
 
-  it('静的JSON fixtureを読み込み、再シリアライズ後も時刻以外の意味的内容を維持する', () => {
-    const json = readFileSync(STATIC_MAINLINE_FIXTURE_PATH, 'utf8');
-    const parsed = JSON.parse(json) as ShogiGameRecordSessionV1;
-    assertSessionContract(parsed);
-    const imported = importShogiGameRecordSession(json);
-    expect(imported.ok).toBe(true);
-    if (!imported.ok) return;
-    expect(imported.metadata).toMatchObject({ branchCount: 0, isLegacyGameRecord: false });
-    const reserialized = JSON.parse(serializeShogiGameRecordSessionV1(imported.session, EXPORTED_AT)) as ShogiGameRecordSessionV1;
-    expect(normalizeExchangeJson(reserialized)).toEqual(normalizeExchangeJson({ ...parsed, exportedAt: EXPORTED_AT.toISOString() }));
+  it.each(STATIC_FIXTURE_NAMES)('%s は静的なv1契約として読み込み・完全往復できる', (filename) => {
+    const { fixture, imported } = importStaticFixture(filename);
+    expect(imported.metadata.isLegacyGameRecord).toBe(false);
+    expect(imported.metadata.branchCount).toBe(fixture.branches.length);
+  });
+
+  it('分岐ありの静的fixtureは本譜との関係と選択中の分岐を維持する', () => {
+    const { fixture, imported } = importStaticFixture('single-branch-v1.json');
+    expect(fixture.branches).toHaveLength(1);
+    const [branch] = fixture.branches;
+    expect(branch).toMatchObject({
+      originHistoryIndex: 2,
+      originSequence: 1,
+      displayName: '第2手後からの分岐 1',
+    });
+    expect(fixture.selectedRecordId).toBe(branch.record.recordId);
+    expect(branch.record.branchFrom).toEqual({
+      recordId: fixture.mainline.recordId,
+      ply: branch.originHistoryIndex,
+    });
+    expect(imported.session.selection).toEqual({ kind: 'branch', recordId: branch.record.recordId });
+    expect(imported.state.recordId).toBe(branch.record.recordId);
+  });
+
+  it('終局済みの静的fixtureは投了結果と終局状態を維持する', () => {
+    const { fixture, imported } = importStaticFixture('ended-v1.json');
+    expect(fixture.mainline.latestState.status).toBe('ended');
+    expect(fixture.mainline.result).toMatchObject({ endReason: 'resignation' });
+    expect(imported.metadata.isEnded).toBe(true);
+    const reserialized = JSON.parse(
+      serializeShogiGameRecordSessionV1(imported.session, EXPORTED_AT)
+    ) as ShogiGameRecordSessionV1;
+    expect(reserialized.mainline.result).toEqual(fixture.mainline.result);
   });
 
   it('serialize → import の往復で本譜、分岐、選択中棋譜を維持する', () => {
