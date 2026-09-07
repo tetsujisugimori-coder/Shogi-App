@@ -115,6 +115,7 @@
     - `getLegalActions(state)` は現手番の盤上移動と駒打ちを共通の `LegalAction` として列挙し、各候補は既存の `executeMove` / `executeDrop` 経路で実行可能
     - 任意成りは `decline` と `promote` を別候補にし、強制成りは `promote` だけを返す。重複する同種の持ち駒は辞書順で最小の `Piece.id` を代表に集約する
     - 手、駒打ち、座標、成り選択、持ち駒種の順序を固定し、入力局面を変更しないため、ローカルAI・探索アルゴリズム・将棋エンジンアダプタで再現可能な候補列として利用できる
+    - `selectRandomLegalAction(state, random?)` はこの固定順の候補列から1手だけを選ぶ基準となるローカルAI実装。`random` に `[0, 1)` を返す関数を注入すれば選択を再現でき、選択後の局面更新は引き続き `executeLegalAction` に分離される
   - **公開APIの統制と低レベル盤面更新処理のカプセル化**:
     - 盤上移動は `executeMove`（および後方互換の `applyMove`）、駒打ちは `executeDrop` を外部向け着手APIとして公開。
     - 駒打ちの事前確認には `validateDrop` と `getLegalDropSquares`、王手放置判定用の仮想盤面には `simulateDropSquares` を公開。

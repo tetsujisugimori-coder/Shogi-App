@@ -2,6 +2,7 @@ export * from './coordinates';
 export * from './attacks';
 export * from './moves';
 export * from './legalActions';
+export * from './randomAi';
 export * from './validation';
 export * from './promotion';
 export * from './gameState';

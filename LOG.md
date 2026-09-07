@@ -2432,3 +2432,25 @@ PR #1のレビュー指摘を受け、簡易APIの`applyMove`と合法手候補�
 - `src/test/shogi-legal-actions.test.ts` を追加し、初期局面、手番限定、決定性・非破壊、通常／任意／強制成り、捕獲、local_ai／shogi_engine実行、全種の駒打ち、王・二歩・行き所・打ち歩詰め除外、王手合駒、ピン、重複持ち駒、順序、古い候補の拒否、終局済み空配列を17件で確認した。
 - `README.md` に共通候補列挙APIの用途と契約を追記した。UI、JSON v1、KIF、Memo-Nexus依存、既存の移動／駒打ち実装は変更していない。ランダムAI、評価関数、探索AI、AI対局UI、将棋エンジン接続、形勢評価グラフも引き続きスコープ外である。
 - `npm run verify:lock`、`npm run verify:macos-fsevents`（Windows上の静的検査）、`npm run lint`、新規テスト17/17件、既存19ファイル・768/768件の分割実行、合わせて20ファイル・785/785件、`npm run build`、`git diff --check`を成功した。`npm run check`はlockfile検証とlint成功後、全件Vitestの終了サマリー前に実行環境の時間上限となったため、全件成功は分割実行で確認した。分割同時実行時に既存の`shogi-branch-replay` 1件が5秒タイムアウトしたが、単独再実行では20/20件成功した。
+
+## [2026-09-07] 再現可能なランダムAIの指し手選択基盤
+
+### 目的と設計
+
+- 強さを評価しない基準AIとして、現手番の既存全合法手から一様に1手だけを選ぶ `selectRandomLegalAction` を追加した。将棋ルール、成り、駒打ち、終局の判定は再実装せず、必ず既存の `getLegalActions(state)` を候補取得境界として使う。
+- 新モジュールは `src/domain/shogi/randomAi.ts`。候補配列の決定順を変更せず、`Math.floor(random() * actions.length)` で選ぶ。候補が空なら `null` を返し、乱数関数は呼ばない。局面も候補配列・候補オブジェクトも変更せず、選択結果の適用は既存の `executeLegalAction` に分離した。
+- 公開APIは `selectRandomLegalAction(state, random?)` と `RandomValueGenerator`。乱数関数の契約は `Math.random` と同じ `[0, 1)` で、既定値は `Math.random`。テストや将来の呼び出し元は任意の決定的な関数を注入できる。契約外の値を補正する処理や、シード付き疑似乱数生成器は追加していない。
+
+### 変更ファイルとテスト
+
+- `src/domain/shogi/randomAi.ts` を追加し、`src/domain/shogi/index.ts` から公開した。`README.md` の「AI・探索向けの全合法手列挙」に、基準AI、乱数注入による再現性、選択／実行の分離を追記した。依存関係ファイルは変更していない。
+- `src/test/shogi-random-ai.test.ts` を追加した。初期局面候補への包含、固定乱数による再現性、先頭・末尾・中間インデックス、1候補局面、終局と空候補、乱数非呼出し、局面／既存候補列の非破壊、`proposer: 'local_ai'` での既存実行、任意成りと駒打ち候補の保持を8件で確認した。
+
+### 検証結果
+
+- `npm run verify:lock`、`npm run verify:macos-fsevents`、`npm run lint`、新規ランダムAIテスト 8/8、`npm run build`、`git diff --check` を成功した。Windows上のmacOS検証は静的検査のみであり、macOSネイティブwatchは対象OS外のため未実施。
+- `npm run check` は実行し、lockfile検証とlintの成功、Vitest開始までは確認できたが、この実行環境では全件Vitestの終了サマリーを回収できなかったため、成功扱いにはしていない。代替として全21テストファイルを完了サマリーが得られる単位に分割し、合計 793/793 件の成功を確認した。
+
+### スコープ外
+
+- AI対局UI、自動進行、AI同士の連続対局、待ち時間表示、評価関数、探索（1手読み・ミニマックス・αβ）、シード付きPRNG、Web Worker、外部エンジン、形勢評価、JSON／KIF／分岐棋譜の仕様変更、Memo-Nexus固有処理、UI・デザイン変更は追加していない。
