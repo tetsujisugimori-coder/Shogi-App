@@ -2423,3 +2423,12 @@ PR #1のレビュー指摘を受け、簡易APIの`applyMove`と合法手候補�
 - 分岐fixtureでは分岐数、選択中recordId、起点手数・連番・表示名・branchFrom関係と復元後の分岐選択を、終局fixtureでは投了結果、`ended`状態、復元metadataと再シリアライズ後の結果を明示検証する。
 - v1のフィールド構造、import/export本体、format/version、入れ子分岐、Memo-Nexus固有の依存・形式は今回のスコープ外として変更しない。
 - 検証では契約テスト12/12件、全テストを2分割して17ファイル・768/768件、`npm run lint`、`npm run build`、`git diff --check`が成功した。`npm run check`はlockfile検証とlintの成功後、全件Vitestの終了サマリーがこの環境の30秒プロセス上限で回収できなかったため、全件結果は前記の分割実行で確認した。
+
+## [2026-09-07] AI・探索向け全合法手列挙API
+
+- `main` の基準コミット `863a517` から、`src/domain/shogi/legalActions.ts` に公開型 `LegalAction`（盤上移動／駒打ちの判別union）、純粋な `getLegalActions(state)`、既存実行APIへ委譲する `executeLegalAction` を追加し、`src/domain/shogi/index.ts` から公開した。
+- 列挙は既存の `getLegalMoves`、`getPromotionStatus`、`getLegalDropSquares` だけを再利用する。終局済み局面は空配列、任意成りは不成→成の2候補、強制成りは成だけとし、王手放置・ピン・捕獲・二歩・行き所のない駒・合駒・打ち歩詰めなどの合法性は既存規則を一元的に通す。
+- 順序は盤上移動を先、移動元・移動先の行列昇順、任意成りは不成→成、続く駒打ちは飛・角・金・銀・桂・香・歩の固定順と打ち先行列昇順に固定した。同種の持ち駒は、手駒配列を並べ替えず、IDのコード単位辞書順で最小の1枚だけを代表として列挙する。
+- `src/test/shogi-legal-actions.test.ts` を追加し、初期局面、手番限定、決定性・非破壊、通常／任意／強制成り、捕獲、local_ai／shogi_engine実行、全種の駒打ち、王・二歩・行き所・打ち歩詰め除外、王手合駒、ピン、重複持ち駒、順序、古い候補の拒否、終局済み空配列を17件で確認した。
+- `README.md` に共通候補列挙APIの用途と契約を追記した。UI、JSON v1、KIF、Memo-Nexus依存、既存の移動／駒打ち実装は変更していない。ランダムAI、評価関数、探索AI、AI対局UI、将棋エンジン接続、形勢評価グラフも引き続きスコープ外である。
+- `npm run verify:lock`、`npm run verify:macos-fsevents`（Windows上の静的検査）、`npm run lint`、新規テスト17/17件、既存19ファイル・768/768件の分割実行、合わせて20ファイル・785/785件、`npm run build`、`git diff --check`を成功した。`npm run check`はlockfile検証とlint成功後、全件Vitestの終了サマリー前に実行環境の時間上限となったため、全件成功は分割実行で確認した。分割同時実行時に既存の`shogi-branch-replay` 1件が5秒タイムアウトしたが、単独再実行では20/20件成功した。
