@@ -3,6 +3,7 @@ export * from './attacks';
 export * from './moves';
 export * from './legalActions';
 export * from './randomAi';
+export * from './materialEvaluation';
 export * from './validation';
 export * from './promotion';
 export * from './gameState';
