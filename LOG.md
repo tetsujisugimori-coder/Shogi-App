@@ -2475,3 +2475,21 @@ PR #1のレビュー指摘を受け、簡易APIの`applyMove`と合法手候補�
 ### 今回のスコープ外
 
 - 1手読み、仮想局面、評価による指し手選択、ミニマックス／ネガマックス／αβ探索、詰み・終局の数値化、王手・玉の安全度・駒の働き・利き・合法手数の評価、AI対局UI、JSON/KIF/分岐棋譜の変更、入玉・持将棋ルールの点数変更、新規依存は追加していない。
+## [2026-09-09] 1手読み駒得AI
+
+### 実装
+
+- `src/domain/shogi/materialAi.ts` に、React/UIに依存しない `selectBestMaterialAction(state, perspective, valueTable?)` を追加し、ドメイン公開APIから利用可能にした。
+- 既存の `getLegalActions` で全合法手を固定順に取得し、候補ごとに `cloneBoardState` で完全複製した局面へ既存の `executeLegalAction` を適用してから、既存の `evaluateMaterial` で採点する。合法手判定・着手・駒価値の実装は重複していない。
+- 評価視点は引数のAI側 `perspective` に固定し、候補着手後に変わる `state.turn` を評価視点に使わない。最大値だけを更新するため、同点では合法手列挙順の先頭を決定的に選ぶ。
+- 選択処理は実対局の状態を更新せず、仮想評価は候補ごとに独立した複製局面で行う。実際の着手更新は従来どおり呼び出し元が `executeLegalAction` に委ねる。
+
+### テストと検証
+
+- `src/test/shogi-material-ai.test.ts` に、全候補評価と先頭以外の高価値駒取り、成り、捕獲後の持ち駒、先手・後手の固定視点と手番変更、カスタム評価表、同点の決定性、空候補、入力局面の非破壊を追加した。
+- 新規テストは7/7件、AI関連（新規・ランダムAI・駒得評価・合法手）の対象テストは4ファイル63/63件、全テストは23ファイル831/831件成功した。`npm run verify:lock`、`npm run lint`、`npm run build`、プロジェクト標準の`npm run check`、`git diff --check`も成功した。
+- `npm run verify:macos-fsevents` はWindows上の静的検査として成功した。macOSネイティブwatchおよびVite watcherのmacOS経路は対象OS外のため未実施。
+
+### 今回のスコープ外
+
+- 2手以上の探索、minimax / negamax / αβ枝刈り、王手・詰み・玉の安全度・位置・利き・合法手数の評価、AI対局UI、自動対局、思考時間制御、JSON/KIF/分岐仕様の変更、新規依存は含めない。
