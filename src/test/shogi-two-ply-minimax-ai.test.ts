@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 import {
   cloneBoardSquares,
   cloneBoardState,
+  analyzeTwoPlyMinimaxSearch,
   evaluateMaterial,
   evaluateSearchPosition,
   executeLegalAction,
@@ -258,5 +259,91 @@ describe('2手読みミニマックスAI', () => {
     expect(selectBestTwoPlyMinimaxAction(tieState)).toEqual(getLegalActions(tieState)[0]);
     expect(selectBestTwoPlyMinimaxAction({ ...tieState, status: 'ended', result: { winner: null, loser: null, endReason: 'repetition' } })).toBeNull();
     expect(JSON.stringify(simpleCapture)).toBe(snapshot);
+  });
+});
+
+describe('2手読みミニマックスAIの探索計測', () => {
+  it('既存の選択手を保ったまま、候補評価と決定的な調査局面数を集約する', () => {
+    const state = recaptureTrapState();
+    const snapshot = JSON.stringify(state);
+    const rootActions = getLegalActions(state);
+    const expectedVisitedPositionCount = rootActions.reduce((count, action) => {
+      const afterRootAction = execute(state, action);
+      return count + 1 + (afterRootAction.status === 'ended'
+        ? 0
+        : getLegalActions(afterRootAction).length);
+    }, 0);
+
+    const result = analyzeTwoPlyMinimaxSearch(state);
+    const selectedCandidate = result.topCandidates.find((candidate) =>
+      JSON.stringify(candidate.action) === JSON.stringify(result.selectedAction)
+    );
+
+    expect(result.selectedAction).toEqual(selectBestTwoPlyMinimaxAction(state));
+    expect(result.rootLegalActionCount).toBe(rootActions.length);
+    expect(result.visitedPositionCount).toBe(expectedVisitedPositionCount);
+    expect(result.depth).toBe(2);
+    expect(result.selectedEvaluation).toBe(selectedCandidate?.evaluation);
+    expect(result.elapsedMilliseconds).toBeGreaterThanOrEqual(0);
+    expect(JSON.stringify(state)).toBe(snapshot);
+  });
+
+  it('上位候補をAI視点の降順かつ固定順の同点処理で最大3件にする', () => {
+    const state = recaptureTrapState();
+    const result = analyzeTwoPlyMinimaxSearch(state);
+
+    expect(result.topCandidates).toHaveLength(Math.min(3, getLegalActions(state).length));
+    for (let index = 1; index < result.topCandidates.length; index += 1) {
+      expect(result.topCandidates[index - 1].evaluation).toBeGreaterThanOrEqual(
+        result.topCandidates[index].evaluation
+      );
+    }
+
+    const tieState = createState([
+      { row: 8, col: 8, piece: piece('sente-king', 'king', 'sente') },
+      { row: 0, col: 8, piece: piece('gote-king', 'king', 'gote') },
+    ]);
+    const tieResult = analyzeTwoPlyMinimaxSearch(tieState);
+    expect(tieResult.selectedAction).toEqual(getLegalActions(tieState)[0]);
+    expect(tieResult.topCandidates[0]?.action).toEqual(getLegalActions(tieState)[0]);
+  });
+
+  it('後手でも評価と候補順をroot AI視点で返す', () => {
+    const state = recaptureTrapState('gote');
+    const result = analyzeTwoPlyMinimaxSearch(state);
+    if (!result.selectedAction) throw new Error('Expected a legal Gote action.');
+    const afterSelectedAction = execute(state, result.selectedAction);
+    const expectedGotePerspectiveEvaluation = Math.min(...getLegalActions(afterSelectedAction).map((reply) =>
+      evaluateSearchPosition(execute(afterSelectedAction, reply), 'gote')
+    ));
+
+    expect(result.selectedAction).toEqual(selectBestTwoPlyMinimaxAction(state));
+    expect(result.selectedEvaluation).toBe(expectedGotePerspectiveEvaluation);
+    for (let index = 1; index < result.topCandidates.length; index += 1) {
+      expect(result.topCandidates[index - 1].evaluation).toBeGreaterThanOrEqual(
+        result.topCandidates[index].evaluation
+      );
+    }
+  });
+
+  it('合法手が3件未満でも結果を返し、終局局面では既存どおり手を選ばない', () => {
+    const forcedLoss = forcedLossAfterEveryRootActionState();
+    const result = analyzeTwoPlyMinimaxSearch(forcedLoss);
+    const ended = {
+      ...forcedLoss,
+      status: 'ended' as const,
+      result: { winner: null, loser: null, endReason: 'repetition' } satisfies GameResult,
+    };
+
+    expect(result.rootLegalActionCount).toBe(1);
+    expect(result.topCandidates).toHaveLength(1);
+    expect(result.selectedAction).toEqual(getLegalActions(forcedLoss)[0]);
+    expect(analyzeTwoPlyMinimaxSearch(ended)).toMatchObject({
+      selectedAction: null,
+      selectedEvaluation: null,
+      rootLegalActionCount: 0,
+      visitedPositionCount: 0,
+      topCandidates: [],
+    });
   });
 });

@@ -28,6 +28,10 @@ import {
   serializeShogiGameRecordSessionV1,
   importShogiGameRecordSession,
   importKifBytes,
+  analyzeTwoPlyMinimaxSearch,
+  executeLegalAction,
+  generateDropNotation,
+  generateMoveNotation,
   MAX_SHOGI_GAME_RECORD_SESSION_FILE_BYTES,
   MAX_KIF_FILE_BYTES,
   PromotionStatus,
@@ -35,6 +39,8 @@ import {
   type KifImportResult,
   type AgreedJishogiProposal,
   type GameRecordSession,
+  type LegalAction,
+  type TwoPlyMinimaxSearchResult,
 } from '../../domain/shogi';
 import { ShogiTable } from './ShogiTable';
 import { PromotionDialog } from './PromotionDialog';
@@ -47,6 +53,7 @@ import { getGameResultDisplay } from './gameResultDisplay';
 import { GameRecordImportDialog } from './GameRecordImportDialog';
 import { KifImportDialog } from './KifImportDialog';
 import { BranchReplayDialog } from './BranchReplayDialog';
+import { AiSearchResultPanel } from './AiSearchResultPanel';
 
 interface ShogiResearchScreenProps {
   initialState?: BoardState;
@@ -69,6 +76,12 @@ interface PendingKifImport {
   filename: string;
   state: BoardState;
   metadata: Extract<KifImportResult, { ok: true }>['metadata'];
+}
+
+interface AiSearchDisplay {
+  result: TwoPlyMinimaxSearchResult;
+  selectedNotation: string;
+  candidateNotations: readonly string[];
 }
 
 type SelectionState =
@@ -95,6 +108,19 @@ const STATUS_BADGE_COLORS = {
   },
 } as const;
 
+function formatLegalActionNotation(state: BoardState, action: LegalAction): string {
+  if (action.kind === 'move') {
+    const piece = state.squares[action.from.row]?.[action.from.col]?.piece;
+    if (!piece) throw new Error('A legal move action must have a source piece.');
+    return generateMoveNotation(state.turn, piece, action.to, action.promotion);
+  }
+
+  const hand = state.turn === 'sente' ? state.senteHand : state.goteHand;
+  const piece = hand.find((candidate) => candidate.id === action.pieceId);
+  if (!piece) throw new Error('A legal drop action must have a hand piece.');
+  return generateDropNotation(state.turn, piece, action.to);
+}
+
 export const ShogiResearchScreen: React.FC<ShogiResearchScreenProps> = ({ initialState }) => {
   const [boardState, setBoardState] = useState<BoardState>(() =>
     normalizePositionSnapshots(initialState ?? createInitialBoardState())
@@ -115,6 +141,7 @@ export const ShogiResearchScreen: React.FC<ShogiResearchScreenProps> = ({ initia
   const [pendingKifImport, setPendingKifImport] = useState<PendingKifImport | null>(null);
   const [isKifFileReading, setIsKifFileReading] = useState(false);
   const [moveHistoryResetKey, setMoveHistoryResetKey] = useState(0);
+  const [aiSearchDisplay, setAiSearchDisplay] = useState<AiSearchDisplay | null>(null);
   const [agreedJishogiProposal, setAgreedJishogiProposal] = useState<AgreedJishogiProposal | null>(null);
   const [agreedJishogiError, setAgreedJishogiError] = useState<string | null>(null);
   const [exportNotice, setExportNotice] = useState<
@@ -337,6 +364,7 @@ export const ShogiResearchScreen: React.FC<ShogiResearchScreenProps> = ({ initia
     focusRequestId.current = 0;
     setGameRecordSession(started.session);
     setBoardState(started.boardState);
+    setAiSearchDisplay(null);
     setReplayHistoryIndex(null);
     setSelection({ kind: 'none' });
     setPendingPromotion(null);
@@ -362,6 +390,7 @@ export const ShogiResearchScreen: React.FC<ShogiResearchScreenProps> = ({ initia
     focusRequestId.current = 0;
     setGameRecordSession(result.session);
     setBoardState(result.boardState);
+    setAiSearchDisplay(null);
     setReplayHistoryIndex(null);
     setSelection({ kind: 'none' });
     setPendingPromotion(null);
@@ -387,6 +416,7 @@ export const ShogiResearchScreen: React.FC<ShogiResearchScreenProps> = ({ initia
     focusRequestId.current = 0;
     setGameRecordSession(result.session);
     setBoardState(result.boardState);
+    setAiSearchDisplay(null);
     setReplayHistoryIndex(null);
     setSelection({ kind: 'none' });
     setPendingPromotion(null);
@@ -568,6 +598,7 @@ export const ShogiResearchScreen: React.FC<ShogiResearchScreenProps> = ({ initia
     focusRequestId.current = 0;
 
     setBoardState(createInitialBoardState());
+    setAiSearchDisplay(null);
     setGameRecordSession(discardGameRecordSession());
     setReplayHistoryIndex(null);
     setSelection({ kind: 'none' });
@@ -704,6 +735,7 @@ export const ShogiResearchScreen: React.FC<ShogiResearchScreenProps> = ({ initia
     if (!pendingKifImport) return;
     focusRequestId.current = 0;
     setBoardState(pendingKifImport.state);
+    setAiSearchDisplay(null);
     setGameRecordSession(discardGameRecordSession());
     setReplayHistoryIndex(null);
     setSelection({ kind: 'none' });
@@ -726,6 +758,7 @@ export const ShogiResearchScreen: React.FC<ShogiResearchScreenProps> = ({ initia
     shouldRestoreGameRecordImportFocus.current = true;
     focusRequestId.current = 0;
     setBoardState(pendingGameRecordImport.state);
+    setAiSearchDisplay(null);
     setGameRecordSession(pendingGameRecordImport.session);
     setReplayHistoryIndex(null);
     setSelection({ kind: 'none' });
@@ -743,6 +776,27 @@ export const ShogiResearchScreen: React.FC<ShogiResearchScreenProps> = ({ initia
       message: `対局記録を読み込みました（${pendingGameRecordImport.filename}）`,
     });
     setPendingGameRecordImport(null);
+  };
+
+  const makeTwoPlyAiMove = () => {
+    if (isInteractionBlocked) return;
+
+    const result = analyzeTwoPlyMinimaxSearch(boardState);
+    if (!result.selectedAction) return;
+
+    const selectedNotation = formatLegalActionNotation(boardState, result.selectedAction);
+    const candidateNotations = result.topCandidates.map((candidate) =>
+      formatLegalActionNotation(boardState, candidate.action)
+    );
+    const execution = executeLegalAction(boardState, result.selectedAction, { proposer: 'local_ai' });
+    if (execution.type !== 'applied') {
+      throw new Error('A selected legal AI action could not be executed.');
+    }
+
+    setBoardState(execution.state);
+    setSelection({ kind: 'none' });
+    setPendingPromotion(null);
+    setAiSearchDisplay({ result, selectedNotation, candidateNotations });
   };
 
   const handleSquareClick = (square: BoardSquare) => {
@@ -905,6 +959,8 @@ export const ShogiResearchScreen: React.FC<ShogiResearchScreenProps> = ({ initia
       data-active-session-record={
         activeSessionBranch?.state.recordId ?? (boardState.branchFrom ? 'standalone-branch' : 'mainline')
       }
+      data-ai-search-depth={aiSearchDisplay?.result.depth ?? ''}
+      data-ai-search-visited-position-count={aiSearchDisplay?.result.visitedPositionCount ?? ''}
       onKeyDown={handleScreenKeyDown}
       className="min-h-full w-full flex flex-col items-center justify-between py-6 px-3 sm:px-6 bg-[#0f1115] text-stone-200"
     >
@@ -941,6 +997,14 @@ export const ShogiResearchScreen: React.FC<ShogiResearchScreenProps> = ({ initia
           AIとの対局・棋譜・判断ログを記録する研究画面です。
         </p>
         <div className="mt-2 flex max-w-full flex-wrap justify-center gap-2">
+          <button
+            type="button"
+            onClick={makeTwoPlyAiMove}
+            disabled={isInteractionBlocked}
+            className="rounded border border-violet-700/70 bg-violet-950/45 px-4 py-1.5 font-serif text-sm tracking-[0.1em] text-violet-100 shadow-inner outline-none transition hover:border-violet-500 hover:bg-violet-900/55 focus-visible:ring-2 focus-visible:ring-amber-300 disabled:cursor-not-allowed disabled:border-stone-800 disabled:text-stone-600 disabled:opacity-65"
+          >
+            2手読みAIに指させる
+          </button>
           {activeSessionBranch && (
             <button
               ref={returnToMainlineButtonRef}
@@ -1149,30 +1213,39 @@ export const ShogiResearchScreen: React.FC<ShogiResearchScreenProps> = ({ initia
             pieceStandsDisabled={isInteractionBlocked}
           />
         </div>
-        <MoveHistoryPanel
-          history={boardState.history}
-          result={!isViewingReplay && boardState.status === 'ended' ? boardState.result : null}
-          resetKey={moveHistoryResetKey}
-          availableHistoryIndexes={replayIndexSet}
-          currentHistoryIndex={replayHistoryIndex}
-          selectionDisabled={dialogsAreOpen}
-          canGoToInitial={replayIndexSet.has(0) && replayHistoryIndex !== 0}
-          canGoToPrevious={previousReplayIndex !== null}
-          canGoToNext={nextReplayIndex !== null}
-          isViewingReplay={isViewingReplay}
-          canStartBranch={canStartBranch}
-          onStartBranch={openBranchStartDialog}
-          branchStartButtonRef={branchStartButtonRef}
-          onSelectHistoryIndex={selectReplayPosition}
-          onGoToInitial={() => selectReplayPosition(0)}
-          onGoToPrevious={() => {
-            if (previousReplayIndex !== null) selectReplayPosition(previousReplayIndex);
-          }}
-          onGoToNext={() => {
-            if (nextReplayIndex !== null) selectReplayPosition(nextReplayIndex);
-          }}
-          onReturnToCurrent={returnToCurrentPosition}
-        />
+        <div className="flex w-full max-w-md flex-col gap-4 xl:w-80 xl:max-w-sm">
+          <MoveHistoryPanel
+            history={boardState.history}
+            result={!isViewingReplay && boardState.status === 'ended' ? boardState.result : null}
+            resetKey={moveHistoryResetKey}
+            availableHistoryIndexes={replayIndexSet}
+            currentHistoryIndex={replayHistoryIndex}
+            selectionDisabled={dialogsAreOpen}
+            canGoToInitial={replayIndexSet.has(0) && replayHistoryIndex !== 0}
+            canGoToPrevious={previousReplayIndex !== null}
+            canGoToNext={nextReplayIndex !== null}
+            isViewingReplay={isViewingReplay}
+            canStartBranch={canStartBranch}
+            onStartBranch={openBranchStartDialog}
+            branchStartButtonRef={branchStartButtonRef}
+            onSelectHistoryIndex={selectReplayPosition}
+            onGoToInitial={() => selectReplayPosition(0)}
+            onGoToPrevious={() => {
+              if (previousReplayIndex !== null) selectReplayPosition(previousReplayIndex);
+            }}
+            onGoToNext={() => {
+              if (nextReplayIndex !== null) selectReplayPosition(nextReplayIndex);
+            }}
+            onReturnToCurrent={returnToCurrentPosition}
+          />
+          {aiSearchDisplay && (
+            <AiSearchResultPanel
+              result={aiSearchDisplay.result}
+              selectedNotation={aiSearchDisplay.selectedNotation}
+              candidateNotations={aiSearchDisplay.candidateNotations}
+            />
+          )}
+        </div>
       </main>
 
       {pendingPromotion && !isEnded && (
