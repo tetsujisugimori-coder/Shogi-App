@@ -101,7 +101,7 @@ export function selectBestTwoPlyMinimaxAction(
       candidateEvaluation = worstReplyEvaluation;
     }
 
-    if (candidateEvaluation > bestEvaluation) {
+    if (bestAction === null || candidateEvaluation > bestEvaluation) {
       bestAction = rootAction;
       bestEvaluation = candidateEvaluation;
     }

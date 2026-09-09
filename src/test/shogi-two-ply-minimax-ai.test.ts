@@ -64,6 +64,23 @@ function recaptureTrapState(turn: Player = 'sente'): BoardState {
   ], [], [], turn);
 }
 
+/**
+ * The knight pins itself in front of its king, leaving only the pawn move.
+ * After that move Gote can checkmate through the existing rook-capture path.
+ */
+function forcedLossAfterEveryRootActionState(): BoardState {
+  return createState([
+    { row: 8, col: 4, piece: piece('sente-king', 'king', 'sente') },
+    { row: 7, col: 4, piece: piece('sente-knight', 'knight', 'sente') },
+    { row: 6, col: 0, piece: piece('sente-pawn', 'pawn', 'sente') },
+    { row: 6, col: 4, piece: piece('gote-rook', 'rook', 'gote') },
+    { row: 6, col: 3, piece: piece('gote-gold', 'gold', 'gote') },
+    { row: 6, col: 5, piece: piece('gote-pawn', 'pawn', 'gote') },
+    { row: 6, col: 1, piece: piece('left-escape-guard', 'bishop', 'gote') },
+    { row: 6, col: 7, piece: piece('right-escape-guard', 'bishop', 'gote') },
+  ]);
+}
+
 function execute(state: BoardState, action: LegalAction): BoardState {
   const result = executeLegalAction(cloneBoardState(state), action);
   expect(result.type).toBe('applied');
@@ -138,6 +155,31 @@ describe('探索用局面評価', () => {
 });
 
 describe('2手読みミニマックスAI', () => {
+  it('全root候補の最小評価が-∞でも固定順の最初の合法手を返す', () => {
+    const state = forcedLossAfterEveryRootActionState();
+    const snapshot = JSON.stringify(state);
+    const rootActions = getLegalActions(state);
+
+    expect(rootActions).toHaveLength(1);
+    const worstEvaluations = rootActions.map((rootAction) => {
+      const afterRootAction = execute(state, rootAction);
+      const replies = getLegalActions(afterRootAction);
+      expect(replies.length).toBeGreaterThan(0);
+      return Math.min(...replies.map((reply) =>
+        evaluateSearchPosition(execute(afterRootAction, reply), state.turn)
+      ));
+    });
+
+    expect(worstEvaluations).toEqual([Number.NEGATIVE_INFINITY]);
+    expect(selectBestTwoPlyMinimaxAction(state)).toEqual(rootActions[0]);
+    expect(JSON.stringify(state)).toBe(snapshot);
+    expect(selectBestTwoPlyMinimaxAction({
+      ...state,
+      status: 'ended',
+      result: { winner: null, loser: null, endReason: 'repetition' },
+    })).toBeNull();
+  });
+
   it('目先の駒得後の取り返しを読んで、1手読みAIとは異なる安全な手を選ぶ', () => {
     const state = recaptureTrapState();
     const onePly = selectBestMaterialAction(state, 'sente');
