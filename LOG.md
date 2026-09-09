@@ -2544,3 +2544,24 @@ PR #1のレビュー指摘を受け、簡易APIの`applyMove`と合法手候補�
 ### 対象外
 
 - 深さ3以上、negamax、αβ枝刈り、評価関数・難易度の変更、探索履歴の永続化・グラフ化、JSON/KIF/Memo-Nexusへの出力、外部将棋エンジン、新規依存は追加しない。
+
+## [2026-09-09] 2手読みαβ枝刈り探索（第一段階）
+
+### 実装と設計判断
+
+- 実装日時: 2026-09-09 20:27:27 +09:00。`src/domain/shogi/twoPlyAlphaBetaAi.ts` に、React/UIに依存しない固定深さ2 plyの `analyzeTwoPlyAlphaBetaSearch` と `selectBestTwoPlyAlphaBetaAction` を追加し、`src/domain/shogi/index.ts` から公開した。既存の `twoPlyMinimaxAi.ts` とその公開契約は変更していない。
+- root AIは探索開始時の `state.turn` に固定する。root合法手を既存の固定順で最大化し、各候補の相手応手を同じroot視点で最小化する。現在のroot最良評価をalphaにし、候補の最小応手評価がalpha以下になり、かつ残り応手があるときだけ残りを打ち切る。`getLegalActions`、`cloneBoardState`、`executeLegalAction`、`evaluateSearchPosition` を再利用し、合法手、着手、終局、評価関数を再実装していない。
+- `visitedPositionCount` は実行済みの着手で生成した後続局面だけを数え、root局面を含めない。`prunedRootCandidateCount` は実際に残り応手を打ち切ったroot候補数、`skippedOpponentReplyCount` はその打ち切りで実行しなかった残り応手数である。未実行応手の `executeLegalAction` や後続局面生成は行わない。
+- 枝刈りした候補は真の最小評価がさらに低い可能性があるため、その途中値を正確な候補評価として公開しない。よってαβ版へ上位3候補を追加していない。既存ミニマックスの上位候補表示も変更していない。
+- 最初の合法root候補は評価が `Number.NEGATIVE_INFINITY` でも比較基準として採用し、以後は厳密な `>` でのみ更新する。PR #54の全候補`-Infinity`時に先頭合法手を返す境界契約と、同点時の固定順を維持する。
+
+### 変更ファイルとテスト
+
+- 追加: `src/domain/shogi/twoPlyAlphaBetaAi.ts`。更新: `src/domain/shogi/index.ts`、`src/test/shogi-two-ply-minimax-ai.test.ts`、`README.md`、`LOG.md`。UI、AI方式切替、既存AI思考結果パネル、JSON/KIF/分岐棋譜、依存関係、評価関数、保存形式は変更していない。
+- 専用テストでは、通常局面・先手/後手・カスタム駒価値表で既存ミニマックスとの選択手/選択評価値の一致、同点順、`-Infinity`境界、`+Infinity`詰み優先、終局済み局面、入力非破壊、時計注入を確認する。決定的な同点局面では枝刈り回数が1以上、調査局面数がミニマックス未満、かつ `visitedPositionCount + skippedOpponentReplyCount` がミニマックスの調査局面数と一致することを検証する。
+- `node --version` は `v24.20.0`、`npm --version` は `11.17.0`。`npm run verify:lock`、`npm run lint`、専用テスト25/25、全25テストファイルを4バッチで857/857、`npm run build`、`git diff --check` は成功した。`npm test` と `npm run check` は実行したが、この環境ではVitest起動後の全件終了サマリーを回収できなかったため成功扱いにせず、前記4バッチを全件の完了証跡とする。
+- `npm run verify:macos-fsevents` はWindows上の静的検査に成功した。macOSネイティブwatchおよびVite watcherのmacOS経路は対象OS外のため未実施であり、成功扱いにはしない。
+
+### 今回の対象外
+
+- UIへのαβ操作・方式選択・結果パネル変更、AI同士の自動対局、深さ3以上、可変深度、汎用再帰探索、negamax、反復深化、手の並べ替え、局面キャッシュ、トランスポジションテーブル、Web Worker、並列探索、停止条件、評価関数の拡張、JSON/KIF/分岐仕様の変更、探索履歴の永続化、Memo-Nexus連携、外部エンジン、新規依存は含めない。
