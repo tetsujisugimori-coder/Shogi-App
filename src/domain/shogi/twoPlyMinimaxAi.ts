@@ -11,6 +11,34 @@ import {
 } from './materialEvaluation';
 import { cloneBoardState } from './replay';
 
+/** The fixed search depth used by the current two-ply minimax AI. */
+export const TWO_PLY_MINIMAX_SEARCH_DEPTH = 2;
+
+/** A root action and its score from the root (AI) player's perspective. */
+export interface TwoPlyMinimaxCandidate {
+  action: LegalAction;
+  evaluation: number;
+}
+
+/**
+ * Observations collected while choosing a two-ply minimax action.
+ *
+ * Every evaluation is from the root AI player's perspective: larger values are
+ * better for that player. `visitedPositionCount` counts each successor state
+ * produced by applying an explored action; the root state itself is excluded.
+ */
+export interface TwoPlyMinimaxSearchResult {
+  selectedAction: LegalAction | null;
+  selectedEvaluation: number | null;
+  rootLegalActionCount: number;
+  visitedPositionCount: number;
+  depth: typeof TWO_PLY_MINIMAX_SEARCH_DEPTH;
+  elapsedMilliseconds: number;
+  topCandidates: readonly TwoPlyMinimaxCandidate[];
+}
+
+export type SearchClock = () => number;
+
 function opponentOf(player: Player): Player {
   return player === 'sente' ? 'gote' : 'sente';
 }
@@ -64,22 +92,34 @@ function executeSearchAction(state: BoardState, action: LegalAction): BoardState
   return execution.state;
 }
 
+type UnmeasuredTwoPlyMinimaxSearchResult = Omit<TwoPlyMinimaxSearchResult, 'elapsedMilliseconds'>;
+
+function compareCandidatesByEvaluation(
+  left: TwoPlyMinimaxCandidate,
+  right: TwoPlyMinimaxCandidate
+): number {
+  if (left.evaluation === right.evaluation) return 0;
+  return right.evaluation > left.evaluation ? 1 : -1;
+}
+
 /**
- * Selects a move by searching the AI's move and every legal opponent reply.
- * The root player is fixed from the initial turn, the opponent minimizes that
- * player's score, and equal scores retain the first stable legal action.
+ * Runs the fixed-depth search once without taking a clock reading. Keeping the
+ * clock outside this function makes the minimax computation deterministic.
  */
-export function selectBestTwoPlyMinimaxAction(
+function searchTwoPlyMinimax(
   state: BoardState,
-  valueTable: MaterialValueTable = DEFAULT_MATERIAL_VALUE_TABLE
-): LegalAction | null {
+  valueTable: MaterialValueTable
+): UnmeasuredTwoPlyMinimaxSearchResult {
   const rootPlayer = state.turn;
   const rootActions = getLegalActions(state);
   let bestAction: LegalAction | null = null;
   let bestEvaluation = Number.NEGATIVE_INFINITY;
+  let visitedPositionCount = 0;
+  const candidates: TwoPlyMinimaxCandidate[] = [];
 
   for (const rootAction of rootActions) {
     const afterRootAction = executeSearchAction(state, rootAction);
+    visitedPositionCount += 1;
     let candidateEvaluation: number;
 
     if (afterRootAction.status === 'ended') {
@@ -93,6 +133,7 @@ export function selectBestTwoPlyMinimaxAction(
       let worstReplyEvaluation = Number.POSITIVE_INFINITY;
       for (const reply of replies) {
         const afterReply = executeSearchAction(afterRootAction, reply);
+        visitedPositionCount += 1;
         const replyEvaluation = evaluateSearchPosition(afterReply, rootPlayer, valueTable);
         if (replyEvaluation < worstReplyEvaluation) {
           worstReplyEvaluation = replyEvaluation;
@@ -101,11 +142,55 @@ export function selectBestTwoPlyMinimaxAction(
       candidateEvaluation = worstReplyEvaluation;
     }
 
+    candidates.push({ action: rootAction, evaluation: candidateEvaluation });
+    // The first legal action establishes the stable comparison baseline. Later
+    // equal scores retain that action because this remains a strict comparison.
     if (bestAction === null || candidateEvaluation > bestEvaluation) {
       bestAction = rootAction;
       bestEvaluation = candidateEvaluation;
     }
   }
 
-  return bestAction;
+  return {
+    selectedAction: bestAction,
+    selectedEvaluation: bestAction === null ? null : bestEvaluation,
+    rootLegalActionCount: rootActions.length,
+    visitedPositionCount,
+    depth: TWO_PLY_MINIMAX_SEARCH_DEPTH,
+    topCandidates: candidates.slice().sort(compareCandidatesByEvaluation).slice(0, 3),
+  };
+}
+
+function defaultSearchClock(): number {
+  return performance.now();
+}
+
+/**
+ * Selects an action and returns the measurements gathered by that same search.
+ * The elapsed time covers the whole search call; it is intentionally excluded
+ * from the deterministic minimax computation itself.
+ */
+export function analyzeTwoPlyMinimaxSearch(
+  state: BoardState,
+  valueTable: MaterialValueTable = DEFAULT_MATERIAL_VALUE_TABLE,
+  clock: SearchClock = defaultSearchClock
+): TwoPlyMinimaxSearchResult {
+  const startedAt = clock();
+  const searchResult = searchTwoPlyMinimax(state, valueTable);
+  return {
+    ...searchResult,
+    elapsedMilliseconds: Math.max(0, clock() - startedAt),
+  };
+}
+
+/**
+ * Selects a move by searching the AI's move and every legal opponent reply.
+ * The root player is fixed from the initial turn, the opponent minimizes that
+ * player's score, and equal scores retain the first stable legal action.
+ */
+export function selectBestTwoPlyMinimaxAction(
+  state: BoardState,
+  valueTable: MaterialValueTable = DEFAULT_MATERIAL_VALUE_TABLE
+): LegalAction | null {
+  return searchTwoPlyMinimax(state, valueTable).selectedAction;
 }
