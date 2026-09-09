@@ -2493,3 +2493,34 @@ PR #1のレビュー指摘を受け、簡易APIの`applyMove`と合法手候補�
 ### 今回のスコープ外
 
 - 2手以上の探索、minimax / negamax / αβ枝刈り、王手・詰み・玉の安全度・位置・利き・合法手数の評価、AI対局UI、自動対局、思考時間制御、JSON/KIF/分岐仕様の変更、新規依存は含めない。
+
+## [2026-09-09] 2手読みミニマックスAI
+
+### 実装
+
+- 実装日時: 2026-09-09 08:48:26 +09:00。公開mainの先頭とローカル基準コミットは `5f7e57f56ea59c8a09e2cc747c6ac68a91c39311`（PR #52のマージ）である。GitのWindows資格情報では`git pull --ff-only`が失敗したため、GitHubの公開mainコミット一覧で同一SHAを確認してから `feat/two-ply-minimax-ai` を作成した。
+- 1手読みの `selectBestMaterialAction` は自分の着手直後の駒得だけを比較するため、その直後に相手が大駒を取り返す局面は評価できなかった。`src/domain/shogi/twoPlyMinimaxAi.ts` に、AI着手を第1 ply、相手の最善応手を第2 plyとする固定深さの探索を追加した。第3 ply以降は読まない。
+- `selectBestTwoPlyMinimaxAction(state, valueTable?)` は開始時の `state.turn` を `rootPlayer` として固定する。各root候補を最大化し、着手後の全合法応手を最小化して、その最低値が最大の候補を返す。`>` / `<` だけで更新するため同点では既存の固定候補順の先頭を保つ。選択だけを返し、実対局状態には着手しない。
+- `evaluateSearchPosition(state, perspective, valueTable?)` は、勝ちを `Number.POSITIVE_INFINITY`、負けを `Number.NEGATIVE_INFINITY`、勝者のない終局を `0` とする。これにより終局結果が任意の有限駒得より必ず優先される。`active` / `check` は既存の `evaluateMaterial` に委譲し、王手加点は加えない。`ended` と `result`、または勝者・敗者の矛盾は通常局面へ黙ってフォールバックせず例外にする。
+- 合法手列挙・成り・捕獲・持ち駒・駒打ち・王手放置・打ち歩詰め・詰み・千日手・500手持将棋の処理は、既存の `getLegalActions`、`executeLegalAction`、`cloneBoardState`、`evaluateMaterial` を再利用し、再実装していない。候補ごと・応手ごとに完全複製した局面だけを実行する。
+
+### 変更ファイルとテスト
+
+- 追加: `src/domain/shogi/twoPlyMinimaxAi.ts`、`src/test/shogi-two-ply-minimax-ai.test.ts`。公開: `src/domain/shogi/index.ts`。説明追記: `README.md`。UI、JSON/KIF/分岐仕様、依存関係、CI設定は変更していない。
+- 新規テスト12件は、active/checkとカスタム評価表、詰み・投了・反則負け・千日手・500手持将棋・入玉引き分けの終局評価、矛盾状態の拒否、目先の銀取りと直後の飛車による取り返し、先手/後手のroot視点、詰みの優先、同点順、空候補、非破壊性を確認する。1手読みAIが銀を取る一方、2手読みAIが相手の最小化応手を読んで別手を選ぶ局面を明示した。
+
+### 検証
+
+- `node --version` は `v24.20.0`、`npm --version` は `11.17.0`。`npm run verify:lock`、`npm run lint`、専用テスト12/12、AI関連5ファイル75/75、全24テストファイルを3バッチで843/843、`npm run build`、`git diff --check` は成功した。
+- `npm run verify:macos-fsevents` はWindows上の静的検査に成功した。macOSネイティブwatchおよびVite watcherのmacOS経路は対象OS外のため未実施。`npm test` と `npm run check` はいずれも24ファイル843/843件、終了コード0で成功した。
+
+### 対象外
+
+- 深さ3以上、再帰探索、negamax、αβ枝刈り、反復深化、思考/ノード時間制限、並列探索、Web Worker、局面キャッシュ、手の並べ替え、王手加点、位置・利き・玉安全度・合法手数評価、ランダム性、難易度、AI対局UI、外部エンジン、新規依存は追加しない。
+
+## [2026-09-09] PR #54 2手読みミニマックスAIの-∞境界修正
+
+- 実装日時: 2026-09-09 12:05:53 +09:00。`bestEvaluation` を `Number.NEGATIVE_INFINITY` で初期化し、厳密な `>` だけで更新していたため、全候補の評価が `-Infinity` のとき最初の合法手さえ採用されず `null` を返していた。
+- 合法手の有無と評価値の大小は別の契約であるため、`bestAction === null` の最初の候補は評価値にかかわらず比較基準として確保し、2件目以降だけ従来どおり厳密な `>` で更新する。同点時の固定候補順は維持する。
+- `shogi-two-ply-minimax-ai.test.ts` に、先手の唯一の合法手の後で後手が既存の合法着手・詰み判定を通して必ず勝つ局面を追加した。root候補の最小評価が実際に `Number.NEGATIVE_INFINITY`、選択結果が固定順の先頭、入力局面が非破壊、終局済み局面が引き続き `null` を返すことを確認する。
+- 検証: `npm run lint`、専用テスト13/13、全テスト、`npm run build`、`git diff --check` を実施する。依存関係、UI、JSON/KIF/分岐、探索深度は変更しない。
