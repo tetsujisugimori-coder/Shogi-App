@@ -6,6 +6,7 @@ export * from './randomAi';
 export * from './materialEvaluation';
 export * from './materialAi';
 export * from './twoPlyMinimaxAi';
+export * from './twoPlyAlphaBetaAi';
 export * from './validation';
 export * from './promotion';
 export * from './gameState';

@@ -2,12 +2,14 @@ import { describe, expect, it } from 'vitest';
 import {
   cloneBoardSquares,
   cloneBoardState,
+  analyzeTwoPlyAlphaBetaSearch,
   analyzeTwoPlyMinimaxSearch,
   evaluateMaterial,
   evaluateSearchPosition,
   executeLegalAction,
   getLegalActions,
   selectBestMaterialAction,
+  selectBestTwoPlyAlphaBetaAction,
   selectBestTwoPlyMinimaxAction,
   type LegalAction,
   type MaterialValueTable,
@@ -345,5 +347,139 @@ describe('2手読みミニマックスAIの探索計測', () => {
       visitedPositionCount: 0,
       topCandidates: [],
     });
+  });
+});
+
+describe('2手読みαβ枝刈り探索', () => {
+  it('通常局面で既存ミニマックスと選択手・選択評価値を一致させ、入力局面を変えない', () => {
+    const state = recaptureTrapState();
+    const snapshot = JSON.stringify(state);
+    const minimax = analyzeTwoPlyMinimaxSearch(state);
+    const alphaBeta = analyzeTwoPlyAlphaBetaSearch(state);
+
+    expect(alphaBeta.selectedAction).toEqual(minimax.selectedAction);
+    expect(alphaBeta.selectedEvaluation).toBe(minimax.selectedEvaluation);
+    expect(selectBestTwoPlyAlphaBetaAction(state)).toEqual(selectBestTwoPlyMinimaxAction(state));
+    expect(alphaBeta.rootLegalActionCount).toBe(getLegalActions(state).length);
+    expect(alphaBeta.depth).toBe(2);
+    expect(JSON.stringify(state)).toBe(snapshot);
+  });
+
+  it('先手・後手とも開始時のroot AI視点を固定し、カスタム駒価値表でもミニマックスと一致する', () => {
+    const table: MaterialValueTable = {
+      unpromoted: { pawn: 13, lance: 2, knight: 3, silver: 17, gold: 5, bishop: 7, rook: 19, king: 0 },
+      promoted: { pawn: 23, lance: 29, knight: 31, silver: 37, bishop: 41, rook: 43 },
+    };
+
+    for (const turn of ['sente', 'gote'] as const) {
+      const state = recaptureTrapState(turn);
+      const minimax = analyzeTwoPlyMinimaxSearch(state, table);
+      const alphaBeta = analyzeTwoPlyAlphaBetaSearch(state, table);
+
+      expect(alphaBeta.selectedAction).toEqual(minimax.selectedAction);
+      expect(alphaBeta.selectedEvaluation).toBe(minimax.selectedEvaluation);
+      if (!alphaBeta.selectedAction) throw new Error('Expected a legal root action.');
+      const afterRootAction = execute(state, alphaBeta.selectedAction);
+      const replies = getLegalActions(afterRootAction);
+      expect(alphaBeta.selectedEvaluation).toBe(Math.min(...replies.map((reply) =>
+        evaluateSearchPosition(execute(afterRootAction, reply), turn, table)
+      )));
+    }
+  });
+
+  it('同点では固定順の先頭を選び、全候補が-∞でも最初の合法手を返す', () => {
+    const tieState = createState([
+      { row: 8, col: 8, piece: piece('sente-king', 'king', 'sente') },
+      { row: 0, col: 8, piece: piece('gote-king', 'king', 'gote') },
+    ]);
+    const forcedLoss = forcedLossAfterEveryRootActionState();
+
+    expect(selectBestTwoPlyAlphaBetaAction(tieState)).toEqual(getLegalActions(tieState)[0]);
+    expect(selectBestTwoPlyAlphaBetaAction(forcedLoss)).toEqual(getLegalActions(forcedLoss)[0]);
+    expect(analyzeTwoPlyAlphaBetaSearch(forcedLoss).selectedEvaluation).toBe(Number.NEGATIVE_INFINITY);
+  });
+
+  it('詰みの+∞を有限の駒得候補より優先して、ミニマックスと一致する', () => {
+    const state = createState([
+      { row: 8, col: 4, piece: piece('sente-king', 'king', 'sente') },
+      { row: 0, col: 4, piece: piece('gote-king', 'king', 'gote') },
+      { row: 2, col: 4, piece: piece('mating-rook', 'rook', 'sente') },
+      { row: 1, col: 4, piece: piece('captured-silver', 'silver', 'gote') },
+      { row: 2, col: 3, piece: piece('rook-defender', 'gold', 'sente') },
+      { row: 2, col: 1, piece: piece('left-escape-guard', 'bishop', 'sente') },
+      { row: 2, col: 7, piece: piece('right-escape-guard', 'bishop', 'sente') },
+    ]);
+    const minimax = analyzeTwoPlyMinimaxSearch(state);
+    const alphaBeta = analyzeTwoPlyAlphaBetaSearch(state);
+
+    expect(alphaBeta.selectedAction).toEqual(minimax.selectedAction);
+    expect(alphaBeta.selectedEvaluation).toBe(Number.POSITIVE_INFINITY);
+    if (!alphaBeta.selectedAction) throw new Error('Expected a mating action.');
+    expect(evaluateSearchPosition(execute(state, alphaBeta.selectedAction), 'sente')).toBe(Number.POSITIVE_INFINITY);
+  });
+
+  it('終局済み局面では手を選ばず、枝刈り計測はすべて0にする', () => {
+    const ended = {
+      ...forcedLossAfterEveryRootActionState(),
+      status: 'ended' as const,
+      result: { winner: null, loser: null, endReason: 'repetition' } satisfies GameResult,
+    };
+
+    expect(analyzeTwoPlyAlphaBetaSearch(ended, undefined, () => 50)).toMatchObject({
+      selectedAction: null,
+      selectedEvaluation: null,
+      rootLegalActionCount: 0,
+      visitedPositionCount: 0,
+      depth: 2,
+      elapsedMilliseconds: 0,
+      prunedRootCandidateCount: 0,
+      skippedOpponentReplyCount: 0,
+    });
+  });
+
+  it('打ち切ったroot候補数と未実行応手数を、実際に省略した探索局面として数える', () => {
+    const state = createState([
+      { row: 8, col: 8, piece: piece('sente-king', 'king', 'sente') },
+      { row: 0, col: 8, piece: piece('gote-king', 'king', 'gote') },
+    ]);
+    const minimax = analyzeTwoPlyMinimaxSearch(state);
+    const alphaBeta = analyzeTwoPlyAlphaBetaSearch(state);
+
+    // The first root action establishes alpha=0. Later tied candidates have
+    // more legal replies, so their first evaluated reply proves they cannot
+    // displace the fixed-order winner and leaves replies unexecuted.
+    expect(alphaBeta.prunedRootCandidateCount).toBeGreaterThanOrEqual(1);
+    expect(alphaBeta.skippedOpponentReplyCount).toBeGreaterThan(0);
+    expect(alphaBeta.visitedPositionCount).toBeLessThan(minimax.visitedPositionCount);
+    expect(alphaBeta.visitedPositionCount + alphaBeta.skippedOpponentReplyCount).toBe(
+      minimax.visitedPositionCount
+    );
+  });
+
+  it('打ち切りが発生しない終局局面では、打ち切り計測を0のまま保つ', () => {
+    const ended = {
+      ...forcedLossAfterEveryRootActionState(),
+      status: 'ended' as const,
+      result: { winner: null, loser: null, endReason: 'entering_king_draw' } satisfies GameResult,
+    };
+    const result = analyzeTwoPlyAlphaBetaSearch(ended);
+
+    expect(result.prunedRootCandidateCount).toBe(0);
+    expect(result.skippedOpponentReplyCount).toBe(0);
+  });
+
+  it('注入時計は経過時間だけを測り、決定的な探索結果を変えない', () => {
+    const state = recaptureTrapState();
+    const readings = [100, 137];
+    const clock = () => readings.shift() ?? 137;
+    const measured = analyzeTwoPlyAlphaBetaSearch(state, undefined, clock);
+    const baseline = analyzeTwoPlyAlphaBetaSearch(state, undefined, () => 0);
+
+    expect(measured.elapsedMilliseconds).toBe(37);
+    expect(measured.selectedAction).toEqual(baseline.selectedAction);
+    expect(measured.selectedEvaluation).toBe(baseline.selectedEvaluation);
+    expect(measured.visitedPositionCount).toBe(baseline.visitedPositionCount);
+    expect(measured.prunedRootCandidateCount).toBe(baseline.prunedRootCandidateCount);
+    expect(measured.skippedOpponentReplyCount).toBe(baseline.skippedOpponentReplyCount);
   });
 });

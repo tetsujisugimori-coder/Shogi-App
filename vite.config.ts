@@ -6,6 +6,8 @@ import { defineConfig } from 'vite';
 
 export default defineConfig(() => {
   return {
+    // GitHub Pages serves this project from https://<owner>.github.io/Shogi-App/.
+    base: '/Shogi-App/',
     plugins: [react(), tailwindcss()],
     resolve: {
       alias: {
