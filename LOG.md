@@ -2562,6 +2562,13 @@ PR #1のレビュー指摘を受け、簡易APIの`applyMove`と合法手候補�
 - `node --version` は `v24.20.0`、`npm --version` は `11.17.0`。`npm run verify:lock`、`npm run lint`、専用テスト25/25、全25テストファイルを4バッチで857/857、`npm run build`、`git diff --check` は成功した。`npm test` と `npm run check` は実行したが、この環境ではVitest起動後の全件終了サマリーを回収できなかったため成功扱いにせず、前記4バッチを全件の完了証跡とする。
 - `npm run verify:macos-fsevents` はWindows上の静的検査に成功した。macOSネイティブwatchおよびVite watcherのmacOS経路は対象OS外のため未実施であり、成功扱いにはしない。
 
+## [2026-09-10] GitHub Pages のVite公開
+
+- 白画面の原因は、GitHub Pages が `main` ブランチのリポジトリrootをそのまま公開しており、`index.html` が参照する未ビルドの `/src/main.tsx` をブラウザが実行しようとしていたことだった。
+- `vite.config.ts` に `base: '/Shogi-App/'` を設定し、リポジトリ配下のアセットURLを `https://tetsujisugimori-coder.github.io/Shogi-App/` 用に生成するようにした。
+- `.github/workflows/deploy-pages.yml` を追加した。`main` へのpushと手動実行でNode.jsをセットアップし、`npm ci`、`npm run build`、`dist` のPages artifactアップロード、`github-pages` environmentへのデプロイを実行する。必要な `contents: read`、`pages: write`、`id-token: write` 権限を設定し、既存の `.github/workflows/ci.yml` は変更していない。
+- READMEに公開URLと、`main` へのpushで公開が更新されることを追記した。
+
 ### 今回の対象外
 
 - UIへのαβ操作・方式選択・結果パネル変更、AI同士の自動対局、深さ3以上、可変深度、汎用再帰探索、negamax、反復深化、手の並べ替え、局面キャッシュ、トランスポジションテーブル、Web Worker、並列探索、停止条件、評価関数の拡張、JSON/KIF/分岐仕様の変更、探索履歴の永続化、Memo-Nexus連携、外部エンジン、新規依存は含めない。

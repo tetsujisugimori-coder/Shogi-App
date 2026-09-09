@@ -258,6 +258,11 @@ GitHub Actions（`.github/workflows/ci.yml`）により、main/master ブラン�
 - `npm run lint`（TypeScript 型チェック）
 - `npm test`（Vitest テストスイート）
 - `npm run build`（本番ビルド）
+
+## GitHub Pages
+
+公開URLは [https://tetsujisugimori-coder.github.io/Shogi-App/](https://tetsujisugimori-coder.github.io/Shogi-App/) です。`main` への push ごとに `.github/workflows/deploy-pages.yml` が `dist` をビルドして公開を更新します。
+
 # KIF棋譜の保存と読み込み
 
 対局中・終局後の局面を、KIF 2.0形式の `.kif` ファイルとして保存できます。書き出しは引き続きUTF-8の`#KIF version=2.0 encoding=UTF-8`、CRLF、最終改行付きです。「KIF棋譜を読み込む」は元のバイト列を32 MiB上限で確認してから、UTF-8（BOM、CRLF/LF可）またはShift_JISとして厳格にデコードします。文字コード宣言があれば宣言どおりにだけデコードし、内容と矛盾する場合は別文字コードへ自動修正せず拒否します。宣言がない従来型KIFはUTF-8を先に試し、不正な場合だけShift_JISを試しますが、どちらの場合も標準の`手数----指手---------消費時間--`見出し、平手開始情報、連番の指し手、既存の合法手再実行を通過したものだけを受理します。確認ダイアログで確定するまで現在の対局は変更されません。
