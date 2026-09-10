@@ -94,6 +94,83 @@ function execute(state: BoardState, action: LegalAction): BoardState {
   return result.state;
 }
 
+/**
+ * A deliberately small, test-only minimax reference. It uses the public
+ * search primitives but does not carry alpha or beta, so it explores every
+ * legal branch up to the supplied ply depth. Production code must continue to
+ * use the single alpha-beta implementation instead of this helper.
+ */
+function analyzeUnprunedMinimaxForTest(
+  state: BoardState,
+  depth: number,
+  valueTable?: MaterialValueTable
+): {
+  selectedAction: LegalAction | null;
+  selectedEvaluation: number | null;
+  visitedPositionCount: number;
+  deepestEvaluatedPly: number;
+  terminalLeafCount: number;
+} {
+  const rootPlayer = state.turn;
+  let visitedPositionCount = 0;
+  let deepestEvaluatedPly = 0;
+  let terminalLeafCount = 0;
+
+  const evaluateLeaf = (position: BoardState, ply: number): number => {
+    deepestEvaluatedPly = Math.max(deepestEvaluatedPly, ply);
+    if (position.status === 'ended') terminalLeafCount += 1;
+    return evaluateSearchPosition(position, rootPlayer, valueTable);
+  };
+
+  const searchNode = (position: BoardState, remainingDepth: number, maximizing: boolean, ply: number): number => {
+    if (position.status === 'ended' || remainingDepth === 0) {
+      return evaluateLeaf(position, ply);
+    }
+
+    const actions = getLegalActions(position);
+    if (actions.length === 0) return evaluateLeaf(position, ply);
+
+    let value = maximizing ? Number.NEGATIVE_INFINITY : Number.POSITIVE_INFINITY;
+    for (const action of actions) {
+      const child = execute(position, action);
+      visitedPositionCount += 1;
+      const childValue = searchNode(child, remainingDepth - 1, !maximizing, ply + 1);
+      if (maximizing ? childValue > value : childValue < value) value = childValue;
+    }
+    return value;
+  };
+
+  if (depth === 0) {
+    return {
+      selectedAction: null,
+      selectedEvaluation: evaluateLeaf(state, 0),
+      visitedPositionCount,
+      deepestEvaluatedPly,
+      terminalLeafCount,
+    };
+  }
+
+  let selectedAction: LegalAction | null = null;
+  let selectedEvaluation = Number.NEGATIVE_INFINITY;
+  for (const action of getLegalActions(state)) {
+    const child = execute(state, action);
+    visitedPositionCount += 1;
+    const candidateEvaluation = searchNode(child, depth - 1, false, 1);
+    if (selectedAction === null || candidateEvaluation > selectedEvaluation) {
+      selectedAction = action;
+      selectedEvaluation = candidateEvaluation;
+    }
+  }
+
+  return {
+    selectedAction,
+    selectedEvaluation: selectedAction === null ? null : selectedEvaluation,
+    visitedPositionCount,
+    deepestEvaluatedPly,
+    terminalLeafCount,
+  };
+}
+
 function findMove(
   actions: LegalAction[],
   from: { row: number; col: number },
@@ -598,5 +675,62 @@ describe('再帰型αβ枝刈り探索', () => {
     expect(defaultDepthResult.selectedAction).toEqual(analyzeAlphaBetaSearch(state, 2).selectedAction);
     expect(() => analyzeAlphaBetaSearch(state, -1)).toThrow(/non-negative integer/);
     expect(() => analyzeAlphaBetaSearch(state, 1.5)).toThrow(/non-negative integer/);
+  });
+
+  it('深さ3は最大化→最小化→最大化で3 ply先を評価し、枝刈りなし参照探索と選択・評価が一致する', () => {
+    const state = recaptureTrapState();
+    const reference = analyzeUnprunedMinimaxForTest(state, 3);
+    const result = analyzeAlphaBetaSearch(state, 3);
+
+    expect(reference.deepestEvaluatedPly).toBe(3);
+    expect(result.depth).toBe(3);
+    expect(result.selectedAction).toEqual(reference.selectedAction);
+    expect(result.selectedEvaluation).toBe(reference.selectedEvaluation);
+    expect(result.selectedAction).toMatchObject({
+      kind: 'move', from: { row: 4, col: 4 }, to: { row: 8, col: 4 },
+    });
+    expect(result.visitedPositionCount).toBeLessThanOrEqual(reference.visitedPositionCount);
+    expect(result.cutoffCount).toBeGreaterThan(0);
+  });
+
+  it('深さ3の途中で詰みへ到達した枝は、それ以上の子局面を生成せず既存の終局評価を返す', () => {
+    const state = createState([
+      { row: 8, col: 4, piece: piece('sente-king', 'king', 'sente') },
+      { row: 0, col: 4, piece: piece('gote-king', 'king', 'gote') },
+      { row: 2, col: 4, piece: piece('mating-rook', 'rook', 'sente') },
+      { row: 1, col: 4, piece: piece('captured-silver', 'silver', 'gote') },
+      { row: 2, col: 3, piece: piece('rook-defender', 'gold', 'sente') },
+      { row: 2, col: 1, piece: piece('left-escape-guard', 'bishop', 'sente') },
+      { row: 2, col: 7, piece: piece('right-escape-guard', 'bishop', 'sente') },
+    ]);
+    const reference = analyzeUnprunedMinimaxForTest(state, 3);
+    const result = analyzeAlphaBetaSearch(state, 3);
+
+    expect(result.selectedAction).toEqual(reference.selectedAction);
+    expect(result.selectedEvaluation).toBe(Number.POSITIVE_INFINITY);
+    if (!result.selectedAction) throw new Error('Expected a mating action.');
+    const afterMate = execute(state, result.selectedAction);
+    expect(afterMate.status).toBe('ended');
+    expect(getLegalActions(afterMate)).toEqual([]);
+    expect(reference.terminalLeafCount).toBeGreaterThan(0);
+    expect(result.visitedPositionCount).toBeLessThanOrEqual(reference.visitedPositionCount);
+  });
+
+  it('深さ2と深さ3の統計を同じ定義で比較でき、深さ3の同点でも固定順を保つ', () => {
+    const state = recaptureTrapState();
+    const depth2 = analyzeAlphaBetaSearch(state, 2);
+    const depth3 = analyzeAlphaBetaSearch(state, 3);
+    const tieState = createState([
+      { row: 8, col: 8, piece: piece('sente-king', 'king', 'sente') },
+      { row: 0, col: 8, piece: piece('gote-king', 'king', 'gote') },
+    ]);
+    const tieDepth3 = analyzeAlphaBetaSearch(tieState, 3);
+
+    expect(depth2.depth).toBe(2);
+    expect(depth3.depth).toBe(3);
+    expect(depth3.visitedPositionCount).toBeGreaterThan(depth2.visitedPositionCount);
+    expect(depth2.cutoffCount).toBeGreaterThanOrEqual(0);
+    expect(depth3.cutoffCount).toBeGreaterThanOrEqual(0);
+    expect(tieDepth3.selectedAction).toEqual(getLegalActions(tieState)[0]);
   });
 });
