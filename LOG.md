@@ -2572,3 +2572,24 @@ PR #1のレビュー指摘を受け、簡易APIの`applyMove`と合法手候補�
 ### 今回の対象外
 
 - UIへのαβ操作・方式選択・結果パネル変更、AI同士の自動対局、深さ3以上、可変深度、汎用再帰探索、negamax、反復深化、手の並べ替え、局面キャッシュ、トランスポジションテーブル、Web Worker、並列探索、停止条件、評価関数の拡張、JSON/KIF/分岐仕様の変更、探索履歴の永続化、Memo-Nexus連携、外部エンジン、新規依存は含めない。
+
+## [2026-09-10] 深さ指定の再帰型αβ枝刈り探索
+
+### 目的と実装
+
+- 固定2 ply専用だったαβ探索を、ply単位の`depth`を受け取る`analyzeAlphaBetaSearch(state, depth, valueTable?, clock?)`と`selectBestAlphaBetaAction(state, depth, valueTable?)`へ組み替えた。開始時の`state.turn`をrootPlayerとして固定し、rootPlayer側を最大化、交代した相手側を最小化する既存の評価符号規則を維持した。
+- 深さはroot着手を含む。深さ0は入力局面だけを評価し、深さ1はAI着手、深さ2はAI→相手、深さ3はAI→相手→AIの3 plyを調べる。root着手を適用した後、再帰関数へ`depth - 1`を渡すことで境界を明示した。深さ3は「各側3手」ではない。
+- 再帰ノードは終局または残り深さ0で既存の`evaluateSearchPosition`を返し、それ以外では`getLegalActions`、`cloneBoardState`、`executeLegalAction`を使って子局面を生成する。最大化側はalpha、最小化側はbetaを更新し、残り候補がある`alpha >= beta`でだけ打ち切る。元局面を使い回して着手・取り消しする方式へは変更していない。
+- 新しい統計はrootを除く実生成局面数`visitedPositionCount`、実際にループを打ち切った回数`cutoffCount`、そのため未実行になった候補数`skippedActionCount`で、探索ごとにローカル初期化する。深さ2互換APIでは既存公開名`prunedRootCandidateCount`と`skippedOpponentReplyCount`へ同じ値を写し、意味を維持する。
+- 旧2 ply専用の探索本体は削除した。既存の`analyzeTwoPlyAlphaBetaSearch`と`selectBestTwoPlyAlphaBetaAction`は深さ2で再帰本体を一度だけ呼ぶ互換ラッパーであり、本番コードに探索ロジックの二重実装は残していない。AIの既定入口も深さ2のままで、UIや方式選択は変更していない。
+
+### テストと検証
+
+- `src/test/shogi-two-ply-minimax-ai.test.ts`へ、深さ2の旧ミニマックス・2 ply互換API・新再帰APIの選択手、評価値、統計の一致、深さ0の子局面ゼロ生成、深さ1/2/3のply境界、深さ3の合法手・非破壊性・決定性、カットオフあり/なし、終局、統計リセット、無効深さの拒否を追加した。同点時は厳密比較により既存の先頭候補を保持する。
+- `npm test -- src/test/shogi-two-ply-minimax-ai.test.ts` は31/31件成功した。`npm run verify:lock`、`npm run lint`、`npm run build`、`git diff --check`も成功した。全件`npm test`はWindows環境で既存の`shogi-branch-replay`が一度だけ5秒超過し完了サマリーを得られなかったが、単独再実行は20/20件成功し、全25テストファイルを4バッチで863/863件成功した。
+- 代表の取り返し局面では、旧2 plyミニマックスは選択手`4,4 -> 4,0`、評価`-700`、調査局面283件、旧2 plyαβ互換APIと再帰型深さ2はいずれも同じ選択手・評価、調査局面184件、カットオフ11回、未実行応手99件だった。再帰型深さ3は正常に`4,4 -> 8,4`、評価`-500`、調査局面1293件、カットオフ163回、未実行候補3854件を返した。深さ3は深さ2と同じ手を要求しない。
+
+### 今回の対象外と注意点
+
+- 手の並べ替え、反復深化、思考時間制限、局面キャッシュ／置換表、評価関数変更、並列探索、AI対局UI、保存形式変更は追加していない。
+- 既存ルールで到達する合法手なし局面は終局済みとして表現される。防御的に、非終局で空の合法手配列が渡された場合も再帰せず既存局面評価を葉として返し、無限再帰や例外を避ける。

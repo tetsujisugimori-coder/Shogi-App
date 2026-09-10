@@ -119,8 +119,9 @@
     - `evaluateMaterial(state, perspective, valueTable?)` は盤上と持ち駒のAI用駒価値を、明示した `perspective` 側の合計から相手側の合計を引いて返す。手番には依存せず、既定表を比較実験用の表に差し替えられる
     - `selectBestMaterialAction(state, perspective, valueTable?)` は全合法手を独立した複製局面で1手だけ仮想実行し、AI自身の固定視点で最も駒得評価が高い手を選ぶ。等値時は固定候補順の先頭を選び、実際の局面更新は引き続き `executeLegalAction` に分離される
     - `evaluateSearchPosition(state, perspective, valueTable?)` と `selectBestTwoPlyMinimaxAction(state, valueTable?)` は、終局の勝敗を `+Infinity` / `-Infinity`、引き分けを `0` として有限の駒得より優先する、2 ply専用の探索基盤である。後者は開始時の `state.turn` を `rootPlayer` として固定し、自分の着手後に相手の全合法応手を1手だけ読み、相手がrootPlayerの評価を最小化すると仮定して最大化側の手を選ぶ。等値時は既存の固定候補順の先頭を保つ
-    - `analyzeTwoPlyAlphaBetaSearch(state, valueTable?, clock?)` と `selectBestTwoPlyAlphaBetaAction(state, valueTable?)` は、同じ2 ply・同じ固定手順・同じrootPlayer視点で既存ミニマックスと同じ選択手・選択評価値を得るための最適化版である。root側の現在最良値をalphaとし、相手応手の最小値がalpha以下になったroot候補では残り応手を実行しない。計測は選択手・選択評価値・root合法手数・rootを除く調査局面数・深さ・経過時間に加え、実際に残り応手を打ち切ったroot候補数と未実行応手数を返す。枝刈りされた候補の未確定な最終評価値は公開しない
-    - ランダムAI、1手読み駒得AI、2手読みミニマックスAI、2手読みαβ枝刈りAIは同じ合法手・実行・複製・評価APIを比較できる。現時点では深さ3以上、再帰探索、反復深化、思考時間制御、局面キャッシュ、AI対局UIは含まない
+    - `analyzeAlphaBetaSearch(state, depth, valueTable?, clock?)` と `selectBestAlphaBetaAction(state, depth, valueTable?)` は、深さをply単位で受け取る再帰型αβ探索である。指定深さはrootのAI着手を含み、深さ1はAI着手だけ、深さ2はAI→相手、深さ3はAI→相手→AIを読む（「3手ずつ読む」意味ではない）。開始時の `state.turn` をrootPlayerとして固定し、rootPlayer側を最大化、相手側を最小化する。各子局面は既存の複製・合法手・着手APIで生成し、残り深さ0または終局では既存の終局優先評価を返す。`alpha >= beta`で残り候補を打ち切り、rootを除く実生成局面数、打ち切り回数、未実行候補数を探索ごとに返す。候補順は変更せず、厳密比較により同点では先頭の合法手を維持する
+    - `analyzeTwoPlyAlphaBetaSearch(state, valueTable?, clock?)` と `selectBestTwoPlyAlphaBetaAction(state, valueTable?)` は互換用の深さ2ラッパーであり、専用探索本体を二重に保持しない。既存のAI入口の深さは引き続き2のままで、互換計測の `prunedRootCandidateCount` と `skippedOpponentReplyCount` は深さ2におけるカットオフ回数と未実行の相手応手数を表す
+    - ランダムAI、1手読み駒得AI、2手読みミニマックスAI、深さ指定αβ枝刈りAIは同じ合法手・実行・複製・評価APIを比較できる。反復深化、思考時間制御、局面キャッシュ、AI対局UIは含まない
     - 駒得評価は入玉・持将棋の公式点数とは別の基盤であり、終局結果、王手、玉の安全度、駒の働き、合法手数は含めない。1手読みは minimax 等の探索を行わない
   - **公開APIの統制と低レベル盤面更新処理のカプセル化**:
     - 盤上移動は `executeMove`（および後方互換の `applyMove`）、駒打ちは `executeDrop` を外部向け着手APIとして公開。

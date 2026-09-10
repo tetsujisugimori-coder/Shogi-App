@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 import {
   cloneBoardSquares,
   cloneBoardState,
+  analyzeAlphaBetaSearch,
   analyzeTwoPlyAlphaBetaSearch,
   analyzeTwoPlyMinimaxSearch,
   evaluateMaterial,
@@ -9,8 +10,10 @@ import {
   executeLegalAction,
   getLegalActions,
   selectBestMaterialAction,
+  selectBestAlphaBetaAction,
   selectBestTwoPlyAlphaBetaAction,
   selectBestTwoPlyMinimaxAction,
+  TWO_PLY_ALPHA_BETA_SEARCH_DEPTH,
   type LegalAction,
   type MaterialValueTable,
 } from '../domain/shogi';
@@ -481,5 +484,119 @@ describe('2手読みαβ枝刈り探索', () => {
     expect(measured.visitedPositionCount).toBe(baseline.visitedPositionCount);
     expect(measured.prunedRootCandidateCount).toBe(baseline.prunedRootCandidateCount);
     expect(measured.skippedOpponentReplyCount).toBe(baseline.skippedOpponentReplyCount);
+  });
+});
+
+describe('再帰型αβ枝刈り探索', () => {
+  it('深さ2は旧2 plyミニマックスと互換ラッパーの選択手・評価値・統計を保つ', () => {
+    const state = recaptureTrapState();
+    const snapshot = JSON.stringify(state);
+    const minimax = analyzeTwoPlyMinimaxSearch(state);
+    const legacyTwoPly = analyzeTwoPlyAlphaBetaSearch(state);
+    const recursive = analyzeAlphaBetaSearch(state, 2);
+
+    expect(recursive.selectedAction).toEqual(minimax.selectedAction);
+    expect(recursive.selectedEvaluation).toBe(minimax.selectedEvaluation);
+    expect(recursive.selectedAction).toEqual(legacyTwoPly.selectedAction);
+    expect(recursive.selectedEvaluation).toBe(legacyTwoPly.selectedEvaluation);
+    expect(recursive.visitedPositionCount).toBe(legacyTwoPly.visitedPositionCount);
+    expect(recursive.cutoffCount).toBe(legacyTwoPly.prunedRootCandidateCount);
+    expect(recursive.skippedActionCount).toBe(legacyTwoPly.skippedOpponentReplyCount);
+    expect(selectBestAlphaBetaAction(state, 2)).toEqual(selectBestTwoPlyAlphaBetaAction(state));
+    expect(JSON.stringify(state)).toBe(snapshot);
+  });
+
+  it('深さ0は局面だけを評価して子局面を生成せず、深さ1/2/3はrootを含むply数で読む', () => {
+    const state = recaptureTrapState();
+    const depth0 = analyzeAlphaBetaSearch(state, 0);
+    const depth1 = analyzeAlphaBetaSearch(state, 1);
+    const depth2 = analyzeAlphaBetaSearch(state, 2);
+    const depth3 = analyzeAlphaBetaSearch(state, 3);
+
+    expect(depth0).toMatchObject({
+      selectedAction: null,
+      selectedEvaluation: evaluateSearchPosition(state, state.turn),
+      rootLegalActionCount: 0,
+      visitedPositionCount: 0,
+      cutoffCount: 0,
+      skippedActionCount: 0,
+    });
+    // depth 1 generates root successors only. The recursive call receives
+    // depth - 1, making depth 2 root/opponent and depth 3 root/opponent/root.
+    expect(depth1.visitedPositionCount).toBe(getLegalActions(state).length);
+    expect(depth2.visitedPositionCount).toBeGreaterThan(depth1.visitedPositionCount);
+    expect(depth3.visitedPositionCount).toBeGreaterThan(depth2.visitedPositionCount);
+    expect([depth1.depth, depth2.depth, depth3.depth]).toEqual([1, 2, 3]);
+  });
+
+  it('深さ3は合法手と探索統計を返し、入力局面を破壊せず決定的に完了する', () => {
+    const state = recaptureTrapState();
+    const snapshot = JSON.stringify(state);
+    const first = analyzeAlphaBetaSearch(state, 3);
+    const second = analyzeAlphaBetaSearch(state, 3);
+    const rootActions = getLegalActions(state);
+
+    expect(first.selectedAction).not.toBeNull();
+    expect(rootActions).toContainEqual(first.selectedAction);
+    expect(first.selectedAction).toEqual(second.selectedAction);
+    expect(first.selectedEvaluation).toBe(second.selectedEvaluation);
+    expect(first.visitedPositionCount).toBeGreaterThan(0);
+    expect(first.cutoffCount).toBeGreaterThanOrEqual(0);
+    expect(first.skippedActionCount).toBeGreaterThanOrEqual(0);
+    expect(JSON.stringify(state)).toBe(snapshot);
+  });
+
+  it('alpha >= betaのカットオフは結果を変えず、深さ1ではカットオフなしでも正しく探索する', () => {
+    const tieState = createState([
+      { row: 8, col: 8, piece: piece('sente-king', 'king', 'sente') },
+      { row: 0, col: 8, piece: piece('gote-king', 'king', 'gote') },
+    ]);
+    const depth1 = analyzeAlphaBetaSearch(tieState, 1);
+    const depth2 = analyzeAlphaBetaSearch(tieState, 2);
+    const minimax = analyzeTwoPlyMinimaxSearch(tieState);
+
+    expect(depth1.cutoffCount).toBe(0);
+    expect(depth1.skippedActionCount).toBe(0);
+    expect(depth1.selectedAction).toEqual(getLegalActions(tieState)[0]);
+    expect(depth2.cutoffCount).toBeGreaterThanOrEqual(1);
+    expect(depth2.skippedActionCount).toBeGreaterThan(0);
+    expect(depth2.selectedAction).toEqual(minimax.selectedAction);
+    expect(depth2.selectedEvaluation).toBe(minimax.selectedEvaluation);
+    expect(depth2.visitedPositionCount).toBeLessThanOrEqual(minimax.visitedPositionCount);
+  });
+
+  it('終局・合法手なし局面では例外や無限再帰を起こさず、探索統計は探索ごとに初期化する', () => {
+    const ended = {
+      ...forcedLossAfterEveryRootActionState(),
+      status: 'ended' as const,
+      result: { winner: null, loser: null, endReason: 'repetition' } satisfies GameResult,
+    };
+    const active = recaptureTrapState();
+    const first = analyzeAlphaBetaSearch(active, 2);
+    const second = analyzeAlphaBetaSearch(active, 2);
+
+    expect(() => analyzeAlphaBetaSearch(ended, 3)).not.toThrow();
+    expect(analyzeAlphaBetaSearch(ended, 3)).toMatchObject({
+      selectedAction: null,
+      selectedEvaluation: null,
+      rootLegalActionCount: 0,
+      visitedPositionCount: 0,
+      cutoffCount: 0,
+      skippedActionCount: 0,
+    });
+    expect(second.visitedPositionCount).toBe(first.visitedPositionCount);
+    expect(second.cutoffCount).toBe(first.cutoffCount);
+    expect(second.skippedActionCount).toBe(first.skippedActionCount);
+  });
+
+  it('既定の2 ply APIは深さ2のままで、無効な深さは明示的に拒否する', () => {
+    const state = recaptureTrapState();
+    const defaultDepthResult = analyzeTwoPlyAlphaBetaSearch(state);
+
+    expect(TWO_PLY_ALPHA_BETA_SEARCH_DEPTH).toBe(2);
+    expect(defaultDepthResult.depth).toBe(2);
+    expect(defaultDepthResult.selectedAction).toEqual(analyzeAlphaBetaSearch(state, 2).selectedAction);
+    expect(() => analyzeAlphaBetaSearch(state, -1)).toThrow(/non-negative integer/);
+    expect(() => analyzeAlphaBetaSearch(state, 1.5)).toThrow(/non-negative integer/);
   });
 });
