@@ -17,6 +17,7 @@ import {
   type LegalAction,
   type MaterialValueTable,
 } from '../domain/shogi';
+import { orderAlphaBetaNodeActions } from '../domain/shogi/twoPlyAlphaBetaAi';
 import {
   createInitialBoardState,
   type BoardState,
@@ -84,6 +85,32 @@ function forcedLossAfterEveryRootActionState(): BoardState {
     { row: 6, col: 5, piece: piece('gote-pawn', 'pawn', 'gote') },
     { row: 6, col: 1, piece: piece('left-escape-guard', 'bishop', 'gote') },
     { row: 6, col: 7, piece: piece('right-escape-guard', 'bishop', 'gote') },
+  ]);
+}
+
+/** Contains one action from each move-ordering class plus a legal drop. */
+function moveOrderingActionState(): BoardState {
+  return createState([
+    { row: 8, col: 8, piece: piece('sente-king', 'king', 'sente') },
+    { row: 0, col: 8, piece: piece('gote-king', 'king', 'gote') },
+    { row: 1, col: 4, piece: piece('promotion-capturing-pawn', 'pawn', 'sente') },
+    { row: 0, col: 4, piece: piece('captured-silver', 'silver', 'gote') },
+    { row: 4, col: 4, piece: piece('capturing-rook', 'rook', 'sente') },
+    { row: 4, col: 5, piece: piece('captured-pawn', 'pawn', 'gote') },
+    { row: 2, col: 2, piece: piece('promotion-pawn', 'pawn', 'sente') },
+  ], [piece('sente-hand-gold', 'gold', 'sente')]);
+}
+
+/** A depth-three fixture where an early tactical reply improves cutoffs. */
+function moveOrderingBenefitState(): BoardState {
+  return createState([
+    { row: 8, col: 8, piece: piece('sente-king', 'king', 'sente') },
+    { row: 0, col: 8, piece: piece('gote-king', 'king', 'gote') },
+    { row: 4, col: 4, piece: piece('sente-rook', 'rook', 'sente') },
+    { row: 3, col: 4, piece: piece('gote-pawn-forward', 'pawn', 'gote') },
+    { row: 4, col: 5, piece: piece('gote-silver', 'silver', 'gote') },
+    { row: 4, col: 6, piece: piece('gote-rook', 'rook', 'gote') },
+    { row: 5, col: 4, piece: piece('sente-pawn', 'pawn', 'sente') },
   ]);
 }
 
@@ -171,6 +198,98 @@ function analyzeUnprunedMinimaxForTest(
   };
 }
 
+/**
+ * Test-only alpha-beta baseline that intentionally keeps every non-root
+ * `getLegalActions` order. It makes the move-ordering node reduction
+ * measurable without adding another production search implementation.
+ */
+function analyzeUnorderedAlphaBetaForTest(
+  state: BoardState,
+  depth: number,
+  valueTable?: MaterialValueTable
+): {
+  selectedAction: LegalAction | null;
+  selectedEvaluation: number | null;
+  visitedPositionCount: number;
+  cutoffCount: number;
+  skippedActionCount: number;
+} {
+  const rootPlayer = state.turn;
+  let visitedPositionCount = 0;
+  let cutoffCount = 0;
+  let skippedActionCount = 0;
+
+  const searchNode = (
+    position: BoardState,
+    remainingDepth: number,
+    maximizing: boolean,
+    alpha: number,
+    beta: number
+  ): number => {
+    if (position.status === 'ended' || remainingDepth === 0) {
+      return evaluateSearchPosition(position, rootPlayer, valueTable);
+    }
+
+    const actions = getLegalActions(position);
+    if (actions.length === 0) return evaluateSearchPosition(position, rootPlayer, valueTable);
+
+    let value = maximizing ? Number.NEGATIVE_INFINITY : Number.POSITIVE_INFINITY;
+    for (let actionIndex = 0; actionIndex < actions.length; actionIndex += 1) {
+      const child = execute(position, actions[actionIndex]);
+      visitedPositionCount += 1;
+      const childValue = searchNode(child, remainingDepth - 1, !maximizing, alpha, beta);
+      if (maximizing) {
+        if (childValue > value) value = childValue;
+        if (value > alpha) alpha = value;
+      } else {
+        if (childValue < value) value = childValue;
+        if (value < beta) beta = value;
+      }
+
+      const remainingActionCount = actions.length - actionIndex - 1;
+      if (alpha >= beta && remainingActionCount > 0) {
+        cutoffCount += 1;
+        skippedActionCount += remainingActionCount;
+        break;
+      }
+    }
+    return value;
+  };
+
+  if (depth === 0) {
+    return {
+      selectedAction: null,
+      selectedEvaluation: evaluateSearchPosition(state, rootPlayer, valueTable),
+      visitedPositionCount,
+      cutoffCount,
+      skippedActionCount,
+    };
+  }
+
+  let selectedAction: LegalAction | null = null;
+  let selectedEvaluation = Number.NEGATIVE_INFINITY;
+  let alpha = Number.NEGATIVE_INFINITY;
+  const beta = Number.POSITIVE_INFINITY;
+  for (const action of getLegalActions(state)) {
+    const child = execute(state, action);
+    visitedPositionCount += 1;
+    const candidateEvaluation = searchNode(child, depth - 1, false, alpha, beta);
+    if (selectedAction === null || candidateEvaluation > selectedEvaluation) {
+      selectedAction = action;
+      selectedEvaluation = candidateEvaluation;
+    }
+    if (selectedEvaluation > alpha) alpha = selectedEvaluation;
+  }
+
+  return {
+    selectedAction,
+    selectedEvaluation: selectedAction === null ? null : selectedEvaluation,
+    visitedPositionCount,
+    cutoffCount,
+    skippedActionCount,
+  };
+}
+
 function findMove(
   actions: LegalAction[],
   from: { row: number; col: number },
@@ -184,6 +303,87 @@ function findMove(
   if (!action) throw new Error('Expected move was not legal in the test position.');
   return action;
 }
+
+describe('再帰型αβ探索の手の並べ替え', () => {
+  it('駒取り＋成り、駒取り、成り、その他の優先順と同一優先度の元順を保つ', () => {
+    const state = moveOrderingActionState();
+    const actions = getLegalActions(state);
+    const capturePromotion = actions.find((action) => action.kind === 'move' &&
+      action.from.row === 1 && action.from.col === 4 && action.to.row === 0 && action.to.col === 4 &&
+      action.promotion === 'promote');
+    const capture = actions.find((action) => action.kind === 'move' &&
+      action.from.row === 4 && action.from.col === 4 && action.to.row === 4 && action.to.col === 5);
+    const promotion = actions.find((action) => action.kind === 'move' &&
+      action.from.row === 2 && action.from.col === 2 && action.to.row === 1 && action.to.col === 2 &&
+      action.promotion === 'promote');
+    const normal = actions.find((action) => action.kind === 'move' &&
+      action.from.row === 4 && action.from.col === 4 && action.to.row === 4 && action.to.col === 3);
+    const anotherNormal = actions.find((action) => action.kind === 'move' &&
+      action.from.row === 4 && action.from.col === 4 && action.to.row === 3 && action.to.col === 4 &&
+      action.promotion === 'none');
+    const drop = actions.find((action) => action.kind === 'drop');
+    if (!capturePromotion || !capture || !promotion || !normal || !anotherNormal || !drop) {
+      throw new Error('Expected every move-ordering class in the fixture.');
+    }
+
+    const source = [normal, drop, anotherNormal, promotion, capture, capturePromotion];
+
+    expect(orderAlphaBetaNodeActions(state, source)).toEqual([
+      capturePromotion,
+      capture,
+      promotion,
+      normal,
+      drop,
+      anotherNormal,
+    ]);
+  });
+
+  it('駒打ちをその他として扱い、元の候補配列と入力局面を変更しない', () => {
+    const state = moveOrderingActionState();
+    const snapshot = JSON.stringify(state);
+    const source = getLegalActions(state);
+    const sourceSnapshot = [...source];
+    const ordered = orderAlphaBetaNodeActions(state, source);
+    const firstDropIndex = ordered.findIndex((action) => action.kind === 'drop');
+    const firstPriorityThreeIndex = ordered.findIndex((action) => action.kind === 'move' &&
+      action.promotion !== 'promote' && state.squares[action.to.row][action.to.col].piece === null);
+
+    expect(ordered).not.toBe(source);
+    expect(source).toEqual(sourceSnapshot);
+    expect(firstDropIndex).toBeGreaterThanOrEqual(firstPriorityThreeIndex);
+    expect(JSON.stringify(state)).toBe(snapshot);
+  });
+
+  it('root候補は並べ替えず、同点では元の先頭手を選ぶ', () => {
+    const state = createState([
+      { row: 8, col: 8, piece: piece('sente-king', 'king', 'sente') },
+      { row: 0, col: 8, piece: piece('gote-king', 'king', 'gote') },
+      { row: 4, col: 4, piece: piece('sente-rook', 'rook', 'sente') },
+      { row: 4, col: 5, piece: piece('gote-pawn', 'pawn', 'gote') },
+    ]);
+    const rootActions = getLegalActions(state);
+    const zeroValueTable: MaterialValueTable = {
+      unpromoted: { pawn: 0, lance: 0, knight: 0, silver: 0, gold: 0, bishop: 0, rook: 0, king: 0 },
+      promoted: { pawn: 0, lance: 0, knight: 0, silver: 0, bishop: 0, rook: 0 },
+    };
+
+    expect(orderAlphaBetaNodeActions(state, rootActions)[0]).not.toEqual(rootActions[0]);
+    expect(analyzeAlphaBetaSearch(state, 1, zeroValueTable).selectedAction).toEqual(rootActions[0]);
+  });
+
+  it('深さ3では並べ替えなしαβより少ない局面を生成し、選択手と評価値を保つ', () => {
+    const state = moveOrderingBenefitState();
+    const unordered = analyzeUnorderedAlphaBetaForTest(state, 3);
+    const ordered = analyzeAlphaBetaSearch(state, 3);
+    const minimax = analyzeUnprunedMinimaxForTest(state, 3);
+
+    expect(ordered.selectedAction).toEqual(unordered.selectedAction);
+    expect(ordered.selectedEvaluation).toBe(unordered.selectedEvaluation);
+    expect(ordered.selectedAction).toEqual(minimax.selectedAction);
+    expect(ordered.selectedEvaluation).toBe(minimax.selectedEvaluation);
+    expect(ordered.visitedPositionCount).toBeLessThan(unordered.visitedPositionCount);
+  });
+});
 
 describe('探索用局面評価', () => {
   it('active/checkでは既存の駒得評価を視点とカスタム評価表を保って使う', () => {

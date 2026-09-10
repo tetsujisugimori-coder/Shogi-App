@@ -69,6 +69,37 @@ function validateSearchDepth(depth: number): void {
 }
 
 /**
+ * Returns a new, deterministic order for actions at non-root alpha-beta
+ * nodes. Captures and promotions are classified from the current position;
+ * no child state is created merely to order an action.
+ *
+ * This is intentionally not used for root actions. The root keeps the public
+ * legal-action order so strict root tie handling remains backward compatible.
+ */
+export function orderAlphaBetaNodeActions(
+  state: BoardState,
+  actions: readonly LegalAction[]
+): LegalAction[] {
+  const priorityOf = (action: LegalAction): number => {
+    const target = action.kind === 'move'
+      ? state.squares[action.to.row][action.to.col].piece
+      : null;
+    const isCapture = action.kind === 'move' && target !== null && target.player !== action.player;
+    const isPromotion = action.kind === 'move' && action.promotion === 'promote';
+
+    if (isCapture && isPromotion) return 0;
+    if (isCapture) return 1;
+    if (isPromotion) return 2;
+    return 3;
+  };
+
+  return actions
+    .map((action, originalIndex) => ({ action, originalIndex, priority: priorityOf(action) }))
+    .sort((left, right) => left.priority - right.priority || left.originalIndex - right.originalIndex)
+    .map(({ action }) => action);
+}
+
+/**
  * Evaluates one non-root search node. `remainingDepth` is the number of plies
  * still available from this node, so the root action has already consumed one
  * ply before this function is first called.
@@ -87,7 +118,7 @@ function searchAlphaBetaNode(
     return evaluateSearchPosition(state, rootPlayer, valueTable);
   }
 
-  const actions = getLegalActions(state);
+  const actions = orderAlphaBetaNodeActions(state, getLegalActions(state));
   // All reachable no-legal-action positions are marked ended by the existing
   // rules. Treat a malformed in-progress position as a leaf as well, rather
   // than recursing forever or throwing after a valid API result of [].
