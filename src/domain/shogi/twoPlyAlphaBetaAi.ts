@@ -34,6 +34,23 @@ export interface AlphaBetaSearchResult {
   skippedActionCount: number;
 }
 
+/** One completed fixed-depth pass of iterative-deepening alpha-beta search. */
+export interface IterativeDeepeningAlphaBetaIterationResult extends AlphaBetaSearchResult {}
+
+/**
+ * The deepest completed result plus every completed shallower iteration.
+ *
+ * The inherited search statistics describe only the deepest iteration. The
+ * `total*` fields are sums across `iterations`, so callers can distinguish a
+ * fixed-depth measurement from the work spent reaching that depth.
+ */
+export interface IterativeDeepeningAlphaBetaSearchResult extends AlphaBetaSearchResult {
+  iterations: readonly IterativeDeepeningAlphaBetaIterationResult[];
+  totalVisitedPositionCount: number;
+  totalCutoffCount: number;
+  totalSkippedActionCount: number;
+}
+
 /** Backward-compatible measurements for the established two-ply API. */
 export interface TwoPlyAlphaBetaSearchResult {
   selectedAction: LegalAction | null;
@@ -68,6 +85,31 @@ function validateSearchDepth(depth: number): void {
   }
 }
 
+function validateIterativeDeepeningMaxDepth(maxDepth: number): void {
+  validateSearchDepth(maxDepth);
+  if (maxDepth === 0) {
+    throw new Error('Iterative-deepening maximum depth must be a positive integer measured in ply.');
+  }
+}
+
+function sameCoordinate(
+  left: { row: number; col: number },
+  right: { row: number; col: number }
+): boolean {
+  return left.row === right.row && left.col === right.col;
+}
+
+function sameLegalAction(left: LegalAction, right: LegalAction): boolean {
+  if (left.kind !== right.kind || left.player !== right.player || left.pieceType !== right.pieceType ||
+    left.promotion !== right.promotion || !sameCoordinate(left.to, right.to)) {
+    return false;
+  }
+
+  return left.kind === 'move' && right.kind === 'move'
+    ? sameCoordinate(left.from, right.from)
+    : left.kind === 'drop' && right.kind === 'drop' && left.pieceId === right.pieceId;
+}
+
 /**
  * Returns a new, deterministic order for actions at non-root alpha-beta
  * nodes. Captures and promotions are classified from the current position;
@@ -97,6 +139,26 @@ export function orderAlphaBetaNodeActions(
     .map((action, originalIndex) => ({ action, originalIndex, priority: priorityOf(action) }))
     .sort((left, right) => left.priority - right.priority || left.originalIndex - right.originalIndex)
     .map(({ action }) => action);
+}
+
+/**
+ * Moves the completed previous iteration's best root action to the front.
+ * Remaining root candidates use the existing capture/promotion ordering. If
+ * that action is no longer legal, the public root legal-action order is kept.
+ */
+export function orderIterativeDeepeningRootActions(
+  state: BoardState,
+  actions: readonly LegalAction[],
+  previousBestAction: LegalAction | null
+): LegalAction[] {
+  if (previousBestAction === null) return [...actions];
+
+  const previousBestIndex = actions.findIndex((action) => sameLegalAction(action, previousBestAction));
+  if (previousBestIndex === -1) return [...actions];
+
+  const previousBest = actions[previousBestIndex];
+  const remainingActions = actions.filter((_, index) => index !== previousBestIndex);
+  return [previousBest, ...orderAlphaBetaNodeActions(state, remainingActions)];
 }
 
 /**
@@ -169,7 +231,8 @@ type UnmeasuredAlphaBetaSearchResult = Omit<AlphaBetaSearchResult, 'elapsedMilli
 function searchAlphaBeta(
   state: BoardState,
   depth: number,
-  valueTable: MaterialValueTable
+  valueTable: MaterialValueTable,
+  previousBestAction: LegalAction | null = null
 ): UnmeasuredAlphaBetaSearchResult {
   validateSearchDepth(depth);
   const rootPlayer = state.turn;
@@ -190,15 +253,22 @@ function searchAlphaBeta(
   }
 
   const rootActions = getLegalActions(state);
+  const orderedRootActions = orderIterativeDeepeningRootActions(state, rootActions, previousBestAction);
+  const indexedRootActions = orderedRootActions.map((action) => ({
+    action,
+    originalIndex: rootActions.indexOf(action),
+  }));
   let bestAction: LegalAction | null = null;
+  let bestOriginalIndex = Number.POSITIVE_INFINITY;
   let bestEvaluation = Number.NEGATIVE_INFINITY;
   let alpha = Number.NEGATIVE_INFINITY;
   const beta = Number.POSITIVE_INFINITY;
 
-  for (const rootAction of rootActions) {
+  for (const { action: rootAction, originalIndex } of indexedRootActions) {
+    const alphaBeforeCandidate = alpha;
     const afterRootAction = executeSearchAction(state, rootAction);
     statistics.visitedPositionCount += 1;
-    const candidateEvaluation = searchAlphaBetaNode(
+    let candidateEvaluation = searchAlphaBetaNode(
       afterRootAction,
       depth - 1,
       rootPlayer,
@@ -209,10 +279,30 @@ function searchAlphaBeta(
       statistics
     );
 
-    // The first legal action establishes the baseline even at -Infinity. The
-    // strict comparison preserves fixed legal-action order when values tie.
-    if (bestAction === null || candidateEvaluation > bestEvaluation) {
+    // A root candidate searched after a higher-index PV candidate can be cut
+    // off at alpha. Re-search only the one case where that bound could hide an
+    // exact tie which belongs to an earlier legal action. This separates the
+    // search order from the established root tie-breaking order.
+    if (bestAction !== null && originalIndex < bestOriginalIndex &&
+      candidateEvaluation === bestEvaluation && candidateEvaluation === alphaBeforeCandidate) {
+      candidateEvaluation = searchAlphaBetaNode(
+        afterRootAction,
+        depth - 1,
+        rootPlayer,
+        false,
+        Number.NEGATIVE_INFINITY,
+        Number.POSITIVE_INFINITY,
+        valueTable,
+        statistics
+      );
+    }
+
+    // The first legal action establishes the baseline even at -Infinity.
+    // For iterative root reordering, compare original indexes on exact ties.
+    if (bestAction === null || candidateEvaluation > bestEvaluation ||
+      (candidateEvaluation === bestEvaluation && originalIndex < bestOriginalIndex)) {
       bestAction = rootAction;
+      bestOriginalIndex = originalIndex;
       bestEvaluation = candidateEvaluation;
     }
     if (bestEvaluation > alpha) alpha = bestEvaluation;
@@ -249,6 +339,50 @@ export function analyzeAlphaBetaSearch(
   };
 }
 
+/**
+ * Completes alpha-beta searches from depth 1 through `maxDepth` in ply.
+ * Every completed pass is retained for a future time-limited implementation;
+ * this first stage has no clock deadline or interruption path.
+ */
+export function analyzeIterativeDeepeningAlphaBetaSearch(
+  state: BoardState,
+  maxDepth: number,
+  valueTable: MaterialValueTable = DEFAULT_MATERIAL_VALUE_TABLE,
+  clock: SearchClock = defaultSearchClock
+): IterativeDeepeningAlphaBetaSearchResult {
+  validateIterativeDeepeningMaxDepth(maxDepth);
+  const startedAt = clock();
+  const iterations: IterativeDeepeningAlphaBetaIterationResult[] = [];
+  let previousBestAction: LegalAction | null = null;
+
+  for (let depth = 1; depth <= maxDepth; depth += 1) {
+    const iterationStartedAt = clock();
+    const searchResult = searchAlphaBeta(state, depth, valueTable, previousBestAction);
+    const iteration = {
+      ...searchResult,
+      elapsedMilliseconds: Math.max(0, clock() - iterationStartedAt),
+    };
+    iterations.push(iteration);
+    previousBestAction = iteration.selectedAction;
+  }
+
+  const deepestIteration = iterations[iterations.length - 1];
+  return {
+    ...deepestIteration,
+    elapsedMilliseconds: Math.max(0, clock() - startedAt),
+    iterations,
+    totalVisitedPositionCount: iterations.reduce(
+      (total, iteration) => total + iteration.visitedPositionCount,
+      0
+    ),
+    totalCutoffCount: iterations.reduce((total, iteration) => total + iteration.cutoffCount, 0),
+    totalSkippedActionCount: iterations.reduce(
+      (total, iteration) => total + iteration.skippedActionCount,
+      0
+    ),
+  };
+}
+
 /** Selects only the best action from the requested recursive search depth. */
 export function selectBestAlphaBetaAction(
   state: BoardState,
@@ -256,6 +390,15 @@ export function selectBestAlphaBetaAction(
   valueTable: MaterialValueTable = DEFAULT_MATERIAL_VALUE_TABLE
 ): LegalAction | null {
   return searchAlphaBeta(state, depth, valueTable).selectedAction;
+}
+
+/** Selects the completed deepest action from iterative-deepening search. */
+export function selectBestIterativeDeepeningAlphaBetaAction(
+  state: BoardState,
+  maxDepth: number,
+  valueTable: MaterialValueTable = DEFAULT_MATERIAL_VALUE_TABLE
+): LegalAction | null {
+  return analyzeIterativeDeepeningAlphaBetaSearch(state, maxDepth, valueTable).selectedAction;
 }
 
 /**

@@ -3,6 +3,7 @@ import {
   cloneBoardSquares,
   cloneBoardState,
   analyzeAlphaBetaSearch,
+  analyzeIterativeDeepeningAlphaBetaSearch,
   analyzeTwoPlyAlphaBetaSearch,
   analyzeTwoPlyMinimaxSearch,
   evaluateMaterial,
@@ -11,13 +12,17 @@ import {
   getLegalActions,
   selectBestMaterialAction,
   selectBestAlphaBetaAction,
+  selectBestIterativeDeepeningAlphaBetaAction,
   selectBestTwoPlyAlphaBetaAction,
   selectBestTwoPlyMinimaxAction,
   TWO_PLY_ALPHA_BETA_SEARCH_DEPTH,
   type LegalAction,
   type MaterialValueTable,
 } from '../domain/shogi';
-import { orderAlphaBetaNodeActions } from '../domain/shogi/twoPlyAlphaBetaAi';
+import {
+  orderAlphaBetaNodeActions,
+  orderIterativeDeepeningRootActions,
+} from '../domain/shogi/twoPlyAlphaBetaAi';
 import {
   createInitialBoardState,
   type BoardState,
@@ -382,6 +387,139 @@ describe('再帰型αβ探索の手の並べ替え', () => {
     expect(ordered.selectedAction).toEqual(minimax.selectedAction);
     expect(ordered.selectedEvaluation).toBe(minimax.selectedEvaluation);
     expect(ordered.visitedPositionCount).toBeLessThan(unordered.visitedPositionCount);
+  });
+});
+
+describe('反復深化αβ探索', () => {
+  it('最大深さ3では深さ1、2、3を順に完了し、最深反復を最終結果として返す', () => {
+    const state = moveOrderingBenefitState();
+    const directDepth3 = analyzeAlphaBetaSearch(state, 3, undefined, () => 0);
+    const iterative = analyzeIterativeDeepeningAlphaBetaSearch(state, 3, undefined, () => 0);
+
+    expect(iterative.iterations.map((iteration) => iteration.depth)).toEqual([1, 2, 3]);
+    expect(iterative.selectedAction).toEqual(directDepth3.selectedAction);
+    expect(iterative.selectedEvaluation).toBe(directDepth3.selectedEvaluation);
+    expect(iterative.visitedPositionCount).toBe(iterative.iterations[2].visitedPositionCount);
+    expect(iterative.cutoffCount).toBe(iterative.iterations[2].cutoffCount);
+    expect(iterative.skippedActionCount).toBe(iterative.iterations[2].skippedActionCount);
+  });
+
+  it('最大深さ1では深さ1だけを実行し、その結果を返す', () => {
+    const state = recaptureTrapState();
+    const directDepth1 = analyzeAlphaBetaSearch(state, 1, undefined, () => 0);
+    const iterative = analyzeIterativeDeepeningAlphaBetaSearch(state, 1, undefined, () => 0);
+
+    expect(iterative.iterations).toHaveLength(1);
+    expect(iterative.iterations[0]).toMatchObject(directDepth1);
+    expect(iterative.selectedAction).toEqual(directDepth1.selectedAction);
+    expect(selectBestIterativeDeepeningAlphaBetaAction(state, 1)).toEqual(directDepth1.selectedAction);
+  });
+
+  it('前回最善手をroot先頭へ置き、残りは既存の分類順にする', () => {
+    const state = moveOrderingActionState();
+    const rootActions = getLegalActions(state);
+    const previousBestAction = rootActions.find((action) => action.kind === 'move' &&
+      action.from.row === 4 && action.from.col === 4 && action.to.row === 4 && action.to.col === 5);
+    if (!previousBestAction) throw new Error('Expected a non-leading previous best action.');
+
+    const ordered = orderIterativeDeepeningRootActions(state, rootActions, previousBestAction);
+    const expectedRemaining = orderAlphaBetaNodeActions(
+      state,
+      rootActions.filter((action) => action !== previousBestAction)
+    );
+
+    expect(ordered[0]).toEqual(previousBestAction);
+    expect(ordered.slice(1)).toEqual(expectedRemaining);
+    expect(rootActions).not.toEqual(ordered);
+  });
+
+  it('前回最善手が現局面の合法手にない場合は既存root順で続行する', () => {
+    const state = moveOrderingActionState();
+    const rootActions = getLegalActions(state);
+    const unavailableAction = getLegalActions(execute(state, rootActions[0]))[0];
+
+    expect(orderIterativeDeepeningRootActions(state, rootActions, unavailableAction)).toEqual(rootActions);
+    expect(analyzeIterativeDeepeningAlphaBetaSearch(state, 2).selectedAction).toEqual(
+      analyzeAlphaBetaSearch(state, 2).selectedAction
+    );
+  });
+
+  it('探索順が変わっても同点時は元の合法手順の先頭を選ぶ', () => {
+    const state = createState([
+      { row: 8, col: 8, piece: piece('sente-king', 'king', 'sente') },
+      { row: 0, col: 8, piece: piece('gote-king', 'king', 'gote') },
+      { row: 4, col: 4, piece: piece('sente-rook', 'rook', 'sente') },
+      { row: 4, col: 5, piece: piece('gote-pawn', 'pawn', 'gote') },
+    ]);
+    const rootActions = getLegalActions(state);
+    const zeroValueTable: MaterialValueTable = {
+      unpromoted: { pawn: 0, lance: 0, knight: 0, silver: 0, gold: 0, bishop: 0, rook: 0, king: 0 },
+      promoted: { pawn: 0, lance: 0, knight: 0, silver: 0, bishop: 0, rook: 0 },
+    };
+
+    const forcedReorder = orderIterativeDeepeningRootActions(state, rootActions, rootActions.at(-1) ?? null);
+    expect(forcedReorder[0]).not.toEqual(rootActions[0]);
+    expect(analyzeIterativeDeepeningAlphaBetaSearch(state, 2, zeroValueTable).selectedAction).toEqual(rootActions[0]);
+  });
+
+  it('深さ別統計を独立して記録し、累計を二重加算しない', () => {
+    const state = moveOrderingBenefitState();
+    const iterative = analyzeIterativeDeepeningAlphaBetaSearch(state, 3, undefined, () => 0);
+    const totals = iterative.iterations.reduce(
+      (sum, iteration) => ({
+        visited: sum.visited + iteration.visitedPositionCount,
+        cutoffs: sum.cutoffs + iteration.cutoffCount,
+        skipped: sum.skipped + iteration.skippedActionCount,
+      }),
+      { visited: 0, cutoffs: 0, skipped: 0 }
+    );
+
+    expect(iterative.iterations.every((iteration) => iteration.rootLegalActionCount > 0)).toBe(true);
+    expect(iterative.totalVisitedPositionCount).toBe(totals.visited);
+    expect(iterative.totalCutoffCount).toBe(totals.cutoffs);
+    expect(iterative.totalSkippedActionCount).toBe(totals.skipped);
+    expect(iterative.totalVisitedPositionCount).toBeGreaterThan(iterative.visitedPositionCount);
+  });
+
+  it('専用局面の深さ3でも選択手4,4 -> 4,0と評価-600を保ち、結果と統計は決定的', () => {
+    const state = moveOrderingBenefitState();
+    const snapshot = JSON.stringify(state);
+    const first = analyzeIterativeDeepeningAlphaBetaSearch(state, 3, undefined, () => 0);
+    const second = analyzeIterativeDeepeningAlphaBetaSearch(state, 3, undefined, () => 0);
+
+    expect(first.selectedAction).toMatchObject({
+      kind: 'move', from: { row: 4, col: 4 }, to: { row: 4, col: 0 },
+    });
+    expect(first.selectedEvaluation).toBe(-600);
+    expect(second).toMatchObject({
+      selectedAction: first.selectedAction,
+      selectedEvaluation: first.selectedEvaluation,
+      visitedPositionCount: first.visitedPositionCount,
+      cutoffCount: first.cutoffCount,
+      skippedActionCount: first.skippedActionCount,
+      totalVisitedPositionCount: first.totalVisitedPositionCount,
+      totalCutoffCount: first.totalCutoffCount,
+      totalSkippedActionCount: first.totalSkippedActionCount,
+    });
+    expect(JSON.stringify(state)).toBe(snapshot);
+  });
+
+  it('終局局面でも各反復を安全に完了し、無効な最大深さを拒否する', () => {
+    const ended = {
+      ...recaptureTrapState(),
+      status: 'ended' as const,
+      result: { winner: null, loser: null, endReason: 'repetition' } satisfies GameResult,
+    };
+    const result = analyzeIterativeDeepeningAlphaBetaSearch(ended, 3, undefined, () => 0);
+
+    expect(result.iterations).toHaveLength(3);
+    expect(result.iterations.every((iteration) => iteration.selectedAction === null)).toBe(true);
+    expect(result.totalVisitedPositionCount).toBe(0);
+    expect(result.totalCutoffCount).toBe(0);
+    expect(result.totalSkippedActionCount).toBe(0);
+    expect(() => analyzeIterativeDeepeningAlphaBetaSearch(ended, 0)).toThrow(/positive integer/);
+    expect(() => analyzeIterativeDeepeningAlphaBetaSearch(ended, -1)).toThrow(/non-negative integer/);
+    expect(() => analyzeIterativeDeepeningAlphaBetaSearch(ended, 1.5)).toThrow(/non-negative integer/);
   });
 });
 

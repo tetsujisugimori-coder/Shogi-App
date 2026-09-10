@@ -120,8 +120,9 @@
     - `selectBestMaterialAction(state, perspective, valueTable?)` は全合法手を独立した複製局面で1手だけ仮想実行し、AI自身の固定視点で最も駒得評価が高い手を選ぶ。等値時は固定候補順の先頭を選び、実際の局面更新は引き続き `executeLegalAction` に分離される
     - `evaluateSearchPosition(state, perspective, valueTable?)` と `selectBestTwoPlyMinimaxAction(state, valueTable?)` は、終局の勝敗を `+Infinity` / `-Infinity`、引き分けを `0` として有限の駒得より優先する、2 ply専用の探索基盤である。後者は開始時の `state.turn` を `rootPlayer` として固定し、自分の着手後に相手の全合法応手を1手だけ読み、相手がrootPlayerの評価を最小化すると仮定して最大化側の手を選ぶ。等値時は既存の固定候補順の先頭を保つ
     - `analyzeAlphaBetaSearch(state, depth, valueTable?, clock?)` と `selectBestAlphaBetaAction(state, depth, valueTable?)` は、深さをply単位で受け取る再帰型αβ探索である。指定深さはrootのAI着手を含み、深さ1はAI着手だけ、深さ2はAI→相手、深さ3はAI→相手→AIを読む（「3手ずつ読む」意味ではない）。開始時の `state.turn` をrootPlayerとして固定し、rootPlayer側を最大化、相手側を最小化する。各子局面は既存の複製・合法手・着手APIで生成し、残り深さ0または終局では既存の終局優先評価を返す。再帰内部では「駒取り＋成り、駒取り、成り、その他（駒打ちを含む）」の順に安定して候補を並べ、`alpha >= beta`で残り候補を打ち切る。root候補は並べ替えず、厳密比較により同点では元の先頭の合法手を維持する。探索ごとにrootを除く実生成局面数、打ち切り回数、未実行候補数を返す
+    - `analyzeIterativeDeepeningAlphaBetaSearch(state, maxDepth, valueTable?, clock?)` と `selectBestIterativeDeepeningAlphaBetaAction(state, maxDepth, valueTable?)` は、深さ1から最大深さまで同じ再帰型αβ探索を完了順に実行する時間制限なしの反復深化である。各深さの結果は `iterations` に保存し、最終結果と通常の探索統計は最深反復だけ、`totalVisitedPositionCount`・`totalCutoffCount`・`totalSkippedActionCount` は全反復の合計を表す。次の深さでは前回最善手をroot先頭に置き、残り候補は既存の駒取り・成り順で調べるが、同点時は元のroot合法手順の先頭を選ぶ。時間制限・中断はまだ実装しない
     - `analyzeTwoPlyAlphaBetaSearch(state, valueTable?, clock?)` と `selectBestTwoPlyAlphaBetaAction(state, valueTable?)` は互換用の深さ2ラッパーであり、専用探索本体を二重に保持しない。既存のAI入口の深さは引き続き2のままで、互換計測の `prunedRootCandidateCount` と `skippedOpponentReplyCount` は深さ2におけるカットオフ回数と未実行の相手応手数を表す
-    - ランダムAI、1手読み駒得AI、2手読みミニマックスAI、深さ指定αβ枝刈りAIは同じ合法手・実行・複製・評価APIを比較できる。反復深化、思考時間制御、局面キャッシュ、AI対局UIは含まない
+    - ランダムAI、1手読み駒得AI、2手読みミニマックスAI、深さ指定αβ枝刈りAI、時間制限なし反復深化は同じ合法手・実行・複製・評価APIを比較できる。思考時間制御、局面キャッシュ、AI対局UIは含まない
     - 駒得評価は入玉・持将棋の公式点数とは別の基盤であり、終局結果、王手、玉の安全度、駒の働き、合法手数は含めない。1手読みは minimax 等の探索を行わない
   - **公開APIの統制と低レベル盤面更新処理のカプセル化**:
     - 盤上移動は `executeMove`（および後方互換の `applyMove`）、駒打ちは `executeDrop` を外部向け着手APIとして公開。
