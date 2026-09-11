@@ -1,5 +1,23 @@
 # SHOGI-APP 開発ログ
 
+## [2026-09-12] 時間制限付き反復深化αβ探索WorkerクライアントのAbortSignal中止
+
+### 目的と設計判断
+
+- 将来の盤面UIで新しい対局、棋譜読込、分岐切替、画面破棄が起きても、古い局面の探索結果を採用しないため、既存の「1要求＝1 Worker」設計のまま外部中止を受けられるようにした。Workerプロトコル、`BoardState`、探索・評価、探索結果、時間計測契約は変更していない。
+- `TimeLimitedIterativeDeepeningAlphaBetaSearchWorkerClient.run(state, maxDepth, timeLimitMilliseconds, signal?)` と `runTimeLimitedIterativeDeepeningAlphaBetaSearchInWorker(..., signal?)` に省略可能な`AbortSignal`を加え、既存の3引数呼び出しを保持した。中止はWorkerへのcancelメッセージを増やさず、対象の専用Workerを`terminate()`する。
+- `TimeLimitedIterativeDeepeningAlphaBetaSearchWorkerAbortError` を公開し、`instanceof` と `error.name === 'AbortError'` の両方で判別できるようにした。`signal.reason`は任意値を取り得るため、未知の値をそのままthrowしない。
+
+### 確定処理とテスト
+
+- 実行前にabort済みならWorker生成・`postMessage`を行わずrejectする。Worker生成中の副作用でabortされた場合、abortリスナー登録前後、および`postMessage`直前にも状態を確認する。探索開始後のabort、成功、構造化失敗、`error`、`messageerror`、送信失敗、プロトコル失敗は既存の`settled`/`finish`を基礎に最初の事象だけで確定し、Workerを一度だけ終了する。
+- `finish`は成功・失敗・中止の全経路でabortリスナーを明示的に解除する。`{ once: true }`で登録する場合も、正常終了やWorker失敗時に不要な参照を残さず、確定後の遅延メッセージ・エラー・中止は結果も終了回数も変えない。
+- `src/test/time-limited-iterative-alpha-beta-worker.test.ts` は、3引数互換、実行前／Worker生成中／探索中のabort、遅延成功・失敗・error、成功／失敗後のabort、各確定経路のリスナー解除、送信失敗後の後始末、公開ヘルパーへの`signal`転送、既存の重複イベント防止をFake Workerと`AbortController`で決定的に確認する。対象Vitestは14件成功、`npm run lint`も成功した。
+
+### 対象外
+
+- Worker内のcancelプロトコル、途中反復結果の返却、Worker再利用・プール・同時探索管理、同期探索へのフォールバック、AI対局UI、盤面反映、思考中表示、思考時間設定、探索・評価・保存形式の変更は追加していない。
+
 ## [2026-09-11] 時間制限付き反復深化αβ探索のWeb Worker基盤
 
 ### 設計と追加ファイル

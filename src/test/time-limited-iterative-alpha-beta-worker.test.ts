@@ -6,6 +6,8 @@ import {
 import { createInitialBoardState } from '../types/shogi';
 import {
   createTimeLimitedIterativeDeepeningAlphaBetaSearchWorkerClient,
+  runTimeLimitedIterativeDeepeningAlphaBetaSearchInWorker,
+  TimeLimitedIterativeDeepeningAlphaBetaSearchWorkerAbortError,
   type TimeLimitedIterativeDeepeningAlphaBetaSearchWorkerLike,
 } from '../application/timeLimitedIterativeDeepeningAlphaBetaWorkerClient';
 import {
@@ -77,6 +79,16 @@ function createFakeWorker(options: { postMessageError?: unknown } = {}) {
       listeners.messageerror.forEach((listener) => listener({} as MessageEvent<unknown>));
     },
   };
+}
+
+async function expectWorkerAbort(pending: Promise<unknown>): Promise<void> {
+  try {
+    await pending;
+    throw new Error('Expected the Worker search to be aborted.');
+  } catch (error) {
+    expect(error).toBeInstanceOf(TimeLimitedIterativeDeepeningAlphaBetaSearchWorkerAbortError);
+    expect(error).toMatchObject({ name: 'AbortError' });
+  }
 }
 
 describe('時間制限付き反復深化αβ探索Workerの純粋処理', () => {
@@ -166,6 +178,113 @@ describe('時間制限付き反復深化αβ探索Workerクライアント', () 
     expect(fake.terminate).toHaveBeenCalledTimes(1);
   });
 
+  it('省略可能なsignalなしの既存3引数呼び出しを従来どおり成功させる', async () => {
+    const fake = createFakeWorker();
+    const client = createTimeLimitedIterativeDeepeningAlphaBetaSearchWorkerClient({
+      workerFactory: () => fake.worker, requestIdFactory: () => 'request-1',
+    });
+
+    const pending = client.run(createInitialBoardState(), 1, 1_000);
+    fake.emitMessage(successResponse());
+
+    await expect(pending).resolves.toMatchObject({ completedDepth: 1 });
+    expect(fake.postMessage).toHaveBeenCalledTimes(1);
+    expect(fake.terminate).toHaveBeenCalledTimes(1);
+  });
+
+  it('実行前からabort済みならWorkerもpostMessageも使わず中止専用エラーでrejectする', async () => {
+    const fake = createFakeWorker();
+    const workerFactory = vi.fn(() => fake.worker);
+    const client = createTimeLimitedIterativeDeepeningAlphaBetaSearchWorkerClient({ workerFactory });
+    const controller = new AbortController();
+    controller.abort({ stalePosition: true });
+
+    await expectWorkerAbort(client.run(createInitialBoardState(), 1, 1_000, controller.signal));
+    expect(workerFactory).not.toHaveBeenCalled();
+    expect(fake.postMessage).not.toHaveBeenCalled();
+    expect(fake.terminate).not.toHaveBeenCalled();
+  });
+
+  it('Worker生成中にabortされてもpostMessage前にWorkerを一度だけ終了する', async () => {
+    const fake = createFakeWorker();
+    const controller = new AbortController();
+    const client = createTimeLimitedIterativeDeepeningAlphaBetaSearchWorkerClient({
+      workerFactory: () => {
+        controller.abort('new game');
+        return fake.worker;
+      },
+    });
+
+    await expectWorkerAbort(client.run(createInitialBoardState(), 1, 1_000, controller.signal));
+    expect(fake.postMessage).not.toHaveBeenCalled();
+    expect(fake.terminate).toHaveBeenCalledTimes(1);
+  });
+
+  it('探索中のabortはWorkerを一度だけ終了し、遅延した成功・失敗・errorを中止結果へ上書きさせない', async () => {
+    const fake = createFakeWorker();
+    const controller = new AbortController();
+    const client = createTimeLimitedIterativeDeepeningAlphaBetaSearchWorkerClient({
+      workerFactory: () => fake.worker, requestIdFactory: () => 'request-1',
+    });
+    const pending = client.run(createInitialBoardState(), 1, 1_000, controller.signal);
+
+    controller.abort({ replacement: 'loaded-record' });
+    fake.emitMessage(successResponse());
+    fake.emitMessage({
+      type: 'time-limited-iterative-deepening-alpha-beta-search-failed',
+      requestId: 'request-1', errorName: 'LateError', errorMessage: 'late failure',
+    });
+    fake.emitError('late error');
+
+    await expectWorkerAbort(pending);
+    expect(fake.terminate).toHaveBeenCalledTimes(1);
+  });
+
+  it('成功または失敗が先なら後続abortは結果と終了回数を変えず、abortリスナーを解除する', async () => {
+    const successFake = createFakeWorker();
+    const successController = new AbortController();
+    const successRemove = vi.spyOn(successController.signal, 'removeEventListener');
+    const successClient = createTimeLimitedIterativeDeepeningAlphaBetaSearchWorkerClient({
+      workerFactory: () => successFake.worker, requestIdFactory: () => 'request-1',
+    });
+    const successful = successClient.run(createInitialBoardState(), 1, 1_000, successController.signal);
+    successFake.emitMessage(successResponse());
+    successController.abort();
+
+    await expect(successful).resolves.toMatchObject({ completedDepth: 1 });
+    expect(successFake.terminate).toHaveBeenCalledTimes(1);
+    expect(successRemove).toHaveBeenCalledWith('abort', expect.any(Function));
+
+    const failureFake = createFakeWorker();
+    const failureController = new AbortController();
+    const failureRemove = vi.spyOn(failureController.signal, 'removeEventListener');
+    const failureClient = createTimeLimitedIterativeDeepeningAlphaBetaSearchWorkerClient({
+      workerFactory: () => failureFake.worker, requestIdFactory: () => 'request-1',
+    });
+    const failed = failureClient.run(createInitialBoardState(), 1, 1_000, failureController.signal);
+    failureFake.emitError('worker crashed');
+    failureController.abort();
+
+    await expect(failed).rejects.toThrow('worker crashed');
+    expect(failureFake.terminate).toHaveBeenCalledTimes(1);
+    expect(failureRemove).toHaveBeenCalledWith('abort', expect.any(Function));
+  });
+
+  it('abort確定経路でもabortリスナーを解除する', async () => {
+    const fake = createFakeWorker();
+    const controller = new AbortController();
+    const remove = vi.spyOn(controller.signal, 'removeEventListener');
+    const client = createTimeLimitedIterativeDeepeningAlphaBetaSearchWorkerClient({
+      workerFactory: () => fake.worker, requestIdFactory: () => 'request-1',
+    });
+    const pending = client.run(createInitialBoardState(), 1, 1_000, controller.signal);
+
+    controller.abort();
+
+    await expectWorkerAbort(pending);
+    expect(remove).toHaveBeenCalledWith('abort', expect.any(Function));
+  });
+
   it('構造化された失敗応答、error、messageerror、postMessage失敗でrejectして終了する', async () => {
     const cases = [
       {
@@ -191,11 +310,16 @@ describe('時間制限付き反復深化αβ探索Workerクライアント', () 
     }
 
     const postFailure = createFakeWorker({ postMessageError: new Error('post failed') });
+    const postFailureController = new AbortController();
+    const postFailureRemove = vi.spyOn(postFailureController.signal, 'removeEventListener');
     const postFailureClient = createTimeLimitedIterativeDeepeningAlphaBetaSearchWorkerClient({
       workerFactory: () => postFailure.worker, requestIdFactory: () => 'request-1',
     });
-    await expect(postFailureClient.run(createInitialBoardState(), 1, 1_000)).rejects.toThrow('post failed');
+    await expect(postFailureClient.run(
+      createInitialBoardState(), 1, 1_000, postFailureController.signal
+    )).rejects.toThrow('post failed');
     expect(postFailure.terminate).toHaveBeenCalledTimes(1);
+    expect(postFailureRemove).toHaveBeenCalledWith('abort', expect.any(Function));
   });
 
   it('requestId不一致とWorker生成失敗を呼び出し側が判別できるエラーにする', async () => {
@@ -231,5 +355,28 @@ describe('時間制限付き反復深化αβ探索Workerクライアント', () 
 
     await expect(pending).resolves.toMatchObject({ completedDepth: 1 });
     expect(fake.terminate).toHaveBeenCalledTimes(1);
+  });
+
+  it('公開ヘルパーの省略可能なsignalをWorkerクライアントへ渡す', async () => {
+    const fake = createFakeWorker();
+    const controller = new AbortController();
+    const WorkerMock = vi.fn(function WorkerMock() {
+      return fake.worker;
+    });
+    vi.stubGlobal('Worker', WorkerMock);
+
+    try {
+      const pending = runTimeLimitedIterativeDeepeningAlphaBetaSearchInWorker(
+        createInitialBoardState(), 1, 1_000, controller.signal
+      );
+      controller.abort('disposed view');
+
+      await expectWorkerAbort(pending);
+      expect(WorkerMock).toHaveBeenCalledTimes(1);
+      expect(fake.postMessage).toHaveBeenCalledTimes(1);
+      expect(fake.terminate).toHaveBeenCalledTimes(1);
+    } finally {
+      vi.unstubAllGlobals();
+    }
   });
 });
