@@ -51,6 +51,18 @@ export interface IterativeDeepeningAlphaBetaSearchResult extends AlphaBetaSearch
   totalSkippedActionCount: number;
 }
 
+/**
+ * A time-limited iterative-deepening result. `completedDepth` and the
+ * inherited fixed-depth fields always describe the last fully completed pass.
+ * The top-level elapsed time includes work discarded from an interrupted pass.
+ */
+export interface TimeLimitedIterativeDeepeningAlphaBetaSearchResult
+  extends IterativeDeepeningAlphaBetaSearchResult {
+  requestedMaxDepth: number;
+  completedDepth: number;
+  timedOut: boolean;
+}
+
 /** Backward-compatible measurements for the established two-ply API. */
 export interface TwoPlyAlphaBetaSearchResult {
   selectedAction: LegalAction | null;
@@ -90,6 +102,38 @@ function validateIterativeDeepeningMaxDepth(maxDepth: number): void {
   if (maxDepth === 0) {
     throw new Error('Iterative-deepening maximum depth must be a positive integer measured in ply.');
   }
+}
+
+function validateSearchTimeLimitMilliseconds(timeLimitMilliseconds: number): void {
+  if (!Number.isFinite(timeLimitMilliseconds) || timeLimitMilliseconds < 0) {
+    throw new Error('Alpha-beta search time limit must be a finite non-negative number of milliseconds.');
+  }
+}
+
+/** An internal-only signal that discards one incomplete iterative pass. */
+class SearchDeadlineExceeded extends Error {
+  constructor() {
+    super('Alpha-beta search deadline exceeded.');
+    this.name = 'SearchDeadlineExceeded';
+  }
+}
+
+type SearchInterruptionCheck = (() => void) | undefined;
+
+function throwIfSearchTimeLimitReachedAt(
+  observedAt: number,
+  startedAt: number,
+  timeLimitMilliseconds: number
+): void {
+  if (observedAt - startedAt >= timeLimitMilliseconds) throw new SearchDeadlineExceeded();
+}
+
+function throwIfSearchTimeLimitReached(
+  clock: SearchClock,
+  startedAt: number,
+  timeLimitMilliseconds: number
+): void {
+  throwIfSearchTimeLimitReachedAt(clock(), startedAt, timeLimitMilliseconds);
 }
 
 function sameCoordinate(
@@ -174,8 +218,10 @@ function searchAlphaBetaNode(
   alpha: number,
   beta: number,
   valueTable: MaterialValueTable,
-  statistics: SearchStatistics
+  statistics: SearchStatistics,
+  interruptionCheck: SearchInterruptionCheck
 ): number {
+  interruptionCheck?.();
   if (state.status === 'ended' || remainingDepth === 0) {
     return evaluateSearchPosition(state, rootPlayer, valueTable);
   }
@@ -190,6 +236,7 @@ function searchAlphaBetaNode(
 
   let value = isMaximizing ? Number.NEGATIVE_INFINITY : Number.POSITIVE_INFINITY;
   for (let actionIndex = 0; actionIndex < actions.length; actionIndex += 1) {
+    interruptionCheck?.();
     const child = executeSearchAction(state, actions[actionIndex]);
     statistics.visitedPositionCount += 1;
     const childValue = searchAlphaBetaNode(
@@ -200,7 +247,8 @@ function searchAlphaBetaNode(
       alpha,
       beta,
       valueTable,
-      statistics
+      statistics,
+      interruptionCheck
     );
 
     if (isMaximizing) {
@@ -232,7 +280,8 @@ function searchAlphaBeta(
   state: BoardState,
   depth: number,
   valueTable: MaterialValueTable,
-  previousBestAction: LegalAction | null = null
+  previousBestAction: LegalAction | null = null,
+  interruptionCheck: SearchInterruptionCheck = undefined
 ): UnmeasuredAlphaBetaSearchResult {
   validateSearchDepth(depth);
   const rootPlayer = state.turn;
@@ -265,6 +314,7 @@ function searchAlphaBeta(
   const beta = Number.POSITIVE_INFINITY;
 
   for (const { action: rootAction, originalIndex } of indexedRootActions) {
+    interruptionCheck?.();
     const alphaBeforeCandidate = alpha;
     const afterRootAction = executeSearchAction(state, rootAction);
     statistics.visitedPositionCount += 1;
@@ -276,7 +326,8 @@ function searchAlphaBeta(
       alpha,
       beta,
       valueTable,
-      statistics
+      statistics,
+      interruptionCheck
     );
 
     // A root candidate searched after a higher-index PV candidate can be cut
@@ -293,7 +344,8 @@ function searchAlphaBeta(
         Number.NEGATIVE_INFINITY,
         Number.POSITIVE_INFINITY,
         valueTable,
-        statistics
+        statistics,
+        interruptionCheck
       );
     }
 
@@ -370,6 +422,83 @@ export function analyzeIterativeDeepeningAlphaBetaSearch(
   return {
     ...deepestIteration,
     elapsedMilliseconds: Math.max(0, clock() - startedAt),
+    iterations,
+    totalVisitedPositionCount: iterations.reduce(
+      (total, iteration) => total + iteration.visitedPositionCount,
+      0
+    ),
+    totalCutoffCount: iterations.reduce((total, iteration) => total + iteration.cutoffCount, 0),
+    totalSkippedActionCount: iterations.reduce(
+      (total, iteration) => total + iteration.skippedActionCount,
+      0
+    ),
+  };
+}
+
+/**
+ * Completes depth 1, then searches deeper iterative passes only while the
+ * supplied time limit remains. An interrupted pass is discarded completely so
+ * the returned action, fixed-depth statistics, and iteration totals always
+ * describe completed work.
+ */
+export function analyzeTimeLimitedIterativeDeepeningAlphaBetaSearch(
+  state: BoardState,
+  maxDepth: number,
+  timeLimitMilliseconds: number,
+  valueTable: MaterialValueTable = DEFAULT_MATERIAL_VALUE_TABLE,
+  clock: SearchClock = defaultSearchClock
+): TimeLimitedIterativeDeepeningAlphaBetaSearchResult {
+  validateIterativeDeepeningMaxDepth(maxDepth);
+  validateSearchTimeLimitMilliseconds(timeLimitMilliseconds);
+  const startedAt = clock();
+  const iterations: IterativeDeepeningAlphaBetaIterationResult[] = [];
+  let previousBestAction: LegalAction | null = null;
+  let timedOut = false;
+
+  for (let depth = 1; depth <= maxDepth; depth += 1) {
+    try {
+      // Depth 1 is deliberately exempt: it is the legal-action fallback even
+      // for a zero-millisecond limit. All later passes check before beginning.
+      if (depth >= 2) {
+        throwIfSearchTimeLimitReached(clock, startedAt, timeLimitMilliseconds);
+      }
+
+      const iterationStartedAt = clock();
+      const searchResult = searchAlphaBeta(
+        state,
+        depth,
+        valueTable,
+        previousBestAction,
+        depth >= 2
+          ? () => throwIfSearchTimeLimitReached(clock, startedAt, timeLimitMilliseconds)
+          : undefined
+      );
+      const iterationFinishedAt = clock();
+      if (depth >= 2) {
+        throwIfSearchTimeLimitReachedAt(iterationFinishedAt, startedAt, timeLimitMilliseconds);
+      }
+      const iteration = {
+        ...searchResult,
+        elapsedMilliseconds: Math.max(0, iterationFinishedAt - iterationStartedAt),
+      };
+      iterations.push(iteration);
+      previousBestAction = iteration.selectedAction;
+    } catch (error) {
+      if (error instanceof SearchDeadlineExceeded) {
+        timedOut = true;
+        break;
+      }
+      throw error;
+    }
+  }
+
+  const deepestIteration = iterations[iterations.length - 1];
+  return {
+    ...deepestIteration,
+    elapsedMilliseconds: Math.max(0, clock() - startedAt),
+    requestedMaxDepth: maxDepth,
+    completedDepth: deepestIteration.depth,
+    timedOut,
     iterations,
     totalVisitedPositionCount: iterations.reduce(
       (total, iteration) => total + iteration.visitedPositionCount,

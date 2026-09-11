@@ -4,6 +4,7 @@ import {
   cloneBoardState,
   analyzeAlphaBetaSearch,
   analyzeIterativeDeepeningAlphaBetaSearch,
+  analyzeTimeLimitedIterativeDeepeningAlphaBetaSearch,
   analyzeTwoPlyAlphaBetaSearch,
   analyzeTwoPlyMinimaxSearch,
   evaluateMaterial,
@@ -520,6 +521,203 @@ describe('反復深化αβ探索', () => {
     expect(() => analyzeIterativeDeepeningAlphaBetaSearch(ended, 0)).toThrow(/positive integer/);
     expect(() => analyzeIterativeDeepeningAlphaBetaSearch(ended, -1)).toThrow(/non-negative integer/);
     expect(() => analyzeIterativeDeepeningAlphaBetaSearch(ended, 1.5)).toThrow(/non-negative integer/);
+  });
+});
+
+describe('時間制限付き反復深化αβ探索', () => {
+  function countClockReadsThroughDepthTwo(state: BoardState): number {
+    let readCount = 0;
+    analyzeTimeLimitedIterativeDeepeningAlphaBetaSearch(
+      state,
+      2,
+      Number.MAX_SAFE_INTEGER,
+      undefined,
+      () => {
+        readCount += 1;
+        return 0;
+      }
+    );
+    return readCount;
+  }
+
+  it('十分な制限時間では最大深さまで完了し、時間制限なしの結果を保つ', () => {
+    const state = moveOrderingBenefitState();
+    const snapshot = JSON.stringify(state);
+    const unlimited = analyzeIterativeDeepeningAlphaBetaSearch(state, 3, undefined, () => 0);
+    const limited = analyzeTimeLimitedIterativeDeepeningAlphaBetaSearch(
+      state,
+      3,
+      Number.MAX_SAFE_INTEGER,
+      undefined,
+      () => 0
+    );
+
+    expect(limited).toMatchObject({ requestedMaxDepth: 3, completedDepth: 3, timedOut: false });
+    expect(limited.iterations.map((iteration) => iteration.depth)).toEqual([1, 2, 3]);
+    expect(limited.selectedAction).toEqual(unlimited.selectedAction);
+    expect(limited.selectedEvaluation).toBe(unlimited.selectedEvaluation);
+    expect(limited.visitedPositionCount).toBe(unlimited.visitedPositionCount);
+    expect(limited.cutoffCount).toBe(unlimited.cutoffCount);
+    expect(limited.skippedActionCount).toBe(unlimited.skippedActionCount);
+    expect(limited.selectedAction).toMatchObject({
+      kind: 'move', from: { row: 4, col: 4 }, to: { row: 4, col: 0 },
+    });
+    expect(limited.selectedEvaluation).toBe(-600);
+    expect(JSON.stringify(state)).toBe(snapshot);
+  });
+
+  it('深さ3の再帰中に期限へ達すると、深さ2だけを採用して途中統計を混ぜない', () => {
+    const state = moveOrderingBenefitState();
+    const completedDepthTwoReadCount = countClockReadsThroughDepthTwo(state);
+    let readCount = 0;
+    const clock = () => {
+      readCount += 1;
+      return readCount >= completedDepthTwoReadCount + 5 ? 10 : 0;
+    };
+    const result = analyzeTimeLimitedIterativeDeepeningAlphaBetaSearch(state, 3, 10, undefined, clock);
+    const depthTwo = analyzeIterativeDeepeningAlphaBetaSearch(state, 2, undefined, () => 0);
+    const totals = result.iterations.reduce(
+      (sum, iteration) => ({
+        visited: sum.visited + iteration.visitedPositionCount,
+        cutoffs: sum.cutoffs + iteration.cutoffCount,
+        skipped: sum.skipped + iteration.skippedActionCount,
+      }),
+      { visited: 0, cutoffs: 0, skipped: 0 }
+    );
+
+    expect(result).toMatchObject({ requestedMaxDepth: 3, completedDepth: 2, timedOut: true });
+    expect(result.iterations.map((iteration) => iteration.depth)).toEqual([1, 2]);
+    expect(result.selectedAction).toEqual(depthTwo.selectedAction);
+    expect(result.selectedEvaluation).toBe(depthTwo.selectedEvaluation);
+    expect(result.visitedPositionCount).toBe(result.iterations[1].visitedPositionCount);
+    expect(result.cutoffCount).toBe(result.iterations[1].cutoffCount);
+    expect(result.skippedActionCount).toBe(result.iterations[1].skippedActionCount);
+    expect(result.totalVisitedPositionCount).toBe(totals.visited);
+    expect(result.totalCutoffCount).toBe(totals.cutoffs);
+    expect(result.totalSkippedActionCount).toBe(totals.skipped);
+    expect(result.elapsedMilliseconds).toBe(10);
+  });
+
+  it('深さ2の探索本体後に期限と同値なら、その完了結果も破棄する', () => {
+    const state = recaptureTrapState();
+    const completedDepthTwoReadCount = countClockReadsThroughDepthTwo(state);
+    const depthOne = analyzeIterativeDeepeningAlphaBetaSearch(state, 1, undefined, () => 0);
+    let readCount = 0;
+    const result = analyzeTimeLimitedIterativeDeepeningAlphaBetaSearch(
+      state,
+      2,
+      10,
+      undefined,
+      () => {
+        readCount += 1;
+        return readCount >= completedDepthTwoReadCount - 1 ? 10 : 0;
+      }
+    );
+
+    expect(readCount).toBe(completedDepthTwoReadCount);
+    expect(result).toMatchObject({ requestedMaxDepth: 2, completedDepth: 1, timedOut: true });
+    expect(result.iterations.map((iteration) => iteration.depth)).toEqual([1]);
+    expect(result.selectedAction).toEqual(depthOne.selectedAction);
+    expect(result.selectedEvaluation).toBe(depthOne.selectedEvaluation);
+    expect(result.visitedPositionCount).toBe(depthOne.visitedPositionCount);
+    expect(result.cutoffCount).toBe(depthOne.cutoffCount);
+    expect(result.skippedActionCount).toBe(depthOne.skippedActionCount);
+    expect(result.totalVisitedPositionCount).toBe(depthOne.totalVisitedPositionCount);
+    expect(result.totalCutoffCount).toBe(depthOne.totalCutoffCount);
+    expect(result.totalSkippedActionCount).toBe(depthOne.totalSkippedActionCount);
+    expect(result.elapsedMilliseconds).toBe(10);
+  });
+
+  it('完了反復ごとの時間と、未完了反復を含む全体時間を分離する', () => {
+    const state = moveOrderingBenefitState();
+    const completedDepthTwoReadCount = countClockReadsThroughDepthTwo(state);
+    let readCount = 0;
+    const clock = () => {
+      readCount += 1;
+      if (readCount === 1) return 100;
+      if (readCount === 2) return 102;
+      if (readCount === 3) return 105;
+      if (readCount === 4) return 106;
+      if (readCount === 5) return 110;
+      if (readCount < completedDepthTwoReadCount - 1) return 110;
+      if (readCount === completedDepthTwoReadCount - 1) return 120;
+      if (readCount === completedDepthTwoReadCount) return 130;
+      return 137;
+    };
+    const result = analyzeTimeLimitedIterativeDeepeningAlphaBetaSearch(state, 3, 30, undefined, clock);
+
+    expect(result).toMatchObject({ completedDepth: 2, timedOut: true, elapsedMilliseconds: 37 });
+    expect(result.iterations.map((iteration) => iteration.elapsedMilliseconds)).toEqual([3, 10]);
+    expect(result.elapsedMilliseconds).not.toBe(result.iterations[1].elapsedMilliseconds);
+  });
+
+  it('0ミリ秒でも深さ1を完了し、深さ2開始前の同値期限を時間切れにする', () => {
+    const state = recaptureTrapState();
+    const result = analyzeTimeLimitedIterativeDeepeningAlphaBetaSearch(state, 2, 0, undefined, () => 0);
+
+    expect(result).toMatchObject({ completedDepth: 1, timedOut: true });
+    expect(result.iterations.map((iteration) => iteration.depth)).toEqual([1]);
+  });
+
+  it('最大深さ1は制限時間を超えても深さ1を返し、時間切れにしない', () => {
+    const state = recaptureTrapState();
+    const readings = [0, 1, 2, 3];
+    const result = analyzeTimeLimitedIterativeDeepeningAlphaBetaSearch(
+      state,
+      1,
+      0,
+      undefined,
+      () => readings.shift() ?? 3
+    );
+
+    expect(result).toMatchObject({ requestedMaxDepth: 1, completedDepth: 1, timedOut: false });
+    expect(result.iterations).toHaveLength(1);
+  });
+
+  it('有限でない値と負数の時間制限を拒否し、時間切れ以外の例外を伝播する', () => {
+    const state = recaptureTrapState();
+
+    expect(() => analyzeTimeLimitedIterativeDeepeningAlphaBetaSearch(state, 2, Number.NaN)).toThrow(/finite non-negative/);
+    expect(() => analyzeTimeLimitedIterativeDeepeningAlphaBetaSearch(state, 2, Number.POSITIVE_INFINITY)).toThrow(/finite non-negative/);
+    expect(() => analyzeTimeLimitedIterativeDeepeningAlphaBetaSearch(state, 2, -1)).toThrow(/finite non-negative/);
+
+    let readCount = 0;
+    expect(() => analyzeTimeLimitedIterativeDeepeningAlphaBetaSearch(
+      state,
+      2,
+      Number.MAX_SAFE_INTEGER,
+      undefined,
+      () => {
+        readCount += 1;
+        if (readCount === 6) throw new Error('clock failure');
+        return 0;
+      }
+    )).toThrow('clock failure');
+  });
+
+  it('同じ局面とclock系列では、時間制限付きの結果と統計も決定的に保つ', () => {
+    const state = moveOrderingBenefitState();
+    const snapshot = JSON.stringify(state);
+    const first = analyzeTimeLimitedIterativeDeepeningAlphaBetaSearch(
+      state, 3, Number.MAX_SAFE_INTEGER, undefined, () => 0
+    );
+    const second = analyzeTimeLimitedIterativeDeepeningAlphaBetaSearch(
+      state, 3, Number.MAX_SAFE_INTEGER, undefined, () => 0
+    );
+
+    expect(second).toMatchObject({
+      selectedAction: first.selectedAction,
+      selectedEvaluation: first.selectedEvaluation,
+      completedDepth: first.completedDepth,
+      timedOut: first.timedOut,
+      visitedPositionCount: first.visitedPositionCount,
+      cutoffCount: first.cutoffCount,
+      skippedActionCount: first.skippedActionCount,
+      totalVisitedPositionCount: first.totalVisitedPositionCount,
+      totalCutoffCount: first.totalCutoffCount,
+      totalSkippedActionCount: first.totalSkippedActionCount,
+    });
+    expect(JSON.stringify(state)).toBe(snapshot);
   });
 });
 

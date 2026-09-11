@@ -2653,3 +2653,34 @@ PR #1のレビュー指摘を受け、簡易APIの`applyMove`と合法手候補�
 
 - `npm run lint`、`npm run verify:lock`、`npm run build`、対象テスト `46/46`、分割した既存テスト24ファイル `858/858` は成功した。全件 `npm test` と一括 `npm run check` は、既存の `shogi-branch-replay` 兄弟分岐UIテストが約5秒で1件タイムアウトするため完了成功にはしていない。探索モジュールを読み込まないUIテストであり、前回からある不安定事象として分離し、テストの削除・緩和はしていない。
 - 今回は思考時間制限、期限判定、強制中断、AbortController、既定最大深さ3超への変更、置換表、PVテーブル、静止探索、評価調整、UI大改修を追加しない。次段階は思考時間制限と、安全に最後の完了反復を返す探索中断である。
+
+## [2026-09-11] 時間制限付き反復深化αβ探索と安全な中断
+
+### 実装と設計判断
+
+- `src/domain/shogi/twoPlyAlphaBetaAi.ts` に `analyzeTimeLimitedIterativeDeepeningAlphaBetaSearch(state, maxDepth, timeLimitMilliseconds, valueTable?, clock?)` と結果型を追加した。既存の時間制限なし `analyzeIterativeDeepeningAlphaBetaSearch`、深さ指定 `analyzeAlphaBetaSearch`、2 ply互換API、既定深さは変更していない。公開 export は既存の `src/domain/shogi/index.ts` の `export * from './twoPlyAlphaBetaAi'` をそのまま利用する。
+- 深さ1は制限時間にかかわらず必ず完了する最低保証とした。深さ2以降は新しい反復の直前、root候補ループ、再帰ノードの入口とその候補ループで同じ注入可能なclockを確認する。期限との同値は到達として扱い、有限かつ0以上でないミリ秒値（NaN、Infinity、負数）は明確なエラーで拒否する。
+- 時間切れ専用の内部 `SearchDeadlineExceeded` だけを反復単位で捕捉し、進行中の反復を丸ごと破棄する。通常の例外は捕捉せず呼び出し側へ伝播するため、未完了反復の指し手・評価・統計が `iterations`、最深統計、`total*` 統計へ混入しない。最後に完了した反復を `completedDepth`、`selectedAction`、`selectedEvaluation`、通常統計として返す。
+- 最上位 `elapsedMilliseconds` はAPI開始から返却までを `Math.max(0, clock() - startedAt)` で測り、中断した反復の消費時間も含める。各 `iterations` 要素の同名値は完了した反復単体の時間であり、最上位値を最深完了反復の値で上書きしない。
+
+### テストと検証
+
+- `src/test/shogi-two-ply-minimax-ai.test.ts` に、実時間待機を使わない呼び出し回数ベースの偽clockで、最大深さ完了、深さ3の再帰途中中断、未完了反復の除外、統計合計、全体／反復別経過時間、深さ1保証、0ms、同値期限、入力値検証、非時間切れ例外の伝播、既存結果互換、専用局面の手 `4,4 -> 4,0` と評価 `-600`、局面非破壊、決定性を追加した。対象テストは `53/53` 成功した。
+- `npm run verify:lock`、`npm run lint`、`npm run build`、`git diff --check` は成功した。`npm test` は `25 files / 885 tests` 成功し、`npm run check` も同じ全テストと本番ビルドを含めて成功した。従来報告されていた `shogi-branch-replay` の兄弟分岐UIテストのタイムアウトは今回再現しなかった。
+
+### 対象外と次の候補
+
+- AbortControllerによる外部中断、Web Worker、UIの中止ボタン・時間設定、非同期化、置換表、PVテーブル、静止探索、評価関数・既定深さ・保存形式の変更は含めない。
+- 次の候補は、同じ完了反復採用規則を保つAbortControllerによる外部中断、またはWeb WorkerによるUI非ブロッキング探索である。
+
+## [2026-09-11] PR #69 反復終了時の期限判定修正
+
+### 原因と修正
+
+- 深さ2以降は再帰ノードと候補ループで期限を確認していた一方、`searchAlphaBeta()` が正常終了した直後の時刻を期限判定に使わず、その反復を完了扱いにしていた。そのため、最後の再帰内確認後から反復終了までに期限と同値または超過した場合、期限切れの指し手・評価・統計が採用される余地があった。
+- `searchAlphaBeta()` の直後に `iterationFinishedAt` を一度だけ取得し、深さ2以降では同じ値で `startedAt` からの期限到達を判定してから、反復単体の `elapsedMilliseconds` を算出するよう修正した。期限到達時は既存の内部 `SearchDeadlineExceeded` を送出して反復全体を破棄するため、`iterations.push()` と `previousBestAction` の更新、最深統計、`total*` 統計への混入は起きない。深さ1の最低保証と、最上位経過時間が破棄反復を含む仕様は維持する。
+
+### 回帰テストと検証
+
+- 呼び出し回数ベースの偽clockで、深さ2の再帰中は期限前、`searchAlphaBeta()` 戻り直後の終了時刻だけが制限値と同値になるケースを追加した。`requestedMaxDepth: 2`、`completedDepth: 1`、`timedOut: true`、深さ1だけの `iterations`、深さ1の選択手・評価・通常統計・`total*` 統計、破棄した深さ2の処理時間を含む最上位経過時間を確認する。
+- 対象テストは `54/54`、全体テストは `25 files / 886 tests` で成功した。`npm run lint`、`npm run build`、`npm run verify:lock`、統合 `npm run check`、`git diff --check` も成功した。`shogi-branch-replay` の兄弟分岐UIテストの既知タイムアウトは今回も再現していない。
