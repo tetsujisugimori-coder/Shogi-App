@@ -40,8 +40,13 @@ import {
   type AgreedJishogiProposal,
   type GameRecordSession,
   type LegalAction,
+  type TimeLimitedIterativeDeepeningAlphaBetaSearchResult,
   type TwoPlyMinimaxSearchResult,
 } from '../../domain/shogi';
+import {
+  runTimeLimitedIterativeDeepeningAlphaBetaSearchInWorker,
+  TimeLimitedIterativeDeepeningAlphaBetaSearchWorkerAbortError,
+} from '../../application/timeLimitedIterativeDeepeningAlphaBetaWorkerClient';
 import { ShogiTable } from './ShogiTable';
 import { PromotionDialog } from './PromotionDialog';
 import { ResignationDialog } from './ResignationDialog';
@@ -53,11 +58,19 @@ import { getGameResultDisplay } from './gameResultDisplay';
 import { GameRecordImportDialog } from './GameRecordImportDialog';
 import { KifImportDialog } from './KifImportDialog';
 import { BranchReplayDialog } from './BranchReplayDialog';
-import { AiSearchResultPanel } from './AiSearchResultPanel';
+import { AiSearchResultPanel, type AiSearchDisplay } from './AiSearchResultPanel';
 
 interface ShogiResearchScreenProps {
   initialState?: BoardState;
+  workerSearchRunner?: TimeLimitedIterativeDeepeningAlphaBetaSearchRunner;
 }
+
+type TimeLimitedIterativeDeepeningAlphaBetaSearchRunner = (
+  state: BoardState,
+  maxDepth: number,
+  timeLimitMilliseconds: number,
+  signal?: AbortSignal
+) => Promise<TimeLimitedIterativeDeepeningAlphaBetaSearchResult>;
 
 interface PendingPromotion {
   from: { row: number; col: number };
@@ -78,10 +91,16 @@ interface PendingKifImport {
   metadata: Extract<KifImportResult, { ok: true }>['metadata'];
 }
 
-interface AiSearchDisplay {
-  result: TwoPlyMinimaxSearchResult;
-  selectedNotation: string;
-  candidateNotations: readonly string[];
+type WorkerSearchState =
+  | { kind: 'idle' }
+  | { kind: 'thinking' }
+  | { kind: 'cancelled' }
+  | { kind: 'error'; message: string };
+
+interface ActiveWorkerSearch {
+  generation: number;
+  controller: AbortController;
+  state: BoardState;
 }
 
 type SelectionState =
@@ -108,6 +127,9 @@ const STATUS_BADGE_COLORS = {
   },
 } as const;
 
+const TIME_LIMITED_AI_MAX_DEPTH = 4;
+const TIME_LIMITED_AI_TIME_LIMIT_MILLISECONDS = 1_000;
+
 function formatLegalActionNotation(state: BoardState, action: LegalAction): string {
   if (action.kind === 'move') {
     const piece = state.squares[action.from.row]?.[action.from.col]?.piece;
@@ -121,7 +143,10 @@ function formatLegalActionNotation(state: BoardState, action: LegalAction): stri
   return generateDropNotation(state.turn, piece, action.to);
 }
 
-export const ShogiResearchScreen: React.FC<ShogiResearchScreenProps> = ({ initialState }) => {
+export const ShogiResearchScreen: React.FC<ShogiResearchScreenProps> = ({
+  initialState,
+  workerSearchRunner = runTimeLimitedIterativeDeepeningAlphaBetaSearchInWorker,
+}) => {
   const [boardState, setBoardState] = useState<BoardState>(() =>
     normalizePositionSnapshots(initialState ?? createInitialBoardState())
   );
@@ -142,6 +167,7 @@ export const ShogiResearchScreen: React.FC<ShogiResearchScreenProps> = ({ initia
   const [isKifFileReading, setIsKifFileReading] = useState(false);
   const [moveHistoryResetKey, setMoveHistoryResetKey] = useState(0);
   const [aiSearchDisplay, setAiSearchDisplay] = useState<AiSearchDisplay | null>(null);
+  const [workerSearchState, setWorkerSearchState] = useState<WorkerSearchState>({ kind: 'idle' });
   const [agreedJishogiProposal, setAgreedJishogiProposal] = useState<AgreedJishogiProposal | null>(null);
   const [agreedJishogiError, setAgreedJishogiError] = useState<string | null>(null);
   const [exportNotice, setExportNotice] = useState<
@@ -171,6 +197,8 @@ export const ShogiResearchScreen: React.FC<ShogiResearchScreenProps> = ({ initia
   const kifImportButtonRef = useRef<HTMLButtonElement>(null);
   const kifFileInputRef = useRef<HTMLInputElement>(null);
   const shouldRestoreKifImportFocus = useRef(false);
+  const activeWorkerSearchRef = useRef<ActiveWorkerSearch | null>(null);
+  const workerSearchGenerationRef = useRef(0);
 
   const replaySnapshot =
     replayHistoryIndex === null
@@ -198,7 +226,8 @@ export const ShogiResearchScreen: React.FC<ShogiResearchScreenProps> = ({ initia
   const isResignationAvailable = boardState.status === 'active' || boardState.status === 'check';
   const isEnteringKingAvailable = boardState.status === 'active' || boardState.status === 'check';
   const isNewGameAvailable = isEnteringKingAvailable || isEnded;
-  const isInteractionBlocked = isEnded || isViewingReplay || dialogsAreOpen;
+  const isWorkerSearchThinking = workerSearchState.kind === 'thinking';
+  const isInteractionBlocked = isEnded || isViewingReplay || dialogsAreOpen || isWorkerSearchThinking;
   const selectedSquare =
     !isEnded && !isViewingReplay && selection.kind === 'board' ? selection.square : null;
   const selectedHandPieceId =
@@ -312,21 +341,42 @@ export const ShogiResearchScreen: React.FC<ShogiResearchScreenProps> = ({ initia
     setFocusRequest({ ...square, requestId: focusRequestId.current });
   }, []);
 
+  const cancelActiveWorkerSearch = useCallback(() => {
+    const activeSearch = activeWorkerSearchRef.current;
+    if (!activeSearch) return;
+
+    activeWorkerSearchRef.current = null;
+    workerSearchGenerationRef.current += 1;
+    activeSearch.controller.abort();
+    setWorkerSearchState({ kind: 'cancelled' });
+  }, []);
+
+  useEffect(() => () => {
+    const activeSearch = activeWorkerSearchRef.current;
+    if (!activeSearch) return;
+
+    activeWorkerSearchRef.current = null;
+    workerSearchGenerationRef.current += 1;
+    activeSearch.controller.abort();
+  }, []);
+
   const selectReplayPosition = useCallback(
     (historyIndex: number) => {
       if (dialogsAreOpen || !getPositionSnapshot(boardState, historyIndex)) return;
+      cancelActiveWorkerSearch();
       setSelection({ kind: 'none' });
       setFocusRequest(null);
       setReplayHistoryIndex(historyIndex);
     },
-    [boardState, dialogsAreOpen]
+    [boardState, cancelActiveWorkerSearch, dialogsAreOpen]
   );
 
   const returnToCurrentPosition = useCallback(() => {
+    cancelActiveWorkerSearch();
     setReplayHistoryIndex(null);
     setSelection({ kind: 'none' });
     setFocusRequest(null);
-  }, []);
+  }, [cancelActiveWorkerSearch]);
 
   const cancelBranchStart = useCallback(() => {
     shouldRestoreBranchStartFocus.current = true;
@@ -361,10 +411,12 @@ export const ShogiResearchScreen: React.FC<ShogiResearchScreenProps> = ({ initia
       setPendingBranchHistoryIndex(null);
       return;
     }
+    cancelActiveWorkerSearch();
     focusRequestId.current = 0;
     setGameRecordSession(started.session);
     setBoardState(started.boardState);
     setAiSearchDisplay(null);
+    setWorkerSearchState({ kind: 'idle' });
     setReplayHistoryIndex(null);
     setSelection({ kind: 'none' });
     setPendingPromotion(null);
@@ -387,10 +439,12 @@ export const ShogiResearchScreen: React.FC<ShogiResearchScreenProps> = ({ initia
     if (!gameRecordSession || !activeSessionBranch) return;
     const result = switchGameRecordSessionToMainline(gameRecordSession, boardState);
     if (!result.ok || !result.boardState) return;
+    cancelActiveWorkerSearch();
     focusRequestId.current = 0;
     setGameRecordSession(result.session);
     setBoardState(result.boardState);
     setAiSearchDisplay(null);
+    setWorkerSearchState({ kind: 'idle' });
     setReplayHistoryIndex(null);
     setSelection({ kind: 'none' });
     setPendingPromotion(null);
@@ -413,10 +467,12 @@ export const ShogiResearchScreen: React.FC<ShogiResearchScreenProps> = ({ initia
     const result = switchGameRecordSessionToBranch(gameRecordSession, boardState, branchId);
     if (!result.ok || !result.boardState) return;
 
+    cancelActiveWorkerSearch();
     focusRequestId.current = 0;
     setGameRecordSession(result.session);
     setBoardState(result.boardState);
     setAiSearchDisplay(null);
+    setWorkerSearchState({ kind: 'idle' });
     setReplayHistoryIndex(null);
     setSelection({ kind: 'none' });
     setPendingPromotion(null);
@@ -456,6 +512,7 @@ export const ShogiResearchScreen: React.FC<ShogiResearchScreenProps> = ({ initia
   const openResignationDialog = () => {
     if (
       !isResignationAvailable ||
+      isWorkerSearchThinking ||
       pendingPromotion ||
       isResignationDialogOpen ||
       isEnteringKingDialogOpen ||
@@ -483,6 +540,7 @@ export const ShogiResearchScreen: React.FC<ShogiResearchScreenProps> = ({ initia
   const openEnteringKingDialog = () => {
     if (
       !isEnteringKingAvailable ||
+      isWorkerSearchThinking ||
       pendingPromotion ||
       isResignationDialogOpen ||
       isEnteringKingDialogOpen ||
@@ -513,6 +571,7 @@ export const ShogiResearchScreen: React.FC<ShogiResearchScreenProps> = ({ initia
   const openAgreedJishogiDialog = () => {
     if (
       !isEnteringKingAvailable ||
+      isWorkerSearchThinking ||
       pendingPromotion ||
       isResignationDialogOpen ||
       isEnteringKingDialogOpen ||
@@ -597,8 +656,10 @@ export const ShogiResearchScreen: React.FC<ShogiResearchScreenProps> = ({ initia
     shouldRestoreNewGameFocus.current = true;
     focusRequestId.current = 0;
 
+    cancelActiveWorkerSearch();
     setBoardState(createInitialBoardState());
     setAiSearchDisplay(null);
+    setWorkerSearchState({ kind: 'idle' });
     setGameRecordSession(discardGameRecordSession());
     setReplayHistoryIndex(null);
     setSelection({ kind: 'none' });
@@ -733,9 +794,11 @@ export const ShogiResearchScreen: React.FC<ShogiResearchScreenProps> = ({ initia
 
   const confirmKifImport = () => {
     if (!pendingKifImport) return;
+    cancelActiveWorkerSearch();
     focusRequestId.current = 0;
     setBoardState(pendingKifImport.state);
     setAiSearchDisplay(null);
+    setWorkerSearchState({ kind: 'idle' });
     setGameRecordSession(discardGameRecordSession());
     setReplayHistoryIndex(null);
     setSelection({ kind: 'none' });
@@ -756,9 +819,11 @@ export const ShogiResearchScreen: React.FC<ShogiResearchScreenProps> = ({ initia
     shouldRestoreAgreedJishogiFocus.current = false;
     shouldRestoreNewGameFocus.current = false;
     shouldRestoreGameRecordImportFocus.current = true;
+    cancelActiveWorkerSearch();
     focusRequestId.current = 0;
     setBoardState(pendingGameRecordImport.state);
     setAiSearchDisplay(null);
+    setWorkerSearchState({ kind: 'idle' });
     setGameRecordSession(pendingGameRecordImport.session);
     setReplayHistoryIndex(null);
     setSelection({ kind: 'none' });
@@ -796,7 +861,70 @@ export const ShogiResearchScreen: React.FC<ShogiResearchScreenProps> = ({ initia
     setBoardState(execution.state);
     setSelection({ kind: 'none' });
     setPendingPromotion(null);
-    setAiSearchDisplay({ result, selectedNotation, candidateNotations });
+    setAiSearchDisplay({ kind: 'two-ply', result, selectedNotation, candidateNotations });
+  };
+
+  const makeTimeLimitedAiMove = () => {
+    if (isInteractionBlocked || activeWorkerSearchRef.current) return;
+
+    const controller = new AbortController();
+    const generation = workerSearchGenerationRef.current + 1;
+    const searchState = boardState;
+    workerSearchGenerationRef.current = generation;
+    activeWorkerSearchRef.current = { generation, controller, state: searchState };
+    setSelection({ kind: 'none' });
+    setPendingPromotion(null);
+    setWorkerSearchState({ kind: 'thinking' });
+
+    const isCurrentSearch = (): boolean => {
+      const activeSearch = activeWorkerSearchRef.current;
+      return activeSearch?.generation === generation && !activeSearch.controller.signal.aborted;
+    };
+
+    void workerSearchRunner(
+      searchState,
+      TIME_LIMITED_AI_MAX_DEPTH,
+      TIME_LIMITED_AI_TIME_LIMIT_MILLISECONDS,
+      controller.signal
+    ).then(
+      (result) => {
+        if (!isCurrentSearch()) return;
+
+        const selectedNotation = result.selectedAction
+          ? formatLegalActionNotation(searchState, result.selectedAction)
+          : '選択手なし';
+        const execution = result.selectedAction
+          ? executeLegalAction(searchState, result.selectedAction, { proposer: 'local_ai' })
+          : null;
+
+        if (!isCurrentSearch()) return;
+        activeWorkerSearchRef.current = null;
+        if (execution?.type === 'applied') {
+          setBoardState(execution.state);
+          setSelection({ kind: 'none' });
+          setPendingPromotion(null);
+        }
+        setAiSearchDisplay({ kind: 'time-limited-worker', result, selectedNotation });
+        setWorkerSearchState({ kind: 'idle' });
+      },
+      (error: unknown) => {
+        if (!isCurrentSearch()) return;
+
+        activeWorkerSearchRef.current = null;
+        if (
+          error instanceof TimeLimitedIterativeDeepeningAlphaBetaSearchWorkerAbortError ||
+          (error instanceof Error && error.name === 'AbortError')
+        ) {
+          setWorkerSearchState({ kind: 'cancelled' });
+          return;
+        }
+
+        setWorkerSearchState({
+          kind: 'error',
+          message: error instanceof Error ? error.message : '時間制限AIの探索に失敗しました。',
+        });
+      }
+    );
   };
 
   const handleSquareClick = (square: BoardSquare) => {
@@ -959,8 +1087,14 @@ export const ShogiResearchScreen: React.FC<ShogiResearchScreenProps> = ({ initia
       data-active-session-record={
         activeSessionBranch?.state.recordId ?? (boardState.branchFrom ? 'standalone-branch' : 'mainline')
       }
-      data-ai-search-depth={aiSearchDisplay?.result.depth ?? ''}
+      data-ai-search-kind={aiSearchDisplay?.kind ?? ''}
+      data-ai-search-depth={
+        aiSearchDisplay?.kind === 'time-limited-worker'
+          ? aiSearchDisplay.result.completedDepth
+          : aiSearchDisplay?.result.depth ?? ''
+      }
       data-ai-search-visited-position-count={aiSearchDisplay?.result.visitedPositionCount ?? ''}
+      data-worker-search-state={workerSearchState.kind}
       onKeyDown={handleScreenKeyDown}
       className="min-h-full w-full flex flex-col items-center justify-between py-6 px-3 sm:px-6 bg-[#0f1115] text-stone-200"
     >
@@ -1005,6 +1139,23 @@ export const ShogiResearchScreen: React.FC<ShogiResearchScreenProps> = ({ initia
           >
             2手読みAIに指させる
           </button>
+          <button
+            type="button"
+            onClick={makeTimeLimitedAiMove}
+            disabled={isInteractionBlocked || activeWorkerSearchRef.current !== null}
+            className="rounded border border-sky-700/70 bg-sky-950/45 px-4 py-1.5 font-serif text-sm tracking-[0.1em] text-sky-100 shadow-inner outline-none transition hover:border-sky-500 hover:bg-sky-900/55 focus-visible:ring-2 focus-visible:ring-amber-300 disabled:cursor-not-allowed disabled:border-stone-800 disabled:text-stone-600 disabled:opacity-65"
+          >
+            時間制限AIに指させる
+          </button>
+          {isWorkerSearchThinking && (
+            <button
+              type="button"
+              onClick={cancelActiveWorkerSearch}
+              className="rounded border border-rose-800/70 bg-rose-950/45 px-4 py-1.5 font-serif text-sm tracking-[0.1em] text-rose-100 shadow-inner outline-none transition hover:border-rose-600 hover:bg-rose-900/55 focus-visible:ring-2 focus-visible:ring-amber-300"
+            >
+              思考を中止
+            </button>
+          )}
           {activeSessionBranch && (
             <button
               ref={returnToMainlineButtonRef}
@@ -1022,7 +1173,7 @@ export const ShogiResearchScreen: React.FC<ShogiResearchScreenProps> = ({ initia
             ref={enteringKingButtonRef}
             type="button"
             onClick={openEnteringKingDialog}
-            disabled={!isEnteringKingAvailable || isViewingReplay || dialogsAreOpen}
+            disabled={!isEnteringKingAvailable || isViewingReplay || dialogsAreOpen || isWorkerSearchThinking}
             aria-haspopup="dialog"
             aria-expanded={isEnteringKingDialogOpen}
             className="rounded border border-amber-700/70 bg-amber-950/45 px-4 py-1.5 font-serif text-sm tracking-[0.12em] text-amber-100 shadow-inner outline-none transition hover:border-amber-500 hover:bg-amber-900/55 focus-visible:ring-2 focus-visible:ring-amber-300 disabled:cursor-not-allowed disabled:border-stone-800 disabled:text-stone-600 disabled:opacity-65"
@@ -1033,7 +1184,7 @@ export const ShogiResearchScreen: React.FC<ShogiResearchScreenProps> = ({ initia
             ref={agreedJishogiButtonRef}
             type="button"
             onClick={openAgreedJishogiDialog}
-            disabled={!isEnteringKingAvailable || isViewingReplay || dialogsAreOpen}
+            disabled={!isEnteringKingAvailable || isViewingReplay || dialogsAreOpen || isWorkerSearchThinking}
             aria-haspopup="dialog"
             aria-expanded={isAgreedJishogiDialogOpen}
             className="rounded border border-sky-800/70 bg-sky-950/45 px-4 py-1.5 font-serif text-sm tracking-[0.1em] text-sky-100 shadow-inner outline-none transition hover:border-sky-600 hover:bg-sky-900/55 focus-visible:ring-2 focus-visible:ring-amber-300 disabled:cursor-not-allowed disabled:border-stone-800 disabled:text-stone-600 disabled:opacity-65"
@@ -1044,7 +1195,7 @@ export const ShogiResearchScreen: React.FC<ShogiResearchScreenProps> = ({ initia
             ref={resignationButtonRef}
             type="button"
             onClick={openResignationDialog}
-            disabled={!isResignationAvailable || isViewingReplay || dialogsAreOpen}
+            disabled={!isResignationAvailable || isViewingReplay || dialogsAreOpen || isWorkerSearchThinking}
             aria-haspopup="dialog"
             aria-expanded={isResignationDialogOpen}
             className="rounded border border-rose-900/70 bg-stone-900/80 px-4 py-1.5 font-serif text-sm tracking-[0.14em] text-rose-200 shadow-inner outline-none transition hover:border-rose-700 hover:bg-rose-950/55 focus-visible:ring-2 focus-visible:ring-amber-300 disabled:cursor-not-allowed disabled:border-stone-800 disabled:text-stone-600 disabled:opacity-65"
@@ -1128,6 +1279,21 @@ export const ShogiResearchScreen: React.FC<ShogiResearchScreenProps> = ({ initia
         {activeSessionBranch && (
           <p className="mt-1 text-xs text-sky-200" role="status">
             検討手順: {activeSessionBranch.displayName}
+          </p>
+        )}
+        {workerSearchState.kind === 'thinking' && (
+          <p className="mt-1 text-xs text-sky-200" role="status" aria-live="polite">
+            AI思考中
+          </p>
+        )}
+        {workerSearchState.kind === 'cancelled' && (
+          <p className="mt-1 text-xs text-stone-300" role="status" aria-live="polite">
+            時間制限AIの思考を中止しました。
+          </p>
+        )}
+        {workerSearchState.kind === 'error' && (
+          <p className="mt-1 text-xs text-rose-300" role="alert">
+            時間制限AIの探索に失敗しました: {workerSearchState.message}
           </p>
         )}
         {(gameRecordSession?.branches.length ?? 0) > 0 && (
@@ -1239,11 +1405,7 @@ export const ShogiResearchScreen: React.FC<ShogiResearchScreenProps> = ({ initia
             onReturnToCurrent={returnToCurrentPosition}
           />
           {aiSearchDisplay && (
-            <AiSearchResultPanel
-              result={aiSearchDisplay.result}
-              selectedNotation={aiSearchDisplay.selectedNotation}
-              candidateNotations={aiSearchDisplay.candidateNotations}
-            />
+            <AiSearchResultPanel search={aiSearchDisplay} />
           )}
         </div>
       </main>
