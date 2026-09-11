@@ -23,6 +23,14 @@ export class TimeLimitedIterativeDeepeningAlphaBetaSearchWorkerError extends Err
   }
 }
 
+/** Identifies a search cancelled by the caller's AbortSignal. */
+export class TimeLimitedIterativeDeepeningAlphaBetaSearchWorkerAbortError extends Error {
+  constructor() {
+    super('Time-limited iterative deepening alpha-beta Worker search was aborted.');
+    this.name = 'AbortError';
+  }
+}
+
 function createDefaultWorker(): TimeLimitedIterativeDeepeningAlphaBetaSearchWorkerLike {
   if (typeof Worker === 'undefined') {
     throw new TimeLimitedIterativeDeepeningAlphaBetaSearchWorkerError(
@@ -45,7 +53,8 @@ export interface TimeLimitedIterativeDeepeningAlphaBetaSearchWorkerClient {
   run(
     state: BoardState,
     maxDepth: number,
-    timeLimitMilliseconds: number
+    timeLimitMilliseconds: number,
+    signal?: AbortSignal
   ): Promise<TimeLimitedIterativeDeepeningAlphaBetaSearchResult>;
 }
 
@@ -65,7 +74,11 @@ export function createTimeLimitedIterativeDeepeningAlphaBetaSearchWorkerClient(
   const requestIdFactory = dependencies.requestIdFactory ?? createRequestId;
 
   return {
-    run(state, maxDepth, timeLimitMilliseconds) {
+    run(state, maxDepth, timeLimitMilliseconds, signal) {
+      if (signal?.aborted) {
+        return Promise.reject(new TimeLimitedIterativeDeepeningAlphaBetaSearchWorkerAbortError());
+      }
+
       return new Promise((resolve, reject) => {
         let worker: TimeLimitedIterativeDeepeningAlphaBetaSearchWorkerLike;
         try {
@@ -76,23 +89,38 @@ export function createTimeLimitedIterativeDeepeningAlphaBetaSearchWorkerClient(
           return;
         }
 
+        let settled = false;
+        let abortListenerAttached = false;
+        const abort = (): void => {
+          finish(() => reject(new TimeLimitedIterativeDeepeningAlphaBetaSearchWorkerAbortError()));
+        };
+        const removeAbortListener = (): void => {
+          if (!signal || !abortListenerAttached) return;
+          signal.removeEventListener('abort', abort);
+          abortListenerAttached = false;
+        };
+        const finish = (completion: () => void): void => {
+          if (settled) return;
+          settled = true;
+          removeAbortListener();
+          worker.terminate();
+          completion();
+        };
+        const fail = (message: string, name?: string): void => {
+          finish(() => reject(new TimeLimitedIterativeDeepeningAlphaBetaSearchWorkerError(message, name)));
+        };
+
+        if (signal?.aborted) {
+          abort();
+          return;
+        }
+
         const request: TimeLimitedIterativeDeepeningAlphaBetaSearchWorkerRequest = {
           type: 'run-time-limited-iterative-deepening-alpha-beta-search',
           requestId: requestIdFactory(),
           state,
           maxDepth,
           timeLimitMilliseconds,
-        };
-        let settled = false;
-
-        const finish = (completion: () => void): void => {
-          if (settled) return;
-          settled = true;
-          worker.terminate();
-          completion();
-        };
-        const fail = (message: string, name?: string): void => {
-          finish(() => reject(new TimeLimitedIterativeDeepeningAlphaBetaSearchWorkerError(message, name)));
         };
 
         worker.addEventListener('message', (event) => {
@@ -123,7 +151,23 @@ export function createTimeLimitedIterativeDeepeningAlphaBetaSearchWorkerClient(
           fail('Web Worker could not deserialize a message.', 'WorkerMessageError');
         });
 
+        if (settled) return;
+
+        if (signal) {
+          abortListenerAttached = true;
+          signal.addEventListener('abort', abort, { once: true });
+          if (settled) return;
+          if (signal.aborted) {
+            abort();
+            return;
+          }
+        }
+
         try {
+          if (signal?.aborted) {
+            abort();
+            return;
+          }
           worker.postMessage(request);
         } catch (error) {
           fail(error instanceof Error ? error.message : 'Web Worker request could not be posted.');
@@ -137,8 +181,9 @@ export function createTimeLimitedIterativeDeepeningAlphaBetaSearchWorkerClient(
 export function runTimeLimitedIterativeDeepeningAlphaBetaSearchInWorker(
   state: BoardState,
   maxDepth: number,
-  timeLimitMilliseconds: number
+  timeLimitMilliseconds: number,
+  signal?: AbortSignal
 ): Promise<TimeLimitedIterativeDeepeningAlphaBetaSearchResult> {
   return createTimeLimitedIterativeDeepeningAlphaBetaSearchWorkerClient()
-    .run(state, maxDepth, timeLimitMilliseconds);
+    .run(state, maxDepth, timeLimitMilliseconds, signal);
 }
