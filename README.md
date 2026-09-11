@@ -122,6 +122,7 @@
     - `analyzeAlphaBetaSearch(state, depth, valueTable?, clock?)` と `selectBestAlphaBetaAction(state, depth, valueTable?)` は、深さをply単位で受け取る再帰型αβ探索である。指定深さはrootのAI着手を含み、深さ1はAI着手だけ、深さ2はAI→相手、深さ3はAI→相手→AIを読む（「3手ずつ読む」意味ではない）。開始時の `state.turn` をrootPlayerとして固定し、rootPlayer側を最大化、相手側を最小化する。各子局面は既存の複製・合法手・着手APIで生成し、残り深さ0または終局では既存の終局優先評価を返す。再帰内部では「駒取り＋成り、駒取り、成り、その他（駒打ちを含む）」の順に安定して候補を並べ、`alpha >= beta`で残り候補を打ち切る。root候補は並べ替えず、厳密比較により同点では元の先頭の合法手を維持する。探索ごとにrootを除く実生成局面数、打ち切り回数、未実行候補数を返す
     - `analyzeIterativeDeepeningAlphaBetaSearch(state, maxDepth, valueTable?, clock?)` と `selectBestIterativeDeepeningAlphaBetaAction(state, maxDepth, valueTable?)` は、深さ1から最大深さまで同じ再帰型αβ探索を完了順に実行する時間制限なしの反復深化である。各深さの結果は `iterations` に保存し、最終結果と通常の探索統計は最深反復だけ、`totalVisitedPositionCount`・`totalCutoffCount`・`totalSkippedActionCount` は全反復の合計を表す。次の深さでは前回最善手をroot先頭に置き、残り候補は既存の駒取り・成り順で調べるが、同点時は元のroot合法手順の先頭を選ぶ
     - `analyzeTimeLimitedIterativeDeepeningAlphaBetaSearch(state, maxDepth, timeLimitMilliseconds, valueTable?, clock?)` は、有限かつ0以上のミリ秒制限を受ける時間制限付き反復深化である。深さ1は0ミリ秒でも必ず完了する最低保証とし、深さ2以降で期限に達した場合は進行中の反復を破棄して、最後に完了した深さの指し手・評価・通常統計を返す。`iterations` と `total*` 統計には完了した反復だけを含め、最上位の `elapsedMilliseconds` は破棄した未完了反復も含むAPI呼び出し全体の経過時間である。各 `iterations` 要素の `elapsedMilliseconds` はその完了反復単体の時間を表す
+    - `runTimeLimitedIterativeDeepeningAlphaBetaSearchInWorker(state, maxDepth, timeLimitMilliseconds)` は、同じ時間制限付き反復深化をViteのmodule Web Workerで1要求ごとに1つ実行し、`Promise<TimeLimitedIterativeDeepeningAlphaBetaSearchResult>` で返す非同期基盤である。`BoardState`と結果はJSON化せず構造化クローンで送受信するため、終局評価の `Infinity` / `-Infinity` を保つ。成功、探索失敗、Workerの`error` / `messageerror`、送信失敗、`requestId`不一致のいずれでもWorkerを確実に終了し、呼び出し側へ成功または明示エラーを一度だけ返す。Worker未対応環境や生成失敗では同期探索へフォールバックしない。現時点ではAI対局UIへは接続していない
     - `analyzeTwoPlyAlphaBetaSearch(state, valueTable?, clock?)` と `selectBestTwoPlyAlphaBetaAction(state, valueTable?)` は互換用の深さ2ラッパーであり、専用探索本体を二重に保持しない。既存のAI入口の深さは引き続き2のままで、互換計測の `prunedRootCandidateCount` と `skippedOpponentReplyCount` は深さ2におけるカットオフ回数と未実行の相手応手数を表す
     - ランダムAI、1手読み駒得AI、2手読みミニマックスAI、深さ指定αβ枝刈りAI、時間制限なし／時間制限付き反復深化は同じ合法手・実行・複製・評価APIを比較できる。外部中断、局面キャッシュ、AI対局UIは含まない
     - 駒得評価は入玉・持将棋の公式点数とは別の基盤であり、終局結果、王手、玉の安全度、駒の働き、合法手数は含めない。1手読みは minimax 等の探索を行わない
@@ -146,7 +147,7 @@
 - v1以外のバージョン付き対局記録JSON、KI2 / CSA / USIの読み込み・書き出し、駒落ち・任意局面・変化手順を含むKIF読み込み
 - Undo / Redo、待った、複数ブランチの同時保存、棋譜ツリー、ブランチ名編集
 - 任意局面の編集・途中局面へのリセット
-- 2手以上の探索、minimax / negamax / αβ枝刈り、AI対局UI、将棋エンジン接続、形勢評価グラフ
+- AI対局UI、思考時間設定・探索中表示・中止操作、Worker再利用／プール、将棋エンジン接続、形勢評価グラフ
 
 ---
 

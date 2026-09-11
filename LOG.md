@@ -1,5 +1,19 @@
 # SHOGI-APP 開発ログ
 
+## [2026-09-11] 時間制限付き反復深化αβ探索のWeb Worker基盤
+
+### 設計と追加ファイル
+
+- 既存の `src/domain/shogi/twoPlyAlphaBetaAi.ts` は変更せず、Worker固有のAPIをドメイン層へ入れなかった。`src/workers/timeLimitedIterativeDeepeningAlphaBetaWorkerProtocol.ts` に判別可能な `type` union、`requestId`、`BoardState`、最大深さ、制限時間、成功結果、構造化された失敗情報を定義した。
+- `src/workers/timeLimitedIterativeDeepeningAlphaBetaWorkerHandler.ts` は `self` と分離した純粋な要求処理で、既存の `analyzeTimeLimitedIterativeDeepeningAlphaBetaSearch` を呼ぶ。`Error`と未知のthrow値を `errorName` / `errorMessage` へ明示変換し、`Error`オブジェクト自体は送らない。`src/workers/timeLimitedIterativeDeepeningAlphaBeta.worker.ts` はこの処理とメッセージ送受信だけを担う。
+- `src/application/timeLimitedIterativeDeepeningAlphaBetaWorkerClient.ts` の公開API `runTimeLimitedIterativeDeepeningAlphaBetaSearchInWorker(state, maxDepth, timeLimitMilliseconds)` は、Vite標準の `new Worker(new URL('../workers/timeLimitedIterativeDeepeningAlphaBeta.worker.ts', import.meta.url), { type: 'module' })` を使う。公開パス文字列を組み立てないため、`base: '/Shogi-App/'` でもViteの解決に委ねる。探索結果と局面はJSON文字列化せず、そのまま構造化クローンで扱い、`Infinity` / `-Infinity` を保つ。
+
+### クリーンアップとテスト
+
+- クライアントは各要求でWorkerを1つ作り、成功、Worker失敗応答、`error`、`messageerror`、同期的な`postMessage`失敗、`requestId`不一致で一度だけPromiseを確定して終了する。Worker未対応／生成失敗は同期探索へフォールバックせず、呼び出し側で判別できるエラーにする。factoryを小さく注入可能にし、jsdomへ偽グローバルWorkerを埋め込まない。
+- `src/test/time-limited-iterative-alpha-beta-worker.test.ts` は、純粋ハンドラが同期APIを呼ぶこと、直接実行とWorker処理の手・評価・完了深さ・反復深さ・各統計一致（経過時間は除外）、局面非破壊、不正入力／未知throwの構造化失敗、`Infinity` / `-Infinity` 保持、成功／失敗／イベント／送信失敗／requestId不一致時のPromiseと終了処理、確定後の重複イベントを決定的に確認する。
+- 検証は対象Vitest 7件、`npm test`、`npm run lint`、`npm run build`、`npm run verify:lock`、`npm run check`、`git diff --check` を実行する。AI対局UI、探索中表示、時間設定、中止、AbortController、Worker再利用や並行制御、探索アルゴリズム・評価・保存形式の変更は対象外に残す。
+
 ## [2026-08-26] 将棋研究 初期画面（平手初期局面表示）の実装
 
 ### 概要
