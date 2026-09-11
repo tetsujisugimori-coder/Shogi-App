@@ -120,12 +120,20 @@ class SearchDeadlineExceeded extends Error {
 
 type SearchInterruptionCheck = (() => void) | undefined;
 
+function throwIfSearchTimeLimitReachedAt(
+  observedAt: number,
+  startedAt: number,
+  timeLimitMilliseconds: number
+): void {
+  if (observedAt - startedAt >= timeLimitMilliseconds) throw new SearchDeadlineExceeded();
+}
+
 function throwIfSearchTimeLimitReached(
   clock: SearchClock,
   startedAt: number,
   timeLimitMilliseconds: number
 ): void {
-  if (clock() - startedAt >= timeLimitMilliseconds) throw new SearchDeadlineExceeded();
+  throwIfSearchTimeLimitReachedAt(clock(), startedAt, timeLimitMilliseconds);
 }
 
 function sameCoordinate(
@@ -465,9 +473,13 @@ export function analyzeTimeLimitedIterativeDeepeningAlphaBetaSearch(
           ? () => throwIfSearchTimeLimitReached(clock, startedAt, timeLimitMilliseconds)
           : undefined
       );
+      const iterationFinishedAt = clock();
+      if (depth >= 2) {
+        throwIfSearchTimeLimitReachedAt(iterationFinishedAt, startedAt, timeLimitMilliseconds);
+      }
       const iteration = {
         ...searchResult,
-        elapsedMilliseconds: Math.max(0, clock() - iterationStartedAt),
+        elapsedMilliseconds: Math.max(0, iterationFinishedAt - iterationStartedAt),
       };
       iterations.push(iteration);
       previousBestAction = iteration.selectedAction;

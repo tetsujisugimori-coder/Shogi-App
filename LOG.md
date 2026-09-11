@@ -2672,3 +2672,15 @@ PR #1のレビュー指摘を受け、簡易APIの`applyMove`と合法手候補�
 
 - AbortControllerによる外部中断、Web Worker、UIの中止ボタン・時間設定、非同期化、置換表、PVテーブル、静止探索、評価関数・既定深さ・保存形式の変更は含めない。
 - 次の候補は、同じ完了反復採用規則を保つAbortControllerによる外部中断、またはWeb WorkerによるUI非ブロッキング探索である。
+
+## [2026-09-11] PR #69 反復終了時の期限判定修正
+
+### 原因と修正
+
+- 深さ2以降は再帰ノードと候補ループで期限を確認していた一方、`searchAlphaBeta()` が正常終了した直後の時刻を期限判定に使わず、その反復を完了扱いにしていた。そのため、最後の再帰内確認後から反復終了までに期限と同値または超過した場合、期限切れの指し手・評価・統計が採用される余地があった。
+- `searchAlphaBeta()` の直後に `iterationFinishedAt` を一度だけ取得し、深さ2以降では同じ値で `startedAt` からの期限到達を判定してから、反復単体の `elapsedMilliseconds` を算出するよう修正した。期限到達時は既存の内部 `SearchDeadlineExceeded` を送出して反復全体を破棄するため、`iterations.push()` と `previousBestAction` の更新、最深統計、`total*` 統計への混入は起きない。深さ1の最低保証と、最上位経過時間が破棄反復を含む仕様は維持する。
+
+### 回帰テストと検証
+
+- 呼び出し回数ベースの偽clockで、深さ2の再帰中は期限前、`searchAlphaBeta()` 戻り直後の終了時刻だけが制限値と同値になるケースを追加した。`requestedMaxDepth: 2`、`completedDepth: 1`、`timedOut: true`、深さ1だけの `iterations`、深さ1の選択手・評価・通常統計・`total*` 統計、破棄した深さ2の処理時間を含む最上位経過時間を確認する。
+- 対象テストは `54/54`、全体テストは `25 files / 886 tests` で成功した。`npm run lint`、`npm run build`、`npm run verify:lock`、統合 `npm run check`、`git diff --check` も成功した。`shogi-branch-replay` の兄弟分岐UIテストの既知タイムアウトは今回も再現していない。

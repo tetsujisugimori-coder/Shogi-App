@@ -598,6 +598,36 @@ describe('時間制限付き反復深化αβ探索', () => {
     expect(result.elapsedMilliseconds).toBe(10);
   });
 
+  it('深さ2の探索本体後に期限と同値なら、その完了結果も破棄する', () => {
+    const state = recaptureTrapState();
+    const completedDepthTwoReadCount = countClockReadsThroughDepthTwo(state);
+    const depthOne = analyzeIterativeDeepeningAlphaBetaSearch(state, 1, undefined, () => 0);
+    let readCount = 0;
+    const result = analyzeTimeLimitedIterativeDeepeningAlphaBetaSearch(
+      state,
+      2,
+      10,
+      undefined,
+      () => {
+        readCount += 1;
+        return readCount >= completedDepthTwoReadCount - 1 ? 10 : 0;
+      }
+    );
+
+    expect(readCount).toBe(completedDepthTwoReadCount);
+    expect(result).toMatchObject({ requestedMaxDepth: 2, completedDepth: 1, timedOut: true });
+    expect(result.iterations.map((iteration) => iteration.depth)).toEqual([1]);
+    expect(result.selectedAction).toEqual(depthOne.selectedAction);
+    expect(result.selectedEvaluation).toBe(depthOne.selectedEvaluation);
+    expect(result.visitedPositionCount).toBe(depthOne.visitedPositionCount);
+    expect(result.cutoffCount).toBe(depthOne.cutoffCount);
+    expect(result.skippedActionCount).toBe(depthOne.skippedActionCount);
+    expect(result.totalVisitedPositionCount).toBe(depthOne.totalVisitedPositionCount);
+    expect(result.totalCutoffCount).toBe(depthOne.totalCutoffCount);
+    expect(result.totalSkippedActionCount).toBe(depthOne.totalSkippedActionCount);
+    expect(result.elapsedMilliseconds).toBe(10);
+  });
+
   it('完了反復ごとの時間と、未完了反復を含む全体時間を分離する', () => {
     const state = moveOrderingBenefitState();
     const completedDepthTwoReadCount = countClockReadsThroughDepthTwo(state);
