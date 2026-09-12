@@ -7,6 +7,7 @@ import {
   analyzeTimeLimitedIterativeDeepeningAlphaBetaSearch,
   analyzeTwoPlyAlphaBetaSearch,
   analyzeTwoPlyMinimaxSearch,
+  areLegalActionsEqual,
   evaluateMaterial,
   evaluateSearchPosition,
   executeLegalAction,
@@ -125,6 +126,14 @@ function execute(state: BoardState, action: LegalAction): BoardState {
   expect(result.type).toBe('applied');
   if (result.type !== 'applied') throw new Error('Test legal action was rejected.');
   return result.state;
+}
+
+function replayPrincipalVariation(state: BoardState, principalVariation: readonly LegalAction[]): BoardState {
+  return principalVariation.reduce((replayState, action) => {
+    expect(getLegalActions(replayState).some((legalAction) => areLegalActionsEqual(legalAction, action)))
+      .toBe(true);
+    return execute(replayState, action);
+  }, cloneBoardState(state));
 }
 
 /**
@@ -1268,5 +1277,56 @@ describe('再帰型αβ枝刈り探索', () => {
     expect(depth2.cutoffCount).toBeGreaterThanOrEqual(0);
     expect(depth3.cutoffCount).toBeGreaterThanOrEqual(0);
     expect(tieDepth3.selectedAction).toEqual(getLegalActions(tieState)[0]);
+  });
+});
+
+describe('再帰型αβ探索の主変化', () => {
+  it('深さ1から3で選択手から始まる合法なPVを、不変の入力局面から返す', () => {
+    const state = recaptureTrapState();
+    const snapshot = JSON.stringify(state);
+
+    for (const depth of [1, 2, 3]) {
+      const result = analyzeAlphaBetaSearch(state, depth);
+      expect(result.selectedAction).not.toBeNull();
+      if (!result.selectedAction) throw new Error('Expected a selected action.');
+      expect(result.principalVariation).toHaveLength(depth);
+      expect(result.principalVariation.length).toBeLessThanOrEqual(result.depth);
+      expect(areLegalActionsEqual(result.principalVariation[0], result.selectedAction)).toBe(true);
+      replayPrincipalVariation(state, result.principalVariation);
+    }
+
+    expect(JSON.stringify(state)).toBe(snapshot);
+  });
+
+  it('終局局面では選択手なしと空のPVを返す', () => {
+    const ended = {
+      ...forcedLossAfterEveryRootActionState(),
+      status: 'ended' as const,
+      result: { winner: null, loser: null, endReason: 'repetition' } satisfies GameResult,
+    };
+
+    expect(analyzeAlphaBetaSearch(ended, 3)).toMatchObject({
+      selectedAction: null,
+      principalVariation: [],
+    });
+  });
+
+  it('反復深化では各完了反復と最上位結果が独立したPVを持つ', () => {
+    const state = recaptureTrapState();
+    const result = analyzeIterativeDeepeningAlphaBetaSearch(state, 3);
+
+    expect(result.iterations.map((iteration) => iteration.depth)).toEqual([1, 2, 3]);
+    for (const iteration of result.iterations) {
+      expect(iteration.principalVariation.length).toBeLessThanOrEqual(iteration.depth);
+      if (!iteration.selectedAction) throw new Error('Expected an iterative selected action.');
+      expect(areLegalActionsEqual(iteration.principalVariation[0], iteration.selectedAction)).toBe(true);
+      replayPrincipalVariation(state, iteration.principalVariation);
+    }
+    expect(result.principalVariation).toEqual(result.iterations[2].principalVariation);
+    expect(result.principalVariation).not.toBe(result.iterations[2].principalVariation);
+
+    const timeLimited = analyzeTimeLimitedIterativeDeepeningAlphaBetaSearch(state, 3, 1_000, undefined, () => 0);
+    expect(timeLimited.principalVariation).toEqual(timeLimited.iterations[2].principalVariation);
+    expect(timeLimited.principalVariation).not.toBe(timeLimited.iterations[2].principalVariation);
   });
 });

@@ -34,6 +34,7 @@ function comparableResult(result: TimeLimitedIterativeDeepeningAlphaBetaSearchRe
   return {
     selectedAction: result.selectedAction,
     selectedEvaluation: result.selectedEvaluation,
+    principalVariation: result.principalVariation,
     requestedMaxDepth: result.requestedMaxDepth,
     completedDepth: result.completedDepth,
     timedOut: result.timedOut,
@@ -110,6 +111,7 @@ describe('時間制限付き反復深化αβ探索Workerの純粋処理', () => 
     }
     expect(response.requestId).toBe(input.requestId);
     expect(comparableResult(response.result)).toEqual(comparableResult(direct));
+    expect(response.result.principalVariation).toEqual(direct.principalVariation);
     expect(JSON.stringify(input.state)).toBe(snapshot);
   });
 
