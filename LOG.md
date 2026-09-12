@@ -2756,3 +2756,42 @@ PR #1のレビュー指摘を受け、簡易APIの`applyMove`と合法手候補�
 
 - 呼び出し回数ベースの偽clockで、深さ2の再帰中は期限前、`searchAlphaBeta()` 戻り直後の終了時刻だけが制限値と同値になるケースを追加した。`requestedMaxDepth: 2`、`completedDepth: 1`、`timedOut: true`、深さ1だけの `iterations`、深さ1の選択手・評価・通常統計・`total*` 統計、破棄した深さ2の処理時間を含む最上位経過時間を確認する。
 - 対象テストは `54/54`、全体テストは `25 files / 886 tests` で成功した。`npm run lint`、`npm run build`、`npm run verify:lock`、統合 `npm run check`、`git diff --check` も成功した。`shogi-branch-replay` の兄弟分岐UIテストの既知タイムアウトは今回も再現していない。
+
+## [2026-09-12] 再帰型αβ探索の主変化（PV）
+
+### 目的と基準
+
+- 実装日時: 2026-09-12。基準mainは PR #77 を含む `66ebe19`。再帰型αβ・反復深化・時間制限Workerの結果へ、評価値に対応する `principalVariation: LegalAction[]` を追加し、研究画面で「AIの読み筋」として確認できるようにした。
+- 変更ファイル: `src/domain/shogi/twoPlyAlphaBetaAi.ts`、`src/components/shogi/ShogiResearchScreen.tsx`、`src/components/shogi/AiSearchResultPanel.tsx`、関連探索・Worker・UIテスト、`README.md`、`LOG.md`。
+
+### PV契約と探索
+
+- `selectedAction` がある結果ではPVの先頭を必ず同じ合法手にし、選択手なしでは空配列にする。PVは指定深さまたは完了深さを超えず、終局・葉ではそれ以上追加しない。各配列・手・座標はコピーし、入力局面、候補列、子探索のPV、既に完了した反復を変更・共有しない。
+- 再帰ノードは評価値とPVを一組で返す。実際に探索した候補ごとに `[action, ...childPrincipalVariation]` を作り、最大化・最小化とも従来の厳密な最善値更新時だけ対応するPVを更新する。αβカットオフでは未探索候補をPVに含めない。rootの同点順と必要な全window再探索は維持し、最終採用候補のPVを使う。
+- 反復深化の各完了反復は独立したPVを持つ。時間切れの未完了反復は従来どおり丸ごと破棄し、最上位PV、`iterations`、累積統計、Worker応答、UIには最深完了反復だけが残る。0msの深さ1保証、期限同値時の破棄、`elapsedMilliseconds`の定義は変更していない。
+
+### Workerと画面境界
+
+- Workerプロトコルは既存の構造化クローン結果型をそのまま使うため、PVはJSON化せず `LegalAction[]` として保持する。1要求1 Worker、requestId照合、AbortSignal、最初の確定だけを採用する処理、terminate、Infinity評価の扱いは変更していない。
+- 画面はWorker PVを信頼せず、開始局面の複製へ各手を順に合法手照合・既存の棋譜表記生成・`executeLegalAction`で再生する。先頭不一致、空、深さ超過、途中不正手は一般的なalertへ移し、盤面、棋譜、成功パネルを変更しない。PV検証後も実盤面には選択手の1手だけを適用する。表示は意味的な順序付きリストで、完了深さとPV手順数を併記し、長い表記は折り返す。
+
+### テストと対象外
+
+- 追加・更新したテストは、深さ1〜3のPV先頭・合法再生・深さ上限・終局空PV、反復ごとの独立性、最上位PV、Workerハンドラ／クライアントのPV保持、正常PV表示、先頭不一致・途中不正・深さ超過の安全な拒否を確認する。
+- 実行結果: `npm run verify:lock`、`npm run lint`、`npm run build`、`git diff --check` は成功。探索・Worker・UI対象3ファイルは `86/86`、全27テストファイルを3分割して `337 + 218 + 363 = 918/918` 成功した。一括 `npm test` と `npm run check` はVitest開始後に終了要約を回収できずbuild段階まで進んだ証跡を得られなかったため、成功扱いにはしていない。これは分割全件成功と独立したbuild成功で補完しており、テストを削除・緩和していない。
+- ローカルVite画面ではWorker探索後に4手のPVが順序付きリストで表示され、実盤面に先頭手だけが適用されることを確認した。375px幅では文書・結果パネルとも横方向のはみ出しがなく、ブラウザのwarning/errorは0件だった。
+- 駒価値・評価項目、合法手・着手規則、αβ条件、ムーブオーダリング、root同点規則、保存形式、Workerプール、時間設定UI、途中反復表示、新規依存は対象外で、変更していない。
+
+## [2026-09-13] 再帰αβノードの無限評価PV欠落修正
+
+### 原因と修正
+
+- `searchAlphaBetaNode()` は最大化値を `-Infinity`、最小化値を `+Infinity` で初期化し、厳密な大小比較が成立したときだけPVを候補のものへ置き換えていた。このため、最大化ノードの探索済み候補がすべて `-Infinity`、または最小化ノードの探索済み候補がすべて `+Infinity` のとき、評価値は正しくても最初の合法手が一度もPVへ採用されず、非終局PVが途中で欠ける。
+- 評価値の有限・無限を個別に分岐せず、`hasExploredAction` を追加した。最大化・最小化のどちらでも最初に実際に探索した候補は無条件で評価値とPVの基準に採用し、2件目以降だけ従来の厳密な `>` / `<` 比較で更新する。同値では最初に探索した候補を維持する。
+- alpha/betaの更新・カットオフ条件、rootの固定同点順と全window再探索、反復深化のroot並べ替え、非rootムーブオーダリング、探索統計、時間切れの未完了反復破棄、最深完了反復採用、Worker中止・UIのPV検証は変更していない。
+
+### 回帰テストと検証
+
+- `src/test/shogi-two-ply-minimax-ai.test.ts` に、合法手を順に実行して連続王手千日手の終局へ到達する局面を追加した。最小化ノードの唯一の応手が先手視点 `+Infinity` でも、選択手からその応手までのPVが返り、開始局面から全手を合法再生でき、指定深さを超えず終局で終了することを確認する。このテストは修正前にPVが1手で止まり失敗し、修正後は成功した。
+- `npm run verify:lock`、`npm run lint`、`git diff --check` は成功した。PV・再帰αβ・時間制限探索・Worker・UIの対象3ファイルは `87/87` 成功した。
+- `npm run build` は成功した。`npm test` と `npm run check` は、Vitest開始後に既存のjsdom通知（`Not implemented: navigation to another Document`）だけが出力され、完了要約を回収できなかったため成功扱いにしていない。`check` 内の `verify:lock` とlintまでは成功している。テストの削除・緩和・待機時間の変更はしていない。

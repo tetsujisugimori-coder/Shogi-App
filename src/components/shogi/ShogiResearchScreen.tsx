@@ -29,7 +29,10 @@ import {
   importShogiGameRecordSession,
   importKifBytes,
   analyzeTwoPlyMinimaxSearch,
+  areLegalActionsEqual,
+  cloneBoardState,
   executeLegalAction,
+  getLegalActions,
   generateDropNotation,
   generateMoveNotation,
   MAX_SHOGI_GAME_RECORD_SESSION_FILE_BYTES,
@@ -141,6 +144,41 @@ function formatLegalActionNotation(state: BoardState, action: LegalAction): stri
   const piece = hand.find((candidate) => candidate.id === action.pieceId);
   if (!piece) throw new Error('A legal drop action must have a hand piece.');
   return generateDropNotation(state.turn, piece, action.to);
+}
+
+/**
+ * Treat a Worker result as untrusted at the UI boundary. The returned notation
+ * is generated while replaying a clone, so every later PV action sees the
+ * position created by the earlier action.
+ */
+function validateAndFormatPrincipalVariation(
+  state: BoardState,
+  result: TimeLimitedIterativeDeepeningAlphaBetaSearchResult
+): string[] | null {
+  if (!result.selectedAction || !Array.isArray(result.principalVariation) ||
+    !Number.isInteger(result.completedDepth) || result.completedDepth < 1 ||
+    result.principalVariation.length === 0 ||
+    result.principalVariation.length > result.completedDepth) {
+    return null;
+  }
+
+  try {
+    if (!areLegalActionsEqual(result.principalVariation[0], result.selectedAction)) return null;
+    let replayState = cloneBoardState(state);
+    const notations: string[] = [];
+    for (const action of result.principalVariation) {
+      if (!getLegalActions(replayState).some((legalAction) => areLegalActionsEqual(legalAction, action))) {
+        return null;
+      }
+      notations.push(formatLegalActionNotation(replayState, action));
+      const execution = executeLegalAction(replayState, action, { proposer: 'local_ai' });
+      if (execution.type !== 'applied') return null;
+      replayState = execution.state;
+    }
+    return notations;
+  } catch {
+    return null;
+  }
 }
 
 export const ShogiResearchScreen: React.FC<ShogiResearchScreenProps> = ({
@@ -902,6 +940,32 @@ export const ShogiResearchScreen: React.FC<ShogiResearchScreenProps> = ({
           return;
         }
 
+        // Preserve the established selected-action failure boundary before the
+        // additional multi-ply result is trusted or shown.
+        const selectedActionCheck = executeLegalAction(
+          cloneBoardState(searchState),
+          result.selectedAction,
+          { proposer: 'local_ai' }
+        );
+        if (selectedActionCheck.type !== 'applied') {
+          activeWorkerSearchRef.current = null;
+          setWorkerSearchState({
+            kind: 'error',
+            message: 'AIの指し手を適用できませんでした。',
+          });
+          return;
+        }
+
+        const principalVariationNotations = validateAndFormatPrincipalVariation(searchState, result);
+        if (!principalVariationNotations) {
+          activeWorkerSearchRef.current = null;
+          setWorkerSearchState({
+            kind: 'error',
+            message: 'AIの読み筋を検証できませんでした。',
+          });
+          return;
+        }
+
         const execution = executeLegalAction(searchState, result.selectedAction, {
           proposer: 'local_ai',
         });
@@ -916,11 +980,13 @@ export const ShogiResearchScreen: React.FC<ShogiResearchScreenProps> = ({
           return;
         }
 
-        const selectedNotation = formatLegalActionNotation(searchState, result.selectedAction);
+        const selectedNotation = principalVariationNotations[0];
         setBoardState(execution.state);
         setSelection({ kind: 'none' });
         setPendingPromotion(null);
-        setAiSearchDisplay({ kind: 'time-limited-worker', result, selectedNotation });
+        setAiSearchDisplay({
+          kind: 'time-limited-worker', result, selectedNotation, principalVariationNotations,
+        });
         setWorkerSearchState({ kind: 'idle' });
       },
       (error: unknown) => {

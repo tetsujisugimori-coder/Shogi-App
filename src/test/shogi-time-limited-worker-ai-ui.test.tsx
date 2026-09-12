@@ -37,6 +37,7 @@ function workerResult(selectedAction: LegalAction | null): TimeLimitedIterativeD
   const iteration = {
     selectedAction,
     selectedEvaluation: 42,
+    principalVariation: selectedAction ? [selectedAction] : [],
     rootLegalActionCount: 30,
     visitedPositionCount: 120,
     depth: 3,
@@ -139,6 +140,62 @@ describe('時間制限Worker AIの盤面UI接続', () => {
     expect(within(panel).getByText('API全体の経過時間')).toBeInTheDocument();
     expect(within(panel).getByText('最深完了反復の調査局面数')).toBeInTheDocument();
     expect(within(panel).getByText('全反復合計の調査局面数')).toBeInTheDocument();
+  });
+
+  it('検証済みPVを局面ごとの棋譜表記でAIの読み筋として順番に表示し、盤面へは先頭手だけ適用する', async () => {
+    const user = userEvent.setup();
+    const pending = deferred<TimeLimitedIterativeDeepeningAlphaBetaSearchResult>();
+    render(<ShogiResearchScreen workerSearchRunner={() => pending.promise} />);
+    const first = initialAction();
+    const afterFirst = stateAfterInitialAction();
+    const second = getLegalActions(afterFirst)[0];
+    if (!second) throw new Error('Expected a second legal action.');
+    const result = workerResult(first);
+    result.principalVariation = [first, second];
+    result.iterations[0].principalVariation = [first, second];
+
+    await user.click(workerButton());
+    await act(async () => pending.resolve(result));
+
+    const panel = screen.getByRole('heading', { name: 'AI思考結果' }).closest('section');
+    if (!panel) throw new Error('Worker AI search result panel not found.');
+    expect(within(panel).getByRole('heading', { name: 'AIの読み筋' })).toBeInTheDocument();
+    expect(within(panel).getByText('完了深さ 3 ply 中 2 手順')).toBeInTheDocument();
+    expect(within(panel).getAllByRole('listitem')).toHaveLength(2);
+    expect(document.getElementById('shogi-research-screen')).toHaveAttribute('data-history-count', '1');
+  });
+
+  it('先頭不一致、途中不正手、完了深さ超過のWorker PVは盤面と成功表示を変えず拒否する', async () => {
+    const cases = [
+      (result: TimeLimitedIterativeDeepeningAlphaBetaSearchResult) => {
+        const differentAction = getLegalActions(createInitialBoardState())[1];
+        if (!differentAction) throw new Error('Expected a distinct legal action.');
+        result.principalVariation = [differentAction];
+      },
+      (result: TimeLimitedIterativeDeepeningAlphaBetaSearchResult) => {
+        result.principalVariation = [result.selectedAction!, result.selectedAction!];
+      },
+      (result: TimeLimitedIterativeDeepeningAlphaBetaSearchResult) => {
+        result.principalVariation = [result.selectedAction!, result.selectedAction!, result.selectedAction!, result.selectedAction!];
+      },
+    ];
+
+    for (const modify of cases) {
+      const user = userEvent.setup();
+      const pending = deferred<TimeLimitedIterativeDeepeningAlphaBetaSearchResult>();
+      const rendered = render(<ShogiResearchScreen workerSearchRunner={() => pending.promise} />);
+      const result = workerResult(initialAction());
+      modify(result);
+      result.iterations[0].principalVariation = result.principalVariation;
+
+      await user.click(workerButton());
+      await act(async () => pending.resolve(result));
+
+      expect(document.getElementById('shogi-research-screen')).toHaveAttribute('data-history-count', '0');
+      expect(screen.queryByRole('heading', { name: 'AI思考結果' })).not.toBeInTheDocument();
+      expect(screen.getByRole('alert')).toHaveTextContent('AIの読み筋を検証できませんでした。');
+      rendered.unmount();
+    }
   });
 
   it('適用できないWorkerのselectedActionは盤面も成功表示も変更せず、利用者向けエラーにする', async () => {

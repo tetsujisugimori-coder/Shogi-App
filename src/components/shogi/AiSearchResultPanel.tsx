@@ -14,6 +14,7 @@ export type AiSearchDisplay =
       kind: 'time-limited-worker';
       result: TimeLimitedIterativeDeepeningAlphaBetaSearchResult;
       selectedNotation: string;
+      principalVariationNotations: readonly string[];
     };
 
 interface AiSearchResultPanelProps {
@@ -30,7 +31,7 @@ function formatEvaluation(evaluation: number | null): string {
 /** A compact presentation of the latest synchronous or Worker AI search. */
 export function AiSearchResultPanel({ search }: AiSearchResultPanelProps) {
   if (search.kind === 'time-limited-worker') {
-    const { result, selectedNotation } = search;
+    const { result, selectedNotation, principalVariationNotations } = search;
     return (
       <section
         aria-labelledby="ai-search-result-title"
@@ -64,6 +65,17 @@ export function AiSearchResultPanel({ search }: AiSearchResultPanelProps) {
           <dt className="text-stone-400">全反復合計の未調査候補手数</dt>
           <dd className="text-sky-100">{result.totalSkippedActionCount}</dd>
         </dl>
+        <div className="mt-3 min-w-0 border-t border-sky-900/80 pt-2">
+          <h3 className="text-xs font-medium text-stone-300">AIの読み筋</h3>
+          <p className="mt-1 text-xs text-stone-400">
+            完了深さ {result.completedDepth} ply 中 {principalVariationNotations.length} 手順
+          </p>
+          <ol className="mt-1 list-decimal space-y-1 break-words pl-5 text-xs text-sky-100">
+            {principalVariationNotations.map((notation, index) => (
+              <li key={`${index + 1}-${notation}`} className="min-w-0 break-words">{notation}</li>
+            ))}
+          </ol>
+        </div>
       </section>
     );
   }
