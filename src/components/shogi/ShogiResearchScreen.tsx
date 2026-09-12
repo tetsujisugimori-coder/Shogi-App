@@ -874,6 +874,7 @@ export const ShogiResearchScreen: React.FC<ShogiResearchScreenProps> = ({
     activeWorkerSearchRef.current = { generation, controller, state: searchState };
     setSelection({ kind: 'none' });
     setPendingPromotion(null);
+    setAiSearchDisplay(null);
     setWorkerSearchState({ kind: 'thinking' });
 
     const isCurrentSearch = (): boolean => {
@@ -890,20 +891,35 @@ export const ShogiResearchScreen: React.FC<ShogiResearchScreenProps> = ({
       (result) => {
         if (!isCurrentSearch()) return;
 
-        const selectedNotation = result.selectedAction
-          ? formatLegalActionNotation(searchState, result.selectedAction)
-          : '選択手なし';
-        const execution = result.selectedAction
-          ? executeLegalAction(searchState, result.selectedAction, { proposer: 'local_ai' })
-          : null;
+        // The screen cannot start this search from an ended position. Therefore a
+        // missing action is not a normal no-move outcome at this UI boundary.
+        if (!result.selectedAction) {
+          activeWorkerSearchRef.current = null;
+          setWorkerSearchState({
+            kind: 'error',
+            message: 'AIの指し手を受け取れませんでした。',
+          });
+          return;
+        }
+
+        const execution = executeLegalAction(searchState, result.selectedAction, {
+          proposer: 'local_ai',
+        });
 
         if (!isCurrentSearch()) return;
         activeWorkerSearchRef.current = null;
-        if (execution?.type === 'applied') {
-          setBoardState(execution.state);
-          setSelection({ kind: 'none' });
-          setPendingPromotion(null);
+        if (execution.type !== 'applied') {
+          setWorkerSearchState({
+            kind: 'error',
+            message: 'AIの指し手を適用できませんでした。',
+          });
+          return;
         }
+
+        const selectedNotation = formatLegalActionNotation(searchState, result.selectedAction);
+        setBoardState(execution.state);
+        setSelection({ kind: 'none' });
+        setPendingPromotion(null);
         setAiSearchDisplay({ kind: 'time-limited-worker', result, selectedNotation });
         setWorkerSearchState({ kind: 'idle' });
       },
