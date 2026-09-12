@@ -26,6 +26,8 @@ export const TWO_PLY_ALPHA_BETA_SEARCH_DEPTH = 2;
 export interface AlphaBetaSearchResult {
   selectedAction: LegalAction | null;
   selectedEvaluation: number | null;
+  /** The explored best line, starting with `selectedAction` when present. */
+  principalVariation: LegalAction[];
   rootLegalActionCount: number;
   visitedPositionCount: number;
   depth: number;
@@ -67,6 +69,7 @@ export interface TimeLimitedIterativeDeepeningAlphaBetaSearchResult
 export interface TwoPlyAlphaBetaSearchResult {
   selectedAction: LegalAction | null;
   selectedEvaluation: number | null;
+  principalVariation: LegalAction[];
   rootLegalActionCount: number;
   visitedPositionCount: number;
   depth: typeof TWO_PLY_ALPHA_BETA_SEARCH_DEPTH;
@@ -143,7 +146,8 @@ function sameCoordinate(
   return left.row === right.row && left.col === right.col;
 }
 
-function sameLegalAction(left: LegalAction, right: LegalAction): boolean {
+/** Compares the meaningful fields of two legal actions without serializing them. */
+export function areLegalActionsEqual(left: LegalAction, right: LegalAction): boolean {
   if (left.kind !== right.kind || left.player !== right.player || left.pieceType !== right.pieceType ||
     left.promotion !== right.promotion || !sameCoordinate(left.to, right.to)) {
     return false;
@@ -152,6 +156,22 @@ function sameLegalAction(left: LegalAction, right: LegalAction): boolean {
   return left.kind === 'move' && right.kind === 'move'
     ? sameCoordinate(left.from, right.from)
     : left.kind === 'drop' && right.kind === 'drop' && left.pieceId === right.pieceId;
+}
+
+function cloneLegalAction(action: LegalAction): LegalAction {
+  if (action.kind === 'move') {
+    return {
+      ...action,
+      from: { ...action.from },
+      to: { ...action.to },
+    };
+  }
+
+  return { ...action, to: { ...action.to } };
+}
+
+function clonePrincipalVariation(actions: readonly LegalAction[]): LegalAction[] {
+  return actions.map(cloneLegalAction);
 }
 
 /**
@@ -197,7 +217,7 @@ export function orderIterativeDeepeningRootActions(
 ): LegalAction[] {
   if (previousBestAction === null) return [...actions];
 
-  const previousBestIndex = actions.findIndex((action) => sameLegalAction(action, previousBestAction));
+  const previousBestIndex = actions.findIndex((action) => areLegalActionsEqual(action, previousBestAction));
   if (previousBestIndex === -1) return [...actions];
 
   const previousBest = actions[previousBestIndex];
@@ -210,6 +230,11 @@ export function orderIterativeDeepeningRootActions(
  * still available from this node, so the root action has already consumed one
  * ply before this function is first called.
  */
+interface SearchNodeResult {
+  evaluation: number;
+  principalVariation: LegalAction[];
+}
+
 function searchAlphaBetaNode(
   state: BoardState,
   remainingDepth: number,
@@ -220,10 +245,13 @@ function searchAlphaBetaNode(
   valueTable: MaterialValueTable,
   statistics: SearchStatistics,
   interruptionCheck: SearchInterruptionCheck
-): number {
+): SearchNodeResult {
   interruptionCheck?.();
   if (state.status === 'ended' || remainingDepth === 0) {
-    return evaluateSearchPosition(state, rootPlayer, valueTable);
+    return {
+      evaluation: evaluateSearchPosition(state, rootPlayer, valueTable),
+      principalVariation: [],
+    };
   }
 
   const actions = orderAlphaBetaNodeActions(state, getLegalActions(state));
@@ -231,15 +259,19 @@ function searchAlphaBetaNode(
   // rules. Treat a malformed in-progress position as a leaf as well, rather
   // than recursing forever or throwing after a valid API result of [].
   if (actions.length === 0) {
-    return evaluateSearchPosition(state, rootPlayer, valueTable);
+    return {
+      evaluation: evaluateSearchPosition(state, rootPlayer, valueTable),
+      principalVariation: [],
+    };
   }
 
   let value = isMaximizing ? Number.NEGATIVE_INFINITY : Number.POSITIVE_INFINITY;
+  let principalVariation: LegalAction[] = [];
   for (let actionIndex = 0; actionIndex < actions.length; actionIndex += 1) {
     interruptionCheck?.();
     const child = executeSearchAction(state, actions[actionIndex]);
     statistics.visitedPositionCount += 1;
-    const childValue = searchAlphaBetaNode(
+    const childResult = searchAlphaBetaNode(
       child,
       remainingDepth - 1,
       rootPlayer,
@@ -251,11 +283,21 @@ function searchAlphaBetaNode(
       interruptionCheck
     );
 
+    const candidatePrincipalVariation = [
+      cloneLegalAction(actions[actionIndex]),
+      ...clonePrincipalVariation(childResult.principalVariation),
+    ];
     if (isMaximizing) {
-      if (childValue > value) value = childValue;
+      if (childResult.evaluation > value) {
+        value = childResult.evaluation;
+        principalVariation = candidatePrincipalVariation;
+      }
       if (value > alpha) alpha = value;
     } else {
-      if (childValue < value) value = childValue;
+      if (childResult.evaluation < value) {
+        value = childResult.evaluation;
+        principalVariation = candidatePrincipalVariation;
+      }
       if (value < beta) beta = value;
     }
 
@@ -266,7 +308,7 @@ function searchAlphaBetaNode(
       break;
     }
   }
-  return value;
+  return { evaluation: value, principalVariation };
 }
 
 type UnmeasuredAlphaBetaSearchResult = Omit<AlphaBetaSearchResult, 'elapsedMilliseconds'>;
@@ -295,6 +337,7 @@ function searchAlphaBeta(
     return {
       selectedAction: null,
       selectedEvaluation: evaluateSearchPosition(state, rootPlayer, valueTable),
+      principalVariation: [],
       rootLegalActionCount: 0,
       depth,
       ...statistics,
@@ -310,6 +353,7 @@ function searchAlphaBeta(
   let bestAction: LegalAction | null = null;
   let bestOriginalIndex = Number.POSITIVE_INFINITY;
   let bestEvaluation = Number.NEGATIVE_INFINITY;
+  let bestPrincipalVariation: LegalAction[] = [];
   let alpha = Number.NEGATIVE_INFINITY;
   const beta = Number.POSITIVE_INFINITY;
 
@@ -318,7 +362,7 @@ function searchAlphaBeta(
     const alphaBeforeCandidate = alpha;
     const afterRootAction = executeSearchAction(state, rootAction);
     statistics.visitedPositionCount += 1;
-    let candidateEvaluation = searchAlphaBetaNode(
+    let candidateResult = searchAlphaBetaNode(
       afterRootAction,
       depth - 1,
       rootPlayer,
@@ -335,8 +379,8 @@ function searchAlphaBeta(
     // exact tie which belongs to an earlier legal action. This separates the
     // search order from the established root tie-breaking order.
     if (bestAction !== null && originalIndex < bestOriginalIndex &&
-      candidateEvaluation === bestEvaluation && candidateEvaluation === alphaBeforeCandidate) {
-      candidateEvaluation = searchAlphaBetaNode(
+      candidateResult.evaluation === bestEvaluation && candidateResult.evaluation === alphaBeforeCandidate) {
+      candidateResult = searchAlphaBetaNode(
         afterRootAction,
         depth - 1,
         rootPlayer,
@@ -351,11 +395,15 @@ function searchAlphaBeta(
 
     // The first legal action establishes the baseline even at -Infinity.
     // For iterative root reordering, compare original indexes on exact ties.
-    if (bestAction === null || candidateEvaluation > bestEvaluation ||
-      (candidateEvaluation === bestEvaluation && originalIndex < bestOriginalIndex)) {
+    if (bestAction === null || candidateResult.evaluation > bestEvaluation ||
+      (candidateResult.evaluation === bestEvaluation && originalIndex < bestOriginalIndex)) {
       bestAction = rootAction;
       bestOriginalIndex = originalIndex;
-      bestEvaluation = candidateEvaluation;
+      bestEvaluation = candidateResult.evaluation;
+      bestPrincipalVariation = [
+        cloneLegalAction(rootAction),
+        ...clonePrincipalVariation(candidateResult.principalVariation),
+      ];
     }
     if (bestEvaluation > alpha) alpha = bestEvaluation;
   }
@@ -363,6 +411,7 @@ function searchAlphaBeta(
   return {
     selectedAction: bestAction,
     selectedEvaluation: bestAction === null ? null : bestEvaluation,
+    principalVariation: clonePrincipalVariation(bestPrincipalVariation),
     rootLegalActionCount: rootActions.length,
     depth,
     ...statistics,
@@ -387,6 +436,7 @@ export function analyzeAlphaBetaSearch(
   const searchResult = searchAlphaBeta(state, depth, valueTable);
   return {
     ...searchResult,
+    principalVariation: clonePrincipalVariation(searchResult.principalVariation),
     elapsedMilliseconds: Math.max(0, clock() - startedAt),
   };
 }
@@ -412,6 +462,7 @@ export function analyzeIterativeDeepeningAlphaBetaSearch(
     const searchResult = searchAlphaBeta(state, depth, valueTable, previousBestAction);
     const iteration = {
       ...searchResult,
+      principalVariation: clonePrincipalVariation(searchResult.principalVariation),
       elapsedMilliseconds: Math.max(0, clock() - iterationStartedAt),
     };
     iterations.push(iteration);
@@ -421,6 +472,7 @@ export function analyzeIterativeDeepeningAlphaBetaSearch(
   const deepestIteration = iterations[iterations.length - 1];
   return {
     ...deepestIteration,
+    principalVariation: clonePrincipalVariation(deepestIteration.principalVariation),
     elapsedMilliseconds: Math.max(0, clock() - startedAt),
     iterations,
     totalVisitedPositionCount: iterations.reduce(
@@ -479,6 +531,7 @@ export function analyzeTimeLimitedIterativeDeepeningAlphaBetaSearch(
       }
       const iteration = {
         ...searchResult,
+        principalVariation: clonePrincipalVariation(searchResult.principalVariation),
         elapsedMilliseconds: Math.max(0, iterationFinishedAt - iterationStartedAt),
       };
       iterations.push(iteration);
@@ -495,6 +548,7 @@ export function analyzeTimeLimitedIterativeDeepeningAlphaBetaSearch(
   const deepestIteration = iterations[iterations.length - 1];
   return {
     ...deepestIteration,
+    principalVariation: clonePrincipalVariation(deepestIteration.principalVariation),
     elapsedMilliseconds: Math.max(0, clock() - startedAt),
     requestedMaxDepth: maxDepth,
     completedDepth: deepestIteration.depth,
@@ -544,6 +598,7 @@ export function analyzeTwoPlyAlphaBetaSearch(
   return {
     selectedAction: result.selectedAction,
     selectedEvaluation: result.selectedEvaluation,
+    principalVariation: clonePrincipalVariation(result.principalVariation),
     rootLegalActionCount: result.rootLegalActionCount,
     visitedPositionCount: result.visitedPositionCount,
     depth: TWO_PLY_ALPHA_BETA_SEARCH_DEPTH,
