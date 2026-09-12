@@ -168,6 +168,67 @@ function minimizingPositiveInfinityPrincipalVariationState(): BoardState {
   };
 }
 
+/**
+ * Sente is checked by the Gote bishop and has two legal interpositions. Each
+ * interposition checks Gote, whose only reply captures it and checks Sente.
+ * The surviving Sente silver then captures that bishop, checks Gote,
+ * and reaches the fourth occurrence of its own checking cycle. The first root
+ * action reaches the silver capture, which is the depth-three maximizing node.
+ */
+function maximizingNegativeInfinityPrincipalVariationState(): BoardState {
+  const state = createState([
+    { row: 8, col: 0, piece: piece('sente-king', 'king', 'sente') },
+    { row: 7, col: 0, piece: piece('sente-king-blocker-1', 'pawn', 'sente') },
+    { row: 6, col: 3, piece: piece('sente-root-silver', 'silver', 'sente') },
+    { row: 6, col: 4, piece: piece('sente-maximizing-silver', 'silver', 'sente') },
+    { row: 4, col: 2, piece: piece('gote-king', 'king', 'gote') },
+    { row: 4, col: 4, piece: piece('gote-checking-bishop', 'bishop', 'gote') },
+    { row: 3, col: 1, piece: piece('gote-blocker-1', 'knight', 'gote') },
+    { row: 3, col: 2, piece: piece('gote-blocker-2', 'lance', 'gote') },
+    { row: 3, col: 3, piece: piece('gote-blocker-3', 'knight', 'gote') },
+    { row: 4, col: 1, piece: piece('gote-blocker-4', 'pawn', 'gote') },
+    { row: 5, col: 1, piece: piece('gote-blocker-5', 'pawn', 'gote') },
+    { row: 5, col: 2, piece: piece('gote-blocker-6', 'pawn', 'gote') },
+    { row: 7, col: 2, piece: piece('gote-king-escape-guard', 'gold', 'gote') },
+  ]);
+  const firstRootSilver = findMove(getLegalActions(state), { row: 6, col: 3 }, { row: 5, col: 3 });
+  const secondRootSilver = findMove(getLegalActions(state), { row: 6, col: 4 }, { row: 5, col: 3 });
+  const goteReplyAfterFirstSilver = findMove(
+    getLegalActions(execute(state, firstRootSilver)),
+    { row: 4, col: 4 },
+    { row: 5, col: 3 }
+  );
+  const goteReplyAfterSecondSilver = findMove(
+    getLegalActions(execute(state, secondRootSilver)),
+    { row: 4, col: 4 },
+    { row: 5, col: 3 }
+  );
+  const firstSilverLineTerminal = execute(
+    execute(execute(state, firstRootSilver), goteReplyAfterFirstSilver),
+    findMove(getLegalActions(execute(execute(state, firstRootSilver), goteReplyAfterFirstSilver)), { row: 6, col: 4 }, { row: 5, col: 3 })
+  );
+  const secondSilverLineTerminal = execute(
+    execute(execute(state, secondRootSilver), goteReplyAfterSecondSilver),
+    findMove(getLegalActions(execute(execute(state, secondRootSilver), goteReplyAfterSecondSilver)), { row: 6, col: 3 }, { row: 5, col: 3 })
+  );
+  const currentKey = createPositionKey(state);
+  const terminalKeys = [createPositionKey(firstSilverLineTerminal), createPositionKey(secondSilverLineTerminal)];
+
+  return {
+    ...state,
+    positionHistory: [
+      ...terminalKeys.flatMap((key, index) => [
+        { key, historyIndex: index * 6 - 12, movedBy: 'sente' as const, gaveCheck: true },
+        { key: `non-checking-gote-${index}-1`, historyIndex: index * 6 - 11, movedBy: 'gote' as const, gaveCheck: false },
+        { key, historyIndex: index * 6 - 10, movedBy: 'sente' as const, gaveCheck: true },
+        { key: `non-checking-gote-${index}-2`, historyIndex: index * 6 - 9, movedBy: 'gote' as const, gaveCheck: false },
+        { key, historyIndex: index * 6 - 8, movedBy: 'sente' as const, gaveCheck: true },
+      ]),
+      { key: currentKey, historyIndex: 0, movedBy: null, gaveCheck: false },
+    ],
+  };
+}
+
 function replayPrincipalVariation(state: BoardState, principalVariation: readonly LegalAction[]): BoardState {
   return principalVariation.reduce((replayState, action) => {
     expect(getLegalActions(replayState).some((legalAction) => areLegalActionsEqual(legalAction, action)))
@@ -1321,6 +1382,50 @@ describe('再帰型αβ枝刈り探索', () => {
 });
 
 describe('再帰型αβ探索の主変化', () => {
+  it('最大化ノードの全探索済み候補が-∞でも、最初の合法候補をPVへ採用する', () => {
+    const state = maximizingNegativeInfinityPrincipalVariationState();
+    const snapshot = JSON.stringify(state);
+    const rootActions = getLegalActions(state);
+    const rootActionsSnapshot = [...rootActions];
+    const expectedRootAction = findMove(rootActions, { row: 6, col: 3 }, { row: 5, col: 3 });
+    const afterRootAction = execute(state, expectedRootAction);
+    const expectedGoteReply = findMove(getLegalActions(afterRootAction), { row: 4, col: 4 }, { row: 5, col: 3 });
+    const maximizingNode = execute(afterRootAction, expectedGoteReply);
+    const maximizingActions = getLegalActions(maximizingNode);
+    const expectedMaximizingAction = findMove(maximizingActions, { row: 6, col: 4 }, { row: 5, col: 3 });
+
+    expect(rootActions[0]).toEqual(expectedRootAction);
+    expect(getLegalActions(afterRootAction)).toEqual([expectedGoteReply]);
+    expect(maximizingNode.turn).toBe(state.turn);
+    expect(maximizingNode.status).not.toBe('ended');
+    expect(maximizingActions).toEqual([expectedMaximizingAction]);
+    expect(maximizingActions.map((action) =>
+      evaluateSearchPosition(execute(maximizingNode, action), state.turn)
+    )).toEqual([Number.NEGATIVE_INFINITY]);
+    const terminal = execute(maximizingNode, expectedMaximizingAction);
+    expect(terminal).toMatchObject({
+      status: 'ended',
+      result: { winner: 'gote', loser: 'sente', endReason: 'foul_loss' },
+    });
+    expect(evaluateSearchPosition(terminal, state.turn)).toBe(Number.NEGATIVE_INFINITY);
+
+    const result = analyzeAlphaBetaSearch(state, 3);
+
+    expect(result.selectedAction).toEqual(expectedRootAction);
+    expect(result.selectedEvaluation).toBe(Number.NEGATIVE_INFINITY);
+    expect(result.principalVariation).toEqual([
+      expectedRootAction,
+      expectedGoteReply,
+      expectedMaximizingAction,
+    ]);
+    expect(result.principalVariation).toHaveLength(3);
+    expect(result.principalVariation.length).toBeLessThanOrEqual(result.depth);
+    expect(areLegalActionsEqual(result.principalVariation[0], result.selectedAction!)).toBe(true);
+    expect(replayPrincipalVariation(state, result.principalVariation)).toMatchObject({ status: 'ended' });
+    expect(rootActions).toEqual(rootActionsSnapshot);
+    expect(JSON.stringify(state)).toBe(snapshot);
+  });
+
   it('最小化ノードの全探索済み候補が+∞でも、最初の合法応手を含むPVを返す', () => {
     const state = minimizingPositiveInfinityPrincipalVariationState();
     const snapshot = JSON.stringify(state);

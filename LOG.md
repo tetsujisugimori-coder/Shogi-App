@@ -2795,3 +2795,12 @@ PR #1のレビュー指摘を受け、簡易APIの`applyMove`と合法手候補�
 - `src/test/shogi-two-ply-minimax-ai.test.ts` に、合法手を順に実行して連続王手千日手の終局へ到達する局面を追加した。最小化ノードの唯一の応手が先手視点 `+Infinity` でも、選択手からその応手までのPVが返り、開始局面から全手を合法再生でき、指定深さを超えず終局で終了することを確認する。このテストは修正前にPVが1手で止まり失敗し、修正後は成功した。
 - `npm run verify:lock`、`npm run lint`、`git diff --check` は成功した。PV・再帰αβ・時間制限探索・Worker・UIの対象3ファイルは `87/87` 成功した。
 - `npm run build` は成功した。`npm test` と `npm run check` は、Vitest開始後に既存のjsdom通知（`Not implemented: navigation to another Document`）だけが出力され、完了要約を回収できなかったため成功扱いにしていない。`check` 内の `verify:lock` とlintまでは成功している。テストの削除・緩和・待機時間の変更はしていない。
+
+## [2026-09-13] PR #79後の最大化`-Infinity` PV回帰テスト
+
+- PR #79では最小化ノードの全探索済み候補が`+Infinity`となるPV回帰テストを追加済みだった。一方、対称となる最大化ノードの全探索済み候補が`-Infinity`となる直接テストは不足していたため、productionコードを変更せず`src/test/shogi-two-ply-minimax-ai.test.ts`だけで補強した。
+- fixtureは深さ3の実探索で、先手玉への後手角の王手を先手銀が遮断して後手玉へ王手、後手角がその銀を取り返して再び先手玉へ王手、残る先手銀がその角を取り返して後手玉へ王手する。最後の先手手がroot player側の非終局最大化ノードであり、合法候補は1件である。
+- fixtureの局面履歴には、同じ最終局面の先手連続王手を3回記録する。最大化候補の実行で4回目となり、既存の連続王手千日手裁定により先手反則負けとなるため、root先手視点の評価は`Number.NEGATIVE_INFINITY`である。開始局面からPVを合法再生し、終局手で終了すること、PV長が深さ3以下であること、選択手・評価値・PV先頭、入力局面と履歴の不変性を確認する。
+- 最大化ノードの最初の候補は初期値`-Infinity`と同値でもPVに残る。`hasExploredAction`を外し、旧来の厳密`>`/`<`比較だけにした一時状態では、このテストはPVの第3手を欠いて失敗した。現在の実装では最大化`-Infinity`・既存最小化`+Infinity`の対称テストがともに成功する。production、Worker、UI、依存関係、READMEは変更していない。
+- 実行済み: `npx vitest run src/test/shogi-two-ply-minimax-ai.test.ts -t "最大化ノードの全探索済み候補が-∞|最小化ノードの全探索済み候補が\\+∞"` は2件成功。旧実装相当では新規テスト1件が失敗した。
+- `npx vitest run src/test/shogi-two-ply-minimax-ai.test.ts` は59/59、PV・時間制限・Worker・UIの3ファイルは88/88、`npm run verify:lock`、`npm run lint`、`npm run build`、`git diff --check` は成功した。`npm test` と`npm run check`はVitest開始後に完了要約を回収できず、`check`はlockfile検証とlintまで成功したため、全件成功とは扱わない。テストの削除・緩和・待機時間変更はしていない。
