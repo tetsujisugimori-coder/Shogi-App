@@ -8,6 +8,7 @@ import {
   analyzeTwoPlyAlphaBetaSearch,
   analyzeTwoPlyMinimaxSearch,
   areLegalActionsEqual,
+  createPositionKey,
   evaluateMaterial,
   evaluateSearchPosition,
   executeLegalAction,
@@ -126,6 +127,45 @@ function execute(state: BoardState, action: LegalAction): BoardState {
   expect(result.type).toBe('applied');
   if (result.type !== 'applied') throw new Error('Test legal action was rejected.');
   return result.state;
+}
+
+/**
+ * The first Sente rook move checks Gote. Gote has exactly one legal reply:
+ * capturing that rook, which also checks Sente. The supplied position history
+ * makes that legal reply the fourth occurrence of a Gote-only checking cycle,
+ * so it is adjudicated as a Gote foul loss.
+ */
+function minimizingPositiveInfinityPrincipalVariationState(): BoardState {
+  const state = createState([
+    { row: 8, col: 0, piece: piece('sente-king', 'king', 'sente') },
+    { row: 2, col: 4, piece: piece('gote-king', 'king', 'gote') },
+    { row: 3, col: 0, piece: piece('sente-rook', 'rook', 'sente') },
+    { row: 0, col: 0, piece: piece('gote-rook', 'rook', 'gote') },
+    { row: 1, col: 3, piece: piece('gote-blocker-1', 'knight', 'gote') },
+    { row: 1, col: 4, piece: piece('gote-blocker-2', 'knight', 'gote') },
+    { row: 1, col: 5, piece: piece('gote-blocker-3', 'knight', 'gote') },
+    { row: 3, col: 3, piece: piece('gote-blocker-4', 'knight', 'gote') },
+    { row: 3, col: 4, piece: piece('gote-blocker-5', 'knight', 'gote') },
+    { row: 3, col: 5, piece: piece('gote-blocker-6', 'knight', 'gote') },
+  ]);
+  const checkingMove = findMove(getLegalActions(state), { row: 3, col: 0 }, { row: 2, col: 0 });
+  const afterCheckingMove = execute(state, checkingMove);
+  const goteReply = findMove(getLegalActions(afterCheckingMove), { row: 0, col: 0 }, { row: 2, col: 0 });
+  const terminalPosition = execute(afterCheckingMove, goteReply);
+  const terminalKey = createPositionKey(terminalPosition);
+  const currentKey = createPositionKey(state);
+
+  return {
+    ...state,
+    positionHistory: [
+      { key: terminalKey, historyIndex: -6, movedBy: 'gote', gaveCheck: true },
+      { key: 'non-checking-sente-history', historyIndex: -5, movedBy: 'sente', gaveCheck: false },
+      { key: terminalKey, historyIndex: -4, movedBy: 'gote', gaveCheck: true },
+      { key: 'other-gote-history', historyIndex: -3, movedBy: 'gote', gaveCheck: true },
+      { key: terminalKey, historyIndex: -2, movedBy: 'gote', gaveCheck: true },
+      { key: currentKey, historyIndex: 0, movedBy: null, gaveCheck: false },
+    ],
+  };
 }
 
 function replayPrincipalVariation(state: BoardState, principalVariation: readonly LegalAction[]): BoardState {
@@ -1281,6 +1321,32 @@ describe('再帰型αβ枝刈り探索', () => {
 });
 
 describe('再帰型αβ探索の主変化', () => {
+  it('最小化ノードの全探索済み候補が+∞でも、最初の合法応手を含むPVを返す', () => {
+    const state = minimizingPositiveInfinityPrincipalVariationState();
+    const snapshot = JSON.stringify(state);
+    const expectedRootAction = findMove(getLegalActions(state), { row: 3, col: 0 }, { row: 2, col: 0 });
+    const afterRootAction = execute(state, expectedRootAction);
+    const expectedReply = findMove(getLegalActions(afterRootAction), { row: 0, col: 0 }, { row: 2, col: 0 });
+
+    expect(getLegalActions(afterRootAction)).toEqual([expectedReply]);
+    const terminal = execute(afterRootAction, expectedReply);
+    expect(terminal).toMatchObject({
+      status: 'ended',
+      result: { winner: 'sente', loser: 'gote', endReason: 'foul_loss' },
+    });
+    expect(evaluateSearchPosition(terminal, state.turn)).toBe(Number.POSITIVE_INFINITY);
+
+    const result = analyzeAlphaBetaSearch(state, 2);
+
+    expect(result.selectedAction).toEqual(expectedRootAction);
+    expect(result.selectedEvaluation).toBe(Number.POSITIVE_INFINITY);
+    expect(result.principalVariation).toEqual([expectedRootAction, expectedReply]);
+    expect(result.principalVariation).toHaveLength(2);
+    expect(result.principalVariation.length).toBeLessThanOrEqual(result.depth);
+    expect(replayPrincipalVariation(state, result.principalVariation)).toMatchObject({ status: 'ended' });
+    expect(JSON.stringify(state)).toBe(snapshot);
+  });
+
   it('深さ1から3で選択手から始まる合法なPVを、不変の入力局面から返す', () => {
     const state = recaptureTrapState();
     const snapshot = JSON.stringify(state);

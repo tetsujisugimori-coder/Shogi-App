@@ -267,6 +267,7 @@ function searchAlphaBetaNode(
 
   let value = isMaximizing ? Number.NEGATIVE_INFINITY : Number.POSITIVE_INFINITY;
   let principalVariation: LegalAction[] = [];
+  let hasExploredAction = false;
   for (let actionIndex = 0; actionIndex < actions.length; actionIndex += 1) {
     interruptionCheck?.();
     const child = executeSearchAction(state, actions[actionIndex]);
@@ -287,17 +288,18 @@ function searchAlphaBetaNode(
       cloneLegalAction(actions[actionIndex]),
       ...clonePrincipalVariation(childResult.principalVariation),
     ];
+    const adoptsCandidate = !hasExploredAction || (isMaximizing
+      ? childResult.evaluation > value
+      : childResult.evaluation < value);
+    if (adoptsCandidate) {
+      value = childResult.evaluation;
+      principalVariation = candidatePrincipalVariation;
+    }
+    hasExploredAction = true;
+
     if (isMaximizing) {
-      if (childResult.evaluation > value) {
-        value = childResult.evaluation;
-        principalVariation = candidatePrincipalVariation;
-      }
       if (value > alpha) alpha = value;
     } else {
-      if (childResult.evaluation < value) {
-        value = childResult.evaluation;
-        principalVariation = candidatePrincipalVariation;
-      }
       if (value < beta) beta = value;
     }
 
