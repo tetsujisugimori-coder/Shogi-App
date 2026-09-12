@@ -1,5 +1,26 @@
 # SHOGI-APP 開発ログ
 
+## [2026-09-12] Worker探索UIの適用境界と局面置換中止の回帰補強
+
+### 目的・原因・設計判断
+
+- PR #71の「1要求＝1 Worker」、PR #73の`AbortSignal`による専用Worker中止、PR #75の`AbortController`・単調増加する世代番号・探索開始時`BoardState`による古い結果の除外を維持した。探索アルゴリズム、Workerプロトコル、JSON/KIF形式、分岐保存形式は変更していない。
+- PR #75ではWorkerが結果を返した時点で結果表示を更新していたため、`executeLegalAction`が`applied`以外を返す契約違反の`selectedAction`でも、盤面は保護される一方で成功パネルだけが表示され得た。Worker探索の成功と盤面への着手適用成功を別段階として扱う。
+- 終局局面では探索開始ボタンが無効な既存設計を維持する。そのため通常の開始局面で`selectedAction`がない結果は正当な終局結果ではなくWorker応答不整合として、盤面を変えず利用者向けの`role="alert"`へ遷移する。適用失敗時も内部エラーを露出せず「AIの指し手を適用できませんでした。」と表示する。
+
+### 変更と回帰テスト
+
+- `ShogiResearchScreen`は、新しいWorker探索開始時に前回の成功結果を消去し、現在世代であることを確認した後に`selectedAction`の存在を確認する。既存の`executeLegalAction(searchState, action, { proposer: 'local_ai' })`が`applied`を返した場合だけ盤面・成功結果パネル・`idle`へ更新する。適用失敗時は盤面、手番、手数、棋譜、分岐情報、成功パネルを更新しない。
+- `shogi-time-limited-worker-ai-ui.test.tsx`は注入可能な`workerSearchRunner`と手動解決／拒否可能なPromiseで、適用失敗、`selectedAction`欠落、JSON読込後の遅延成功／失敗、分岐開始・本譜復帰・保存済み分岐切替でのAbortSignal中止と遅延結果の無視を決定的に確認する。各局面置換後にAI成功表示・通常エラー表示で上書きされないことも確認する。
+
+### 検証
+
+- 変更対象のUIテストは13件成功。Workerクライアント、JSON読込、分岐を含む4ファイルは108件成功、全27ファイルを7バッチで実行して913件成功した。`npm run lint`、`npm run build`、`npm run verify:lock`、`git diff --check`も成功した。`npm test`と`npm run check`は実行したが、このWindows経路ではVitest起動後の最終サマリーを回収できず、コマンド単体としての完了結果は未確認とした。
+
+### 対象外
+
+- 人間対AIの自動応答、AI同士の連続対局、先後選択、思考時間・深さ設定UI、Worker再利用／プール／並列探索、Worker内cancelメッセージ、途中反復表示、同期探索フォールバック、探索・評価・合法手生成、JSON/KIF・分岐形式の変更は追加していない。
+
 ## [2026-09-12] 時間制限付き反復深化αβ探索Workerの盤面UI接続
 
 ### 目的と設計判断
