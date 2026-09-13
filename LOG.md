@@ -1,5 +1,33 @@
 # SHOGI-APP 開発ログ
 
+## [2026-09-13] 空の評価設定オブジェクトの既定値補完
+
+- 原因: `SearchEvaluationOptions`の両フィールドは任意だが、旧実装は`materialValueTable`または`pieceSquareValueTable`のキーがある場合だけ設定オブジェクトと判定していた。そのため`{}`を旧形式の`MaterialValueTable`として扱い、`evaluateMaterial()`へ不正な表を渡していた。
+- 修正: `unpromoted`と`promoted`の両方を持つ値だけを旧形式`MaterialValueTable`として判定し、それ以外（空オブジェクトを含む）を`SearchEvaluationOptions`として解決する。空は両既定表、片方だけの指定はもう片方の既定表を使う。評価値、探索、Workerプロトコル、PV、公開名は変更していない。
+- 回帰テスト: `{}`、直接の旧形式表、`materialValueTable`だけ、`pieceSquareValueTable`だけについて、駒得と位置点の合計値（102、15、19、107）と局面・表の不変性を確認する。
+- 検証: `npx vitest run src/test/shogi-piece-square-evaluation.test.ts src/test/shogi-material-evaluation.test.ts src/test/shogi-two-ply-minimax-ai.test.ts src/test/time-limited-iterative-alpha-beta-worker.test.ts` は4ファイル116件成功。`npm run verify:lock`、`npm run lint`、`npm run build`、`git diff --check`は成功。`npm test`、`npm run check`、および残りテストをまとめた分割実行はVitest開始後の終了要約を回収できず、成功扱いにはしていない。出力上の失敗・今回の変更に起因するエラーは得られていないが、未完了としてPR本文にも記録する。
+
+## [2026-09-13] 駒得へ独立したPiece-Square位置評価を合成
+
+### 前提・目的・構造
+
+- PR #49の駒価値評価、PR #61/#65/#67/#69の再帰αβ・順序付け・反復深化・時間制限、PR #71〜#77のWorker／中止／UI境界、PR #79のPV、PR #80の最大化`-Infinity` PV回帰を含むmain `2e3d9a5` を基準にした。合法手・着手・探索統計・PV・Worker requestId／AbortSignal・UI適用境界・JSON/KIF／分岐形式は維持する。
+- 駒得だけでは、交換も終局もない候補が同点になり固定順の先頭を選びやすい。そのため`evaluateMaterial()`を削除・改名せず純粋な駒得APIとして残し、新しい`evaluatePieceSquarePosition()`を独立させ、非終局の`evaluateSearchPosition()`だけが「駒得＋位置点」を返すようにした。終局は従来どおり勝ち`+Infinity`、負け`-Infinity`、無勝負`0`で有限評価を常に優先する。
+- `PieceSquareValueTable`と`DEFAULT_PIECE_SQUARE_VALUE_TABLE`は、先手基準の9×9表を未成駒／成駒で分ける。後手の盤上座標`(row, col)`は必ず`(8 - row, 8 - col)`へ180度反転して同じ表を参照し、rowだけでなくcolも反転する。持ち駒は位置を持たないため0点である。
+- 位置点は駒得と混在させず、同じ数値単位でも1駒あたりの既定差を最大5点に抑えた。歩・香・桂・銀には小さな前進／中央の働き、金には過度に前進しないほぼ平坦な値、飛車・角には敵陣深部ではなく中央付近の最大2点程度の働き、成駒には別表、玉には全0を設定した。玉の安全度は評価しない。
+- `SearchEvaluationOptions`に`materialValueTable`と`pieceSquareValueTable`を集約した。既存の第3引数`MaterialValueTable`は後方互換のまま使え、両表を差し替える実験だけ設定オブジェクトを渡す。値は構造化クローン可能な数値表だけで、Workerの入力／出力契約は変更しない。
+
+### 探索接続・比較・テスト
+
+- 1手読み`selectBestMaterialAction`（名称は互換維持）、2手読みミニマックス、深さ指定αβ、2 ply互換αβ、反復深化、時間制限付き反復深化は同じ`evaluateSearchPosition()`を通る。Workerは既存の時間制限付き探索を呼ぶため、同じ合成評価とPVをそのまま送受信する。参照ミニマックスも同関数を使う。
+- 実測比較（同一の人工局面、αβ）: 駒得同一の歩前進制御局面は位置評価なし／ありとも`6,4→5,4`、評価`100→102`、探索`4/0/0`（生成局面／cutoff／未調査）。角だけの局面は位置評価なしで成り`6,2→0,8`・評価`1000`、ありで`6,2→2,6`・評価`1002`、探索はいずれも`18/0/0`。明確な駒取りを含む比較局面は`4,4→4,0`・`-700`・`66/11/217`から`4,4→4,2`・`-705`・`86/10/197`へ変化した。これは小さな位置差が同点や近い候補を区別する証跡であり、一般的に強いAIになったとは結論づけない。
+- `shogi-piece-square-evaluation.test.ts`を追加し、位置差、先後180度対称、row/col双方の反転、視点の符号反転、成駒別表、持ち駒0点、決定性・不変性、初期局面対称、終局Infinity、駒得優先を確認した。探索テストは位置的に高い歩前進を1手読み・αβが選び、枝刈りなし参照ミニマックスと選択手／評価値が一致し、PVが合法再生できることを確認する。既存の駒得だけの数値・同点順テストは明示的なゼロ位置表で目的を分離した。
+
+### 検証・対象外・懸念
+
+- 実行済み: `npm run verify:lock`、`npm run lint`、`npm run build`、`git diff --check` は成功。位置評価・駒得・1手読み・探索・Worker・UIの対象7ファイルは135件成功し、残りのルール・棋譜・分岐UI 20ファイルは785件成功、計27ファイル920件成功した。`npm test`と`npm run check`も起動したが、Windows実行経路ではVitest開始後の終了サマリーを回収できず、コマンド単体として成功扱いにはしていない（分割27ファイルの結果とbuildは別途確認済み）。
+- 今回は玉の安全度、王手加点、利き・支配、攻防数、可動性、連携、定跡、静止探索、置換表、killer/history heuristic、Workerプール、AI自動対局／自動応答、深さ／時間設定UI、JSON/KIF変更を実装していない。角の深部移動は小さな中央補正で常に解消されるわけではなく、玉の安全度・利き・防御・静止探索が今後の課題である。
+
 ## [2026-09-12] Worker探索UIの適用境界と局面置換中止の回帰補強
 
 ### 目的・原因・設計判断
