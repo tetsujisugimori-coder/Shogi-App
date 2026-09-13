@@ -232,6 +232,38 @@ export function isPieceAttacking(
 }
 
 /**
+ * Counts the on-board pieces belonging to `attacker` that currently attack `targetCoord`.
+ *
+ * This is a raw influence query: pinned pieces are included, and any occupied target square
+ * (including a friendly piece or King) can be attacked. Sliding rays include their first
+ * occupied square and stop beyond it.
+ */
+export function countSquareAttackersBy(
+  squares: BoardSquare[][],
+  targetCoord: Coordinate,
+  attacker: Player
+): number {
+  if (!isWithinBoard(targetCoord.row, targetCoord.col)) {
+    return 0;
+  }
+
+  let attackerCount = 0;
+  for (let r = 0; r < 9; r++) {
+    for (let c = 0; c < 9; c++) {
+      const piece = squares[r][c].piece;
+      if (
+        piece?.player === attacker &&
+        isPieceAttacking(squares, { row: r, col: c }, piece, targetCoord)
+      ) {
+        attackerCount += 1;
+      }
+    }
+  }
+
+  return attackerCount;
+}
+
+/**
  * Determines whether `targetCoord` is currently under attack by any piece belonging to `attacker`.
  * NOTE: Target square is attacked regardless of what piece (including King or friendly piece) occupies it.
  */
@@ -240,22 +272,7 @@ export function isSquareAttackedBy(
   targetCoord: Coordinate,
   attacker: Player
 ): boolean {
-  if (!isWithinBoard(targetCoord.row, targetCoord.col)) {
-    return false;
-  }
-
-  for (let r = 0; r < 9; r++) {
-    for (let c = 0; c < 9; c++) {
-      const piece = squares[r][c].piece;
-      if (piece && piece.player === attacker) {
-        if (isPieceAttacking(squares, { row: r, col: c }, piece, targetCoord)) {
-          return true;
-        }
-      }
-    }
-  }
-
-  return false;
+  return countSquareAttackersBy(squares, targetCoord, attacker) > 0;
 }
 
 /**

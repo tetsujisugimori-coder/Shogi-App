@@ -1,5 +1,25 @@
 # SHOGI-APP 開発ログ
 
+## [2026-09-13] 指定マスを攻撃する盤上駒数の共通基盤
+
+### 目的・設計判断
+
+- 将来の玉安全度評価では、指定マスに対する敵味方それぞれの利き枚数が必要になる。既存の`isSquareAttackedBy()`は真偽値だけを返すため、評価・探索・AIの指し手には接続せず、指定側の盤上駒が指定マスへ利く枚数を返す純粋API `countSquareAttackersBy(squares, targetCoord, attacker): number` を追加した。
+- 新APIは盤面を最大81マス走査し、指定側の盤上駒だけに既存の`isPieceAttacking()`を適用する。したがって歩、香、桂、銀、金、角、飛、玉と全成駒は既存の`getPieceAttackPattern()`による生の利き規則をそのまま使い、合法手生成や自玉の安全判定を代用しない。盤外座標は既存の真偽APIと整合して`0`、玉のない人工局面でも盤上だけから決定的に集計し、入力を変更しない。
+- 走り駒は既存の`isPieceAttacking()`どおり最初の遮蔽物のマス自体を利きとして数え、その先では数えない。対象に味方駒・敵駒・玉があっても生の利きとして数え、ピンされた駒も含める。
+- `isSquareAttackedBy()`は`countSquareAttackersBy(...) > 0`へ委譲したため、盤面走査と各駒の利き判定を二重実装していない。従来の真偽APIは最初の利きで早期終了できたが、委譲後は最大81マスを走査する。対象盤面が固定81マスであり、真偽・数値結果の完全な同一経路を保つ可読性と回帰安全性を優先した。
+
+### テスト・対象外
+
+- `src/test/shogi-attacks.test.ts`を追加し、利き0枚、1枚、歩・角・飛・金・玉の5枚、飛・角・香の遮蔽物上1枚／遮蔽物越し0枚、全成駒、先後180度対称、対象が味方・敵・玉の場合、盤外0、真偽APIとの一致、ピンされた駒の生の利き、反復実行と盤面・座標の不変性を具体的な小局面で確認した。
+- 攻撃・王手・詰み・合法手の既存テストも実行し、`isKingInCheck()`、詰み判定、合法手生成の回帰がないことを確認した。評価関数、探索、Worker、AI画面、盤面UI、JSON/KIF、棋譜・分岐形式は変更していない。次段階では、この基盤で玉周辺の攻守差を使う玉安全度評価を検討する。
+
+### 検証
+
+- `npm test -- src/test/shogi-attacks.test.ts src/test/shogi.test.tsx src/test/shogi-checkmate.test.tsx src/test/shogi-legal-actions.test.ts src/test/shogi-drop.test.tsx`: 5ファイル270件成功。
+- `npm test`: Vitest起動表示後に終了サマリーを回収できず、成功扱いにはしていない。代わりに全29テストファイルを4バッチで実行し、324件、196件、320件、99件、合計939件成功。第3バッチのjsdom `Not implemented: navigation to another Document` 出力は既存テストの出力で、同バッチは8ファイル320件成功した。
+- `npm run verify:lock`、`npm run lint`、`npm run build`、`git diff --check`: すべて成功。
+
 ## [2026-09-13] 空の評価設定オブジェクトの既定値補完
 
 - 原因: `SearchEvaluationOptions`の両フィールドは任意だが、旧実装は`materialValueTable`または`pieceSquareValueTable`のキーがある場合だけ設定オブジェクトと判定していた。そのため`{}`を旧形式の`MaterialValueTable`として扱い、`evaluateMaterial()`へ不正な表を渡していた。
