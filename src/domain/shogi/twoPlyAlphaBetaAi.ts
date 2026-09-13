@@ -6,10 +6,13 @@ import type { BoardState, Player } from '../../types/shogi';
 import { executeLegalAction, getLegalActions, type LegalAction } from './legalActions';
 import {
   DEFAULT_MATERIAL_VALUE_TABLE,
-  type MaterialValueTable,
 } from './materialEvaluation';
 import { cloneBoardState } from './replay';
-import { evaluateSearchPosition, type SearchClock } from './twoPlyMinimaxAi';
+import {
+  evaluateSearchPosition,
+  type SearchClock,
+  type SearchEvaluationConfig,
+} from './twoPlyMinimaxAi';
 
 /** The existing AI entry point remains a two-ply search by default. */
 export const TWO_PLY_ALPHA_BETA_SEARCH_DEPTH = 2;
@@ -242,7 +245,7 @@ function searchAlphaBetaNode(
   isMaximizing: boolean,
   alpha: number,
   beta: number,
-  valueTable: MaterialValueTable,
+  valueTable: SearchEvaluationConfig,
   statistics: SearchStatistics,
   interruptionCheck: SearchInterruptionCheck
 ): SearchNodeResult {
@@ -323,7 +326,7 @@ type UnmeasuredAlphaBetaSearchResult = Omit<AlphaBetaSearchResult, 'elapsedMilli
 function searchAlphaBeta(
   state: BoardState,
   depth: number,
-  valueTable: MaterialValueTable,
+  valueTable: SearchEvaluationConfig,
   previousBestAction: LegalAction | null = null,
   interruptionCheck: SearchInterruptionCheck = undefined
 ): UnmeasuredAlphaBetaSearchResult {
@@ -431,7 +434,7 @@ function defaultSearchClock(): number {
 export function analyzeAlphaBetaSearch(
   state: BoardState,
   depth: number,
-  valueTable: MaterialValueTable = DEFAULT_MATERIAL_VALUE_TABLE,
+  valueTable: SearchEvaluationConfig = DEFAULT_MATERIAL_VALUE_TABLE,
   clock: SearchClock = defaultSearchClock
 ): AlphaBetaSearchResult {
   const startedAt = clock();
@@ -451,7 +454,7 @@ export function analyzeAlphaBetaSearch(
 export function analyzeIterativeDeepeningAlphaBetaSearch(
   state: BoardState,
   maxDepth: number,
-  valueTable: MaterialValueTable = DEFAULT_MATERIAL_VALUE_TABLE,
+  valueTable: SearchEvaluationConfig = DEFAULT_MATERIAL_VALUE_TABLE,
   clock: SearchClock = defaultSearchClock
 ): IterativeDeepeningAlphaBetaSearchResult {
   validateIterativeDeepeningMaxDepth(maxDepth);
@@ -499,7 +502,7 @@ export function analyzeTimeLimitedIterativeDeepeningAlphaBetaSearch(
   state: BoardState,
   maxDepth: number,
   timeLimitMilliseconds: number,
-  valueTable: MaterialValueTable = DEFAULT_MATERIAL_VALUE_TABLE,
+  valueTable: SearchEvaluationConfig = DEFAULT_MATERIAL_VALUE_TABLE,
   clock: SearchClock = defaultSearchClock
 ): TimeLimitedIterativeDeepeningAlphaBetaSearchResult {
   validateIterativeDeepeningMaxDepth(maxDepth);
@@ -572,7 +575,7 @@ export function analyzeTimeLimitedIterativeDeepeningAlphaBetaSearch(
 export function selectBestAlphaBetaAction(
   state: BoardState,
   depth: number,
-  valueTable: MaterialValueTable = DEFAULT_MATERIAL_VALUE_TABLE
+  valueTable: SearchEvaluationConfig = DEFAULT_MATERIAL_VALUE_TABLE
 ): LegalAction | null {
   return searchAlphaBeta(state, depth, valueTable).selectedAction;
 }
@@ -581,7 +584,7 @@ export function selectBestAlphaBetaAction(
 export function selectBestIterativeDeepeningAlphaBetaAction(
   state: BoardState,
   maxDepth: number,
-  valueTable: MaterialValueTable = DEFAULT_MATERIAL_VALUE_TABLE
+  valueTable: SearchEvaluationConfig = DEFAULT_MATERIAL_VALUE_TABLE
 ): LegalAction | null {
   return analyzeIterativeDeepeningAlphaBetaSearch(state, maxDepth, valueTable).selectedAction;
 }
@@ -593,7 +596,7 @@ export function selectBestIterativeDeepeningAlphaBetaAction(
  */
 export function analyzeTwoPlyAlphaBetaSearch(
   state: BoardState,
-  valueTable: MaterialValueTable = DEFAULT_MATERIAL_VALUE_TABLE,
+  valueTable: SearchEvaluationConfig = DEFAULT_MATERIAL_VALUE_TABLE,
   clock: SearchClock = defaultSearchClock
 ): TwoPlyAlphaBetaSearchResult {
   const result = analyzeAlphaBetaSearch(state, TWO_PLY_ALPHA_BETA_SEARCH_DEPTH, valueTable, clock);
@@ -613,7 +616,7 @@ export function analyzeTwoPlyAlphaBetaSearch(
 /** Compatibility selector that preserves the established default depth of 2. */
 export function selectBestTwoPlyAlphaBetaAction(
   state: BoardState,
-  valueTable: MaterialValueTable = DEFAULT_MATERIAL_VALUE_TABLE
+  valueTable: SearchEvaluationConfig = DEFAULT_MATERIAL_VALUE_TABLE
 ): LegalAction | null {
   return selectBestAlphaBetaAction(state, TWO_PLY_ALPHA_BETA_SEARCH_DEPTH, valueTable);
 }

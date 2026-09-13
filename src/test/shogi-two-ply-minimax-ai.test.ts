@@ -21,6 +21,7 @@ import {
   TWO_PLY_ALPHA_BETA_SEARCH_DEPTH,
   type LegalAction,
   type MaterialValueTable,
+  type PieceSquareValueTable,
 } from '../domain/shogi';
 import {
   orderAlphaBetaNodeActions,
@@ -63,6 +64,26 @@ function createState(
 
 function opponentOf(player: Player): Player {
   return player === 'sente' ? 'gote' : 'sente';
+}
+
+function zeroPieceSquareGrid(): number[][] {
+  return Array.from({ length: 9 }, () => Array.from({ length: 9 }, () => 0));
+}
+
+const ZERO_PIECE_SQUARE_VALUE_TABLE: PieceSquareValueTable = {
+  unpromoted: {
+    pawn: zeroPieceSquareGrid(), lance: zeroPieceSquareGrid(), knight: zeroPieceSquareGrid(),
+    silver: zeroPieceSquareGrid(), gold: zeroPieceSquareGrid(), bishop: zeroPieceSquareGrid(),
+    rook: zeroPieceSquareGrid(), king: zeroPieceSquareGrid(),
+  },
+  promoted: {
+    pawn: zeroPieceSquareGrid(), lance: zeroPieceSquareGrid(), knight: zeroPieceSquareGrid(),
+    silver: zeroPieceSquareGrid(), bishop: zeroPieceSquareGrid(), rook: zeroPieceSquareGrid(),
+  },
+};
+
+function materialOnlyEvaluation(materialValueTable: MaterialValueTable) {
+  return { materialValueTable, pieceSquareValueTable: ZERO_PIECE_SQUARE_VALUE_TABLE };
 }
 
 /** A tempting silver capture is immediately recaptured by the opposing rook. */
@@ -484,7 +505,7 @@ describe('再帰型αβ探索の手の並べ替え', () => {
     };
 
     expect(orderAlphaBetaNodeActions(state, rootActions)[0]).not.toEqual(rootActions[0]);
-    expect(analyzeAlphaBetaSearch(state, 1, zeroValueTable).selectedAction).toEqual(rootActions[0]);
+    expect(analyzeAlphaBetaSearch(state, 1, materialOnlyEvaluation(zeroValueTable)).selectedAction).toEqual(rootActions[0]);
   });
 
   it('深さ3では並べ替えなしαβより少ない局面を生成し、選択手と評価値を保つ', () => {
@@ -570,7 +591,7 @@ describe('反復深化αβ探索', () => {
 
     const forcedReorder = orderIterativeDeepeningRootActions(state, rootActions, rootActions.at(-1) ?? null);
     expect(forcedReorder[0]).not.toEqual(rootActions[0]);
-    expect(analyzeIterativeDeepeningAlphaBetaSearch(state, 2, zeroValueTable).selectedAction).toEqual(rootActions[0]);
+    expect(analyzeIterativeDeepeningAlphaBetaSearch(state, 2, materialOnlyEvaluation(zeroValueTable)).selectedAction).toEqual(rootActions[0]);
   });
 
   it('深さ別統計を独立して記録し、累計を二重加算しない', () => {
@@ -595,8 +616,12 @@ describe('反復深化αβ探索', () => {
   it('専用局面の深さ3でも選択手4,4 -> 4,0と評価-600を保ち、結果と統計は決定的', () => {
     const state = moveOrderingBenefitState();
     const snapshot = JSON.stringify(state);
-    const first = analyzeIterativeDeepeningAlphaBetaSearch(state, 3, undefined, () => 0);
-    const second = analyzeIterativeDeepeningAlphaBetaSearch(state, 3, undefined, () => 0);
+    const evaluation = materialOnlyEvaluation({
+      unpromoted: { pawn: 100, lance: 300, knight: 300, silver: 400, gold: 500, bishop: 800, rook: 1000, king: 0 },
+      promoted: { pawn: 500, lance: 500, knight: 500, silver: 500, bishop: 1000, rook: 1200 },
+    });
+    const first = analyzeIterativeDeepeningAlphaBetaSearch(state, 3, evaluation, () => 0);
+    const second = analyzeIterativeDeepeningAlphaBetaSearch(state, 3, evaluation, () => 0);
 
     expect(first.selectedAction).toMatchObject({
       kind: 'move', from: { row: 4, col: 4 }, to: { row: 4, col: 0 },
@@ -653,12 +678,16 @@ describe('時間制限付き反復深化αβ探索', () => {
   it('十分な制限時間では最大深さまで完了し、時間制限なしの結果を保つ', () => {
     const state = moveOrderingBenefitState();
     const snapshot = JSON.stringify(state);
-    const unlimited = analyzeIterativeDeepeningAlphaBetaSearch(state, 3, undefined, () => 0);
+    const evaluation = materialOnlyEvaluation({
+      unpromoted: { pawn: 100, lance: 300, knight: 300, silver: 400, gold: 500, bishop: 800, rook: 1000, king: 0 },
+      promoted: { pawn: 500, lance: 500, knight: 500, silver: 500, bishop: 1000, rook: 1200 },
+    });
+    const unlimited = analyzeIterativeDeepeningAlphaBetaSearch(state, 3, evaluation, () => 0);
     const limited = analyzeTimeLimitedIterativeDeepeningAlphaBetaSearch(
       state,
       3,
       Number.MAX_SAFE_INTEGER,
-      undefined,
+      evaluation,
       () => 0
     );
 
@@ -844,8 +873,9 @@ describe('探索用局面評価', () => {
       promoted: { pawn: 12, lance: 13, knight: 14, silver: 15, bishop: 16, rook: 17 },
     };
 
-    expect(evaluateSearchPosition(state, 'sente', table)).toBe(evaluateMaterial(state, 'sente', table));
-    expect(evaluateSearchPosition({ ...state, status: 'check' }, 'gote', table)).toBe(
+    const evaluation = materialOnlyEvaluation(table);
+    expect(evaluateSearchPosition(state, 'sente', evaluation)).toBe(evaluateMaterial(state, 'sente', table));
+    expect(evaluateSearchPosition({ ...state, status: 'check' }, 'gote', evaluation)).toBe(
       evaluateMaterial(state, 'gote', table)
     );
   });
@@ -911,8 +941,12 @@ describe('2手読みミニマックスAI', () => {
 
   it('目先の駒得後の取り返しを読んで、1手読みAIとは異なる安全な手を選ぶ', () => {
     const state = recaptureTrapState();
-    const onePly = selectBestMaterialAction(state, 'sente');
-    const twoPly = selectBestTwoPlyMinimaxAction(state);
+    const evaluation = materialOnlyEvaluation({
+      unpromoted: { pawn: 100, lance: 300, knight: 300, silver: 400, gold: 500, bishop: 800, rook: 1000, king: 0 },
+      promoted: { pawn: 500, lance: 500, knight: 500, silver: 500, bishop: 1000, rook: 1200 },
+    });
+    const onePly = selectBestMaterialAction(state, 'sente', evaluation);
+    const twoPly = selectBestTwoPlyMinimaxAction(state, evaluation);
 
     expect(onePly).toMatchObject({ kind: 'move', from: { row: 4, col: 4 }, to: { row: 4, col: 5 } });
     expect(twoPly).toMatchObject({ kind: 'move', from: { row: 4, col: 4 }, to: { row: 4, col: 0 } });
@@ -923,10 +957,10 @@ describe('2手読みミニマックスAI', () => {
     const afterRecapture = execute(afterTemptingCapture, recapture);
     const afterSafeMove = execute(state, twoPly);
     const worstSafeReplyEvaluation = Math.min(...getLegalActions(afterSafeMove).map((reply) =>
-      evaluateSearchPosition(execute(afterSafeMove, reply), 'sente')
+      evaluateSearchPosition(execute(afterSafeMove, reply), 'sente', evaluation)
     ));
 
-    expect(evaluateSearchPosition(afterRecapture, 'sente')).toBeLessThan(
+    expect(evaluateSearchPosition(afterRecapture, 'sente', evaluation)).toBeLessThan(
       worstSafeReplyEvaluation
     );
   });
@@ -1211,6 +1245,27 @@ describe('2手読みαβ枝刈り探索', () => {
 });
 
 describe('再帰型αβ枝刈り探索', () => {
+  it('駒得が同じ制御局面では、1手読みとαβが位置的に高い歩の前進を選び、参照ミニマックスと一致する', () => {
+    const state = createState([
+      { row: 8, col: 8, piece: piece('sente-king', 'king', 'sente') },
+      { row: 0, col: 0, piece: piece('gote-king', 'king', 'gote') },
+      { row: 6, col: 4, piece: piece('sente-pawn', 'pawn', 'sente') },
+    ]);
+    const expected = findMove(getLegalActions(state), { row: 6, col: 4 }, { row: 5, col: 4 });
+    const reference = analyzeUnprunedMinimaxForTest(state, 1);
+    const alphaBeta = analyzeAlphaBetaSearch(state, 1);
+
+    expect(selectBestMaterialAction(state, 'sente')).toEqual(expected);
+    expect(alphaBeta.selectedAction).toEqual(expected);
+    expect(alphaBeta.selectedAction).toEqual(reference.selectedAction);
+    expect(alphaBeta.selectedEvaluation).toBe(reference.selectedEvaluation);
+    expect(alphaBeta.selectedEvaluation).toBe(
+      evaluateSearchPosition(execute(state, expected), 'sente')
+    );
+    expect(alphaBeta.principalVariation).toEqual([expected]);
+    replayPrincipalVariation(state, alphaBeta.principalVariation);
+  });
+
   it('深さ2は旧2 plyミニマックスと互換ラッパーの選択手・評価値・統計を保つ', () => {
     const state = recaptureTrapState();
     const snapshot = JSON.stringify(state);

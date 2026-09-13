@@ -8,14 +8,13 @@ import type { BoardState, Player } from '../../types/shogi';
 import { executeLegalAction, getLegalActions, type LegalAction } from './legalActions';
 import {
   DEFAULT_MATERIAL_VALUE_TABLE,
-  evaluateMaterial,
-  type MaterialValueTable,
 } from './materialEvaluation';
+import { evaluateSearchPosition, type SearchEvaluationConfig } from './twoPlyMinimaxAi';
 import { cloneBoardState } from './replay';
 
 /**
- * Selects the legal action whose resulting position has the highest material
- * evaluation from the supplied AI perspective.
+ * Selects the legal action whose resulting non-terminal position has the
+ * highest material-plus-piece-square evaluation from the supplied perspective.
  *
  * Every candidate is applied to an independent cloned state. The perspective
  * intentionally remains fixed even though applying a move changes turn. Ties
@@ -25,7 +24,7 @@ import { cloneBoardState } from './replay';
 export function selectBestMaterialAction(
   state: BoardState,
   perspective: Player,
-  valueTable: MaterialValueTable = DEFAULT_MATERIAL_VALUE_TABLE
+  evaluation: SearchEvaluationConfig = DEFAULT_MATERIAL_VALUE_TABLE
 ): LegalAction | null {
   const actions = getLegalActions(state);
   let bestAction: LegalAction | null = null;
@@ -35,10 +34,10 @@ export function selectBestMaterialAction(
     const execution = executeLegalAction(cloneBoardState(state), action);
     if (execution.type !== 'applied') continue;
 
-    const evaluation = evaluateMaterial(execution.state, perspective, valueTable);
-    if (evaluation > bestEvaluation) {
+    const candidateEvaluation = evaluateSearchPosition(execution.state, perspective, evaluation);
+    if (candidateEvaluation > bestEvaluation) {
       bestAction = action;
-      bestEvaluation = evaluation;
+      bestEvaluation = candidateEvaluation;
     }
   }
 

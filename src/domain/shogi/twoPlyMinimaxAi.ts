@@ -9,6 +9,11 @@ import {
   evaluateMaterial,
   type MaterialValueTable,
 } from './materialEvaluation';
+import {
+  DEFAULT_PIECE_SQUARE_VALUE_TABLE,
+  evaluatePieceSquarePosition,
+  type PieceSquareValueTable,
+} from './pieceSquareEvaluation';
 import { cloneBoardState } from './replay';
 
 /** The fixed search depth used by the current two-ply minimax AI. */
@@ -39,13 +44,39 @@ export interface TwoPlyMinimaxSearchResult {
 
 export type SearchClock = () => number;
 
+/** Optional, serializable evaluation tables for search experiments. */
+export interface SearchEvaluationOptions {
+  readonly materialValueTable?: MaterialValueTable;
+  readonly pieceSquareValueTable?: PieceSquareValueTable;
+}
+
+/** Retains the historical MaterialValueTable argument while allowing both tables as one option. */
+export type SearchEvaluationConfig = MaterialValueTable | SearchEvaluationOptions;
+
+function isSearchEvaluationOptions(config: SearchEvaluationConfig): config is SearchEvaluationOptions {
+  return 'materialValueTable' in config || 'pieceSquareValueTable' in config;
+}
+
+function resolveSearchEvaluationOptions(config: SearchEvaluationConfig | undefined): Required<SearchEvaluationOptions> {
+  if (config && isSearchEvaluationOptions(config)) {
+    return {
+      materialValueTable: config.materialValueTable ?? DEFAULT_MATERIAL_VALUE_TABLE,
+      pieceSquareValueTable: config.pieceSquareValueTable ?? DEFAULT_PIECE_SQUARE_VALUE_TABLE,
+    };
+  }
+  return {
+    materialValueTable: config ?? DEFAULT_MATERIAL_VALUE_TABLE,
+    pieceSquareValueTable: DEFAULT_PIECE_SQUARE_VALUE_TABLE,
+  };
+}
+
 function opponentOf(player: Player): Player {
   return player === 'sente' ? 'gote' : 'sente';
 }
 
 /**
  * Scores a position for search while making the recorded game result dominate
- * every finite material score. Draw results are neutral.
+ * every finite material-plus-position score. Draw results are neutral.
  *
  * An ended position must have a consistent result, and an in-progress
  * position must not have one. Throwing for malformed state prevents search
@@ -54,7 +85,7 @@ function opponentOf(player: Player): Player {
 export function evaluateSearchPosition(
   state: BoardState,
   perspective: Player,
-  valueTable: MaterialValueTable = DEFAULT_MATERIAL_VALUE_TABLE
+  evaluation: SearchEvaluationConfig = DEFAULT_MATERIAL_VALUE_TABLE
 ): number {
   if (state.status === 'ended') {
     if (!state.result) {
@@ -81,7 +112,9 @@ export function evaluateSearchPosition(
   if (state.status !== 'active' && state.status !== 'check') {
     throw new Error(`Search evaluation requires an active, check, or ended position; received ${state.status}.`);
   }
-  return evaluateMaterial(state, perspective, valueTable);
+  const { materialValueTable, pieceSquareValueTable } = resolveSearchEvaluationOptions(evaluation);
+  return evaluateMaterial(state, perspective, materialValueTable) +
+    evaluatePieceSquarePosition(state, perspective, pieceSquareValueTable);
 }
 
 function executeSearchAction(state: BoardState, action: LegalAction): BoardState {
@@ -108,7 +141,7 @@ function compareCandidatesByEvaluation(
  */
 function searchTwoPlyMinimax(
   state: BoardState,
-  valueTable: MaterialValueTable
+  evaluation: SearchEvaluationConfig
 ): UnmeasuredTwoPlyMinimaxSearchResult {
   const rootPlayer = state.turn;
   const rootActions = getLegalActions(state);
@@ -123,7 +156,7 @@ function searchTwoPlyMinimax(
     let candidateEvaluation: number;
 
     if (afterRootAction.status === 'ended') {
-      candidateEvaluation = evaluateSearchPosition(afterRootAction, rootPlayer, valueTable);
+      candidateEvaluation = evaluateSearchPosition(afterRootAction, rootPlayer, evaluation);
     } else {
       const replies = getLegalActions(afterRootAction);
       if (replies.length === 0) {
@@ -134,7 +167,7 @@ function searchTwoPlyMinimax(
       for (const reply of replies) {
         const afterReply = executeSearchAction(afterRootAction, reply);
         visitedPositionCount += 1;
-        const replyEvaluation = evaluateSearchPosition(afterReply, rootPlayer, valueTable);
+        const replyEvaluation = evaluateSearchPosition(afterReply, rootPlayer, evaluation);
         if (replyEvaluation < worstReplyEvaluation) {
           worstReplyEvaluation = replyEvaluation;
         }
@@ -172,11 +205,11 @@ function defaultSearchClock(): number {
  */
 export function analyzeTwoPlyMinimaxSearch(
   state: BoardState,
-  valueTable: MaterialValueTable = DEFAULT_MATERIAL_VALUE_TABLE,
+  evaluation: SearchEvaluationConfig = DEFAULT_MATERIAL_VALUE_TABLE,
   clock: SearchClock = defaultSearchClock
 ): TwoPlyMinimaxSearchResult {
   const startedAt = clock();
-  const searchResult = searchTwoPlyMinimax(state, valueTable);
+  const searchResult = searchTwoPlyMinimax(state, evaluation);
   return {
     ...searchResult,
     elapsedMilliseconds: Math.max(0, clock() - startedAt),
@@ -190,7 +223,7 @@ export function analyzeTwoPlyMinimaxSearch(
  */
 export function selectBestTwoPlyMinimaxAction(
   state: BoardState,
-  valueTable: MaterialValueTable = DEFAULT_MATERIAL_VALUE_TABLE
+  evaluation: SearchEvaluationConfig = DEFAULT_MATERIAL_VALUE_TABLE
 ): LegalAction | null {
-  return searchTwoPlyMinimax(state, valueTable).selectedAction;
+  return searchTwoPlyMinimax(state, evaluation).selectedAction;
 }
