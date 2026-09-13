@@ -1,5 +1,26 @@
 # SHOGI-APP 開発ログ
 
+## [2026-09-14] 玉周辺の攻守差による独立した玉安全度評価
+
+### 目的・設計判断
+
+- PR #84の`countSquareAttackersBy(squares, targetCoord, attacker)`を唯一の利き数基盤として、`evaluateKingSafety(state, perspective, weights?)`を追加した。玉ごとに現在地と盤内の隣接最大8マスを評価対象とし、返値は一貫して`相手玉の危険度 - 自玉の危険度`である。従って高い値ほど明示視点に有利で、同一局面の先手・後手視点では符号が反転する。
+- 玉位置への敵の生の利きは王手圧力として、味方の利き数と相殺せずに加算する。隣接マスは`max(0, 敵の利き数 - 補正後の味方の利き数)`を加算し、玉自身が必ず隣接マスへ利く1枚分だけを味方守りから除外する。これにより裸の玉が自分の利きだけで逃げ場を守り切っているようには扱わない。
+- 暫定重みは玉位置への敵利き1枚を10点、隣接マスの守り不足1枚を1点とした。直接王手は局所的な周辺圧力より緊急性が高いため分けた値であり、探索へ未接続の比較可能な純粋評価として固定したものに過ぎない。今回の実装からAIの強さは判断しない。
+- PR #84と同じ生の利きを用いるため、遮蔽物の最初のマスを含みその先を除く走り駒、占有マス、成駒、先後対称、ピンされた駒をそのまま反映する。合法手生成や`isPieceAttacking()`の再実装を行わず、手番、終局、履歴、持ち駒にも依存しない。どちらかの玉がない人工局面は終局を推測せず中立値0とする。
+
+### テスト・対象外・性能上の懸念
+
+- `src/test/shogi-king-safety-evaluation.test.ts`で、初期局面、周辺の敵利き、追加守り、裸玉の補正、王手圧力、重み差、180度対称、端・隅、ピンされた駒、玉欠落、視点の符号反転、決定性・局面／設定不変性を確認する。
+- `evaluateSearchPosition()`の合成式、`SearchEvaluationConfig`／`SearchEvaluationOptions`、各探索、Worker要求・応答、UI、AI操作、棋譜、分岐、JSON、KIF、既存の王手・詰み・合法手判定は変更しない。
+- 玉2枚で評価対象は最大18マス（各玉の現在地と隣接最大8マス）であり、隣接マスは敵味方それぞれの利き数を数える。各集計は盤面最大81マスを走査するため、探索末端へ接続する場合は到達深さ・探索局面数・経過時間を同一局面・同一時間制限で比較してから、利きマップやキャッシュを検討する。計測なしの先回り最適化は行わない。
+
+### 検証
+
+- `npx vitest run src/test/shogi-king-safety-evaluation.test.ts src/test/shogi-attacks.test.ts src/test/shogi.test.tsx src/test/shogi-checkmate.test.tsx src/test/shogi-legal-actions.test.ts src/test/shogi-material-evaluation.test.ts src/test/shogi-piece-square-evaluation.test.ts src/test/shogi-two-ply-minimax-ai.test.ts src/test/time-limited-iterative-alpha-beta-worker.test.ts`: 9ファイル333件成功。
+- `npm run verify:lock`、`npm run lint`、`npm run build`、`git diff --check`: すべて成功。
+- `npm test`はVitest起動表示後に終了サマリーを回収できず、成功扱いにしていない。全30テストファイルを4分割して再実行し、8ファイル275件、8ファイル204件、8ファイル166件、6ファイル305件、合計950件がすべて成功した。第2バッチの`Not implemented: navigation to another Document`は既存jsdomの出力であり、同バッチは終了コード0・8ファイル204件成功だった。
+
 ## [2026-09-13] 指定マスを攻撃する盤上駒数の共通基盤
 
 ### 目的・設計判断
