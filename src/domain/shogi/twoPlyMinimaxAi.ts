@@ -53,20 +53,20 @@ export interface SearchEvaluationOptions {
 /** Retains the historical MaterialValueTable argument while allowing both tables as one option. */
 export type SearchEvaluationConfig = MaterialValueTable | SearchEvaluationOptions;
 
-function isSearchEvaluationOptions(config: SearchEvaluationConfig): config is SearchEvaluationOptions {
-  return 'materialValueTable' in config || 'pieceSquareValueTable' in config;
+function isMaterialValueTable(config: SearchEvaluationConfig): config is MaterialValueTable {
+  return 'unpromoted' in config && 'promoted' in config;
 }
 
 function resolveSearchEvaluationOptions(config: SearchEvaluationConfig | undefined): Required<SearchEvaluationOptions> {
-  if (config && isSearchEvaluationOptions(config)) {
+  if (config && isMaterialValueTable(config)) {
     return {
-      materialValueTable: config.materialValueTable ?? DEFAULT_MATERIAL_VALUE_TABLE,
-      pieceSquareValueTable: config.pieceSquareValueTable ?? DEFAULT_PIECE_SQUARE_VALUE_TABLE,
+      materialValueTable: config,
+      pieceSquareValueTable: DEFAULT_PIECE_SQUARE_VALUE_TABLE,
     };
   }
   return {
-    materialValueTable: config ?? DEFAULT_MATERIAL_VALUE_TABLE,
-    pieceSquareValueTable: DEFAULT_PIECE_SQUARE_VALUE_TABLE,
+    materialValueTable: config?.materialValueTable ?? DEFAULT_MATERIAL_VALUE_TABLE,
+    pieceSquareValueTable: config?.pieceSquareValueTable ?? DEFAULT_PIECE_SQUARE_VALUE_TABLE,
   };
 }
 

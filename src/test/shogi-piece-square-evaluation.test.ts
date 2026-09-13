@@ -5,6 +5,7 @@ import {
   evaluateMaterial,
   evaluatePieceSquarePosition,
   evaluateSearchPosition,
+  type MaterialValueTable,
   type PieceSquareGrid,
   type PieceSquareValueTable,
 } from '../domain/shogi';
@@ -60,7 +61,76 @@ function tableWith(values: Array<{ type: PieceType; row: number; col: number; va
   return { unpromoted, promoted };
 }
 
+function materialTableWithPawnValue(pawn: number): MaterialValueTable {
+  return {
+    unpromoted: { pawn, lance: 0, knight: 0, silver: 0, gold: 0, bishop: 0, rook: 0, king: 0 },
+    promoted: { pawn: 0, lance: 0, knight: 0, silver: 0, bishop: 0, rook: 0 },
+  };
+}
+
+function searchEvaluationFixture(): BoardState {
+  return createState([{ row: 5, col: 4, piece: piece('sente-pawn', 'pawn', 'sente') }]);
+}
+
 describe('駒の位置評価', () => {
+  it('空のSearchEvaluationOptionsは両方の既定表を使い、入力局面を変更しない', () => {
+    const state = searchEvaluationFixture();
+    const options = {};
+    const stateSnapshot = JSON.stringify(state);
+    const optionsSnapshot = JSON.stringify(options);
+
+    expect(evaluateMaterial(state, 'sente')).toBe(100);
+    expect(evaluatePieceSquarePosition(state, 'sente')).toBe(2);
+    expect(evaluateSearchPosition(state, 'sente', options)).toBe(102);
+    expect(JSON.stringify(state)).toBe(stateSnapshot);
+    expect(JSON.stringify(options)).toBe(optionsSnapshot);
+  });
+
+  it('旧形式MaterialValueTableを直接渡すと、既定位置表と合成する', () => {
+    const state = searchEvaluationFixture();
+    const materialValueTable = materialTableWithPawnValue(13);
+    const stateSnapshot = JSON.stringify(state);
+    const tableSnapshot = JSON.stringify(materialValueTable);
+
+    expect(evaluateMaterial(state, 'sente', materialValueTable)).toBe(13);
+    expect(evaluatePieceSquarePosition(state, 'sente')).toBe(2);
+    expect(evaluateSearchPosition(state, 'sente', materialValueTable)).toBe(15);
+    expect(JSON.stringify(state)).toBe(stateSnapshot);
+    expect(JSON.stringify(materialValueTable)).toBe(tableSnapshot);
+  });
+
+  it('materialValueTableだけの設定は既定位置表で補完する', () => {
+    const state = searchEvaluationFixture();
+    const materialValueTable = materialTableWithPawnValue(17);
+    const options = { materialValueTable };
+    const stateSnapshot = JSON.stringify(state);
+    const materialSnapshot = JSON.stringify(materialValueTable);
+    const optionsSnapshot = JSON.stringify(options);
+
+    expect(evaluateMaterial(state, 'sente', materialValueTable)).toBe(17);
+    expect(evaluatePieceSquarePosition(state, 'sente')).toBe(2);
+    expect(evaluateSearchPosition(state, 'sente', options)).toBe(19);
+    expect(JSON.stringify(state)).toBe(stateSnapshot);
+    expect(JSON.stringify(materialValueTable)).toBe(materialSnapshot);
+    expect(JSON.stringify(options)).toBe(optionsSnapshot);
+  });
+
+  it('pieceSquareValueTableだけの設定は既定駒価値表で補完する', () => {
+    const state = searchEvaluationFixture();
+    const pieceSquareValueTable = tableWith([{ type: 'pawn', row: 5, col: 4, value: 7 }]);
+    const options = { pieceSquareValueTable };
+    const stateSnapshot = JSON.stringify(state);
+    const tableSnapshot = JSON.stringify(pieceSquareValueTable);
+    const optionsSnapshot = JSON.stringify(options);
+
+    expect(evaluateMaterial(state, 'sente')).toBe(100);
+    expect(evaluatePieceSquarePosition(state, 'sente', pieceSquareValueTable)).toBe(7);
+    expect(evaluateSearchPosition(state, 'sente', options)).toBe(107);
+    expect(JSON.stringify(state)).toBe(stateSnapshot);
+    expect(JSON.stringify(pieceSquareValueTable)).toBe(tableSnapshot);
+    expect(JSON.stringify(options)).toBe(optionsSnapshot);
+  });
+
   it('同じ駒の位置差を評価し、明示した視点で符号を反転する', () => {
     const table = tableWith([{ type: 'pawn', row: 5, col: 4, value: 7 }]);
     const advanced = createState([{ row: 5, col: 4, piece: piece('sente-pawn', 'pawn', 'sente') }]);

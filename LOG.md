@@ -1,5 +1,12 @@
 # SHOGI-APP 開発ログ
 
+## [2026-09-13] 空の評価設定オブジェクトの既定値補完
+
+- 原因: `SearchEvaluationOptions`の両フィールドは任意だが、旧実装は`materialValueTable`または`pieceSquareValueTable`のキーがある場合だけ設定オブジェクトと判定していた。そのため`{}`を旧形式の`MaterialValueTable`として扱い、`evaluateMaterial()`へ不正な表を渡していた。
+- 修正: `unpromoted`と`promoted`の両方を持つ値だけを旧形式`MaterialValueTable`として判定し、それ以外（空オブジェクトを含む）を`SearchEvaluationOptions`として解決する。空は両既定表、片方だけの指定はもう片方の既定表を使う。評価値、探索、Workerプロトコル、PV、公開名は変更していない。
+- 回帰テスト: `{}`、直接の旧形式表、`materialValueTable`だけ、`pieceSquareValueTable`だけについて、駒得と位置点の合計値（102、15、19、107）と局面・表の不変性を確認する。
+- 検証: `npx vitest run src/test/shogi-piece-square-evaluation.test.ts src/test/shogi-material-evaluation.test.ts src/test/shogi-two-ply-minimax-ai.test.ts src/test/time-limited-iterative-alpha-beta-worker.test.ts` は4ファイル116件成功。`npm run verify:lock`、`npm run lint`、`npm run build`、`git diff --check`は成功。`npm test`、`npm run check`、および残りテストをまとめた分割実行はVitest開始後の終了要約を回収できず、成功扱いにはしていない。出力上の失敗・今回の変更に起因するエラーは得られていないが、未完了としてPR本文にも記録する。
+
 ## [2026-09-13] 駒得へ独立したPiece-Square位置評価を合成
 
 ### 前提・目的・構造
