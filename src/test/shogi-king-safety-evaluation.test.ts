@@ -1,9 +1,13 @@
 import { describe, expect, it } from 'vitest';
 import {
   cloneBoardSquares,
+  countSquareAttackersBy,
   DEFAULT_KING_SAFETY_EVALUATION_WEIGHTS,
   evaluateKingSafety,
+  getLegalMoves,
   isKingInCheck,
+  simulateMoveSquares,
+  validateMove,
   type KingSafetyEvaluationWeights,
 } from '../domain/shogi';
 import {
@@ -138,15 +142,35 @@ describe('玉安全度評価', () => {
   });
 
   it('ピンされた駒の生の利きもPR #84と同じ意味で反映する', () => {
-    const pinned = createState([
-      { row: 3, col: 4, piece: piece('sente-king', 'king', 'sente') },
-      { row: 0, col: 4, piece: piece('gote-king', 'king', 'gote') },
-      { row: 1, col: 4, piece: piece('pinned-gote-gold', 'gold', 'gote') },
-      { row: 8, col: 4, piece: piece('sente-rook', 'rook', 'sente') },
-    ]);
+    const pinnedGold = createState([
+      { row: 0, col: 4, piece: piece('gote-rook', 'rook', 'gote') },
+      { row: 5, col: 3, piece: piece('gote-king', 'king', 'gote') },
+      // 金が斜めへ動くと、飛車から先手玉までの筋が開く。
+      { row: 7, col: 4, piece: piece('pinned-sente-gold', 'gold', 'sente') },
+      { row: 8, col: 4, piece: piece('sente-king', 'king', 'sente') },
+    ], { turn: 'sente' });
+    const pinnedGoldFrom = { row: 7, col: 4 };
+    const goteKingNeighbor = { row: 6, col: 3 };
+    const controlPawn = createState([
+      { row: 0, col: 4, piece: piece('gote-rook', 'rook', 'gote') },
+      { row: 5, col: 3, piece: piece('gote-king', 'king', 'gote') },
+      { row: 7, col: 4, piece: piece('control-sente-pawn', 'pawn', 'sente') },
+      { row: 8, col: 4, piece: piece('sente-king', 'king', 'sente') },
+    ], { turn: 'sente' });
 
-    expect(isKingInCheck(pinned.squares, 'gote')).toBe(false);
-    expect(evaluateKingSafety(pinned, 'sente')).toBe(-3);
+    expect(isKingInCheck(pinnedGold.squares, 'sente')).toBe(false);
+    expect(validateMove(pinnedGold, pinnedGoldFrom, goteKingNeighbor)).toMatchObject({
+      isValid: false,
+      reason: 'self_check_unresolved',
+    });
+    expect(getLegalMoves(pinnedGold.squares, pinnedGoldFrom, 'sente')).not.toContainEqual(goteKingNeighbor);
+    expect(isKingInCheck(simulateMoveSquares(pinnedGold.squares, pinnedGoldFrom, goteKingNeighbor), 'sente')).toBe(true);
+
+    expect(countSquareAttackersBy(pinnedGold.squares, goteKingNeighbor, 'sente')).toBe(1);
+    expect(countSquareAttackersBy(controlPawn.squares, goteKingNeighbor, 'sente')).toBe(0);
+    expect(evaluateKingSafety(pinnedGold, 'sente')).toBe(
+      evaluateKingSafety(controlPawn, 'sente') + 1
+    );
   });
 
   it('どちらかの玉がない人工局面は終局と推測せず0を返す', () => {
