@@ -5,6 +5,7 @@ export * from './legalActions';
 export * from './randomAi';
 export * from './materialEvaluation';
 export * from './pieceSquareEvaluation';
+export * from './kingSafetyEvaluation';
 export * from './materialAi';
 export * from './twoPlyMinimaxAi';
 export * from './twoPlyAlphaBetaAi';
