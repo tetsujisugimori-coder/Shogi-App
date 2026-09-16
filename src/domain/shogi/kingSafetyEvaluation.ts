@@ -1,5 +1,10 @@
 import type { BoardState, Player } from '../../types/shogi';
-import { countSquareAttackersBy, findKingSquare } from './attacks';
+import {
+  createAttackCountMaps,
+  getAttackCount,
+  findKingSquare,
+  type AttackCountMaps,
+} from './attacks';
 import { isWithinBoard } from './coordinates';
 import { getOpponent } from './boardStateUtils';
 
@@ -21,7 +26,8 @@ export const DEFAULT_KING_SAFETY_EVALUATION_WEIGHTS: Readonly<KingSafetyEvaluati
 function kingDanger(
   state: BoardState,
   player: Player,
-  weights: Readonly<KingSafetyEvaluationWeights>
+  weights: Readonly<KingSafetyEvaluationWeights>,
+  attackCountMaps: AttackCountMaps
 ): number {
   const kingCoord = findKingSquare(state.squares, player);
   if (!kingCoord) return 0;
@@ -29,7 +35,7 @@ function kingDanger(
   const opponent = getOpponent(player);
   // Check pressure is not offset by friendly defenders: it is a distinct,
   // immediate risk from the balance of influence around the King.
-  let danger = countSquareAttackersBy(state.squares, kingCoord, opponent) * weights.kingSquareAttack;
+  let danger = getAttackCount(attackCountMaps, kingCoord, opponent) * weights.kingSquareAttack;
 
   for (let rowOffset = -1; rowOffset <= 1; rowOffset += 1) {
     for (let colOffset = -1; colOffset <= 1; colOffset += 1) {
@@ -38,12 +44,12 @@ function kingDanger(
       const target = { row: kingCoord.row + rowOffset, col: kingCoord.col + colOffset };
       if (!isWithinBoard(target.row, target.col)) continue;
 
-      const enemyAttackers = countSquareAttackersBy(state.squares, target, opponent);
+      const enemyAttackers = getAttackCount(attackCountMaps, target, opponent);
       // The King always attacks its adjacent squares and must not by itself make
       // an otherwise bare escape square look defended.
       const friendlyDefenders = Math.max(
         0,
-        countSquareAttackersBy(state.squares, target, player) - 1
+        getAttackCount(attackCountMaps, target, player) - 1
       );
       danger += Math.max(0, enemyAttackers - friendlyDefenders) * weights.uncoveredAdjacentAttack;
     }
@@ -61,12 +67,14 @@ function kingDanger(
 export function evaluateKingSafety(
   state: BoardState,
   perspective: Player,
-  weights: Readonly<KingSafetyEvaluationWeights> = DEFAULT_KING_SAFETY_EVALUATION_WEIGHTS
+  weights: Readonly<KingSafetyEvaluationWeights> = DEFAULT_KING_SAFETY_EVALUATION_WEIGHTS,
+  attackCountMaps: AttackCountMaps = createAttackCountMaps(state.squares)
 ): number {
   const opponent = getOpponent(perspective);
   if (!findKingSquare(state.squares, perspective) || !findKingSquare(state.squares, opponent)) {
     return 0;
   }
 
-  return kingDanger(state, opponent, weights) - kingDanger(state, perspective, weights);
+  return kingDanger(state, opponent, weights, attackCountMaps) -
+    kingDanger(state, perspective, weights, attackCountMaps);
 }

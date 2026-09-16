@@ -4,7 +4,11 @@
  * shallow-search warning, not an exchange or capture evaluation.
  */
 import type { BoardState, Player } from '../../types/shogi';
-import { countSquareAttackersBy } from './attacks';
+import {
+  createAttackCountMaps,
+  getAttackCount,
+  type AttackCountMaps,
+} from './attacks';
 import { getOpponent } from './boardStateUtils';
 import {
   DEFAULT_MATERIAL_VALUE_TABLE,
@@ -22,7 +26,8 @@ export const UNDEFENDED_PIECE_SAFETY_PENALTY_RATE = 0.1;
 function ownedUndefendedPiecePenalty(
   state: BoardState,
   owner: Player,
-  valueTable: MaterialValueTable
+  valueTable: MaterialValueTable,
+  attackCountMaps: AttackCountMaps
 ): number {
   const opponent = getOpponent(owner);
   let penalty = 0;
@@ -35,8 +40,8 @@ function ownedUndefendedPiecePenalty(
       if (!piece || piece.player !== owner || piece.type === 'king') continue;
 
       const square = { row, col };
-      const enemyAttackers = countSquareAttackersBy(state.squares, square, opponent);
-      const friendlyDefenders = countSquareAttackersBy(state.squares, square, owner);
+      const enemyAttackers = getAttackCount(attackCountMaps, square, opponent);
+      const friendlyDefenders = getAttackCount(attackCountMaps, square, owner);
       if (enemyAttackers > 0 && friendlyDefenders === 0) {
         penalty += getBoardPieceMaterialValue(piece, valueTable) * UNDEFENDED_PIECE_SAFETY_PENALTY_RATE;
       }
@@ -58,9 +63,10 @@ function ownedUndefendedPiecePenalty(
 export function evaluateUndefendedPieceSafety(
   state: BoardState,
   perspective: Player,
-  valueTable: MaterialValueTable = DEFAULT_MATERIAL_VALUE_TABLE
+  valueTable: MaterialValueTable = DEFAULT_MATERIAL_VALUE_TABLE,
+  attackCountMaps: AttackCountMaps = createAttackCountMaps(state.squares)
 ): number {
   const opponent = getOpponent(perspective);
-  return ownedUndefendedPiecePenalty(state, opponent, valueTable) -
-    ownedUndefendedPiecePenalty(state, perspective, valueTable);
+  return ownedUndefendedPiecePenalty(state, opponent, valueTable, attackCountMaps) -
+    ownedUndefendedPiecePenalty(state, perspective, valueTable, attackCountMaps);
 }

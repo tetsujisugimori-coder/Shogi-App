@@ -59,6 +59,15 @@ export interface AttackPattern {
   rayDirections: readonly [number, number][];
 }
 
+/** Raw attacker counts for every on-board target square. */
+export type AttackCountMap = number[][];
+
+/** Raw attacker counts for both players in one immutable board position. */
+export interface AttackCountMaps {
+  readonly sente: AttackCountMap;
+  readonly gote: AttackCountMap;
+}
+
 /**
  * Returns the raw attack/influence pattern of a piece (step offsets and ray directions).
  * Correctly accounts for promoted pieces (と金, 成香, 成桂, 成銀, 竜王, 竜馬).
@@ -261,6 +270,69 @@ export function countSquareAttackersBy(
   }
 
   return attackerCount;
+}
+
+function createEmptyAttackCountMap(): AttackCountMap {
+  return Array.from({ length: 9 }, () => Array.from({ length: 9 }, () => 0));
+}
+
+/**
+ * Builds raw influence counts for both players from this board position.
+ *
+ * The result deliberately matches `countSquareAttackersBy()`: pinned pieces
+ * still contribute, step attacks count only on-board targets, and sliding
+ * attacks include their first occupied square before stopping. It does not
+ * generate legal moves and does not retain or modify the supplied board.
+ */
+export function createAttackCountMaps(squares: BoardSquare[][]): AttackCountMaps {
+  const maps: AttackCountMaps = {
+    sente: createEmptyAttackCountMap(),
+    gote: createEmptyAttackCountMap(),
+  };
+
+  for (let row = 0; row < 9; row += 1) {
+    for (let col = 0; col < 9; col += 1) {
+      const piece = squares[row][col].piece;
+      if (!piece) continue;
+
+      const attacks = maps[piece.player];
+      const pattern = getPieceAttackPattern(piece);
+
+      for (const [rowOffset, colOffset] of pattern.stepOffsets) {
+        const targetRow = row + rowOffset;
+        const targetCol = col + colOffset;
+        if (isWithinBoard(targetRow, targetCol)) {
+          attacks[targetRow][targetCol] += 1;
+        }
+      }
+
+      for (const [rowOffset, colOffset] of pattern.rayDirections) {
+        let targetRow = row + rowOffset;
+        let targetCol = col + colOffset;
+        while (isWithinBoard(targetRow, targetCol)) {
+          attacks[targetRow][targetCol] += 1;
+          if (squares[targetRow][targetCol].piece) break;
+          targetRow += rowOffset;
+          targetCol += colOffset;
+        }
+      }
+    }
+  }
+
+  return maps;
+}
+
+/**
+ * Returns a raw precomputed attacker count with the same out-of-board
+ * contract as `countSquareAttackersBy()`.
+ */
+export function getAttackCount(
+  maps: AttackCountMaps,
+  targetCoord: Coordinate,
+  attacker: Player
+): number {
+  if (!isWithinBoard(targetCoord.row, targetCoord.col)) return 0;
+  return maps[attacker][targetCoord.row][targetCoord.col];
 }
 
 /**

@@ -21,6 +21,7 @@ import {
   type KingSafetyEvaluationWeights,
 } from './kingSafetyEvaluation';
 import { evaluateUndefendedPieceSafety } from './undefendedPieceSafetyEvaluation';
+import { createAttackCountMaps } from './attacks';
 
 /** The fixed search depth used by the current two-ply minimax AI. */
 export const TWO_PLY_MINIMAX_SEARCH_DEPTH = 2;
@@ -123,10 +124,14 @@ export function evaluateSearchPosition(
     throw new Error(`Search evaluation requires an active, check, or ended position; received ${state.status}.`);
   }
   const { materialValueTable, pieceSquareValueTable, kingSafetyWeights } = resolveSearchEvaluationOptions(evaluation);
+  // Raw influence is useful to the static heuristics only. It is intentionally
+  // rebuilt for this one position evaluation and is not used for legal moves,
+  // check detection, or any cross-position cache.
+  const attackCountMaps = createAttackCountMaps(state.squares);
   return evaluateMaterial(state, perspective, materialValueTable) +
     evaluatePieceSquarePosition(state, perspective, pieceSquareValueTable) +
-    evaluateKingSafety(state, perspective, kingSafetyWeights) +
-    evaluateUndefendedPieceSafety(state, perspective, materialValueTable);
+    evaluateKingSafety(state, perspective, kingSafetyWeights, attackCountMaps) +
+    evaluateUndefendedPieceSafety(state, perspective, materialValueTable, attackCountMaps);
 }
 
 function executeSearchAction(state: BoardState, action: LegalAction): BoardState {

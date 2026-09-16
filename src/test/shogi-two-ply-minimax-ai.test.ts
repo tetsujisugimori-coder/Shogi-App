@@ -527,6 +527,29 @@ describe('再帰型αβ探索の手の並べ替え', () => {
 });
 
 describe('反復深化αβ探索', () => {
+  it('初期局面の固定深さ3は利きマップ共有前と選択手、評価値、PV、探索統計を保つ', () => {
+    const state = createInitialBoardState();
+    const snapshot = JSON.stringify(state);
+    const result = analyzeAlphaBetaSearch(state, 3);
+
+    expect(result).toMatchObject({
+      selectedAction: {
+        kind: 'move', from: { row: 6, col: 2 }, to: { row: 5, col: 2 },
+        pieceType: 'pawn', promotion: 'none',
+      },
+      selectedEvaluation: 214,
+      visitedPositionCount: 1244,
+      cutoffCount: 80,
+      skippedActionCount: 2565,
+    });
+    expect(result.principalVariation).toMatchObject([
+      { kind: 'move', from: { row: 6, col: 2 }, to: { row: 5, col: 2 } },
+      { kind: 'move', from: { row: 2, col: 5 }, to: { row: 3, col: 5 } },
+      { kind: 'move', from: { row: 7, col: 1 }, to: { row: 3, col: 5 } },
+    ]);
+    expect(JSON.stringify(state)).toBe(snapshot);
+  });
+
   it('最大深さ3では深さ1、2、3を順に完了し、最深反復を最終結果として返す', () => {
     const state = moveOrderingBenefitState();
     const directDepth3 = analyzeAlphaBetaSearch(state, 3, undefined, () => 0);
