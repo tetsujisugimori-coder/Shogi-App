@@ -11,6 +11,7 @@ import {
   createPositionKey,
   evaluateMaterial,
   evaluateSearchPosition,
+  evaluateUndefendedPieceSafety,
   executeLegalAction,
   getLegalActions,
   selectBestMaterialAction,
@@ -613,7 +614,7 @@ describe('反復深化αβ探索', () => {
     expect(iterative.totalVisitedPositionCount).toBeGreaterThan(iterative.visitedPositionCount);
   });
 
-  it('専用局面の深さ3でも選択手4,4 -> 4,0と評価-600を保ち、結果と統計は決定的', () => {
+  it('専用局面の深さ3でも選択手4,4 -> 4,0と危険度評価込みの-570を保ち、結果と統計は決定的', () => {
     const state = moveOrderingBenefitState();
     const snapshot = JSON.stringify(state);
     const evaluation = materialOnlyEvaluation({
@@ -626,7 +627,9 @@ describe('反復深化αβ探索', () => {
     expect(first.selectedAction).toMatchObject({
       kind: 'move', from: { row: 4, col: 4 }, to: { row: 4, col: 0 },
     });
-    expect(first.selectedEvaluation).toBe(-600);
+    // The selected leaf is still the same action; its net 30-point warning is
+    // the new 10%-of-material undefended-piece safety contribution.
+    expect(first.selectedEvaluation).toBe(-570);
     expect(second).toMatchObject({
       selectedAction: first.selectedAction,
       selectedEvaluation: first.selectedEvaluation,
@@ -701,7 +704,7 @@ describe('時間制限付き反復深化αβ探索', () => {
     expect(limited.selectedAction).toMatchObject({
       kind: 'move', from: { row: 4, col: 4 }, to: { row: 4, col: 0 },
     });
-    expect(limited.selectedEvaluation).toBe(-600);
+    expect(limited.selectedEvaluation).toBe(-570);
     expect(JSON.stringify(state)).toBe(snapshot);
   });
 
@@ -861,7 +864,7 @@ describe('時間制限付き反復深化αβ探索', () => {
 });
 
 describe('探索用局面評価', () => {
-  it('active/checkでは既存の駒得評価を視点とカスタム評価表を保って使う', () => {
+  it('active/checkでは駒得と守られていない駒の危険度を視点とカスタム評価表で合成する', () => {
     const state = createState([
       { row: 8, col: 8, piece: piece('sente-king', 'king', 'sente') },
       { row: 0, col: 8, piece: piece('gote-king', 'king', 'gote') },
@@ -874,9 +877,11 @@ describe('探索用局面評価', () => {
     };
 
     const evaluation = materialOnlyEvaluation(table);
-    expect(evaluateSearchPosition(state, 'sente', evaluation)).toBe(evaluateMaterial(state, 'sente', table));
+    expect(evaluateSearchPosition(state, 'sente', evaluation)).toBe(
+      evaluateMaterial(state, 'sente', table) + evaluateUndefendedPieceSafety(state, 'sente', table)
+    );
     expect(evaluateSearchPosition({ ...state, status: 'check' }, 'gote', evaluation)).toBe(
-      evaluateMaterial(state, 'gote', table)
+      evaluateMaterial(state, 'gote', table) + evaluateUndefendedPieceSafety(state, 'gote', table)
     );
   });
 

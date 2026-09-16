@@ -15,6 +15,7 @@ import {
   type PieceSquareValueTable,
 } from './pieceSquareEvaluation';
 import { cloneBoardState } from './replay';
+import { evaluateUndefendedPieceSafety } from './undefendedPieceSafetyEvaluation';
 
 /** The fixed search depth used by the current two-ply minimax AI. */
 export const TWO_PLY_MINIMAX_SEARCH_DEPTH = 2;
@@ -76,7 +77,8 @@ function opponentOf(player: Player): Player {
 
 /**
  * Scores a position for search while making the recorded game result dominate
- * every finite material-plus-position score. Draw results are neutral.
+ * every finite material, position, and undefended-piece safety score. Draw
+ * results are neutral.
  *
  * An ended position must have a consistent result, and an in-progress
  * position must not have one. Throwing for malformed state prevents search
@@ -114,7 +116,8 @@ export function evaluateSearchPosition(
   }
   const { materialValueTable, pieceSquareValueTable } = resolveSearchEvaluationOptions(evaluation);
   return evaluateMaterial(state, perspective, materialValueTable) +
-    evaluatePieceSquarePosition(state, perspective, pieceSquareValueTable);
+    evaluatePieceSquarePosition(state, perspective, pieceSquareValueTable) +
+    evaluateUndefendedPieceSafety(state, perspective, materialValueTable);
 }
 
 function executeSearchAction(state: BoardState, action: LegalAction): BoardState {

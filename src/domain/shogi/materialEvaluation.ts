@@ -41,7 +41,12 @@ function isPromotablePieceType(type: PieceType): type is PromotablePieceType {
   return type !== 'gold' && type !== 'king';
 }
 
-function getBoardPieceValue(piece: Piece, valueTable: MaterialValueTable): number {
+/**
+ * Returns the material value of a piece while it remains on the board.
+ * Other board-only heuristics reuse this so promoted pieces share this module's
+ * single material-value definition.
+ */
+export function getBoardPieceMaterialValue(piece: Piece, valueTable: MaterialValueTable): number {
   if (piece.isPromoted && isPromotablePieceType(piece.type)) {
     return valueTable.promoted[piece.type];
   }
@@ -63,7 +68,7 @@ function getOwnedMaterialTotal(
   for (const row of state.squares) {
     for (const square of row) {
       if (square.piece?.player === player) {
-        total += getBoardPieceValue(square.piece, valueTable);
+        total += getBoardPieceMaterialValue(square.piece, valueTable);
       }
     }
   }

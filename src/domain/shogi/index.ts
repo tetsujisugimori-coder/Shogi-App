@@ -6,6 +6,7 @@ export * from './randomAi';
 export * from './materialEvaluation';
 export * from './pieceSquareEvaluation';
 export * from './kingSafetyEvaluation';
+export * from './undefendedPieceSafetyEvaluation';
 export * from './materialAi';
 export * from './twoPlyMinimaxAi';
 export * from './twoPlyAlphaBetaAi';

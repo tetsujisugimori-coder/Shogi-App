@@ -1,5 +1,26 @@
 # SHOGI-APP 開発ログ
 
+## [2026-09-17] 守られていない盤上駒の危険度評価
+
+### 実装と設計判断
+
+- PR #84の既存`countSquareAttackersBy(squares, targetCoord, attacker)`を再利用し、`evaluateUndefendedPieceSafety(state, perspective, valueTable?)`を追加した。玉以外の各盤上駒について「敵の利き数が1以上、かつ味方の利き数が0」を満たすと、その所有側の危険度として数える。返値は相手側の危険度減点から明示視点側の減点を引くため、高い値ほど指定視点に有利で、先後を反転すると符号も反転する。
+- `UNDEFENDED_PIECE_SAFETY_PENALTY_RATE = 0.1`を単一の意味付き定数として採用した。減点は既存の`DEFAULT_MATERIAL_VALUE_TABLE`と同じ盤上駒価値の10%であり、歩10、角80、飛100となる。全額の駒損より十分に軽い一方、浅い探索で高価値駒を無防備に置く候補を区別できる初期値とした。成駒も既存の`getBoardPieceMaterialValue()`で同じ成駒値を使い、別の価値表は作っていない。
+- 玉は既存の独立した`evaluateKingSafety()`だけで扱うため本評価から除外し、持ち駒は盤面マスを持たないため対象外とした。利き数はピンを含む既存の生の利き契約のままであり、交換損得や実際に動けるかの判定は追加していない。評価は局面、盤、駒、持ち駒を変更しない。
+- 非終局の`evaluateSearchPosition()`へ、既存の駒得と位置評価に加えて本危険度評価を合成した。終局の`+Infinity`、`-Infinity`、`0`の既存契約、探索深さ・時間制限・手の並べ替え・玉安全度評価は変更していない。
+
+### テスト・検証
+
+- `src/test/shogi-undefended-piece-safety-evaluation.test.ts`を追加し、攻撃され未防御の減点、味方の防御時の非適用、非攻撃時の非適用、先後180度対称、玉・持ち駒の対象外、歩と飛車の減点差、探索静的評価への合成、局面と設定の不変性を確認する。
+- 対象テスト: `npx vitest run src/test/shogi-undefended-piece-safety-evaluation.test.ts src/test/shogi-king-safety-evaluation.test.ts src/test/shogi-material-evaluation.test.ts src/test/shogi-piece-square-evaluation.test.ts src/test/shogi-two-ply-minimax-ai.test.ts src/test/shogi-attacks.test.ts src/test/shogi-legal-actions.test.ts`は7ファイル145件成功。
+- 全テスト: 一括`npm test`はVitest起動表示までしか終了要約を回収できなかったため成功扱いにしない。その代わり実在する全31テストファイルを4バッチで終了要約つきに実行し、`275 + 204 + 166 + 313 = 958`件がすべて成功した。第2バッチの`Not implemented: navigation to another Document`は既存jsdom通知であり、8ファイル204件・終了コード0だった。
+- `npm run verify:lock`、`npm run lint`（`tsc --noEmit`のため型検査も兼ねる）、`npm run build`、`git diff --check`はすべて成功した。typecheck専用スクリプトはpackage.jsonに存在しない。Vitest/Viteはサンドボックス内でesbuildの`spawn EPERM`となるため、対象・全テストとbuildは通常実行環境で検証した。
+
+### 今回見送った項目と次の候補
+
+- 敵味方の利き数差だけによる交換判定、攻防駒価値を含む交換順序解析、Static Exchange Evaluation、静止探索、詰み探索、ピンなどによる実可動性判定、守られた駒への追加減点、駒の可動性、玉安全度の再設計、UI、探索深さ・時間制限・手の並べ替え、無関係なリファクタリングは含めない。
+- 次の候補は、交換損得評価、または静止探索である。
+
 ## [2026-09-14] PR #86の玉安全度テストにおける実ピン局面への修正
 
 - PR #86の旧テストは、先手玉が先手飛車の射線を遮っていたため、対象の後手金を動かしても後手玉への王手が開かず、実際にはピンを表していなかった。
