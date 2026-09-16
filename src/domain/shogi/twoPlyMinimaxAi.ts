@@ -15,6 +15,11 @@ import {
   type PieceSquareValueTable,
 } from './pieceSquareEvaluation';
 import { cloneBoardState } from './replay';
+import {
+  DEFAULT_KING_SAFETY_EVALUATION_WEIGHTS,
+  evaluateKingSafety,
+  type KingSafetyEvaluationWeights,
+} from './kingSafetyEvaluation';
 import { evaluateUndefendedPieceSafety } from './undefendedPieceSafetyEvaluation';
 
 /** The fixed search depth used by the current two-ply minimax AI. */
@@ -49,6 +54,7 @@ export type SearchClock = () => number;
 export interface SearchEvaluationOptions {
   readonly materialValueTable?: MaterialValueTable;
   readonly pieceSquareValueTable?: PieceSquareValueTable;
+  readonly kingSafetyWeights?: KingSafetyEvaluationWeights;
 }
 
 /** Retains the historical MaterialValueTable argument while allowing both tables as one option. */
@@ -63,11 +69,13 @@ function resolveSearchEvaluationOptions(config: SearchEvaluationConfig | undefin
     return {
       materialValueTable: config,
       pieceSquareValueTable: DEFAULT_PIECE_SQUARE_VALUE_TABLE,
+      kingSafetyWeights: DEFAULT_KING_SAFETY_EVALUATION_WEIGHTS,
     };
   }
   return {
     materialValueTable: config?.materialValueTable ?? DEFAULT_MATERIAL_VALUE_TABLE,
     pieceSquareValueTable: config?.pieceSquareValueTable ?? DEFAULT_PIECE_SQUARE_VALUE_TABLE,
+    kingSafetyWeights: config?.kingSafetyWeights ?? DEFAULT_KING_SAFETY_EVALUATION_WEIGHTS,
   };
 }
 
@@ -77,8 +85,8 @@ function opponentOf(player: Player): Player {
 
 /**
  * Scores a position for search while making the recorded game result dominate
- * every finite material, position, and undefended-piece safety score. Draw
- * results are neutral.
+ * every finite material, position, King-safety, and undefended-piece safety
+ * score. Draw results are neutral.
  *
  * An ended position must have a consistent result, and an in-progress
  * position must not have one. Throwing for malformed state prevents search
@@ -114,9 +122,10 @@ export function evaluateSearchPosition(
   if (state.status !== 'active' && state.status !== 'check') {
     throw new Error(`Search evaluation requires an active, check, or ended position; received ${state.status}.`);
   }
-  const { materialValueTable, pieceSquareValueTable } = resolveSearchEvaluationOptions(evaluation);
+  const { materialValueTable, pieceSquareValueTable, kingSafetyWeights } = resolveSearchEvaluationOptions(evaluation);
   return evaluateMaterial(state, perspective, materialValueTable) +
     evaluatePieceSquarePosition(state, perspective, pieceSquareValueTable) +
+    evaluateKingSafety(state, perspective, kingSafetyWeights) +
     evaluateUndefendedPieceSafety(state, perspective, materialValueTable);
 }
 
