@@ -6,7 +6,7 @@ import { getOpponent } from './boardStateUtils';
 /**
  * Weights for the pure king-safety heuristic. A direct attack on the King is
  * deliberately much more urgent than one uncovered attack on an adjacent square.
- * These provisional values are not connected to search in this change.
+ * These provisional values are used by search unless explicitly overridden.
  */
 export interface KingSafetyEvaluationWeights {
   readonly kingSquareAttack: number;

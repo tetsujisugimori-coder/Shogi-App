@@ -9,7 +9,10 @@ import {
   analyzeTwoPlyMinimaxSearch,
   areLegalActionsEqual,
   createPositionKey,
+  DEFAULT_KING_SAFETY_EVALUATION_WEIGHTS,
+  evaluateKingSafety,
   evaluateMaterial,
+  evaluatePieceSquarePosition,
   evaluateSearchPosition,
   evaluateUndefendedPieceSafety,
   executeLegalAction,
@@ -627,9 +630,9 @@ describe('反復深化αβ探索', () => {
     expect(first.selectedAction).toMatchObject({
       kind: 'move', from: { row: 4, col: 4 }, to: { row: 4, col: 0 },
     });
-    // The selected leaf is still the same action; its net 30-point warning is
-    // the new 10%-of-material undefended-piece safety contribution.
-    expect(first.selectedEvaluation).toBe(-570);
+    // The selected leaf is still the same action; the prior 30-point
+    // undefended-piece warning is joined by a 3-point King-safety penalty.
+    expect(first.selectedEvaluation).toBe(-573);
     expect(second).toMatchObject({
       selectedAction: first.selectedAction,
       selectedEvaluation: first.selectedEvaluation,
@@ -704,7 +707,7 @@ describe('時間制限付き反復深化αβ探索', () => {
     expect(limited.selectedAction).toMatchObject({
       kind: 'move', from: { row: 4, col: 4 }, to: { row: 4, col: 0 },
     });
-    expect(limited.selectedEvaluation).toBe(-570);
+    expect(limited.selectedEvaluation).toBe(-573);
     expect(JSON.stringify(state)).toBe(snapshot);
   });
 
@@ -864,7 +867,7 @@ describe('時間制限付き反復深化αβ探索', () => {
 });
 
 describe('探索用局面評価', () => {
-  it('active/checkでは駒得と守られていない駒の危険度を視点とカスタム評価表で合成する', () => {
+  it('active/checkでは駒得、駒位置、玉安全度、守られていない駒の危険度を合成する', () => {
     const state = createState([
       { row: 8, col: 8, piece: piece('sente-king', 'king', 'sente') },
       { row: 0, col: 8, piece: piece('gote-king', 'king', 'gote') },
@@ -878,10 +881,96 @@ describe('探索用局面評価', () => {
 
     const evaluation = materialOnlyEvaluation(table);
     expect(evaluateSearchPosition(state, 'sente', evaluation)).toBe(
-      evaluateMaterial(state, 'sente', table) + evaluateUndefendedPieceSafety(state, 'sente', table)
+      evaluateMaterial(state, 'sente', table) +
+      evaluatePieceSquarePosition(state, 'sente', ZERO_PIECE_SQUARE_VALUE_TABLE) +
+      evaluateKingSafety(state, 'sente', DEFAULT_KING_SAFETY_EVALUATION_WEIGHTS) +
+      evaluateUndefendedPieceSafety(state, 'sente', table)
     );
     expect(evaluateSearchPosition({ ...state, status: 'check' }, 'gote', evaluation)).toBe(
-      evaluateMaterial(state, 'gote', table) + evaluateUndefendedPieceSafety(state, 'gote', table)
+      evaluateMaterial(state, 'gote', table) +
+      evaluatePieceSquarePosition(state, 'gote', ZERO_PIECE_SQUARE_VALUE_TABLE) +
+      evaluateKingSafety(state, 'gote', DEFAULT_KING_SAFETY_EVALUATION_WEIGHTS) +
+      evaluateUndefendedPieceSafety(state, 'gote', table)
+    );
+  });
+
+  it('玉周辺の利き、視点、カスタム重み、重み0を共通探索評価へ反映し、入力を変更しない', () => {
+    const safe = createState([
+      { row: 8, col: 4, piece: piece('sente-king', 'king', 'sente') },
+      { row: 0, col: 4, piece: piece('gote-king', 'king', 'gote') },
+      { row: 5, col: 3, piece: piece('gote-pawn', 'pawn', 'gote') },
+    ]);
+    const exposed = createState([
+      { row: 8, col: 4, piece: piece('sente-king', 'king', 'sente') },
+      { row: 0, col: 4, piece: piece('gote-king', 'king', 'gote') },
+      { row: 7, col: 3, piece: piece('gote-pawn', 'pawn', 'gote') },
+    ]);
+    const zeroMaterialValueTable: MaterialValueTable = {
+      unpromoted: { pawn: 0, lance: 0, knight: 0, silver: 0, gold: 0, bishop: 0, rook: 0, king: 0 },
+      promoted: { pawn: 0, lance: 0, knight: 0, silver: 0, bishop: 0, rook: 0 },
+    };
+    const kingSafetyWeights = { kingSquareAttack: 40, uncoveredAdjacentAttack: 3 };
+    const evaluation = {
+      materialValueTable: zeroMaterialValueTable,
+      pieceSquareValueTable: ZERO_PIECE_SQUARE_VALUE_TABLE,
+      kingSafetyWeights,
+    };
+    const zeroKingSafety = {
+      materialValueTable: zeroMaterialValueTable,
+      pieceSquareValueTable: ZERO_PIECE_SQUARE_VALUE_TABLE,
+      kingSafetyWeights: { kingSquareAttack: 0, uncoveredAdjacentAttack: 0 },
+    };
+    const safeSnapshot = JSON.stringify(safe);
+    const exposedSnapshot = JSON.stringify(exposed);
+    const evaluationSnapshot = JSON.stringify(evaluation);
+
+    const safetyDifference = evaluateKingSafety(exposed, 'sente', kingSafetyWeights) -
+      evaluateKingSafety(safe, 'sente', kingSafetyWeights);
+    expect(safetyDifference).toBeLessThan(0);
+    expect(evaluateSearchPosition(exposed, 'sente', evaluation) -
+      evaluateSearchPosition(safe, 'sente', evaluation)).toBe(safetyDifference);
+    expect(evaluateSearchPosition(exposed, 'gote', evaluation)).toBe(
+      -evaluateSearchPosition(exposed, 'sente', evaluation)
+    );
+    expect(evaluateSearchPosition(exposed, 'sente', zeroKingSafety)).toBe(0);
+    expect(JSON.stringify(safe)).toBe(safeSnapshot);
+    expect(JSON.stringify(exposed)).toBe(exposedSnapshot);
+    expect(JSON.stringify(evaluation)).toBe(evaluationSnapshot);
+  });
+
+  it('旧MaterialValueTable形式でも既定の玉安全度を使い、探索経路は共通評価を利用する', () => {
+    const state = createState([
+      { row: 8, col: 4, piece: piece('sente-king', 'king', 'sente') },
+      { row: 0, col: 4, piece: piece('gote-king', 'king', 'gote') },
+      { row: 7, col: 3, piece: piece('gote-pawn', 'pawn', 'gote') },
+    ]);
+    const table: MaterialValueTable = {
+      unpromoted: { pawn: 1, lance: 2, knight: 3, silver: 5, gold: 6, bishop: 7, rook: 11, king: 0 },
+      promoted: { pawn: 12, lance: 13, knight: 14, silver: 15, bishop: 16, rook: 17 },
+    };
+    const expected = evaluateMaterial(state, 'sente', table) +
+      evaluatePieceSquarePosition(state, 'sente') +
+      evaluateKingSafety(state, 'sente') +
+      evaluateUndefendedPieceSafety(state, 'sente', table);
+
+    expect(evaluateSearchPosition(state, 'sente', table)).toBe(expected);
+    expect(analyzeAlphaBetaSearch(state, 0, table).selectedEvaluation).toBe(expected);
+  });
+
+  it('玉が欠けた人工局面では玉安全度を中立のまま合成する', () => {
+    const state = createState([
+      { row: 8, col: 4, piece: piece('sente-king', 'king', 'sente') },
+      { row: 7, col: 3, piece: piece('gote-pawn', 'pawn', 'gote') },
+    ]);
+    const evaluation = materialOnlyEvaluation({
+      unpromoted: { pawn: 1, lance: 2, knight: 3, silver: 5, gold: 6, bishop: 7, rook: 11, king: 0 },
+      promoted: { pawn: 12, lance: 13, knight: 14, silver: 15, bishop: 16, rook: 17 },
+    });
+
+    expect(evaluateKingSafety(state, 'sente')).toBe(0);
+    expect(evaluateSearchPosition(state, 'sente', evaluation)).toBe(
+      evaluateMaterial(state, 'sente', evaluation.materialValueTable) +
+      evaluateUndefendedPieceSafety(state, 'sente', evaluation.materialValueTable)
     );
   });
 
