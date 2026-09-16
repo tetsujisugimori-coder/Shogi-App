@@ -61,6 +61,20 @@ export interface SearchEvaluationOptions {
 /** Retains the historical MaterialValueTable argument while allowing both tables as one option. */
 export type SearchEvaluationConfig = MaterialValueTable | SearchEvaluationOptions;
 
+/**
+ * The terminal outcome and every finite term used to evaluate one search
+ * position. This is plain serializable data so a future Worker boundary can
+ * carry it without changing its representation.
+ */
+export interface SearchEvaluationBreakdown {
+  readonly total: number;
+  readonly material: number;
+  readonly pieceSquare: number;
+  readonly kingSafety: number;
+  readonly undefendedPieceSafety: number;
+  readonly terminal: 'win' | 'loss' | 'draw' | null;
+}
+
 function isMaterialValueTable(config: SearchEvaluationConfig): config is MaterialValueTable {
   return 'unpromoted' in config && 'promoted' in config;
 }
@@ -93,11 +107,11 @@ function opponentOf(player: Player): Player {
  * position must not have one. Throwing for malformed state prevents search
  * from silently treating a corrupted terminal position as ordinary material.
  */
-export function evaluateSearchPosition(
+export function evaluateSearchPositionBreakdown(
   state: BoardState,
   perspective: Player,
   evaluation: SearchEvaluationConfig = DEFAULT_MATERIAL_VALUE_TABLE
-): number {
+): SearchEvaluationBreakdown {
   if (state.status === 'ended') {
     if (!state.result) {
       throw new Error('Ended search position must have a game result.');
@@ -108,13 +122,28 @@ export function evaluateSearchPosition(
       if (winner !== null || loser !== null) {
         throw new Error('Draw search result must not name a winner or loser.');
       }
-      return 0;
+      return {
+        total: 0,
+        material: 0,
+        pieceSquare: 0,
+        kingSafety: 0,
+        undefendedPieceSafety: 0,
+        terminal: 'draw',
+      };
     }
 
     if (winner === loser || loser !== opponentOf(winner)) {
       throw new Error('Decisive search result must name opposite winner and loser.');
     }
-    return winner === perspective ? Number.POSITIVE_INFINITY : Number.NEGATIVE_INFINITY;
+    const terminal = winner === perspective ? 'win' : 'loss';
+    return {
+      total: terminal === 'win' ? Number.POSITIVE_INFINITY : Number.NEGATIVE_INFINITY,
+      material: 0,
+      pieceSquare: 0,
+      kingSafety: 0,
+      undefendedPieceSafety: 0,
+      terminal,
+    };
   }
 
   if (state.result) {
@@ -128,10 +157,35 @@ export function evaluateSearchPosition(
   // rebuilt for this one position evaluation and is not used for legal moves,
   // check detection, or any cross-position cache.
   const attackCountMaps = createAttackCountMaps(state.squares);
-  return evaluateMaterial(state, perspective, materialValueTable) +
-    evaluatePieceSquarePosition(state, perspective, pieceSquareValueTable) +
-    evaluateKingSafety(state, perspective, kingSafetyWeights, attackCountMaps) +
-    evaluateUndefendedPieceSafety(state, perspective, materialValueTable, attackCountMaps);
+  const material = evaluateMaterial(state, perspective, materialValueTable);
+  const pieceSquare = evaluatePieceSquarePosition(state, perspective, pieceSquareValueTable);
+  const kingSafety = evaluateKingSafety(state, perspective, kingSafetyWeights, attackCountMaps);
+  const undefendedPieceSafety = evaluateUndefendedPieceSafety(
+    state,
+    perspective,
+    materialValueTable,
+    attackCountMaps
+  );
+  return {
+    total: material + pieceSquare + kingSafety + undefendedPieceSafety,
+    material,
+    pieceSquare,
+    kingSafety,
+    undefendedPieceSafety,
+    terminal: null,
+  };
+}
+
+/**
+ * Returns the total from the canonical search evaluation breakdown. The
+ * historical numeric API remains unchanged for every caller and config form.
+ */
+export function evaluateSearchPosition(
+  state: BoardState,
+  perspective: Player,
+  evaluation: SearchEvaluationConfig = DEFAULT_MATERIAL_VALUE_TABLE
+): number {
+  return evaluateSearchPositionBreakdown(state, perspective, evaluation).total;
 }
 
 function executeSearchAction(state: BoardState, action: LegalAction): BoardState {

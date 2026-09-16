@@ -1,5 +1,27 @@
 # SHOGI-APP 開発ログ
 
+## [2026-09-17] 局面評価の内訳取得基盤
+
+### 実装と設計判断
+
+- `SearchEvaluationBreakdown`と純粋関数`evaluateSearchPositionBreakdown(state, perspective, evaluation?)`を追加した。返値は`total`、`material`、`pieceSquare`、`kingSafety`、`undefendedPieceSafety`、`terminal`だけから成るプレーンオブジェクトであり、将来Worker境界で構造化クローンできる形に限定している。
+- 非終局では既存の`evaluateMaterial()`、`evaluatePieceSquarePosition()`、`evaluateKingSafety()`、`evaluateUndefendedPieceSafety()`をそのまま呼び、4項目の合計を`total`にする。`createAttackCountMaps()`はこの共通経路で一度だけ生成し、玉安全度と未防御駒評価へ同一マップを渡す。局面間キャッシュ、モジュール状態、WeakMap、差分更新は加えていない。
+- 終局検証は従来の`evaluateSearchPosition()`契約を同じ経路へ移した。勝ち／負け／引き分けはそれぞれ`terminal: 'win' | 'loss' | 'draw'`と`+Infinity`／`-Infinity`／`0`を返し、通常4項目はすべて`0`である。`ended`と`result`、勝者／敗者、非終局の`result`の矛盾は従来どおり例外にする。
+- 既存の数値API`evaluateSearchPosition()`はシグネチャと戻り値を変えず、内訳APIの`total`を返す薄い互換ラッパーにした。旧`MaterialValueTable`第3引数、空の設定、部分設定、カスタム駒価値表・Piece-Square Table・玉安全度重み（0を含む）は同じ設定解決を共有するため、評価式を二重管理していない。
+- `src/domain/shogi/index.ts`は既存の`twoPlyMinimaxAi`再公開経路を通じて新しい型と関数も公開する。Workerプロトコル、探索結果、UIへは接続していない。
+
+### テスト・性能確認
+
+- `src/test/shogi-search-evaluation-breakdown.test.ts`を追加し、非終局4項目と合計、既存数値APIとの一致、先後反転、入力不変性、旧・空・部分設定、カスタム表と重み0、終局3種と不整合例外、初期局面の中立、深さ0 αβの共通経路を確認する。
+- 関連テストは`src/test/shogi-search-evaluation-breakdown.test.ts`、駒得、位置評価、玉安全度、未防御駒、ミニマックス／αβ／反復深化、時間制限Workerの7ファイルで145件成功した。
+- `npm run verify:lock`、`npm run lint`、`npm run build`、`git diff --check`は成功した。一括`npm test`はVitest起動表示後の終了要約を回収できなかったため成功扱いにせず、実在する全32ファイルを重複なく4バッチへ分割して`156 + 282 + 215 + 316 = 969`件成功を終了要約付きで確認した。第3バッチの`Not implemented: navigation to another Document`は既存jsdom通知で、終了コード0だった。
+- 初期局面・固定深さ3を1回ウォームアップ後に7回測定した参考中央値は導入前77.764 ms、導入後81.300 msだった。選択手`6,2 -> 5,2`、評価214、PV、`visitedPositionCount: 1244`、`cutoffCount: 80`、`skippedActionCount: 2565`は一致した。後実装を21回で再測定した中央値は78.843 ms（範囲74.501–84.120 ms）であり、短い測定のばらつきも確認した。環境依存の参考値でありCIの閾値にはしていない。
+
+### 今回見送った項目と次の候補
+
+- 選択PV末端局面の内訳を探索結果へ保持すること、Worker要求・応答、UI表示、評価プリセット・重み調整、新評価項目、SEE、静止／詰み探索、可動性、置換表、局面間キャッシュ、ルール・探索深さ・時間制限・手順・棋譜・JSON/KIFの変更は対象外とした。
+- 次の候補は、選択されたPV末端局面の評価内訳を探索結果へ保持し、Worker境界へ渡すこと。
+
 ## [2026-09-17] 守られていない盤上駒の危険度評価
 
 ### 実装と設計判断
