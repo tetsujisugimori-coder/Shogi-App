@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 import {
   cloneBoardSquares,
   countSquareAttackersBy,
+  createAttackCountMaps,
   DEFAULT_KING_SAFETY_EVALUATION_WEIGHTS,
   evaluateKingSafety,
   getLegalMoves,
@@ -39,6 +40,32 @@ const KINGS = [
 ] as const;
 
 describe('玉安全度評価', () => {
+  it('事前生成した利きマップを渡しても、単独生成時と同じ評価を返し入力を変更しない', () => {
+    const state = createState([
+      ...KINGS,
+      { row: 7, col: 3, piece: piece('gote-pawn', 'pawn', 'gote') },
+      { row: 7, col: 2, piece: piece('sente-bishop', 'bishop', 'sente') },
+    ]);
+    const stateSnapshot = JSON.stringify(state);
+    const maps = createAttackCountMaps(state.squares);
+    const mapsSnapshot = JSON.stringify(maps);
+
+    expect(evaluateKingSafety(state, 'sente')).toBe(evaluateKingSafety(
+      state,
+      'sente',
+      DEFAULT_KING_SAFETY_EVALUATION_WEIGHTS,
+      maps
+    ));
+    expect(evaluateKingSafety(state, 'gote')).toBe(evaluateKingSafety(
+      state,
+      'gote',
+      DEFAULT_KING_SAFETY_EVALUATION_WEIGHTS,
+      maps
+    ));
+    expect(JSON.stringify(state)).toBe(stateSnapshot);
+    expect(JSON.stringify(maps)).toBe(mapsSnapshot);
+  });
+
   it('初期局面は先後対称で、どちらの視点でも0を返す', () => {
     const state = createInitialBoardState();
 

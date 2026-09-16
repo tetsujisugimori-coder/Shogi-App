@@ -1,7 +1,15 @@
 import { describe, expect, it } from 'vitest';
-import { BoardSquare, Piece, Player, RANK_KANJI } from '../types/shogi';
+import {
+  BoardSquare,
+  createInitialBoardState,
+  Piece,
+  Player,
+  RANK_KANJI,
+} from '../types/shogi';
 import {
   countSquareAttackersBy,
+  createAttackCountMaps,
+  getAttackCount,
   isKingInCheck,
   isSquareAttackedBy,
 } from '../domain/shogi';
@@ -33,7 +41,72 @@ function piece(id: string, type: Piece['type'], player: Player, isPromoted?: boo
   return { id, type, player, isPromoted };
 }
 
+function expectAttackMapsToMatchRawCounts(squares: BoardSquare[][]): void {
+  const maps = createAttackCountMaps(squares);
+  for (let row = 0; row < 9; row += 1) {
+    for (let col = 0; col < 9; col += 1) {
+      const target = { row, col };
+      for (const attacker of ['sente', 'gote'] as const) {
+        expect(getAttackCount(maps, target, attacker)).toBe(
+          countSquareAttackersBy(squares, target, attacker)
+        );
+      }
+    }
+  }
+
+  for (const target of [{ row: -1, col: 4 }, { row: 9, col: 4 }, { row: 4, col: -1 }, { row: 4, col: 9 }]) {
+    expect(getAttackCount(maps, target, 'sente')).toBe(0);
+    expect(getAttackCount(maps, target, 'gote')).toBe(0);
+  }
+}
+
 describe('countSquareAttackersBy', () => {
+  it('局面ごとの利きマップは代表局面の全81マスで既存の生の利き数と一致し、入力盤面を変更しない', () => {
+    const positions = [
+      createInitialBoardState().squares,
+      // Sliding rays include the blocker but never pass through it.
+      createAttackBoard([
+        { row: 4, col: 0, piece: piece('sente-rook', 'rook', 'sente') },
+        { row: 4, col: 2, piece: piece('rook-blocker', 'gold', 'gote') },
+        { row: 0, col: 0, piece: piece('gote-bishop', 'bishop', 'gote') },
+        { row: 2, col: 2, piece: piece('bishop-blocker', 'silver', 'sente') },
+        { row: 6, col: 8, piece: piece('sente-lance', 'lance', 'sente') },
+        { row: 4, col: 8, piece: piece('lance-blocker', 'pawn', 'gote') },
+      ]),
+      // Edge-bound step pieces must not add off-board coordinates.
+      createAttackBoard([
+        { row: 0, col: 0, piece: piece('edge-sente-pawn', 'pawn', 'sente') },
+        { row: 0, col: 1, piece: piece('edge-sente-lance', 'lance', 'sente') },
+        { row: 1, col: 2, piece: piece('edge-sente-knight', 'knight', 'sente') },
+        { row: 8, col: 8, piece: piece('edge-gote-pawn', 'pawn', 'gote') },
+        { row: 8, col: 7, piece: piece('edge-gote-lance', 'lance', 'gote') },
+        { row: 7, col: 6, piece: piece('edge-gote-knight', 'knight', 'gote') },
+      ]),
+      // Promoted minor pieces, dragon, and horse keep getPieceAttackPattern semantics.
+      createAttackBoard([
+        { row: 4, col: 1, piece: piece('promoted-pawn', 'pawn', 'sente', true) },
+        { row: 4, col: 2, piece: piece('promoted-lance', 'lance', 'sente', true) },
+        { row: 4, col: 3, piece: piece('promoted-knight', 'knight', 'sente', true) },
+        { row: 4, col: 4, piece: piece('promoted-silver', 'silver', 'sente', true) },
+        { row: 4, col: 6, piece: piece('dragon', 'rook', 'sente', true) },
+        { row: 6, col: 4, piece: piece('horse', 'bishop', 'gote', true) },
+      ]),
+      // Targets may be friendly, enemy, or Kings, and sparse positions are valid.
+      createAttackBoard([
+        { row: 5, col: 4, piece: piece('sente-pawn', 'pawn', 'sente') },
+        { row: 4, col: 4, piece: piece('friendly-target', 'gold', 'sente') },
+        { row: 3, col: 3, piece: piece('enemy-target', 'silver', 'gote') },
+        { row: 0, col: 4, piece: piece('gote-king', 'king', 'gote') },
+      ]),
+    ];
+
+    for (const squares of positions) {
+      const snapshot = JSON.stringify(squares);
+      expectAttackMapsToMatchRawCounts(squares);
+      expect(JSON.stringify(squares)).toBe(snapshot);
+    }
+  });
+
   it('returns explicit counts for no attackers, one attacker, and multiple distinct attackers', () => {
     expect(countSquareAttackersBy(createAttackBoard([]), { row: 4, col: 4 }, 'sente')).toBe(0);
 

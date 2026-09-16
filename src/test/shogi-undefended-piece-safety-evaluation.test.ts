@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import {
   cloneBoardSquares,
+  createAttackCountMaps,
   DEFAULT_MATERIAL_VALUE_TABLE,
   evaluateSearchPosition,
   evaluateUndefendedPieceSafety,
@@ -59,6 +60,28 @@ const ATTACKED_SENTE_ROOK = [
 ] as const;
 
 describe('守られていない駒の危険度評価', () => {
+  it('事前生成した利きマップを渡しても、単独生成時と同じ評価を返し入力を変更しない', () => {
+    const state = createState([...ATTACKED_SENTE_ROOK]);
+    const stateSnapshot = JSON.stringify(state);
+    const maps = createAttackCountMaps(state.squares);
+    const mapsSnapshot = JSON.stringify(maps);
+
+    expect(evaluateUndefendedPieceSafety(state, 'sente')).toBe(evaluateUndefendedPieceSafety(
+      state,
+      'sente',
+      DEFAULT_MATERIAL_VALUE_TABLE,
+      maps
+    ));
+    expect(evaluateUndefendedPieceSafety(state, 'gote')).toBe(evaluateUndefendedPieceSafety(
+      state,
+      'gote',
+      DEFAULT_MATERIAL_VALUE_TABLE,
+      maps
+    ));
+    expect(JSON.stringify(state)).toBe(stateSnapshot);
+    expect(JSON.stringify(maps)).toBe(mapsSnapshot);
+  });
+
   it('敵に攻撃され味方に守られていない盤上の駒は、所有側の評価を既存価値の10%だけ下げる', () => {
     const exposed = createState([...ATTACKED_SENTE_ROOK]);
 
