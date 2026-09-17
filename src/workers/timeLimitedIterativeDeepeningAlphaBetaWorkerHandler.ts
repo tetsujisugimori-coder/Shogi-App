@@ -2,6 +2,8 @@ import {
   analyzeTimeLimitedIterativeDeepeningAlphaBetaSearch,
   type TimeLimitedIterativeDeepeningAlphaBetaSearchResult,
 } from '../domain/shogi/twoPlyAlphaBetaAi';
+import type { SearchEvaluationConfig } from '../domain/shogi/twoPlyMinimaxAi';
+import { DEFAULT_SEARCH_EVALUATION_PRESET_ID, resolveSearchEvaluationPreset } from '../domain/shogi/searchEvaluationPresets';
 import type {
   TimeLimitedIterativeDeepeningAlphaBetaSearchWorkerFailureResponse,
   TimeLimitedIterativeDeepeningAlphaBetaSearchWorkerRequest,
@@ -11,7 +13,8 @@ import type {
 export type TimeLimitedIterativeDeepeningAlphaBetaSearch = (
   state: TimeLimitedIterativeDeepeningAlphaBetaSearchWorkerRequest['state'],
   maxDepth: number,
-  timeLimitMilliseconds: number
+  timeLimitMilliseconds: number,
+  evaluation?: SearchEvaluationConfig
 ) => TimeLimitedIterativeDeepeningAlphaBetaSearchResult;
 
 function toWorkerFailureResponse(
@@ -47,10 +50,16 @@ export function handleTimeLimitedIterativeDeepeningAlphaBetaSearchWorkerRequest(
     analyzeTimeLimitedIterativeDeepeningAlphaBetaSearch
 ): TimeLimitedIterativeDeepeningAlphaBetaSearchWorkerResponse {
   try {
+    const evaluationPresetId = request.evaluationPresetId === undefined
+      ? DEFAULT_SEARCH_EVALUATION_PRESET_ID : request.evaluationPresetId;
+    const evaluation = resolveSearchEvaluationPreset(evaluationPresetId);
     return {
       type: 'time-limited-iterative-deepening-alpha-beta-search-succeeded',
       requestId: request.requestId,
-      result: search(request.state, request.maxDepth, request.timeLimitMilliseconds),
+      result: {
+        ...search(request.state, request.maxDepth, request.timeLimitMilliseconds, evaluation),
+        evaluationPresetId,
+      },
     };
   } catch (error) {
     return toWorkerFailureResponse(request.requestId, error);

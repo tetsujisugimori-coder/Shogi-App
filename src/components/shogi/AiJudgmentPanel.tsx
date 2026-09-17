@@ -1,3 +1,5 @@
+import { isSearchEvaluationPresetId } from '../../domain/shogi/searchEvaluationPresets';
+import { SEARCH_EVALUATION_PRESET_DISPLAY } from './searchEvaluationPresetDisplay';
 import type { AiSearchDisplay } from './AiSearchResultPanel';
 import { formatSenteEvaluation, getDisplayEvaluationBreakdown } from './searchEvaluationDisplay';
 
@@ -20,6 +22,9 @@ export function AiJudgmentPanel({ search, thinking }: AiJudgmentPanelProps) {
         <p className="mt-2 text-stone-400">AIの探索結果はまだありません。</p>
       ) : (
         <div className="mt-2 min-w-0 space-y-3 break-words [overflow-wrap:anywhere]">
+          <p>評価設定: {isSearchEvaluationPresetId(search.result.evaluationPresetId)
+            ? SEARCH_EVALUATION_PRESET_DISPLAY[search.result.evaluationPresetId].name : '不明'}</p>
+          <p className="text-stone-400">内訳は評価係数を適用した後の寄与値です。</p>
           <p className="text-stone-300">先手基準：＋は先手有利、−は後手有利、0は互角です。</p>
           <p className="text-stone-400">直前のAI着手を選んだ探索の末端評価です。現在の盤面そのものの評価ではありません。</p>
           <dl className="grid grid-cols-[minmax(0,1fr)_minmax(0,1fr)] gap-x-3 gap-y-2">

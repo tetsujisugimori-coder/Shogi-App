@@ -1,3 +1,6 @@
+import { DEFAULT_SEARCH_EVALUATION_PRESET_ID, SEARCH_EVALUATION_PRESET_IDS, isSearchEvaluationPresetId, resolveSearchEvaluationPreset, type SearchEvaluationPresetId } from '../../domain/shogi/searchEvaluationPresets';
+import type { PresetTimeLimitedSearchResult } from '../../workers/timeLimitedIterativeDeepeningAlphaBetaWorkerProtocol';
+import { SEARCH_EVALUATION_PRESET_DISPLAY } from './searchEvaluationPresetDisplay';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { createInitialBoardState, BoardState, BoardSquare, Piece, PieceType } from '../../types/shogi';
 import {
@@ -73,8 +76,9 @@ type TimeLimitedIterativeDeepeningAlphaBetaSearchRunner = (
   state: BoardState,
   maxDepth: number,
   timeLimitMilliseconds: number,
-  signal?: AbortSignal
-) => Promise<TimeLimitedIterativeDeepeningAlphaBetaSearchResult>;
+  signal?: AbortSignal,
+  evaluationPresetId?: SearchEvaluationPresetId
+) => Promise<PresetTimeLimitedSearchResult>;
 
 interface PendingPromotion {
   from: { row: number; col: number };
@@ -205,6 +209,7 @@ export const ShogiResearchScreen: React.FC<ShogiResearchScreenProps> = ({
   const [pendingKifImport, setPendingKifImport] = useState<PendingKifImport | null>(null);
   const [isKifFileReading, setIsKifFileReading] = useState(false);
   const [moveHistoryResetKey, setMoveHistoryResetKey] = useState(0);
+  const [evaluationPresetId, setEvaluationPresetId] = useState<SearchEvaluationPresetId>(DEFAULT_SEARCH_EVALUATION_PRESET_ID);
   const [aiSearchDisplay, setAiSearchDisplay] = useState<AiSearchDisplay | null>(null);
   const [workerSearchState, setWorkerSearchState] = useState<WorkerSearchState>({ kind: 'idle' });
   const [agreedJishogiProposal, setAgreedJishogiProposal] = useState<AgreedJishogiProposal | null>(null);
@@ -890,7 +895,10 @@ export const ShogiResearchScreen: React.FC<ShogiResearchScreenProps> = ({
   const makeTwoPlyAiMove = () => {
     if (isInteractionBlocked) return;
 
-    const result = analyzeTwoPlyMinimaxSearch(boardState);
+    const result = {
+      ...analyzeTwoPlyMinimaxSearch(boardState, resolveSearchEvaluationPreset(evaluationPresetId)),
+      evaluationPresetId,
+    };
     if (!result.selectedAction) return;
 
     const selectedNotation = formatLegalActionNotation(boardState, result.selectedAction);
@@ -914,6 +922,7 @@ export const ShogiResearchScreen: React.FC<ShogiResearchScreenProps> = ({
     const controller = new AbortController();
     const generation = workerSearchGenerationRef.current + 1;
     const searchState = boardState;
+    const searchPresetId = evaluationPresetId;
     workerSearchGenerationRef.current = generation;
     activeWorkerSearchRef.current = { generation, controller, state: searchState };
     setSelection({ kind: 'none' });
@@ -930,10 +939,17 @@ export const ShogiResearchScreen: React.FC<ShogiResearchScreenProps> = ({
       searchState,
       TIME_LIMITED_AI_MAX_DEPTH,
       TIME_LIMITED_AI_TIME_LIMIT_MILLISECONDS,
-      controller.signal
+      controller.signal,
+      searchPresetId
     ).then(
       (result) => {
         if (!isCurrentSearch()) return;
+
+        if (result.evaluationPresetId !== searchPresetId) {
+          activeWorkerSearchRef.current = null;
+          setWorkerSearchState({ kind: 'error', message: 'AIの評価設定が探索要求と一致しません。' });
+          return;
+        }
 
         // The screen cannot start this search from an ended position. Therefore a
         // missing action is not a normal no-move outcome at this UI boundary.
@@ -1220,6 +1236,26 @@ export const ShogiResearchScreen: React.FC<ShogiResearchScreenProps> = ({
         >
           AIとの対局・棋譜・判断ログを記録する研究画面です。
         </p>
+        <div className="mt-2 w-full min-w-0 max-w-sm space-y-1 text-xs text-stone-300">
+          <label htmlFor="evaluation-preset" className="block">評価プリセット</label>
+          <select
+            id="evaluation-preset"
+            aria-describedby="evaluation-preset-description"
+            value={evaluationPresetId}
+            disabled={isWorkerSearchThinking || dialogsAreOpen}
+            onChange={(event) => {
+              if (!activeWorkerSearchRef.current && isSearchEvaluationPresetId(event.target.value)) {
+                setEvaluationPresetId(event.target.value);
+              }
+            }}
+            className="w-full min-w-0 rounded border border-stone-700 bg-stone-900 px-3 py-2 text-sm text-stone-100 disabled:opacity-50"
+          >
+            {SEARCH_EVALUATION_PRESET_IDS.map((id) => (
+              <option key={id} value={id}>{SEARCH_EVALUATION_PRESET_DISPLAY[id].name}</option>
+            ))}
+          </select>
+          <p id="evaluation-preset-description">{SEARCH_EVALUATION_PRESET_DISPLAY[evaluationPresetId].description}</p>
+        </div>
         <div className="mt-2 flex max-w-full flex-wrap justify-center gap-2">
           <button
             type="button"

@@ -1,4 +1,5 @@
-import type { TimeLimitedIterativeDeepeningAlphaBetaSearchResult } from '../domain/shogi/twoPlyAlphaBetaAi';
+import { DEFAULT_SEARCH_EVALUATION_PRESET_ID, resolveSearchEvaluationPreset, type SearchEvaluationPresetId } from '../domain/shogi/searchEvaluationPresets';
+import type { PresetTimeLimitedSearchResult } from '../workers/timeLimitedIterativeDeepeningAlphaBetaWorkerProtocol';
 import type { BoardState } from '../types/shogi';
 import type {
   TimeLimitedIterativeDeepeningAlphaBetaSearchWorkerRequest,
@@ -54,8 +55,9 @@ export interface TimeLimitedIterativeDeepeningAlphaBetaSearchWorkerClient {
     state: BoardState,
     maxDepth: number,
     timeLimitMilliseconds: number,
-    signal?: AbortSignal
-  ): Promise<TimeLimitedIterativeDeepeningAlphaBetaSearchResult>;
+    signal?: AbortSignal,
+    evaluationPresetId?: SearchEvaluationPresetId
+  ): Promise<PresetTimeLimitedSearchResult>;
 }
 
 export interface TimeLimitedIterativeDeepeningAlphaBetaSearchWorkerClientDependencies {
@@ -74,7 +76,7 @@ export function createTimeLimitedIterativeDeepeningAlphaBetaSearchWorkerClient(
   const requestIdFactory = dependencies.requestIdFactory ?? createRequestId;
 
   return {
-    run(state, maxDepth, timeLimitMilliseconds, signal) {
+    run(state, maxDepth, timeLimitMilliseconds, signal, evaluationPresetId = DEFAULT_SEARCH_EVALUATION_PRESET_ID) {
       if (signal?.aborted) {
         return Promise.reject(new TimeLimitedIterativeDeepeningAlphaBetaSearchWorkerAbortError());
       }
@@ -82,6 +84,7 @@ export function createTimeLimitedIterativeDeepeningAlphaBetaSearchWorkerClient(
       return new Promise((resolve, reject) => {
         let worker: TimeLimitedIterativeDeepeningAlphaBetaSearchWorkerLike;
         try {
+          resolveSearchEvaluationPreset(evaluationPresetId);
           worker = workerFactory();
         } catch (error) {
           const message = error instanceof Error ? error.message : 'Web Worker could not be created.';
@@ -121,6 +124,7 @@ export function createTimeLimitedIterativeDeepeningAlphaBetaSearchWorkerClient(
           state,
           maxDepth,
           timeLimitMilliseconds,
+          evaluationPresetId,
         };
 
         worker.addEventListener('message', (event) => {
@@ -135,6 +139,10 @@ export function createTimeLimitedIterativeDeepeningAlphaBetaSearchWorkerClient(
             return;
           }
           if (response.type === 'time-limited-iterative-deepening-alpha-beta-search-succeeded') {
+            if (response.result?.evaluationPresetId !== evaluationPresetId) {
+              fail('Worker response preset did not match the submitted request.', 'WorkerProtocolError');
+              return;
+            }
             finish(() => resolve(response.result));
             return;
           }
@@ -182,8 +190,9 @@ export function runTimeLimitedIterativeDeepeningAlphaBetaSearchInWorker(
   state: BoardState,
   maxDepth: number,
   timeLimitMilliseconds: number,
-  signal?: AbortSignal
-): Promise<TimeLimitedIterativeDeepeningAlphaBetaSearchResult> {
+  signal?: AbortSignal,
+  evaluationPresetId?: SearchEvaluationPresetId
+): Promise<PresetTimeLimitedSearchResult> {
   return createTimeLimitedIterativeDeepeningAlphaBetaSearchWorkerClient()
-    .run(state, maxDepth, timeLimitMilliseconds, signal);
+    .run(state, maxDepth, timeLimitMilliseconds, signal, evaluationPresetId);
 }

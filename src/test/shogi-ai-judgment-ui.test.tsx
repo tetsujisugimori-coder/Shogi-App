@@ -15,6 +15,7 @@ function search(evaluationBreakdown: SearchEvaluationBreakdown | null = breakdow
   return {
     kind: 'two-ply', perspective: 'gote', selectedNotation: '△3四歩', candidateNotations: [],
     result: {
+      evaluationPresetId: 'standard',
       selectedAction: null, selectedEvaluation: evaluationBreakdown?.total ?? 85, evaluationBreakdown,
       rootLegalActionCount: 1, visitedPositionCount: 2, depth: 2, elapsedMilliseconds: 1, topCandidates: [],
     },
@@ -22,6 +23,15 @@ function search(evaluationBreakdown: SearchEvaluationBreakdown | null = breakdow
 }
 
 describe('AIの判断', () => {
+  it.each([
+    ['standard', '標準'], ['material-focused', '駒得重視'], ['king-safety-focused', '玉の安全重視'],
+  ] as const)('結果自身に保持されたプリセットを表示する: %s', async (id, label) => {
+    const display = search();
+    display.result = { ...display.result, evaluationPresetId: id };
+    render(<AiJudgmentPanel search={display} thinking={false} />);
+    await userEvent.setup().click(screen.getByText('AIの判断'));
+    expect(screen.getByText(`評価設定: ${label}`)).toBeVisible();
+  });
   it('初期状態は折りたたみ、後手探索の評価と全項目を先手基準で表示する', async () => {
     const user = userEvent.setup();
     render(<AiJudgmentPanel search={search()} thinking={false} />);

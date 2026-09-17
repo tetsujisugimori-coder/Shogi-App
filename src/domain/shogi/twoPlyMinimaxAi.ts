@@ -22,6 +22,11 @@ import {
 } from './kingSafetyEvaluation';
 import { evaluateUndefendedPieceSafety } from './undefendedPieceSafetyEvaluation';
 import { createAttackCountMaps } from './attacks';
+import {
+  resolveSearchEvaluationPreset,
+  validateSearchEvaluationCoefficients,
+  type SearchEvaluationCoefficients,
+} from './searchEvaluationPresets';
 
 /** The fixed search depth used by the current two-ply minimax AI. */
 export const TWO_PLY_MINIMAX_SEARCH_DEPTH = 2;
@@ -55,6 +60,7 @@ export type SearchClock = () => number;
 
 /** Optional, serializable evaluation tables for search experiments. */
 export interface SearchEvaluationOptions {
+  readonly coefficients?: SearchEvaluationCoefficients;
   readonly materialValueTable?: MaterialValueTable;
   readonly pieceSquareValueTable?: PieceSquareValueTable;
   readonly kingSafetyWeights?: KingSafetyEvaluationWeights;
@@ -87,12 +93,14 @@ function resolveSearchEvaluationOptions(config: SearchEvaluationConfig | undefin
       materialValueTable: config,
       pieceSquareValueTable: DEFAULT_PIECE_SQUARE_VALUE_TABLE,
       kingSafetyWeights: DEFAULT_KING_SAFETY_EVALUATION_WEIGHTS,
+      coefficients: resolveSearchEvaluationPreset().coefficients,
     };
   }
   return {
     materialValueTable: config?.materialValueTable ?? DEFAULT_MATERIAL_VALUE_TABLE,
     pieceSquareValueTable: config?.pieceSquareValueTable ?? DEFAULT_PIECE_SQUARE_VALUE_TABLE,
     kingSafetyWeights: config?.kingSafetyWeights ?? DEFAULT_KING_SAFETY_EVALUATION_WEIGHTS,
+    coefficients: config?.coefficients ?? resolveSearchEvaluationPreset().coefficients,
   };
 }
 
@@ -114,6 +122,10 @@ export function evaluateSearchPositionBreakdown(
   perspective: Player,
   evaluation: SearchEvaluationConfig = DEFAULT_MATERIAL_VALUE_TABLE
 ): SearchEvaluationBreakdown {
+  // Validate even for terminal positions; valid multipliers never alter outcomes.
+  if (!isMaterialValueTable(evaluation) && evaluation.coefficients !== undefined) {
+    validateSearchEvaluationCoefficients(evaluation.coefficients);
+  }
   if (state.status === 'ended') {
     if (!state.result) {
       throw new Error('Ended search position must have a game result.');
@@ -154,20 +166,20 @@ export function evaluateSearchPositionBreakdown(
   if (state.status !== 'active' && state.status !== 'check') {
     throw new Error(`Search evaluation requires an active, check, or ended position; received ${state.status}.`);
   }
-  const { materialValueTable, pieceSquareValueTable, kingSafetyWeights } = resolveSearchEvaluationOptions(evaluation);
+  const { materialValueTable, pieceSquareValueTable, kingSafetyWeights, coefficients } = resolveSearchEvaluationOptions(evaluation);
   // Raw influence is useful to the static heuristics only. It is intentionally
   // rebuilt for this one position evaluation and is not used for legal moves,
   // check detection, or any cross-position cache.
   const attackCountMaps = createAttackCountMaps(state.squares);
-  const material = evaluateMaterial(state, perspective, materialValueTable);
-  const pieceSquare = evaluatePieceSquarePosition(state, perspective, pieceSquareValueTable);
-  const kingSafety = evaluateKingSafety(state, perspective, kingSafetyWeights, attackCountMaps);
+  const material = evaluateMaterial(state, perspective, materialValueTable) * coefficients.material;
+  const pieceSquare = evaluatePieceSquarePosition(state, perspective, pieceSquareValueTable) * coefficients.pieceSquare;
+  const kingSafety = evaluateKingSafety(state, perspective, kingSafetyWeights, attackCountMaps) * coefficients.kingSafety;
   const undefendedPieceSafety = evaluateUndefendedPieceSafety(
     state,
     perspective,
     materialValueTable,
     attackCountMaps
-  );
+  ) * coefficients.undefendedPieceSafety;
   return {
     total: material + pieceSquare + kingSafety + undefendedPieceSafety,
     material,
