@@ -1,13 +1,15 @@
 import { handleTimeLimitedIterativeDeepeningAlphaBetaSearchWorkerRequest } from './timeLimitedIterativeDeepeningAlphaBetaWorkerHandler';
+import { handleEvaluationPresetComparisonWorkerRequest } from './evaluationPresetComparisonWorkerHandler';
+import type { EvaluationPresetComparisonWorkerRequest } from './evaluationPresetComparisonWorkerProtocol';
 import type {
   TimeLimitedIterativeDeepeningAlphaBetaSearchWorkerRequest,
-  TimeLimitedIterativeDeepeningAlphaBetaSearchWorkerResponse,
 } from './timeLimitedIterativeDeepeningAlphaBetaWorkerProtocol';
 
 self.addEventListener(
   'message',
-  (event: MessageEvent<TimeLimitedIterativeDeepeningAlphaBetaSearchWorkerRequest>) => {
-    const response: TimeLimitedIterativeDeepeningAlphaBetaSearchWorkerResponse =
+  (event: MessageEvent<TimeLimitedIterativeDeepeningAlphaBetaSearchWorkerRequest | EvaluationPresetComparisonWorkerRequest>) => {
+    const response = event.data.type === 'compare-evaluation-presets'
+      ? handleEvaluationPresetComparisonWorkerRequest(event.data) :
       handleTimeLimitedIterativeDeepeningAlphaBetaSearchWorkerRequest(event.data);
     self.postMessage(response);
   }

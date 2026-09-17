@@ -34,6 +34,14 @@ node scripts/verify-evaluation-presets-browser.mjs http://127.0.0.1:4173/Shogi-A
 
 1440px・375px・320pxで3プリセットを実操作し、実Workerの要求・応答、設定の固定、再読み込み時の標準復帰、内訳と最終完了反復の一致、選択欄とパネルの横幅、2手読みAIの設定表示、console warning/errorを検証します。
 
+## 同一局面の3プリセット比較
+
+「3プリセットを比較」で、同じ開始局面を固定深さ3のαβ探索で解析し、標準・駒得重視・玉の安全重視の推奨手、先手基準の評価値、PV、評価内訳、探索統計を並べて確認できます。1つのmodule Worker内で直列実行し、3件の完成後に表示します。
+
+比較は解析専用で、盤面・棋譜へ着手せず、選択プリセットと直前の単独AI結果も保持します。中止や局面変更・読込・分岐・再生で比較結果を破棄します。評価尺度が異なるため強さランキングではなく、値の大小だけで優劣は決められません。同じ推奨手になる場合もあります。
+
+参考性能測定は `npx tsx scripts/measure-evaluation-preset-comparison.ts`、実Workerと1440/375/320px表示のブラウザ検証は既存の外部Playwright環境で `node scripts/verify-evaluation-preset-comparison-browser.mjs <ViteのURL> <証跡の出力先>` を使えます（`PLAYWRIGHT_MODULE` は既存環境のパッケージパス）。実時間はCIの合否条件にしません。
+
 ## Shogi-App JSON Exchange Format
 
 外部アプリとの交換には、研究セッション全体を表す `shogi-app-game-record-session` / `version: 1` を推奨します。これは本譜 `mainline` と兄弟分岐 `branches`、選択中の `selectedRecordId` を含みます。各 `mainline` と `branches[].record` は、単局形式 `shogi-app-game-record` / `version: 1` です。
