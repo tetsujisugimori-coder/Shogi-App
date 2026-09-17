@@ -14,6 +14,7 @@ import {
   evaluateMaterial,
   evaluatePieceSquarePosition,
   evaluateSearchPosition,
+  evaluateSearchPositionBreakdown,
   evaluateUndefendedPieceSafety,
   executeLegalAction,
   getLegalActions,
@@ -26,6 +27,7 @@ import {
   type LegalAction,
   type MaterialValueTable,
   type PieceSquareValueTable,
+  type SearchEvaluationConfig,
 } from '../domain/shogi';
 import {
   orderAlphaBetaNodeActions,
@@ -260,6 +262,24 @@ function replayPrincipalVariation(state: BoardState, principalVariation: readonl
       .toBe(true);
     return execute(replayState, action);
   }, cloneBoardState(state));
+}
+
+function expectEvaluationBreakdownToMatchPrincipalVariation(
+  state: BoardState,
+  result: {
+    selectedEvaluation: number | null;
+    principalVariation: readonly LegalAction[];
+    evaluationBreakdown: ReturnType<typeof evaluateSearchPositionBreakdown>;
+  },
+  evaluation?: SearchEvaluationConfig
+): void {
+  const leaf = replayPrincipalVariation(state, result.principalVariation);
+  const expected = evaluateSearchPositionBreakdown(leaf, state.turn, evaluation);
+
+  expect(result.evaluationBreakdown).toEqual(expected);
+  if (result.selectedEvaluation !== null) {
+    expect(result.selectedEvaluation).toBe(result.evaluationBreakdown.total);
+  }
 }
 
 /**
@@ -757,6 +777,8 @@ describe('時間制限付き反復深化αβ探索', () => {
     expect(result.iterations.map((iteration) => iteration.depth)).toEqual([1, 2]);
     expect(result.selectedAction).toEqual(depthTwo.selectedAction);
     expect(result.selectedEvaluation).toBe(depthTwo.selectedEvaluation);
+    expect(result.evaluationBreakdown).toEqual(depthTwo.evaluationBreakdown);
+    expectEvaluationBreakdownToMatchPrincipalVariation(state, result);
     expect(result.visitedPositionCount).toBe(result.iterations[1].visitedPositionCount);
     expect(result.cutoffCount).toBe(result.iterations[1].cutoffCount);
     expect(result.skippedActionCount).toBe(result.iterations[1].skippedActionCount);
@@ -787,6 +809,8 @@ describe('時間制限付き反復深化αβ探索', () => {
     expect(result.iterations.map((iteration) => iteration.depth)).toEqual([1]);
     expect(result.selectedAction).toEqual(depthOne.selectedAction);
     expect(result.selectedEvaluation).toBe(depthOne.selectedEvaluation);
+    expect(result.evaluationBreakdown).toEqual(depthOne.evaluationBreakdown);
+    expectEvaluationBreakdownToMatchPrincipalVariation(state, result);
     expect(result.visitedPositionCount).toBe(depthOne.visitedPositionCount);
     expect(result.cutoffCount).toBe(depthOne.cutoffCount);
     expect(result.skippedActionCount).toBe(depthOne.skippedActionCount);
@@ -1671,5 +1695,116 @@ describe('再帰型αβ探索の主変化', () => {
     const timeLimited = analyzeTimeLimitedIterativeDeepeningAlphaBetaSearch(state, 3, 1_000, undefined, () => 0);
     expect(timeLimited.principalVariation).toEqual(timeLimited.iterations[2].principalVariation);
     expect(timeLimited.principalVariation).not.toBe(timeLimited.iterations[2].principalVariation);
+  });
+});
+
+describe('再帰型αβ探索のPV末端評価内訳', () => {
+  it('固定深さのscore、PV、内訳を同じ末端局面から返し、入力を変更しない', () => {
+    const state = recaptureTrapState();
+    const evaluation = materialOnlyEvaluation({
+      unpromoted: { pawn: 100, lance: 300, knight: 300, silver: 400, gold: 500, bishop: 800, rook: 1000, king: 0 },
+      promoted: { pawn: 500, lance: 500, knight: 500, silver: 500, bishop: 1000, rook: 1200 },
+    });
+    const stateSnapshot = JSON.stringify(state);
+    const evaluationSnapshot = JSON.stringify(evaluation);
+
+    for (const depth of [1, 3]) {
+      const result = analyzeAlphaBetaSearch(state, depth, evaluation, () => 0);
+
+      expect(result.selectedEvaluation).toBe(result.evaluationBreakdown.total);
+      expectEvaluationBreakdownToMatchPrincipalVariation(state, result, evaluation);
+    }
+
+    expect(JSON.stringify(state)).toBe(stateSnapshot);
+    expect(JSON.stringify(evaluation)).toBe(evaluationSnapshot);
+  });
+
+  it('最大化・最小化の採用候補とαβカットオフ後も、PVと同じ候補の内訳を返す', () => {
+    const maximizing = maximizingNegativeInfinityPrincipalVariationState();
+    const minimizing = minimizingPositiveInfinityPrincipalVariationState();
+    const cutoffState = createState([
+      { row: 8, col: 8, piece: piece('sente-king', 'king', 'sente') },
+      { row: 0, col: 8, piece: piece('gote-king', 'king', 'gote') },
+    ]);
+    const maximizingResult = analyzeAlphaBetaSearch(maximizing, 3);
+    const minimizingResult = analyzeAlphaBetaSearch(minimizing, 2);
+    const cutoffResult = analyzeAlphaBetaSearch(cutoffState, 2);
+
+    expect(maximizingResult.evaluationBreakdown).toMatchObject({
+      total: Number.NEGATIVE_INFINITY,
+      terminal: 'loss',
+    });
+    expect(minimizingResult.evaluationBreakdown).toMatchObject({
+      total: Number.POSITIVE_INFINITY,
+      terminal: 'win',
+    });
+    expect(cutoffResult.cutoffCount).toBeGreaterThanOrEqual(1);
+    expect(cutoffResult.skippedActionCount).toBeGreaterThan(0);
+
+    expectEvaluationBreakdownToMatchPrincipalVariation(maximizing, maximizingResult);
+    expectEvaluationBreakdownToMatchPrincipalVariation(minimizing, minimizingResult);
+    expectEvaluationBreakdownToMatchPrincipalVariation(cutoffState, cutoffResult);
+  });
+
+  it('反復深化と時間制限探索は完了反復だけの対応する内訳を保持する', () => {
+    const state = moveOrderingBenefitState();
+    const iterative = analyzeIterativeDeepeningAlphaBetaSearch(state, 3, undefined, () => 0);
+
+    for (const iteration of iterative.iterations) {
+      expect(iteration.selectedEvaluation).toBe(iteration.evaluationBreakdown.total);
+      expectEvaluationBreakdownToMatchPrincipalVariation(state, iteration);
+    }
+    expect(iterative.evaluationBreakdown).toEqual(iterative.iterations[2].evaluationBreakdown);
+    expect(iterative.evaluationBreakdown).not.toBe(iterative.iterations[2].evaluationBreakdown);
+
+    const depthOne = analyzeAlphaBetaSearch(state, 1, undefined, () => 0);
+    const timedOut = analyzeTimeLimitedIterativeDeepeningAlphaBetaSearch(state, 3, 0, undefined, () => 0);
+
+    expect(timedOut).toMatchObject({ completedDepth: 1, timedOut: true });
+    expect(timedOut.iterations).toHaveLength(1);
+    expect(timedOut.selectedEvaluation).toBe(depthOne.selectedEvaluation);
+    expect(timedOut.principalVariation).toEqual(depthOne.principalVariation);
+    expect(timedOut.evaluationBreakdown).toEqual(depthOne.evaluationBreakdown);
+    expectEvaluationBreakdownToMatchPrincipalVariation(state, timedOut);
+  });
+
+  it('終局の勝ち・負け・引き分けでは空PVでも評価内訳のterminalとtotalを保つ', () => {
+    const base = forcedLossAfterEveryRootActionState();
+    const cases = [
+      {
+        state: {
+          ...base,
+          status: 'ended' as const,
+          result: { winner: 'sente' as const, loser: 'gote' as const, endReason: 'checkmate' as const },
+        },
+        total: Number.POSITIVE_INFINITY,
+        terminal: 'win',
+      },
+      {
+        state: {
+          ...base,
+          status: 'ended' as const,
+          result: { winner: 'gote' as const, loser: 'sente' as const, endReason: 'resignation' as const },
+        },
+        total: Number.NEGATIVE_INFINITY,
+        terminal: 'loss',
+      },
+      {
+        state: {
+          ...base,
+          status: 'ended' as const,
+          result: { winner: null, loser: null, endReason: 'repetition' as const },
+        },
+        total: 0,
+        terminal: 'draw',
+      },
+    ];
+
+    for (const testCase of cases) {
+      const result = analyzeAlphaBetaSearch(testCase.state, 3, undefined, () => 0);
+      expect(result).toMatchObject({ selectedAction: null, selectedEvaluation: null, principalVariation: [] });
+      expect(result.evaluationBreakdown).toMatchObject({ total: testCase.total, terminal: testCase.terminal });
+      expectEvaluationBreakdownToMatchPrincipalVariation(testCase.state, result);
+    }
   });
 });
