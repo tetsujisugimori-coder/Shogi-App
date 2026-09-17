@@ -1,5 +1,26 @@
 # SHOGI-APP 開発ログ
 
+## [2026-09-17] PV末端局面の評価内訳を探索結果とWorkerへ伝播
+
+### 実装と設計判断
+
+- 再帰型αβ探索の内部結果を、数値評価・主変化（PV）・`SearchEvaluationBreakdown`の一組に拡張した。末端と合法手なしの葉では`evaluateSearchPositionBreakdown()`を一度だけ呼び、その`total`を探索値に使うため、同一局面で既存数値APIと内訳APIを重複評価しない。
+- 最大化・最小化・rootの候補採用では、評価値だけでなく候補PVと同じ候補の内訳を同時に採用する。枝刈りで未評価の候補には内訳を作らず、探索後にPVを再生して作り直す経路も加えていない。通常の選択結果では`selectedEvaluation === evaluationBreakdown.total`であり、内訳は開始時のrootPlayer視点でPV末端局面を表す。
+- `analyzeAlphaBetaSearch()`、互換の`analyzeTwoPlyAlphaBetaSearch()`、時間制限なし反復深化、時間制限付き反復深化の公開結果へ`evaluationBreakdown`を追加した。各完了反復と最上位結果は対応するPV・評価値・内訳を持ち、時間切れの未完了反復の内訳は既存の評価値・PV・統計と同様に破棄する。
+- 時間制限付き探索の結果型がそのままWorker成功応答に含まれる既存プロトコルを維持し、プレーンオブジェクトの全内訳項目と`terminal`を構造化クローンでクライアントへ渡す。requestId、1要求1 Worker、AbortSignal、世代不一致時の遅延結果無視、一次確定、エラー処理は変更していない。UIは結果型追従だけで、内訳の表示やAI着手・盤面・棋譜・分岐の挙動は変えていない。
+
+### テスト・性能確認
+
+- `src/test/shogi-two-ply-minimax-ai.test.ts`に、固定深さ1/3のPV再生末端との完全一致、最大化・最小化・αβカットオフ、各反復、時間切れで最後の完了反復だけを採用すること、勝ち・負け・引き分け終局の`terminal`と`total`を追加した。局面と評価設定の不変性も確認する。
+- `src/test/time-limited-iterative-alpha-beta-worker.test.ts`はWorker成功応答の比較対象に内訳を含め、勝ち・負け・引き分けの全項目・`terminal`・`Infinity`/`-Infinity`が`structuredClone()`後も残ることを確認した。既存のUI遅延応答・中止・世代不一致テストは新しい必須結果型を通して継続している。
+- `npm run verify:lock`、`npm run lint`、関連4ファイル102件、`npm run build`、`git diff --check`は成功した。一括`npm test`はVitest起動表示後に終了要約を回収できなかったため成功扱いにせず、実在する全32テストファイルを重複なく4バッチへ分割し、`276 + 205 + 166 + 327 = 974`件を終了要約付きで成功確認した。第2バッチの`Not implemented: navigation to another Document`は既存jsdom通知で終了コード0だった。
+- 初期局面・固定深さ3は、既存基準どおり選択手`6,2 -> 5,2`、評価214、PV、`visitedPositionCount: 1244`、`cutoffCount: 80`、`skippedActionCount: 2565`を維持した。3回のウォームアップ後11回の参考測定は中央値79.127 ms（範囲76.786–85.834 ms）で、PR #94後に記録した同一局面の参考中央値78.843 msとの差は+0.284 msだった。短時間測定のためCI閾値にはしない。
+
+### 今回見送った項目と次の候補
+
+- 評価内訳の結果パネル表示、文言・表・グラフ、評価項目・重み・プリセット、SEE、静止／詰み探索、可動性、置換表・局面間キャッシュ・Workerプール、探索深さ・制限時間・ルール・棋譜・分岐・JSON/KIF形式、`Infinity`のJSON変換、新規依存は追加していない。
+- 次の候補は、選択されたPV末端局面の評価内訳を結果パネルへ表示することである。
+
 ## [2026-09-17] 局面評価の内訳取得基盤
 
 ### 実装と設計判断

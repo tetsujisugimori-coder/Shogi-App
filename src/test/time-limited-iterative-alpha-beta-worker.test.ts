@@ -35,6 +35,7 @@ function comparableResult(result: TimeLimitedIterativeDeepeningAlphaBetaSearchRe
     selectedAction: result.selectedAction,
     selectedEvaluation: result.selectedEvaluation,
     principalVariation: result.principalVariation,
+    evaluationBreakdown: result.evaluationBreakdown,
     requestedMaxDepth: result.requestedMaxDepth,
     completedDepth: result.completedDepth,
     timedOut: result.timedOut,
@@ -156,6 +157,58 @@ describe('時間制限付き反復深化αβ探索Workerの純粋処理', () => 
       positive.result.selectedEvaluation).toBe(Number.POSITIVE_INFINITY);
     expect(negative.type === 'time-limited-iterative-deepening-alpha-beta-search-succeeded' &&
       negative.result.selectedEvaluation).toBe(Number.NEGATIVE_INFINITY);
+  });
+
+  it('終局の全評価内訳とterminalをWorker応答でも構造化クローンのまま保持する', () => {
+    const base = createInitialBoardState();
+    const cases = [
+      {
+        state: {
+          ...base,
+          status: 'ended' as const,
+          result: { winner: 'sente' as const, loser: 'gote' as const, endReason: 'checkmate' as const },
+        },
+        total: Number.POSITIVE_INFINITY,
+        terminal: 'win' as const,
+      },
+      {
+        state: {
+          ...base,
+          status: 'ended' as const,
+          result: { winner: 'gote' as const, loser: 'sente' as const, endReason: 'resignation' as const },
+        },
+        total: Number.NEGATIVE_INFINITY,
+        terminal: 'loss' as const,
+      },
+      {
+        state: {
+          ...base,
+          status: 'ended' as const,
+          result: { winner: null, loser: null, endReason: 'repetition' as const },
+        },
+        total: 0,
+        terminal: 'draw' as const,
+      },
+    ];
+
+    for (const testCase of cases) {
+      const response = handleTimeLimitedIterativeDeepeningAlphaBetaSearchWorkerRequest(
+        request({ state: testCase.state })
+      );
+
+      expect(response.type).toBe('time-limited-iterative-deepening-alpha-beta-search-succeeded');
+      if (response.type !== 'time-limited-iterative-deepening-alpha-beta-search-succeeded') continue;
+      expect(response.result.evaluationBreakdown).toEqual({
+        total: testCase.total,
+        material: 0,
+        pieceSquare: 0,
+        kingSafety: 0,
+        undefendedPieceSafety: 0,
+        terminal: testCase.terminal,
+      });
+      expect(response.result.iterations[0].evaluationBreakdown).toEqual(response.result.evaluationBreakdown);
+      expect(structuredClone(response)).toEqual(response);
+    }
   });
 });
 

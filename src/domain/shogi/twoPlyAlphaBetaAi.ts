@@ -9,9 +9,10 @@ import {
 } from './materialEvaluation';
 import { cloneBoardState } from './replay';
 import {
-  evaluateSearchPosition,
+  evaluateSearchPositionBreakdown,
   type SearchClock,
   type SearchEvaluationConfig,
+  type SearchEvaluationBreakdown,
 } from './twoPlyMinimaxAi';
 
 /** The existing AI entry point remains a two-ply search by default. */
@@ -31,6 +32,12 @@ export interface AlphaBetaSearchResult {
   selectedEvaluation: number | null;
   /** The explored best line, starting with `selectedAction` when present. */
   principalVariation: LegalAction[];
+  /**
+   * Evaluation of the leaf reached by `principalVariation`, from the root
+   * player's perspective. It is carried from the evaluated search leaf rather
+   * than recomputed by replaying the variation after the search.
+   */
+  evaluationBreakdown: SearchEvaluationBreakdown;
   rootLegalActionCount: number;
   visitedPositionCount: number;
   depth: number;
@@ -73,6 +80,7 @@ export interface TwoPlyAlphaBetaSearchResult {
   selectedAction: LegalAction | null;
   selectedEvaluation: number | null;
   principalVariation: LegalAction[];
+  evaluationBreakdown: SearchEvaluationBreakdown;
   rootLegalActionCount: number;
   visitedPositionCount: number;
   depth: typeof TWO_PLY_ALPHA_BETA_SEARCH_DEPTH;
@@ -177,6 +185,12 @@ function clonePrincipalVariation(actions: readonly LegalAction[]): LegalAction[]
   return actions.map(cloneLegalAction);
 }
 
+function cloneSearchEvaluationBreakdown(
+  evaluationBreakdown: SearchEvaluationBreakdown
+): SearchEvaluationBreakdown {
+  return { ...evaluationBreakdown };
+}
+
 /**
  * Returns a new, deterministic order for actions at non-root alpha-beta
  * nodes. Captures and promotions are classified from the current position;
@@ -236,6 +250,7 @@ export function orderIterativeDeepeningRootActions(
 interface SearchNodeResult {
   evaluation: number;
   principalVariation: LegalAction[];
+  evaluationBreakdown: SearchEvaluationBreakdown;
 }
 
 function searchAlphaBetaNode(
@@ -251,9 +266,11 @@ function searchAlphaBetaNode(
 ): SearchNodeResult {
   interruptionCheck?.();
   if (state.status === 'ended' || remainingDepth === 0) {
+    const evaluationBreakdown = evaluateSearchPositionBreakdown(state, rootPlayer, valueTable);
     return {
-      evaluation: evaluateSearchPosition(state, rootPlayer, valueTable),
+      evaluation: evaluationBreakdown.total,
       principalVariation: [],
+      evaluationBreakdown,
     };
   }
 
@@ -262,14 +279,17 @@ function searchAlphaBetaNode(
   // rules. Treat a malformed in-progress position as a leaf as well, rather
   // than recursing forever or throwing after a valid API result of [].
   if (actions.length === 0) {
+    const evaluationBreakdown = evaluateSearchPositionBreakdown(state, rootPlayer, valueTable);
     return {
-      evaluation: evaluateSearchPosition(state, rootPlayer, valueTable),
+      evaluation: evaluationBreakdown.total,
       principalVariation: [],
+      evaluationBreakdown,
     };
   }
 
   let value = isMaximizing ? Number.NEGATIVE_INFINITY : Number.POSITIVE_INFINITY;
   let principalVariation: LegalAction[] = [];
+  let evaluationBreakdown: SearchEvaluationBreakdown | null = null;
   let hasExploredAction = false;
   for (let actionIndex = 0; actionIndex < actions.length; actionIndex += 1) {
     interruptionCheck?.();
@@ -297,6 +317,7 @@ function searchAlphaBetaNode(
     if (adoptsCandidate) {
       value = childResult.evaluation;
       principalVariation = candidatePrincipalVariation;
+      evaluationBreakdown = childResult.evaluationBreakdown;
     }
     hasExploredAction = true;
 
@@ -313,7 +334,10 @@ function searchAlphaBetaNode(
       break;
     }
   }
-  return { evaluation: value, principalVariation };
+  if (evaluationBreakdown === null) {
+    throw new Error('Alpha-beta search explored no actions at a non-leaf node.');
+  }
+  return { evaluation: value, principalVariation, evaluationBreakdown };
 }
 
 type UnmeasuredAlphaBetaSearchResult = Omit<AlphaBetaSearchResult, 'elapsedMilliseconds'>;
@@ -339,10 +363,12 @@ function searchAlphaBeta(
   };
 
   if (depth === 0) {
+    const evaluationBreakdown = evaluateSearchPositionBreakdown(state, rootPlayer, valueTable);
     return {
       selectedAction: null,
-      selectedEvaluation: evaluateSearchPosition(state, rootPlayer, valueTable),
+      selectedEvaluation: evaluationBreakdown.total,
       principalVariation: [],
+      evaluationBreakdown,
       rootLegalActionCount: 0,
       depth,
       ...statistics,
@@ -350,6 +376,18 @@ function searchAlphaBeta(
   }
 
   const rootActions = getLegalActions(state);
+  if (rootActions.length === 0) {
+    const evaluationBreakdown = evaluateSearchPositionBreakdown(state, rootPlayer, valueTable);
+    return {
+      selectedAction: null,
+      selectedEvaluation: null,
+      principalVariation: [],
+      evaluationBreakdown,
+      rootLegalActionCount: 0,
+      depth,
+      ...statistics,
+    };
+  }
   const orderedRootActions = orderIterativeDeepeningRootActions(state, rootActions, previousBestAction);
   const indexedRootActions = orderedRootActions.map((action) => ({
     action,
@@ -359,6 +397,7 @@ function searchAlphaBeta(
   let bestOriginalIndex = Number.POSITIVE_INFINITY;
   let bestEvaluation = Number.NEGATIVE_INFINITY;
   let bestPrincipalVariation: LegalAction[] = [];
+  let bestEvaluationBreakdown: SearchEvaluationBreakdown | null = null;
   let alpha = Number.NEGATIVE_INFINITY;
   const beta = Number.POSITIVE_INFINITY;
 
@@ -409,14 +448,20 @@ function searchAlphaBeta(
         cloneLegalAction(rootAction),
         ...clonePrincipalVariation(candidateResult.principalVariation),
       ];
+      bestEvaluationBreakdown = candidateResult.evaluationBreakdown;
     }
     if (bestEvaluation > alpha) alpha = bestEvaluation;
+  }
+
+  if (bestEvaluationBreakdown === null) {
+    throw new Error('Alpha-beta search explored no root actions.');
   }
 
   return {
     selectedAction: bestAction,
     selectedEvaluation: bestAction === null ? null : bestEvaluation,
     principalVariation: clonePrincipalVariation(bestPrincipalVariation),
+    evaluationBreakdown: cloneSearchEvaluationBreakdown(bestEvaluationBreakdown),
     rootLegalActionCount: rootActions.length,
     depth,
     ...statistics,
@@ -442,6 +487,7 @@ export function analyzeAlphaBetaSearch(
   return {
     ...searchResult,
     principalVariation: clonePrincipalVariation(searchResult.principalVariation),
+    evaluationBreakdown: cloneSearchEvaluationBreakdown(searchResult.evaluationBreakdown),
     elapsedMilliseconds: Math.max(0, clock() - startedAt),
   };
 }
@@ -468,6 +514,7 @@ export function analyzeIterativeDeepeningAlphaBetaSearch(
     const iteration = {
       ...searchResult,
       principalVariation: clonePrincipalVariation(searchResult.principalVariation),
+      evaluationBreakdown: cloneSearchEvaluationBreakdown(searchResult.evaluationBreakdown),
       elapsedMilliseconds: Math.max(0, clock() - iterationStartedAt),
     };
     iterations.push(iteration);
@@ -478,6 +525,7 @@ export function analyzeIterativeDeepeningAlphaBetaSearch(
   return {
     ...deepestIteration,
     principalVariation: clonePrincipalVariation(deepestIteration.principalVariation),
+    evaluationBreakdown: cloneSearchEvaluationBreakdown(deepestIteration.evaluationBreakdown),
     elapsedMilliseconds: Math.max(0, clock() - startedAt),
     iterations,
     totalVisitedPositionCount: iterations.reduce(
@@ -537,6 +585,7 @@ export function analyzeTimeLimitedIterativeDeepeningAlphaBetaSearch(
       const iteration = {
         ...searchResult,
         principalVariation: clonePrincipalVariation(searchResult.principalVariation),
+        evaluationBreakdown: cloneSearchEvaluationBreakdown(searchResult.evaluationBreakdown),
         elapsedMilliseconds: Math.max(0, iterationFinishedAt - iterationStartedAt),
       };
       iterations.push(iteration);
@@ -554,6 +603,7 @@ export function analyzeTimeLimitedIterativeDeepeningAlphaBetaSearch(
   return {
     ...deepestIteration,
     principalVariation: clonePrincipalVariation(deepestIteration.principalVariation),
+    evaluationBreakdown: cloneSearchEvaluationBreakdown(deepestIteration.evaluationBreakdown),
     elapsedMilliseconds: Math.max(0, clock() - startedAt),
     requestedMaxDepth: maxDepth,
     completedDepth: deepestIteration.depth,
@@ -604,6 +654,7 @@ export function analyzeTwoPlyAlphaBetaSearch(
     selectedAction: result.selectedAction,
     selectedEvaluation: result.selectedEvaluation,
     principalVariation: clonePrincipalVariation(result.principalVariation),
+    evaluationBreakdown: cloneSearchEvaluationBreakdown(result.evaluationBreakdown),
     rootLegalActionCount: result.rootLegalActionCount,
     visitedPositionCount: result.visitedPositionCount,
     depth: TWO_PLY_ALPHA_BETA_SEARCH_DEPTH,
