@@ -25,8 +25,10 @@ describe('AI思考結果パネル', () => {
 
     await user.click(screen.getByRole('button', { name: '2手読みAIに指させる' }));
     const firstPanel = searchPanel();
-    expect(within(firstPanel).getByText('選択手')).toBeInTheDocument();
-    expect(within(firstPanel).getByText('評価値')).toBeInTheDocument();
+    await user.click(screen.getByText('AIの判断'));
+    expect(screen.getByText('推奨手')).toBeVisible();
+    expect(screen.getByText('評価値')).toBeVisible();
+    expect(screen.getByText('内訳合計')).toBeVisible();
     expect(within(firstPanel).getByText('合法手数')).toBeInTheDocument();
     expect(within(firstPanel).getByText('調査局面数')).toBeInTheDocument();
     expect(within(firstPanel).getByText('読みの深さ')).toBeInTheDocument();

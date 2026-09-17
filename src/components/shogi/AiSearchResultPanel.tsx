@@ -3,15 +3,20 @@ import type {
   TwoPlyMinimaxSearchResult,
 } from '../../domain/shogi';
 
+import type { Player } from '../../types/shogi';
+import { formatSenteEvaluation } from './searchEvaluationDisplay';
+
 export type AiSearchDisplay =
   | {
       kind: 'two-ply';
+      perspective: Player;
       result: TwoPlyMinimaxSearchResult;
       selectedNotation: string;
       candidateNotations: readonly string[];
     }
   | {
       kind: 'time-limited-worker';
+      perspective: Player;
       result: TimeLimitedIterativeDeepeningAlphaBetaSearchResult;
       selectedNotation: string;
       principalVariationNotations: readonly string[];
@@ -21,17 +26,10 @@ interface AiSearchResultPanelProps {
   search: AiSearchDisplay;
 }
 
-function formatEvaluation(evaluation: number | null): string {
-  if (evaluation === null) return '該当なし';
-  if (evaluation === Number.POSITIVE_INFINITY) return '+∞';
-  if (evaluation === Number.NEGATIVE_INFINITY) return '-∞';
-  return String(evaluation);
-}
-
 /** A compact presentation of the latest synchronous or Worker AI search. */
 export function AiSearchResultPanel({ search }: AiSearchResultPanelProps) {
   if (search.kind === 'time-limited-worker') {
-    const { result, selectedNotation, principalVariationNotations } = search;
+    const { result } = search;
     return (
       <section
         aria-labelledby="ai-search-result-title"
@@ -41,11 +39,7 @@ export function AiSearchResultPanel({ search }: AiSearchResultPanelProps) {
           AI思考結果
         </h2>
         <p className="mt-1 text-xs text-stone-300">時間制限付き反復深化αβ探索</p>
-        <dl className="mt-2 grid grid-cols-[auto_1fr] gap-x-3 gap-y-1 text-xs">
-          <dt className="text-stone-400">選択手</dt>
-          <dd className="min-w-0 break-words text-sky-100">{selectedNotation}</dd>
-          <dt className="text-stone-400">評価値</dt>
-          <dd className="text-sky-100">{formatEvaluation(result.selectedEvaluation)}</dd>
+        <dl className="mt-2 grid grid-cols-[minmax(0,2fr)_minmax(0,1fr)] gap-x-3 gap-y-1 text-xs">
           <dt className="text-stone-400">完了深さ</dt>
           <dd className="text-sky-100">{result.completedDepth}</dd>
           <dt className="text-stone-400">指定最大深さ</dt>
@@ -65,22 +59,11 @@ export function AiSearchResultPanel({ search }: AiSearchResultPanelProps) {
           <dt className="text-stone-400">全反復合計の未調査候補手数</dt>
           <dd className="text-sky-100">{result.totalSkippedActionCount}</dd>
         </dl>
-        <div className="mt-3 min-w-0 border-t border-sky-900/80 pt-2">
-          <h3 className="text-xs font-medium text-stone-300">AIの読み筋</h3>
-          <p className="mt-1 text-xs text-stone-400">
-            完了深さ {result.completedDepth} ply 中 {principalVariationNotations.length} 手順
-          </p>
-          <ol className="mt-1 list-decimal space-y-1 break-words pl-5 text-xs text-sky-100">
-            {principalVariationNotations.map((notation, index) => (
-              <li key={`${index + 1}-${notation}`} className="min-w-0 break-words">{notation}</li>
-            ))}
-          </ol>
-        </div>
       </section>
     );
   }
 
-  const { result, selectedNotation, candidateNotations } = search;
+  const { result, candidateNotations } = search;
   return (
     <section
       aria-labelledby="ai-search-result-title"
@@ -89,11 +72,7 @@ export function AiSearchResultPanel({ search }: AiSearchResultPanelProps) {
       <h2 id="ai-search-result-title" className="font-serif text-sm tracking-[0.12em] text-violet-100">
         AI思考結果
       </h2>
-      <dl className="mt-2 grid grid-cols-[auto_1fr] gap-x-3 gap-y-1 text-xs">
-        <dt className="text-stone-400">選択手</dt>
-        <dd className="min-w-0 break-words text-violet-100">{selectedNotation}</dd>
-        <dt className="text-stone-400">評価値</dt>
-        <dd className="text-violet-100">{formatEvaluation(result.selectedEvaluation)}</dd>
+      <dl className="mt-2 grid grid-cols-[minmax(0,2fr)_minmax(0,1fr)] gap-x-3 gap-y-1 text-xs">
         <dt className="text-stone-400">合法手数</dt>
         <dd className="text-violet-100">{result.rootLegalActionCount}</dd>
         <dt className="text-stone-400">調査局面数</dt>
@@ -105,11 +84,12 @@ export function AiSearchResultPanel({ search }: AiSearchResultPanelProps) {
       </dl>
       <div className="mt-3 border-t border-violet-900/80 pt-2">
         <h3 className="text-xs font-medium text-stone-300">上位候補手</h3>
+        <p className="mt-1 text-xs text-stone-400">先手基準：＋は先手有利、−は後手有利</p>
         <ol className="mt-1 space-y-1 text-xs text-violet-100">
           {result.topCandidates.map((candidate, index) => (
-            <li key={`${candidateNotations[index]}-${index}`} className="flex justify-between gap-3">
+            <li key={`${candidateNotations[index]}-${index}`} className="flex flex-wrap justify-between gap-3 break-words">
               <span>{candidateNotations[index]}</span>
-              <span>{formatEvaluation(candidate.evaluation)}</span>
+              <span>先手 {formatSenteEvaluation(candidate.evaluation, search.perspective)}</span>
             </li>
           ))}
         </ol>

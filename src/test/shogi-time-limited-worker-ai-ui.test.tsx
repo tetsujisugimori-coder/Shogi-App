@@ -11,7 +11,7 @@ import {
   type LegalAction,
   type TimeLimitedIterativeDeepeningAlphaBetaSearchResult,
 } from '../domain/shogi';
-import { createInitialBoardState } from '../types/shogi';
+import { createInitialBoardState, type BoardState } from '../types/shogi';
 import { TimeLimitedIterativeDeepeningAlphaBetaSearchWorkerAbortError } from
   '../application/timeLimitedIterativeDeepeningAlphaBetaWorkerClient';
 
@@ -112,6 +112,66 @@ function createFourMoveState() {
 }
 
 describe('時間制限Worker AIの盤面UI接続', () => {
+  it('別局面の新探索が完了してから届く旧内訳で表示や符号が巻き戻らない', async () => {
+    const user = userEvent.setup();
+    const old = deferred<TimeLimitedIterativeDeepeningAlphaBetaSearchResult>();
+    const current = deferred<TimeLimitedIterativeDeepeningAlphaBetaSearchResult>();
+    const runner = vi.fn<(state: BoardState) => Promise<TimeLimitedIterativeDeepeningAlphaBetaSearchResult>>().mockReturnValueOnce(old.promise).mockReturnValueOnce(current.promise);
+    render(<ShogiResearchScreen workerSearchRunner={runner} />);
+    await user.click(screen.getByText('AIの判断'));
+    await user.click(workerButton());
+    await user.click(screen.getByRole('button', { name: '思考を中止' }));
+    await user.click(screen.getByRole('gridcell', { name: '7筋 7段、先手の歩兵' }));
+    await user.click(screen.getByRole('gridcell', { name: '7筋 6段、空のマス、移動可能' }));
+    await user.click(workerButton());
+    expect(screen.getByText('解析中')).toBeVisible();
+    const searchState = runner.mock.calls[1][0];
+    expect(searchState.turn).toBe('gote');
+    const fresh = workerResult(getLegalActions(searchState)[0]);
+    fresh.selectedEvaluation = 85;
+    fresh.evaluationBreakdown = { total: 85, material: 100, pieceSquare: 20, kingSafety: -5, undefendedPieceSafety: -30, terminal: null };
+    await act(async () => current.resolve(fresh));
+    expect(screen.getAllByText('先手 -85')).toHaveLength(2);
+    expect(screen.getByText('+30')).toBeVisible();
+    await act(async () => old.resolve(workerResult(initialAction())));
+    expect(screen.getAllByText('先手 -85')).toHaveLength(2);
+    expect(screen.queryByText('先手 +42')).not.toBeInTheDocument();
+    expect(document.getElementById('shogi-research-screen')).toHaveAttribute('data-history-count', '2');
+  });
+
+  it.each(['cancel', 'error'] as const)('新探索開始と%s後に前局面の内訳を残さない', async (outcome) => {
+    const user = userEvent.setup();
+    const pending = deferred<TimeLimitedIterativeDeepeningAlphaBetaSearchResult>();
+    const runner = vi.fn().mockResolvedValueOnce(workerResult(initialAction())).mockReturnValueOnce(pending.promise);
+    render(<ShogiResearchScreen workerSearchRunner={runner} />);
+    await user.click(screen.getByText('AIの判断'));
+    await user.click(workerButton());
+    expect(screen.getAllByText('先手 +42')).toHaveLength(2);
+    await user.click(workerButton());
+    expect(screen.queryByText('先手 +42')).not.toBeInTheDocument();
+    expect(screen.getByText('解析中')).toBeVisible();
+    if (outcome === 'cancel') await user.click(screen.getByRole('button', { name: '思考を中止' }));
+    else await act(async () => pending.reject(new Error('failure')));
+    expect(screen.queryByText('内訳合計')).not.toBeInTheDocument();
+    expect(screen.getByText('AIの探索結果はまだありません。')).toBeVisible();
+  });
+
+  it('通常着手と棋譜再生でも前局面の内訳を破棄する', async () => {
+    const user = userEvent.setup();
+    const runner = vi.fn(async (state: BoardState) => workerResult(getLegalActions(state)[0]));
+    render(<ShogiResearchScreen workerSearchRunner={runner} />);
+    await user.click(screen.getByText('AIの判断'));
+    await user.click(workerButton());
+    expect(screen.getByText('内訳合計')).toBeVisible();
+    await user.click(screen.getByRole('gridcell', { name: '3筋 3段、後手の歩兵' }));
+    await user.click(screen.getByRole('gridcell', { name: '3筋 4段、空のマス、移動可能' }));
+    expect(screen.queryByText('内訳合計')).not.toBeInTheDocument();
+    await user.click(workerButton());
+    expect(screen.getByText('内訳合計')).toBeVisible();
+    await user.click(screen.getByRole('button', { name: '初期局面' }));
+    expect(screen.queryByText('内訳合計')).not.toBeInTheDocument();
+  });
+
   it('Worker探索を一度だけ開始し、思考中は重複開始と盤面操作を止める', async () => {
     const user = userEvent.setup();
     const pending = deferred<TimeLimitedIterativeDeepeningAlphaBetaSearchResult>();
@@ -167,9 +227,11 @@ describe('時間制限Worker AIの盤面UI接続', () => {
 
     const panel = screen.getByRole('heading', { name: 'AI思考結果' }).closest('section');
     if (!panel) throw new Error('Worker AI search result panel not found.');
-    expect(within(panel).getByRole('heading', { name: 'AIの読み筋' })).toBeInTheDocument();
-    expect(within(panel).getByText('完了深さ 3 ply 中 2 手順')).toBeInTheDocument();
-    expect(within(panel).getAllByRole('listitem')).toHaveLength(2);
+    await user.click(screen.getByText('AIの判断'));
+    const judgment = screen.getByText('AIの判断').closest('details')!;
+    expect(within(judgment).getByRole('heading', { name: 'AIの読み筋' })).toBeInTheDocument();
+    expect(within(judgment).getByText('完了深さ 3 ply 中 2 手順')).toBeInTheDocument();
+    expect(within(judgment).getAllByRole('listitem')).toHaveLength(2);
     expect(document.getElementById('shogi-research-screen')).toHaveAttribute('data-history-count', '1');
   });
 

@@ -1,7 +1,11 @@
 import { describe, expect, it } from 'vitest';
 import {
   analyzeAlphaBetaSearch,
+  analyzeTwoPlyMinimaxSearch,
   cloneBoardSquares,
+  cloneBoardState,
+  executeLegalAction,
+  getLegalActions,
   evaluateKingSafety,
   evaluateMaterial,
   evaluatePieceSquarePosition,
@@ -51,6 +55,31 @@ const VALUE_TABLE: MaterialValueTable = {
 };
 
 describe('探索局面評価の内訳', () => {
+  it.each(['sente', 'gote'] as const)('2手読みは採用手への最悪応手の既存内訳をそのまま返す: %s', (turn) => {
+    const state = createState([
+      { row: 8, col: 4, piece: piece('sente-king', 'king', 'sente') },
+      { row: 0, col: 4, piece: piece('gote-king', 'king', 'gote') },
+      { row: 4, col: 4, piece: piece('sente-rook', 'rook', 'sente') },
+      { row: 4, col: 5, piece: piece('gote-silver', 'silver', 'gote') },
+    ], { turn });
+    const snapshot = structuredClone(state);
+    const result = analyzeTwoPlyMinimaxSearch(state);
+    expect(result.selectedAction).not.toBeNull();
+    const after = executeLegalAction(cloneBoardState(state), result.selectedAction!);
+    if (after.type !== 'applied') throw new Error('Selected action must be legal.');
+    const leaves = after.state.status === 'ended' ? [after.state] : getLegalActions(after.state).map((reply) => {
+      const execution = executeLegalAction(cloneBoardState(after.state), reply);
+      if (execution.type !== 'applied') throw new Error('Reply must be legal.');
+      return execution.state;
+    });
+    const evaluations = leaves.map((leaf) => evaluateSearchPositionBreakdown(leaf, turn));
+    const worst = evaluations.reduce((a, b) => b.total < a.total ? b : a);
+    expect(result.evaluationBreakdown).toEqual(worst);
+    expect(result.selectedEvaluation).toBe(worst.total);
+    expect(worst.total).toBe(worst.material + worst.pieceSquare + worst.kingSafety + worst.undefendedPieceSafety);
+    expect(state).toEqual(snapshot);
+  });
+
   it('非終局の4項目、合計、既存数値API、および視点反転を同じ評価経路で返す', () => {
     const state = createState([
       { row: 8, col: 4, piece: piece('sente-king', 'king', 'sente') },
