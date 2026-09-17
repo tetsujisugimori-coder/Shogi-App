@@ -1,3 +1,5 @@
+import type { PresetTimeLimitedSearchResult } from '../workers/timeLimitedIterativeDeepeningAlphaBetaWorkerProtocol';
+import { DEFAULT_SEARCH_EVALUATION_PRESET_ID } from '../domain/shogi/searchEvaluationPresets';
 import React from 'react';
 import { act, render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
@@ -9,7 +11,6 @@ import {
   getLegalActions,
   serializeShogiGameRecordV1,
   type LegalAction,
-  type TimeLimitedIterativeDeepeningAlphaBetaSearchResult,
 } from '../domain/shogi';
 import { createInitialBoardState, type BoardState } from '../types/shogi';
 import { TimeLimitedIterativeDeepeningAlphaBetaSearchWorkerAbortError } from
@@ -33,7 +34,7 @@ function deferred<T>(): Deferred<T> {
   return { promise, resolve, reject };
 }
 
-function workerResult(selectedAction: LegalAction | null): TimeLimitedIterativeDeepeningAlphaBetaSearchResult {
+function workerResult(selectedAction: LegalAction | null): PresetTimeLimitedSearchResult {
   const iteration = {
     selectedAction,
     selectedEvaluation: 42,
@@ -56,6 +57,7 @@ function workerResult(selectedAction: LegalAction | null): TimeLimitedIterativeD
 
   return {
     ...iteration,
+    evaluationPresetId: DEFAULT_SEARCH_EVALUATION_PRESET_ID,
     iterations: [iteration],
     totalVisitedPositionCount: 220,
     totalCutoffCount: 14,
@@ -112,11 +114,68 @@ function createFourMoveState() {
 }
 
 describe('時間制限Worker AIの盤面UI接続', () => {
+  it('設定を開始時に固定し、変更後の次回探索と結果表示へ反映する', async () => {
+    const user = userEvent.setup();
+    const first = deferred<PresetTimeLimitedSearchResult>();
+    const second = deferred<PresetTimeLimitedSearchResult>();
+    const runner = vi.fn().mockReturnValueOnce(first.promise).mockReturnValueOnce(second.promise);
+    render(<ShogiResearchScreen workerSearchRunner={runner} />);
+    const select = screen.getByRole('combobox', { name: '評価プリセット' });
+    expect(select).toHaveValue('standard');
+    expect(screen.getByText('現在の基本評価を使用します。')).toBeVisible();
+    await user.selectOptions(select, 'material-focused');
+    await user.click(screen.getByText('AIの判断'));
+    await user.click(workerButton());
+    expect(select).toBeDisabled();
+    expect(runner).toHaveBeenLastCalledWith(expect.anything(), 4, 1000, expect.any(AbortSignal), 'material-focused');
+    await user.selectOptions(select, 'king-safety-focused');
+    expect(select).toHaveValue('material-focused');
+    await act(async () => first.resolve({ ...workerResult(initialAction()), evaluationPresetId: 'material-focused' }));
+    expect(screen.getByText('評価設定: 駒得重視')).toBeVisible();
+    expect(select).toBeEnabled();
+    await user.selectOptions(select, 'king-safety-focused');
+    expect(screen.getByText('評価設定: 駒得重視')).toBeVisible();
+    await user.click(workerButton());
+    expect(runner).toHaveBeenLastCalledWith(expect.anything(), 4, 1000, expect.any(AbortSignal), 'king-safety-focused');
+    expect(screen.queryByText('評価設定: 駒得重視')).not.toBeInTheDocument();
+    const state = runner.mock.calls[1][0] as BoardState;
+    await act(async () => second.resolve({ ...workerResult(getLegalActions(state)[0]), evaluationPresetId: 'king-safety-focused' }));
+    expect(screen.getByText('評価設定: 玉の安全重視')).toBeVisible();
+    expect(screen.getAllByText('先手 -42')).toHaveLength(2);
+  });
+
+  it('中止後の古い設定付き応答は新しい結果のプリセットを巻き戻さない', async () => {
+    const user = userEvent.setup();
+    const old = deferred<PresetTimeLimitedSearchResult>();
+    const fresh = deferred<PresetTimeLimitedSearchResult>();
+    const runner = vi.fn().mockReturnValueOnce(old.promise).mockReturnValueOnce(fresh.promise);
+    render(<ShogiResearchScreen workerSearchRunner={runner} />);
+    const select = screen.getByRole('combobox', { name: '評価プリセット' });
+    await user.click(screen.getByText('AIの判断'));
+    await user.click(workerButton());
+    await user.click(screen.getByRole('button', { name: '思考を中止' }));
+    await user.selectOptions(select, 'king-safety-focused');
+    await user.click(workerButton());
+    await act(async () => fresh.resolve({ ...workerResult(initialAction()), evaluationPresetId: 'king-safety-focused' }));
+    await act(async () => old.resolve(workerResult(initialAction())));
+    expect(screen.getByText('評価設定: 玉の安全重視')).toBeVisible();
+    expect(screen.queryByText('評価設定: 標準')).not.toBeInTheDocument();
+  });
+
+  it('要求と異なるプリセットを持つ結果は着手にも表示にも採用しない', async () => {
+    const user = userEvent.setup();
+    const runner = vi.fn().mockResolvedValue({ ...workerResult(initialAction()), evaluationPresetId: 'material-focused' });
+    render(<ShogiResearchScreen workerSearchRunner={runner} />);
+    await user.click(workerButton());
+    expect(await screen.findByRole('alert')).toHaveTextContent('AIの評価設定が探索要求と一致しません。');
+    expect(screen.getByRole('gridcell', { name: '9筋 7段、先手の歩兵' })).toBeInTheDocument();
+    expect(screen.queryByText('評価設定: 駒得重視')).not.toBeInTheDocument();
+  });
   it('別局面の新探索が完了してから届く旧内訳で表示や符号が巻き戻らない', async () => {
     const user = userEvent.setup();
-    const old = deferred<TimeLimitedIterativeDeepeningAlphaBetaSearchResult>();
-    const current = deferred<TimeLimitedIterativeDeepeningAlphaBetaSearchResult>();
-    const runner = vi.fn<(state: BoardState) => Promise<TimeLimitedIterativeDeepeningAlphaBetaSearchResult>>().mockReturnValueOnce(old.promise).mockReturnValueOnce(current.promise);
+    const old = deferred<PresetTimeLimitedSearchResult>();
+    const current = deferred<PresetTimeLimitedSearchResult>();
+    const runner = vi.fn<(state: BoardState) => Promise<PresetTimeLimitedSearchResult>>().mockReturnValueOnce(old.promise).mockReturnValueOnce(current.promise);
     render(<ShogiResearchScreen workerSearchRunner={runner} />);
     await user.click(screen.getByText('AIの判断'));
     await user.click(workerButton());
@@ -141,7 +200,7 @@ describe('時間制限Worker AIの盤面UI接続', () => {
 
   it.each(['cancel', 'error'] as const)('新探索開始と%s後に前局面の内訳を残さない', async (outcome) => {
     const user = userEvent.setup();
-    const pending = deferred<TimeLimitedIterativeDeepeningAlphaBetaSearchResult>();
+    const pending = deferred<PresetTimeLimitedSearchResult>();
     const runner = vi.fn().mockResolvedValueOnce(workerResult(initialAction())).mockReturnValueOnce(pending.promise);
     render(<ShogiResearchScreen workerSearchRunner={runner} />);
     await user.click(screen.getByText('AIの判断'));
@@ -174,7 +233,7 @@ describe('時間制限Worker AIの盤面UI接続', () => {
 
   it('Worker探索を一度だけ開始し、思考中は重複開始と盤面操作を止める', async () => {
     const user = userEvent.setup();
-    const pending = deferred<TimeLimitedIterativeDeepeningAlphaBetaSearchResult>();
+    const pending = deferred<PresetTimeLimitedSearchResult>();
     const runner = vi.fn(() => pending.promise);
     render(<ShogiResearchScreen workerSearchRunner={runner} />);
 
@@ -183,14 +242,14 @@ describe('時間制限Worker AIの盤面UI接続', () => {
     await user.click(screen.getByRole('gridcell', { name: '7筋 7段、先手の歩兵' }));
 
     expect(runner).toHaveBeenCalledTimes(1);
-    expect(runner).toHaveBeenCalledWith(expect.anything(), 4, 1_000, expect.any(AbortSignal));
+    expect(runner).toHaveBeenCalledWith(expect.anything(), 4, 1_000, expect.any(AbortSignal), DEFAULT_SEARCH_EVALUATION_PRESET_ID);
     expect(screen.getByText('AI思考中')).toHaveAttribute('role', 'status');
     expect(document.getElementById('shogi-research-screen')).toHaveAttribute('data-history-count', '0');
   });
 
   it('成功した選択手を探索開始局面へ一度だけ適用し、Worker結果を表示する', async () => {
     const user = userEvent.setup();
-    const pending = deferred<TimeLimitedIterativeDeepeningAlphaBetaSearchResult>();
+    const pending = deferred<PresetTimeLimitedSearchResult>();
     render(<ShogiResearchScreen workerSearchRunner={() => pending.promise} />);
 
     await user.click(workerButton());
@@ -212,7 +271,7 @@ describe('時間制限Worker AIの盤面UI接続', () => {
 
   it('検証済みPVを局面ごとの棋譜表記でAIの読み筋として順番に表示し、盤面へは先頭手だけ適用する', async () => {
     const user = userEvent.setup();
-    const pending = deferred<TimeLimitedIterativeDeepeningAlphaBetaSearchResult>();
+    const pending = deferred<PresetTimeLimitedSearchResult>();
     render(<ShogiResearchScreen workerSearchRunner={() => pending.promise} />);
     const first = initialAction();
     const afterFirst = stateAfterInitialAction();
@@ -237,22 +296,22 @@ describe('時間制限Worker AIの盤面UI接続', () => {
 
   it('先頭不一致、途中不正手、完了深さ超過のWorker PVは盤面と成功表示を変えず拒否する', async () => {
     const cases = [
-      (result: TimeLimitedIterativeDeepeningAlphaBetaSearchResult) => {
+      (result: PresetTimeLimitedSearchResult) => {
         const differentAction = getLegalActions(createInitialBoardState())[1];
         if (!differentAction) throw new Error('Expected a distinct legal action.');
         result.principalVariation = [differentAction];
       },
-      (result: TimeLimitedIterativeDeepeningAlphaBetaSearchResult) => {
+      (result: PresetTimeLimitedSearchResult) => {
         result.principalVariation = [result.selectedAction!, result.selectedAction!];
       },
-      (result: TimeLimitedIterativeDeepeningAlphaBetaSearchResult) => {
+      (result: PresetTimeLimitedSearchResult) => {
         result.principalVariation = [result.selectedAction!, result.selectedAction!, result.selectedAction!, result.selectedAction!];
       },
     ];
 
     for (const modify of cases) {
       const user = userEvent.setup();
-      const pending = deferred<TimeLimitedIterativeDeepeningAlphaBetaSearchResult>();
+      const pending = deferred<PresetTimeLimitedSearchResult>();
       const rendered = render(<ShogiResearchScreen workerSearchRunner={() => pending.promise} />);
       const result = workerResult(initialAction());
       modify(result);
@@ -270,7 +329,7 @@ describe('時間制限Worker AIの盤面UI接続', () => {
 
   it('適用できないWorkerのselectedActionは盤面も成功表示も変更せず、利用者向けエラーにする', async () => {
     const user = userEvent.setup();
-    const pending = deferred<TimeLimitedIterativeDeepeningAlphaBetaSearchResult>();
+    const pending = deferred<PresetTimeLimitedSearchResult>();
     render(<ShogiResearchScreen workerSearchRunner={() => pending.promise} />);
 
     await user.click(workerButton());
@@ -296,7 +355,7 @@ describe('時間制限Worker AIの盤面UI接続', () => {
 
   it('通常の探索開始局面でselectedActionがないWorker結果は成功表示にしない', async () => {
     const user = userEvent.setup();
-    const pending = deferred<TimeLimitedIterativeDeepeningAlphaBetaSearchResult>();
+    const pending = deferred<PresetTimeLimitedSearchResult>();
     render(<ShogiResearchScreen workerSearchRunner={() => pending.promise} />);
 
     await user.click(workerButton());
@@ -309,7 +368,7 @@ describe('時間制限Worker AIの盤面UI接続', () => {
 
   it('Worker失敗では盤面を変更せず、通常エラーをalertで表示する', async () => {
     const user = userEvent.setup();
-    const pending = deferred<TimeLimitedIterativeDeepeningAlphaBetaSearchResult>();
+    const pending = deferred<PresetTimeLimitedSearchResult>();
     render(<ShogiResearchScreen workerSearchRunner={() => pending.promise} />);
 
     await user.click(workerButton());
@@ -321,7 +380,7 @@ describe('時間制限Worker AIの盤面UI接続', () => {
 
   it('明示的な中止はsignalをabortし、AbortErrorを通常エラーとして表示しない', async () => {
     const user = userEvent.setup();
-    const pending = deferred<TimeLimitedIterativeDeepeningAlphaBetaSearchResult>();
+    const pending = deferred<PresetTimeLimitedSearchResult>();
     let signal: AbortSignal | undefined;
     render(
       <ShogiResearchScreen
@@ -344,7 +403,7 @@ describe('時間制限Worker AIの盤面UI接続', () => {
 
   it('中止後や局面置換後に遅れて届く成功結果を適用しない', async () => {
     const user = userEvent.setup();
-    const pending = deferred<TimeLimitedIterativeDeepeningAlphaBetaSearchResult>();
+    const pending = deferred<PresetTimeLimitedSearchResult>();
     let signal: AbortSignal | undefined;
     render(
       <ShogiResearchScreen
@@ -367,8 +426,8 @@ describe('時間制限Worker AIの盤面UI接続', () => {
 
   it('KIF読込確定と棋譜再生位置への移動で探索を中止する', async () => {
     const user = userEvent.setup();
-    const first = deferred<TimeLimitedIterativeDeepeningAlphaBetaSearchResult>();
-    const second = deferred<TimeLimitedIterativeDeepeningAlphaBetaSearchResult>();
+    const first = deferred<PresetTimeLimitedSearchResult>();
+    const second = deferred<PresetTimeLimitedSearchResult>();
     const signals: AbortSignal[] = [];
     const runner = vi.fn()
       .mockImplementationOnce((_: unknown, __: unknown, ___: unknown, signal: AbortSignal) => {
@@ -396,7 +455,7 @@ describe('時間制限Worker AIの盤面UI接続', () => {
 
   it('JSON読込確定は探索を中止し、遅延した成功結果で読込後の局面を上書きしない', async () => {
     const user = userEvent.setup();
-    const pending = deferred<TimeLimitedIterativeDeepeningAlphaBetaSearchResult>();
+    const pending = deferred<PresetTimeLimitedSearchResult>();
     let signal: AbortSignal | undefined;
     render(
       <ShogiResearchScreen
@@ -437,7 +496,7 @@ describe('時間制限Worker AIの盤面UI接続', () => {
 
   it('JSON読込後の遅延したWorker失敗はエラー表示を上書きしない', async () => {
     const user = userEvent.setup();
-    const pending = deferred<TimeLimitedIterativeDeepeningAlphaBetaSearchResult>();
+    const pending = deferred<PresetTimeLimitedSearchResult>();
     render(<ShogiResearchScreen workerSearchRunner={() => pending.promise} />);
 
     await user.click(workerButton());
@@ -460,9 +519,9 @@ describe('時間制限Worker AIの盤面UI接続', () => {
   it('分岐開始・本譜復帰・保存済み分岐への切替は探索を中止し、遅延結果を反映しない', async () => {
     const user = userEvent.setup();
     const pendingSearches = [
-      deferred<TimeLimitedIterativeDeepeningAlphaBetaSearchResult>(),
-      deferred<TimeLimitedIterativeDeepeningAlphaBetaSearchResult>(),
-      deferred<TimeLimitedIterativeDeepeningAlphaBetaSearchResult>(),
+      deferred<PresetTimeLimitedSearchResult>(),
+      deferred<PresetTimeLimitedSearchResult>(),
+      deferred<PresetTimeLimitedSearchResult>(),
     ];
     const signals: AbortSignal[] = [];
     const runner = vi.fn((_: unknown, __: unknown, ___: unknown, signal?: AbortSignal) => {
@@ -502,8 +561,8 @@ describe('時間制限Worker AIの盤面UI接続', () => {
 
   it('中止済みの古い探索は次の探索結果や盤面を上書きしない', async () => {
     const user = userEvent.setup();
-    const first = deferred<TimeLimitedIterativeDeepeningAlphaBetaSearchResult>();
-    const second = deferred<TimeLimitedIterativeDeepeningAlphaBetaSearchResult>();
+    const first = deferred<PresetTimeLimitedSearchResult>();
+    const second = deferred<PresetTimeLimitedSearchResult>();
     const runner = vi.fn()
       .mockReturnValueOnce(first.promise)
       .mockReturnValueOnce(second.promise);
@@ -522,7 +581,7 @@ describe('時間制限Worker AIの盤面UI接続', () => {
 
   it('アンマウント時に実行中の探索を中止する', async () => {
     const user = userEvent.setup();
-    const pending = deferred<TimeLimitedIterativeDeepeningAlphaBetaSearchResult>();
+    const pending = deferred<PresetTimeLimitedSearchResult>();
     let signal: AbortSignal | undefined;
     const rendered = render(
       <ShogiResearchScreen

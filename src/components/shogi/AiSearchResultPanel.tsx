@@ -1,5 +1,6 @@
+import type { SearchEvaluationPresetId } from '../../domain/shogi/searchEvaluationPresets';
+import type { PresetTimeLimitedSearchResult } from '../../workers/timeLimitedIterativeDeepeningAlphaBetaWorkerProtocol';
 import type {
-  TimeLimitedIterativeDeepeningAlphaBetaSearchResult,
   TwoPlyMinimaxSearchResult,
 } from '../../domain/shogi';
 
@@ -10,14 +11,14 @@ export type AiSearchDisplay =
   | {
       kind: 'two-ply';
       perspective: Player;
-      result: TwoPlyMinimaxSearchResult;
+      result: TwoPlyMinimaxSearchResult & { readonly evaluationPresetId: SearchEvaluationPresetId };
       selectedNotation: string;
       candidateNotations: readonly string[];
     }
   | {
       kind: 'time-limited-worker';
       perspective: Player;
-      result: TimeLimitedIterativeDeepeningAlphaBetaSearchResult;
+      result: PresetTimeLimitedSearchResult;
       selectedNotation: string;
       principalVariationNotations: readonly string[];
     };

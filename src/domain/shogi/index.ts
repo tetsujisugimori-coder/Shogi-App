@@ -37,3 +37,4 @@ export * from './gameRecordImport';
 export * from './gameRecordSession';
 export * from './kifExport';
 export * from './kifImport';
+export * from './searchEvaluationPresets';

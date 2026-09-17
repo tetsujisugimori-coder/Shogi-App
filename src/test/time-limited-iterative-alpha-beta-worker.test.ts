@@ -1,3 +1,4 @@
+import { DEFAULT_SEARCH_EVALUATION_PRESET_ID, resolveSearchEvaluationPreset, SEARCH_EVALUATION_PRESET_IDS, type SearchEvaluationPresetId } from '../domain/shogi/searchEvaluationPresets';
 import { describe, expect, it, vi } from 'vitest';
 import {
   analyzeTimeLimitedIterativeDeepeningAlphaBetaSearch,
@@ -94,6 +95,28 @@ async function expectWorkerAbort(pending: Promise<unknown>): Promise<void> {
 }
 
 describe('時間制限付き反復深化αβ探索Workerの純粋処理', () => {
+  it.each(SEARCH_EVALUATION_PRESET_IDS)('共有設定を探索へ渡し、実際のIDと完了反復の内訳を返す: %s', (id) => {
+    const input = structuredClone(request({ evaluationPresetId: id, maxDepth: 2 }));
+    const search = vi.fn((state, depth, milliseconds, evaluation) =>
+      analyzeTimeLimitedIterativeDeepeningAlphaBetaSearch(state, depth, milliseconds, evaluation, () => 0));
+    const response = handleTimeLimitedIterativeDeepeningAlphaBetaSearchWorkerRequest(input, search);
+    expect(search).toHaveBeenCalledWith(input.state, 2, 1000, resolveSearchEvaluationPreset(id));
+    expect(response.type).toBe('time-limited-iterative-deepening-alpha-beta-search-succeeded');
+    if (response.type !== 'time-limited-iterative-deepening-alpha-beta-search-succeeded') throw new Error('Expected success');
+    expect(response.result).toEqual({
+      ...analyzeTimeLimitedIterativeDeepeningAlphaBetaSearch(input.state, 2, 1000, resolveSearchEvaluationPreset(id), () => 0),
+      evaluationPresetId: id,
+    });
+    expect(structuredClone(response)).toEqual(response);
+  });
+
+  it.each(['unknown', '__proto__', null, 1])('不正なWorkerプリセットIDは探索前に失敗する: %s', (id) => {
+    const search = vi.fn(analyzeTimeLimitedIterativeDeepeningAlphaBetaSearch);
+    const response = handleTimeLimitedIterativeDeepeningAlphaBetaSearchWorkerRequest(
+      request({ evaluationPresetId: id as SearchEvaluationPresetId }), search);
+    expect(response).toMatchObject({ type: 'time-limited-iterative-deepening-alpha-beta-search-failed', errorMessage: 'Unknown search evaluation preset.' });
+    expect(search).not.toHaveBeenCalled();
+  });
   it('既存の同期探索を呼び、同じrequestIdと探索結果を構造化クローン可能な成功応答にする', () => {
     const input = request({ maxDepth: 2 });
     const snapshot = JSON.stringify(input.state);
@@ -105,7 +128,7 @@ describe('時間制限付き反復深化αβ探索Workerの純粋処理', () => 
     const search = vi.fn(analyzeTimeLimitedIterativeDeepeningAlphaBetaSearch);
     const response = handleTimeLimitedIterativeDeepeningAlphaBetaSearchWorkerRequest(input, search);
 
-    expect(search).toHaveBeenCalledWith(input.state, 2, 1_000);
+    expect(search).toHaveBeenCalledWith(input.state, 2, 1_000, resolveSearchEvaluationPreset());
     expect(response.type).toBe('time-limited-iterative-deepening-alpha-beta-search-succeeded');
     if (response.type !== 'time-limited-iterative-deepening-alpha-beta-search-succeeded') {
       throw new Error('Expected a successful worker response.');
@@ -213,10 +236,30 @@ describe('時間制限付き反復深化αβ探索Workerの純粋処理', () => 
 });
 
 describe('時間制限付き反復深化αβ探索Workerクライアント', () => {
+  it.each(SEARCH_EVALUATION_PRESET_IDS)('選択IDを要求へ渡し、そのIDを持つ応答だけを採用する: %s', async (id) => {
+    const fake = createFakeWorker();
+    const client = createTimeLimitedIterativeDeepeningAlphaBetaSearchWorkerClient({ workerFactory: () => fake.worker, requestIdFactory: () => 'preset-request' });
+    const input = createInitialBoardState();
+    const pending = client.run(input, 1, 1000, undefined, id);
+    expect(fake.postMessage).toHaveBeenCalledWith(request({ state: input, requestId: 'preset-request', evaluationPresetId: id }));
+    const response = handleTimeLimitedIterativeDeepeningAlphaBetaSearchWorkerRequest(request({ state: input, requestId: 'preset-request', evaluationPresetId: id }));
+    fake.emitMessage(structuredClone(response));
+    await expect(pending).resolves.toMatchObject({ evaluationPresetId: id });
+  });
+
+  it('応答の設定不一致を拒否し、公開クライアントの不正IDも安全に失敗する', async () => {
+    const fake = createFakeWorker();
+    const client = createTimeLimitedIterativeDeepeningAlphaBetaSearchWorkerClient({ workerFactory: () => fake.worker, requestIdFactory: () => 'request-1' });
+    const pending = client.run(createInitialBoardState(), 1, 1000, undefined, 'material-focused');
+    fake.emitMessage(successResponse());
+    await expect(pending).rejects.toMatchObject({ name: 'WorkerProtocolError' });
+    await expect(client.run(createInitialBoardState(), 1, 1000, undefined, 'invalid' as SearchEvaluationPresetId)).rejects.toThrow(/preset/);
+    expect(fake.postMessage).toHaveBeenCalledTimes(1);
+  });
   const successResponse = (requestId = 'request-1'): TimeLimitedIterativeDeepeningAlphaBetaSearchWorkerResponse => ({
     type: 'time-limited-iterative-deepening-alpha-beta-search-succeeded',
     requestId,
-    result: analyzeTimeLimitedIterativeDeepeningAlphaBetaSearch(createInitialBoardState(), 1, 1_000),
+    result: { ...analyzeTimeLimitedIterativeDeepeningAlphaBetaSearch(createInitialBoardState(), 1, 1_000), evaluationPresetId: DEFAULT_SEARCH_EVALUATION_PRESET_ID },
   });
 
   it('成功応答でresolveし、Workerを一度だけ終了する', async () => {
