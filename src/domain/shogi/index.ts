@@ -38,3 +38,4 @@ export * from './gameRecordSession';
 export * from './kifExport';
 export * from './kifImport';
 export * from './searchEvaluationPresets';
+export * from './evaluationPresetComparison';

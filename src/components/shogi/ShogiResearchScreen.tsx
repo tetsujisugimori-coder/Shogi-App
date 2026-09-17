@@ -1,3 +1,8 @@
+import { EVALUATION_PRESET_COMPARISON_DEPTH, createComparisonSnapshot } from '../../domain/shogi/evaluationPresetComparison';
+import { runEvaluationPresetComparisonInWorker } from '../../application/evaluationPresetComparisonWorkerClient';
+import { isSameComparisonPosition, validateEvaluationPresetComparison } from '../../application/evaluationPresetComparisonValidation';
+import { EvaluationPresetComparisonPanel, type EvaluationPresetComparisonDisplay } from './EvaluationPresetComparisonPanel';
+import { formatLegalActionNotation, validateAndFormatPrincipalVariation } from '../../application/searchPrincipalVariation';
 import { DEFAULT_SEARCH_EVALUATION_PRESET_ID, SEARCH_EVALUATION_PRESET_IDS, isSearchEvaluationPresetId, resolveSearchEvaluationPreset, type SearchEvaluationPresetId } from '../../domain/shogi/searchEvaluationPresets';
 import type { PresetTimeLimitedSearchResult } from '../../workers/timeLimitedIterativeDeepeningAlphaBetaWorkerProtocol';
 import { SEARCH_EVALUATION_PRESET_DISPLAY } from './searchEvaluationPresetDisplay';
@@ -32,12 +37,8 @@ import {
   importShogiGameRecordSession,
   importKifBytes,
   analyzeTwoPlyMinimaxSearch,
-  areLegalActionsEqual,
   cloneBoardState,
   executeLegalAction,
-  getLegalActions,
-  generateDropNotation,
-  generateMoveNotation,
   MAX_SHOGI_GAME_RECORD_SESSION_FILE_BYTES,
   MAX_KIF_FILE_BYTES,
   PromotionStatus,
@@ -45,9 +46,6 @@ import {
   type KifImportResult,
   type AgreedJishogiProposal,
   type GameRecordSession,
-  type LegalAction,
-  type TimeLimitedIterativeDeepeningAlphaBetaSearchResult,
-  type TwoPlyMinimaxSearchResult,
 } from '../../domain/shogi';
 import {
   runTimeLimitedIterativeDeepeningAlphaBetaSearchInWorker,
@@ -69,6 +67,7 @@ import { AiJudgmentPanel } from './AiJudgmentPanel';
 
 interface ShogiResearchScreenProps {
   initialState?: BoardState;
+  comparisonRunner?: typeof runEvaluationPresetComparisonInWorker;
   workerSearchRunner?: TimeLimitedIterativeDeepeningAlphaBetaSearchRunner;
 }
 
@@ -106,6 +105,7 @@ type WorkerSearchState =
   | { kind: 'error'; message: string };
 
 interface ActiveWorkerSearch {
+  kind: 'single' | 'comparison';
   generation: number;
   controller: AbortController;
   state: BoardState;
@@ -138,59 +138,12 @@ const STATUS_BADGE_COLORS = {
 const TIME_LIMITED_AI_MAX_DEPTH = 4;
 const TIME_LIMITED_AI_TIME_LIMIT_MILLISECONDS = 1_000;
 
-function formatLegalActionNotation(state: BoardState, action: LegalAction): string {
-  if (action.kind === 'move') {
-    const piece = state.squares[action.from.row]?.[action.from.col]?.piece;
-    if (!piece) throw new Error('A legal move action must have a source piece.');
-    return generateMoveNotation(state.turn, piece, action.to, action.promotion);
-  }
-
-  const hand = state.turn === 'sente' ? state.senteHand : state.goteHand;
-  const piece = hand.find((candidate) => candidate.id === action.pieceId);
-  if (!piece) throw new Error('A legal drop action must have a hand piece.');
-  return generateDropNotation(state.turn, piece, action.to);
-}
-
-/**
- * Treat a Worker result as untrusted at the UI boundary. The returned notation
- * is generated while replaying a clone, so every later PV action sees the
- * position created by the earlier action.
- */
-function validateAndFormatPrincipalVariation(
-  state: BoardState,
-  result: TimeLimitedIterativeDeepeningAlphaBetaSearchResult
-): string[] | null {
-  if (!result.selectedAction || !Array.isArray(result.principalVariation) ||
-    !Number.isInteger(result.completedDepth) || result.completedDepth < 1 ||
-    result.principalVariation.length === 0 ||
-    result.principalVariation.length > result.completedDepth) {
-    return null;
-  }
-
-  try {
-    if (!areLegalActionsEqual(result.principalVariation[0], result.selectedAction)) return null;
-    let replayState = cloneBoardState(state);
-    const notations: string[] = [];
-    for (const action of result.principalVariation) {
-      if (!getLegalActions(replayState).some((legalAction) => areLegalActionsEqual(legalAction, action))) {
-        return null;
-      }
-      notations.push(formatLegalActionNotation(replayState, action));
-      const execution = executeLegalAction(replayState, action, { proposer: 'local_ai' });
-      if (execution.type !== 'applied') return null;
-      replayState = execution.state;
-    }
-    return notations;
-  } catch {
-    return null;
-  }
-}
-
 export const ShogiResearchScreen: React.FC<ShogiResearchScreenProps> = ({
   initialState,
+  comparisonRunner = runEvaluationPresetComparisonInWorker,
   workerSearchRunner = runTimeLimitedIterativeDeepeningAlphaBetaSearchInWorker,
 }) => {
-  const [boardState, setBoardState] = useState<BoardState>(() =>
+  const [boardState, setCurrentBoardState] = useState<BoardState>(() =>
     normalizePositionSnapshots(initialState ?? createInitialBoardState())
   );
   const [replayHistoryIndex, setReplayHistoryIndex] = useState<number | null>(null);
@@ -211,6 +164,8 @@ export const ShogiResearchScreen: React.FC<ShogiResearchScreenProps> = ({
   const [moveHistoryResetKey, setMoveHistoryResetKey] = useState(0);
   const [evaluationPresetId, setEvaluationPresetId] = useState<SearchEvaluationPresetId>(DEFAULT_SEARCH_EVALUATION_PRESET_ID);
   const [aiSearchDisplay, setAiSearchDisplay] = useState<AiSearchDisplay | null>(null);
+  const [comparisonState, setComparisonState] = useState<WorkerSearchState>({ kind: 'idle' });
+  const [comparisonDisplay, setComparisonDisplay] = useState<EvaluationPresetComparisonDisplay | null>(null);
   const [workerSearchState, setWorkerSearchState] = useState<WorkerSearchState>({ kind: 'idle' });
   const [agreedJishogiProposal, setAgreedJishogiProposal] = useState<AgreedJishogiProposal | null>(null);
   const [agreedJishogiError, setAgreedJishogiError] = useState<string | null>(null);
@@ -270,6 +225,7 @@ export const ShogiResearchScreen: React.FC<ShogiResearchScreenProps> = ({
   const isResignationAvailable = boardState.status === 'active' || boardState.status === 'check';
   const isEnteringKingAvailable = boardState.status === 'active' || boardState.status === 'check';
   const isNewGameAvailable = isEnteringKingAvailable || isEnded;
+  const isComparisonThinking = comparisonState.kind === 'thinking';
   const isWorkerSearchThinking = workerSearchState.kind === 'thinking';
   const isInteractionBlocked = isEnded || isViewingReplay || dialogsAreOpen || isWorkerSearchThinking;
   const selectedSquare =
@@ -385,7 +341,25 @@ export const ShogiResearchScreen: React.FC<ShogiResearchScreenProps> = ({
     setFocusRequest({ ...square, requestId: focusRequestId.current });
   }, []);
 
+  const invalidateComparison = useCallback(() => {
+    const active = activeWorkerSearchRef.current;
+    if (active?.kind === 'comparison') {
+      activeWorkerSearchRef.current = null;
+      workerSearchGenerationRef.current += 1;
+      active.controller.abort();
+    }
+    setComparisonDisplay(null);
+    setComparisonState({ kind: 'idle' });
+  }, []);
+
+  // All committed board replacements synchronously invalidate comparison work.
+  const setBoardState = useCallback((state: BoardState) => {
+    invalidateComparison();
+    setCurrentBoardState(state);
+  }, [invalidateComparison]);
+
   const cancelActiveWorkerSearch = useCallback(() => {
+    invalidateComparison();
     const activeSearch = activeWorkerSearchRef.current;
     if (!activeSearch) return;
 
@@ -393,7 +367,7 @@ export const ShogiResearchScreen: React.FC<ShogiResearchScreenProps> = ({
     workerSearchGenerationRef.current += 1;
     activeSearch.controller.abort();
     setWorkerSearchState({ kind: 'cancelled' });
-  }, []);
+  }, [invalidateComparison]);
 
   useEffect(() => () => {
     const activeSearch = activeWorkerSearchRef.current;
@@ -565,6 +539,7 @@ export const ShogiResearchScreen: React.FC<ShogiResearchScreenProps> = ({
       isAgreedJishogiDialogOpen ||
       isNewGameDialogOpen
     ) return;
+    invalidateComparison();
     setIsResignationDialogOpen(true);
   };
 
@@ -594,6 +569,7 @@ export const ShogiResearchScreen: React.FC<ShogiResearchScreenProps> = ({
       isAgreedJishogiDialogOpen ||
       isNewGameDialogOpen
     ) return;
+    invalidateComparison();
     setIsEnteringKingDialogOpen(true);
   };
 
@@ -628,6 +604,7 @@ export const ShogiResearchScreen: React.FC<ShogiResearchScreenProps> = ({
     ) return;
     setAgreedJishogiProposal(null);
     setAgreedJishogiError(null);
+    invalidateComparison();
     setIsAgreedJishogiDialogOpen(true);
   };
 
@@ -690,6 +667,7 @@ export const ShogiResearchScreen: React.FC<ShogiResearchScreenProps> = ({
       isAgreedJishogiDialogOpen ||
       isNewGameDialogOpen
     ) return;
+    invalidateComparison();
     setIsNewGameDialogOpen(true);
   };
 
@@ -775,6 +753,7 @@ export const ShogiResearchScreen: React.FC<ShogiResearchScreenProps> = ({
       });
       return;
     }
+    invalidateComparison();
     setIsGameRecordFileReading(true);
     setExportNotice(null);
     try {
@@ -819,6 +798,7 @@ export const ShogiResearchScreen: React.FC<ShogiResearchScreenProps> = ({
       setExportNotice({ kind: 'error', message: 'KIFファイルが大きすぎます（上限32 MiB）。' });
       return;
     }
+    invalidateComparison();
     setIsKifFileReading(true);
     setExportNotice(null);
     try {
@@ -892,8 +872,42 @@ export const ShogiResearchScreen: React.FC<ShogiResearchScreenProps> = ({
     setPendingGameRecordImport(null);
   };
 
+  const compareEvaluationPresets = async () => {
+    if (isInteractionBlocked || activeWorkerSearchRef.current) return;
+    invalidateComparison();
+    const snapshot = createComparisonSnapshot(boardState);
+    const generation = ++workerSearchGenerationRef.current;
+    const controller = new AbortController();
+    const job: ActiveWorkerSearch = { kind: 'comparison', generation, controller, state: boardState };
+    activeWorkerSearchRef.current = job;
+    setComparisonState({ kind: 'thinking' });
+    const isCurrent = () => activeWorkerSearchRef.current === job &&
+      workerSearchGenerationRef.current === generation && !controller.signal.aborted;
+    try {
+      const results = await comparisonRunner(snapshot, EVALUATION_PRESET_COMPARISON_DEPTH, controller.signal);
+      if (!isCurrent()) return;
+      if (!isSameComparisonPosition(snapshot, job.state)) throw new Error('比較の開始局面が変更されました。');
+      validateEvaluationPresetComparison(snapshot, EVALUATION_PRESET_COMPARISON_DEPTH, results);
+      const entries = results.map((result) => ({ result,
+        principalVariationNotations: result.selectedAction
+          ? validateAndFormatPrincipalVariation(snapshot, result, result.depth)! : [],
+      }));
+      activeWorkerSearchRef.current = null;
+      setComparisonDisplay({ perspective: snapshot.turn, entries });
+      setComparisonState({ kind: 'idle' });
+    } catch (error) {
+      if (!isCurrent()) return;
+      activeWorkerSearchRef.current = null;
+      setComparisonDisplay(null);
+      setComparisonState(error instanceof Error && error.name === 'AbortError'
+        ? { kind: 'cancelled' }
+        : { kind: 'error', message: error instanceof Error ? error.message : '比較に失敗しました。' });
+    }
+  };
+
   const makeTwoPlyAiMove = () => {
-    if (isInteractionBlocked) return;
+    if (isInteractionBlocked || isComparisonThinking || activeWorkerSearchRef.current) return;
+    invalidateComparison();
 
     const result = {
       ...analyzeTwoPlyMinimaxSearch(boardState, resolveSearchEvaluationPreset(evaluationPresetId)),
@@ -918,13 +932,14 @@ export const ShogiResearchScreen: React.FC<ShogiResearchScreenProps> = ({
 
   const makeTimeLimitedAiMove = () => {
     if (isInteractionBlocked || activeWorkerSearchRef.current) return;
+    invalidateComparison();
 
     const controller = new AbortController();
     const generation = workerSearchGenerationRef.current + 1;
     const searchState = boardState;
     const searchPresetId = evaluationPresetId;
     workerSearchGenerationRef.current = generation;
-    activeWorkerSearchRef.current = { generation, controller, state: searchState };
+    activeWorkerSearchRef.current = { kind: 'single', generation, controller, state: searchState };
     setSelection({ kind: 'none' });
     setPendingPromotion(null);
     setAiSearchDisplay(null);
@@ -978,7 +993,7 @@ export const ShogiResearchScreen: React.FC<ShogiResearchScreenProps> = ({
           return;
         }
 
-        const principalVariationNotations = validateAndFormatPrincipalVariation(searchState, result);
+        const principalVariationNotations = validateAndFormatPrincipalVariation(searchState, result, result.completedDepth);
         if (!principalVariationNotations) {
           activeWorkerSearchRef.current = null;
           setWorkerSearchState({
@@ -1092,6 +1107,7 @@ export const ShogiResearchScreen: React.FC<ShogiResearchScreenProps> = ({
       const promotionStatus = getPromotionStatus(movingPiece, from, to);
 
       if (promotionStatus !== 'none') {
+        invalidateComparison();
         setPendingPromotion({ from, to, status: promotionStatus });
         return;
       }
@@ -1242,7 +1258,7 @@ export const ShogiResearchScreen: React.FC<ShogiResearchScreenProps> = ({
             id="evaluation-preset"
             aria-describedby="evaluation-preset-description"
             value={evaluationPresetId}
-            disabled={isWorkerSearchThinking || dialogsAreOpen}
+            disabled={isWorkerSearchThinking || isComparisonThinking || dialogsAreOpen}
             onChange={(event) => {
               if (!activeWorkerSearchRef.current && isSearchEvaluationPresetId(event.target.value)) {
                 setEvaluationPresetId(event.target.value);
@@ -1260,7 +1276,7 @@ export const ShogiResearchScreen: React.FC<ShogiResearchScreenProps> = ({
           <button
             type="button"
             onClick={makeTwoPlyAiMove}
-            disabled={isInteractionBlocked}
+            disabled={isInteractionBlocked || isComparisonThinking}
             className="rounded border border-violet-700/70 bg-violet-950/45 px-4 py-1.5 font-serif text-sm tracking-[0.1em] text-violet-100 shadow-inner outline-none transition hover:border-violet-500 hover:bg-violet-900/55 focus-visible:ring-2 focus-visible:ring-amber-300 disabled:cursor-not-allowed disabled:border-stone-800 disabled:text-stone-600 disabled:opacity-65"
           >
             2手読みAIに指させる
@@ -1273,6 +1289,19 @@ export const ShogiResearchScreen: React.FC<ShogiResearchScreenProps> = ({
           >
             時間制限AIに指させる
           </button>
+          <button type="button" onClick={compareEvaluationPresets}
+            disabled={isInteractionBlocked || isComparisonThinking}
+            className="rounded border border-sky-700/70 bg-sky-950/45 px-4 py-1.5 font-serif text-sm text-sky-100 disabled:opacity-50">
+            3プリセットを比較
+          </button>
+          {isComparisonThinking && (
+            <button type="button" onClick={() => {
+              invalidateComparison();
+              setComparisonState({ kind: 'cancelled' });
+            }} className="rounded border border-rose-800/70 px-4 py-1.5 text-sm text-rose-100">
+              比較を中止
+            </button>
+          )}
           {isWorkerSearchThinking && (
             <button
               type="button"
@@ -1536,6 +1565,7 @@ export const ShogiResearchScreen: React.FC<ShogiResearchScreenProps> = ({
           )}
         </div>
       </main>
+      <EvaluationPresetComparisonPanel display={comparisonDisplay} state={comparisonState} />
 
       {pendingPromotion && !isEnded && (
         <PromotionDialog
