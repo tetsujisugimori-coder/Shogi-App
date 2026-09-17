@@ -42,6 +42,8 @@ export interface TwoPlyMinimaxCandidate {
 export interface TwoPlyMinimaxSearchResult {
   selectedAction: LegalAction | null;
   selectedEvaluation: number | null;
+  /** The adopted leaf evaluation, or null when no action is selected. */
+  evaluationBreakdown: SearchEvaluationBreakdown | null;
   rootLegalActionCount: number;
   visitedPositionCount: number;
   depth: typeof TWO_PLY_MINIMAX_SEARCH_DEPTH;
@@ -218,46 +220,51 @@ function searchTwoPlyMinimax(
   const rootActions = getLegalActions(state);
   let bestAction: LegalAction | null = null;
   let bestEvaluation = Number.NEGATIVE_INFINITY;
+  let bestBreakdown: SearchEvaluationBreakdown | null = null;
   let visitedPositionCount = 0;
   const candidates: TwoPlyMinimaxCandidate[] = [];
 
   for (const rootAction of rootActions) {
     const afterRootAction = executeSearchAction(state, rootAction);
     visitedPositionCount += 1;
-    let candidateEvaluation: number;
+    let candidateBreakdown: SearchEvaluationBreakdown;
 
     if (afterRootAction.status === 'ended') {
-      candidateEvaluation = evaluateSearchPosition(afterRootAction, rootPlayer, evaluation);
+      candidateBreakdown = evaluateSearchPositionBreakdown(afterRootAction, rootPlayer, evaluation);
     } else {
       const replies = getLegalActions(afterRootAction);
       if (replies.length === 0) {
         throw new Error('A non-ended search position has no legal opponent response.');
       }
 
-      let worstReplyEvaluation = Number.POSITIVE_INFINITY;
+      let worstReplyBreakdown: SearchEvaluationBreakdown | null = null;
       for (const reply of replies) {
         const afterReply = executeSearchAction(afterRootAction, reply);
         visitedPositionCount += 1;
-        const replyEvaluation = evaluateSearchPosition(afterReply, rootPlayer, evaluation);
-        if (replyEvaluation < worstReplyEvaluation) {
-          worstReplyEvaluation = replyEvaluation;
+        const replyBreakdown = evaluateSearchPositionBreakdown(afterReply, rootPlayer, evaluation);
+        if (worstReplyBreakdown === null || replyBreakdown.total < worstReplyBreakdown.total) {
+          worstReplyBreakdown = replyBreakdown;
         }
       }
-      candidateEvaluation = worstReplyEvaluation;
+      if (worstReplyBreakdown === null) throw new Error('No opponent reply was evaluated.');
+      candidateBreakdown = worstReplyBreakdown;
     }
 
+    const candidateEvaluation = candidateBreakdown.total;
     candidates.push({ action: rootAction, evaluation: candidateEvaluation });
     // The first legal action establishes the stable comparison baseline. Later
     // equal scores retain that action because this remains a strict comparison.
     if (bestAction === null || candidateEvaluation > bestEvaluation) {
       bestAction = rootAction;
       bestEvaluation = candidateEvaluation;
+      bestBreakdown = candidateBreakdown;
     }
   }
 
   return {
     selectedAction: bestAction,
     selectedEvaluation: bestAction === null ? null : bestEvaluation,
+    evaluationBreakdown: bestBreakdown,
     rootLegalActionCount: rootActions.length,
     visitedPositionCount,
     depth: TWO_PLY_MINIMAX_SEARCH_DEPTH,

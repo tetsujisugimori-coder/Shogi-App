@@ -62,6 +62,7 @@ import { GameRecordImportDialog } from './GameRecordImportDialog';
 import { KifImportDialog } from './KifImportDialog';
 import { BranchReplayDialog } from './BranchReplayDialog';
 import { AiSearchResultPanel, type AiSearchDisplay } from './AiSearchResultPanel';
+import { AiJudgmentPanel } from './AiJudgmentPanel';
 
 interface ShogiResearchScreenProps {
   initialState?: BoardState;
@@ -405,6 +406,7 @@ export const ShogiResearchScreen: React.FC<ShogiResearchScreenProps> = ({
       setSelection({ kind: 'none' });
       setFocusRequest(null);
       setReplayHistoryIndex(historyIndex);
+      setAiSearchDisplay(null);
     },
     [boardState, cancelActiveWorkerSearch, dialogsAreOpen]
   );
@@ -539,6 +541,7 @@ export const ShogiResearchScreen: React.FC<ShogiResearchScreenProps> = ({
 
     if (result.type === 'applied') {
       setBoardState(result.state);
+      setAiSearchDisplay(null);
     }
 
     const restoreSquare = result.type === 'applied' ? pendingPromotion.to : pendingPromotion.from;
@@ -569,6 +572,7 @@ export const ShogiResearchScreen: React.FC<ShogiResearchScreenProps> = ({
     const result = executeResignation(boardState);
     if (result.type === 'applied') {
       setBoardState(result.state);
+      setAiSearchDisplay(null);
       setSelection({ kind: 'none' });
       setPendingPromotion(null);
     }
@@ -600,6 +604,7 @@ export const ShogiResearchScreen: React.FC<ShogiResearchScreenProps> = ({
     });
     if (result.type === 'applied') {
       setBoardState(result.state);
+      setAiSearchDisplay(null);
       setSelection({ kind: 'none' });
       setPendingPromotion(null);
     }
@@ -659,6 +664,7 @@ export const ShogiResearchScreen: React.FC<ShogiResearchScreenProps> = ({
       'accept'
     );
     if (execution.type === 'accepted') {
+      setAiSearchDisplay(null);
       setBoardState(execution.state);
       setAgreedJishogiProposal(null);
       setAgreedJishogiError(null);
@@ -899,7 +905,7 @@ export const ShogiResearchScreen: React.FC<ShogiResearchScreenProps> = ({
     setBoardState(execution.state);
     setSelection({ kind: 'none' });
     setPendingPromotion(null);
-    setAiSearchDisplay({ kind: 'two-ply', result, selectedNotation, candidateNotations });
+    setAiSearchDisplay({ kind: 'two-ply', perspective: boardState.turn, result, selectedNotation, candidateNotations });
   };
 
   const makeTimeLimitedAiMove = () => {
@@ -985,7 +991,7 @@ export const ShogiResearchScreen: React.FC<ShogiResearchScreenProps> = ({
         setSelection({ kind: 'none' });
         setPendingPromotion(null);
         setAiSearchDisplay({
-          kind: 'time-limited-worker', result, selectedNotation, principalVariationNotations,
+          kind: 'time-limited-worker', perspective: searchState.turn, result, selectedNotation, principalVariationNotations,
         });
         setWorkerSearchState({ kind: 'idle' });
       },
@@ -1030,6 +1036,7 @@ export const ShogiResearchScreen: React.FC<ShogiResearchScreenProps> = ({
       );
       if (result.type === 'applied') {
         setBoardState(result.state);
+        setAiSearchDisplay(null);
         setSelection({ kind: 'none' });
         restoreBoardFocus({ row: square.row, col: square.col });
       }
@@ -1079,6 +1086,7 @@ export const ShogiResearchScreen: React.FC<ShogiResearchScreenProps> = ({
       });
       if (result.type === 'applied') {
         setBoardState(result.state);
+        setAiSearchDisplay(null);
       }
       setSelection({ kind: 'none' });
       return;
@@ -1486,6 +1494,7 @@ export const ShogiResearchScreen: React.FC<ShogiResearchScreenProps> = ({
             }}
             onReturnToCurrent={returnToCurrentPosition}
           />
+          <AiJudgmentPanel search={aiSearchDisplay} thinking={isWorkerSearchThinking} />
           {aiSearchDisplay && (
             <AiSearchResultPanel search={aiSearchDisplay} />
           )}

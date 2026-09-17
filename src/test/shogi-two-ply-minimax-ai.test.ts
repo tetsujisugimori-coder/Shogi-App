@@ -1241,9 +1241,11 @@ describe('2手読みミニマックスAIの探索計測', () => {
     expect(result.rootLegalActionCount).toBe(1);
     expect(result.topCandidates).toHaveLength(1);
     expect(result.selectedAction).toEqual(getLegalActions(forcedLoss)[0]);
+    expect(result.evaluationBreakdown).toMatchObject({ total: -Infinity, terminal: 'loss' });
     expect(analyzeTwoPlyMinimaxSearch(ended)).toMatchObject({
       selectedAction: null,
       selectedEvaluation: null,
+      evaluationBreakdown: null,
       rootLegalActionCount: 0,
       visitedPositionCount: 0,
       topCandidates: [],
