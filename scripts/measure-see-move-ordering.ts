@@ -4,6 +4,7 @@
 // Each position / time budget runs in a fresh process to isolate JIT history.
 import assert from 'node:assert/strict';
 import { execFileSync } from 'node:child_process';
+import { createHash } from 'node:crypto';
 import { readFile } from 'node:fs/promises';
 import { cpus } from 'node:os';
 import { resolve } from 'node:path';
@@ -19,32 +20,77 @@ type Engine = Pick<typeof Search, 'analyzeAlphaBetaSearch' |
   getLegalActions: typeof import('../src/domain/shogi/legalActions').getLegalActions;
   seeCallCount: number;
   resetSeeCallCount: () => void;
+  seeMetrics: () => {
+    startingLegalGenerations: number; baselineMaterialEvaluations: number; recursiveLegalGenerations: number;
+    multiCaptureStarts: number; maximumCapturesPerStart: number; evaluationTrace: unknown[];
+  };
 };
 
 // Compile the chosen checkout in memory using the existing dev dependency.
-// Timings use unmodified source. A separate untimed build wraps only the public
-// SEE entry for counting; neither checkout nor the production API is modified.
+// Timings use unmodified source. A separate untimed build counts each candidate
+// through the old public entry or the new prepared evaluator, plus SEE-only
+// legal/material calls by starting-state identity. No production API is added.
 async function loadEngine(countCalls: boolean): Promise<Engine> {
   const result = await build({
     stdin: {
       contents: `export * from './src/domain/shogi/twoPlyAlphaBetaAi';
         export { getLegalActions } from './src/domain/shogi/legalActions';
-        ${countCalls ? "export { seeCallCount, resetSeeCallCount } from './src/domain/shogi/staticExchangeEvaluation';" : ''}`,
+        ${countCalls ? "export { seeCallCount, resetSeeCallCount, seeMetrics } from './src/domain/shogi/staticExchangeEvaluation';" : ''}`,
       resolveDir: sourceRoot, loader: 'ts',
     },
     bundle: true, write: false, platform: 'node', format: 'esm', target: 'node24',
-    plugins: countCalls ? [{ name: 'count-public-see-calls', setup(builder) {
+    plugins: countCalls ? [{ name: 'count-see-preparation-and-candidates', setup(builder) {
       builder.onLoad({ filter: /staticExchangeEvaluation\.ts$/ }, async ({ path }) => {
-        const source = await readFile(path, 'utf8');
+        let source = await readFile(path, 'utf8');
         const signature = 'export function evaluateStaticExchange(';
         assert(source.includes(signature), 'Expected public SEE entry for instrumentation');
-        return { loader: 'ts', contents: source.replace(signature, 'function uncountedStaticExchange(') + `
-          export let seeCallCount = 0;
-          export function resetSeeCallCount() { seeCallCount = 0; }
+        const preparedSignature = 'export function prepareStaticExchangeEvaluation(';
+        const hasPreparation = source.includes(preparedSignature);
+        source = source.replaceAll('getLegalActions(', 'measuredGetLegalActions(')
+          .replaceAll('evaluateMaterial(', 'measuredEvaluateMaterial(');
+        const wrapper = hasPreparation ? `
+          export function prepareStaticExchangeEvaluation(...args: Parameters<typeof uncountedPreparation>) {
+            registerStart(args[0]);
+            const evaluate = uncountedPreparation(...args);
+            return (action: LegalAction) => recordEvaluation(args[0], action, evaluate(action));
+          }` : `
           export function evaluateStaticExchange(...args: Parameters<typeof uncountedStaticExchange>) {
+            registerStart(args[0]);
+            return recordEvaluation(args[0], args[1], uncountedStaticExchange(...args));
+          }`;
+        source = hasPreparation
+          ? source.replace(preparedSignature, 'function uncountedPreparation(')
+          : source.replace(signature, 'function uncountedStaticExchange(');
+        return { loader: 'ts', contents: source + `
+          export let seeCallCount = 0;
+          let startingLegalGenerations = 0, baselineMaterialEvaluations = 0, recursiveLegalGenerations = 0;
+          const starts = new Map<BoardState, number>();
+          const evaluationTrace: unknown[] = [];
+          function registerStart(state: BoardState) { if (!starts.has(state)) starts.set(state, 0); }
+          function recordEvaluation(state: BoardState, action: LegalAction, value: number | null) {
             seeCallCount++;
-            return uncountedStaticExchange(...args);
-          }` };
+            starts.set(state, (starts.get(state) ?? 0) + 1);
+            evaluationTrace.push({ action, value });
+            return value;
+          }
+          function measuredGetLegalActions(state: BoardState) {
+            if (starts.has(state)) startingLegalGenerations++; else recursiveLegalGenerations++;
+            return getLegalActions(state);
+          }
+          function measuredEvaluateMaterial(...args: Parameters<typeof evaluateMaterial>) {
+            if (starts.has(args[0])) baselineMaterialEvaluations++;
+            return evaluateMaterial(...args);
+          }
+          export function resetSeeCallCount() {
+            seeCallCount = startingLegalGenerations = baselineMaterialEvaluations = recursiveLegalGenerations = 0;
+            starts.clear(); evaluationTrace.length = 0;
+          }
+          export function seeMetrics() {
+            return { startingLegalGenerations, baselineMaterialEvaluations, recursiveLegalGenerations,
+              multiCaptureStarts: [...starts.values()].filter(n => n >= 2).length,
+              maximumCapturesPerStart: Math.max(0, ...starts.values()), evaluationTrace };
+          }
+          ${wrapper}` };
       });
     } }] : [],
   });
@@ -70,6 +116,9 @@ const results = [
   ['initial', createInitialBoardState()], ['moveOrderingBenefitState', tactical],
   ['singleCapture', position([[4, 4, 'rook', 'sente'], [4, 5, 'pawn', 'gote']])],
   ['multipleCaptures', position([[4, 4, 'rook', 'sente'], [4, 5, 'pawn', 'gote'], [3, 4, 'silver', 'gote']])],
+  // Both the Gote silver and rook can capture after quiet Sente root actions.
+  ['nonRootMultipleCaptures', position([[1, 2, 'pawn', 'sente'], [0, 2, 'silver', 'gote'],
+    [4, 4, 'rook', 'sente'], [4, 5, 'rook', 'gote'], [2, 0, 'pawn', 'sente']])],
 ] as const;
 const median = (values: number[]) => [...values].sort((a, b) => a - b)[Math.floor(values.length / 2)];
 const comparable = (result: Search.AlphaBetaSearchResult) => ({ ...result, elapsedMilliseconds: 0 });
@@ -96,7 +145,15 @@ function measure(engine: Engine, counted: Engine) {
         for (const run of runs) assert.deepEqual(comparable(run), reference);
         counted.resetSeeCallCount();
         assert.deepEqual(comparable(counted.analyzeAlphaBetaSearch(state, 3)), reference);
+        const { evaluationTrace, ...preparationMetrics } = counted.seeMetrics();
+        if (name === 'nonRootMultipleCaptures' && rootOrderingSeeCalls > 0) {
+          assert(counted.seeCallCount > 0, 'Must exercise SEE within fixed-depth search');
+          assert(preparationMetrics.multiCaptureStarts > 0, 'Must compare multiple captures at non-root');
+          assert(preparationMetrics.maximumCapturesPerStart >= 2);
+        }
         fixed = { result: reference, seeCalls: counted.seeCallCount,
+          ...preparationMetrics,
+          seeTraceDigest: createHash('sha256').update(JSON.stringify(evaluationTrace)).digest('hex'),
           medianMilliseconds: median(runs.map((run) => run.elapsedMilliseconds)),
           times: runs.map((run) => run.elapsedMilliseconds) };
       }

@@ -78,15 +78,33 @@ export function evaluateStaticExchange(
   action: LegalAction,
   valueTable: MaterialValueTable = DEFAULT_MATERIAL_VALUE_TABLE
 ): number | null {
-  const legalAction = getLegalActions(state).find((candidate) => sameAction(candidate, action));
-  if (!legalAction) {
-    throw new Error('Static exchange requires an action legal in the starting position.');
-  }
-  if (legalAction.kind === 'drop' || !state.squares[legalAction.to.row][legalAction.to.col].piece) {
-    return null;
-  }
-  const baseline = evaluateMaterial(state, legalAction.player, valueTable);
-  return evaluateExchangeContinuation(
-    applyLegalAction(state, legalAction), legalAction.to, legalAction.player, baseline, valueTable
-  );
+  return prepareStaticExchangeEvaluation(state, valueTable)(action);
+}
+
+/**
+ * Internal to synchronous capture ordering; deliberately excluded from the barrel.
+ * The caller must keep this starting state and value table unchanged while using
+ * the evaluator, and discard it before moving to another position. Legal actions
+ * all belong to the starting side. Each exchange still gets its own cloned state
+ * and generates legal recaptures at every continuation; no position cache is used.
+ */
+export function prepareStaticExchangeEvaluation(
+  state: BoardState,
+  valueTable: MaterialValueTable = DEFAULT_MATERIAL_VALUE_TABLE
+): (action: LegalAction) => number | null {
+  const legalActions = getLegalActions(state);
+  let baseline: number | undefined;
+  return (action) => {
+    const legalAction = legalActions.find((candidate) => sameAction(candidate, action));
+    if (!legalAction) {
+      throw new Error('Static exchange requires an action legal in the starting position.');
+    }
+    if (legalAction.kind === 'drop' || !state.squares[legalAction.to.row][legalAction.to.col].piece) {
+      return null;
+    }
+    baseline ??= evaluateMaterial(state, legalAction.player, valueTable);
+    return evaluateExchangeContinuation(
+      applyLegalAction(state, legalAction), legalAction.to, legalAction.player, baseline, valueTable
+    );
+  };
 }

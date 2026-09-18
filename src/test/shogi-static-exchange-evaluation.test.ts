@@ -1,10 +1,13 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import {
   cloneBoardState, createPositionKey, DEFAULT_MATERIAL_VALUE_TABLE, evaluateMaterial,
-  evaluateStaticExchange, executeLegalAction, getLegalActions, isPlayerInCheck, validateMove,
+  evaluateStaticExchange as evaluateStaticExchangePublic, executeLegalAction, getLegalActions, isPlayerInCheck, validateMove,
   type LegalAction, type LegalMoveAction, type MaterialValueTable,
 } from '../domain/shogi';
 import * as legalActionsApi from '../domain/shogi/legalActions';
+import * as materialApi from '../domain/shogi/materialEvaluation';
+import * as domain from '../domain/shogi';
+import { prepareStaticExchangeEvaluation } from '../domain/shogi/staticExchangeEvaluation';
 import { createInitialBoardState, type BoardState, type PieceType, type Player } from '../types/shogi';
 
 type Placement = [row: number, col: number, type: PieceType, player: Player, promoted?: boolean];
@@ -66,7 +69,56 @@ function freezeDeep<T>(value: T): T {
 
 afterEach(() => vi.restoreAllMocks());
 
-describe('合法手ベースの静的交換評価', () => {
+describe('共有する開始局面の準備', () => {
+  it('内部経路は公開barrelへ追加しない', () => {
+    expect(domain).not.toHaveProperty('prepareStaticExchangeEvaluation');
+    expect(domain.evaluateStaticExchange).toBe(evaluateStaticExchangePublic);
+  });
+
+  it.each(['default', 'custom'] as const)('%s価値表で成り・不成を個別評価と対応させ、先後対称かつ準備を1回にする', (values) => {
+    const pieces: Placement[] = [...KINGS, [3, 4, 'silver', 'sente'], [2, 4, 'pawn', 'gote'],
+      [1, 4, 'gold', 'gote'], [4, 0, 'rook', 'sente'], [4, 1, 'silver', 'gote']];
+    const table: MaterialValueTable = values === 'custom' ? {
+      unpromoted: { ...DEFAULT_MATERIAL_VALUE_TABLE.unpromoted, silver: 1700 },
+      promoted: { ...DEFAULT_MATERIAL_VALUE_TABLE.promoted, silver: 2200 },
+    } : structuredClone(DEFAULT_MATERIAL_VALUE_TABLE);
+    const states = [position(pieces, []), position(pieces.map(([row, col, type, player, promoted]) =>
+      [8 - row, 8 - col, type, player === 'sente' ? 'gote' : 'sente', promoted]), [])];
+    states[1].turn = 'gote';
+    const scoresBySide: number[][] = [];
+    for (const state of states) {
+      const captures = getLegalActions(state).filter((action) => action.kind === 'move' &&
+        state.squares[action.to.row][action.to.col].piece !== null);
+      expect(captures.length).toBeGreaterThanOrEqual(3);
+      expect(captures.some((action) => action.promotion === 'promote')).toBe(true);
+      expect(captures.some((action) => action.promotion === 'decline')).toBe(true);
+      const expected = captures.map((action) => evaluateStaticExchangePublic(state, action, table));
+      const snapshot = structuredClone({ state, captures, table });
+      freezeDeep(state); freezeDeep(captures); freezeDeep(table);
+      const generated = vi.spyOn(legalActionsApi, 'getLegalActions');
+      const material = vi.spyOn(materialApi, 'evaluateMaterial');
+      const evaluate = prepareStaticExchangeEvaluation(state, table);
+      expect(captures.map(evaluate)).toEqual(expected);
+      expect([...captures].reverse().map(evaluate)).toEqual([...expected].reverse());
+      expect(generated.mock.calls.filter(([input]) => input === state)).toHaveLength(1);
+      expect(material.mock.calls.filter(([input]) => input === state)).toHaveLength(1);
+      expect(generated.mock.calls.filter(([input]) => input !== state).length).toBeGreaterThan(captures.length);
+      expect(material.mock.calls.every(([, perspective, received]) => perspective === state.turn && received === table)).toBe(true);
+      expect({ state, captures, table }).toEqual(snapshot);
+      scoresBySide.push(expected.map((score) => {
+        expect(score).not.toBeNull();
+        return score!;
+      }).sort((a, b) => a - b));
+      vi.restoreAllMocks();
+    }
+    expect(scoresBySide[0]).toEqual(scoresBySide[1]);
+  });
+});
+
+describe.each(['public', 'prepared'] as const)('合法手ベースの静的交換評価 (%s)', (mode) => {
+  const evaluateStaticExchange: typeof evaluateStaticExchangePublic = mode === 'public'
+    ? evaluateStaticExchangePublic
+    : (state, action, table) => prepareStaticExchangeEvaluation(state, table)(action);
   it('無防備な歩の一回の捕獲は盤上喪失と持ち駒獲得の駒得差分になる', () => {
     const state = basic();
     const action = move(state, [5, 4]);
@@ -78,7 +130,10 @@ describe('合法手ベースの静的交換評価', () => {
 
   it('合法な非捕獲移動はnullを返す', () => {
     const state = basic();
-    expect(evaluateStaticExchange(state, move(state, [5, 4], [5, 3]))).toBeNull();
+    const action = move(state, [5, 4], [5, 3]);
+    const material = vi.spyOn(materialApi, 'evaluateMaterial');
+    expect(evaluateStaticExchange(state, action)).toBeNull();
+    expect(material).not.toHaveBeenCalled();
   });
 
   it('合法な駒打ちはnullを返す', () => {
@@ -86,8 +141,10 @@ describe('合法手ベースの静的交換評価', () => {
     state.senteHand.push({ id: 'hand', type: 'silver', player: 'sente' });
     const action = getLegalActions(state).find((candidate) => candidate.kind === 'drop');
     if (!action) throw new Error('Fixture requires a drop.');
+    const material = vi.spyOn(materialApi, 'evaluateMaterial');
     expect(evaluateStaticExchange(state, action)).toBeNull();
     expect(() => evaluateStaticExchange(state, { ...action, pieceId: 'missing' })).toThrow(/legal in the starting position/);
+    expect(material).not.toHaveBeenCalled();
   });
 
   it.each([
