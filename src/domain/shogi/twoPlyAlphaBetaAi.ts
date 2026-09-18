@@ -8,8 +8,10 @@ import {
   DEFAULT_MATERIAL_VALUE_TABLE,
 } from './materialEvaluation';
 import { cloneBoardState } from './replay';
+import { prepareStaticExchangeEvaluation } from './staticExchangeEvaluation';
 import {
   evaluateSearchPositionBreakdown,
+  resolveSearchMaterialValueTable,
   type SearchClock,
   type SearchEvaluationConfig,
   type SearchEvaluationBreakdown,
@@ -17,6 +19,21 @@ import {
 
 /** The existing AI entry point remains a two-ply search by default. */
 export const TWO_PLY_ALPHA_BETA_SEARCH_DEPTH = 2;
+
+/** Search order is independent of evaluation weights and presets. */
+export type AlphaBetaMoveOrderingMode = 'standard' | 'static-exchange';
+
+/** Optional trailing configuration; existing callers keep standard ordering. */
+export interface AlphaBetaSearchOptions {
+  readonly moveOrdering?: AlphaBetaMoveOrderingMode;
+}
+
+function resolveMoveOrdering(options: AlphaBetaSearchOptions | undefined): AlphaBetaMoveOrderingMode {
+  const mode = options?.moveOrdering;
+  if (mode === undefined) return 'standard';
+  if (mode === 'standard' || mode === 'static-exchange') return mode;
+  throw new RangeError(`Unsupported alpha-beta move ordering mode: ${String(mode)}`);
+}
 
 /**
  * Observations collected while choosing an action with alpha-beta search.
@@ -193,44 +210,106 @@ function cloneSearchEvaluationBreakdown(
 
 /**
  * Returns a new, deterministic order for actions at non-root alpha-beta
- * nodes. Captures and promotions are classified from the current position;
- * no child state is created merely to order an action.
+ * nodes. Standard uses capture+promotion, capture, promotion, other, without SEE.
+ * Explicit static-exchange orders competing captures by moving-side SEE.
+ * Negative exchanges remain candidates; neither mode changes leaf evaluations.
  *
- * This is intentionally not used for root actions. The root keeps the public
- * legal-action order so strict root tie handling remains backward compatible.
+ * Fixed-depth roots keep public legal-action order. Iterative roots use this
+ * only after the previous best action; root ties still use original indexes.
  */
 export function orderAlphaBetaNodeActions(
   state: BoardState,
-  actions: readonly LegalAction[]
+  actions: readonly LegalAction[],
+  evaluation: SearchEvaluationConfig = DEFAULT_MATERIAL_VALUE_TABLE,
+  interruptionCheck: SearchInterruptionCheck = undefined,
+  options?: AlphaBetaSearchOptions
 ): LegalAction[] {
-  const priorityOf = (action: LegalAction): number => {
+  return orderAlphaBetaNodeActionsByMode(state, actions, evaluation, interruptionCheck, resolveMoveOrdering(options));
+}
+
+function orderAlphaBetaNodeActionsByMode(
+  state: BoardState,
+  actions: readonly LegalAction[],
+  evaluation: SearchEvaluationConfig,
+  interruptionCheck: SearchInterruptionCheck,
+  moveOrdering: AlphaBetaMoveOrderingMode
+): LegalAction[] {
+  if (moveOrdering === 'standard') {
+    // Keep the pre-SEE main ordering, including promotion priority and stable
+    // indexes. This path never resolves a SEE table or prepares a child state.
+    const priorityOf = (action: LegalAction): number => {
+      const target = action.kind === 'move'
+        ? state.squares[action.to.row][action.to.col].piece
+        : null;
+      const isCapture = action.kind === 'move' && target !== null && target.player !== action.player;
+      const isPromotion = action.kind === 'move' && action.promotion === 'promote';
+      if (isCapture && isPromotion) return 0;
+      if (isCapture) return 1;
+      if (isPromotion) return 2;
+      return 3;
+    };
+    return actions
+      .map((action, originalIndex) => ({ action, originalIndex, priority: priorityOf(action) }))
+      .sort((left, right) => left.priority - right.priority || left.originalIndex - right.originalIndex)
+      .map(({ action }) => action);
+  }
+  const classified = actions.map((action, originalIndex) => {
     const target = action.kind === 'move'
       ? state.squares[action.to.row][action.to.col].piece
       : null;
     const isCapture = action.kind === 'move' && target !== null && target.player !== action.player;
     const isPromotion = action.kind === 'move' && action.promotion === 'promote';
 
-    if (isCapture && isPromotion) return 0;
-    if (isCapture) return 1;
-    if (isPromotion) return 2;
-    return 3;
-  };
-
-  return actions
-    .map((action, originalIndex) => ({ action, originalIndex, priority: priorityOf(action) }))
-    .sort((left, right) => left.priority - right.priority || left.originalIndex - right.originalIndex)
+    return { action, originalIndex, priority: isCapture ? 0 : isPromotion ? 1 : 2, exchange: 0 };
+  });
+  const captures = classified.filter(({ priority }) => priority === 0);
+  // With no competing capture, SEE cannot affect the order. In particular,
+  // iterative roots reach this point after removing the previous best action.
+  if (captures.length >= 2) {
+    const materialValueTable = resolveSearchMaterialValueTable(evaluation);
+    let evaluateCapture: ReturnType<typeof prepareStaticExchangeEvaluation> | undefined;
+    for (const candidate of captures) {
+      interruptionCheck?.();
+      evaluateCapture ??= prepareStaticExchangeEvaluation(state, materialValueTable);
+      const score = evaluateCapture(candidate.action);
+      if (score === null) {
+        throw new Error('Alpha-beta capture ordering contract violated: legal capture returned null SEE.');
+      }
+      interruptionCheck?.();
+      candidate.exchange = score;
+    }
+  }
+  return classified
+    .sort((left, right) => left.priority - right.priority ||
+      right.exchange - left.exchange || left.originalIndex - right.originalIndex)
     .map(({ action }) => action);
 }
 
 /**
  * Moves the completed previous iteration's best root action to the front.
- * Remaining root candidates use the existing capture/promotion ordering. If
+ * Remaining root candidates use the selected move-ordering mode. If
  * that action is no longer legal, the public root legal-action order is kept.
  */
 export function orderIterativeDeepeningRootActions(
   state: BoardState,
   actions: readonly LegalAction[],
-  previousBestAction: LegalAction | null
+  previousBestAction: LegalAction | null,
+  evaluation: SearchEvaluationConfig = DEFAULT_MATERIAL_VALUE_TABLE,
+  interruptionCheck: SearchInterruptionCheck = undefined,
+  options?: AlphaBetaSearchOptions
+): LegalAction[] {
+  return orderIterativeDeepeningRootActionsByMode(
+    state, actions, previousBestAction, evaluation, interruptionCheck, resolveMoveOrdering(options)
+  );
+}
+
+function orderIterativeDeepeningRootActionsByMode(
+  state: BoardState,
+  actions: readonly LegalAction[],
+  previousBestAction: LegalAction | null,
+  evaluation: SearchEvaluationConfig,
+  interruptionCheck: SearchInterruptionCheck,
+  moveOrdering: AlphaBetaMoveOrderingMode
 ): LegalAction[] {
   if (previousBestAction === null) return [...actions];
 
@@ -239,7 +318,7 @@ export function orderIterativeDeepeningRootActions(
 
   const previousBest = actions[previousBestIndex];
   const remainingActions = actions.filter((_, index) => index !== previousBestIndex);
-  return [previousBest, ...orderAlphaBetaNodeActions(state, remainingActions)];
+  return [previousBest, ...orderAlphaBetaNodeActionsByMode(state, remainingActions, evaluation, interruptionCheck, moveOrdering)];
 }
 
 /**
@@ -262,7 +341,8 @@ function searchAlphaBetaNode(
   beta: number,
   valueTable: SearchEvaluationConfig,
   statistics: SearchStatistics,
-  interruptionCheck: SearchInterruptionCheck
+  interruptionCheck: SearchInterruptionCheck,
+  moveOrdering: AlphaBetaMoveOrderingMode
 ): SearchNodeResult {
   interruptionCheck?.();
   if (state.status === 'ended' || remainingDepth === 0) {
@@ -274,7 +354,7 @@ function searchAlphaBetaNode(
     };
   }
 
-  const actions = orderAlphaBetaNodeActions(state, getLegalActions(state));
+  const actions = orderAlphaBetaNodeActionsByMode(state, getLegalActions(state), valueTable, interruptionCheck, moveOrdering);
   // All reachable no-legal-action positions are marked ended by the existing
   // rules. Treat a malformed in-progress position as a leaf as well, rather
   // than recursing forever or throwing after a valid API result of [].
@@ -304,7 +384,8 @@ function searchAlphaBetaNode(
       beta,
       valueTable,
       statistics,
-      interruptionCheck
+      interruptionCheck,
+      moveOrdering
     );
 
     const candidatePrincipalVariation = [
@@ -352,7 +433,8 @@ function searchAlphaBeta(
   depth: number,
   valueTable: SearchEvaluationConfig,
   previousBestAction: LegalAction | null = null,
-  interruptionCheck: SearchInterruptionCheck = undefined
+  interruptionCheck: SearchInterruptionCheck = undefined,
+  moveOrdering: AlphaBetaMoveOrderingMode = 'standard'
 ): UnmeasuredAlphaBetaSearchResult {
   validateSearchDepth(depth);
   const rootPlayer = state.turn;
@@ -388,7 +470,9 @@ function searchAlphaBeta(
       ...statistics,
     };
   }
-  const orderedRootActions = orderIterativeDeepeningRootActions(state, rootActions, previousBestAction);
+  const orderedRootActions = orderIterativeDeepeningRootActionsByMode(
+    state, rootActions, previousBestAction, valueTable, interruptionCheck, moveOrdering
+  );
   const indexedRootActions = orderedRootActions.map((action) => ({
     action,
     originalIndex: rootActions.indexOf(action),
@@ -415,7 +499,8 @@ function searchAlphaBeta(
       beta,
       valueTable,
       statistics,
-      interruptionCheck
+      interruptionCheck,
+      moveOrdering
     );
 
     // A root candidate searched after a higher-index PV candidate can be cut
@@ -433,7 +518,8 @@ function searchAlphaBeta(
         Number.POSITIVE_INFINITY,
         valueTable,
         statistics,
-        interruptionCheck
+        interruptionCheck,
+        moveOrdering
       );
     }
 
@@ -480,10 +566,12 @@ export function analyzeAlphaBetaSearch(
   state: BoardState,
   depth: number,
   valueTable: SearchEvaluationConfig = DEFAULT_MATERIAL_VALUE_TABLE,
-  clock: SearchClock = defaultSearchClock
+  clock: SearchClock = defaultSearchClock,
+  options?: AlphaBetaSearchOptions
 ): AlphaBetaSearchResult {
+  const moveOrdering = resolveMoveOrdering(options);
   const startedAt = clock();
-  const searchResult = searchAlphaBeta(state, depth, valueTable);
+  const searchResult = searchAlphaBeta(state, depth, valueTable, null, undefined, moveOrdering);
   return {
     ...searchResult,
     principalVariation: clonePrincipalVariation(searchResult.principalVariation),
@@ -501,8 +589,10 @@ export function analyzeIterativeDeepeningAlphaBetaSearch(
   state: BoardState,
   maxDepth: number,
   valueTable: SearchEvaluationConfig = DEFAULT_MATERIAL_VALUE_TABLE,
-  clock: SearchClock = defaultSearchClock
+  clock: SearchClock = defaultSearchClock,
+  options?: AlphaBetaSearchOptions
 ): IterativeDeepeningAlphaBetaSearchResult {
+  const moveOrdering = resolveMoveOrdering(options);
   validateIterativeDeepeningMaxDepth(maxDepth);
   const startedAt = clock();
   const iterations: IterativeDeepeningAlphaBetaIterationResult[] = [];
@@ -510,7 +600,7 @@ export function analyzeIterativeDeepeningAlphaBetaSearch(
 
   for (let depth = 1; depth <= maxDepth; depth += 1) {
     const iterationStartedAt = clock();
-    const searchResult = searchAlphaBeta(state, depth, valueTable, previousBestAction);
+    const searchResult = searchAlphaBeta(state, depth, valueTable, previousBestAction, undefined, moveOrdering);
     const iteration = {
       ...searchResult,
       principalVariation: clonePrincipalVariation(searchResult.principalVariation),
@@ -551,8 +641,10 @@ export function analyzeTimeLimitedIterativeDeepeningAlphaBetaSearch(
   maxDepth: number,
   timeLimitMilliseconds: number,
   valueTable: SearchEvaluationConfig = DEFAULT_MATERIAL_VALUE_TABLE,
-  clock: SearchClock = defaultSearchClock
+  clock: SearchClock = defaultSearchClock,
+  options?: AlphaBetaSearchOptions
 ): TimeLimitedIterativeDeepeningAlphaBetaSearchResult {
+  const moveOrdering = resolveMoveOrdering(options);
   validateIterativeDeepeningMaxDepth(maxDepth);
   validateSearchTimeLimitMilliseconds(timeLimitMilliseconds);
   const startedAt = clock();
@@ -576,7 +668,8 @@ export function analyzeTimeLimitedIterativeDeepeningAlphaBetaSearch(
         previousBestAction,
         depth >= 2
           ? () => throwIfSearchTimeLimitReached(clock, startedAt, timeLimitMilliseconds)
-          : undefined
+          : undefined,
+        moveOrdering
       );
       const iterationFinishedAt = clock();
       if (depth >= 2) {
@@ -625,18 +718,20 @@ export function analyzeTimeLimitedIterativeDeepeningAlphaBetaSearch(
 export function selectBestAlphaBetaAction(
   state: BoardState,
   depth: number,
-  valueTable: SearchEvaluationConfig = DEFAULT_MATERIAL_VALUE_TABLE
+  valueTable: SearchEvaluationConfig = DEFAULT_MATERIAL_VALUE_TABLE,
+  options?: AlphaBetaSearchOptions
 ): LegalAction | null {
-  return searchAlphaBeta(state, depth, valueTable).selectedAction;
+  return searchAlphaBeta(state, depth, valueTable, null, undefined, resolveMoveOrdering(options)).selectedAction;
 }
 
 /** Selects the completed deepest action from iterative-deepening search. */
 export function selectBestIterativeDeepeningAlphaBetaAction(
   state: BoardState,
   maxDepth: number,
-  valueTable: SearchEvaluationConfig = DEFAULT_MATERIAL_VALUE_TABLE
+  valueTable: SearchEvaluationConfig = DEFAULT_MATERIAL_VALUE_TABLE,
+  options?: AlphaBetaSearchOptions
 ): LegalAction | null {
-  return analyzeIterativeDeepeningAlphaBetaSearch(state, maxDepth, valueTable).selectedAction;
+  return analyzeIterativeDeepeningAlphaBetaSearch(state, maxDepth, valueTable, undefined, options).selectedAction;
 }
 
 /**
@@ -647,9 +742,10 @@ export function selectBestIterativeDeepeningAlphaBetaAction(
 export function analyzeTwoPlyAlphaBetaSearch(
   state: BoardState,
   valueTable: SearchEvaluationConfig = DEFAULT_MATERIAL_VALUE_TABLE,
-  clock: SearchClock = defaultSearchClock
+  clock: SearchClock = defaultSearchClock,
+  options?: AlphaBetaSearchOptions
 ): TwoPlyAlphaBetaSearchResult {
-  const result = analyzeAlphaBetaSearch(state, TWO_PLY_ALPHA_BETA_SEARCH_DEPTH, valueTable, clock);
+  const result = analyzeAlphaBetaSearch(state, TWO_PLY_ALPHA_BETA_SEARCH_DEPTH, valueTable, clock, options);
   return {
     selectedAction: result.selectedAction,
     selectedEvaluation: result.selectedEvaluation,
@@ -667,7 +763,8 @@ export function analyzeTwoPlyAlphaBetaSearch(
 /** Compatibility selector that preserves the established default depth of 2. */
 export function selectBestTwoPlyAlphaBetaAction(
   state: BoardState,
-  valueTable: SearchEvaluationConfig = DEFAULT_MATERIAL_VALUE_TABLE
+  valueTable: SearchEvaluationConfig = DEFAULT_MATERIAL_VALUE_TABLE,
+  options?: AlphaBetaSearchOptions
 ): LegalAction | null {
-  return selectBestAlphaBetaAction(state, TWO_PLY_ALPHA_BETA_SEARCH_DEPTH, valueTable);
+  return selectBestAlphaBetaAction(state, TWO_PLY_ALPHA_BETA_SEARCH_DEPTH, valueTable, options);
 }

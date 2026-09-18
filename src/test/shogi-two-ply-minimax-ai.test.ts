@@ -466,7 +466,7 @@ function findMove(
 }
 
 describe('再帰型αβ探索の手の並べ替え', () => {
-  it('駒取り＋成り、駒取り、成り、その他の優先順と同一優先度の元順を保つ', () => {
+  it('SEEが高い成り付き捕獲、通常捕獲、非捕獲成り、その他の順と同点の元順を保つ', () => {
     const state = moveOrderingActionState();
     const actions = getLegalActions(state);
     const capturePromotion = actions.find((action) => action.kind === 'move' &&
@@ -489,7 +489,7 @@ describe('再帰型αβ探索の手の並べ替え', () => {
 
     const source = [normal, drop, anotherNormal, promotion, capture, capturePromotion];
 
-    expect(orderAlphaBetaNodeActions(state, source)).toEqual([
+    expect(orderAlphaBetaNodeActions(state, source, undefined, undefined, { moveOrdering: 'static-exchange' })).toEqual([
       capturePromotion,
       capture,
       promotion,
@@ -543,14 +543,22 @@ describe('再帰型αβ探索の手の並べ替え', () => {
     expect(ordered.selectedAction).toEqual(minimax.selectedAction);
     expect(ordered.selectedEvaluation).toBe(minimax.selectedEvaluation);
     expect(ordered.visitedPositionCount).toBeLessThan(unordered.visitedPositionCount);
+    // Recorded on pre-SEE main a964fd6; ordering must not change the root answer.
+    expect(ordered.selectedAction).toMatchObject({ from: { row: 4, col: 4 }, to: { row: 4, col: 2 } });
+    expect(ordered.selectedEvaluation).toBe(-575);
+    expect(ordered.principalVariation).toMatchObject([
+      { from: { row: 4, col: 4 }, to: { row: 4, col: 2 }, promotion: 'none' },
+      { from: { row: 4, col: 6 }, to: { row: 8, col: 6 }, promotion: 'promote' },
+      { from: { row: 8, col: 8 }, to: { row: 7, col: 8 }, promotion: 'none' },
+    ]);
   });
 });
 
 describe('反復深化αβ探索', () => {
-  it('初期局面の固定深さ3は利きマップ共有前と選択手、評価値、PV、探索統計を保つ', () => {
+  it.each(['standard', 'static-exchange'] as const)('初期局面の固定深さ3は選択手、評価値、PVと%sの統計を保つ', (moveOrdering) => {
     const state = createInitialBoardState();
     const snapshot = JSON.stringify(state);
-    const result = analyzeAlphaBetaSearch(state, 3);
+    const result = analyzeAlphaBetaSearch(state, 3, undefined, undefined, { moveOrdering });
 
     expect(result).toMatchObject({
       selectedAction: {
@@ -558,9 +566,11 @@ describe('反復深化αβ探索', () => {
         pieceType: 'pawn', promotion: 'none',
       },
       selectedEvaluation: 214,
-      visitedPositionCount: 1244,
+      // Recorded statistics from pre-SEE main and the parent SEE implementation.
+      // Both modes retain 80 cutoffs and the same root answer.
+      visitedPositionCount: moveOrdering === 'standard' ? 1244 : 1267,
       cutoffCount: 80,
-      skippedActionCount: 2565,
+      skippedActionCount: moveOrdering === 'standard' ? 2565 : 2542,
     });
     expect(result.principalVariation).toMatchObject([
       { kind: 'move', from: { row: 6, col: 2 }, to: { row: 5, col: 2 } },
