@@ -8,7 +8,7 @@ import {
   DEFAULT_MATERIAL_VALUE_TABLE,
 } from './materialEvaluation';
 import { cloneBoardState } from './replay';
-import { evaluateStaticExchange } from './staticExchangeEvaluation';
+import { prepareStaticExchangeEvaluation } from './staticExchangeEvaluation';
 import {
   evaluateSearchPositionBreakdown,
   resolveSearchMaterialValueTable,
@@ -222,9 +222,11 @@ export function orderAlphaBetaNodeActions(
   // iterative roots reach this point after removing the previous best action.
   if (captures.length >= 2) {
     const materialValueTable = resolveSearchMaterialValueTable(evaluation);
+    let evaluateCapture: ReturnType<typeof prepareStaticExchangeEvaluation> | undefined;
     for (const candidate of captures) {
       interruptionCheck?.();
-      const score = evaluateStaticExchange(state, candidate.action, materialValueTable);
+      evaluateCapture ??= prepareStaticExchangeEvaluation(state, materialValueTable);
+      const score = evaluateCapture(candidate.action);
       if (score === null) {
         throw new Error('Alpha-beta capture ordering contract violated: legal capture returned null SEE.');
       }
