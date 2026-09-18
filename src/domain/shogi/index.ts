@@ -4,6 +4,7 @@ export * from './moves';
 export * from './legalActions';
 export * from './randomAi';
 export * from './materialEvaluation';
+export * from './staticExchangeEvaluation';
 export * from './pieceSquareEvaluation';
 export * from './kingSafetyEvaluation';
 export * from './undefendedPieceSafetyEvaluation';
