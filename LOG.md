@@ -3244,3 +3244,48 @@ PR #1のレビュー指摘を受け、簡易APIの`applyMove`と合法手候補�
 - `npm run check` はlock・型検査・**39ファイル1187/1187成功**・本番buildまで完走、終了コード0。テスト工程45.01秒。既存jsdomのnavigation未実装通知は出たが失敗なし。今回テストの失敗、skip、削除、条件緩和、タイムアウト延長はない。
 - `git diff --check` は終了コード0。非root専用局面でSEE実行・複数比較を必須とする計測アサーションも終了コード0で確認した。
 - CIの既存push/PRトリガーはmain/masterのみであり、今回の積み重ねbaseでは自動起動しない。workflowは変更せず、push後の新ブランチで既存workflow_dispatchを明示実行し、Ubuntu/macOSと対象SHAを確認する。結果は新PR本文へ記録する。
+
+## [2026-09-19] 積み重ねPR: SEE手順並べ替えを明示選択にする
+
+### 目的・分岐・互換性
+
+- fetch後、親PR #106はOPEN、base main、head `feat/see-move-ordering`、HEAD `414e7a13e7e0957cf7e3dc8e68cf6a1e25999825`で指定と一致。PR #107は同HEADでマージ済み。リポジトリ内のAGENTS.mdはなし、作業ツリーはクリーンだった。指定どおり親をcheckoutし`git pull --ff-only origin feat/see-move-ordering`で最新化後、`fix/see-ordering-opt-in`を作成した。親・mainへ直接commitしない。
+- 変更前の関連7ファイル248/248成功、`npm run check`もlock・型・39ファイル1187/1187・buildまで成功（テスト98.80秒）、いずれも終了コード0。親414e7a1とmain a964fd6を参照チェックアウトに固定し、4段階を同じ測定スクリプトで比較した。
+- 既定SEEの計算費用で初期100msの完了深さが低下するため、機能と#107の準備共有を保持し、通常利用だけ従来の手順へ戻す。`AlphaBetaMoveOrderingMode = 'standard' | 'static-exchange'` と、独立した `AlphaBetaSearchOptions { readonly moveOrdering?: AlphaBetaMoveOrderingMode }` を追加。評価係数・SearchEvaluationOptions・プリセットには混ぜない。
+- analyze系は既存clockの後、select系は既存evaluationの後へ、省略可能な末尾optionsを追加。固定深さ・反復深化・時間制限・select・互換2手読み・並べ替えAPIへ伝播し、既存引数順は不変。省略・空optionsはstandard。不明モードは、空候補や終了局面でも黙って既定へ落とさずRangeErrorにする。モードは公開入口で解決し、再帰では解決済みの値だけを渡す。
+- standardはmainの分類をそのまま使い「駒取りかつ成り→通常駒取り→非駒取り成り→その他（駒打ち含む）」、同分類は元インデックス順。SEE準備・公開SEE・SEE用価値表解決・SEE用複製や合法手生成には入らない。
+- static-exchangeは親の実装を維持。全捕獲を先頭へ分類し、2手以上だけ共有準備、各SEE最大1回、着手側降順・同点元順・負値保持、各候補前後の中断確認。0～1捕獲の省略、固定root順序、前回最善手優先、未完了反復破棄、深さ1フォールバックも維持する。
+- SEE本体とprepare関数は変更せず、公開合法手検証・非有限差分・終局・例外契約もそのまま。Worker handler／プロトコルとUIは変更せず、既存の呼び出しがstandardを使う。入力局面・配列・手・価値表・optionsは変更しない。READMEは既定・明示選択・末尾引数と例を最小限更新した。
+
+### 自動テストと検証
+
+- `shogi-move-ordering-modes.test.ts`に34件を追加。standard分類・元順・SEE関連6種類のspyが0、7つの探索入口で省略／空／明示standardと明示SEEの伝播、9公開入口の不明値拒否、両モードの5局面完全一致・凍結入力・決定性、固定root／前回最善手、期限超過反復破棄・0msフォールバック、3プリセットのWorker既定standard一致を確認する。
+- main／親の固定深さ3結果全フィールドを`fixtures/alpha-beta-ordering-baselines.ts`へ記録。elapsedだけ0に正規化し、選択手・評価・PV・内訳・visited・cutoff・skipped等をCIで完全一致検証する。初期局面の既存回帰テストは両モードで実行し、standard=1244/80/2565、SEE=1267/80/2542の統計を維持する（1件増）。
+- 既存SEE並べ替え28件は全呼び出しへ明示static-exchangeを追加し、アサーションを維持。WorkerへSEEを注入する既存テストも明示注入として残し、既定Workerのテストを別途追加した。公開／共有SEE71件は変更なし。テスト削除・skip追加・条件緩和・タイムアウト延長はない。
+- 初期の型検査で2回終了コード2。1回目は既存テスト置換が3箇所へ広がり未定義moveOrderingを参照（TS18004）。範囲外の3箇所を元へ戻した。2回目は新規テスト配列の関数型が第2引数必須となった点（TS2554）と、既存評価設定にないWeight名の使用（TS2353）。テストの関数型を正しく宣言し、既存coefficients設定へ修正した。いずれもテスト記述起因で、検証条件を緩めず修正後lintは終了コード0。
+- 変更後関連8ファイル **283/283成功**、終了コード0。`npm run verify:lock`は399 entries / registry 398・欠落0、`npm run lint`、`npm run build`はいずれも終了コード0。
+- 最終`npm run check`はlock・型・**40ファイル1222/1222成功**・buildまで完走、終了コード0（テスト60.40秒）。runtimeテストの失敗はない。既存jsdom navigation通知は失敗ではない。CIは積み重ねbaseのため既存workflow_dispatchで新HEADを検証し、Ubuntu/macOSの結果とSHAを新PR本文に記録する。
+- `git diff --check`は終了コード0。変更対象は本件の9ファイルのみで、SEE本体、Worker、UI、評価プリセット、依存ファイルには差分なし。
+
+### 4段階の性能比較
+
+- Windows / Node v24.20.0 / Intel Core i7-14650HX。5局面・固定深さ3、各独立Nodeプロセス、3ウォームアップ・7測定。時間測定とSEE計数は別実行。全測定範囲、選択手・評価・PV・内訳・統計・SEE候補／準備／開始合法手／基準駒得の回数、全7サンプルは[測定記録](docs/see-move-ordering-performance.md)の2026-09-19節へ追記した。
+
+| 局面 | main a964fd6 ms | 親414e7a1 ms | standard ms | static-exchange ms |
+| --- | ---: | ---: | ---: | ---: |
+| initial | 74.892 | 107.903 | 76.414 | 108.281 |
+| moveOrderingBenefitState | 28.196 | 31.554 | 27.956 | 30.722 |
+| singleCapture | 24.967 | 25.928 | 25.054 | 24.314 |
+| multipleCaptures | 17.924 | 18.075 | 18.422 | 17.878 |
+| nonRootMultipleCaptures | 40.548 | 39.928 | 40.756 | 37.645 |
+
+- standardは全局面でSEE候補／準備／開始合法手／基準駒得／再帰合法手の計数が0。固定深さ結果全フィールドはmainと一致。中央値はmain比-0.9～+2.8%で範囲が重なり、同程度へ戻った。
+- static-exchangeは親の結果全フィールドとSEE候補値／順序ダイジェストが一致。初期の候補58・準備29・開始合法手29・基準駒得29・再帰186、既存専用12/6/6/6/19、非root専用38/16/16/16/46は親と同じ。初期中央値は親比+0.4%で同程度。ほかの小幅な変動をSEEの追加最適化効果とは扱わない。
+- 時間制限はrequestedMaxDepth=6、100/250/500ms、各独立プロセスで3ウォームアップ・7測定。全条件timedOut=true。initial100msはmain/standardが深さ3×7、親/明示SEEが深さ2×7で、standardは深さ3へ安定して戻った。main/standardの選択手6,2→5,2・評価214、親/SEEの6,0→5,0・評価0という差は完了深さ差で、固定深さ回帰ではない。
+- initial250msは全段階3×7。nonRootMultipleCaptures250msはmain/standardが3×7、親/SEEが4×7で、SEEが有利な局面も保持する。全局面・全時間の分布とvisited/totalVisited/実時間は測定記録に保存した。
+- initial500msは主測定で全段階2×4/3×3と、250msより低くなる揺れを観測。独立プロセスで追加3ウォームアップ＋7測定を行っても、全段階で最初3回が深さ3、後4回が深さ2となった。入力不変性は確認済み。mainにも共通し、今回のモード切替固有とは判断しない。実行履歴・JIT・環境負荷の寄与は未確定とし、最初の測定を捨てず両方を記録した。実時間や実完了深さをCI固定期待値にしない。
+
+### 判断・対象外
+
+- 新PRは親への取り込みを推奨。親PR #106は本PRを取り込みstandardが既定になった状態ならmainへのマージ候補。未反映の親414e7a1を既定SEEのままマージする推奨ではない。どのPRも自動マージせず、親本文は#107マージ済みと新PR参照だけ最小限更新する。
+- 明示SEEの性能負担と1交換系列中に中断できない制限、実時間測定の揺れは残る。SEE内部追加最適化、make/unmake、undo、差分更新、合法手生成変更、静止探索、詰み専用探索、置換表・局面間キャッシュ、新しい枝刈り、評価係数・プリセット、Workerプロトコル、UI、棋譜・保存形式、依存追加は対象外。

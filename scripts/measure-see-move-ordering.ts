@@ -1,5 +1,5 @@
 // Reference timings, never a CI threshold:
-// npx tsx scripts/measure-see-move-ordering.ts [source checkout] [fixed|timed|all]
+// npx tsx scripts/measure-see-move-ordering.ts [source checkout] [fixed|timed|all] [--ordering=standard|static-exchange]
 // Run sequentially on each revision, without concurrent tests/builds.
 // Each position / time budget runs in a fresh process to isolate JIT history.
 import assert from 'node:assert/strict';
@@ -12,8 +12,14 @@ import { build } from 'esbuild';
 import type * as Search from '../src/domain/shogi/twoPlyAlphaBetaAi';
 import { createInitialBoardState, type PieceType, type Player } from '../src/types/shogi';
 
-const sourceRoot = resolve(process.argv[2] ?? resolve(import.meta.dirname, '..'));
-const mode = process.argv[3] ?? 'all';
+const orderingFlag = process.argv.find((argument) => argument.startsWith('--ordering='));
+const ordering = orderingFlag?.slice('--ordering='.length);
+assert(ordering === undefined || ordering === 'standard' || ordering === 'static-exchange', 'Unknown ordering mode');
+const searchOptions: Search.AlphaBetaSearchOptions | undefined = ordering === undefined
+  ? undefined : { moveOrdering: ordering };
+const args = process.argv.slice(2).filter((argument) => !argument.startsWith('--ordering='));
+const sourceRoot = resolve(args[0] ?? resolve(import.meta.dirname, '..'));
+const mode = args[1] ?? 'all';
 assert(['fixed', 'timed', 'all'].includes(mode), 'Mode must be fixed, timed or all');
 type Engine = Pick<typeof Search, 'analyzeAlphaBetaSearch' |
   'analyzeTimeLimitedIterativeDeepeningAlphaBetaSearch' | 'orderAlphaBetaNodeActions'> & {
@@ -21,6 +27,7 @@ type Engine = Pick<typeof Search, 'analyzeAlphaBetaSearch' |
   seeCallCount: number;
   resetSeeCallCount: () => void;
   seeMetrics: () => {
+    preparationCalls: number;
     startingLegalGenerations: number; baselineMaterialEvaluations: number; recursiveLegalGenerations: number;
     multiCaptureStarts: number; maximumCapturesPerStart: number; evaluationTrace: unknown[];
   };
@@ -50,6 +57,7 @@ async function loadEngine(countCalls: boolean): Promise<Engine> {
           .replaceAll('evaluateMaterial(', 'measuredEvaluateMaterial(');
         const wrapper = hasPreparation ? `
           export function prepareStaticExchangeEvaluation(...args: Parameters<typeof uncountedPreparation>) {
+            preparationCalls++;
             registerStart(args[0]);
             const evaluate = uncountedPreparation(...args);
             return (action: LegalAction) => recordEvaluation(args[0], action, evaluate(action));
@@ -63,6 +71,7 @@ async function loadEngine(countCalls: boolean): Promise<Engine> {
           : source.replace(signature, 'function uncountedStaticExchange(');
         return { loader: 'ts', contents: source + `
           export let seeCallCount = 0;
+          let preparationCalls = 0;
           let startingLegalGenerations = 0, baselineMaterialEvaluations = 0, recursiveLegalGenerations = 0;
           const starts = new Map<BoardState, number>();
           const evaluationTrace: unknown[] = [];
@@ -82,11 +91,11 @@ async function loadEngine(countCalls: boolean): Promise<Engine> {
             return evaluateMaterial(...args);
           }
           export function resetSeeCallCount() {
-            seeCallCount = startingLegalGenerations = baselineMaterialEvaluations = recursiveLegalGenerations = 0;
+            seeCallCount = preparationCalls = startingLegalGenerations = baselineMaterialEvaluations = recursiveLegalGenerations = 0;
             starts.clear(); evaluationTrace.length = 0;
           }
           export function seeMetrics() {
-            return { startingLegalGenerations, baselineMaterialEvaluations, recursiveLegalGenerations,
+            return { preparationCalls, startingLegalGenerations, baselineMaterialEvaluations, recursiveLegalGenerations,
               multiCaptureStarts: [...starts.values()].filter(n => n >= 2).length,
               maximumCapturesPerStart: Math.max(0, ...starts.values()), evaluationTrace };
           }
@@ -125,8 +134,8 @@ const comparable = (result: Search.AlphaBetaSearchResult) => ({ ...result, elaps
 function measure(engine: Engine, counted: Engine) {
   return {
     revision: execFileSync('git', ['rev-parse', 'HEAD'], { cwd: sourceRoot, encoding: 'utf8' }).trim(),
-    sourceRoot, node: process.version, cpu: cpus()[0].model, mode, depth: 3, warmups: 3, samples: 7,
-    positions: results.filter(([name]) => name === process.argv[4]).map(([name, state]) => {
+    sourceRoot, node: process.version, cpu: cpus()[0].model, mode, ordering: ordering ?? 'default', depth: 3, warmups: 3, samples: 7,
+    positions: results.filter(([name]) => name === args[2]).map(([name, state]) => {
       const before = structuredClone(state);
       const actions = engine.getLegalActions(state);
       const rootCaptureCount = actions.filter((action) => action.kind === 'move' &&
@@ -135,17 +144,25 @@ function measure(engine: Engine, counted: Engine) {
       if (name === 'singleCapture') assert.equal(rootCaptureCount, 1);
       if (name === 'multipleCaptures') assert.equal(rootCaptureCount, 2);
       counted.resetSeeCallCount();
-      counted.orderAlphaBetaNodeActions(state, actions);
+      counted.orderAlphaBetaNodeActions(state, actions, undefined, undefined, searchOptions);
       const rootOrderingSeeCalls = counted.seeCallCount;
       let fixed;
       if (mode !== 'timed') {
-        for (let i = 0; i < 3; i++) engine.analyzeAlphaBetaSearch(state, 3);
-        const runs = Array.from({ length: 7 }, () => engine.analyzeAlphaBetaSearch(state, 3));
+        const run = () => engine.analyzeAlphaBetaSearch(state, 3, undefined, undefined, searchOptions);
+        for (let i = 0; i < 3; i++) run();
+        const runs = Array.from({ length: 7 }, run);
         const reference = comparable(runs[0]);
         for (const run of runs) assert.deepEqual(comparable(run), reference);
         counted.resetSeeCallCount();
-        assert.deepEqual(comparable(counted.analyzeAlphaBetaSearch(state, 3)), reference);
+        assert.deepEqual(comparable(counted.analyzeAlphaBetaSearch(state, 3, undefined, undefined, searchOptions)), reference);
         const { evaluationTrace, ...preparationMetrics } = counted.seeMetrics();
+        if (ordering === 'standard') {
+          assert.equal(counted.seeCallCount, 0);
+          for (const count of Object.values(preparationMetrics)) assert.equal(count, 0);
+        }
+        if (ordering === 'static-exchange' && name === 'nonRootMultipleCaptures') {
+          assert(preparationMetrics.preparationCalls > 0, 'Explicit SEE must prepare non-root captures');
+        }
         if (name === 'nonRootMultipleCaptures' && rootOrderingSeeCalls > 0) {
           assert(counted.seeCallCount > 0, 'Must exercise SEE within fixed-depth search');
           assert(preparationMetrics.multiCaptureStarts > 0, 'Must compare multiple captures at non-root');
@@ -157,9 +174,10 @@ function measure(engine: Engine, counted: Engine) {
           medianMilliseconds: median(runs.map((run) => run.elapsedMilliseconds)),
           times: runs.map((run) => run.elapsedMilliseconds) };
       }
-      const timed = mode === 'fixed' ? [] : [Number(process.argv[5])].map((timeLimitMilliseconds) => {
+      const timed = mode === 'fixed' ? [] : [Number(args[3])].map((timeLimitMilliseconds) => {
         assert([100, 250, 500].includes(timeLimitMilliseconds));
-        const run = () => engine.analyzeTimeLimitedIterativeDeepeningAlphaBetaSearch(state, 6, timeLimitMilliseconds);
+        const run = () => engine.analyzeTimeLimitedIterativeDeepeningAlphaBetaSearch(
+          state, 6, timeLimitMilliseconds, undefined, undefined, searchOptions);
         for (let i = 0; i < 3; i++) run();
         const runs = Array.from({ length: 7 }, () => {
           const result = run();
@@ -187,12 +205,13 @@ function measure(engine: Engine, counted: Engine) {
 }
 
 let report: ReturnType<typeof measure>;
-if (process.argv[4]) {
+if (args[2]) {
   report = measure(await loadEngine(false), await loadEngine(true));
 } else {
   const runCase = (name: string, caseMode: 'fixed' | 'timed', limit?: number): ReturnType<typeof measure> =>
     JSON.parse(execFileSync(process.execPath, [
       ...process.execArgv, import.meta.filename, sourceRoot, caseMode, name, ...(limit ? [String(limit)] : []),
+      ...(orderingFlag ? [orderingFlag] : []),
     ], { encoding: 'utf8', stdio: ['ignore', 'pipe', 'inherit'] }));
   const cases = results.map(([name]) => {
     const fixed = mode !== 'timed' ? runCase(name, 'fixed') : undefined;

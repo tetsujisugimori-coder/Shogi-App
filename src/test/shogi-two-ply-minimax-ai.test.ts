@@ -489,7 +489,7 @@ describe('再帰型αβ探索の手の並べ替え', () => {
 
     const source = [normal, drop, anotherNormal, promotion, capture, capturePromotion];
 
-    expect(orderAlphaBetaNodeActions(state, source)).toEqual([
+    expect(orderAlphaBetaNodeActions(state, source, undefined, undefined, { moveOrdering: 'static-exchange' })).toEqual([
       capturePromotion,
       capture,
       promotion,
@@ -555,10 +555,10 @@ describe('再帰型αβ探索の手の並べ替え', () => {
 });
 
 describe('反復深化αβ探索', () => {
-  it('初期局面の固定深さ3はSEE接続前の選択手、評価値、PVを保ち、SEE順の統計を返す', () => {
+  it.each(['standard', 'static-exchange'] as const)('初期局面の固定深さ3は選択手、評価値、PVと%sの統計を保つ', (moveOrdering) => {
     const state = createInitialBoardState();
     const snapshot = JSON.stringify(state);
-    const result = analyzeAlphaBetaSearch(state, 3);
+    const result = analyzeAlphaBetaSearch(state, 3, undefined, undefined, { moveOrdering });
 
     expect(result).toMatchObject({
       selectedAction: {
@@ -566,11 +566,11 @@ describe('反復深化αβ探索', () => {
         pieceType: 'pawn', promotion: 'none',
       },
       selectedEvaluation: 214,
-      // SEE replaces capture+promotion priority: 23 fewer actions are skipped
-      // than pre-SEE main (1244 visited / 2565 skipped), with the same 80 cutoffs.
-      visitedPositionCount: 1267,
+      // Recorded statistics from pre-SEE main and the parent SEE implementation.
+      // Both modes retain 80 cutoffs and the same root answer.
+      visitedPositionCount: moveOrdering === 'standard' ? 1244 : 1267,
       cutoffCount: 80,
-      skippedActionCount: 2542,
+      skippedActionCount: moveOrdering === 'standard' ? 2565 : 2542,
     });
     expect(result.principalVariation).toMatchObject([
       { kind: 'move', from: { row: 6, col: 2 }, to: { row: 5, col: 2 } },

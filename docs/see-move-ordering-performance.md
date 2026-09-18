@@ -315,3 +315,290 @@ requestedMaxDepth=6。分布はcompletedDepth×件数、各条件合計7件。�
 | 共有準備後 | initial | 500ms再測定 (3×7) | 500.077, 500.068, 500.064, 500.069, 500.064, 500.073, 500.077 |
 
 </details>
+
+
+## [2026-09-19] 積み重ねPR: SEEを既定無効・明示選択に変更
+
+比較対象はSEE導入前main `a964fd6cffb536b20133e3bc68cf5b13427eaafb`、#107を取り込み済みの親PR #106 `414e7a13e7e0957cf7e3dc8e68cf6a1e25999825`、そのHEADから作成した`fix/see-ordering-opt-in`のstandard／static-exchange作業ツリー。以前の測定値とは混ぜず、全条件を今回測り直した。
+
+環境: Windows、v24.20.0、Intel(R) Core(TM) i7-14650HX、既定評価。固定深さ3、時間制限はrequestedMaxDepth=6・100/250/500ms。各局面・各制限時間は別Nodeプロセス、3回ウォームアップ後7回測定。テスト／buildと同時には走らせず逐次実行した。実時間と実完了深さはCI期待値にしない。
+
+再現: `npx tsx scripts/measure-see-move-ordering.ts <対象チェックアウト> all`。新実装では末尾へ`--ordering=standard`または`--ordering=static-exchange`を指定する。フラグ省略はそのリビジョンの既定挙動。旧mainと親には新しいモード設定を渡していない。局面は前節と同じ5局面。
+
+計時には無計装ソースを使用。別の非計時ビルドで候補評価、準備関数、SEE内部からの開始合法手生成・基準駒得・再帰合法手生成を計数し、無計装結果との一致もassertする。開始処理は局面の参照一致で区別し、通常探索の合法手生成／静的評価は計数対象外。standardの全SEE計数0、明示SEE専用局面の実使用もassertする。
+
+### 固定深さ3の比較
+
+| 局面 | main a964fd6 ms | 親414e7a1 ms | standard ms | static-exchange ms |
+| --- | ---: | ---: | ---: | ---: |
+| initial | 74.892 | 107.903 | 76.414 | 108.281 |
+| moveOrderingBenefitState | 28.196 | 31.554 | 27.956 | 30.722 |
+| singleCapture | 24.967 | 25.928 | 25.054 | 24.314 |
+| multipleCaptures | 17.924 | 18.075 | 18.422 | 17.878 |
+| nonRootMultipleCaptures | 40.548 | 39.928 | 40.756 | 37.645 |
+
+| 局面 | standardのmain比 | static-exchangeの親比 |
+| --- | ---: | ---: |
+| initial | 2.0% | 0.4% |
+| moveOrderingBenefitState | -0.9% | -2.6% |
+| singleCapture | 0.3% | -6.2% |
+| multipleCaptures | 2.8% | -1.1% |
+| nonRootMultipleCaptures | 0.5% | -5.7% |
+
+| 段階 | 局面 | visited | cutoff | skipped | 中央値ms | 範囲ms | SEE候補 | SEE準備 | 開始合法手 | 基準駒得 | 再帰合法手 |
+| --- | --- | ---: | ---: | ---: | ---: | --- | ---: | ---: | ---: | ---: | ---: |
+| main a964fd6 | initial | 1244 | 80 | 2565 | 74.892 | 71.394–82.838 | 0 | 0 | 0 | 0 | 0 |
+| 親414e7a1 | initial | 1267 | 80 | 2542 | 107.903 | 104.895–122.538 | 58 | 29 | 29 | 29 | 186 |
+| standard | initial | 1244 | 80 | 2565 | 76.414 | 75.093–79.255 | 0 | 0 | 0 | 0 | 0 |
+| static-exchange | initial | 1267 | 80 | 2542 | 108.281 | 104.167–113.801 | 58 | 29 | 29 | 29 | 186 |
+| main a964fd6 | moveOrderingBenefitState | 528 | 60 | 2025 | 28.196 | 26.269–32.971 | 0 | 0 | 0 | 0 | 0 |
+| 親414e7a1 | moveOrderingBenefitState | 528 | 60 | 2025 | 31.554 | 29.437–35.075 | 12 | 6 | 6 | 6 | 19 |
+| standard | moveOrderingBenefitState | 528 | 60 | 2025 | 27.956 | 26.359–31.747 | 0 | 0 | 0 | 0 | 0 |
+| static-exchange | moveOrderingBenefitState | 528 | 60 | 2025 | 30.722 | 27.951–31.894 | 12 | 6 | 6 | 6 | 19 |
+| main a964fd6 | singleCapture | 617 | 18 | 222 | 24.967 | 23.832–26.848 | 0 | 0 | 0 | 0 | 0 |
+| 親414e7a1 | singleCapture | 617 | 18 | 222 | 25.928 | 24.048–26.158 | 0 | 0 | 0 | 0 | 0 |
+| standard | singleCapture | 617 | 18 | 222 | 25.054 | 24.353–27.324 | 0 | 0 | 0 | 0 | 0 |
+| static-exchange | singleCapture | 617 | 18 | 222 | 24.314 | 23.608–25.672 | 0 | 0 | 0 | 0 | 0 |
+| main a964fd6 | multipleCaptures | 445 | 14 | 278 | 17.924 | 17.078–19.165 | 0 | 0 | 0 | 0 | 0 |
+| 親414e7a1 | multipleCaptures | 445 | 14 | 278 | 18.075 | 17.504–18.891 | 0 | 0 | 0 | 0 | 0 |
+| standard | multipleCaptures | 445 | 14 | 278 | 18.422 | 17.297–19.169 | 0 | 0 | 0 | 0 | 0 |
+| static-exchange | multipleCaptures | 445 | 14 | 278 | 17.878 | 16.995–18.353 | 0 | 0 | 0 | 0 | 0 |
+| main a964fd6 | nonRootMultipleCaptures | 861 | 42 | 2340 | 40.548 | 38.281–42.495 | 0 | 0 | 0 | 0 | 0 |
+| 親414e7a1 | nonRootMultipleCaptures | 688 | 42 | 2349 | 39.928 | 36.868–42.195 | 38 | 16 | 16 | 16 | 46 |
+| standard | nonRootMultipleCaptures | 861 | 42 | 2340 | 40.756 | 39.129–44.235 | 0 | 0 | 0 | 0 | 0 |
+| static-exchange | nonRootMultipleCaptures | 688 | 42 | 2349 | 37.645 | 36.169–41.830 | 38 | 16 | 16 | 16 | 46 |
+
+### 固定深さの正しさ
+
+全5局面で、standardはmain、static-exchangeは親とelapsedMilliseconds以外の結果全フィールドが一致した。各7回の決定性・入力不変性もassertした。記録値は`src/test/fixtures/alpha-beta-ordering-baselines.ts`にも保存し、CIで両モードの完全一致をテストする。全4段階で選択手・評価値・PV・評価内訳は同一。モード間の統計差は、初期局面1244対1267、新規専用861対688など、手順方式の違いに由来する既存の差であり、対応する基準リビジョンからの回帰ではない。
+
+| 局面 | selectedAction | selectedEvaluation | principalVariation | evaluationBreakdown |
+| --- | --- | ---: | --- | --- |
+| initial | 6,2→5,2 | 214 | 6,2→5,2 / 2,5→3,5 / 7,1→3,5 | `{"total":214,"material":200,"pieceSquare":4,"kingSafety":0,"undefendedPieceSafety":10,"terminal":null}` |
+| moveOrderingBenefitState | 4,4→4,2 | -575 | 4,4→4,2 / 4,6→8,6成 / 8,8→7,8 | `{"total":-575,"material":-600,"pieceSquare":-2,"kingSafety":-3,"undefendedPieceSafety":30,"terminal":null}` |
+| singleCapture | 4,4→4,5 | 1313 | 4,4→4,5 / 0,8→0,7 / 4,5→0,5成 | `{"total":1313,"material":1300,"pieceSquare":1,"kingSafety":12,"undefendedPieceSafety":0,"terminal":null}` |
+| multipleCaptures | 4,4→3,4 | 1508 | 4,4→3,4 / 4,5→5,5 / 3,4→0,4成 | `{"total":1508,"material":1500,"pieceSquare":-3,"kingSafety":11,"undefendedPieceSafety":0,"terminal":null}` |
+| nonRootMultipleCaptures | 4,4→4,5 | 2003 | 4,4→4,5 / 0,2→1,2 / 2,0→1,0成 | `{"total":2003,"material":2000,"pieceSquare":3,"kingSafety":0,"undefendedPieceSafety":0,"terminal":null}` |
+
+親と明示SEEで候補評価順とSEE値のダイジェストも一致（空系列の2局面も含む）。準備共有と交換系列の再帰回数は変わらない。
+
+| 局面 | 親＝static-exchangeのSHA-256 |
+| --- | --- |
+| initial | `335c0626917efaf29ea3e627fc4ecf6f846f2106221a249be57abf5f261a6d8a` |
+| moveOrderingBenefitState | `501ff181b4e9158e2a6c0a73c7f414cb07b383a49068e62dc02c0fa756658f11` |
+| singleCapture | `4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945` |
+| multipleCaptures | `4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945` |
+| nonRootMultipleCaptures | `2f2ca9a3201e6958ca0356c936d91ecd43602ed1424da3316b7b50eef56e466f` |
+
+### 時間制限探索
+
+requestedMaxDepth=6。下表は100 / 250 / 500msの順のcompletedDepth×件数。全条件7回、全結果timedOut=true。実時間や完了深さに固定合否閾値は設けない。
+
+| 局面 | main | 親414e7a1 | standard | static-exchange |
+| --- | --- | --- | --- | --- |
+| initial | 3×7 / 3×7 / 2×4,3×3 | 2×7 / 3×7 / 2×4,3×3 | 3×7 / 3×7 / 2×4,3×3 | 2×7 / 3×7 / 2×4,3×3 |
+| moveOrderingBenefitState | 3×7 / 4×7 / 3×4,4×3 | 3×7 / 4×7 / 3×4,4×3 | 3×7 / 4×7 / 3×4,4×3 | 3×7 / 4×7 / 3×4,4×3 |
+| singleCapture | 4×7 / 4×7 / 3×1,4×6 | 4×7 / 4×7 / 3×4,4×3 | 4×7 / 4×7 / 4×7 | 4×7 / 4×7 / 4×7 |
+| multipleCaptures | 4×7 / 4×7 / 3×4,4×3 | 4×7 / 4×7 / 3×3,4×4 | 4×7 / 4×7 / 4×7 | 4×7 / 4×7 / 4×7 |
+| nonRootMultipleCaptures | 3×7 / 3×7 / 3×5,4×2 | 3×7 / 4×7 / 3×4,4×3 | 3×7 / 3×7 / 3×5,4×2 | 3×7 / 4×7 / 3×4,4×3 |
+
+initial 100msはmainとstandardで深さ3×7、親とstatic-exchangeで深さ2×7。standardの選択手6,2→5,2・評価214はmainと一致し、SEEの6,0→5,0・評価0との差は完了深さ差による。standardは今回の測定でmainと同じ深さ3へ安定して戻った。
+
+同一結果群ごとの全結果を以下に示す。同条件は件数合計7、visitedは最後の完了反復、totalVisitedは完了反復の合計で、未完了反復を含まない。実時間は未完了反復を含むAPI全体。
+
+| 段階 | 局面 | 制限ms | 深さ×件数 | timedOut | 選択手 | 評価 | visited | totalVisited | 実時間中央値ms | 範囲ms |
+| --- | --- | ---: | --- | --- | --- | ---: | ---: | ---: | ---: | --- |
+| main a964fd6 | initial | 100 | 3×7 | true | 6,2→5,2 | 214 | 1244 | 1363 | 100.066 | 100.036–100.126 |
+| 親414e7a1 | initial | 100 | 2×7 | true | 6,0→5,0 | 0 | 89 | 119 | 100.066 | 100.048–100.125 |
+| standard | initial | 100 | 3×7 | true | 6,2→5,2 | 214 | 1244 | 1363 | 100.081 | 100.061–100.177 |
+| static-exchange | initial | 100 | 2×7 | true | 6,0→5,0 | 0 | 89 | 119 | 100.053 | 100.047–100.069 |
+| main a964fd6 | initial | 250 | 3×7 | true | 6,2→5,2 | 214 | 1244 | 1363 | 250.058 | 250.046–250.100 |
+| 親414e7a1 | initial | 250 | 3×7 | true | 6,2→5,2 | 214 | 1267 | 1386 | 250.076 | 250.049–250.182 |
+| standard | initial | 250 | 3×7 | true | 6,2→5,2 | 214 | 1244 | 1363 | 250.082 | 250.059–250.114 |
+| static-exchange | initial | 250 | 3×7 | true | 6,2→5,2 | 214 | 1267 | 1386 | 250.078 | 250.060–250.393 |
+| main a964fd6 | initial | 500 | 3×3 | true | 6,2→5,2 | 214 | 1244 | 1363 | 500.085 | 500.057–501.247 |
+| main a964fd6 | initial | 500 | 2×4 | true | 6,0→5,0 | 0 | 89 | 119 | 500.397 | 500.216–500.533 |
+| 親414e7a1 | initial | 500 | 3×3 | true | 6,2→5,2 | 214 | 1267 | 1386 | 500.077 | 500.060–501.067 |
+| 親414e7a1 | initial | 500 | 2×4 | true | 6,0→5,0 | 0 | 89 | 119 | 502.617 | 500.230–504.345 |
+| standard | initial | 500 | 3×3 | true | 6,2→5,2 | 214 | 1244 | 1363 | 500.063 | 500.052–500.586 |
+| standard | initial | 500 | 2×4 | true | 6,0→5,0 | 0 | 89 | 119 | 500.390 | 500.254–500.495 |
+| static-exchange | initial | 500 | 3×3 | true | 6,2→5,2 | 214 | 1267 | 1386 | 500.064 | 500.050–500.360 |
+| static-exchange | initial | 500 | 2×4 | true | 6,0→5,0 | 0 | 89 | 119 | 500.444 | 500.202–500.667 |
+| main a964fd6 | moveOrderingBenefitState | 100 | 3×7 | true | 4,4→4,2 | -575 | 454 | 538 | 100.076 | 100.067–100.192 |
+| 親414e7a1 | moveOrderingBenefitState | 100 | 3×7 | true | 4,4→4,2 | -575 | 454 | 538 | 100.123 | 100.064–100.571 |
+| standard | moveOrderingBenefitState | 100 | 3×7 | true | 4,4→4,2 | -575 | 454 | 538 | 100.071 | 100.057–100.165 |
+| static-exchange | moveOrderingBenefitState | 100 | 3×7 | true | 4,4→4,2 | -575 | 454 | 538 | 100.138 | 100.062–100.203 |
+| main a964fd6 | moveOrderingBenefitState | 250 | 4×7 | true | 4,4→4,2 | -807 | 1644 | 2182 | 250.071 | 250.062–250.233 |
+| 親414e7a1 | moveOrderingBenefitState | 250 | 4×7 | true | 4,4→4,2 | -807 | 1644 | 2182 | 250.062 | 250.057–250.380 |
+| standard | moveOrderingBenefitState | 250 | 4×7 | true | 4,4→4,2 | -807 | 1644 | 2182 | 250.079 | 250.050–250.215 |
+| static-exchange | moveOrderingBenefitState | 250 | 4×7 | true | 4,4→4,2 | -807 | 1644 | 2182 | 250.060 | 250.057–250.103 |
+| main a964fd6 | moveOrderingBenefitState | 500 | 4×3 | true | 4,4→4,2 | -807 | 1644 | 2182 | 500.087 | 500.054–500.403 |
+| main a964fd6 | moveOrderingBenefitState | 500 | 3×4 | true | 4,4→4,2 | -575 | 454 | 538 | 501.293 | 500.671–501.956 |
+| 親414e7a1 | moveOrderingBenefitState | 500 | 4×3 | true | 4,4→4,2 | -807 | 1644 | 2182 | 500.213 | 500.068–500.414 |
+| 親414e7a1 | moveOrderingBenefitState | 500 | 3×4 | true | 4,4→4,2 | -575 | 454 | 538 | 501.091 | 500.242–501.413 |
+| standard | moveOrderingBenefitState | 500 | 4×3 | true | 4,4→4,2 | -807 | 1644 | 2182 | 500.105 | 500.079–500.141 |
+| standard | moveOrderingBenefitState | 500 | 3×4 | true | 4,4→4,2 | -575 | 454 | 538 | 500.844 | 500.226–501.294 |
+| static-exchange | moveOrderingBenefitState | 500 | 4×3 | true | 4,4→4,2 | -807 | 1644 | 2182 | 500.278 | 500.113–500.359 |
+| static-exchange | moveOrderingBenefitState | 500 | 3×4 | true | 4,4→4,2 | -575 | 454 | 538 | 500.863 | 500.272–501.119 |
+| main a964fd6 | singleCapture | 100 | 4×7 | true | 4,4→4,5 | 1304 | 1091 | 1710 | 100.070 | 100.051–100.091 |
+| 親414e7a1 | singleCapture | 100 | 4×7 | true | 4,4→4,5 | 1304 | 1091 | 1710 | 100.060 | 100.044–100.112 |
+| standard | singleCapture | 100 | 4×7 | true | 4,4→4,5 | 1304 | 1091 | 1710 | 100.067 | 100.059–100.078 |
+| static-exchange | singleCapture | 100 | 4×7 | true | 4,4→4,5 | 1304 | 1091 | 1710 | 100.057 | 100.052–100.194 |
+| main a964fd6 | singleCapture | 250 | 4×7 | true | 4,4→4,5 | 1304 | 1091 | 1710 | 250.072 | 250.055–250.262 |
+| 親414e7a1 | singleCapture | 250 | 4×7 | true | 4,4→4,5 | 1304 | 1091 | 1710 | 250.071 | 250.058–250.076 |
+| standard | singleCapture | 250 | 4×7 | true | 4,4→4,5 | 1304 | 1091 | 1710 | 250.079 | 250.051–250.189 |
+| static-exchange | singleCapture | 250 | 4×7 | true | 4,4→4,5 | 1304 | 1091 | 1710 | 250.076 | 250.056–250.160 |
+| main a964fd6 | singleCapture | 500 | 4×6 | true | 4,4→4,5 | 1304 | 1091 | 1710 | 500.323 | 500.070–500.401 |
+| main a964fd6 | singleCapture | 500 | 3×1 | true | 4,4→4,5 | 1313 | 559 | 619 | 500.288 | 500.288–500.288 |
+| 親414e7a1 | singleCapture | 500 | 4×3 | true | 4,4→4,5 | 1304 | 1091 | 1710 | 500.066 | 500.063–500.551 |
+| 親414e7a1 | singleCapture | 500 | 3×4 | true | 4,4→4,5 | 1313 | 559 | 619 | 500.351 | 500.211–501.021 |
+| standard | singleCapture | 500 | 4×7 | true | 4,4→4,5 | 1304 | 1091 | 1710 | 500.209 | 500.064–500.623 |
+| static-exchange | singleCapture | 500 | 4×7 | true | 4,4→4,5 | 1304 | 1091 | 1710 | 500.271 | 500.061–500.398 |
+| main a964fd6 | multipleCaptures | 100 | 4×7 | true | 4,4→3,4 | 1499 | 882 | 1369 | 100.070 | 100.052–100.096 |
+| 親414e7a1 | multipleCaptures | 100 | 4×7 | true | 4,4→3,4 | 1499 | 882 | 1369 | 100.079 | 100.052–100.234 |
+| standard | multipleCaptures | 100 | 4×7 | true | 4,4→3,4 | 1499 | 882 | 1369 | 100.066 | 100.052–100.089 |
+| static-exchange | multipleCaptures | 100 | 4×7 | true | 4,4→3,4 | 1499 | 882 | 1369 | 100.061 | 100.038–100.087 |
+| main a964fd6 | multipleCaptures | 250 | 4×7 | true | 4,4→3,4 | 1499 | 882 | 1369 | 250.072 | 250.064–250.082 |
+| 親414e7a1 | multipleCaptures | 250 | 4×7 | true | 4,4→3,4 | 1499 | 882 | 1369 | 250.076 | 250.063–250.089 |
+| standard | multipleCaptures | 250 | 4×7 | true | 4,4→3,4 | 1499 | 882 | 1369 | 250.069 | 250.061–250.178 |
+| static-exchange | multipleCaptures | 250 | 4×7 | true | 4,4→3,4 | 1499 | 882 | 1369 | 250.076 | 250.053–250.176 |
+| main a964fd6 | multipleCaptures | 500 | 4×3 | true | 4,4→3,4 | 1499 | 882 | 1369 | 500.064 | 500.058–502.112 |
+| main a964fd6 | multipleCaptures | 500 | 3×4 | true | 4,4→3,4 | 1508 | 445 | 487 | 500.319 | 500.315–501.051 |
+| 親414e7a1 | multipleCaptures | 500 | 4×4 | true | 4,4→3,4 | 1499 | 882 | 1369 | 500.256 | 500.051–500.283 |
+| 親414e7a1 | multipleCaptures | 500 | 3×3 | true | 4,4→3,4 | 1508 | 445 | 487 | 500.245 | 500.225–500.254 |
+| standard | multipleCaptures | 500 | 4×7 | true | 4,4→3,4 | 1499 | 882 | 1369 | 500.299 | 500.052–500.385 |
+| static-exchange | multipleCaptures | 500 | 4×7 | true | 4,4→3,4 | 1499 | 882 | 1369 | 500.243 | 500.053–500.313 |
+| main a964fd6 | nonRootMultipleCaptures | 100 | 3×7 | true | 4,4→4,5 | 2003 | 790 | 861 | 100.189 | 100.061–100.437 |
+| 親414e7a1 | nonRootMultipleCaptures | 100 | 3×7 | true | 4,4→4,5 | 2003 | 592 | 663 | 100.161 | 100.042–100.225 |
+| standard | nonRootMultipleCaptures | 100 | 3×7 | true | 4,4→4,5 | 2003 | 790 | 861 | 100.086 | 100.051–100.282 |
+| static-exchange | nonRootMultipleCaptures | 100 | 3×7 | true | 4,4→4,5 | 2003 | 592 | 663 | 100.139 | 100.063–100.187 |
+| main a964fd6 | nonRootMultipleCaptures | 250 | 3×7 | true | 4,4→4,5 | 2003 | 790 | 861 | 250.113 | 250.079–250.287 |
+| 親414e7a1 | nonRootMultipleCaptures | 250 | 4×7 | true | 4,4→4,5 | 1911 | 1257 | 1920 | 250.069 | 250.055–250.206 |
+| standard | nonRootMultipleCaptures | 250 | 3×7 | true | 4,4→4,5 | 2003 | 790 | 861 | 250.112 | 250.057–250.226 |
+| static-exchange | nonRootMultipleCaptures | 250 | 4×7 | true | 4,4→4,5 | 1911 | 1257 | 1920 | 250.053 | 250.044–250.076 |
+| main a964fd6 | nonRootMultipleCaptures | 500 | 4×2 | true | 4,4→4,5 | 1911 | 2243 | 3104 | 500.073 | 500.061–500.073 |
+| main a964fd6 | nonRootMultipleCaptures | 500 | 3×5 | true | 4,4→4,5 | 2003 | 790 | 861 | 500.295 | 500.261–501.441 |
+| 親414e7a1 | nonRootMultipleCaptures | 500 | 4×3 | true | 4,4→4,5 | 1911 | 1257 | 1920 | 500.077 | 500.074–500.417 |
+| 親414e7a1 | nonRootMultipleCaptures | 500 | 3×4 | true | 4,4→4,5 | 2003 | 592 | 663 | 501.051 | 500.560–501.918 |
+| standard | nonRootMultipleCaptures | 500 | 4×2 | true | 4,4→4,5 | 1911 | 2243 | 3104 | 500.065 | 500.062–500.065 |
+| standard | nonRootMultipleCaptures | 500 | 3×5 | true | 4,4→4,5 | 2003 | 790 | 861 | 500.822 | 500.322–502.541 |
+| static-exchange | nonRootMultipleCaptures | 500 | 4×3 | true | 4,4→4,5 | 1911 | 1257 | 1920 | 500.072 | 500.057–502.022 |
+| static-exchange | nonRootMultipleCaptures | 500 | 3×4 | true | 4,4→4,5 | 2003 | 592 | 663 | 501.150 | 500.307–501.378 |
+
+### 500msの揺れと追加測定
+
+独立プロセスの主測定でもinitialは全4段階で500msが深さ2×4/3×3となり、250msの3×7より低下した。前節と同様、mainにも起きるため本変更固有とは断定できない。実行履歴・JIT・環境負荷の影響が疑われるが原因は未確定。initial 500msを各4段階で再度個別起動し、3ウォームアップ＋7測定を行った。主測定を置き換えず、追加結果を分離して記録する。
+
+| 段階 | 局面 | 制限ms | 深さ×件数 | timedOut | 選択手 | 評価 | visited | totalVisited | 実時間中央値ms | 範囲ms |
+| --- | --- | ---: | --- | --- | --- | ---: | ---: | ---: | ---: | --- |
+| main a964fd6 | initial | 500 | 3×3 | true | 6,2→5,2 | 214 | 1244 | 1363 | 500.084 | 500.063–501.291 |
+| main a964fd6 | initial | 500 | 2×4 | true | 6,0→5,0 | 0 | 89 | 119 | 500.283 | 500.201–500.409 |
+| 親414e7a1 | initial | 500 | 3×3 | true | 6,2→5,2 | 214 | 1267 | 1386 | 500.073 | 500.053–500.318 |
+| 親414e7a1 | initial | 500 | 2×4 | true | 6,0→5,0 | 0 | 89 | 119 | 500.455 | 500.293–502.746 |
+| standard | initial | 500 | 3×3 | true | 6,2→5,2 | 214 | 1244 | 1363 | 500.060 | 500.057–500.394 |
+| standard | initial | 500 | 2×4 | true | 6,0→5,0 | 0 | 89 | 119 | 500.395 | 500.199–500.820 |
+| static-exchange | initial | 500 | 3×3 | true | 6,2→5,2 | 214 | 1267 | 1386 | 500.071 | 500.060–503.940 |
+| static-exchange | initial | 500 | 2×4 | true | 6,0→5,0 | 0 | 89 | 119 | 501.222 | 500.295–502.875 |
+
+追加測定でも全4段階で、測定順1～3回目は深さ3、4～7回目は深さ2が再現した。開始局面の入力不変性は全実行後に確認済み。今回のモード切替固有の悪化とは扱わず、実行履歴・JIT・負荷のどれが原因かは未確定のまま残す。100msのstandard深さ3×7とは別の観測である。
+
+### 判断
+
+- standardでは全5局面でSEE候補、準備、開始合法手、基準駒得、再帰合法手が完全に0。並べ替え単体のspyではSEE用価値表解決と局面複製も0で、複数捕獲があってもSEE経路へ入らない。通常探索に必要な合法手生成や評価は引き続き実施する。
+- standardの固定深さ中央値はmain比約-0.9～+2.8%、初期は74.892→76.414ms（約+2.0%）。測定範囲は重なり、同程度の実時間へ戻った。initial 100msの深さ3×7もmainと一致し、既定SEE時の深さ2低下を回避できた。
+- static-exchangeの初期は親107.903→108.281ms（約+0.4%）と同程度で、100msの深さ2×7も同じ。ほかの中央値変動を新しいSEE最適化の効果とは扱わない。SEE候補値・順序・準備・再帰回数と固定深さ結果は親と同一。
+- 500msなどの実完了深さには揺れがあるため、一般的な時間保証や棋力向上を主張しない。nonRootMultipleCapturesの250msはmain/standardが深さ3、親/明示SEEが深さ4であり、SEEが有利な局面もある。このため機能は削除せず明示選択として保持する。根拠の弱い自動切替は追加しない。
+- 検証・CI成功を条件に、新PRは親への取り込みを推奨する。親PR #106は本PRを取り込みstandardを既定にした状態ならmainへのマージ候補と判断する。未反映の親414e7a1を既定SEEのままマージする推奨ではない。どのPRも自動マージしない。
+- 公開SEEと#107の準備共有は保持する。明示SEEの1交換系列中に中断できない既存制限も不変。UI・Workerプロトコル・評価設定・キャッシュ・新しい枝刈りなどには変更を加えていない。
+
+<details>
+<summary>実時間の全7サンプル（ms、測定順）</summary>
+
+| 段階 | 局面 | 条件 | 7サンプル |
+| --- | --- | --- | --- |
+| main a964fd6 | initial | 固定3 | 82.838, 79.418, 71.394, 72.703, 72.596, 77.297, 74.892 |
+| main a964fd6 | initial | 100ms | 100.126, 100.058, 100.071, 100.061, 100.036, 100.075, 100.066 |
+| main a964fd6 | initial | 250ms | 250.100, 250.049, 250.046, 250.089, 250.056, 250.058, 250.070 |
+| main a964fd6 | initial | 500ms | 500.057, 500.085, 501.247, 500.269, 500.216, 500.533, 500.397 |
+| main a964fd6 | moveOrderingBenefitState | 固定3 | 26.837, 28.741, 26.269, 26.962, 32.971, 28.196, 28.340 |
+| main a964fd6 | moveOrderingBenefitState | 100ms | 100.078, 100.076, 100.081, 100.072, 100.068, 100.192, 100.067 |
+| main a964fd6 | moveOrderingBenefitState | 250ms | 250.062, 250.077, 250.068, 250.071, 250.071, 250.233, 250.086 |
+| main a964fd6 | moveOrderingBenefitState | 500ms | 500.054, 500.087, 500.403, 500.671, 500.867, 501.956, 501.293 |
+| main a964fd6 | singleCapture | 固定3 | 24.967, 25.496, 23.946, 23.832, 26.848, 24.934, 25.568 |
+| main a964fd6 | singleCapture | 100ms | 100.070, 100.051, 100.077, 100.060, 100.066, 100.091, 100.080 |
+| main a964fd6 | singleCapture | 250ms | 250.069, 250.080, 250.072, 250.072, 250.055, 250.068, 250.262 |
+| main a964fd6 | singleCapture | 500ms | 500.070, 500.070, 500.323, 500.340, 500.288, 500.401, 500.309 |
+| main a964fd6 | multipleCaptures | 固定3 | 18.005, 17.830, 18.279, 17.078, 17.924, 19.165, 17.351 |
+| main a964fd6 | multipleCaptures | 100ms | 100.069, 100.055, 100.072, 100.070, 100.052, 100.096, 100.074 |
+| main a964fd6 | multipleCaptures | 250ms | 250.080, 250.082, 250.072, 250.080, 250.064, 250.069, 250.069 |
+| main a964fd6 | multipleCaptures | 500ms | 500.058, 500.064, 502.112, 500.319, 500.315, 500.316, 501.051 |
+| main a964fd6 | nonRootMultipleCaptures | 固定3 | 38.281, 42.495, 40.852, 42.164, 39.774, 40.548, 40.523 |
+| main a964fd6 | nonRootMultipleCaptures | 100ms | 100.437, 100.293, 100.295, 100.145, 100.100, 100.189, 100.061 |
+| main a964fd6 | nonRootMultipleCaptures | 250ms | 250.083, 250.180, 250.113, 250.082, 250.212, 250.079, 250.287 |
+| main a964fd6 | nonRootMultipleCaptures | 500ms | 500.061, 500.073, 500.662, 501.441, 500.280, 500.261, 500.295 |
+| 親414e7a1 | initial | 固定3 | 108.651, 106.167, 122.538, 106.425, 111.654, 107.903, 104.895 |
+| 親414e7a1 | initial | 100ms | 100.063, 100.070, 100.057, 100.048, 100.066, 100.125, 100.075 |
+| 親414e7a1 | initial | 250ms | 250.182, 250.110, 250.083, 250.062, 250.072, 250.076, 250.049 |
+| 親414e7a1 | initial | 500ms | 500.060, 500.077, 501.067, 500.230, 500.988, 504.345, 502.617 |
+| 親414e7a1 | moveOrderingBenefitState | 固定3 | 31.554, 30.782, 33.856, 33.473, 35.075, 30.167, 29.437 |
+| 親414e7a1 | moveOrderingBenefitState | 100ms | 100.102, 100.146, 100.064, 100.073, 100.411, 100.123, 100.571 |
+| 親414e7a1 | moveOrderingBenefitState | 250ms | 250.059, 250.062, 250.067, 250.062, 250.057, 250.380, 250.133 |
+| 親414e7a1 | moveOrderingBenefitState | 500ms | 500.213, 500.068, 500.414, 501.091, 500.242, 501.413, 500.366 |
+| 親414e7a1 | singleCapture | 固定3 | 25.928, 25.970, 26.009, 25.031, 26.158, 24.048, 24.768 |
+| 親414e7a1 | singleCapture | 100ms | 100.062, 100.044, 100.074, 100.059, 100.112, 100.060, 100.057 |
+| 親414e7a1 | singleCapture | 250ms | 250.073, 250.076, 250.071, 250.058, 250.062, 250.075, 250.071 |
+| 親414e7a1 | singleCapture | 500ms | 500.066, 500.063, 500.551, 500.211, 500.262, 501.021, 500.351 |
+| 親414e7a1 | multipleCaptures | 固定3 | 18.746, 17.816, 18.075, 17.896, 17.504, 18.891, 18.534 |
+| 親414e7a1 | multipleCaptures | 100ms | 100.234, 100.066, 100.052, 100.079, 100.071, 100.231, 100.231 |
+| 親414e7a1 | multipleCaptures | 250ms | 250.069, 250.089, 250.076, 250.082, 250.066, 250.085, 250.063 |
+| 親414e7a1 | multipleCaptures | 500ms | 500.051, 500.058, 500.283, 500.256, 500.254, 500.245, 500.225 |
+| 親414e7a1 | nonRootMultipleCaptures | 固定3 | 39.995, 41.867, 42.195, 37.680, 37.755, 39.928, 36.868 |
+| 親414e7a1 | nonRootMultipleCaptures | 100ms | 100.042, 100.225, 100.161, 100.173, 100.071, 100.224, 100.146 |
+| 親414e7a1 | nonRootMultipleCaptures | 250ms | 250.069, 250.062, 250.068, 250.089, 250.206, 250.055, 250.106 |
+| 親414e7a1 | nonRootMultipleCaptures | 500ms | 500.077, 500.074, 500.417, 500.560, 501.051, 501.918, 501.042 |
+| standard | initial | 固定3 | 77.469, 75.569, 76.322, 75.093, 76.414, 79.255, 76.936 |
+| standard | initial | 100ms | 100.177, 100.128, 100.065, 100.101, 100.081, 100.076, 100.061 |
+| standard | initial | 250ms | 250.082, 250.065, 250.059, 250.114, 250.106, 250.070, 250.090 |
+| standard | initial | 500ms | 500.052, 500.063, 500.586, 500.495, 500.296, 500.390, 500.254 |
+| standard | moveOrderingBenefitState | 固定3 | 27.922, 27.956, 26.359, 26.813, 31.747, 28.316, 29.060 |
+| standard | moveOrderingBenefitState | 100ms | 100.061, 100.165, 100.071, 100.082, 100.146, 100.057, 100.062 |
+| standard | moveOrderingBenefitState | 250ms | 250.079, 250.069, 250.050, 250.072, 250.215, 250.090, 250.145 |
+| standard | moveOrderingBenefitState | 500ms | 500.079, 500.141, 500.105, 500.226, 500.844, 501.294, 500.362 |
+| standard | singleCapture | 固定3 | 25.019, 25.218, 24.550, 25.054, 27.324, 24.353, 26.185 |
+| standard | singleCapture | 100ms | 100.059, 100.069, 100.062, 100.062, 100.075, 100.078, 100.067 |
+| standard | singleCapture | 250ms | 250.061, 250.075, 250.079, 250.051, 250.093, 250.189, 250.151 |
+| standard | singleCapture | 500ms | 500.064, 500.072, 500.273, 500.322, 500.209, 500.209, 500.623 |
+| standard | multipleCaptures | 固定3 | 18.757, 18.042, 18.422, 17.297, 17.947, 19.169, 19.069 |
+| standard | multipleCaptures | 100ms | 100.056, 100.064, 100.089, 100.052, 100.084, 100.080, 100.066 |
+| standard | multipleCaptures | 250ms | 250.065, 250.063, 250.069, 250.178, 250.061, 250.085, 250.078 |
+| standard | multipleCaptures | 500ms | 500.114, 500.052, 500.385, 500.299, 500.268, 500.331, 500.300 |
+| standard | nonRootMultipleCaptures | 固定3 | 40.862, 44.235, 40.756, 40.928, 39.165, 40.726, 39.129 |
+| standard | nonRootMultipleCaptures | 100ms | 100.058, 100.057, 100.282, 100.051, 100.086, 100.096, 100.192 |
+| standard | nonRootMultipleCaptures | 250ms | 250.057, 250.092, 250.123, 250.226, 250.077, 250.112, 250.137 |
+| standard | nonRootMultipleCaptures | 500ms | 500.062, 500.065, 502.541, 500.912, 500.822, 500.322, 500.357 |
+| static-exchange | initial | 固定3 | 108.769, 107.688, 113.195, 104.167, 113.801, 108.281, 106.836 |
+| static-exchange | initial | 100ms | 100.061, 100.051, 100.047, 100.069, 100.053, 100.049, 100.058 |
+| static-exchange | initial | 250ms | 250.097, 250.078, 250.090, 250.072, 250.064, 250.060, 250.393 |
+| static-exchange | initial | 500ms | 500.064, 500.050, 500.360, 500.444, 500.202, 500.667, 500.257 |
+| static-exchange | moveOrderingBenefitState | 固定3 | 30.722, 29.940, 31.671, 30.846, 31.894, 27.951, 29.373 |
+| static-exchange | moveOrderingBenefitState | 100ms | 100.106, 100.062, 100.138, 100.062, 100.175, 100.203, 100.203 |
+| static-exchange | moveOrderingBenefitState | 250ms | 250.103, 250.058, 250.060, 250.057, 250.058, 250.067, 250.099 |
+| static-exchange | moveOrderingBenefitState | 500ms | 500.113, 500.278, 500.359, 500.744, 500.272, 501.119, 500.863 |
+| static-exchange | singleCapture | 固定3 | 24.314, 24.536, 23.721, 23.682, 25.672, 23.608, 25.097 |
+| static-exchange | singleCapture | 100ms | 100.194, 100.069, 100.063, 100.052, 100.057, 100.057, 100.057 |
+| static-exchange | singleCapture | 250ms | 250.056, 250.065, 250.089, 250.076, 250.077, 250.070, 250.160 |
+| static-exchange | singleCapture | 500ms | 500.064, 500.061, 500.398, 500.272, 500.271, 500.343, 500.260 |
+| static-exchange | multipleCaptures | 固定3 | 18.353, 17.741, 17.878, 17.747, 17.955, 18.295, 16.995 |
+| static-exchange | multipleCaptures | 100ms | 100.050, 100.058, 100.061, 100.065, 100.038, 100.087, 100.063 |
+| static-exchange | multipleCaptures | 250ms | 250.176, 250.076, 250.053, 250.145, 250.060, 250.076, 250.075 |
+| static-exchange | multipleCaptures | 500ms | 500.063, 500.053, 500.313, 500.291, 500.243, 500.232, 500.307 |
+| static-exchange | nonRootMultipleCaptures | 固定3 | 39.578, 41.830, 41.523, 36.920, 37.645, 37.628, 36.169 |
+| static-exchange | nonRootMultipleCaptures | 100ms | 100.064, 100.170, 100.170, 100.104, 100.139, 100.063, 100.187 |
+| static-exchange | nonRootMultipleCaptures | 250ms | 250.049, 250.044, 250.053, 250.062, 250.047, 250.076, 250.073 |
+| static-exchange | nonRootMultipleCaptures | 500ms | 500.057, 500.072, 502.022, 500.307, 501.150, 501.378, 500.326 |
+| main a964fd6 | initial | 500ms再測定 (2×4,3×3) | 500.084, 500.063, 501.291, 500.409, 500.201, 500.264, 500.283 |
+| 親414e7a1 | initial | 500ms再測定 (2×4,3×3) | 500.073, 500.053, 500.318, 500.293, 502.746, 500.455, 500.306 |
+| standard | initial | 500ms再測定 (2×4,3×3) | 500.057, 500.060, 500.394, 500.820, 500.199, 500.333, 500.395 |
+| static-exchange | initial | 500ms再測定 (2×4,3×3) | 500.071, 500.060, 503.940, 500.295, 502.875, 501.222, 501.200 |
+
+</details>

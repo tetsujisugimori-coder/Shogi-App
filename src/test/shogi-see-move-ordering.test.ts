@@ -13,6 +13,8 @@ import {
   orderAlphaBetaNodeActions, orderIterativeDeepeningRootActions,
 } from '../domain/shogi/twoPlyAlphaBetaAi';
 
+const SEE_OPTIONS = Object.freeze({ moveOrdering: 'static-exchange' } as const);
+
 function position(turn: Player = 'sente'): BoardState {
   const state = createInitialBoardState();
   for (const row of state.squares) for (const square of row) square.piece = null;
@@ -91,10 +93,10 @@ describe('SEE capture ordering', () => {
     const spy = observePreparedSee().mockImplementation(() => {
       throw new Error('SEE must not run without a competing capture');
     });
-    const ordered = orderAlphaBetaNodeActions(state, actions, table);
+    const ordered = orderAlphaBetaNodeActions(state, actions, table, undefined, SEE_OPTIONS);
     expect(ordered).not.toBe(actions);
     expect(ordered).toEqual([...captures, ...promotions, ...others]);
-    expect(orderAlphaBetaNodeActions(state, actions, table)).toEqual(ordered);
+    expect(orderAlphaBetaNodeActions(state, actions, table, undefined, SEE_OPTIONS)).toEqual(ordered);
     expect({ state, actions, table }).toEqual(snapshot);
     expect(spy).not.toHaveBeenCalled();
     expect(spy.preparation).not.toHaveBeenCalled();
@@ -107,7 +109,7 @@ describe('SEE capture ordering', () => {
       see.evaluateStaticExchange(state, promotedCapture) ?? Infinity
     );
     for (const source of [[promotedCapture, ordinaryCapture], [ordinaryCapture, promotedCapture]]) {
-      expect(orderAlphaBetaNodeActions(state, source)).toEqual([ordinaryCapture, promotedCapture]);
+      expect(orderAlphaBetaNodeActions(state, source, undefined, undefined, SEE_OPTIONS)).toEqual([ordinaryCapture, promotedCapture]);
     }
   });
 
@@ -115,8 +117,8 @@ describe('SEE capture ordering', () => {
     const state = position();
     const { captures } = categories(state);
     observePreparedSee().mockReturnValue(200);
-    expect(orderAlphaBetaNodeActions(state, captures)).toEqual(captures);
-    expect(orderAlphaBetaNodeActions(state, [...captures].reverse())).toEqual([...captures].reverse());
+    expect(orderAlphaBetaNodeActions(state, captures, undefined, undefined, SEE_OPTIONS)).toEqual(captures);
+    expect(orderAlphaBetaNodeActions(state, [...captures].reverse(), undefined, undefined, SEE_OPTIONS)).toEqual([...captures].reverse());
   });
 
   it('retains real negative exchanges ahead of quiet promotions, moves and drops', () => {
@@ -125,7 +127,7 @@ describe('SEE capture ordering', () => {
     state.squares[4][6].piece = { id: 'defender', type: 'rook', player: 'gote' };
     const { ordinaryCapture, promotedCapture, normal, drop, promotion } = categories(state);
     expect(see.evaluateStaticExchange(state, ordinaryCapture)).toBeLessThan(0);
-    expect(orderAlphaBetaNodeActions(state, [normal, drop, promotion, ordinaryCapture, promotedCapture]))
+    expect(orderAlphaBetaNodeActions(state, [normal, drop, promotion, ordinaryCapture, promotedCapture], undefined, undefined, SEE_OPTIONS))
       .toEqual([promotedCapture, ordinaryCapture, promotion, normal, drop]);
   });
 
@@ -136,7 +138,7 @@ describe('SEE capture ordering', () => {
     const spy = observePreparedSee();
     const generated = vi.spyOn(legal, 'getLegalActions');
     const baseline = vi.spyOn(material, 'evaluateMaterial');
-    orderAlphaBetaNodeActions(state, all);
+    orderAlphaBetaNodeActions(state, all, undefined, undefined, SEE_OPTIONS);
     expect(spy).toHaveBeenCalledTimes(captures.length);
     expect(spy.preparation).toHaveBeenCalledTimes(1);
     expect(generated.mock.calls.filter(([input]) => input === state)).toHaveLength(1);
@@ -155,10 +157,10 @@ describe('SEE capture ordering', () => {
       promoted: { ...DEFAULT_MATERIAL_VALUE_TABLE.promoted },
     };
     const config = form === 'direct' ? table : { materialValueTable: table };
-    expect(orderAlphaBetaNodeActions(state, [ordinaryCapture, promotedCapture], config))
+    expect(orderAlphaBetaNodeActions(state, [ordinaryCapture, promotedCapture], config, undefined, SEE_OPTIONS))
       .toEqual([promotedCapture, ordinaryCapture]);
     const spy = observePreparedSee();
-    analyzeAlphaBetaSearch(state, 2, config);
+    analyzeAlphaBetaSearch(state, 2, config, undefined, SEE_OPTIONS);
     expect(spy.mock.calls.length).toBeGreaterThan(0);
     expect(spy.mock.calls.every(([, , received]) => received === table)).toBe(true);
   });
@@ -168,11 +170,11 @@ describe('SEE capture ordering', () => {
     const actions = freezeDeep(getLegalActions(state));
     const table = freezeDeep(structuredClone(DEFAULT_MATERIAL_VALUE_TABLE));
     const before = structuredClone({ state, actions, table });
-    const first = orderAlphaBetaNodeActions(state, actions, table);
+    const first = orderAlphaBetaNodeActions(state, actions, table, undefined, SEE_OPTIONS);
     expect(first).not.toBe(actions);
     expect(first.every((action) => actions.includes(action))).toBe(true);
-    expect(orderAlphaBetaNodeActions(state, actions, table)).toEqual(first);
-    expect(orderAlphaBetaNodeActions(state, actions, {})).toEqual(first);
+    expect(orderAlphaBetaNodeActions(state, actions, table, undefined, SEE_OPTIONS)).toEqual(first);
+    expect(orderAlphaBetaNodeActions(state, actions, {}, undefined, SEE_OPTIONS)).toEqual(first);
     expect({ state, actions, table }).toEqual(before);
   });
 
@@ -180,7 +182,7 @@ describe('SEE capture ordering', () => {
     const state = position();
     expect(categories(state).captures.length).toBeGreaterThanOrEqual(2);
     observePreparedSee().mockReturnValue(null);
-    expect(() => orderAlphaBetaNodeActions(state, getLegalActions(state))).toThrow(/contract violated/);
+    expect(() => orderAlphaBetaNodeActions(state, getLegalActions(state), undefined, undefined, SEE_OPTIONS)).toThrow(/contract violated/);
   });
 
   it('propagates SEE errors including non-finite material failures unchanged', () => {
@@ -188,8 +190,8 @@ describe('SEE capture ordering', () => {
     expect(categories(state).captures.length).toBeGreaterThanOrEqual(2);
     const error = new RangeError('finite material difference');
     observePreparedSee().mockImplementation(() => { throw error; });
-    expect(() => orderAlphaBetaNodeActions(state, getLegalActions(state))).toThrow(error);
-    expect(() => analyzeAlphaBetaSearch(state, 2)).toThrow(error);
+    expect(() => orderAlphaBetaNodeActions(state, getLegalActions(state), undefined, undefined, SEE_OPTIONS)).toThrow(error);
+    expect(() => analyzeAlphaBetaSearch(state, 2, undefined, undefined, SEE_OPTIONS)).toThrow(error);
   });
 
   it('preserves public SEE non-finite validation when multiple captures need comparison', () => {
@@ -200,7 +202,7 @@ describe('SEE capture ordering', () => {
       ...DEFAULT_MATERIAL_VALUE_TABLE,
       unpromoted: { ...DEFAULT_MATERIAL_VALUE_TABLE.unpromoted, rook: Infinity },
     };
-    expect(() => orderAlphaBetaNodeActions(state, captures, table)).toThrow(RangeError);
+    expect(() => orderAlphaBetaNodeActions(state, captures, table, undefined, SEE_OPTIONS)).toThrow(RangeError);
   });
 
   it.each([0, 1])('skips SEE for %i remaining root captures after moving the previous best first', (remaining) => {
@@ -209,7 +211,7 @@ describe('SEE capture ordering', () => {
     const rest = remaining === 1 ? [ordinaryCapture] : [];
     const actions = [normal, ...rest, drop, promotion, promotedCapture];
     const spy = observePreparedSee();
-    expect(orderIterativeDeepeningRootActions(state, actions, promotedCapture))
+    expect(orderIterativeDeepeningRootActions(state, actions, promotedCapture, undefined, undefined, SEE_OPTIONS))
       .toEqual([promotedCapture, ...rest, promotion, normal, drop]);
     expect(spy).not.toHaveBeenCalled();
     expect(spy.preparation).not.toHaveBeenCalled();
@@ -223,7 +225,7 @@ describe('SEE capture ordering', () => {
     state.squares[4][4].piece = { id: 's-rook', type: 'rook', player: 'sente' };
     state.squares[4][5].piece = { id: 'g-pawn', type: 'pawn', player: 'gote' };
     const spy = observePreparedSee();
-    const result = analyzeAlphaBetaSearch(state, 3, undefined, () => 0);
+    const result = analyzeAlphaBetaSearch(state, 3, undefined, () => 0, SEE_OPTIONS);
     // Recorded from unmodified PR HEAD 2507fdb, which calls SEE seven times.
     expect(result).toMatchObject({
       selectedAction: { from: { row: 4, col: 4 }, to: { row: 4, col: 5 }, promotion: 'none' },
@@ -237,7 +239,7 @@ describe('SEE capture ordering', () => {
       { from: { row: 4, col: 5 }, to: { row: 0, col: 5 }, promotion: 'promote' },
     ]);
     expect(spy).not.toHaveBeenCalled();
-    expect(analyzeAlphaBetaSearch(state, 3, undefined, () => 0)).toEqual(result);
+    expect(analyzeAlphaBetaSearch(state, 3, undefined, () => 0, SEE_OPTIONS)).toEqual(result);
   });
 
   it('keeps the previous best first and applies custom SEE only to remaining root captures', () => {
@@ -245,19 +247,19 @@ describe('SEE capture ordering', () => {
     const { all, normal, captures } = categories(state);
     const table = { ...DEFAULT_MATERIAL_VALUE_TABLE, unpromoted: { ...DEFAULT_MATERIAL_VALUE_TABLE.unpromoted, silver: 2000 } };
     const spy = observePreparedSee();
-    const ordered = orderIterativeDeepeningRootActions(state, all, normal, { materialValueTable: table });
+    const ordered = orderIterativeDeepeningRootActions(state, all, normal, { materialValueTable: table }, undefined, SEE_OPTIONS);
     expect(ordered[0]).toBe(normal);
     expect(spy).toHaveBeenCalledTimes(captures.length);
     expect(spy.mock.calls.every(([, , received]) => received === table)).toBe(true);
-    expect(ordered.slice(1)).toEqual(orderAlphaBetaNodeActions(state, all.filter((a) => a !== normal), table));
+    expect(ordered.slice(1)).toEqual(orderAlphaBetaNodeActions(state, all.filter((a) => a !== normal), table, undefined, SEE_OPTIONS));
   });
 
   it('preserves fixed root order without evaluating captures when no previous best exists', () => {
     const state = position();
     const actions = getLegalActions(state);
     const spy = observePreparedSee();
-    expect(orderIterativeDeepeningRootActions(state, actions, null)).toEqual(actions);
-    analyzeAlphaBetaSearch(state, 1);
+    expect(orderIterativeDeepeningRootActions(state, actions, null, undefined, undefined, SEE_OPTIONS)).toEqual(actions);
+    analyzeAlphaBetaSearch(state, 1, undefined, undefined, SEE_OPTIONS);
     expect(spy).not.toHaveBeenCalled();
   });
 
@@ -269,7 +271,7 @@ describe('SEE capture ordering', () => {
     expect(() => orderAlphaBetaNodeActions(state, getLegalActions(state), undefined, () => {
       checks++;
       if (checks === (when === 'before' ? 1 : 2)) throw error;
-    })).toThrow(error);
+    }, SEE_OPTIONS)).toThrow(error);
     expect(spy).toHaveBeenCalledTimes(when === 'before' ? 0 : 1);
     expect(spy.preparation).toHaveBeenCalledTimes(when === 'before' ? 0 : 1);
   });
@@ -282,7 +284,7 @@ describe('SEE capture ordering', () => {
       events.push('evaluate');
       return evaluate(action);
     });
-    orderAlphaBetaNodeActions(state, captures, undefined, () => { events.push('check'); });
+    orderAlphaBetaNodeActions(state, captures, undefined, () => { events.push('check'); }, SEE_OPTIONS);
     expect(events).toEqual(captures.flatMap(() => ['check', 'evaluate', 'check']));
   });
 
@@ -293,25 +295,25 @@ describe('SEE capture ordering', () => {
       promoted: { ...DEFAULT_MATERIAL_VALUE_TABLE.promoted, silver: 2200 },
     });
     const before = structuredClone({ state, table });
-    const prepared = analyzeAlphaBetaSearch(state, 2, table, () => 0);
-    expect(analyzeAlphaBetaSearch(state, 2, table, () => 0)).toEqual(prepared);
+    const prepared = analyzeAlphaBetaSearch(state, 2, table, () => 0, SEE_OPTIONS);
+    expect(analyzeAlphaBetaSearch(state, 2, table, () => 0, SEE_OPTIONS)).toEqual(prepared);
     const spy = vi.spyOn(see, 'prepareStaticExchangeEvaluation').mockImplementation((input, values) =>
       (action) => see.evaluateStaticExchange(input, action, values));
-    expect(analyzeAlphaBetaSearch(state, 2, table, () => 0)).toEqual(prepared);
+    expect(analyzeAlphaBetaSearch(state, 2, table, () => 0, SEE_OPTIONS)).toEqual(prepared);
     expect(spy).toHaveBeenCalled();
     expect({ state, table }).toEqual(before);
   });
 
   it('discards an iteration whose SEE evaluation crosses the deadline', () => {
     const state = position();
-    const fallback = analyzeTimeLimitedIterativeDeepeningAlphaBetaSearch(state, 1, 10, undefined, () => 0);
+    const fallback = analyzeTimeLimitedIterativeDeepeningAlphaBetaSearch(state, 1, 10, undefined, () => 0, SEE_OPTIONS);
     let now = 0;
     const spy = observePreparedSee().mockImplementation((_state, action, _table, evaluate) => {
       const score = evaluate(action);
       now = 10;
       return score;
     });
-    const result = analyzeTimeLimitedIterativeDeepeningAlphaBetaSearch(state, 3, 10, undefined, () => now);
+    const result = analyzeTimeLimitedIterativeDeepeningAlphaBetaSearch(state, 3, 10, undefined, () => now, SEE_OPTIONS);
     expect(spy).toHaveBeenCalledTimes(1);
     expect(result).toEqual({ ...fallback, requestedMaxDepth: 3, timedOut: true, elapsedMilliseconds: 10 });
   });
@@ -331,14 +333,14 @@ describe('SEE capture ordering', () => {
       else searchExecutions++;
       return originalExecute(...args);
     });
-    const result = analyzeAlphaBetaSearch(state, 2);
+    const result = analyzeAlphaBetaSearch(state, 2, undefined, undefined, SEE_OPTIONS);
     expect(seeExecutions).toBeGreaterThan(0);
     expect(result.visitedPositionCount).toBe(searchExecutions);
     expect(result.cutoffCount).toBeGreaterThan(0);
     expect(result.skippedActionCount).toBeGreaterThanOrEqual(result.cutoffCount);
   });
 
-  it.each(SEARCH_EVALUATION_PRESET_IDS)('Worker handler matches direct search on captures for %s', (presetId) => {
+  it.each(SEARCH_EVALUATION_PRESET_IDS)('Worker handler with explicitly injected SEE search matches direct search for %s', (presetId) => {
     const state = position();
     const spy = observePreparedSee();
     const response = handleTimeLimitedIterativeDeepeningAlphaBetaSearchWorkerRequest({
@@ -346,12 +348,12 @@ describe('SEE capture ordering', () => {
       requestId: 'see-captures', state: structuredClone(state), maxDepth: 2,
       timeLimitMilliseconds: 1000, evaluationPresetId: presetId,
     }, (input, depth, limit, evaluation) =>
-      analyzeTimeLimitedIterativeDeepeningAlphaBetaSearch(input, depth, limit, evaluation, () => 0));
+      analyzeTimeLimitedIterativeDeepeningAlphaBetaSearch(input, depth, limit, evaluation, () => 0, SEE_OPTIONS));
     expect(spy.mock.calls.length).toBeGreaterThan(0);
     expect(response).toEqual({
       type: 'time-limited-iterative-deepening-alpha-beta-search-succeeded', requestId: 'see-captures',
       result: {
-        ...analyzeTimeLimitedIterativeDeepeningAlphaBetaSearch(state, 2, 1000, resolveSearchEvaluationPreset(presetId), () => 0),
+        ...analyzeTimeLimitedIterativeDeepeningAlphaBetaSearch(state, 2, 1000, resolveSearchEvaluationPreset(presetId), () => 0, SEE_OPTIONS),
         evaluationPresetId: presetId,
       },
     });
