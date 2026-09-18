@@ -195,8 +195,8 @@ function cloneSearchEvaluationBreakdown(
 
 /**
  * Returns a new, deterministic order for actions at non-root alpha-beta
- * nodes. All captures precede quiet promotions and other actions. Each capture
- * is evaluated once by SEE, descending from the moving player's perspective.
+ * nodes. All captures precede quiet promotions and other actions. Only when
+ * two or more captures compete, evaluate each once by moving-side SEE.
  * Negative exchanges remain candidates; SEE never changes leaf evaluations.
  *
  * Fixed-depth roots keep public legal-action order. Iterative roots use this
@@ -208,26 +208,31 @@ export function orderAlphaBetaNodeActions(
   evaluation: SearchEvaluationConfig = DEFAULT_MATERIAL_VALUE_TABLE,
   interruptionCheck: SearchInterruptionCheck = undefined
 ): LegalAction[] {
-  const materialValueTable = resolveSearchMaterialValueTable(evaluation);
-  return actions.map((action, originalIndex) => {
+  const classified = actions.map((action, originalIndex) => {
     const target = action.kind === 'move'
       ? state.squares[action.to.row][action.to.col].piece
       : null;
     const isCapture = action.kind === 'move' && target !== null && target.player !== action.player;
     const isPromotion = action.kind === 'move' && action.promotion === 'promote';
 
-    let exchange = 0;
-    if (isCapture) {
+    return { action, originalIndex, priority: isCapture ? 0 : isPromotion ? 1 : 2, exchange: 0 };
+  });
+  const captures = classified.filter(({ priority }) => priority === 0);
+  // With no competing capture, SEE cannot affect the order. In particular,
+  // iterative roots reach this point after removing the previous best action.
+  if (captures.length >= 2) {
+    const materialValueTable = resolveSearchMaterialValueTable(evaluation);
+    for (const candidate of captures) {
       interruptionCheck?.();
-      const score = evaluateStaticExchange(state, action, materialValueTable);
+      const score = evaluateStaticExchange(state, candidate.action, materialValueTable);
       if (score === null) {
         throw new Error('Alpha-beta capture ordering contract violated: legal capture returned null SEE.');
       }
       interruptionCheck?.();
-      exchange = score;
+      candidate.exchange = score;
     }
-    return { action, originalIndex, priority: isCapture ? 0 : isPromotion ? 1 : 2, exchange };
-  })
+  }
+  return classified
     .sort((left, right) => left.priority - right.priority ||
       right.exchange - left.exchange || left.originalIndex - right.originalIndex)
     .map(({ action }) => action);

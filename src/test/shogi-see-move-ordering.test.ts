@@ -55,6 +55,32 @@ function freezeDeep<T>(value: T): T {
 afterEach(() => vi.restoreAllMocks());
 
 describe('SEE capture ordering', () => {
+  it.each([0, 1])('skips SEE for %i captures while preserving classification and frozen inputs', (captureCount) => {
+    const state = position();
+    // Keep only the forced promoting capture (or remove both targets).
+    state.squares[4][5].piece = null;
+    if (captureCount === 0) state.squares[0][2].piece = null;
+    const actions = getLegalActions(state);
+    const captures = actions.filter((a) => a.kind === 'move' && state.squares[a.to.row][a.to.col].piece);
+    const promotions = actions.filter((a) => a.promotion === 'promote' && !captures.includes(a));
+    const others = actions.filter((a) => !captures.includes(a) && !promotions.includes(a));
+    expect(captures).toHaveLength(captureCount);
+    expect(promotions.length).toBeGreaterThan(0);
+    expect(others.some((a) => a.kind === 'drop')).toBe(true);
+    const table = structuredClone(DEFAULT_MATERIAL_VALUE_TABLE);
+    const snapshot = structuredClone({ state, actions, table });
+    freezeDeep(state); freezeDeep(actions); freezeDeep(table);
+    const spy = vi.spyOn(see, 'evaluateStaticExchange').mockImplementation(() => {
+      throw new Error('SEE must not run without a competing capture');
+    });
+    const ordered = orderAlphaBetaNodeActions(state, actions, table);
+    expect(ordered).not.toBe(actions);
+    expect(ordered).toEqual([...captures, ...promotions, ...others]);
+    expect(orderAlphaBetaNodeActions(state, actions, table)).toEqual(ordered);
+    expect({ state, actions, table }).toEqual(snapshot);
+    expect(spy).not.toHaveBeenCalled();
+  });
+
   it.each(['sente', 'gote'] as const)('%s uses descending moving-side SEE even across promotion classes', (turn) => {
     const state = position(turn);
     const { ordinaryCapture, promotedCapture } = categories(state);
@@ -87,6 +113,7 @@ describe('SEE capture ordering', () => {
   it('calls SEE once per capture and never for quiet moves, promotions or drops', () => {
     const state = position();
     const { all, captures } = categories(state);
+    expect(captures.length).toBeGreaterThanOrEqual(2);
     const spy = vi.spyOn(see, 'evaluateStaticExchange');
     orderAlphaBetaNodeActions(state, all);
     expect(spy).toHaveBeenCalledTimes(captures.length);
@@ -126,16 +153,65 @@ describe('SEE capture ordering', () => {
 
   it('throws on null instead of substituting a zero score', () => {
     const state = position();
+    expect(categories(state).captures.length).toBeGreaterThanOrEqual(2);
     vi.spyOn(see, 'evaluateStaticExchange').mockReturnValue(null);
     expect(() => orderAlphaBetaNodeActions(state, getLegalActions(state))).toThrow(/contract violated/);
   });
 
   it('propagates SEE errors including non-finite material failures unchanged', () => {
     const state = position();
+    expect(categories(state).captures.length).toBeGreaterThanOrEqual(2);
     const error = new RangeError('finite material difference');
     vi.spyOn(see, 'evaluateStaticExchange').mockImplementation(() => { throw error; });
     expect(() => orderAlphaBetaNodeActions(state, getLegalActions(state))).toThrow(error);
     expect(() => analyzeAlphaBetaSearch(state, 2)).toThrow(error);
+  });
+
+  it('preserves public SEE non-finite validation when multiple captures need comparison', () => {
+    const state = position();
+    const { captures } = categories(state);
+    expect(captures.length).toBeGreaterThanOrEqual(2);
+    const table = {
+      ...DEFAULT_MATERIAL_VALUE_TABLE,
+      unpromoted: { ...DEFAULT_MATERIAL_VALUE_TABLE.unpromoted, rook: Infinity },
+    };
+    expect(() => orderAlphaBetaNodeActions(state, captures, table)).toThrow(RangeError);
+  });
+
+  it.each([0, 1])('skips SEE for %i remaining root captures after moving the previous best first', (remaining) => {
+    const state = position();
+    const { normal, drop, promotion, ordinaryCapture, promotedCapture } = categories(state);
+    const rest = remaining === 1 ? [ordinaryCapture] : [];
+    const actions = [normal, ...rest, drop, promotion, promotedCapture];
+    const spy = vi.spyOn(see, 'evaluateStaticExchange');
+    expect(orderIterativeDeepeningRootActions(state, actions, promotedCapture))
+      .toEqual([promotedCapture, ...rest, promotion, normal, drop]);
+    expect(spy).not.toHaveBeenCalled();
+  });
+
+  it('keeps the pre-fix depth-three answer, PV, breakdown and statistics when single captures are skipped', () => {
+    const state = createInitialBoardState();
+    for (const row of state.squares) for (const square of row) square.piece = null;
+    state.squares[8][8].piece = { id: 's-king', type: 'king', player: 'sente' };
+    state.squares[0][8].piece = { id: 'g-king', type: 'king', player: 'gote' };
+    state.squares[4][4].piece = { id: 's-rook', type: 'rook', player: 'sente' };
+    state.squares[4][5].piece = { id: 'g-pawn', type: 'pawn', player: 'gote' };
+    const spy = vi.spyOn(see, 'evaluateStaticExchange');
+    const result = analyzeAlphaBetaSearch(state, 3, undefined, () => 0);
+    // Recorded from unmodified PR HEAD 2507fdb, which calls SEE seven times.
+    expect(result).toMatchObject({
+      selectedAction: { from: { row: 4, col: 4 }, to: { row: 4, col: 5 }, promotion: 'none' },
+      selectedEvaluation: 1313, visitedPositionCount: 617, cutoffCount: 18, skippedActionCount: 222,
+      evaluationBreakdown: { total: 1313, material: 1300, pieceSquare: 1, kingSafety: 12,
+        undefendedPieceSafety: 0, terminal: null },
+    });
+    expect(result.principalVariation).toMatchObject([
+      { from: { row: 4, col: 4 }, to: { row: 4, col: 5 }, promotion: 'none' },
+      { from: { row: 0, col: 8 }, to: { row: 0, col: 7 }, promotion: 'none' },
+      { from: { row: 4, col: 5 }, to: { row: 0, col: 5 }, promotion: 'promote' },
+    ]);
+    expect(spy).not.toHaveBeenCalled();
+    expect(analyzeAlphaBetaSearch(state, 3, undefined, () => 0)).toEqual(result);
   });
 
   it('keeps the previous best first and applies custom SEE only to remaining root captures', () => {
