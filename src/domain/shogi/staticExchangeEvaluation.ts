@@ -71,7 +71,7 @@ function evaluateExchangeContinuation(
  * Legal drops/quiet moves return null; actions absent from getLegalActions throw.
  * Terminal outcomes keep their material delta, never a win/loss infinity.
  * Non-finite material differences (including custom-table overflow) throw.
- * This foundation is not connected to search, ordering, Worker, or UI.
+ * Alpha-beta capture ordering consumes this value without adding it to evaluation.
  */
 export function evaluateStaticExchange(
   state: BoardState,

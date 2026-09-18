@@ -8,8 +8,10 @@ import {
   DEFAULT_MATERIAL_VALUE_TABLE,
 } from './materialEvaluation';
 import { cloneBoardState } from './replay';
+import { evaluateStaticExchange } from './staticExchangeEvaluation';
 import {
   evaluateSearchPositionBreakdown,
+  resolveSearchMaterialValueTable,
   type SearchClock,
   type SearchEvaluationConfig,
   type SearchEvaluationBreakdown,
@@ -193,44 +195,55 @@ function cloneSearchEvaluationBreakdown(
 
 /**
  * Returns a new, deterministic order for actions at non-root alpha-beta
- * nodes. Captures and promotions are classified from the current position;
- * no child state is created merely to order an action.
+ * nodes. All captures precede quiet promotions and other actions. Each capture
+ * is evaluated once by SEE, descending from the moving player's perspective.
+ * Negative exchanges remain candidates; SEE never changes leaf evaluations.
  *
- * This is intentionally not used for root actions. The root keeps the public
- * legal-action order so strict root tie handling remains backward compatible.
+ * Fixed-depth roots keep public legal-action order. Iterative roots use this
+ * only after the previous best action; root ties still use original indexes.
  */
 export function orderAlphaBetaNodeActions(
   state: BoardState,
-  actions: readonly LegalAction[]
+  actions: readonly LegalAction[],
+  evaluation: SearchEvaluationConfig = DEFAULT_MATERIAL_VALUE_TABLE,
+  interruptionCheck: SearchInterruptionCheck = undefined
 ): LegalAction[] {
-  const priorityOf = (action: LegalAction): number => {
+  const materialValueTable = resolveSearchMaterialValueTable(evaluation);
+  return actions.map((action, originalIndex) => {
     const target = action.kind === 'move'
       ? state.squares[action.to.row][action.to.col].piece
       : null;
     const isCapture = action.kind === 'move' && target !== null && target.player !== action.player;
     const isPromotion = action.kind === 'move' && action.promotion === 'promote';
 
-    if (isCapture && isPromotion) return 0;
-    if (isCapture) return 1;
-    if (isPromotion) return 2;
-    return 3;
-  };
-
-  return actions
-    .map((action, originalIndex) => ({ action, originalIndex, priority: priorityOf(action) }))
-    .sort((left, right) => left.priority - right.priority || left.originalIndex - right.originalIndex)
+    let exchange = 0;
+    if (isCapture) {
+      interruptionCheck?.();
+      const score = evaluateStaticExchange(state, action, materialValueTable);
+      if (score === null) {
+        throw new Error('Alpha-beta capture ordering contract violated: legal capture returned null SEE.');
+      }
+      interruptionCheck?.();
+      exchange = score;
+    }
+    return { action, originalIndex, priority: isCapture ? 0 : isPromotion ? 1 : 2, exchange };
+  })
+    .sort((left, right) => left.priority - right.priority ||
+      right.exchange - left.exchange || left.originalIndex - right.originalIndex)
     .map(({ action }) => action);
 }
 
 /**
  * Moves the completed previous iteration's best root action to the front.
- * Remaining root candidates use the existing capture/promotion ordering. If
+ * Remaining root candidates use the same SEE capture/promotion ordering. If
  * that action is no longer legal, the public root legal-action order is kept.
  */
 export function orderIterativeDeepeningRootActions(
   state: BoardState,
   actions: readonly LegalAction[],
-  previousBestAction: LegalAction | null
+  previousBestAction: LegalAction | null,
+  evaluation: SearchEvaluationConfig = DEFAULT_MATERIAL_VALUE_TABLE,
+  interruptionCheck: SearchInterruptionCheck = undefined
 ): LegalAction[] {
   if (previousBestAction === null) return [...actions];
 
@@ -239,7 +252,7 @@ export function orderIterativeDeepeningRootActions(
 
   const previousBest = actions[previousBestIndex];
   const remainingActions = actions.filter((_, index) => index !== previousBestIndex);
-  return [previousBest, ...orderAlphaBetaNodeActions(state, remainingActions)];
+  return [previousBest, ...orderAlphaBetaNodeActions(state, remainingActions, evaluation, interruptionCheck)];
 }
 
 /**
@@ -274,7 +287,7 @@ function searchAlphaBetaNode(
     };
   }
 
-  const actions = orderAlphaBetaNodeActions(state, getLegalActions(state));
+  const actions = orderAlphaBetaNodeActions(state, getLegalActions(state), valueTable, interruptionCheck);
   // All reachable no-legal-action positions are marked ended by the existing
   // rules. Treat a malformed in-progress position as a leaf as well, rather
   // than recursing forever or throwing after a valid API result of [].
@@ -388,7 +401,9 @@ function searchAlphaBeta(
       ...statistics,
     };
   }
-  const orderedRootActions = orderIterativeDeepeningRootActions(state, rootActions, previousBestAction);
+  const orderedRootActions = orderIterativeDeepeningRootActions(
+    state, rootActions, previousBestAction, valueTable, interruptionCheck
+  );
   const indexedRootActions = orderedRootActions.map((action) => ({
     action,
     originalIndex: rootActions.indexOf(action),

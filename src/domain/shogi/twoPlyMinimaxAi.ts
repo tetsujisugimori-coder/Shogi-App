@@ -87,17 +87,25 @@ function isMaterialValueTable(config: SearchEvaluationConfig): config is Materia
   return 'unpromoted' in config && 'promoted' in config;
 }
 
+/** Shared material table resolution for static evaluation and capture ordering. */
+export function resolveSearchMaterialValueTable(config?: SearchEvaluationConfig): MaterialValueTable {
+  return config && isMaterialValueTable(config)
+    ? config
+    : config?.materialValueTable ?? DEFAULT_MATERIAL_VALUE_TABLE;
+}
+
 function resolveSearchEvaluationOptions(config: SearchEvaluationConfig | undefined): Required<SearchEvaluationOptions> {
+  const materialValueTable = resolveSearchMaterialValueTable(config);
   if (config && isMaterialValueTable(config)) {
     return {
-      materialValueTable: config,
+      materialValueTable,
       pieceSquareValueTable: DEFAULT_PIECE_SQUARE_VALUE_TABLE,
       kingSafetyWeights: DEFAULT_KING_SAFETY_EVALUATION_WEIGHTS,
       coefficients: resolveSearchEvaluationPreset().coefficients,
     };
   }
   return {
-    materialValueTable: config?.materialValueTable ?? DEFAULT_MATERIAL_VALUE_TABLE,
+    materialValueTable,
     pieceSquareValueTable: config?.pieceSquareValueTable ?? DEFAULT_PIECE_SQUARE_VALUE_TABLE,
     kingSafetyWeights: config?.kingSafetyWeights ?? DEFAULT_KING_SAFETY_EVALUATION_WEIGHTS,
     coefficients: config?.coefficients ?? resolveSearchEvaluationPreset().coefficients,
