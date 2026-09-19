@@ -42,6 +42,12 @@ node scripts/verify-evaluation-presets-browser.mjs http://127.0.0.1:4173/Shogi-A
 
 参考性能測定は `npx tsx scripts/measure-evaluation-preset-comparison.ts`、実Workerと1440/375/320px表示のブラウザ検証は既存の外部Playwright環境で `node scripts/verify-evaluation-preset-comparison-browser.mjs <ViteのURL> <証跡の出力先>` を使えます（`PLAYWRIGHT_MODULE` は既存環境のパッケージパス）。実時間はCIの合否条件にしません。
 
+## 静止探索（Quiescence Search）の純粋関数基盤
+
+`analyzeQuiescenceSearch(state, perspective, maxTacticalDepth, evaluation?, interruptionCheck?)` は、通常の固定深さ探索が駒取り直後などの不安定な局面で静的評価を確定してしまう探索境界の問題を、限定的に読み足して検証するためのドメインAPIです。開始時に指定した`perspective`を固定し、その側の手番で最大化、相手側で最小化します。非王手局面では既存の静的評価をstand-pat候補として先に置き、合法な駒取り（成り付き捕獲を含む）だけを元の合法手順で読みます。同値ならstand-patを維持します。王手中はstand-patを置かず、既存の合法手生成による玉移動・合駒・駒打ちを含む全回避手を読みます。
+
+`maxTacticalDepth`はこのAPIが実行できる追加着手数の安全上限です。`0`では着手せず既存評価を返すため、王手中も静的評価で終える近似になります。終局は既存の終局評価をそのまま返します。各結果はPV末端と同じ`evaluationBreakdown`、rootを除く生成局面数、αβ打切り回数、打切り後の未実行候補数を返します。現時点では通常のαβ探索、反復深化、時間制限探索、Worker、UIへ接続しておらず、SEEによる順序付け・枝刈り・評価も利用していません。
+
 ## Shogi-App JSON Exchange Format
 
 外部アプリとの交換には、研究セッション全体を表す `shogi-app-game-record-session` / `version: 1` を推奨します。これは本譜 `mainline` と兄弟分岐 `branches`、選択中の `selectedRecordId` を含みます。各 `mainline` と `branches[].record` は、単局形式 `shogi-app-game-record` / `version: 1` です。

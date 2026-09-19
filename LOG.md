@@ -1,5 +1,22 @@
 # SHOGI-APP 開発ログ
 
+## [2026-09-19] 静止探索の純粋関数基盤
+
+### 目的・設計
+
+- PR #106が`ef5badb`として`origin/main`へマージ済みであること、local `main`とのfast-forward後に両者が同一であること、作業ツリーがクリーンであることを確認し、`feat/quiescence-search-foundation`を作成した。既存のαβ探索、反復深化、時間制限探索、Worker、UI、評価係数、合法手順、SEE順序付けは変更しない。
+- 新しい公開ドメインAPIは`analyzeQuiescenceSearch(state, perspective, maxTacticalDepth, evaluation?, interruptionCheck?)`とした。評価視点を明示引数で固定するため、再帰中に手番が替わっても同じ視点の値を、視点側では最大化、相手側では最小化する。既存の`evaluateSearchPositionBreakdown()`だけを静的評価経路にし、`getLegalActions()`、`executeLegalAction()`、`cloneBoardState()`、`isPlayerInCheck()`を再利用する。
+- 非王手ではstand-patを最初の候補とし、合法な盤上駒取り（成り付き捕獲を含む）だけを元の順序で読む。厳密比較なので同値ならstand-pat／先行合法手を維持する。王手中はstand-patを禁止し、既存合法手生成の全回避手（玉移動・合駒・駒打ちを含む）を読む。終局は手生成前に既存終局内訳を返す。最大戦術深さは実行できる追加plyの上限であり、0では王手中も安全上限を優先して静的評価で終了する近似である。
+- `visitedPositionCount`は開始局面を除く、実際に候補を実行して生成した子局面数。`cutoffCount`はαβにより候補ループを停止した回数、`skippedActionCount`はその停止で実行しなかった候補数と固定した。評価値・評価内訳・PVは同一の採用葉から伝播し、PVは実行済みの採用手だけで最大戦術深さを超えない。
+
+### テスト・失敗履歴・制限
+
+- `shogi-quiescence-search.test.ts`を追加し、深さ0、静かな局面、損な交換のstand-pat、有利な捕獲、取り返し、固定視点の最大化／最小化、王手中の玉移動・合駒・駒打ち、終局、深さ上限、同値、αβ統計（専用局面で生成2・cutoff 1・未実行1）、凍結入力、決定性、中断例外、不正深さ、SEE未呼出、既存αβ不変を確認する。人工局面は各テストで王手・合法手の存在を明示検証する。
+- 変更前の関連9テストファイルは303件成功。通常経路の関連テストと`npm run check`はesbuildの`spawn EPERM`で止まったため環境制約として扱い、許可経路の関連テストは成功した。許可経路の変更前`npm run check`と全件`npm test`はVitest開始後に完了要約を回収できなかったため、成功扱いにはしていない。
+- 変更後の専用テストは1ファイル18件、関連回帰テストは10ファイル321件が成功。全42テストファイルを重複・漏れなく4バッチへ分割し、344件、248件（既存jsdomの`Not implemented: navigation to another Document`通知あり）、265件、383件、合計1,240件を終了要約付きで確認した。`npm run verify:lock`（398 registry packages、欠落0）、`npm run lint`、`npm run build`、`git diff --check`も成功。変更後の`npm run check`は実行したが、Vitest開始後の完了要約が回収できない同環境の制約が再現したため、コマンド単体は成功扱いにしない。分割全件結果と個別buildは別証跡である。
+- 実装途中の`tsc --noEmit`はstand-pat分岐の内訳null絞り込み不足で1件失敗し、非nullを明示して修正した。専用テストは初期局面の既存駒得を0と誤認した期待値2件で失敗し、初期静的評価をstand-patとして維持する正しい契約へ直した。skip、緩和、固定待機、既存テスト変更は行っていない。
+- 現段階でも通常αβ探索への葉接続、既定有効化、Worker/UI/通信、SEE順序付け・pruning、非駒取り王手、詰み専用探索、置換表・局面キャッシュ、make/unmake、ルール・評価・保存形式の変更は対象外である。次段階で、性能と戦術精度を別途比較したうえで明示選択による通常αβ探索の葉接続を検討する。
+
 ## [2026-09-18] 評価プリセット選択
 
 ### 実装・係数設計
