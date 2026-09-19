@@ -355,6 +355,7 @@ describe('SEE capture ordering', () => {
       result: {
         ...analyzeTimeLimitedIterativeDeepeningAlphaBetaSearch(state, 2, 1000, resolveSearchEvaluationPreset(presetId), () => 0, SEE_OPTIONS),
         evaluationPresetId: presetId,
+        quiescenceMaxTacticalDepth: null,
       },
     });
     expect(structuredClone(response)).toEqual(response);
