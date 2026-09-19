@@ -1,3 +1,5 @@
+import { handleQuiescenceComparisonWorkerRequest } from './quiescenceComparisonWorkerHandler';
+import type { QuiescenceComparisonWorkerRequest } from './quiescenceComparisonWorkerProtocol';
 import { handleTimeLimitedIterativeDeepeningAlphaBetaSearchWorkerRequest } from './timeLimitedIterativeDeepeningAlphaBetaWorkerHandler';
 import { handleEvaluationPresetComparisonWorkerRequest } from './evaluationPresetComparisonWorkerHandler';
 import type { EvaluationPresetComparisonWorkerRequest } from './evaluationPresetComparisonWorkerProtocol';
@@ -7,10 +9,17 @@ import type {
 
 self.addEventListener(
   'message',
-  (event: MessageEvent<TimeLimitedIterativeDeepeningAlphaBetaSearchWorkerRequest | EvaluationPresetComparisonWorkerRequest>) => {
-    const response = event.data.type === 'compare-evaluation-presets'
-      ? handleEvaluationPresetComparisonWorkerRequest(event.data) :
-      handleTimeLimitedIterativeDeepeningAlphaBetaSearchWorkerRequest(event.data);
-    self.postMessage(response);
+  (event: MessageEvent<TimeLimitedIterativeDeepeningAlphaBetaSearchWorkerRequest | EvaluationPresetComparisonWorkerRequest | QuiescenceComparisonWorkerRequest>) => {
+    switch (event.data.type) {
+      case 'compare-evaluation-presets':
+        self.postMessage(handleEvaluationPresetComparisonWorkerRequest(event.data));
+        break;
+      case 'compare-quiescence-settings':
+        self.postMessage(handleQuiescenceComparisonWorkerRequest(event.data));
+        break;
+      case 'run-time-limited-iterative-deepening-alpha-beta-search':
+        self.postMessage(handleTimeLimitedIterativeDeepeningAlphaBetaSearchWorkerRequest(event.data));
+        break;
+    }
   }
 );
