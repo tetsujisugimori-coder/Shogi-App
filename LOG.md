@@ -3370,4 +3370,10 @@ PR #1のレビュー指摘を受け、簡易APIの`applyMove`と合法手候補�
 - `npm run build`: 1743 modules、本番成果物とWorker bundleの生成まで成功、終了コード0。
 - `npm run check`: lock→lint→全41ファイル1273/1273成功（47.10秒）→本番buildまで完走、終了コード0。既存jsdomのnavigation未実装通知は出たが失敗なし。
 - `git diff --check`: 終了コード0（既存CRLF方針に伴う変換予定の警告のみ）。差分は上記3テストと本LOGのみで、本番コードの差分はない。
-- 修正後のGitHub Actions結果はpush後に確認し、追記する。
+
+### GitHub Actions確認
+
+- テスト修正コミット `f843bc265f90606f9ea494f0f2a035bdea580695` を既存PR #115の `feat/quiescence-worker-ui` へpush。新規PRは作成していない。
+- [修正後CI run 35452435326](https://github.com/tetsujisugimori-coder/Shogi-App/actions/runs/35452435326) の対象HEADは上記コミット。Ubuntu・macOSともsuccessで、全41ファイルのテストと `Run production build` まで成功した。
+- Ubuntu: 1273 passed / 0 failed、テスト64.97秒、本番build 2.47秒。macOS: 1271 passed / 0 failed / 従来のOS条件による2 skipped、テスト58.05秒、本番build 1.92秒。両OSでlock・TypeScript検査も成功し、macOS固有fsevents／Vite watcher検証も成功した。
+- CIログの完了要約とbuild完了行を照合した。探索ロジックや公開仕様は変更せず、7件のテスト追従漏れを修正した。今回の修正に関する未解決の失敗はない。
