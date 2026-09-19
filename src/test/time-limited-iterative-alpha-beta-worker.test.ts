@@ -2,9 +2,10 @@ import { DEFAULT_SEARCH_EVALUATION_PRESET_ID, resolveSearchEvaluationPreset, SEA
 import { describe, expect, it, vi } from 'vitest';
 import {
   analyzeTimeLimitedIterativeDeepeningAlphaBetaSearch,
+  cloneBoardSquares,
   type TimeLimitedIterativeDeepeningAlphaBetaSearchResult,
 } from '../domain/shogi';
-import { createInitialBoardState } from '../types/shogi';
+import { createInitialBoardState, type Piece } from '../types/shogi';
 import {
   createTimeLimitedIterativeDeepeningAlphaBetaSearchWorkerClient,
   runTimeLimitedIterativeDeepeningAlphaBetaSearchInWorker,
@@ -29,6 +30,19 @@ function request(overrides: Partial<TimeLimitedIterativeDeepeningAlphaBetaSearch
     timeLimitMilliseconds: 1_000,
     ...overrides,
   };
+}
+
+function captureTrapState() {
+  const initial = createInitialBoardState();
+  const squares = cloneBoardSquares(initial.squares);
+  for (const row of squares) for (const square of row) square.piece = null;
+  const piece = (id: string, type: Piece['type'], player: Piece['player']): Piece => ({ id, type, player });
+  squares[8][8].piece = piece('sente-king', 'king', 'sente');
+  squares[0][8].piece = piece('gote-king', 'king', 'gote');
+  squares[5][4].piece = piece('sente-rook', 'rook', 'sente');
+  squares[4][4].piece = piece('gote-pawn', 'pawn', 'gote');
+  squares[3][4].piece = piece('gote-recapturing-pawn', 'pawn', 'gote');
+  return { ...initial, squares, senteHand: [], goteHand: [], turn: 'sente' as const };
 }
 
 function comparableResult(result: TimeLimitedIterativeDeepeningAlphaBetaSearchResult) {
@@ -106,6 +120,7 @@ describe('時間制限付き反復深化αβ探索Workerの純粋処理', () => 
     expect(response.result).toEqual({
       ...analyzeTimeLimitedIterativeDeepeningAlphaBetaSearch(input.state, 2, 1000, resolveSearchEvaluationPreset(id), () => 0),
       evaluationPresetId: id,
+      quiescenceMaxTacticalDepth: null,
     });
     expect(structuredClone(response)).toEqual(response);
   });
@@ -117,6 +132,60 @@ describe('時間制限付き反復深化αβ探索Workerの純粋処理', () => 
     expect(response).toMatchObject({ type: 'time-limited-iterative-deepening-alpha-beta-search-failed', errorMessage: 'Unknown search evaluation preset.' });
     expect(search).not.toHaveBeenCalled();
   });
+
+  it.each([1, 2] as const)('静止探索の追加%s手を探索optionsへ変換し、成功応答へ実値を含める', (depth) => {
+    const search = vi.fn(analyzeTimeLimitedIterativeDeepeningAlphaBetaSearch);
+    const input = request({ quiescenceMaxTacticalDepth: depth });
+
+    const response = handleTimeLimitedIterativeDeepeningAlphaBetaSearchWorkerRequest(input, search);
+
+    expect(search).toHaveBeenCalledWith(
+      input.state,
+      input.maxDepth,
+      input.timeLimitMilliseconds,
+      resolveSearchEvaluationPreset(),
+      undefined,
+      { quiescence: { maxTacticalDepth: depth } }
+    );
+    expect(response).toMatchObject({
+      type: 'time-limited-iterative-deepening-alpha-beta-search-succeeded',
+      result: { quiescenceMaxTacticalDepth: depth },
+    });
+  });
+
+  it('PR #113相当の取り返し局面をWorker経由で静止探索し、統計と使用設定を保持する', () => {
+    const response = handleTimeLimitedIterativeDeepeningAlphaBetaSearchWorkerRequest(request({
+      state: captureTrapState(),
+      maxDepth: 1,
+      quiescenceMaxTacticalDepth: 2,
+    }));
+
+    expect(response).toMatchObject({
+      type: 'time-limited-iterative-deepening-alpha-beta-search-succeeded',
+      result: { quiescenceMaxTacticalDepth: 2 },
+    });
+    if (response.type !== 'time-limited-iterative-deepening-alpha-beta-search-succeeded') throw new Error('Expected success');
+    expect(response.result.quiescenceLeafCount).toBeGreaterThan(0);
+    expect(response.result.totalQuiescenceLeafCount).toBe(response.result.quiescenceLeafCount);
+  });
+
+  it.each([0, -1, 1.5, 3, '1', Number.NaN, Number.POSITIVE_INFINITY, null, {}, { maxTacticalDepth: 1 }])(
+    '不正な静止探索設定 %p は探索前に拒否する',
+    (value) => {
+      const search = vi.fn(analyzeTimeLimitedIterativeDeepeningAlphaBetaSearch);
+      const input = request({ quiescenceMaxTacticalDepth: value } as unknown as Partial<TimeLimitedIterativeDeepeningAlphaBetaSearchWorkerRequest>);
+
+      const response = handleTimeLimitedIterativeDeepeningAlphaBetaSearchWorkerRequest(input, search);
+
+      expect(response).toMatchObject({
+        type: 'time-limited-iterative-deepening-alpha-beta-search-failed',
+        errorName: 'RangeError',
+        errorMessage: expect.stringMatching(/quiescence/i),
+      });
+      expect(search).not.toHaveBeenCalled();
+    }
+  );
+
   it('既存の同期探索を呼び、同じrequestIdと探索結果を構造化クローン可能な成功応答にする', () => {
     const input = request({ maxDepth: 2 });
     const snapshot = JSON.stringify(input.state);
@@ -134,6 +203,7 @@ describe('時間制限付き反復深化αβ探索Workerの純粋処理', () => 
       throw new Error('Expected a successful worker response.');
     }
     expect(response.requestId).toBe(input.requestId);
+    expect(response.result.quiescenceMaxTacticalDepth).toBeNull();
     expect(comparableResult(response.result)).toEqual(comparableResult(direct));
     expect(response.result.principalVariation).toEqual(direct.principalVariation);
     expect(JSON.stringify(input.state)).toBe(snapshot);
@@ -247,6 +317,31 @@ describe('時間制限付き反復深化αβ探索Workerクライアント', () 
     await expect(pending).resolves.toMatchObject({ evaluationPresetId: id });
   });
 
+  it.each([1, 2] as const)('静止探索の追加%s手を要求へ渡し、同じ応答だけを採用する', async (depth) => {
+    const fake = createFakeWorker();
+    const client = createTimeLimitedIterativeDeepeningAlphaBetaSearchWorkerClient({ workerFactory: () => fake.worker, requestIdFactory: () => 'quiescence-request' });
+    const input = createInitialBoardState();
+    const pending = client.run(input, 1, 1000, undefined, undefined, depth);
+    const workerRequest = request({
+      state: input,
+      requestId: 'quiescence-request',
+      evaluationPresetId: DEFAULT_SEARCH_EVALUATION_PRESET_ID,
+      quiescenceMaxTacticalDepth: depth,
+    });
+    expect(fake.postMessage).toHaveBeenCalledWith(workerRequest);
+    fake.emitMessage(handleTimeLimitedIterativeDeepeningAlphaBetaSearchWorkerRequest(workerRequest));
+    await expect(pending).resolves.toMatchObject({ quiescenceMaxTacticalDepth: depth });
+  });
+
+  it('応答の静止探索設定不一致をWorkerProtocolErrorとして拒否する', async () => {
+    const fake = createFakeWorker();
+    const client = createTimeLimitedIterativeDeepeningAlphaBetaSearchWorkerClient({ workerFactory: () => fake.worker, requestIdFactory: () => 'request-1' });
+    const pending = client.run(createInitialBoardState(), 1, 1000, undefined, undefined, 1);
+    fake.emitMessage(successResponse());
+
+    await expect(pending).rejects.toMatchObject({ name: 'WorkerProtocolError' });
+  });
+
   it('応答の設定不一致を拒否し、公開クライアントの不正IDも安全に失敗する', async () => {
     const fake = createFakeWorker();
     const client = createTimeLimitedIterativeDeepeningAlphaBetaSearchWorkerClient({ workerFactory: () => fake.worker, requestIdFactory: () => 'request-1' });
@@ -259,7 +354,11 @@ describe('時間制限付き反復深化αβ探索Workerクライアント', () 
   const successResponse = (requestId = 'request-1'): TimeLimitedIterativeDeepeningAlphaBetaSearchWorkerResponse => ({
     type: 'time-limited-iterative-deepening-alpha-beta-search-succeeded',
     requestId,
-    result: { ...analyzeTimeLimitedIterativeDeepeningAlphaBetaSearch(createInitialBoardState(), 1, 1_000), evaluationPresetId: DEFAULT_SEARCH_EVALUATION_PRESET_ID },
+    result: {
+      ...analyzeTimeLimitedIterativeDeepeningAlphaBetaSearch(createInitialBoardState(), 1, 1_000),
+      evaluationPresetId: DEFAULT_SEARCH_EVALUATION_PRESET_ID,
+      quiescenceMaxTacticalDepth: null,
+    },
   });
 
   it('成功応答でresolveし、Workerを一度だけ終了する', async () => {
