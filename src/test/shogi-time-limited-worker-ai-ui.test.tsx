@@ -62,6 +62,7 @@ function workerResult(selectedAction: LegalAction | null): PresetTimeLimitedSear
   return {
     ...iteration,
     evaluationPresetId: DEFAULT_SEARCH_EVALUATION_PRESET_ID,
+    quiescenceMaxTacticalDepth: null,
     iterations: [iteration],
     totalVisitedPositionCount: 220,
     totalCutoffCount: 14,
@@ -122,6 +123,73 @@ function createFourMoveState() {
 }
 
 describe('時間制限Worker AIの盤面UI接続', () => {
+  it('静止探索は初期状態で無効、選択値を固定してWorkerへ渡し、変更時に古い結果を消去する', async () => {
+    const user = userEvent.setup();
+    const first = deferred<PresetTimeLimitedSearchResult>();
+    const second = deferred<PresetTimeLimitedSearchResult>();
+    const runner = vi.fn().mockReturnValueOnce(first.promise).mockReturnValueOnce(second.promise);
+    render(<ShogiResearchScreen workerSearchRunner={runner} />);
+    const select = screen.getByRole('combobox', { name: '静止探索（駒取りの読み足し）' });
+
+    expect(select).toHaveValue('disabled');
+    await user.click(workerButton());
+    expect(runner).toHaveBeenLastCalledWith(expect.anything(), 4, 1000, expect.any(AbortSignal), DEFAULT_SEARCH_EVALUATION_PRESET_ID);
+    expect(select).toBeDisabled();
+    await act(async () => first.resolve(workerResult(initialAction())));
+    expect(screen.getByText('静止探索')).toBeVisible();
+    expect(within(screen.getByRole('heading', { name: 'AI思考結果' }).closest('section')!).getByText('無効')).toBeVisible();
+
+    await user.selectOptions(select, '2');
+    expect(screen.queryByRole('heading', { name: 'AI思考結果' })).not.toBeInTheDocument();
+    await user.click(workerButton());
+    expect(runner).toHaveBeenLastCalledWith(expect.anything(), 4, 1000, expect.any(AbortSignal), DEFAULT_SEARCH_EVALUATION_PRESET_ID, 2);
+    expect(select).toBeDisabled();
+    const searchState = runner.mock.calls[1][0] as BoardState;
+    const quiescentResult = {
+      ...workerResult(getLegalActions(searchState)[0]),
+      quiescenceMaxTacticalDepth: 2 as const,
+      quiescenceLeafCount: 3,
+      quiescenceVisitedPositionCount: 5,
+      quiescenceCutoffCount: 2,
+      quiescenceSkippedActionCount: 4,
+      totalQuiescenceLeafCount: 7,
+      totalQuiescenceVisitedPositionCount: 11,
+      totalQuiescenceCutoffCount: 6,
+      totalQuiescenceSkippedActionCount: 9,
+    };
+    await act(async () => second.resolve(quiescentResult));
+    expect(within(screen.getByRole('heading', { name: 'AI思考結果' }).closest('section')!).getByText('追加2手')).toBeVisible();
+    expect(screen.getByText('静止探索の量（通常探索とは別）')).toBeVisible();
+    expect(screen.getByText('最深完了反復の静止探索葉数')).toBeVisible();
+    expect(screen.getByText('最深完了反復の静止探索調査局面数').nextElementSibling).toHaveTextContent('5');
+    expect(screen.getByText('全反復合計の静止探索葉数').nextElementSibling).toHaveTextContent('7');
+    expect(select).toBeEnabled();
+  });
+
+  it('追加1手を選ぶと1だけをWorkerへ渡す', async () => {
+    const user = userEvent.setup();
+    const pending = deferred<PresetTimeLimitedSearchResult>();
+    const runner = vi.fn().mockReturnValue(pending.promise);
+    render(<ShogiResearchScreen workerSearchRunner={runner} />);
+
+    await user.selectOptions(screen.getByRole('combobox', { name: '静止探索（駒取りの読み足し）' }), '1');
+    await user.click(workerButton());
+
+    expect(runner).toHaveBeenCalledWith(expect.anything(), 4, 1000, expect.any(AbortSignal), DEFAULT_SEARCH_EVALUATION_PRESET_ID, 1);
+  });
+
+  it('要求と異なる静止探索設定を持つ結果は着手にも表示にも採用しない', async () => {
+    const user = userEvent.setup();
+    const runner = vi.fn().mockResolvedValue({ ...workerResult(initialAction()), quiescenceMaxTacticalDepth: 1 as const });
+    render(<ShogiResearchScreen workerSearchRunner={runner} />);
+
+    await user.click(workerButton());
+
+    expect(await screen.findByRole('alert')).toHaveTextContent('AIの静止探索設定が探索要求と一致しません。');
+    expect(document.getElementById('shogi-research-screen')).toHaveAttribute('data-history-count', '0');
+    expect(screen.queryByRole('heading', { name: 'AI思考結果' })).not.toBeInTheDocument();
+  });
+
   it('設定を開始時に固定し、変更後の次回探索と結果表示へ反映する', async () => {
     const user = userEvent.setup();
     const first = deferred<PresetTimeLimitedSearchResult>();

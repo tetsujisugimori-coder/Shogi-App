@@ -4,7 +4,10 @@ import { isSameComparisonPosition, validateEvaluationPresetComparison } from '..
 import { EvaluationPresetComparisonPanel, type EvaluationPresetComparisonDisplay } from './EvaluationPresetComparisonPanel';
 import { formatLegalActionNotation, validateAndFormatPrincipalVariation } from '../../application/searchPrincipalVariation';
 import { DEFAULT_SEARCH_EVALUATION_PRESET_ID, SEARCH_EVALUATION_PRESET_IDS, isSearchEvaluationPresetId, resolveSearchEvaluationPreset, type SearchEvaluationPresetId } from '../../domain/shogi/searchEvaluationPresets';
-import type { PresetTimeLimitedSearchResult } from '../../workers/timeLimitedIterativeDeepeningAlphaBetaWorkerProtocol';
+import type {
+  PresetTimeLimitedSearchResult,
+  TimeLimitedSearchQuiescenceMaxTacticalDepth,
+} from '../../workers/timeLimitedIterativeDeepeningAlphaBetaWorkerProtocol';
 import { SEARCH_EVALUATION_PRESET_DISPLAY } from './searchEvaluationPresetDisplay';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { createInitialBoardState, BoardState, BoardSquare, Piece, PieceType } from '../../types/shogi';
@@ -76,7 +79,8 @@ type TimeLimitedIterativeDeepeningAlphaBetaSearchRunner = (
   maxDepth: number,
   timeLimitMilliseconds: number,
   signal?: AbortSignal,
-  evaluationPresetId?: SearchEvaluationPresetId
+  evaluationPresetId?: SearchEvaluationPresetId,
+  quiescenceMaxTacticalDepth?: TimeLimitedSearchQuiescenceMaxTacticalDepth
 ) => Promise<PresetTimeLimitedSearchResult>;
 
 interface PendingPromotion {
@@ -137,6 +141,7 @@ const STATUS_BADGE_COLORS = {
 
 const TIME_LIMITED_AI_MAX_DEPTH = 4;
 const TIME_LIMITED_AI_TIME_LIMIT_MILLISECONDS = 1_000;
+type QuiescenceSelection = TimeLimitedSearchQuiescenceMaxTacticalDepth | null;
 
 export const ShogiResearchScreen: React.FC<ShogiResearchScreenProps> = ({
   initialState,
@@ -163,6 +168,7 @@ export const ShogiResearchScreen: React.FC<ShogiResearchScreenProps> = ({
   const [isKifFileReading, setIsKifFileReading] = useState(false);
   const [moveHistoryResetKey, setMoveHistoryResetKey] = useState(0);
   const [evaluationPresetId, setEvaluationPresetId] = useState<SearchEvaluationPresetId>(DEFAULT_SEARCH_EVALUATION_PRESET_ID);
+  const [quiescenceSelection, setQuiescenceSelection] = useState<QuiescenceSelection>(null);
   const [aiSearchDisplay, setAiSearchDisplay] = useState<AiSearchDisplay | null>(null);
   const [comparisonState, setComparisonState] = useState<WorkerSearchState>({ kind: 'idle' });
   const [comparisonDisplay, setComparisonDisplay] = useState<EvaluationPresetComparisonDisplay | null>(null);
@@ -938,6 +944,7 @@ export const ShogiResearchScreen: React.FC<ShogiResearchScreenProps> = ({
     const generation = workerSearchGenerationRef.current + 1;
     const searchState = boardState;
     const searchPresetId = evaluationPresetId;
+    const searchQuiescenceMaxTacticalDepth = quiescenceSelection;
     workerSearchGenerationRef.current = generation;
     activeWorkerSearchRef.current = { kind: 'single', generation, controller, state: searchState };
     setSelection({ kind: 'none' });
@@ -950,19 +957,35 @@ export const ShogiResearchScreen: React.FC<ShogiResearchScreenProps> = ({
       return activeSearch?.generation === generation && !activeSearch.controller.signal.aborted;
     };
 
-    void workerSearchRunner(
-      searchState,
-      TIME_LIMITED_AI_MAX_DEPTH,
-      TIME_LIMITED_AI_TIME_LIMIT_MILLISECONDS,
-      controller.signal,
-      searchPresetId
-    ).then(
+    const pendingSearch = searchQuiescenceMaxTacticalDepth === null
+      ? workerSearchRunner(
+        searchState,
+        TIME_LIMITED_AI_MAX_DEPTH,
+        TIME_LIMITED_AI_TIME_LIMIT_MILLISECONDS,
+        controller.signal,
+        searchPresetId
+      )
+      : workerSearchRunner(
+        searchState,
+        TIME_LIMITED_AI_MAX_DEPTH,
+        TIME_LIMITED_AI_TIME_LIMIT_MILLISECONDS,
+        controller.signal,
+        searchPresetId,
+        searchQuiescenceMaxTacticalDepth
+      );
+
+    void pendingSearch.then(
       (result) => {
         if (!isCurrentSearch()) return;
 
         if (result.evaluationPresetId !== searchPresetId) {
           activeWorkerSearchRef.current = null;
           setWorkerSearchState({ kind: 'error', message: 'AIの評価設定が探索要求と一致しません。' });
+          return;
+        }
+        if (result.quiescenceMaxTacticalDepth !== searchQuiescenceMaxTacticalDepth) {
+          activeWorkerSearchRef.current = null;
+          setWorkerSearchState({ kind: 'error', message: 'AIの静止探索設定が探索要求と一致しません。' });
           return;
         }
 
@@ -1271,6 +1294,29 @@ export const ShogiResearchScreen: React.FC<ShogiResearchScreenProps> = ({
             ))}
           </select>
           <p id="evaluation-preset-description">{SEARCH_EVALUATION_PRESET_DISPLAY[evaluationPresetId].description}</p>
+        </div>
+        <div className="mt-2 w-full min-w-0 max-w-sm space-y-1 text-xs text-stone-300">
+          <label htmlFor="quiescence-selection" className="block">静止探索（駒取りの読み足し）</label>
+          <select
+            id="quiescence-selection"
+            aria-describedby="quiescence-selection-description"
+            value={quiescenceSelection === null ? 'disabled' : String(quiescenceSelection)}
+            disabled={isWorkerSearchThinking || isComparisonThinking || dialogsAreOpen}
+            onChange={(event) => {
+              if (activeWorkerSearchRef.current) return;
+              const value = event.target.value;
+              const nextSelection: QuiescenceSelection = value === '1' ? 1 : value === '2' ? 2 : null;
+              if (value !== 'disabled' && nextSelection === null) return;
+              setQuiescenceSelection(nextSelection);
+              setAiSearchDisplay(null);
+            }}
+            className="w-full min-w-0 rounded border border-stone-700 bg-stone-900 px-3 py-2 text-sm text-stone-100 disabled:opacity-50"
+          >
+            <option value="disabled">無効</option>
+            <option value="1">追加1手</option>
+            <option value="2">追加2手</option>
+          </select>
+          <p id="quiescence-selection-description">通常探索の葉で駒取りだけを追加で読みます。</p>
         </div>
         <div className="mt-2 flex max-w-full flex-wrap justify-center gap-2">
           <button

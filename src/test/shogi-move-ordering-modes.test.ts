@@ -178,7 +178,8 @@ describe('alpha-beta move-ordering modes', () => {
     expect(run).toHaveBeenCalledWith(state, 2, 1000, resolveSearchEvaluationPreset(presetId));
     expect(result).toEqual({ type: 'time-limited-iterative-deepening-alpha-beta-search-succeeded', requestId: 'standard',
       result: { ...search.analyzeTimeLimitedIterativeDeepeningAlphaBetaSearch(state, 2, 1000,
-        resolveSearchEvaluationPreset(presetId), clock, { moveOrdering: 'standard' }), evaluationPresetId: presetId } });
+        resolveSearchEvaluationPreset(presetId), clock, { moveOrdering: 'standard' }), evaluationPresetId: presetId,
+        quiescenceMaxTacticalDepth: null } });
     expect(prepared).not.toHaveBeenCalled();
     expect(publicSee).not.toHaveBeenCalled();
   });

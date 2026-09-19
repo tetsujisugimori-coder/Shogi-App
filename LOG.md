@@ -3327,3 +3327,53 @@ PR #1のレビュー指摘を受け、簡易APIの`applyMove`と合法手候補�
 
 - 新PRは親への取り込みを推奨。親PR #106は本PRを取り込みstandardが既定になった状態ならmainへのマージ候補。未反映の親414e7a1を既定SEEのままマージする推奨ではない。どのPRも自動マージせず、親本文は#107マージ済みと新PR参照だけ最小限更新する。
 - 明示SEEの性能負担と1交換系列中に中断できない制限、実時間測定の揺れは残る。SEE内部追加最適化、make/unmake、undo、差分更新、合法手生成変更、静止探索、詰み専用探索、置換表・局面間キャッシュ、新しい枝刈り、評価係数・プリセット、Workerプロトコル、UI、棋譜・保存形式、依存追加は対象外。
+
+## [2026-09-19] Worker経由の静止探索設定と対局画面選択
+
+### 開始時点の確認
+
+- 指定どおり `git fetch origin` を実行した。`origin/main` とローカル `main` はともに `0dce2a46a46368b2b2f4c95fdef64bc71f91da44`（PR #113のマージコミット）であり、同コミットが `origin/main` の祖先であることを確認した。
+- 作業開始前の `git status --short --branch` は `## main...origin/main`、ステージ済み・未ステージ・未追跡の変更はいずれもなかった。既存ユーザー変更を上書き、削除、退避する必要はないと判断し、最新 `main` から `feat/quiescence-worker-ui` を作成した。
+- 今回は既定の完全無効を保つため、UIの無効値は `null` とし、Worker境界で許可する有効値を `1` と `2` に限定する。省略時に `maxTacticalDepth: 0` や空の `quiescence` は生成しない。既存の時間制限1,000ms、深さ、評価プリセット、取消・世代管理、棋譜・保存形式、評価プリセット比較Workerは変更対象外とする。
+
+### 実装・検証
+
+- 時間制限Workerの要求に `quiescenceMaxTacticalDepth?: 1 | 2` を追加し、省略時は既存どおり探索optionsを渡さない。Handlerは実行時に1と2だけを許可し、無効値は `null`、有効値は `AlphaBetaSearchOptions` の `{ quiescence: { maxTacticalDepth } }` へ変換して成功応答へ返す。不正値は探索関数を呼ぶ前に `RangeError` の失敗応答にする。
+- クライアントは末尾の省略可能引数として設定を追加し、要求へは有効時だけフィールドを含める。成功応答は既存の評価プリセットIDと静止探索設定の両方を照合し、不一致を `WorkerProtocolError` とする。
+- 対局画面は無効／追加1手／追加2手の型限定selectを持つ。単独AI探索中は無効化し、開始時の値を固定する。選択変更後は古いAI結果を消去する。結果欄には使用設定と、通常探索と区別した最深完了反復・全反復合計の静止探索統計を表示する。
+- `npm run lint` は終了コード0。Worker回帰は **42/42成功**、UI集中回帰は **25/25成功**（いずれも終了コード0）。`npm run verify:lock` は399 entries・不足0、`npm run build` は終了コード0。`npm run check` と全体 `npm test` はVitest開始表示後に完了要約・終了コードを取得できなかったため、全件成功としては記録しない。`git diff --check` は終了コード0（CRLF変換予定のGit警告のみ）。
+
+## [2026-09-20] PR #115: 静止探索UI・Worker応答追加に既存テストを追従
+
+### 開始状態・CI失敗の原因
+
+- `git fetch origin` 後、作業ツリーは未コミット・未追跡変更なし。現在ブランチは指定の `feat/quiescence-worker-ui` で、`git merge --ff-only origin/feat/quiescence-worker-ui` は Already up to date。ローカル・origin・OPENのPR #115のHEADはすべて `861194ca7ba9a7fb0cfae95352ba66e484d4d28c` と一致した。
+- [GitHub Actions run 35451401533](https://github.com/tetsujisugimori-coder/Shogi-App/actions/runs/35451401533) はUbuntu・macOSとも既存テスト7件で失敗（終了コード1）、本番build工程はskippedだった。Ubuntuは1266 passed / 7 failed、macOSは1264 passed / 7 failed / 2 skipped、計1273件。macOSの2件は従来からの `shogi.test.tsx` 内 `skipIf(process.platform === 'darwin')` で、今回追加したskipではない。
+- UIの1件は静止探索selectの追加により、名前を指定しない `getByRole('combobox')` が評価プリセットと静止探索の両方へ一致したことが原因。残り6件は通常並べ替え・明示SEEの各3プリセットで、Worker成功応答へ追加された `quiescenceMaxTacticalDepth: null` が完全一致の期待値に欠けていた。
+
+### 修正範囲・契約の確認
+
+- `src/test/shogi-evaluation-preset-comparison-ui.test.tsx`: 操作と確認の2箇所を実ラベル `評価プリセット` によるアクセシブルクエリへ限定。DOM順に依存せず、選択プリセット・比較処理・単独AI結果の保持に対する既存検証を維持した。
+- `src/test/shogi-move-ordering-modes.test.ts`、`src/test/shogi-see-move-ordering.test.ts`: Worker応答の期待値にだけ `quiescenceMaxTacticalDepth: null` を追加。直接探索の戻り値はそのまま展開し、選択手・評価・PV・全統計の `toEqual`、SEE呼び出し／非呼び出し・並べ替えの検証を維持した。
+- 本番コード・探索ロジック・公開仕様・評価プリセット比較Worker・依存関係・タイムアウトに変更なし。テスト削除、skip追加、期待値の条件緩和もなし。
+- 既存67件の静止探索UI／Worker回帰と実装を照合。省略時はクライアントの条件付き展開により要求フィールドを送らず、handlerは探索optionsなし・応答nullを維持する。1/2は要求→探索options→成功応答へ渡り、UIは検証済み応答の値から「追加N手」を表示する。不一致のWorkerProtocolError・UI拒否、AbortSignal・終了処理・旧応答無視のテストを維持した。比較Workerの要求・応答には静止探索フィールドがなく、UIも従来の3引数で比較を呼ぶ。
+
+### ローカル検証
+
+- Node v24.20.0 / npm 11.17.0 / Windows。初回fetchはサンドボックスの `SEC_E_NO_CREDENTIALS`、CIログ取得はキャッシュ書き込み拒否となり、許可された実行環境で再実行して成功した。
+- 指定3ファイルの初回Vitestはesbuild子プロセス起動の `spawn EPERM` でテスト開始前に終了コード1。許可された環境で同一コマンドを実行し、以下の完了要約と終了コードを確認した。
+- `npm run lint`: 終了コード0。
+- `npx vitest run src/test/shogi-evaluation-preset-comparison-ui.test.tsx src/test/shogi-move-ordering-modes.test.ts src/test/shogi-see-move-ordering.test.ts`: 3ファイル86/86成功、終了コード0。
+- `npx vitest run src/test/shogi-time-limited-worker-ai-ui.test.tsx src/test/time-limited-iterative-alpha-beta-worker.test.ts`: 2ファイル67/67成功、終了コード0。
+- `npm run verify:lock`: 399 entries / registry 398、version・resolved・integrity欠落0、終了コード0。
+- `npm test`: 41ファイル1273/1273成功（47.46秒）、完了要約・終了コード0を確認。
+- `npm run build`: 1743 modules、本番成果物とWorker bundleの生成まで成功、終了コード0。
+- `npm run check`: lock→lint→全41ファイル1273/1273成功（47.10秒）→本番buildまで完走、終了コード0。既存jsdomのnavigation未実装通知は出たが失敗なし。
+- `git diff --check`: 終了コード0（既存CRLF方針に伴う変換予定の警告のみ）。差分は上記3テストと本LOGのみで、本番コードの差分はない。
+
+### GitHub Actions確認
+
+- テスト修正コミット `f843bc265f90606f9ea494f0f2a035bdea580695` を既存PR #115の `feat/quiescence-worker-ui` へpush。新規PRは作成していない。
+- [修正後CI run 35452435326](https://github.com/tetsujisugimori-coder/Shogi-App/actions/runs/35452435326) の対象HEADは上記コミット。Ubuntu・macOSともsuccessで、全41ファイルのテストと `Run production build` まで成功した。
+- Ubuntu: 1273 passed / 0 failed、テスト64.97秒、本番build 2.47秒。macOS: 1271 passed / 0 failed / 従来のOS条件による2 skipped、テスト58.05秒、本番build 1.92秒。両OSでlock・TypeScript検査も成功し、macOS固有fsevents／Vite watcher検証も成功した。
+- CIログの完了要約とbuild完了行を照合した。探索ロジックや公開仕様は変更せず、7件のテスト追従漏れを修正した。今回の修正に関する未解決の失敗はない。

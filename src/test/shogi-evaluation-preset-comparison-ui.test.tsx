@@ -78,7 +78,7 @@ describe('解析専用の3プリセット比較UI', () => {
     const user = userEvent.setup();
     const runner = vi.fn(async (state: BoardState) => analyzeEvaluationPresetComparison(state, 3, () => 0));
     render(<ShogiResearchScreen comparisonRunner={runner} />);
-    await user.selectOptions(screen.getByRole('combobox'), 'material-focused');
+    await user.selectOptions(screen.getByRole('combobox', { name: '評価プリセット' }), 'material-focused');
     await user.click(screen.getByRole('button', { name: '2手読みAIに指させる' }));
     await user.click(screen.getByText('AIの判断'));
     const judgment = screen.getByText('AIの判断').closest('details')!;
@@ -88,7 +88,7 @@ describe('解析専用の3プリセット比較UI', () => {
     await within(panel()).findAllByRole('article');
     expect(judgment.textContent).toBe(text);
     expect(boardEvidence()).toEqual(before);
-    expect(screen.getByRole('combobox')).toHaveValue('material-focused');
+    expect(screen.getByRole('combobox', { name: '評価プリセット' })).toHaveValue('material-focused');
     const goteResults = await runner.mock.results[0].value;
     expect(runner.mock.calls[0][0].turn).toBe('gote');
     expect(within(panel()).getAllByRole('article')[0]).toHaveTextContent(`先手 ${formatSenteEvaluation(goteResults[0].selectedEvaluation, 'gote')}`);

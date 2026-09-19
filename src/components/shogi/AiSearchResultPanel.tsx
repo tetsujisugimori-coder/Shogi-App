@@ -31,6 +31,8 @@ interface AiSearchResultPanelProps {
 export function AiSearchResultPanel({ search }: AiSearchResultPanelProps) {
   if (search.kind === 'time-limited-worker') {
     const { result } = search;
+    const quiescenceLabel = result.quiescenceMaxTacticalDepth === null
+      ? '無効' : `追加${result.quiescenceMaxTacticalDepth}手`;
     return (
       <section
         aria-labelledby="ai-search-result-title"
@@ -47,6 +49,8 @@ export function AiSearchResultPanel({ search }: AiSearchResultPanelProps) {
           <dd className="text-sky-100">{result.requestedMaxDepth}</dd>
           <dt className="text-stone-400">API全体の経過時間</dt>
           <dd className="text-sky-100">{result.elapsedMilliseconds.toFixed(2)} ms</dd>
+          <dt className="text-stone-400">静止探索</dt>
+          <dd className="text-sky-100">{quiescenceLabel}</dd>
           <dt className="text-stone-400">最深完了反復の調査局面数</dt>
           <dd className="text-sky-100">{result.visitedPositionCount}</dd>
           <dt className="text-stone-400">最深完了反復の枝刈り回数</dt>
@@ -60,6 +64,27 @@ export function AiSearchResultPanel({ search }: AiSearchResultPanelProps) {
           <dt className="text-stone-400">全反復合計の未調査候補手数</dt>
           <dd className="text-sky-100">{result.totalSkippedActionCount}</dd>
         </dl>
+        <div className="mt-3 border-t border-sky-900/80 pt-2">
+          <h3 className="text-xs font-medium text-stone-300">静止探索の量（通常探索とは別）</h3>
+          <dl className="mt-1 grid grid-cols-[minmax(0,2fr)_minmax(0,1fr)] gap-x-3 gap-y-1 text-xs">
+            <dt className="text-stone-400">最深完了反復の静止探索葉数</dt>
+            <dd className="text-sky-100">{result.quiescenceLeafCount}</dd>
+            <dt className="text-stone-400">最深完了反復の静止探索調査局面数</dt>
+            <dd className="text-sky-100">{result.quiescenceVisitedPositionCount}</dd>
+            <dt className="text-stone-400">最深完了反復の静止探索枝刈り回数</dt>
+            <dd className="text-sky-100">{result.quiescenceCutoffCount}</dd>
+            <dt className="text-stone-400">最深完了反復の静止探索未調査候補手数</dt>
+            <dd className="text-sky-100">{result.quiescenceSkippedActionCount}</dd>
+            <dt className="text-stone-400">全反復合計の静止探索葉数</dt>
+            <dd className="text-sky-100">{result.totalQuiescenceLeafCount}</dd>
+            <dt className="text-stone-400">全反復合計の静止探索調査局面数</dt>
+            <dd className="text-sky-100">{result.totalQuiescenceVisitedPositionCount}</dd>
+            <dt className="text-stone-400">全反復合計の静止探索枝刈り回数</dt>
+            <dd className="text-sky-100">{result.totalQuiescenceCutoffCount}</dd>
+            <dt className="text-stone-400">全反復合計の静止探索未調査候補手数</dt>
+            <dd className="text-sky-100">{result.totalQuiescenceSkippedActionCount}</dd>
+          </dl>
+        </div>
       </section>
     );
   }

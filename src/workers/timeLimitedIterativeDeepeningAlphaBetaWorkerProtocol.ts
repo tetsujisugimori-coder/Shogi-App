@@ -2,8 +2,13 @@ import type { TimeLimitedIterativeDeepeningAlphaBetaSearchResult } from '../doma
 import type { BoardState } from '../types/shogi';
 import type { SearchEvaluationPresetId } from '../domain/shogi/searchEvaluationPresets';
 
+/** The only tactical extensions exposed by the time-limited Worker contract. */
+export type TimeLimitedSearchQuiescenceMaxTacticalDepth = 1 | 2;
+
 export type PresetTimeLimitedSearchResult = TimeLimitedIterativeDeepeningAlphaBetaSearchResult & {
   readonly evaluationPresetId: SearchEvaluationPresetId;
+  /** `null` means the Worker intentionally did not enable quiescence search. */
+  readonly quiescenceMaxTacticalDepth: TimeLimitedSearchQuiescenceMaxTacticalDepth | null;
 };
 
 /** A structured-cloneable request sent from the UI thread to one search worker. */
@@ -15,6 +20,8 @@ export interface RunTimeLimitedIterativeDeepeningAlphaBetaSearchWorkerRequest {
   timeLimitMilliseconds: number;
   /** Omitted by legacy callers: resolved to the shared default in the Worker. */
   evaluationPresetId?: SearchEvaluationPresetId;
+  /** Omitted means quiescence search is disabled; only 1 and 2 are accepted. */
+  quiescenceMaxTacticalDepth?: TimeLimitedSearchQuiescenceMaxTacticalDepth;
 }
 
 /** A completed time-limited search, preserving numeric values such as Infinity. */
