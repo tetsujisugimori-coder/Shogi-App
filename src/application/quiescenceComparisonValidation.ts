@@ -4,8 +4,8 @@ import { getLegalActions } from '../domain/shogi/legalActions';
 import { getDisplayEvaluationBreakdown } from './searchEvaluationBreakdownValidation';
 import { validateAndFormatPrincipalVariation } from './searchPrincipalVariation';
 
-export function quiescenceComparisonProtocolError(message: string): Error {
-  const error = new Error(message);
+export function quiescenceComparisonProtocolError(message: string, comparisonSetting?: string): Error {
+  const error = Object.assign(new Error(message), { comparisonSetting });
   error.name = 'WorkerProtocolError';
   return error;
 }
@@ -14,12 +14,14 @@ export function quiescenceComparisonProtocolError(message: string): Error {
 export function validateQuiescenceComparison(
   state: BoardState, depth: number, value: unknown,
 ): asserts value is readonly QuiescenceComparisonResult[] {
-  const invalid = () => { throw quiescenceComparisonProtocolError('3条件の静止探索比較結果を検証できませんでした。'); };
+  let setting = 'all';
+  const invalid = () => { throw quiescenceComparisonProtocolError('3条件の静止探索比較結果を検証できませんでした。', setting); };
   if (!Number.isSafeInteger(depth) || depth < 1 || !Array.isArray(value) || value.length !== 3) return invalid();
   const legalCount = getLegalActions(state).length;
   const normalKeys = ['visitedPositionCount', 'cutoffCount', 'skippedActionCount'] as const;
   const tacticalKeys = ['quiescenceLeafCount', 'quiescenceVisitedPositionCount', 'quiescenceCutoffCount', 'quiescenceSkippedActionCount'] as const;
   for (const [index, entry] of (value as unknown[]).entries()) {
+    setting = String(QUIESCENCE_COMPARISON_SETTINGS[index] ?? 'disabled');
     if (typeof entry !== 'object' || entry === null) return invalid();
     const result = entry as QuiescenceComparisonResult;
     const extension = QUIESCENCE_COMPARISON_SETTINGS[index];
