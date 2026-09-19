@@ -1,0 +1,3650 @@
+{
+  "initial": [
+    {
+      "selectedAction": {
+        "kind": "move",
+        "player": "sente",
+        "from": {
+          "row": 6,
+          "col": 2
+        },
+        "to": {
+          "row": 5,
+          "col": 2
+        },
+        "pieceType": "pawn",
+        "promotion": "none"
+      },
+      "selectedEvaluation": 214,
+      "principalVariation": [
+        {
+          "kind": "move",
+          "player": "sente",
+          "from": {
+            "row": 6,
+            "col": 2
+          },
+          "to": {
+            "row": 5,
+            "col": 2
+          },
+          "pieceType": "pawn",
+          "promotion": "none"
+        },
+        {
+          "kind": "move",
+          "player": "gote",
+          "from": {
+            "row": 2,
+            "col": 5
+          },
+          "to": {
+            "row": 3,
+            "col": 5
+          },
+          "pieceType": "pawn",
+          "promotion": "none"
+        },
+        {
+          "kind": "move",
+          "player": "sente",
+          "from": {
+            "row": 7,
+            "col": 1
+          },
+          "to": {
+            "row": 3,
+            "col": 5
+          },
+          "pieceType": "bishop",
+          "promotion": "none"
+        }
+      ],
+      "evaluationBreakdown": {
+        "total": 214,
+        "material": 200,
+        "pieceSquare": 4,
+        "kingSafety": 0,
+        "undefendedPieceSafety": 10,
+        "terminal": null
+      },
+      "rootLegalActionCount": 30,
+      "depth": 3,
+      "visitedPositionCount": 1244,
+      "cutoffCount": 80,
+      "skippedActionCount": 2565,
+      "quiescenceLeafCount": 0,
+      "quiescenceVisitedPositionCount": 0,
+      "quiescenceCutoffCount": 0,
+      "quiescenceSkippedActionCount": 0,
+      "elapsedMilliseconds": 0,
+      "requestedMaxDepth": 4,
+      "completedDepth": 3,
+      "timedOut": true,
+      "iterations": [
+        {
+          "selectedAction": {
+            "kind": "move",
+            "player": "sente",
+            "from": {
+              "row": 6,
+              "col": 0
+            },
+            "to": {
+              "row": 5,
+              "col": 0
+            },
+            "pieceType": "pawn",
+            "promotion": "none"
+          },
+          "selectedEvaluation": 1,
+          "principalVariation": [
+            {
+              "kind": "move",
+              "player": "sente",
+              "from": {
+                "row": 6,
+                "col": 0
+              },
+              "to": {
+                "row": 5,
+                "col": 0
+              },
+              "pieceType": "pawn",
+              "promotion": "none"
+            }
+          ],
+          "evaluationBreakdown": {
+            "total": 1,
+            "material": 0,
+            "pieceSquare": 1,
+            "kingSafety": 0,
+            "undefendedPieceSafety": 0,
+            "terminal": null
+          },
+          "rootLegalActionCount": 30,
+          "depth": 1,
+          "visitedPositionCount": 30,
+          "cutoffCount": 0,
+          "skippedActionCount": 0,
+          "quiescenceLeafCount": 0,
+          "quiescenceVisitedPositionCount": 0,
+          "quiescenceCutoffCount": 0,
+          "quiescenceSkippedActionCount": 0,
+          "elapsedMilliseconds": 0
+        },
+        {
+          "selectedAction": {
+            "kind": "move",
+            "player": "sente",
+            "from": {
+              "row": 6,
+              "col": 0
+            },
+            "to": {
+              "row": 5,
+              "col": 0
+            },
+            "pieceType": "pawn",
+            "promotion": "none"
+          },
+          "selectedEvaluation": 0,
+          "principalVariation": [
+            {
+              "kind": "move",
+              "player": "sente",
+              "from": {
+                "row": 6,
+                "col": 0
+              },
+              "to": {
+                "row": 5,
+                "col": 0
+              },
+              "pieceType": "pawn",
+              "promotion": "none"
+            },
+            {
+              "kind": "move",
+              "player": "gote",
+              "from": {
+                "row": 0,
+                "col": 0
+              },
+              "to": {
+                "row": 1,
+                "col": 0
+              },
+              "pieceType": "lance",
+              "promotion": "none"
+            }
+          ],
+          "evaluationBreakdown": {
+            "total": 0,
+            "material": 0,
+            "pieceSquare": 0,
+            "kingSafety": 0,
+            "undefendedPieceSafety": 0,
+            "terminal": null
+          },
+          "rootLegalActionCount": 30,
+          "depth": 2,
+          "visitedPositionCount": 89,
+          "cutoffCount": 29,
+          "skippedActionCount": 841,
+          "quiescenceLeafCount": 0,
+          "quiescenceVisitedPositionCount": 0,
+          "quiescenceCutoffCount": 0,
+          "quiescenceSkippedActionCount": 0,
+          "elapsedMilliseconds": 0
+        },
+        {
+          "selectedAction": {
+            "kind": "move",
+            "player": "sente",
+            "from": {
+              "row": 6,
+              "col": 2
+            },
+            "to": {
+              "row": 5,
+              "col": 2
+            },
+            "pieceType": "pawn",
+            "promotion": "none"
+          },
+          "selectedEvaluation": 214,
+          "principalVariation": [
+            {
+              "kind": "move",
+              "player": "sente",
+              "from": {
+                "row": 6,
+                "col": 2
+              },
+              "to": {
+                "row": 5,
+                "col": 2
+              },
+              "pieceType": "pawn",
+              "promotion": "none"
+            },
+            {
+              "kind": "move",
+              "player": "gote",
+              "from": {
+                "row": 2,
+                "col": 5
+              },
+              "to": {
+                "row": 3,
+                "col": 5
+              },
+              "pieceType": "pawn",
+              "promotion": "none"
+            },
+            {
+              "kind": "move",
+              "player": "sente",
+              "from": {
+                "row": 7,
+                "col": 1
+              },
+              "to": {
+                "row": 3,
+                "col": 5
+              },
+              "pieceType": "bishop",
+              "promotion": "none"
+            }
+          ],
+          "evaluationBreakdown": {
+            "total": 214,
+            "material": 200,
+            "pieceSquare": 4,
+            "kingSafety": 0,
+            "undefendedPieceSafety": 10,
+            "terminal": null
+          },
+          "rootLegalActionCount": 30,
+          "depth": 3,
+          "visitedPositionCount": 1244,
+          "cutoffCount": 80,
+          "skippedActionCount": 2565,
+          "quiescenceLeafCount": 0,
+          "quiescenceVisitedPositionCount": 0,
+          "quiescenceCutoffCount": 0,
+          "quiescenceSkippedActionCount": 0,
+          "elapsedMilliseconds": 0
+        }
+      ],
+      "totalVisitedPositionCount": 1363,
+      "totalCutoffCount": 109,
+      "totalSkippedActionCount": 3406,
+      "totalQuiescenceLeafCount": 0,
+      "totalQuiescenceVisitedPositionCount": 0,
+      "totalQuiescenceCutoffCount": 0,
+      "totalQuiescenceSkippedActionCount": 0,
+      "quiescenceMaxTacticalDepth": null
+    },
+    {
+      "selectedAction": {
+        "kind": "move",
+        "player": "sente",
+        "from": {
+          "row": 6,
+          "col": 2
+        },
+        "to": {
+          "row": 5,
+          "col": 2
+        },
+        "pieceType": "pawn",
+        "promotion": "none"
+      },
+      "selectedEvaluation": 214,
+      "principalVariation": [
+        {
+          "kind": "move",
+          "player": "sente",
+          "from": {
+            "row": 6,
+            "col": 2
+          },
+          "to": {
+            "row": 5,
+            "col": 2
+          },
+          "pieceType": "pawn",
+          "promotion": "none"
+        },
+        {
+          "kind": "move",
+          "player": "gote",
+          "from": {
+            "row": 2,
+            "col": 5
+          },
+          "to": {
+            "row": 3,
+            "col": 5
+          },
+          "pieceType": "pawn",
+          "promotion": "none"
+        },
+        {
+          "kind": "move",
+          "player": "sente",
+          "from": {
+            "row": 7,
+            "col": 1
+          },
+          "to": {
+            "row": 3,
+            "col": 5
+          },
+          "pieceType": "bishop",
+          "promotion": "none"
+        }
+      ],
+      "evaluationBreakdown": {
+        "total": 214,
+        "material": 200,
+        "pieceSquare": 4,
+        "kingSafety": 0,
+        "undefendedPieceSafety": 10,
+        "terminal": null
+      },
+      "rootLegalActionCount": 30,
+      "depth": 2,
+      "visitedPositionCount": 118,
+      "cutoffCount": 28,
+      "skippedActionCount": 812,
+      "quiescenceLeafCount": 88,
+      "quiescenceVisitedPositionCount": 58,
+      "quiescenceCutoffCount": 1,
+      "quiescenceSkippedActionCount": 1,
+      "elapsedMilliseconds": 0,
+      "requestedMaxDepth": 4,
+      "completedDepth": 2,
+      "timedOut": true,
+      "iterations": [
+        {
+          "selectedAction": {
+            "kind": "move",
+            "player": "sente",
+            "from": {
+              "row": 6,
+              "col": 0
+            },
+            "to": {
+              "row": 5,
+              "col": 0
+            },
+            "pieceType": "pawn",
+            "promotion": "none"
+          },
+          "selectedEvaluation": 1,
+          "principalVariation": [
+            {
+              "kind": "move",
+              "player": "sente",
+              "from": {
+                "row": 6,
+                "col": 0
+              },
+              "to": {
+                "row": 5,
+                "col": 0
+              },
+              "pieceType": "pawn",
+              "promotion": "none"
+            }
+          ],
+          "evaluationBreakdown": {
+            "total": 1,
+            "material": 0,
+            "pieceSquare": 1,
+            "kingSafety": 0,
+            "undefendedPieceSafety": 0,
+            "terminal": null
+          },
+          "rootLegalActionCount": 30,
+          "depth": 1,
+          "visitedPositionCount": 30,
+          "cutoffCount": 0,
+          "skippedActionCount": 0,
+          "quiescenceLeafCount": 30,
+          "quiescenceVisitedPositionCount": 0,
+          "quiescenceCutoffCount": 0,
+          "quiescenceSkippedActionCount": 0,
+          "elapsedMilliseconds": 0
+        },
+        {
+          "selectedAction": {
+            "kind": "move",
+            "player": "sente",
+            "from": {
+              "row": 6,
+              "col": 2
+            },
+            "to": {
+              "row": 5,
+              "col": 2
+            },
+            "pieceType": "pawn",
+            "promotion": "none"
+          },
+          "selectedEvaluation": 214,
+          "principalVariation": [
+            {
+              "kind": "move",
+              "player": "sente",
+              "from": {
+                "row": 6,
+                "col": 2
+              },
+              "to": {
+                "row": 5,
+                "col": 2
+              },
+              "pieceType": "pawn",
+              "promotion": "none"
+            },
+            {
+              "kind": "move",
+              "player": "gote",
+              "from": {
+                "row": 2,
+                "col": 5
+              },
+              "to": {
+                "row": 3,
+                "col": 5
+              },
+              "pieceType": "pawn",
+              "promotion": "none"
+            },
+            {
+              "kind": "move",
+              "player": "sente",
+              "from": {
+                "row": 7,
+                "col": 1
+              },
+              "to": {
+                "row": 3,
+                "col": 5
+              },
+              "pieceType": "bishop",
+              "promotion": "none"
+            }
+          ],
+          "evaluationBreakdown": {
+            "total": 214,
+            "material": 200,
+            "pieceSquare": 4,
+            "kingSafety": 0,
+            "undefendedPieceSafety": 10,
+            "terminal": null
+          },
+          "rootLegalActionCount": 30,
+          "depth": 2,
+          "visitedPositionCount": 118,
+          "cutoffCount": 28,
+          "skippedActionCount": 812,
+          "quiescenceLeafCount": 88,
+          "quiescenceVisitedPositionCount": 58,
+          "quiescenceCutoffCount": 1,
+          "quiescenceSkippedActionCount": 1,
+          "elapsedMilliseconds": 0
+        }
+      ],
+      "totalVisitedPositionCount": 148,
+      "totalCutoffCount": 28,
+      "totalSkippedActionCount": 812,
+      "totalQuiescenceLeafCount": 118,
+      "totalQuiescenceVisitedPositionCount": 58,
+      "totalQuiescenceCutoffCount": 1,
+      "totalQuiescenceSkippedActionCount": 1,
+      "quiescenceMaxTacticalDepth": 1
+    },
+    {
+      "selectedAction": {
+        "kind": "move",
+        "player": "sente",
+        "from": {
+          "row": 6,
+          "col": 2
+        },
+        "to": {
+          "row": 5,
+          "col": 2
+        },
+        "pieceType": "pawn",
+        "promotion": "none"
+      },
+      "selectedEvaluation": 0,
+      "principalVariation": [
+        {
+          "kind": "move",
+          "player": "sente",
+          "from": {
+            "row": 6,
+            "col": 2
+          },
+          "to": {
+            "row": 5,
+            "col": 2
+          },
+          "pieceType": "pawn",
+          "promotion": "none"
+        },
+        {
+          "kind": "move",
+          "player": "gote",
+          "from": {
+            "row": 2,
+            "col": 6
+          },
+          "to": {
+            "row": 3,
+            "col": 6
+          },
+          "pieceType": "pawn",
+          "promotion": "none"
+        },
+        {
+          "kind": "move",
+          "player": "sente",
+          "from": {
+            "row": 7,
+            "col": 1
+          },
+          "to": {
+            "row": 1,
+            "col": 7
+          },
+          "pieceType": "bishop",
+          "promotion": "promote"
+        },
+        {
+          "kind": "move",
+          "player": "gote",
+          "from": {
+            "row": 0,
+            "col": 6
+          },
+          "to": {
+            "row": 1,
+            "col": 7
+          },
+          "pieceType": "silver",
+          "promotion": "none"
+        }
+      ],
+      "evaluationBreakdown": {
+        "total": 0,
+        "material": 0,
+        "pieceSquare": 0,
+        "kingSafety": 0,
+        "undefendedPieceSafety": 0,
+        "terminal": null
+      },
+      "rootLegalActionCount": 30,
+      "depth": 4,
+      "visitedPositionCount": 9936,
+      "cutoffCount": 1690,
+      "skippedActionCount": 44897,
+      "quiescenceLeafCount": 8003,
+      "quiescenceVisitedPositionCount": 2890,
+      "quiescenceCutoffCount": 2936,
+      "quiescenceSkippedActionCount": 7840,
+      "elapsedMilliseconds": 0,
+      "requestedMaxDepth": 4,
+      "completedDepth": 4,
+      "timedOut": false,
+      "iterations": [
+        {
+          "selectedAction": {
+            "kind": "move",
+            "player": "sente",
+            "from": {
+              "row": 6,
+              "col": 0
+            },
+            "to": {
+              "row": 5,
+              "col": 0
+            },
+            "pieceType": "pawn",
+            "promotion": "none"
+          },
+          "selectedEvaluation": 1,
+          "principalVariation": [
+            {
+              "kind": "move",
+              "player": "sente",
+              "from": {
+                "row": 6,
+                "col": 0
+              },
+              "to": {
+                "row": 5,
+                "col": 0
+              },
+              "pieceType": "pawn",
+              "promotion": "none"
+            }
+          ],
+          "evaluationBreakdown": {
+            "total": 1,
+            "material": 0,
+            "pieceSquare": 1,
+            "kingSafety": 0,
+            "undefendedPieceSafety": 0,
+            "terminal": null
+          },
+          "rootLegalActionCount": 30,
+          "depth": 1,
+          "visitedPositionCount": 30,
+          "cutoffCount": 0,
+          "skippedActionCount": 0,
+          "quiescenceLeafCount": 30,
+          "quiescenceVisitedPositionCount": 0,
+          "quiescenceCutoffCount": 0,
+          "quiescenceSkippedActionCount": 0,
+          "elapsedMilliseconds": 0
+        },
+        {
+          "selectedAction": {
+            "kind": "move",
+            "player": "sente",
+            "from": {
+              "row": 6,
+              "col": 0
+            },
+            "to": {
+              "row": 5,
+              "col": 0
+            },
+            "pieceType": "pawn",
+            "promotion": "none"
+          },
+          "selectedEvaluation": 0,
+          "principalVariation": [
+            {
+              "kind": "move",
+              "player": "sente",
+              "from": {
+                "row": 6,
+                "col": 0
+              },
+              "to": {
+                "row": 5,
+                "col": 0
+              },
+              "pieceType": "pawn",
+              "promotion": "none"
+            },
+            {
+              "kind": "move",
+              "player": "gote",
+              "from": {
+                "row": 0,
+                "col": 0
+              },
+              "to": {
+                "row": 1,
+                "col": 0
+              },
+              "pieceType": "lance",
+              "promotion": "none"
+            }
+          ],
+          "evaluationBreakdown": {
+            "total": 0,
+            "material": 0,
+            "pieceSquare": 0,
+            "kingSafety": 0,
+            "undefendedPieceSafety": 0,
+            "terminal": null
+          },
+          "rootLegalActionCount": 30,
+          "depth": 2,
+          "visitedPositionCount": 89,
+          "cutoffCount": 29,
+          "skippedActionCount": 841,
+          "quiescenceLeafCount": 59,
+          "quiescenceVisitedPositionCount": 12,
+          "quiescenceCutoffCount": 2,
+          "quiescenceSkippedActionCount": 4,
+          "elapsedMilliseconds": 0
+        },
+        {
+          "selectedAction": {
+            "kind": "move",
+            "player": "sente",
+            "from": {
+              "row": 6,
+              "col": 2
+            },
+            "to": {
+              "row": 5,
+              "col": 2
+            },
+            "pieceType": "pawn",
+            "promotion": "none"
+          },
+          "selectedEvaluation": 2,
+          "principalVariation": [
+            {
+              "kind": "move",
+              "player": "sente",
+              "from": {
+                "row": 6,
+                "col": 2
+              },
+              "to": {
+                "row": 5,
+                "col": 2
+              },
+              "pieceType": "pawn",
+              "promotion": "none"
+            },
+            {
+              "kind": "move",
+              "player": "gote",
+              "from": {
+                "row": 2,
+                "col": 4
+              },
+              "to": {
+                "row": 3,
+                "col": 4
+              },
+              "pieceType": "pawn",
+              "promotion": "none"
+            },
+            {
+              "kind": "move",
+              "player": "sente",
+              "from": {
+                "row": 7,
+                "col": 1
+              },
+              "to": {
+                "row": 5,
+                "col": 3
+              },
+              "pieceType": "bishop",
+              "promotion": "none"
+            }
+          ],
+          "evaluationBreakdown": {
+            "total": 2,
+            "material": 0,
+            "pieceSquare": 2,
+            "kingSafety": 0,
+            "undefendedPieceSafety": 0,
+            "terminal": null
+          },
+          "rootLegalActionCount": 30,
+          "depth": 3,
+          "visitedPositionCount": 1430,
+          "cutoffCount": 84,
+          "skippedActionCount": 2379,
+          "quiescenceLeafCount": 1312,
+          "quiescenceVisitedPositionCount": 274,
+          "quiescenceCutoffCount": 276,
+          "quiescenceSkippedActionCount": 753,
+          "elapsedMilliseconds": 0
+        },
+        {
+          "selectedAction": {
+            "kind": "move",
+            "player": "sente",
+            "from": {
+              "row": 6,
+              "col": 2
+            },
+            "to": {
+              "row": 5,
+              "col": 2
+            },
+            "pieceType": "pawn",
+            "promotion": "none"
+          },
+          "selectedEvaluation": 0,
+          "principalVariation": [
+            {
+              "kind": "move",
+              "player": "sente",
+              "from": {
+                "row": 6,
+                "col": 2
+              },
+              "to": {
+                "row": 5,
+                "col": 2
+              },
+              "pieceType": "pawn",
+              "promotion": "none"
+            },
+            {
+              "kind": "move",
+              "player": "gote",
+              "from": {
+                "row": 2,
+                "col": 6
+              },
+              "to": {
+                "row": 3,
+                "col": 6
+              },
+              "pieceType": "pawn",
+              "promotion": "none"
+            },
+            {
+              "kind": "move",
+              "player": "sente",
+              "from": {
+                "row": 7,
+                "col": 1
+              },
+              "to": {
+                "row": 1,
+                "col": 7
+              },
+              "pieceType": "bishop",
+              "promotion": "promote"
+            },
+            {
+              "kind": "move",
+              "player": "gote",
+              "from": {
+                "row": 0,
+                "col": 6
+              },
+              "to": {
+                "row": 1,
+                "col": 7
+              },
+              "pieceType": "silver",
+              "promotion": "none"
+            }
+          ],
+          "evaluationBreakdown": {
+            "total": 0,
+            "material": 0,
+            "pieceSquare": 0,
+            "kingSafety": 0,
+            "undefendedPieceSafety": 0,
+            "terminal": null
+          },
+          "rootLegalActionCount": 30,
+          "depth": 4,
+          "visitedPositionCount": 9936,
+          "cutoffCount": 1690,
+          "skippedActionCount": 44897,
+          "quiescenceLeafCount": 8003,
+          "quiescenceVisitedPositionCount": 2890,
+          "quiescenceCutoffCount": 2936,
+          "quiescenceSkippedActionCount": 7840,
+          "elapsedMilliseconds": 0
+        }
+      ],
+      "totalVisitedPositionCount": 11485,
+      "totalCutoffCount": 1803,
+      "totalSkippedActionCount": 48117,
+      "totalQuiescenceLeafCount": 9404,
+      "totalQuiescenceVisitedPositionCount": 3176,
+      "totalQuiescenceCutoffCount": 3214,
+      "totalQuiescenceSkippedActionCount": 8597,
+      "quiescenceMaxTacticalDepth": 2
+    }
+  ],
+  "fourMoves": [
+    {
+      "selectedAction": {
+        "kind": "move",
+        "player": "sente",
+        "from": {
+          "row": 5,
+          "col": 3
+        },
+        "to": {
+          "row": 4,
+          "col": 3
+        },
+        "pieceType": "pawn",
+        "promotion": "none"
+      },
+      "selectedEvaluation": 124,
+      "principalVariation": [
+        {
+          "kind": "move",
+          "player": "sente",
+          "from": {
+            "row": 5,
+            "col": 3
+          },
+          "to": {
+            "row": 4,
+            "col": 3
+          },
+          "pieceType": "pawn",
+          "promotion": "none"
+        },
+        {
+          "kind": "move",
+          "player": "gote",
+          "from": {
+            "row": 0,
+            "col": 2
+          },
+          "to": {
+            "row": 1,
+            "col": 3
+          },
+          "pieceType": "silver",
+          "promotion": "none"
+        },
+        {
+          "kind": "move",
+          "player": "sente",
+          "from": {
+            "row": 7,
+            "col": 1
+          },
+          "to": {
+            "row": 3,
+            "col": 5
+          },
+          "pieceType": "bishop",
+          "promotion": "none"
+        }
+      ],
+      "evaluationBreakdown": {
+        "total": 124,
+        "material": 200,
+        "pieceSquare": 4,
+        "kingSafety": 0,
+        "undefendedPieceSafety": -80,
+        "terminal": null
+      },
+      "rootLegalActionCount": 32,
+      "depth": 3,
+      "visitedPositionCount": 1493,
+      "cutoffCount": 120,
+      "skippedActionCount": 3844,
+      "quiescenceLeafCount": 0,
+      "quiescenceVisitedPositionCount": 0,
+      "quiescenceCutoffCount": 0,
+      "quiescenceSkippedActionCount": 0,
+      "elapsedMilliseconds": 0,
+      "requestedMaxDepth": 4,
+      "completedDepth": 3,
+      "timedOut": true,
+      "iterations": [
+        {
+          "selectedAction": {
+            "kind": "move",
+            "player": "sente",
+            "from": {
+              "row": 7,
+              "col": 1
+            },
+            "to": {
+              "row": 6,
+              "col": 2
+            },
+            "pieceType": "bishop",
+            "promotion": "none"
+          },
+          "selectedEvaluation": 2,
+          "principalVariation": [
+            {
+              "kind": "move",
+              "player": "sente",
+              "from": {
+                "row": 7,
+                "col": 1
+              },
+              "to": {
+                "row": 6,
+                "col": 2
+              },
+              "pieceType": "bishop",
+              "promotion": "none"
+            }
+          ],
+          "evaluationBreakdown": {
+            "total": 2,
+            "material": 0,
+            "pieceSquare": 2,
+            "kingSafety": 0,
+            "undefendedPieceSafety": 0,
+            "terminal": null
+          },
+          "rootLegalActionCount": 32,
+          "depth": 1,
+          "visitedPositionCount": 32,
+          "cutoffCount": 0,
+          "skippedActionCount": 0,
+          "quiescenceLeafCount": 0,
+          "quiescenceVisitedPositionCount": 0,
+          "quiescenceCutoffCount": 0,
+          "quiescenceSkippedActionCount": 0,
+          "elapsedMilliseconds": 0
+        },
+        {
+          "selectedAction": {
+            "kind": "move",
+            "player": "sente",
+            "from": {
+              "row": 7,
+              "col": 1
+            },
+            "to": {
+              "row": 6,
+              "col": 2
+            },
+            "pieceType": "bishop",
+            "promotion": "none"
+          },
+          "selectedEvaluation": 0,
+          "principalVariation": [
+            {
+              "kind": "move",
+              "player": "sente",
+              "from": {
+                "row": 7,
+                "col": 1
+              },
+              "to": {
+                "row": 6,
+                "col": 2
+              },
+              "pieceType": "bishop",
+              "promotion": "none"
+            },
+            {
+              "kind": "move",
+              "player": "gote",
+              "from": {
+                "row": 0,
+                "col": 7
+              },
+              "to": {
+                "row": 2,
+                "col": 6
+              },
+              "pieceType": "knight",
+              "promotion": "none"
+            }
+          ],
+          "evaluationBreakdown": {
+            "total": 0,
+            "material": 0,
+            "pieceSquare": 0,
+            "kingSafety": 0,
+            "undefendedPieceSafety": 0,
+            "terminal": null
+          },
+          "rootLegalActionCount": 32,
+          "depth": 2,
+          "visitedPositionCount": 397,
+          "cutoffCount": 31,
+          "skippedActionCount": 947,
+          "quiescenceLeafCount": 0,
+          "quiescenceVisitedPositionCount": 0,
+          "quiescenceCutoffCount": 0,
+          "quiescenceSkippedActionCount": 0,
+          "elapsedMilliseconds": 0
+        },
+        {
+          "selectedAction": {
+            "kind": "move",
+            "player": "sente",
+            "from": {
+              "row": 5,
+              "col": 3
+            },
+            "to": {
+              "row": 4,
+              "col": 3
+            },
+            "pieceType": "pawn",
+            "promotion": "none"
+          },
+          "selectedEvaluation": 124,
+          "principalVariation": [
+            {
+              "kind": "move",
+              "player": "sente",
+              "from": {
+                "row": 5,
+                "col": 3
+              },
+              "to": {
+                "row": 4,
+                "col": 3
+              },
+              "pieceType": "pawn",
+              "promotion": "none"
+            },
+            {
+              "kind": "move",
+              "player": "gote",
+              "from": {
+                "row": 0,
+                "col": 2
+              },
+              "to": {
+                "row": 1,
+                "col": 3
+              },
+              "pieceType": "silver",
+              "promotion": "none"
+            },
+            {
+              "kind": "move",
+              "player": "sente",
+              "from": {
+                "row": 7,
+                "col": 1
+              },
+              "to": {
+                "row": 3,
+                "col": 5
+              },
+              "pieceType": "bishop",
+              "promotion": "none"
+            }
+          ],
+          "evaluationBreakdown": {
+            "total": 124,
+            "material": 200,
+            "pieceSquare": 4,
+            "kingSafety": 0,
+            "undefendedPieceSafety": -80,
+            "terminal": null
+          },
+          "rootLegalActionCount": 32,
+          "depth": 3,
+          "visitedPositionCount": 1493,
+          "cutoffCount": 120,
+          "skippedActionCount": 3844,
+          "quiescenceLeafCount": 0,
+          "quiescenceVisitedPositionCount": 0,
+          "quiescenceCutoffCount": 0,
+          "quiescenceSkippedActionCount": 0,
+          "elapsedMilliseconds": 0
+        }
+      ],
+      "totalVisitedPositionCount": 1922,
+      "totalCutoffCount": 151,
+      "totalSkippedActionCount": 4791,
+      "totalQuiescenceLeafCount": 0,
+      "totalQuiescenceVisitedPositionCount": 0,
+      "totalQuiescenceCutoffCount": 0,
+      "totalQuiescenceSkippedActionCount": 0,
+      "quiescenceMaxTacticalDepth": null
+    },
+    {
+      "selectedAction": {
+        "kind": "move",
+        "player": "sente",
+        "from": {
+          "row": 5,
+          "col": 3
+        },
+        "to": {
+          "row": 4,
+          "col": 3
+        },
+        "pieceType": "pawn",
+        "promotion": "none"
+      },
+      "selectedEvaluation": 124,
+      "principalVariation": [
+        {
+          "kind": "move",
+          "player": "sente",
+          "from": {
+            "row": 5,
+            "col": 3
+          },
+          "to": {
+            "row": 4,
+            "col": 3
+          },
+          "pieceType": "pawn",
+          "promotion": "none"
+        },
+        {
+          "kind": "move",
+          "player": "gote",
+          "from": {
+            "row": 0,
+            "col": 2
+          },
+          "to": {
+            "row": 1,
+            "col": 3
+          },
+          "pieceType": "silver",
+          "promotion": "none"
+        },
+        {
+          "kind": "move",
+          "player": "sente",
+          "from": {
+            "row": 7,
+            "col": 1
+          },
+          "to": {
+            "row": 3,
+            "col": 5
+          },
+          "pieceType": "bishop",
+          "promotion": "none"
+        }
+      ],
+      "evaluationBreakdown": {
+        "total": 124,
+        "material": 200,
+        "pieceSquare": 4,
+        "kingSafety": 0,
+        "undefendedPieceSafety": -80,
+        "terminal": null
+      },
+      "rootLegalActionCount": 32,
+      "depth": 2,
+      "visitedPositionCount": 158,
+      "cutoffCount": 30,
+      "skippedActionCount": 930,
+      "quiescenceLeafCount": 126,
+      "quiescenceVisitedPositionCount": 32,
+      "quiescenceCutoffCount": 3,
+      "quiescenceSkippedActionCount": 3,
+      "elapsedMilliseconds": 0,
+      "requestedMaxDepth": 4,
+      "completedDepth": 2,
+      "timedOut": true,
+      "iterations": [
+        {
+          "selectedAction": {
+            "kind": "move",
+            "player": "sente",
+            "from": {
+              "row": 7,
+              "col": 1
+            },
+            "to": {
+              "row": 6,
+              "col": 2
+            },
+            "pieceType": "bishop",
+            "promotion": "none"
+          },
+          "selectedEvaluation": 2,
+          "principalVariation": [
+            {
+              "kind": "move",
+              "player": "sente",
+              "from": {
+                "row": 7,
+                "col": 1
+              },
+              "to": {
+                "row": 6,
+                "col": 2
+              },
+              "pieceType": "bishop",
+              "promotion": "none"
+            }
+          ],
+          "evaluationBreakdown": {
+            "total": 2,
+            "material": 0,
+            "pieceSquare": 2,
+            "kingSafety": 0,
+            "undefendedPieceSafety": 0,
+            "terminal": null
+          },
+          "rootLegalActionCount": 32,
+          "depth": 1,
+          "visitedPositionCount": 32,
+          "cutoffCount": 0,
+          "skippedActionCount": 0,
+          "quiescenceLeafCount": 32,
+          "quiescenceVisitedPositionCount": 0,
+          "quiescenceCutoffCount": 0,
+          "quiescenceSkippedActionCount": 0,
+          "elapsedMilliseconds": 0
+        },
+        {
+          "selectedAction": {
+            "kind": "move",
+            "player": "sente",
+            "from": {
+              "row": 5,
+              "col": 3
+            },
+            "to": {
+              "row": 4,
+              "col": 3
+            },
+            "pieceType": "pawn",
+            "promotion": "none"
+          },
+          "selectedEvaluation": 124,
+          "principalVariation": [
+            {
+              "kind": "move",
+              "player": "sente",
+              "from": {
+                "row": 5,
+                "col": 3
+              },
+              "to": {
+                "row": 4,
+                "col": 3
+              },
+              "pieceType": "pawn",
+              "promotion": "none"
+            },
+            {
+              "kind": "move",
+              "player": "gote",
+              "from": {
+                "row": 0,
+                "col": 2
+              },
+              "to": {
+                "row": 1,
+                "col": 3
+              },
+              "pieceType": "silver",
+              "promotion": "none"
+            },
+            {
+              "kind": "move",
+              "player": "sente",
+              "from": {
+                "row": 7,
+                "col": 1
+              },
+              "to": {
+                "row": 3,
+                "col": 5
+              },
+              "pieceType": "bishop",
+              "promotion": "none"
+            }
+          ],
+          "evaluationBreakdown": {
+            "total": 124,
+            "material": 200,
+            "pieceSquare": 4,
+            "kingSafety": 0,
+            "undefendedPieceSafety": -80,
+            "terminal": null
+          },
+          "rootLegalActionCount": 32,
+          "depth": 2,
+          "visitedPositionCount": 158,
+          "cutoffCount": 30,
+          "skippedActionCount": 930,
+          "quiescenceLeafCount": 126,
+          "quiescenceVisitedPositionCount": 32,
+          "quiescenceCutoffCount": 3,
+          "quiescenceSkippedActionCount": 3,
+          "elapsedMilliseconds": 0
+        }
+      ],
+      "totalVisitedPositionCount": 190,
+      "totalCutoffCount": 30,
+      "totalSkippedActionCount": 930,
+      "totalQuiescenceLeafCount": 158,
+      "totalQuiescenceVisitedPositionCount": 32,
+      "totalQuiescenceCutoffCount": 3,
+      "totalQuiescenceSkippedActionCount": 3,
+      "quiescenceMaxTacticalDepth": 1
+    },
+    {
+      "selectedAction": {
+        "kind": "move",
+        "player": "sente",
+        "from": {
+          "row": 5,
+          "col": 3
+        },
+        "to": {
+          "row": 4,
+          "col": 3
+        },
+        "pieceType": "pawn",
+        "promotion": "none"
+      },
+      "selectedEvaluation": 0,
+      "principalVariation": [
+        {
+          "kind": "move",
+          "player": "sente",
+          "from": {
+            "row": 5,
+            "col": 3
+          },
+          "to": {
+            "row": 4,
+            "col": 3
+          },
+          "pieceType": "pawn",
+          "promotion": "none"
+        },
+        {
+          "kind": "move",
+          "player": "gote",
+          "from": {
+            "row": 0,
+            "col": 0
+          },
+          "to": {
+            "row": 1,
+            "col": 0
+          },
+          "pieceType": "lance",
+          "promotion": "none"
+        },
+        {
+          "kind": "move",
+          "player": "sente",
+          "from": {
+            "row": 7,
+            "col": 1
+          },
+          "to": {
+            "row": 6,
+            "col": 2
+          },
+          "pieceType": "bishop",
+          "promotion": "none"
+        },
+        {
+          "kind": "move",
+          "player": "gote",
+          "from": {
+            "row": 1,
+            "col": 7
+          },
+          "to": {
+            "row": 2,
+            "col": 6
+          },
+          "pieceType": "bishop",
+          "promotion": "none"
+        }
+      ],
+      "evaluationBreakdown": {
+        "total": 0,
+        "material": 0,
+        "pieceSquare": 0,
+        "kingSafety": 0,
+        "undefendedPieceSafety": 0,
+        "terminal": null
+      },
+      "rootLegalActionCount": 32,
+      "depth": 4,
+      "visitedPositionCount": 16686,
+      "cutoffCount": 1464,
+      "skippedActionCount": 36968,
+      "quiescenceLeafCount": 14929,
+      "quiescenceVisitedPositionCount": 1125,
+      "quiescenceCutoffCount": 9527,
+      "quiescenceSkippedActionCount": 18899,
+      "elapsedMilliseconds": 0,
+      "requestedMaxDepth": 4,
+      "completedDepth": 4,
+      "timedOut": false,
+      "iterations": [
+        {
+          "selectedAction": {
+            "kind": "move",
+            "player": "sente",
+            "from": {
+              "row": 7,
+              "col": 1
+            },
+            "to": {
+              "row": 6,
+              "col": 2
+            },
+            "pieceType": "bishop",
+            "promotion": "none"
+          },
+          "selectedEvaluation": 2,
+          "principalVariation": [
+            {
+              "kind": "move",
+              "player": "sente",
+              "from": {
+                "row": 7,
+                "col": 1
+              },
+              "to": {
+                "row": 6,
+                "col": 2
+              },
+              "pieceType": "bishop",
+              "promotion": "none"
+            }
+          ],
+          "evaluationBreakdown": {
+            "total": 2,
+            "material": 0,
+            "pieceSquare": 2,
+            "kingSafety": 0,
+            "undefendedPieceSafety": 0,
+            "terminal": null
+          },
+          "rootLegalActionCount": 32,
+          "depth": 1,
+          "visitedPositionCount": 32,
+          "cutoffCount": 0,
+          "skippedActionCount": 0,
+          "quiescenceLeafCount": 32,
+          "quiescenceVisitedPositionCount": 0,
+          "quiescenceCutoffCount": 0,
+          "quiescenceSkippedActionCount": 0,
+          "elapsedMilliseconds": 0
+        },
+        {
+          "selectedAction": {
+            "kind": "move",
+            "player": "sente",
+            "from": {
+              "row": 7,
+              "col": 1
+            },
+            "to": {
+              "row": 6,
+              "col": 2
+            },
+            "pieceType": "bishop",
+            "promotion": "none"
+          },
+          "selectedEvaluation": 0,
+          "principalVariation": [
+            {
+              "kind": "move",
+              "player": "sente",
+              "from": {
+                "row": 7,
+                "col": 1
+              },
+              "to": {
+                "row": 6,
+                "col": 2
+              },
+              "pieceType": "bishop",
+              "promotion": "none"
+            },
+            {
+              "kind": "move",
+              "player": "gote",
+              "from": {
+                "row": 0,
+                "col": 7
+              },
+              "to": {
+                "row": 2,
+                "col": 6
+              },
+              "pieceType": "knight",
+              "promotion": "none"
+            }
+          ],
+          "evaluationBreakdown": {
+            "total": 0,
+            "material": 0,
+            "pieceSquare": 0,
+            "kingSafety": 0,
+            "undefendedPieceSafety": 0,
+            "terminal": null
+          },
+          "rootLegalActionCount": 32,
+          "depth": 2,
+          "visitedPositionCount": 397,
+          "cutoffCount": 31,
+          "skippedActionCount": 947,
+          "quiescenceLeafCount": 365,
+          "quiescenceVisitedPositionCount": 6,
+          "quiescenceCutoffCount": 33,
+          "quiescenceSkippedActionCount": 35,
+          "elapsedMilliseconds": 0
+        },
+        {
+          "selectedAction": {
+            "kind": "move",
+            "player": "sente",
+            "from": {
+              "row": 8,
+              "col": 1
+            },
+            "to": {
+              "row": 6,
+              "col": 2
+            },
+            "pieceType": "knight",
+            "promotion": "none"
+          },
+          "selectedEvaluation": 3,
+          "principalVariation": [
+            {
+              "kind": "move",
+              "player": "sente",
+              "from": {
+                "row": 8,
+                "col": 1
+              },
+              "to": {
+                "row": 6,
+                "col": 2
+              },
+              "pieceType": "knight",
+              "promotion": "none"
+            },
+            {
+              "kind": "move",
+              "player": "gote",
+              "from": {
+                "row": 0,
+                "col": 2
+              },
+              "to": {
+                "row": 1,
+                "col": 3
+              },
+              "pieceType": "silver",
+              "promotion": "none"
+            },
+            {
+              "kind": "move",
+              "player": "sente",
+              "from": {
+                "row": 6,
+                "col": 2
+              },
+              "to": {
+                "row": 4,
+                "col": 3
+              },
+              "pieceType": "knight",
+              "promotion": "none"
+            }
+          ],
+          "evaluationBreakdown": {
+            "total": 3,
+            "material": 0,
+            "pieceSquare": 3,
+            "kingSafety": 0,
+            "undefendedPieceSafety": 0,
+            "terminal": null
+          },
+          "rootLegalActionCount": 32,
+          "depth": 3,
+          "visitedPositionCount": 2332,
+          "cutoffCount": 172,
+          "skippedActionCount": 4904,
+          "quiescenceLeafCount": 2118,
+          "quiescenceVisitedPositionCount": 191,
+          "quiescenceCutoffCount": 66,
+          "quiescenceSkippedActionCount": 102,
+          "elapsedMilliseconds": 0
+        },
+        {
+          "selectedAction": {
+            "kind": "move",
+            "player": "sente",
+            "from": {
+              "row": 5,
+              "col": 3
+            },
+            "to": {
+              "row": 4,
+              "col": 3
+            },
+            "pieceType": "pawn",
+            "promotion": "none"
+          },
+          "selectedEvaluation": 0,
+          "principalVariation": [
+            {
+              "kind": "move",
+              "player": "sente",
+              "from": {
+                "row": 5,
+                "col": 3
+              },
+              "to": {
+                "row": 4,
+                "col": 3
+              },
+              "pieceType": "pawn",
+              "promotion": "none"
+            },
+            {
+              "kind": "move",
+              "player": "gote",
+              "from": {
+                "row": 0,
+                "col": 0
+              },
+              "to": {
+                "row": 1,
+                "col": 0
+              },
+              "pieceType": "lance",
+              "promotion": "none"
+            },
+            {
+              "kind": "move",
+              "player": "sente",
+              "from": {
+                "row": 7,
+                "col": 1
+              },
+              "to": {
+                "row": 6,
+                "col": 2
+              },
+              "pieceType": "bishop",
+              "promotion": "none"
+            },
+            {
+              "kind": "move",
+              "player": "gote",
+              "from": {
+                "row": 1,
+                "col": 7
+              },
+              "to": {
+                "row": 2,
+                "col": 6
+              },
+              "pieceType": "bishop",
+              "promotion": "none"
+            }
+          ],
+          "evaluationBreakdown": {
+            "total": 0,
+            "material": 0,
+            "pieceSquare": 0,
+            "kingSafety": 0,
+            "undefendedPieceSafety": 0,
+            "terminal": null
+          },
+          "rootLegalActionCount": 32,
+          "depth": 4,
+          "visitedPositionCount": 16686,
+          "cutoffCount": 1464,
+          "skippedActionCount": 36968,
+          "quiescenceLeafCount": 14929,
+          "quiescenceVisitedPositionCount": 1125,
+          "quiescenceCutoffCount": 9527,
+          "quiescenceSkippedActionCount": 18899,
+          "elapsedMilliseconds": 0
+        }
+      ],
+      "totalVisitedPositionCount": 19447,
+      "totalCutoffCount": 1667,
+      "totalSkippedActionCount": 42819,
+      "totalQuiescenceLeafCount": 17444,
+      "totalQuiescenceVisitedPositionCount": 1322,
+      "totalQuiescenceCutoffCount": 9626,
+      "totalQuiescenceSkippedActionCount": 19036,
+      "quiescenceMaxTacticalDepth": 2
+    }
+  ],
+  "trap": [
+    {
+      "selectedAction": {
+        "kind": "move",
+        "player": "sente",
+        "from": {
+          "row": 5,
+          "col": 4
+        },
+        "to": {
+          "row": 5,
+          "col": 6
+        },
+        "pieceType": "rook",
+        "promotion": "none"
+      },
+      "selectedEvaluation": 547,
+      "principalVariation": [
+        {
+          "kind": "move",
+          "player": "sente",
+          "from": {
+            "row": 5,
+            "col": 4
+          },
+          "to": {
+            "row": 5,
+            "col": 6
+          },
+          "pieceType": "rook",
+          "promotion": "none"
+        },
+        {
+          "kind": "move",
+          "player": "gote",
+          "from": {
+            "row": 2,
+            "col": 6
+          },
+          "to": {
+            "row": 3,
+            "col": 5
+          },
+          "pieceType": "gold",
+          "promotion": "none"
+        },
+        {
+          "kind": "move",
+          "player": "sente",
+          "from": {
+            "row": 5,
+            "col": 6
+          },
+          "to": {
+            "row": 2,
+            "col": 6
+          },
+          "pieceType": "rook",
+          "promotion": "promote"
+        }
+      ],
+      "evaluationBreakdown": {
+        "total": 547,
+        "material": 500,
+        "pieceSquare": -4,
+        "kingSafety": 1,
+        "undefendedPieceSafety": 50,
+        "terminal": null
+      },
+      "rootLegalActionCount": 15,
+      "depth": 3,
+      "visitedPositionCount": 703,
+      "cutoffCount": 48,
+      "skippedActionCount": 800,
+      "quiescenceLeafCount": 0,
+      "quiescenceVisitedPositionCount": 0,
+      "quiescenceCutoffCount": 0,
+      "quiescenceSkippedActionCount": 0,
+      "elapsedMilliseconds": 0,
+      "requestedMaxDepth": 4,
+      "completedDepth": 3,
+      "timedOut": true,
+      "iterations": [
+        {
+          "selectedAction": {
+            "kind": "move",
+            "player": "sente",
+            "from": {
+              "row": 5,
+              "col": 4
+            },
+            "to": {
+              "row": 4,
+              "col": 4
+            },
+            "pieceType": "rook",
+            "promotion": "none"
+          },
+          "selectedEvaluation": 410,
+          "principalVariation": [
+            {
+              "kind": "move",
+              "player": "sente",
+              "from": {
+                "row": 5,
+                "col": 4
+              },
+              "to": {
+                "row": 4,
+                "col": 4
+              },
+              "pieceType": "rook",
+              "promotion": "none"
+            }
+          ],
+          "evaluationBreakdown": {
+            "total": 410,
+            "material": 500,
+            "pieceSquare": 0,
+            "kingSafety": 0,
+            "undefendedPieceSafety": -90,
+            "terminal": null
+          },
+          "rootLegalActionCount": 15,
+          "depth": 1,
+          "visitedPositionCount": 15,
+          "cutoffCount": 0,
+          "skippedActionCount": 0,
+          "quiescenceLeafCount": 0,
+          "quiescenceVisitedPositionCount": 0,
+          "quiescenceCutoffCount": 0,
+          "quiescenceSkippedActionCount": 0,
+          "elapsedMilliseconds": 0
+        },
+        {
+          "selectedAction": {
+            "kind": "move",
+            "player": "sente",
+            "from": {
+              "row": 5,
+              "col": 4
+            },
+            "to": {
+              "row": 5,
+              "col": 7
+            },
+            "pieceType": "rook",
+            "promotion": "none"
+          },
+          "selectedEvaluation": 297,
+          "principalVariation": [
+            {
+              "kind": "move",
+              "player": "sente",
+              "from": {
+                "row": 5,
+                "col": 4
+              },
+              "to": {
+                "row": 5,
+                "col": 7
+              },
+              "pieceType": "rook",
+              "promotion": "none"
+            },
+            {
+              "kind": "move",
+              "player": "gote",
+              "from": {
+                "row": 0,
+                "col": 8
+              },
+              "to": {
+                "row": 1,
+                "col": 8
+              },
+              "pieceType": "king",
+              "promotion": "none"
+            }
+          ],
+          "evaluationBreakdown": {
+            "total": 297,
+            "material": 300,
+            "pieceSquare": -5,
+            "kingSafety": 2,
+            "undefendedPieceSafety": 0,
+            "terminal": null
+          },
+          "rootLegalActionCount": 15,
+          "depth": 2,
+          "visitedPositionCount": 68,
+          "cutoffCount": 11,
+          "skippedActionCount": 87,
+          "quiescenceLeafCount": 0,
+          "quiescenceVisitedPositionCount": 0,
+          "quiescenceCutoffCount": 0,
+          "quiescenceSkippedActionCount": 0,
+          "elapsedMilliseconds": 0
+        },
+        {
+          "selectedAction": {
+            "kind": "move",
+            "player": "sente",
+            "from": {
+              "row": 5,
+              "col": 4
+            },
+            "to": {
+              "row": 5,
+              "col": 6
+            },
+            "pieceType": "rook",
+            "promotion": "none"
+          },
+          "selectedEvaluation": 547,
+          "principalVariation": [
+            {
+              "kind": "move",
+              "player": "sente",
+              "from": {
+                "row": 5,
+                "col": 4
+              },
+              "to": {
+                "row": 5,
+                "col": 6
+              },
+              "pieceType": "rook",
+              "promotion": "none"
+            },
+            {
+              "kind": "move",
+              "player": "gote",
+              "from": {
+                "row": 2,
+                "col": 6
+              },
+              "to": {
+                "row": 3,
+                "col": 5
+              },
+              "pieceType": "gold",
+              "promotion": "none"
+            },
+            {
+              "kind": "move",
+              "player": "sente",
+              "from": {
+                "row": 5,
+                "col": 6
+              },
+              "to": {
+                "row": 2,
+                "col": 6
+              },
+              "pieceType": "rook",
+              "promotion": "promote"
+            }
+          ],
+          "evaluationBreakdown": {
+            "total": 547,
+            "material": 500,
+            "pieceSquare": -4,
+            "kingSafety": 1,
+            "undefendedPieceSafety": 50,
+            "terminal": null
+          },
+          "rootLegalActionCount": 15,
+          "depth": 3,
+          "visitedPositionCount": 703,
+          "cutoffCount": 48,
+          "skippedActionCount": 800,
+          "quiescenceLeafCount": 0,
+          "quiescenceVisitedPositionCount": 0,
+          "quiescenceCutoffCount": 0,
+          "quiescenceSkippedActionCount": 0,
+          "elapsedMilliseconds": 0
+        }
+      ],
+      "totalVisitedPositionCount": 786,
+      "totalCutoffCount": 59,
+      "totalSkippedActionCount": 887,
+      "totalQuiescenceLeafCount": 0,
+      "totalQuiescenceVisitedPositionCount": 0,
+      "totalQuiescenceCutoffCount": 0,
+      "totalQuiescenceSkippedActionCount": 0,
+      "quiescenceMaxTacticalDepth": null
+    },
+    {
+      "selectedAction": {
+        "kind": "move",
+        "player": "sente",
+        "from": {
+          "row": 5,
+          "col": 4
+        },
+        "to": {
+          "row": 6,
+          "col": 4
+        },
+        "pieceType": "rook",
+        "promotion": "none"
+      },
+      "selectedEvaluation": 400,
+      "principalVariation": [
+        {
+          "kind": "move",
+          "player": "sente",
+          "from": {
+            "row": 5,
+            "col": 4
+          },
+          "to": {
+            "row": 6,
+            "col": 4
+          },
+          "pieceType": "rook",
+          "promotion": "none"
+        },
+        {
+          "kind": "move",
+          "player": "gote",
+          "from": {
+            "row": 2,
+            "col": 6
+          },
+          "to": {
+            "row": 2,
+            "col": 5
+          },
+          "pieceType": "gold",
+          "promotion": "none"
+        },
+        {
+          "kind": "move",
+          "player": "sente",
+          "from": {
+            "row": 6,
+            "col": 4
+          },
+          "to": {
+            "row": 4,
+            "col": 4
+          },
+          "pieceType": "rook",
+          "promotion": "none"
+        }
+      ],
+      "evaluationBreakdown": {
+        "total": 400,
+        "material": 500,
+        "pieceSquare": 0,
+        "kingSafety": 0,
+        "undefendedPieceSafety": -100,
+        "terminal": null
+      },
+      "rootLegalActionCount": 15,
+      "depth": 2,
+      "visitedPositionCount": 73,
+      "cutoffCount": 12,
+      "skippedActionCount": 92,
+      "quiescenceLeafCount": 58,
+      "quiescenceVisitedPositionCount": 28,
+      "quiescenceCutoffCount": 6,
+      "quiescenceSkippedActionCount": 9,
+      "elapsedMilliseconds": 0,
+      "requestedMaxDepth": 4,
+      "completedDepth": 2,
+      "timedOut": true,
+      "iterations": [
+        {
+          "selectedAction": {
+            "kind": "move",
+            "player": "sente",
+            "from": {
+              "row": 5,
+              "col": 4
+            },
+            "to": {
+              "row": 5,
+              "col": 6
+            },
+            "pieceType": "rook",
+            "promotion": "none"
+          },
+          "selectedEvaluation": 346,
+          "principalVariation": [
+            {
+              "kind": "move",
+              "player": "sente",
+              "from": {
+                "row": 5,
+                "col": 4
+              },
+              "to": {
+                "row": 5,
+                "col": 6
+              },
+              "pieceType": "rook",
+              "promotion": "none"
+            }
+          ],
+          "evaluationBreakdown": {
+            "total": 346,
+            "material": 300,
+            "pieceSquare": -4,
+            "kingSafety": 0,
+            "undefendedPieceSafety": 50,
+            "terminal": null
+          },
+          "rootLegalActionCount": 15,
+          "depth": 1,
+          "visitedPositionCount": 15,
+          "cutoffCount": 0,
+          "skippedActionCount": 0,
+          "quiescenceLeafCount": 15,
+          "quiescenceVisitedPositionCount": 2,
+          "quiescenceCutoffCount": 4,
+          "quiescenceSkippedActionCount": 4,
+          "elapsedMilliseconds": 0
+        },
+        {
+          "selectedAction": {
+            "kind": "move",
+            "player": "sente",
+            "from": {
+              "row": 5,
+              "col": 4
+            },
+            "to": {
+              "row": 6,
+              "col": 4
+            },
+            "pieceType": "rook",
+            "promotion": "none"
+          },
+          "selectedEvaluation": 400,
+          "principalVariation": [
+            {
+              "kind": "move",
+              "player": "sente",
+              "from": {
+                "row": 5,
+                "col": 4
+              },
+              "to": {
+                "row": 6,
+                "col": 4
+              },
+              "pieceType": "rook",
+              "promotion": "none"
+            },
+            {
+              "kind": "move",
+              "player": "gote",
+              "from": {
+                "row": 2,
+                "col": 6
+              },
+              "to": {
+                "row": 2,
+                "col": 5
+              },
+              "pieceType": "gold",
+              "promotion": "none"
+            },
+            {
+              "kind": "move",
+              "player": "sente",
+              "from": {
+                "row": 6,
+                "col": 4
+              },
+              "to": {
+                "row": 4,
+                "col": 4
+              },
+              "pieceType": "rook",
+              "promotion": "none"
+            }
+          ],
+          "evaluationBreakdown": {
+            "total": 400,
+            "material": 500,
+            "pieceSquare": 0,
+            "kingSafety": 0,
+            "undefendedPieceSafety": -100,
+            "terminal": null
+          },
+          "rootLegalActionCount": 15,
+          "depth": 2,
+          "visitedPositionCount": 73,
+          "cutoffCount": 12,
+          "skippedActionCount": 92,
+          "quiescenceLeafCount": 58,
+          "quiescenceVisitedPositionCount": 28,
+          "quiescenceCutoffCount": 6,
+          "quiescenceSkippedActionCount": 9,
+          "elapsedMilliseconds": 0
+        }
+      ],
+      "totalVisitedPositionCount": 88,
+      "totalCutoffCount": 12,
+      "totalSkippedActionCount": 92,
+      "totalQuiescenceLeafCount": 73,
+      "totalQuiescenceVisitedPositionCount": 30,
+      "totalQuiescenceCutoffCount": 10,
+      "totalQuiescenceSkippedActionCount": 13,
+      "quiescenceMaxTacticalDepth": 1
+    },
+    {
+      "selectedAction": {
+        "kind": "move",
+        "player": "sente",
+        "from": {
+          "row": 5,
+          "col": 4
+        },
+        "to": {
+          "row": 5,
+          "col": 2
+        },
+        "pieceType": "rook",
+        "promotion": "none"
+      },
+      "selectedEvaluation": 497,
+      "principalVariation": [
+        {
+          "kind": "move",
+          "player": "sente",
+          "from": {
+            "row": 5,
+            "col": 4
+          },
+          "to": {
+            "row": 5,
+            "col": 2
+          },
+          "pieceType": "rook",
+          "promotion": "none"
+        },
+        {
+          "kind": "move",
+          "player": "gote",
+          "from": {
+            "row": 0,
+            "col": 8
+          },
+          "to": {
+            "row": 0,
+            "col": 7
+          },
+          "pieceType": "king",
+          "promotion": "none"
+        },
+        {
+          "kind": "move",
+          "player": "sente",
+          "from": {
+            "row": 5,
+            "col": 2
+          },
+          "to": {
+            "row": 0,
+            "col": 2
+          },
+          "pieceType": "rook",
+          "promotion": "promote"
+        },
+        {
+          "kind": "move",
+          "player": "gote",
+          "from": {
+            "row": 0,
+            "col": 7
+          },
+          "to": {
+            "row": 1,
+            "col": 8
+          },
+          "pieceType": "king",
+          "promotion": "none"
+        }
+      ],
+      "evaluationBreakdown": {
+        "total": 497,
+        "material": 500,
+        "pieceSquare": -5,
+        "kingSafety": 2,
+        "undefendedPieceSafety": 0,
+        "terminal": null
+      },
+      "rootLegalActionCount": 15,
+      "depth": 4,
+      "visitedPositionCount": 1053,
+      "cutoffCount": 374,
+      "skippedActionCount": 10568,
+      "quiescenceLeafCount": 620,
+      "quiescenceVisitedPositionCount": 636,
+      "quiescenceCutoffCount": 105,
+      "quiescenceSkippedActionCount": 119,
+      "elapsedMilliseconds": 0,
+      "requestedMaxDepth": 4,
+      "completedDepth": 4,
+      "timedOut": false,
+      "iterations": [
+        {
+          "selectedAction": {
+            "kind": "move",
+            "player": "sente",
+            "from": {
+              "row": 5,
+              "col": 4
+            },
+            "to": {
+              "row": 5,
+              "col": 6
+            },
+            "pieceType": "rook",
+            "promotion": "none"
+          },
+          "selectedEvaluation": 346,
+          "principalVariation": [
+            {
+              "kind": "move",
+              "player": "sente",
+              "from": {
+                "row": 5,
+                "col": 4
+              },
+              "to": {
+                "row": 5,
+                "col": 6
+              },
+              "pieceType": "rook",
+              "promotion": "none"
+            }
+          ],
+          "evaluationBreakdown": {
+            "total": 346,
+            "material": 300,
+            "pieceSquare": -4,
+            "kingSafety": 0,
+            "undefendedPieceSafety": 50,
+            "terminal": null
+          },
+          "rootLegalActionCount": 15,
+          "depth": 1,
+          "visitedPositionCount": 15,
+          "cutoffCount": 0,
+          "skippedActionCount": 0,
+          "quiescenceLeafCount": 15,
+          "quiescenceVisitedPositionCount": 2,
+          "quiescenceCutoffCount": 4,
+          "quiescenceSkippedActionCount": 4,
+          "elapsedMilliseconds": 0
+        },
+        {
+          "selectedAction": {
+            "kind": "move",
+            "player": "sente",
+            "from": {
+              "row": 5,
+              "col": 4
+            },
+            "to": {
+              "row": 5,
+              "col": 7
+            },
+            "pieceType": "rook",
+            "promotion": "none"
+          },
+          "selectedEvaluation": 297,
+          "principalVariation": [
+            {
+              "kind": "move",
+              "player": "sente",
+              "from": {
+                "row": 5,
+                "col": 4
+              },
+              "to": {
+                "row": 5,
+                "col": 7
+              },
+              "pieceType": "rook",
+              "promotion": "none"
+            },
+            {
+              "kind": "move",
+              "player": "gote",
+              "from": {
+                "row": 0,
+                "col": 8
+              },
+              "to": {
+                "row": 1,
+                "col": 8
+              },
+              "pieceType": "king",
+              "promotion": "none"
+            }
+          ],
+          "evaluationBreakdown": {
+            "total": 297,
+            "material": 300,
+            "pieceSquare": -5,
+            "kingSafety": 2,
+            "undefendedPieceSafety": 0,
+            "terminal": null
+          },
+          "rootLegalActionCount": 15,
+          "depth": 2,
+          "visitedPositionCount": 56,
+          "cutoffCount": 13,
+          "skippedActionCount": 109,
+          "quiescenceLeafCount": 41,
+          "quiescenceVisitedPositionCount": 15,
+          "quiescenceCutoffCount": 8,
+          "quiescenceSkippedActionCount": 13,
+          "elapsedMilliseconds": 0
+        },
+        {
+          "selectedAction": {
+            "kind": "move",
+            "player": "sente",
+            "from": {
+              "row": 5,
+              "col": 4
+            },
+            "to": {
+              "row": 5,
+              "col": 5
+            },
+            "pieceType": "rook",
+            "promotion": "none"
+          },
+          "selectedEvaluation": 506,
+          "principalVariation": [
+            {
+              "kind": "move",
+              "player": "sente",
+              "from": {
+                "row": 5,
+                "col": 4
+              },
+              "to": {
+                "row": 5,
+                "col": 5
+              },
+              "pieceType": "rook",
+              "promotion": "none"
+            },
+            {
+              "kind": "move",
+              "player": "gote",
+              "from": {
+                "row": 2,
+                "col": 6
+              },
+              "to": {
+                "row": 3,
+                "col": 7
+              },
+              "pieceType": "gold",
+              "promotion": "none"
+            },
+            {
+              "kind": "move",
+              "player": "sente",
+              "from": {
+                "row": 5,
+                "col": 5
+              },
+              "to": {
+                "row": 2,
+                "col": 5
+              },
+              "pieceType": "rook",
+              "promotion": "promote"
+            }
+          ],
+          "evaluationBreakdown": {
+            "total": 506,
+            "material": 500,
+            "pieceSquare": -4,
+            "kingSafety": 0,
+            "undefendedPieceSafety": 10,
+            "terminal": null
+          },
+          "rootLegalActionCount": 15,
+          "depth": 3,
+          "visitedPositionCount": 631,
+          "cutoffCount": 45,
+          "skippedActionCount": 734,
+          "quiescenceLeafCount": 558,
+          "quiescenceVisitedPositionCount": 155,
+          "quiescenceCutoffCount": 101,
+          "quiescenceSkippedActionCount": 222,
+          "elapsedMilliseconds": 0
+        },
+        {
+          "selectedAction": {
+            "kind": "move",
+            "player": "sente",
+            "from": {
+              "row": 5,
+              "col": 4
+            },
+            "to": {
+              "row": 5,
+              "col": 2
+            },
+            "pieceType": "rook",
+            "promotion": "none"
+          },
+          "selectedEvaluation": 497,
+          "principalVariation": [
+            {
+              "kind": "move",
+              "player": "sente",
+              "from": {
+                "row": 5,
+                "col": 4
+              },
+              "to": {
+                "row": 5,
+                "col": 2
+              },
+              "pieceType": "rook",
+              "promotion": "none"
+            },
+            {
+              "kind": "move",
+              "player": "gote",
+              "from": {
+                "row": 0,
+                "col": 8
+              },
+              "to": {
+                "row": 0,
+                "col": 7
+              },
+              "pieceType": "king",
+              "promotion": "none"
+            },
+            {
+              "kind": "move",
+              "player": "sente",
+              "from": {
+                "row": 5,
+                "col": 2
+              },
+              "to": {
+                "row": 0,
+                "col": 2
+              },
+              "pieceType": "rook",
+              "promotion": "promote"
+            },
+            {
+              "kind": "move",
+              "player": "gote",
+              "from": {
+                "row": 0,
+                "col": 7
+              },
+              "to": {
+                "row": 1,
+                "col": 8
+              },
+              "pieceType": "king",
+              "promotion": "none"
+            }
+          ],
+          "evaluationBreakdown": {
+            "total": 497,
+            "material": 500,
+            "pieceSquare": -5,
+            "kingSafety": 2,
+            "undefendedPieceSafety": 0,
+            "terminal": null
+          },
+          "rootLegalActionCount": 15,
+          "depth": 4,
+          "visitedPositionCount": 1053,
+          "cutoffCount": 374,
+          "skippedActionCount": 10568,
+          "quiescenceLeafCount": 620,
+          "quiescenceVisitedPositionCount": 636,
+          "quiescenceCutoffCount": 105,
+          "quiescenceSkippedActionCount": 119,
+          "elapsedMilliseconds": 0
+        }
+      ],
+      "totalVisitedPositionCount": 1755,
+      "totalCutoffCount": 432,
+      "totalSkippedActionCount": 11411,
+      "totalQuiescenceLeafCount": 1234,
+      "totalQuiescenceVisitedPositionCount": 808,
+      "totalQuiescenceCutoffCount": 218,
+      "totalQuiescenceSkippedActionCount": 358,
+      "quiescenceMaxTacticalDepth": 2
+    }
+  ],
+  "extended": [
+    {
+      "selectedAction": {
+        "kind": "move",
+        "player": "sente",
+        "from": {
+          "row": 5,
+          "col": 4
+        },
+        "to": {
+          "row": 5,
+          "col": 3
+        },
+        "pieceType": "rook",
+        "promotion": "none"
+      },
+      "selectedEvaluation": 548,
+      "principalVariation": [
+        {
+          "kind": "move",
+          "player": "sente",
+          "from": {
+            "row": 5,
+            "col": 4
+          },
+          "to": {
+            "row": 5,
+            "col": 3
+          },
+          "pieceType": "rook",
+          "promotion": "none"
+        },
+        {
+          "kind": "move",
+          "player": "gote",
+          "from": {
+            "row": 4,
+            "col": 4
+          },
+          "to": {
+            "row": 5,
+            "col": 4
+          },
+          "pieceType": "pawn",
+          "promotion": "none"
+        },
+        {
+          "kind": "move",
+          "player": "sente",
+          "from": {
+            "row": 5,
+            "col": 3
+          },
+          "to": {
+            "row": 1,
+            "col": 3
+          },
+          "pieceType": "rook",
+          "promotion": "promote"
+        }
+      ],
+      "evaluationBreakdown": {
+        "total": 548,
+        "material": 500,
+        "pieceSquare": -4,
+        "kingSafety": 2,
+        "undefendedPieceSafety": 50,
+        "terminal": null
+      },
+      "rootLegalActionCount": 15,
+      "depth": 3,
+      "visitedPositionCount": 610,
+      "cutoffCount": 30,
+      "skippedActionCount": 439,
+      "quiescenceLeafCount": 0,
+      "quiescenceVisitedPositionCount": 0,
+      "quiescenceCutoffCount": 0,
+      "quiescenceSkippedActionCount": 0,
+      "elapsedMilliseconds": 0,
+      "requestedMaxDepth": 4,
+      "completedDepth": 3,
+      "timedOut": true,
+      "iterations": [
+        {
+          "selectedAction": {
+            "kind": "move",
+            "player": "sente",
+            "from": {
+              "row": 5,
+              "col": 4
+            },
+            "to": {
+              "row": 4,
+              "col": 4
+            },
+            "pieceType": "rook",
+            "promotion": "none"
+          },
+          "selectedEvaluation": 411,
+          "principalVariation": [
+            {
+              "kind": "move",
+              "player": "sente",
+              "from": {
+                "row": 5,
+                "col": 4
+              },
+              "to": {
+                "row": 4,
+                "col": 4
+              },
+              "pieceType": "rook",
+              "promotion": "none"
+            }
+          ],
+          "evaluationBreakdown": {
+            "total": 411,
+            "material": 500,
+            "pieceSquare": 1,
+            "kingSafety": 0,
+            "undefendedPieceSafety": -90,
+            "terminal": null
+          },
+          "rootLegalActionCount": 15,
+          "depth": 1,
+          "visitedPositionCount": 15,
+          "cutoffCount": 0,
+          "skippedActionCount": 0,
+          "quiescenceLeafCount": 0,
+          "quiescenceVisitedPositionCount": 0,
+          "quiescenceCutoffCount": 0,
+          "quiescenceSkippedActionCount": 0,
+          "elapsedMilliseconds": 0
+        },
+        {
+          "selectedAction": {
+            "kind": "move",
+            "player": "sente",
+            "from": {
+              "row": 5,
+              "col": 4
+            },
+            "to": {
+              "row": 5,
+              "col": 8
+            },
+            "pieceType": "rook",
+            "promotion": "none"
+          },
+          "selectedEvaluation": 298,
+          "principalVariation": [
+            {
+              "kind": "move",
+              "player": "sente",
+              "from": {
+                "row": 5,
+                "col": 4
+              },
+              "to": {
+                "row": 5,
+                "col": 8
+              },
+              "pieceType": "rook",
+              "promotion": "none"
+            },
+            {
+              "kind": "move",
+              "player": "gote",
+              "from": {
+                "row": 0,
+                "col": 8
+              },
+              "to": {
+                "row": 0,
+                "col": 7
+              },
+              "pieceType": "king",
+              "promotion": "none"
+            }
+          ],
+          "evaluationBreakdown": {
+            "total": 298,
+            "material": 300,
+            "pieceSquare": -4,
+            "kingSafety": 2,
+            "undefendedPieceSafety": 0,
+            "terminal": null
+          },
+          "rootLegalActionCount": 15,
+          "depth": 2,
+          "visitedPositionCount": 77,
+          "cutoffCount": 10,
+          "skippedActionCount": 50,
+          "quiescenceLeafCount": 0,
+          "quiescenceVisitedPositionCount": 0,
+          "quiescenceCutoffCount": 0,
+          "quiescenceSkippedActionCount": 0,
+          "elapsedMilliseconds": 0
+        },
+        {
+          "selectedAction": {
+            "kind": "move",
+            "player": "sente",
+            "from": {
+              "row": 5,
+              "col": 4
+            },
+            "to": {
+              "row": 5,
+              "col": 3
+            },
+            "pieceType": "rook",
+            "promotion": "none"
+          },
+          "selectedEvaluation": 548,
+          "principalVariation": [
+            {
+              "kind": "move",
+              "player": "sente",
+              "from": {
+                "row": 5,
+                "col": 4
+              },
+              "to": {
+                "row": 5,
+                "col": 3
+              },
+              "pieceType": "rook",
+              "promotion": "none"
+            },
+            {
+              "kind": "move",
+              "player": "gote",
+              "from": {
+                "row": 4,
+                "col": 4
+              },
+              "to": {
+                "row": 5,
+                "col": 4
+              },
+              "pieceType": "pawn",
+              "promotion": "none"
+            },
+            {
+              "kind": "move",
+              "player": "sente",
+              "from": {
+                "row": 5,
+                "col": 3
+              },
+              "to": {
+                "row": 1,
+                "col": 3
+              },
+              "pieceType": "rook",
+              "promotion": "promote"
+            }
+          ],
+          "evaluationBreakdown": {
+            "total": 548,
+            "material": 500,
+            "pieceSquare": -4,
+            "kingSafety": 2,
+            "undefendedPieceSafety": 50,
+            "terminal": null
+          },
+          "rootLegalActionCount": 15,
+          "depth": 3,
+          "visitedPositionCount": 610,
+          "cutoffCount": 30,
+          "skippedActionCount": 439,
+          "quiescenceLeafCount": 0,
+          "quiescenceVisitedPositionCount": 0,
+          "quiescenceCutoffCount": 0,
+          "quiescenceSkippedActionCount": 0,
+          "elapsedMilliseconds": 0
+        }
+      ],
+      "totalVisitedPositionCount": 702,
+      "totalCutoffCount": 40,
+      "totalSkippedActionCount": 489,
+      "totalQuiescenceLeafCount": 0,
+      "totalQuiescenceVisitedPositionCount": 0,
+      "totalQuiescenceCutoffCount": 0,
+      "totalQuiescenceSkippedActionCount": 0,
+      "quiescenceMaxTacticalDepth": null
+    },
+    {
+      "selectedAction": {
+        "kind": "move",
+        "player": "sente",
+        "from": {
+          "row": 5,
+          "col": 4
+        },
+        "to": {
+          "row": 6,
+          "col": 4
+        },
+        "pieceType": "rook",
+        "promotion": "none"
+      },
+      "selectedEvaluation": 410,
+      "principalVariation": [
+        {
+          "kind": "move",
+          "player": "sente",
+          "from": {
+            "row": 5,
+            "col": 4
+          },
+          "to": {
+            "row": 6,
+            "col": 4
+          },
+          "pieceType": "rook",
+          "promotion": "none"
+        },
+        {
+          "kind": "move",
+          "player": "gote",
+          "from": {
+            "row": 1,
+            "col": 0
+          },
+          "to": {
+            "row": 2,
+            "col": 0
+          },
+          "pieceType": "gold",
+          "promotion": "none"
+        },
+        {
+          "kind": "move",
+          "player": "sente",
+          "from": {
+            "row": 6,
+            "col": 4
+          },
+          "to": {
+            "row": 4,
+            "col": 4
+          },
+          "pieceType": "rook",
+          "promotion": "none"
+        }
+      ],
+      "evaluationBreakdown": {
+        "total": 410,
+        "material": 500,
+        "pieceSquare": 0,
+        "kingSafety": 0,
+        "undefendedPieceSafety": -90,
+        "terminal": null
+      },
+      "rootLegalActionCount": 15,
+      "depth": 2,
+      "visitedPositionCount": 87,
+      "cutoffCount": 10,
+      "skippedActionCount": 40,
+      "quiescenceLeafCount": 72,
+      "quiescenceVisitedPositionCount": 28,
+      "quiescenceCutoffCount": 5,
+      "quiescenceSkippedActionCount": 9,
+      "elapsedMilliseconds": 0,
+      "requestedMaxDepth": 4,
+      "completedDepth": 2,
+      "timedOut": true,
+      "iterations": [
+        {
+          "selectedAction": {
+            "kind": "move",
+            "player": "sente",
+            "from": {
+              "row": 5,
+              "col": 4
+            },
+            "to": {
+              "row": 5,
+              "col": 0
+            },
+            "pieceType": "rook",
+            "promotion": "none"
+          },
+          "selectedEvaluation": 346,
+          "principalVariation": [
+            {
+              "kind": "move",
+              "player": "sente",
+              "from": {
+                "row": 5,
+                "col": 4
+              },
+              "to": {
+                "row": 5,
+                "col": 0
+              },
+              "pieceType": "rook",
+              "promotion": "none"
+            }
+          ],
+          "evaluationBreakdown": {
+            "total": 346,
+            "material": 300,
+            "pieceSquare": -4,
+            "kingSafety": 0,
+            "undefendedPieceSafety": 50,
+            "terminal": null
+          },
+          "rootLegalActionCount": 15,
+          "depth": 1,
+          "visitedPositionCount": 15,
+          "cutoffCount": 0,
+          "skippedActionCount": 0,
+          "quiescenceLeafCount": 15,
+          "quiescenceVisitedPositionCount": 2,
+          "quiescenceCutoffCount": 4,
+          "quiescenceSkippedActionCount": 4,
+          "elapsedMilliseconds": 0
+        },
+        {
+          "selectedAction": {
+            "kind": "move",
+            "player": "sente",
+            "from": {
+              "row": 5,
+              "col": 4
+            },
+            "to": {
+              "row": 6,
+              "col": 4
+            },
+            "pieceType": "rook",
+            "promotion": "none"
+          },
+          "selectedEvaluation": 410,
+          "principalVariation": [
+            {
+              "kind": "move",
+              "player": "sente",
+              "from": {
+                "row": 5,
+                "col": 4
+              },
+              "to": {
+                "row": 6,
+                "col": 4
+              },
+              "pieceType": "rook",
+              "promotion": "none"
+            },
+            {
+              "kind": "move",
+              "player": "gote",
+              "from": {
+                "row": 1,
+                "col": 0
+              },
+              "to": {
+                "row": 2,
+                "col": 0
+              },
+              "pieceType": "gold",
+              "promotion": "none"
+            },
+            {
+              "kind": "move",
+              "player": "sente",
+              "from": {
+                "row": 6,
+                "col": 4
+              },
+              "to": {
+                "row": 4,
+                "col": 4
+              },
+              "pieceType": "rook",
+              "promotion": "none"
+            }
+          ],
+          "evaluationBreakdown": {
+            "total": 410,
+            "material": 500,
+            "pieceSquare": 0,
+            "kingSafety": 0,
+            "undefendedPieceSafety": -90,
+            "terminal": null
+          },
+          "rootLegalActionCount": 15,
+          "depth": 2,
+          "visitedPositionCount": 87,
+          "cutoffCount": 10,
+          "skippedActionCount": 40,
+          "quiescenceLeafCount": 72,
+          "quiescenceVisitedPositionCount": 28,
+          "quiescenceCutoffCount": 5,
+          "quiescenceSkippedActionCount": 9,
+          "elapsedMilliseconds": 0
+        }
+      ],
+      "totalVisitedPositionCount": 102,
+      "totalCutoffCount": 10,
+      "totalSkippedActionCount": 40,
+      "totalQuiescenceLeafCount": 87,
+      "totalQuiescenceVisitedPositionCount": 30,
+      "totalQuiescenceCutoffCount": 9,
+      "totalQuiescenceSkippedActionCount": 13,
+      "quiescenceMaxTacticalDepth": 1
+    },
+    {
+      "selectedAction": {
+        "kind": "move",
+        "player": "sente",
+        "from": {
+          "row": 5,
+          "col": 4
+        },
+        "to": {
+          "row": 5,
+          "col": 3
+        },
+        "pieceType": "rook",
+        "promotion": "none"
+      },
+      "selectedEvaluation": 701,
+      "principalVariation": [
+        {
+          "kind": "move",
+          "player": "sente",
+          "from": {
+            "row": 5,
+            "col": 4
+          },
+          "to": {
+            "row": 5,
+            "col": 3
+          },
+          "pieceType": "rook",
+          "promotion": "none"
+        },
+        {
+          "kind": "move",
+          "player": "gote",
+          "from": {
+            "row": 4,
+            "col": 4
+          },
+          "to": {
+            "row": 5,
+            "col": 4
+          },
+          "pieceType": "pawn",
+          "promotion": "none"
+        },
+        {
+          "kind": "move",
+          "player": "sente",
+          "from": {
+            "row": 5,
+            "col": 3
+          },
+          "to": {
+            "row": 5,
+            "col": 4
+          },
+          "pieceType": "rook",
+          "promotion": "none"
+        },
+        {
+          "kind": "move",
+          "player": "gote",
+          "from": {
+            "row": 1,
+            "col": 0
+          },
+          "to": {
+            "row": 2,
+            "col": 0
+          },
+          "pieceType": "gold",
+          "promotion": "none"
+        },
+        {
+          "kind": "move",
+          "player": "sente",
+          "from": {
+            "row": 5,
+            "col": 4
+          },
+          "to": {
+            "row": 3,
+            "col": 4
+          },
+          "pieceType": "rook",
+          "promotion": "none"
+        }
+      ],
+      "evaluationBreakdown": {
+        "total": 701,
+        "material": 700,
+        "pieceSquare": 1,
+        "kingSafety": 0,
+        "undefendedPieceSafety": 0,
+        "terminal": null
+      },
+      "rootLegalActionCount": 15,
+      "depth": 4,
+      "visitedPositionCount": 1246,
+      "cutoffCount": 454,
+      "skippedActionCount": 10155,
+      "quiescenceLeafCount": 737,
+      "quiescenceVisitedPositionCount": 778,
+      "quiescenceCutoffCount": 82,
+      "quiescenceSkippedActionCount": 86,
+      "elapsedMilliseconds": 0,
+      "requestedMaxDepth": 4,
+      "completedDepth": 4,
+      "timedOut": false,
+      "iterations": [
+        {
+          "selectedAction": {
+            "kind": "move",
+            "player": "sente",
+            "from": {
+              "row": 5,
+              "col": 4
+            },
+            "to": {
+              "row": 5,
+              "col": 0
+            },
+            "pieceType": "rook",
+            "promotion": "none"
+          },
+          "selectedEvaluation": 346,
+          "principalVariation": [
+            {
+              "kind": "move",
+              "player": "sente",
+              "from": {
+                "row": 5,
+                "col": 4
+              },
+              "to": {
+                "row": 5,
+                "col": 0
+              },
+              "pieceType": "rook",
+              "promotion": "none"
+            }
+          ],
+          "evaluationBreakdown": {
+            "total": 346,
+            "material": 300,
+            "pieceSquare": -4,
+            "kingSafety": 0,
+            "undefendedPieceSafety": 50,
+            "terminal": null
+          },
+          "rootLegalActionCount": 15,
+          "depth": 1,
+          "visitedPositionCount": 15,
+          "cutoffCount": 0,
+          "skippedActionCount": 0,
+          "quiescenceLeafCount": 15,
+          "quiescenceVisitedPositionCount": 2,
+          "quiescenceCutoffCount": 4,
+          "quiescenceSkippedActionCount": 4,
+          "elapsedMilliseconds": 0
+        },
+        {
+          "selectedAction": {
+            "kind": "move",
+            "player": "sente",
+            "from": {
+              "row": 5,
+              "col": 4
+            },
+            "to": {
+              "row": 5,
+              "col": 8
+            },
+            "pieceType": "rook",
+            "promotion": "none"
+          },
+          "selectedEvaluation": 298,
+          "principalVariation": [
+            {
+              "kind": "move",
+              "player": "sente",
+              "from": {
+                "row": 5,
+                "col": 4
+              },
+              "to": {
+                "row": 5,
+                "col": 8
+              },
+              "pieceType": "rook",
+              "promotion": "none"
+            },
+            {
+              "kind": "move",
+              "player": "gote",
+              "from": {
+                "row": 0,
+                "col": 8
+              },
+              "to": {
+                "row": 0,
+                "col": 7
+              },
+              "pieceType": "king",
+              "promotion": "none"
+            }
+          ],
+          "evaluationBreakdown": {
+            "total": 298,
+            "material": 300,
+            "pieceSquare": -4,
+            "kingSafety": 2,
+            "undefendedPieceSafety": 0,
+            "terminal": null
+          },
+          "rootLegalActionCount": 15,
+          "depth": 2,
+          "visitedPositionCount": 70,
+          "cutoffCount": 11,
+          "skippedActionCount": 57,
+          "quiescenceLeafCount": 55,
+          "quiescenceVisitedPositionCount": 38,
+          "quiescenceCutoffCount": 5,
+          "quiescenceSkippedActionCount": 9,
+          "elapsedMilliseconds": 0
+        },
+        {
+          "selectedAction": {
+            "kind": "move",
+            "player": "sente",
+            "from": {
+              "row": 5,
+              "col": 4
+            },
+            "to": {
+              "row": 5,
+              "col": 3
+            },
+            "pieceType": "rook",
+            "promotion": "none"
+          },
+          "selectedEvaluation": 548,
+          "principalVariation": [
+            {
+              "kind": "move",
+              "player": "sente",
+              "from": {
+                "row": 5,
+                "col": 4
+              },
+              "to": {
+                "row": 5,
+                "col": 3
+              },
+              "pieceType": "rook",
+              "promotion": "none"
+            },
+            {
+              "kind": "move",
+              "player": "gote",
+              "from": {
+                "row": 4,
+                "col": 4
+              },
+              "to": {
+                "row": 5,
+                "col": 4
+              },
+              "pieceType": "pawn",
+              "promotion": "none"
+            },
+            {
+              "kind": "move",
+              "player": "sente",
+              "from": {
+                "row": 5,
+                "col": 3
+              },
+              "to": {
+                "row": 1,
+                "col": 3
+              },
+              "pieceType": "rook",
+              "promotion": "promote"
+            }
+          ],
+          "evaluationBreakdown": {
+            "total": 548,
+            "material": 500,
+            "pieceSquare": -4,
+            "kingSafety": 2,
+            "undefendedPieceSafety": 50,
+            "terminal": null
+          },
+          "rootLegalActionCount": 15,
+          "depth": 3,
+          "visitedPositionCount": 646,
+          "cutoffCount": 28,
+          "skippedActionCount": 403,
+          "quiescenceLeafCount": 587,
+          "quiescenceVisitedPositionCount": 169,
+          "quiescenceCutoffCount": 129,
+          "quiescenceSkippedActionCount": 193,
+          "elapsedMilliseconds": 0
+        },
+        {
+          "selectedAction": {
+            "kind": "move",
+            "player": "sente",
+            "from": {
+              "row": 5,
+              "col": 4
+            },
+            "to": {
+              "row": 5,
+              "col": 3
+            },
+            "pieceType": "rook",
+            "promotion": "none"
+          },
+          "selectedEvaluation": 701,
+          "principalVariation": [
+            {
+              "kind": "move",
+              "player": "sente",
+              "from": {
+                "row": 5,
+                "col": 4
+              },
+              "to": {
+                "row": 5,
+                "col": 3
+              },
+              "pieceType": "rook",
+              "promotion": "none"
+            },
+            {
+              "kind": "move",
+              "player": "gote",
+              "from": {
+                "row": 4,
+                "col": 4
+              },
+              "to": {
+                "row": 5,
+                "col": 4
+              },
+              "pieceType": "pawn",
+              "promotion": "none"
+            },
+            {
+              "kind": "move",
+              "player": "sente",
+              "from": {
+                "row": 5,
+                "col": 3
+              },
+              "to": {
+                "row": 5,
+                "col": 4
+              },
+              "pieceType": "rook",
+              "promotion": "none"
+            },
+            {
+              "kind": "move",
+              "player": "gote",
+              "from": {
+                "row": 1,
+                "col": 0
+              },
+              "to": {
+                "row": 2,
+                "col": 0
+              },
+              "pieceType": "gold",
+              "promotion": "none"
+            },
+            {
+              "kind": "move",
+              "player": "sente",
+              "from": {
+                "row": 5,
+                "col": 4
+              },
+              "to": {
+                "row": 3,
+                "col": 4
+              },
+              "pieceType": "rook",
+              "promotion": "none"
+            }
+          ],
+          "evaluationBreakdown": {
+            "total": 701,
+            "material": 700,
+            "pieceSquare": 1,
+            "kingSafety": 0,
+            "undefendedPieceSafety": 0,
+            "terminal": null
+          },
+          "rootLegalActionCount": 15,
+          "depth": 4,
+          "visitedPositionCount": 1246,
+          "cutoffCount": 454,
+          "skippedActionCount": 10155,
+          "quiescenceLeafCount": 737,
+          "quiescenceVisitedPositionCount": 778,
+          "quiescenceCutoffCount": 82,
+          "quiescenceSkippedActionCount": 86,
+          "elapsedMilliseconds": 0
+        }
+      ],
+      "totalVisitedPositionCount": 1977,
+      "totalCutoffCount": 493,
+      "totalSkippedActionCount": 10615,
+      "totalQuiescenceLeafCount": 1394,
+      "totalQuiescenceVisitedPositionCount": 987,
+      "totalQuiescenceCutoffCount": 220,
+      "totalQuiescenceSkippedActionCount": 292,
+      "quiescenceMaxTacticalDepth": 2
+    }
+  ]
+}

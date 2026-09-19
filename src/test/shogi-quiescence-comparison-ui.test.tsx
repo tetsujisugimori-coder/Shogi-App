@@ -30,7 +30,7 @@ function deferred() {
   const promise = new Promise<Results>((yes, no) => { resolve = yes; reject = no; });
   return { resolve, reject, promise };
 }
-const button = () => screen.getByRole('button', { name: '静止探索を比較' });
+const button = () => screen.getByRole('button', { name: '静止探索を固定深さ3で比較' });
 const panel = () => screen.getByRole('region', { name: '静止探索設定の比較' });
 const root = () => document.getElementById('shogi-research-screen')!;
 function boardEvidence() {

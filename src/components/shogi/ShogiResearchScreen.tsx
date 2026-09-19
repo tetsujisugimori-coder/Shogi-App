@@ -1,3 +1,7 @@
+import { TIME_LIMITED_QUIESCENCE_COMPARISON_MAX_DEPTH, TIME_LIMITED_QUIESCENCE_COMPARISON_MILLISECONDS } from '../../domain/shogi/timeLimitedQuiescenceComparison';
+import { runTimeLimitedQuiescenceComparisonInWorker } from '../../application/timeLimitedQuiescenceComparisonWorkerClient';
+import { validateTimeLimitedQuiescenceComparison } from '../../application/timeLimitedQuiescenceComparisonValidation';
+import { TimeLimitedQuiescenceComparisonPanel, type TimeLimitedQuiescenceComparisonDisplay } from './TimeLimitedQuiescenceComparisonPanel';
 import { QUIESCENCE_COMPARISON_DEPTH } from '../../domain/shogi/quiescenceComparison';
 import { runQuiescenceComparisonInWorker } from '../../application/quiescenceComparisonWorkerClient';
 import { validateQuiescenceComparison } from '../../application/quiescenceComparisonValidation';
@@ -74,6 +78,7 @@ import { AiJudgmentPanel } from './AiJudgmentPanel';
 
 interface ShogiResearchScreenProps {
   initialState?: BoardState;
+  timeLimitedQuiescenceComparisonRunner?: typeof runTimeLimitedQuiescenceComparisonInWorker;
   quiescenceComparisonRunner?: typeof runQuiescenceComparisonInWorker;
   comparisonRunner?: typeof runEvaluationPresetComparisonInWorker;
   workerSearchRunner?: TimeLimitedIterativeDeepeningAlphaBetaSearchRunner;
@@ -114,7 +119,7 @@ type WorkerSearchState =
   | { kind: 'error'; message: string };
 
 interface ActiveWorkerSearch {
-  kind: 'single' | 'comparison' | 'quiescence-comparison';
+  kind: 'single' | 'comparison' | 'quiescence-comparison' | 'time-limited-quiescence-comparison';
   generation: number;
   controller: AbortController;
   state: BoardState;
@@ -150,6 +155,7 @@ type QuiescenceSelection = TimeLimitedSearchQuiescenceMaxTacticalDepth | null;
 
 export const ShogiResearchScreen: React.FC<ShogiResearchScreenProps> = ({
   initialState,
+  timeLimitedQuiescenceComparisonRunner = runTimeLimitedQuiescenceComparisonInWorker,
   quiescenceComparisonRunner = runQuiescenceComparisonInWorker,
   comparisonRunner = runEvaluationPresetComparisonInWorker,
   workerSearchRunner = runTimeLimitedIterativeDeepeningAlphaBetaSearchInWorker,
@@ -176,6 +182,8 @@ export const ShogiResearchScreen: React.FC<ShogiResearchScreenProps> = ({
   const [evaluationPresetId, setEvaluationPresetId] = useState<SearchEvaluationPresetId>(DEFAULT_SEARCH_EVALUATION_PRESET_ID);
   const [quiescenceSelection, setQuiescenceSelection] = useState<QuiescenceSelection>(null);
   const [aiSearchDisplay, setAiSearchDisplay] = useState<AiSearchDisplay | null>(null);
+  const [timeLimitedQuiescenceComparisonState, setTimeLimitedQuiescenceComparisonState] = useState<WorkerSearchState>({ kind: 'idle' });
+  const [timeLimitedQuiescenceComparisonDisplay, setTimeLimitedQuiescenceComparisonDisplay] = useState<TimeLimitedQuiescenceComparisonDisplay | null>(null);
   const [quiescenceComparisonState, setQuiescenceComparisonState] = useState<WorkerSearchState>({ kind: 'idle' });
   const [quiescenceComparisonDisplay, setQuiescenceComparisonDisplay] = useState<QuiescenceComparisonDisplay | null>(null);
   const [comparisonState, setComparisonState] = useState<WorkerSearchState>({ kind: 'idle' });
@@ -239,6 +247,7 @@ export const ShogiResearchScreen: React.FC<ShogiResearchScreenProps> = ({
   const isResignationAvailable = boardState.status === 'active' || boardState.status === 'check';
   const isEnteringKingAvailable = boardState.status === 'active' || boardState.status === 'check';
   const isNewGameAvailable = isEnteringKingAvailable || isEnded;
+  const isTimeLimitedQuiescenceComparisonThinking = timeLimitedQuiescenceComparisonState.kind === 'thinking';
   const isQuiescenceComparisonThinking = quiescenceComparisonState.kind === 'thinking';
   const isComparisonThinking = comparisonState.kind === 'thinking';
   const isWorkerSearchThinking = workerSearchState.kind === 'thinking';
@@ -356,6 +365,17 @@ export const ShogiResearchScreen: React.FC<ShogiResearchScreenProps> = ({
     setFocusRequest({ ...square, requestId: focusRequestId.current });
   }, []);
 
+  const invalidateTimeLimitedQuiescenceComparison = useCallback(() => {
+    const active = activeWorkerSearchRef.current;
+    if (active?.kind === 'time-limited-quiescence-comparison') {
+      activeWorkerSearchRef.current = null;
+      workerSearchGenerationRef.current += 1;
+      active.controller.abort();
+    }
+    setTimeLimitedQuiescenceComparisonDisplay(null);
+    setTimeLimitedQuiescenceComparisonState({ kind: 'idle' });
+  }, []);
+
   const invalidateQuiescenceComparison = useCallback(() => {
     const active = activeWorkerSearchRef.current;
     if (active?.kind === 'quiescence-comparison') {
@@ -368,6 +388,7 @@ export const ShogiResearchScreen: React.FC<ShogiResearchScreenProps> = ({
   }, []);
 
   const invalidateComparison = useCallback(() => {
+    invalidateTimeLimitedQuiescenceComparison();
     invalidateQuiescenceComparison();
     const active = activeWorkerSearchRef.current;
     if (active?.kind === 'comparison') {
@@ -377,7 +398,7 @@ export const ShogiResearchScreen: React.FC<ShogiResearchScreenProps> = ({
     }
     setComparisonDisplay(null);
     setComparisonState({ kind: 'idle' });
-  }, [invalidateQuiescenceComparison]);
+  }, [invalidateQuiescenceComparison, invalidateTimeLimitedQuiescenceComparison]);
 
   // All committed board replacements synchronously invalidate comparison work.
   const setBoardState = useCallback((state: BoardState) => {
@@ -965,8 +986,41 @@ export const ShogiResearchScreen: React.FC<ShogiResearchScreenProps> = ({
     }
   };
 
+  const compareTimeLimitedQuiescenceSettings = async () => {
+    if (isInteractionBlocked || activeWorkerSearchRef.current) return;
+    invalidateTimeLimitedQuiescenceComparison();
+    const snapshot = createComparisonSnapshot(boardState);
+    const generation = ++workerSearchGenerationRef.current;
+    const controller = new AbortController();
+    const job: ActiveWorkerSearch = { kind: 'time-limited-quiescence-comparison', generation, controller, state: boardState };
+    activeWorkerSearchRef.current = job;
+    setTimeLimitedQuiescenceComparisonState({ kind: 'thinking' });
+    const isCurrent = () => activeWorkerSearchRef.current === job &&
+      workerSearchGenerationRef.current === generation && !controller.signal.aborted;
+    try {
+      const results = await timeLimitedQuiescenceComparisonRunner(snapshot, TIME_LIMITED_QUIESCENCE_COMPARISON_MAX_DEPTH, TIME_LIMITED_QUIESCENCE_COMPARISON_MILLISECONDS, controller.signal);
+      if (!isCurrent()) return;
+      if (!isSameComparisonPosition(snapshot, job.state)) throw new Error('比較の開始局面が変更されました。');
+      validateTimeLimitedQuiescenceComparison(snapshot, TIME_LIMITED_QUIESCENCE_COMPARISON_MAX_DEPTH, TIME_LIMITED_QUIESCENCE_COMPARISON_MILLISECONDS, results);
+      const entries = results.map((result) => ({ result,
+        principalVariationNotations: result.selectedAction
+          ? validateAndFormatPrincipalVariation(snapshot, result, result.depth + (result.quiescenceMaxTacticalDepth ?? 0))! : [],
+      }));
+      activeWorkerSearchRef.current = null;
+      setTimeLimitedQuiescenceComparisonDisplay({ perspective: snapshot.turn, entries });
+      setTimeLimitedQuiescenceComparisonState({ kind: 'idle' });
+    } catch (error) {
+      if (!isCurrent()) return;
+      activeWorkerSearchRef.current = null;
+      setTimeLimitedQuiescenceComparisonDisplay(null);
+      setTimeLimitedQuiescenceComparisonState(error instanceof Error && error.name === 'AbortError'
+        ? { kind: 'cancelled' }
+        : { kind: 'error', message: error instanceof Error ? error.message : '比較に失敗しました。' });
+    }
+  };
+
   const makeTwoPlyAiMove = () => {
-    if (isInteractionBlocked || isComparisonThinking || isQuiescenceComparisonThinking || activeWorkerSearchRef.current) return;
+    if (isInteractionBlocked || isComparisonThinking || isQuiescenceComparisonThinking || isTimeLimitedQuiescenceComparisonThinking || activeWorkerSearchRef.current) return;
     invalidateComparison();
 
     const result = {
@@ -1335,7 +1389,7 @@ export const ShogiResearchScreen: React.FC<ShogiResearchScreenProps> = ({
             id="evaluation-preset"
             aria-describedby="evaluation-preset-description"
             value={evaluationPresetId}
-            disabled={isWorkerSearchThinking || isComparisonThinking || isQuiescenceComparisonThinking || dialogsAreOpen}
+            disabled={isWorkerSearchThinking || isComparisonThinking || isQuiescenceComparisonThinking || isTimeLimitedQuiescenceComparisonThinking || dialogsAreOpen}
             onChange={(event) => {
               if (!activeWorkerSearchRef.current && isSearchEvaluationPresetId(event.target.value)) {
                 setEvaluationPresetId(event.target.value);
@@ -1355,7 +1409,7 @@ export const ShogiResearchScreen: React.FC<ShogiResearchScreenProps> = ({
             id="quiescence-selection"
             aria-describedby="quiescence-selection-description"
             value={quiescenceSelection === null ? 'disabled' : String(quiescenceSelection)}
-            disabled={isWorkerSearchThinking || isComparisonThinking || isQuiescenceComparisonThinking || dialogsAreOpen}
+            disabled={isWorkerSearchThinking || isComparisonThinking || isQuiescenceComparisonThinking || isTimeLimitedQuiescenceComparisonThinking || dialogsAreOpen}
             onChange={(event) => {
               if (activeWorkerSearchRef.current) return;
               const value = event.target.value;
@@ -1376,7 +1430,7 @@ export const ShogiResearchScreen: React.FC<ShogiResearchScreenProps> = ({
           <button
             type="button"
             onClick={makeTwoPlyAiMove}
-            disabled={isInteractionBlocked || isComparisonThinking || isQuiescenceComparisonThinking}
+            disabled={isInteractionBlocked || isComparisonThinking || isQuiescenceComparisonThinking || isTimeLimitedQuiescenceComparisonThinking}
             className="rounded border border-violet-700/70 bg-violet-950/45 px-4 py-1.5 font-serif text-sm tracking-[0.1em] text-violet-100 shadow-inner outline-none transition hover:border-violet-500 hover:bg-violet-900/55 focus-visible:ring-2 focus-visible:ring-amber-300 disabled:cursor-not-allowed disabled:border-stone-800 disabled:text-stone-600 disabled:opacity-65"
           >
             2手読みAIに指させる
@@ -1390,15 +1444,28 @@ export const ShogiResearchScreen: React.FC<ShogiResearchScreenProps> = ({
             時間制限AIに指させる
           </button>
           <button type="button" onClick={compareEvaluationPresets}
-            disabled={isInteractionBlocked || isComparisonThinking || isQuiescenceComparisonThinking}
+            disabled={isInteractionBlocked || isComparisonThinking || isQuiescenceComparisonThinking || isTimeLimitedQuiescenceComparisonThinking}
             className="rounded border border-sky-700/70 bg-sky-950/45 px-4 py-1.5 font-serif text-sm text-sky-100 disabled:opacity-50">
             3プリセットを比較
           </button>
           <button type="button" onClick={compareQuiescenceSettings}
-            disabled={isInteractionBlocked || isComparisonThinking || isQuiescenceComparisonThinking}
+            disabled={isInteractionBlocked || isComparisonThinking || isQuiescenceComparisonThinking || isTimeLimitedQuiescenceComparisonThinking}
             className="max-w-full rounded border border-sky-700/70 bg-sky-950/45 px-4 py-1.5 font-serif text-sm text-sky-100 disabled:opacity-50">
-            静止探索を比較
+            静止探索を固定深さ3で比較
           </button>
+          <button type="button" onClick={compareTimeLimitedQuiescenceSettings}
+            disabled={isInteractionBlocked || activeWorkerSearchRef.current !== null}
+            className="max-w-full rounded border border-sky-700/70 bg-sky-950/45 px-4 py-1.5 font-serif text-sm text-sky-100 disabled:opacity-50">
+            静止探索を同じ1秒で比較
+          </button>
+          {isTimeLimitedQuiescenceComparisonThinking && (
+            <button type="button" onClick={() => {
+              invalidateTimeLimitedQuiescenceComparison();
+              setTimeLimitedQuiescenceComparisonState({ kind: 'cancelled' });
+            }} className="max-w-full rounded border border-rose-800/70 px-4 py-1.5 text-sm text-rose-100">
+              同一時間の静止探索比較を中止
+            </button>
+          )}
           {isQuiescenceComparisonThinking && (
             <button type="button" onClick={() => {
               invalidateQuiescenceComparison();
@@ -1679,6 +1746,7 @@ export const ShogiResearchScreen: React.FC<ShogiResearchScreenProps> = ({
         </div>
       </main>
       <EvaluationPresetComparisonPanel display={comparisonDisplay} state={comparisonState} />
+      <TimeLimitedQuiescenceComparisonPanel display={timeLimitedQuiescenceComparisonDisplay} state={timeLimitedQuiescenceComparisonState} />
       <QuiescenceComparisonPanel display={quiescenceComparisonDisplay} state={quiescenceComparisonState} />
 
       {pendingPromotion && !isEnded && (
