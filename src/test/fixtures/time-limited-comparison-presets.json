@@ -1,0 +1,242 @@
+[
+  {
+    "selectedAction": {
+      "kind": "move",
+      "player": "sente",
+      "from": {
+        "row": 6,
+        "col": 2
+      },
+      "to": {
+        "row": 5,
+        "col": 2
+      },
+      "pieceType": "pawn",
+      "promotion": "none"
+    },
+    "selectedEvaluation": 214,
+    "principalVariation": [
+      {
+        "kind": "move",
+        "player": "sente",
+        "from": {
+          "row": 6,
+          "col": 2
+        },
+        "to": {
+          "row": 5,
+          "col": 2
+        },
+        "pieceType": "pawn",
+        "promotion": "none"
+      },
+      {
+        "kind": "move",
+        "player": "gote",
+        "from": {
+          "row": 2,
+          "col": 5
+        },
+        "to": {
+          "row": 3,
+          "col": 5
+        },
+        "pieceType": "pawn",
+        "promotion": "none"
+      },
+      {
+        "kind": "move",
+        "player": "sente",
+        "from": {
+          "row": 7,
+          "col": 1
+        },
+        "to": {
+          "row": 3,
+          "col": 5
+        },
+        "pieceType": "bishop",
+        "promotion": "none"
+      }
+    ],
+    "evaluationBreakdown": {
+      "total": 214,
+      "material": 200,
+      "pieceSquare": 4,
+      "kingSafety": 0,
+      "undefendedPieceSafety": 10,
+      "terminal": null
+    },
+    "rootLegalActionCount": 30,
+    "depth": 3,
+    "visitedPositionCount": 1244,
+    "cutoffCount": 80,
+    "skippedActionCount": 2565,
+    "quiescenceLeafCount": 0,
+    "quiescenceVisitedPositionCount": 0,
+    "quiescenceCutoffCount": 0,
+    "quiescenceSkippedActionCount": 0,
+    "elapsedMilliseconds": 0,
+    "presetId": "standard"
+  },
+  {
+    "selectedAction": {
+      "kind": "move",
+      "player": "sente",
+      "from": {
+        "row": 6,
+        "col": 2
+      },
+      "to": {
+        "row": 5,
+        "col": 2
+      },
+      "pieceType": "pawn",
+      "promotion": "none"
+    },
+    "selectedEvaluation": 262,
+    "principalVariation": [
+      {
+        "kind": "move",
+        "player": "sente",
+        "from": {
+          "row": 6,
+          "col": 2
+        },
+        "to": {
+          "row": 5,
+          "col": 2
+        },
+        "pieceType": "pawn",
+        "promotion": "none"
+      },
+      {
+        "kind": "move",
+        "player": "gote",
+        "from": {
+          "row": 2,
+          "col": 5
+        },
+        "to": {
+          "row": 3,
+          "col": 5
+        },
+        "pieceType": "pawn",
+        "promotion": "none"
+      },
+      {
+        "kind": "move",
+        "player": "sente",
+        "from": {
+          "row": 7,
+          "col": 1
+        },
+        "to": {
+          "row": 3,
+          "col": 5
+        },
+        "pieceType": "bishop",
+        "promotion": "none"
+      }
+    ],
+    "evaluationBreakdown": {
+      "total": 262,
+      "material": 250,
+      "pieceSquare": 2,
+      "kingSafety": 0,
+      "undefendedPieceSafety": 10,
+      "terminal": null
+    },
+    "rootLegalActionCount": 30,
+    "depth": 3,
+    "visitedPositionCount": 1244,
+    "cutoffCount": 80,
+    "skippedActionCount": 2565,
+    "quiescenceLeafCount": 0,
+    "quiescenceVisitedPositionCount": 0,
+    "quiescenceCutoffCount": 0,
+    "quiescenceSkippedActionCount": 0,
+    "elapsedMilliseconds": 0,
+    "presetId": "material-focused"
+  },
+  {
+    "selectedAction": {
+      "kind": "move",
+      "player": "sente",
+      "from": {
+        "row": 6,
+        "col": 2
+      },
+      "to": {
+        "row": 5,
+        "col": 2
+      },
+      "pieceType": "pawn",
+      "promotion": "none"
+    },
+    "selectedEvaluation": 214,
+    "principalVariation": [
+      {
+        "kind": "move",
+        "player": "sente",
+        "from": {
+          "row": 6,
+          "col": 2
+        },
+        "to": {
+          "row": 5,
+          "col": 2
+        },
+        "pieceType": "pawn",
+        "promotion": "none"
+      },
+      {
+        "kind": "move",
+        "player": "gote",
+        "from": {
+          "row": 2,
+          "col": 5
+        },
+        "to": {
+          "row": 3,
+          "col": 5
+        },
+        "pieceType": "pawn",
+        "promotion": "none"
+      },
+      {
+        "kind": "move",
+        "player": "sente",
+        "from": {
+          "row": 7,
+          "col": 1
+        },
+        "to": {
+          "row": 3,
+          "col": 5
+        },
+        "pieceType": "bishop",
+        "promotion": "none"
+      }
+    ],
+    "evaluationBreakdown": {
+      "total": 214,
+      "material": 200,
+      "pieceSquare": 4,
+      "kingSafety": 0,
+      "undefendedPieceSafety": 10,
+      "terminal": null
+    },
+    "rootLegalActionCount": 30,
+    "depth": 3,
+    "visitedPositionCount": 1280,
+    "cutoffCount": 79,
+    "skippedActionCount": 2529,
+    "quiescenceLeafCount": 0,
+    "quiescenceVisitedPositionCount": 0,
+    "quiescenceCutoffCount": 0,
+    "quiescenceSkippedActionCount": 0,
+    "elapsedMilliseconds": 0,
+    "presetId": "king-safety-focused"
+  }
+]
