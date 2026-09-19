@@ -8,6 +8,7 @@ import {
   DEFAULT_MATERIAL_VALUE_TABLE,
 } from './materialEvaluation';
 import { cloneBoardState } from './replay';
+import { analyzeQuiescenceSearchWithinBounds } from './quiescenceSearch';
 import { prepareStaticExchangeEvaluation } from './staticExchangeEvaluation';
 import {
   evaluateSearchPositionBreakdown,
@@ -23,9 +24,16 @@ export const TWO_PLY_ALPHA_BETA_SEARCH_DEPTH = 2;
 /** Search order is independent of evaluation weights and presets. */
 export type AlphaBetaMoveOrderingMode = 'standard' | 'static-exchange';
 
+/** Explicit opt-in tactical extension at ordinary alpha-beta leaves. */
+export interface AlphaBetaQuiescenceOptions {
+  readonly maxTacticalDepth: number;
+}
+
 /** Optional trailing configuration; existing callers keep standard ordering. */
 export interface AlphaBetaSearchOptions {
   readonly moveOrdering?: AlphaBetaMoveOrderingMode;
+  /** Omit to retain the historical static evaluation at depth-zero leaves. */
+  readonly quiescence?: AlphaBetaQuiescenceOptions;
 }
 
 function resolveMoveOrdering(options: AlphaBetaSearchOptions | undefined): AlphaBetaMoveOrderingMode {
@@ -33,6 +41,21 @@ function resolveMoveOrdering(options: AlphaBetaSearchOptions | undefined): Alpha
   if (mode === undefined) return 'standard';
   if (mode === 'standard' || mode === 'static-exchange') return mode;
   throw new RangeError(`Unsupported alpha-beta move ordering mode: ${String(mode)}`);
+}
+
+function resolveQuiescenceMaxTacticalDepth(options: AlphaBetaSearchOptions | undefined): number | undefined {
+  const quiescence = options?.quiescence;
+  if (quiescence === undefined) return undefined;
+  if (quiescence === null || typeof quiescence !== 'object' || Array.isArray(quiescence) ||
+    Object.keys(quiescence).some((key) => key !== 'maxTacticalDepth')) {
+    throw new RangeError('Alpha-beta quiescence options must contain only maxTacticalDepth.');
+  }
+  const maxTacticalDepth = (quiescence as AlphaBetaQuiescenceOptions).maxTacticalDepth;
+  if (typeof maxTacticalDepth !== 'number' || !Number.isFinite(maxTacticalDepth) ||
+    !Number.isInteger(maxTacticalDepth) || maxTacticalDepth < 0) {
+    throw new RangeError('Alpha-beta quiescence maximum tactical depth must be a finite non-negative integer measured in ply.');
+  }
+  return maxTacticalDepth;
 }
 
 /**
@@ -43,6 +66,9 @@ function resolveMoveOrdering(options: AlphaBetaSearchOptions | undefined): Alpha
  * by applying explored actions; the supplied root state is excluded.
  * `cutoffCount` counts loops actually stopped by `alpha >= beta`, and
  * `skippedActionCount` counts the unexecuted actions left in those loops.
+ * Those established fields describe ordinary alpha-beta only. The
+ * `quiescence*` fields separately describe opt-in tactical leaf work.
+ * When quiescence is enabled, the PV may be longer than `depth`.
  */
 export interface AlphaBetaSearchResult {
   selectedAction: LegalAction | null;
@@ -61,6 +87,10 @@ export interface AlphaBetaSearchResult {
   elapsedMilliseconds: number;
   cutoffCount: number;
   skippedActionCount: number;
+  quiescenceLeafCount: number;
+  quiescenceVisitedPositionCount: number;
+  quiescenceCutoffCount: number;
+  quiescenceSkippedActionCount: number;
 }
 
 /** One completed fixed-depth pass of iterative-deepening alpha-beta search. */
@@ -78,6 +108,10 @@ export interface IterativeDeepeningAlphaBetaSearchResult extends AlphaBetaSearch
   totalVisitedPositionCount: number;
   totalCutoffCount: number;
   totalSkippedActionCount: number;
+  totalQuiescenceLeafCount: number;
+  totalQuiescenceVisitedPositionCount: number;
+  totalQuiescenceCutoffCount: number;
+  totalQuiescenceSkippedActionCount: number;
 }
 
 /**
@@ -106,12 +140,20 @@ export interface TwoPlyAlphaBetaSearchResult {
   prunedRootCandidateCount: number;
   /** At depth 2 this is exactly the number of skipped opponent replies. */
   skippedOpponentReplyCount: number;
+  quiescenceLeafCount: number;
+  quiescenceVisitedPositionCount: number;
+  quiescenceCutoffCount: number;
+  quiescenceSkippedActionCount: number;
 }
 
 interface SearchStatistics {
   visitedPositionCount: number;
   cutoffCount: number;
   skippedActionCount: number;
+  quiescenceLeafCount: number;
+  quiescenceVisitedPositionCount: number;
+  quiescenceCutoffCount: number;
+  quiescenceSkippedActionCount: number;
 }
 
 function executeSearchAction(state: BoardState, action: LegalAction): BoardState {
@@ -342,15 +384,34 @@ function searchAlphaBetaNode(
   valueTable: SearchEvaluationConfig,
   statistics: SearchStatistics,
   interruptionCheck: SearchInterruptionCheck,
-  moveOrdering: AlphaBetaMoveOrderingMode
+  moveOrdering: AlphaBetaMoveOrderingMode,
+  quiescenceMaxTacticalDepth: number | undefined
 ): SearchNodeResult {
   interruptionCheck?.();
-  if (state.status === 'ended' || remainingDepth === 0) {
+  if (state.status === 'ended') {
     const evaluationBreakdown = evaluateSearchPositionBreakdown(state, rootPlayer, valueTable);
     return {
       evaluation: evaluationBreakdown.total,
       principalVariation: [],
       evaluationBreakdown,
+    };
+  }
+  if (remainingDepth === 0) {
+    if (quiescenceMaxTacticalDepth === undefined) {
+      const evaluationBreakdown = evaluateSearchPositionBreakdown(state, rootPlayer, valueTable);
+      return { evaluation: evaluationBreakdown.total, principalVariation: [], evaluationBreakdown };
+    }
+    statistics.quiescenceLeafCount += 1;
+    const quiescence = analyzeQuiescenceSearchWithinBounds(
+      state, rootPlayer, quiescenceMaxTacticalDepth, valueTable, interruptionCheck, alpha, beta
+    );
+    statistics.quiescenceVisitedPositionCount += quiescence.visitedPositionCount;
+    statistics.quiescenceCutoffCount += quiescence.cutoffCount;
+    statistics.quiescenceSkippedActionCount += quiescence.skippedActionCount;
+    return {
+      evaluation: quiescence.selectedEvaluation,
+      principalVariation: clonePrincipalVariation(quiescence.principalVariation),
+      evaluationBreakdown: cloneSearchEvaluationBreakdown(quiescence.evaluationBreakdown),
     };
   }
 
@@ -385,7 +446,8 @@ function searchAlphaBetaNode(
       valueTable,
       statistics,
       interruptionCheck,
-      moveOrdering
+      moveOrdering,
+      quiescenceMaxTacticalDepth
     );
 
     const candidatePrincipalVariation = [
@@ -434,7 +496,8 @@ function searchAlphaBeta(
   valueTable: SearchEvaluationConfig,
   previousBestAction: LegalAction | null = null,
   interruptionCheck: SearchInterruptionCheck = undefined,
-  moveOrdering: AlphaBetaMoveOrderingMode = 'standard'
+  moveOrdering: AlphaBetaMoveOrderingMode = 'standard',
+  quiescenceMaxTacticalDepth: number | undefined = undefined
 ): UnmeasuredAlphaBetaSearchResult {
   validateSearchDepth(depth);
   const rootPlayer = state.turn;
@@ -442,6 +505,10 @@ function searchAlphaBeta(
     visitedPositionCount: 0,
     cutoffCount: 0,
     skippedActionCount: 0,
+    quiescenceLeafCount: 0,
+    quiescenceVisitedPositionCount: 0,
+    quiescenceCutoffCount: 0,
+    quiescenceSkippedActionCount: 0,
   };
 
   if (depth === 0) {
@@ -500,7 +567,8 @@ function searchAlphaBeta(
       valueTable,
       statistics,
       interruptionCheck,
-      moveOrdering
+      moveOrdering,
+      quiescenceMaxTacticalDepth
     );
 
     // A root candidate searched after a higher-index PV candidate can be cut
@@ -519,7 +587,8 @@ function searchAlphaBeta(
         valueTable,
         statistics,
         interruptionCheck,
-        moveOrdering
+        moveOrdering,
+        quiescenceMaxTacticalDepth
       );
     }
 
@@ -570,8 +639,11 @@ export function analyzeAlphaBetaSearch(
   options?: AlphaBetaSearchOptions
 ): AlphaBetaSearchResult {
   const moveOrdering = resolveMoveOrdering(options);
+  const quiescenceMaxTacticalDepth = resolveQuiescenceMaxTacticalDepth(options);
   const startedAt = clock();
-  const searchResult = searchAlphaBeta(state, depth, valueTable, null, undefined, moveOrdering);
+  const searchResult = searchAlphaBeta(
+    state, depth, valueTable, null, undefined, moveOrdering, quiescenceMaxTacticalDepth
+  );
   return {
     ...searchResult,
     principalVariation: clonePrincipalVariation(searchResult.principalVariation),
@@ -593,6 +665,7 @@ export function analyzeIterativeDeepeningAlphaBetaSearch(
   options?: AlphaBetaSearchOptions
 ): IterativeDeepeningAlphaBetaSearchResult {
   const moveOrdering = resolveMoveOrdering(options);
+  const quiescenceMaxTacticalDepth = resolveQuiescenceMaxTacticalDepth(options);
   validateIterativeDeepeningMaxDepth(maxDepth);
   const startedAt = clock();
   const iterations: IterativeDeepeningAlphaBetaIterationResult[] = [];
@@ -600,7 +673,9 @@ export function analyzeIterativeDeepeningAlphaBetaSearch(
 
   for (let depth = 1; depth <= maxDepth; depth += 1) {
     const iterationStartedAt = clock();
-    const searchResult = searchAlphaBeta(state, depth, valueTable, previousBestAction, undefined, moveOrdering);
+    const searchResult = searchAlphaBeta(
+      state, depth, valueTable, previousBestAction, undefined, moveOrdering, quiescenceMaxTacticalDepth
+    );
     const iteration = {
       ...searchResult,
       principalVariation: clonePrincipalVariation(searchResult.principalVariation),
@@ -627,6 +702,14 @@ export function analyzeIterativeDeepeningAlphaBetaSearch(
       (total, iteration) => total + iteration.skippedActionCount,
       0
     ),
+    totalQuiescenceLeafCount: iterations.reduce((total, iteration) => total + iteration.quiescenceLeafCount, 0),
+    totalQuiescenceVisitedPositionCount: iterations.reduce(
+      (total, iteration) => total + iteration.quiescenceVisitedPositionCount, 0
+    ),
+    totalQuiescenceCutoffCount: iterations.reduce((total, iteration) => total + iteration.quiescenceCutoffCount, 0),
+    totalQuiescenceSkippedActionCount: iterations.reduce(
+      (total, iteration) => total + iteration.quiescenceSkippedActionCount, 0
+    ),
   };
 }
 
@@ -645,6 +728,7 @@ export function analyzeTimeLimitedIterativeDeepeningAlphaBetaSearch(
   options?: AlphaBetaSearchOptions
 ): TimeLimitedIterativeDeepeningAlphaBetaSearchResult {
   const moveOrdering = resolveMoveOrdering(options);
+  const quiescenceMaxTacticalDepth = resolveQuiescenceMaxTacticalDepth(options);
   validateIterativeDeepeningMaxDepth(maxDepth);
   validateSearchTimeLimitMilliseconds(timeLimitMilliseconds);
   const startedAt = clock();
@@ -669,7 +753,8 @@ export function analyzeTimeLimitedIterativeDeepeningAlphaBetaSearch(
         depth >= 2
           ? () => throwIfSearchTimeLimitReached(clock, startedAt, timeLimitMilliseconds)
           : undefined,
-        moveOrdering
+        moveOrdering,
+        quiescenceMaxTacticalDepth
       );
       const iterationFinishedAt = clock();
       if (depth >= 2) {
@@ -711,6 +796,14 @@ export function analyzeTimeLimitedIterativeDeepeningAlphaBetaSearch(
       (total, iteration) => total + iteration.skippedActionCount,
       0
     ),
+    totalQuiescenceLeafCount: iterations.reduce((total, iteration) => total + iteration.quiescenceLeafCount, 0),
+    totalQuiescenceVisitedPositionCount: iterations.reduce(
+      (total, iteration) => total + iteration.quiescenceVisitedPositionCount, 0
+    ),
+    totalQuiescenceCutoffCount: iterations.reduce((total, iteration) => total + iteration.quiescenceCutoffCount, 0),
+    totalQuiescenceSkippedActionCount: iterations.reduce(
+      (total, iteration) => total + iteration.quiescenceSkippedActionCount, 0
+    ),
   };
 }
 
@@ -721,7 +814,9 @@ export function selectBestAlphaBetaAction(
   valueTable: SearchEvaluationConfig = DEFAULT_MATERIAL_VALUE_TABLE,
   options?: AlphaBetaSearchOptions
 ): LegalAction | null {
-  return searchAlphaBeta(state, depth, valueTable, null, undefined, resolveMoveOrdering(options)).selectedAction;
+  return searchAlphaBeta(
+    state, depth, valueTable, null, undefined, resolveMoveOrdering(options), resolveQuiescenceMaxTacticalDepth(options)
+  ).selectedAction;
 }
 
 /** Selects the completed deepest action from iterative-deepening search. */
@@ -757,6 +852,10 @@ export function analyzeTwoPlyAlphaBetaSearch(
     elapsedMilliseconds: result.elapsedMilliseconds,
     prunedRootCandidateCount: result.cutoffCount,
     skippedOpponentReplyCount: result.skippedActionCount,
+    quiescenceLeafCount: result.quiescenceLeafCount,
+    quiescenceVisitedPositionCount: result.quiescenceVisitedPositionCount,
+    quiescenceCutoffCount: result.quiescenceCutoffCount,
+    quiescenceSkippedActionCount: result.quiescenceSkippedActionCount,
   };
 }
 

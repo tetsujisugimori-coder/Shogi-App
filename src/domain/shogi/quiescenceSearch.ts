@@ -175,14 +175,39 @@ export function analyzeQuiescenceSearch(
   evaluation: SearchEvaluationConfig = DEFAULT_MATERIAL_VALUE_TABLE,
   interruptionCheck: QuiescenceSearchInterruptionCheck = undefined
 ): QuiescenceSearchResult {
+  return analyzeQuiescenceSearchWithinBounds(
+    state,
+    perspective,
+    maxTacticalDepth,
+    evaluation,
+    interruptionCheck,
+    Number.NEGATIVE_INFINITY,
+    Number.POSITIVE_INFINITY
+  );
+}
+
+/**
+ * Internal alpha-beta integration boundary. It keeps the standalone public
+ * API's unbounded behavior while allowing a fixed-depth caller to preserve
+ * its current alpha/beta window at a tactical leaf.
+ */
+export function analyzeQuiescenceSearchWithinBounds(
+  state: BoardState,
+  perspective: Player,
+  maxTacticalDepth: number,
+  evaluation: SearchEvaluationConfig,
+  interruptionCheck: QuiescenceSearchInterruptionCheck,
+  alpha: number,
+  beta: number
+): QuiescenceSearchResult {
   validateMaxTacticalDepth(maxTacticalDepth);
   const statistics: SearchStatistics = { visitedPositionCount: 0, cutoffCount: 0, skippedActionCount: 0 };
   const result = searchNode(
     state,
     maxTacticalDepth,
     perspective,
-    Number.NEGATIVE_INFINITY,
-    Number.POSITIVE_INFINITY,
+    alpha,
+    beta,
     evaluation,
     statistics,
     interruptionCheck

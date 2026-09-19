@@ -1,5 +1,26 @@
 # SHOGI-APP 開発ログ
 
+## [2026-09-19] αβ探索の静止探索オプトイン
+
+### 実装・契約
+
+- 開始前に`origin`をfetchし、GitHubのPR #112が`2026-09-19T10:23:22Z`にマージ済み、merge commitが`2fc63e55ee66c216c1b227d4532e9f22f85bd247`であることを確認した。local `main`は同じ`origin/main`と一致し、`git pull --ff-only origin main`後もtracked／untrackedともクリーンだったため、そこから`feat/quiescence-alpha-beta-opt-in`を作成した。
+- `AlphaBetaSearchOptions`に独立した`quiescence?: { maxTacticalDepth: number }`を追加した。省略時は無効、`0`は明示選択だが追加plyなし、正の有限整数だけが追加戦術深さになる。負数・小数・NaN・Infinity・数値以外・余分な設定キーは探索開始前に例外で拒否し、optionsと内部オブジェクトを変更しない。
+- `quiescenceSearch.ts`の既存探索本体を複製せず、現在の`alpha`／`beta`を渡せる`analyzeQuiescenceSearchWithinBounds()`へ抽出した。`searchAlphaBetaNode()`は終局を先に既存評価で返し、非終局かつ`remainingDepth === 0`だけでこの内部境界を呼ぶ。root `depth: 0`、不正な非終局の合法手なしフォールバック、終局評価は従来契約を維持する。
+- 通常の`visitedPositionCount`・`cutoffCount`・`skippedActionCount`は通常αβだけと固定し、静止探索分は`quiescenceLeafCount`・`quiescenceVisitedPositionCount`・`quiescenceCutoffCount`・`quiescenceSkippedActionCount`へ分離した。反復深化は各完了反復の値と`totalQuiescence*`合計を返す。未完了の時間制限反復は既存統計と同様に結果へ混ぜない。値、内訳、PVは同一の採用葉から一組で返し、静止探索有効PVは通常`depth`を超え得る。
+- 固定深さ、互換2手読み、反復深化、時間制限反復深化、各selectorへ同じ末尾optionsを伝播した。Worker要求、UI、保存設定は変更せず、既存Workerはoptions省略で静止探索無効のままとした。`moveOrdering`と独立させ、standardでは静止探索有効時もSEEを呼ばない。
+
+### テスト・測定・失敗履歴
+
+- `shogi-quiescence-search.test.ts`に、無効／空options回帰、depth 0 root、明示0、取り返し専用局面、PV再生と内訳、凍結入力と決定性、反復・時間制限・2手読み・selector伝播、不正設定、standard時SEE未呼出を追加した。固定深さ1の専用局面では、無効が毒入り飛車取りを`+1000`で選ぶのに対し、戦術深さ2は取り返しを読み、別の静かな飛車手を`+800`で選ぶことを確認した。
+- PR #112の固定基準は`alpha-beta-ordering-baselines.ts`のまま保持し、無効時の追加4統計がすべて0であることを基準比較へ明示した。最初の回帰実行ではこの新しいゼロフィールドだけが基準との差として10件失敗し、基準値を更新せず期待オブジェクトへ0を加えることで意図を明確化した。テストの削除・skip・待機追加はしていない。
+- 途中の型検査は専用テストの`selectedEvaluation: number | null`を数値比較へ渡した1件で失敗し、active局面でnullを明示拒否して修正した。変更前の関連3ファイルは121件中120件成功、既存`shogi-two-ply-minimax-ai.test.ts`の終局枝テスト1件だけが環境内の5秒timeoutで失敗した。変更後の静止探索・順序モード・Worker重点3ファイルは92件すべて成功した。
+- `scripts/measure-alpha-beta-quiescence.ts`を追加した。5局面×無効／戦術深さ1／戦術深さ2、standard順序、固定深さ3、各局面を別Nodeプロセス、3回ウォームアップ／7回測定とし、選択手・評価・PV・通常統計・静止探索統計・中央値・範囲を記録する。結果は`docs/alpha-beta-quiescence-performance.md`に保存した。静かな局面の追加生成は0、初期局面は静止探索により探索量と実時間が増え、専用局面の地平線問題改善と一般的な強さの主張を混同しない。
+
+### 既知の制限・次段階
+
+- UI／Worker要求／保存からの選択、非駒取り王手、SEEによる静止探索順序・除外・枝刈り、詰み専用探索、置換表・局面キャッシュ、make/unmake、評価式・合法手・棋譜形式の変更は対象外のままである。実時間は環境依存の参考値で、実機ブラウザや長時間対局の強さは未検証である。
+
 ## [2026-09-19] 静止探索の純粋関数基盤
 
 ### 目的・設計

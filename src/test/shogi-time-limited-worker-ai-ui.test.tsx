@@ -53,6 +53,10 @@ function workerResult(selectedAction: LegalAction | null): PresetTimeLimitedSear
     elapsedMilliseconds: 12.5,
     cutoffCount: 8,
     skippedActionCount: 16,
+    quiescenceLeafCount: 0,
+    quiescenceVisitedPositionCount: 0,
+    quiescenceCutoffCount: 0,
+    quiescenceSkippedActionCount: 0,
   };
 
   return {
@@ -62,6 +66,10 @@ function workerResult(selectedAction: LegalAction | null): PresetTimeLimitedSear
     totalVisitedPositionCount: 220,
     totalCutoffCount: 14,
     totalSkippedActionCount: 31,
+    totalQuiescenceLeafCount: 0,
+    totalQuiescenceVisitedPositionCount: 0,
+    totalQuiescenceCutoffCount: 0,
+    totalQuiescenceSkippedActionCount: 0,
     requestedMaxDepth: 4,
     completedDepth: 3,
     timedOut: true,
