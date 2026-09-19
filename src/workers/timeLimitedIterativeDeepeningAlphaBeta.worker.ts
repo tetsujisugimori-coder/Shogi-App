@@ -1,3 +1,5 @@
+import { handleTimeLimitedQuiescenceComparisonWorkerRequest } from './timeLimitedQuiescenceComparisonWorkerHandler';
+import type { TimeLimitedQuiescenceComparisonWorkerRequest } from './timeLimitedQuiescenceComparisonWorkerProtocol';
 import { handleQuiescenceComparisonWorkerRequest } from './quiescenceComparisonWorkerHandler';
 import type { QuiescenceComparisonWorkerRequest } from './quiescenceComparisonWorkerProtocol';
 import { handleTimeLimitedIterativeDeepeningAlphaBetaSearchWorkerRequest } from './timeLimitedIterativeDeepeningAlphaBetaWorkerHandler';
@@ -9,8 +11,11 @@ import type {
 
 self.addEventListener(
   'message',
-  (event: MessageEvent<TimeLimitedIterativeDeepeningAlphaBetaSearchWorkerRequest | EvaluationPresetComparisonWorkerRequest | QuiescenceComparisonWorkerRequest>) => {
+  (event: MessageEvent<TimeLimitedIterativeDeepeningAlphaBetaSearchWorkerRequest | EvaluationPresetComparisonWorkerRequest | QuiescenceComparisonWorkerRequest | TimeLimitedQuiescenceComparisonWorkerRequest>) => {
     switch (event.data.type) {
+      case 'compare-time-limited-quiescence-settings':
+        self.postMessage(handleTimeLimitedQuiescenceComparisonWorkerRequest(event.data));
+        break;
       case 'compare-evaluation-presets':
         self.postMessage(handleEvaluationPresetComparisonWorkerRequest(event.data));
         break;
