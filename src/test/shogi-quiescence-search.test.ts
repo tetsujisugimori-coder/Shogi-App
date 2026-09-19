@@ -1,7 +1,10 @@
 import { describe, expect, it, vi } from 'vitest';
 import {
   analyzeAlphaBetaSearch,
+  analyzeIterativeDeepeningAlphaBetaSearch,
   analyzeQuiescenceSearch,
+  analyzeTimeLimitedIterativeDeepeningAlphaBetaSearch,
+  analyzeTwoPlyAlphaBetaSearch,
   cloneBoardSquares,
   cloneBoardState,
   DEFAULT_MATERIAL_VALUE_TABLE,
@@ -9,6 +12,9 @@ import {
   executeLegalAction,
   getLegalActions,
   isPlayerInCheck,
+  selectBestAlphaBetaAction,
+  selectBestIterativeDeepeningAlphaBetaAction,
+  selectBestTwoPlyAlphaBetaAction,
   type LegalAction,
   type SearchEvaluationConfig,
 } from '../domain/shogi';
@@ -217,5 +223,120 @@ describe('静止探索の純粋関数基盤', () => {
     expect(prepare).not.toHaveBeenCalled();
     expect(evaluate).not.toHaveBeenCalled();
     expect(after).toEqual(before);
+  });
+});
+
+describe('αβ探索の明示的な静止探索接続', () => {
+  const enabled = { quiescence: { maxTacticalDepth: 2 } } as const;
+
+  it('省略・空optionsでは既存の静的葉を維持し、静止探索統計はすべて0', () => {
+    const state = captureTrap();
+    const omitted = analyzeAlphaBetaSearch(state, 1, MATERIAL_ONLY, () => 0);
+    const empty = analyzeAlphaBetaSearch(state, 1, MATERIAL_ONLY, () => 0, {});
+    expect(empty).toEqual(omitted);
+    expect(omitted).toMatchObject({
+      quiescenceLeafCount: 0,
+      quiescenceVisitedPositionCount: 0,
+      quiescenceCutoffCount: 0,
+      quiescenceSkippedActionCount: 0,
+    });
+  });
+
+  it('深さ0 rootは明示有効時もselectedAction:nullと空PVを維持する', () => {
+    const state = captureTrap();
+    const result = analyzeAlphaBetaSearch(state, 0, MATERIAL_ONLY, () => 0, enabled);
+    expect(result).toMatchObject({ selectedAction: null, principalVariation: [], quiescenceLeafCount: 0 });
+    expect(result.selectedEvaluation).toBe(evaluateSearchPositionBreakdown(state, 'sente', MATERIAL_ONLY).total);
+  });
+
+  it('maxTacticalDepth:0は葉を明示選択するが追加局面やPVを作らない', () => {
+    const state = captureTrap();
+    const staticResult = analyzeAlphaBetaSearch(state, 1, MATERIAL_ONLY, () => 0);
+    const zeroDepth = analyzeAlphaBetaSearch(
+      state, 1, MATERIAL_ONLY, () => 0, { quiescence: { maxTacticalDepth: 0 } }
+    );
+    expect(zeroDepth.selectedAction).toEqual(staticResult.selectedAction);
+    expect(zeroDepth.selectedEvaluation).toBe(staticResult.selectedEvaluation);
+    expect(zeroDepth.principalVariation).toEqual(staticResult.principalVariation);
+    expect(zeroDepth.evaluationBreakdown).toEqual(staticResult.evaluationBreakdown);
+    expect(zeroDepth.quiescenceLeafCount).toBeGreaterThan(0);
+    expect(zeroDepth.quiescenceVisitedPositionCount).toBe(0);
+    expect(zeroDepth.quiescenceCutoffCount).toBe(0);
+    expect(zeroDepth.quiescenceSkippedActionCount).toBe(0);
+  });
+
+  it('戦術葉を同じ評価設定と境界で読み、返却PV・内訳・統計を一組で伝播する', () => {
+    const state = captureTrap();
+    const frozenState = freezeDeep(structuredClone(state));
+    const frozenOptions = freezeDeep(structuredClone(enabled));
+    const result = analyzeAlphaBetaSearch(frozenState, 1, MATERIAL_ONLY, () => 0, frozenOptions);
+    const again = analyzeAlphaBetaSearch(frozenState, 1, MATERIAL_ONLY, () => 0, frozenOptions);
+    expect(again).toEqual(result);
+    expect(result.quiescenceLeafCount).toBeGreaterThan(0);
+    expect(result.quiescenceVisitedPositionCount).toBeGreaterThan(0);
+    expect(result.principalVariation.length).toBeLessThanOrEqual(result.depth + enabled.quiescence.maxTacticalDepth);
+    const leaf = replay(frozenState, result.principalVariation);
+    expect(evaluateSearchPositionBreakdown(leaf, 'sente', MATERIAL_ONLY)).toEqual(result.evaluationBreakdown);
+    expect(result.selectedEvaluation).toBe(result.evaluationBreakdown.total);
+  });
+
+  it('専用の取り返し局面では静的葉の毒入り捕獲を避け、評価を修正する', () => {
+    const state = captureTrap();
+    const staticLeaf = analyzeAlphaBetaSearch(state, 1, MATERIAL_ONLY, () => 0);
+    const quiescentLeaf = analyzeAlphaBetaSearch(state, 1, MATERIAL_ONLY, () => 0, enabled);
+    expect(staticLeaf.selectedAction).toEqual(findAction(state, (action) =>
+      action.kind === 'move' && action.from.row === 5 && action.from.col === 4 && action.to.row === 4 && action.to.col === 4
+    ));
+    if (staticLeaf.selectedEvaluation === null || quiescentLeaf.selectedEvaluation === null) {
+      throw new Error('Active tactical fixture must produce a root evaluation.');
+    }
+    expect(staticLeaf.selectedEvaluation).toBe(1000);
+    expect(quiescentLeaf.selectedAction).not.toEqual(staticLeaf.selectedAction);
+    expect(quiescentLeaf.selectedEvaluation).toBe(800);
+    expect(quiescentLeaf.selectedEvaluation).toBeLessThan(staticLeaf.selectedEvaluation);
+  });
+
+  it('反復深化・時間制限・互換2手読み・selectorへ同じoptionsを伝播する', () => {
+    const state = captureTrap();
+    const fixed = analyzeAlphaBetaSearch(state, 2, MATERIAL_ONLY, () => 0, enabled);
+    expect(selectBestAlphaBetaAction(state, 2, MATERIAL_ONLY, enabled)).toEqual(fixed.selectedAction);
+
+    const iterative = analyzeIterativeDeepeningAlphaBetaSearch(state, 2, MATERIAL_ONLY, () => 0, enabled);
+    expect(selectBestIterativeDeepeningAlphaBetaAction(state, 2, MATERIAL_ONLY, enabled)).toEqual(iterative.selectedAction);
+    expect(iterative.totalQuiescenceLeafCount).toBe(
+      iterative.iterations.reduce((total, iteration) => total + iteration.quiescenceLeafCount, 0)
+    );
+    expect(iterative.totalQuiescenceVisitedPositionCount).toBe(
+      iterative.iterations.reduce((total, iteration) => total + iteration.quiescenceVisitedPositionCount, 0)
+    );
+
+    const timed = analyzeTimeLimitedIterativeDeepeningAlphaBetaSearch(state, 2, 1_000, MATERIAL_ONLY, () => 0, enabled);
+    expect(timed.totalQuiescenceCutoffCount).toBe(
+      timed.iterations.reduce((total, iteration) => total + iteration.quiescenceCutoffCount, 0)
+    );
+    const twoPly = analyzeTwoPlyAlphaBetaSearch(state, MATERIAL_ONLY, () => 0, enabled);
+    expect(selectBestTwoPlyAlphaBetaAction(state, MATERIAL_ONLY, enabled)).toEqual(twoPly.selectedAction);
+    expect(twoPly.quiescenceLeafCount).toBeGreaterThan(0);
+  });
+
+  it.each([-1, 0.5, Number.NaN, Number.POSITIVE_INFINITY, '1', null, {}])(
+    '不正なquiescence設定 %p を探索開始前に拒否する',
+    (maxTacticalDepth) => {
+      expect(() => analyzeAlphaBetaSearch(
+        captureTrap(), 1, MATERIAL_ONLY, () => 0,
+        { quiescence: { maxTacticalDepth } } as unknown as Parameters<typeof analyzeAlphaBetaSearch>[4]
+      )).toThrow(/quiescence/i);
+    }
+  );
+
+  it('moveOrderingと独立し、standardでは静止探索有効時もSEEを呼ばない', () => {
+    const prepare = vi.spyOn(staticExchangeApi, 'prepareStaticExchangeEvaluation');
+    const evaluate = vi.spyOn(staticExchangeApi, 'evaluateStaticExchange');
+    const result = analyzeAlphaBetaSearch(captureTrap(), 1, MATERIAL_ONLY, () => 0, {
+      moveOrdering: 'standard', quiescence: { maxTacticalDepth: 2 },
+    });
+    expect(result.quiescenceLeafCount).toBeGreaterThan(0);
+    expect(prepare).not.toHaveBeenCalled();
+    expect(evaluate).not.toHaveBeenCalled();
   });
 });

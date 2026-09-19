@@ -46,7 +46,24 @@ node scripts/verify-evaluation-presets-browser.mjs http://127.0.0.1:4173/Shogi-A
 
 `analyzeQuiescenceSearch(state, perspective, maxTacticalDepth, evaluation?, interruptionCheck?)` は、通常の固定深さ探索が駒取り直後などの不安定な局面で静的評価を確定してしまう探索境界の問題を、限定的に読み足して検証するためのドメインAPIです。開始時に指定した`perspective`を固定し、その側の手番で最大化、相手側で最小化します。非王手局面では既存の静的評価をstand-pat候補として先に置き、合法な駒取り（成り付き捕獲を含む）だけを元の合法手順で読みます。同値ならstand-patを維持します。王手中はstand-patを置かず、既存の合法手生成による玉移動・合駒・駒打ちを含む全回避手を読みます。
 
-`maxTacticalDepth`はこのAPIが実行できる追加着手数の安全上限です。`0`では着手せず既存評価を返すため、王手中も静的評価で終える近似になります。終局は既存の終局評価をそのまま返します。各結果はPV末端と同じ`evaluationBreakdown`、rootを除く生成局面数、αβ打切り回数、打切り後の未実行候補数を返します。現時点では通常のαβ探索、反復深化、時間制限探索、Worker、UIへ接続しておらず、SEEによる順序付け・枝刈り・評価も利用していません。
+`maxTacticalDepth`はこのAPIが実行できる追加着手数の安全上限です。`0`では着手せず既存評価を返すため、王手中も静的評価で終える近似になります。終局は既存の終局評価をそのまま返します。各結果はPV末端と同じ`evaluationBreakdown`、rootを除く生成局面数、αβ打切り回数、打切り後の未実行候補数を返します。SEEによる順序付け・枝刈り・評価は利用しません。
+
+## αβ探索の静止探索オプトイン
+
+通常探索の`depth`はゲーム終了ではなく、rootから読む通常plyを使い切る境界です。`AlphaBetaSearchOptions.quiescence`を明示した場合だけ、その非終局の深さ0葉から限定的な駒取り／王手回避を読み足します。省略時と`{}`では静止探索は無効で、従来の静的評価・PV・通常探索量を保ちます。
+
+```ts
+analyzeAlphaBetaSearch(state, 3, undefined, undefined, {
+  moveOrdering: 'standard',
+  quiescence: { maxTacticalDepth: 2 },
+});
+```
+
+`maxTacticalDepth`は有限の0以上の整数です。`0`は明示選択しても追加着手を生成しません。`depth`は通常探索の深さのままであり、静止探索を有効にした結果のPVは`depth + maxTacticalDepth`まで伸びることがあります。終局葉とrootへ直接指定した`depth: 0`は従来どおり追加探索せず、後者は`selectedAction: null`と空PVを維持します。
+
+結果の既存`visitedPositionCount`・`cutoffCount`・`skippedActionCount`は通常αβだけを表し、`quiescenceLeafCount`・`quiescenceVisitedPositionCount`・`quiescenceCutoffCount`・`quiescenceSkippedActionCount`が追加分を表します。反復深化は同名の`totalQuiescence*`で完了反復合計も返します。Worker要求、UIの切替、保存設定にはこの指定を追加していないため、既存Worker/UIは無効のままです。
+
+静止探索は専用の取り返し局面で地平線問題を修正しますが、候補生成とαβ探索量を増やします。再現可能な5局面・固定深さ3の参考測定は`npx tsx scripts/measure-alpha-beta-quiescence.ts`、記録は[docs/alpha-beta-quiescence-performance.md](docs/alpha-beta-quiescence-performance.md)を参照してください。実時間は環境依存でありCIの合否条件にはしません。
 
 ## Shogi-App JSON Exchange Format
 

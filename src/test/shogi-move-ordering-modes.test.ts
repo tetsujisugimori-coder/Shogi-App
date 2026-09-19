@@ -120,8 +120,15 @@ describe('alpha-beta move-ordering modes', () => {
       const table = freezeDeep(structuredClone(material.DEFAULT_MATERIAL_VALUE_TABLE));
       const before = structuredClone({ state, options, table });
       const expected = moveOrdering === 'standard' ? baseline.standard : baseline.staticExchange;
-      expect(search.analyzeAlphaBetaSearch(state, 3, table, clock, options)).toEqual(expected);
-      expect(search.analyzeAlphaBetaSearch(state, 3, table, clock, options)).toEqual(expected);
+      const expectedWithDisabledQuiescence = {
+        ...expected,
+        quiescenceLeafCount: 0,
+        quiescenceVisitedPositionCount: 0,
+        quiescenceCutoffCount: 0,
+        quiescenceSkippedActionCount: 0,
+      };
+      expect(search.analyzeAlphaBetaSearch(state, 3, table, clock, options)).toEqual(expectedWithDisabledQuiescence);
+      expect(search.analyzeAlphaBetaSearch(state, 3, table, clock, options)).toEqual(expectedWithDisabledQuiescence);
       expect({ state, options, table }).toEqual(before);
     });
 
