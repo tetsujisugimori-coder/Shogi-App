@@ -1,0 +1,14 @@
+param([Parameter(Mandatory=$true)][string]$Id,[Parameter(Mandatory=$true)][string]$Command)
+$ErrorActionPreference = 'Continue'
+$taskEvidence = 'C:\Users\tetsu\Documents\Codex\Shogi-App\docs\quiescence-ordering-windows-20260920'
+$taskLog = Join-Path $taskEvidence ($Id + '.txt')
+if (Test-Path -LiteralPath $taskLog) { throw 'Evidence log already exists' }
+$taskStart = Get-Date
+$taskBlock = [scriptblock]::Create($Command)
+& $taskBlock *> $taskLog
+$taskCode = $LASTEXITCODE
+$taskEnd = Get-Date
+[ordered]@{id=$Id;command=$Command;cwd=(Get-Location).Path;start=$taskStart.ToString('o');end=$taskEnd.ToString('o');exitCode=$taskCode} | ConvertTo-Json -Compress | Add-Content -LiteralPath (Join-Path $taskEvidence 'validation-results.jsonl') -Encoding utf8
+Get-Content -LiteralPath $taskLog -Tail 24
+Write-Output "Recorded exit code: $taskCode"
+exit $taskCode

@@ -3632,3 +3632,60 @@ PR #1のレビュー指摘を受け、簡易APIの`applyMove`と合法手候補�
 - Draft PR #123: https://github.com/tetsujisugimori-coder/Shogi-App/pull/123 。OPEN、isDraft:true、headRefOidが実装コミットと一致することを確認し、このCodexタスクへ添付した。
 - 21:13 JST時点のCIはubuntuがIN_PROGRESS、macOSがQUEUED。完了/成功とは扱わない。ローカル集中テストの未解決失敗、全体/build/check/UI/Worker未検証、性能結果と既定化非推奨をPR本文へ明記した。
 - PR作成後の作業ツリーはクリーン、ローカルとoriginの作業ブランチは同じコミット。以下のログ追記も別のdocsコミットとしてpushする。マージは行わない。
+
+## [2026-09-20 21:23–21:39 JST] PR #123 Windows同条件タイムアウト再検証
+
+### 開始確認・同一条件の構築
+
+- 依頼は既存PR #123のWindows時間超過の切り分けと必要時のみの修正。新PR作成・mainへのマージは行わず、条件を満たした場合のみReady for reviewへ変更する。
+- 開始時 `feat/quiescence-lightweight-ordering` / `2f9f1920d40445a1e796aeb87526d04d5a9d5e84`、作業ツリーはクリーン。親ディレクトリおよびrepo内に追加AGENTS.mdなし。fetch終了0、origin/main `032622f4f23f90198681d745ff71c2ea5ca0261e`、origin作業ブランチ/PR HEADはローカルと同じ。PRはOPEN/Draft。
+- CI run #168 (35510024792) のHEADとmacOS/Ubuntuの各lock/lint/test/build成功をAPIで確認。JSONは `docs/quiescence-ordering-windows-20260920/ci-run-168.json`。Windowsの成功の代用にはしない。
+- Windows 11 Home 10.0.26200 / Intel Core i7-14650HX (24論理CPU) / Node v24.20.0 / npm11.17.0。両側同じnode.exeを使用。
+- 既存のjunction共有worktreeを変更せず、新たに `../shogi-pr123-windows-main-20260920` をorigin/mainのdetached worktreeとして作成。PR側npm ciは302 packages/45秒、main側は302 packages/35秒、各終了0。node_modulesは別の実ディレクトリで、symlink/junctionでないこととVitestの実体パスを確認。
+- 両lockfile SHA-256 `5e8430b71c59da6d0bf9018c0c2910312da375a97ff194b2e332903844c97c57`、両インストール済みnode_modules/.package-lock.json SHA-256 `a9f1deb316eb3cd4647d76519f111403dd507d47e97ab102b80fe13a66221ed8`。dependencies/devDependenciesも一致。共通8テスト/setup/vite.configにもmainとの差分なし。
+- 前回の集中10ファイルの正確なコマンドはこのタスクのtool-call履歴から復元し、LOG/保存済みfocused出力の件数と照合した。新規2ファイルはmainに存在しないためコピーせず、比較は共通8ファイル（291件）で揃えた。正確な一覧は追加資料と `recovered-command.txt` に保存。
+- 既定Vitest sequencerが失敗/実時間キャッシュで順を変えることをインストール済みソースで確認。比較6回だけ、元configを継承した同一内容の一時configで8ファイルの投入順とmaxWorkers:2/fileParallelism:trueを固定。timeoutは既存5000ms、テスト本文/環境/setup/隔離は維持。2ワーカー内の完了順や重なりまで固定したとは主張しない。
+- main→PR→PR→main→main→PRを厳密に直列実行。各プロセスの終了後だけ次を開始し、他のVitest/build/benchmark/E2Eは並行しない。ユーザーの常駐プロセスは停止していない。予定6回を成功までの無制限再実行に変えない。
+
+### 6回の結果・原因判定
+
+| 順/対象 | 終了 | 成功/失敗 | benchmark入力不変性 ms | 深さ3詰み枝 ms | プロセス全体 ms |
+| --- | ---: | ---: | ---: | ---: | ---: |
+| 1 main | 1 | 290/1 | 700.825 | 5348.428（timeout） | 26930 |
+| 2 PR | 1 | 290/1 | 724.150 | 5323.100（timeout） | 25875 |
+| 3 PR | 0 | 291/0 | 789.746 | 2444.595 | 11137 |
+| 4 main | 0 | 291/0 | 710.665 | 2628.232 | 11051 |
+| 5 main | 0 | 291/0 | 778.486 | 1967.315 | 10931 |
+| 6 PR | 0 | 291/0 | 1355.306 | 2157.918 | 10843 |
+
+- PR固有の性能回帰を示す結果なし。main/PRの各初回だけ同じ詰み枝テストが約5.3秒で超過し、後続2回ずつは変更なしで成功した。値・選択手・PV等の機能assertion不一致は報告されていない。benchmark側の過去7.3/5.4秒超過は今回6回とも再現しない。
+- 発生範囲は独立npm ci後の各ディレクトリ初回。既存の深さ3全合法枝の参照minimaxという重いテストがWindowsの初回実行負荷・実行条件に依存している。特定のOS処理、JIT、キャッシュ、ウイルス対策等の物理的原因までは特定していない。過去benchmark超過の正確な負荷源も断定しない。
+- 片側だけ継続的に遅いという条件を満たさないため、材料表解決・静止探索等の本体変更は行わない。mainが複数回にわたり閾値付近という条件も満たさず、fixture/局所timeout/グローバル設定/skip/期待値も変更しない。追加するのは証跡と説明だけ。READMEは仕様変更がないので維持。
+- 一時configは保存コピーとハッシュが一致することを確認して両側から削除。証跡としてconfigとrunnerのテキストを保存。既存worktreeは触らず、今回の独立main worktreeは再現用に保持。
+
+### 通常設定での検証（全体check前まで）
+
+- verify:lock終了0、399entries/registry398、欠落0。lint終了0。
+- 問題ファイル単独: quiescence-benchmark 38/38成功（1.54秒）、two-ply-minimax 69/69成功（6.20秒、対象テスト1837ms）、各終了0。新規2ファイル41/41成功（0.935秒）、終了0。
+- 比較6回後、元の10ファイル構成も通常configで1回だけ検証し332/332成功、10.67秒、終了0。比較の共通8ファイルと新規2ファイルを混同しない。
+- `measure:quiescence-ordering -- fixed` は24条件成功/失敗0、終了0。12ペアの評価一致・全PV合法性・末端内訳・入力不変性が成功。静止訪問948→712 / 681→472、カット1042→1102 / 714→546で旧実測と同じ。
+- fixed参考時間は追加1手883.2→802.6ms、追加2手563.1→1358.0ms。金打ち合駒の追加2手materialは983.4ms、original130.2msより遅い結果も保存。
+- `measure:quiescence-ordering -- timed` は24条件成功/失敗0、終了0。未完了反復の不採用と最深/合計統計の対応を検証。初期局面の追加2手originalは深さ3、materialは深さ2となった。他は両モード同じ深さ。既定化非推奨は維持。
+- 旧 `measure:quiescence-suite` は36条件成功/失敗0、終了0。各コマンドの開始/終了/終了コードはvalidation-results.jsonl、生出力は同フォルダ。性能値はCI期待値にしていない。
+- 全体 `npm run check` を通常configで直列実行中。最終結果は後段に追記し、単独成功/CI成功で代用しない。
+
+### 調査経路の失敗
+
+- OS/CPUのGet-CimInstanceはアクセス拒否。安全な読取代替のNode標準os APIで情報取得した。情報取得失敗をテスト失敗と扱わない。
+- rgのワイルドカードをパスとして渡した2回の調査はWindows os error123。ディレクトリ＋-g指定へ修正して対象ソースを確認。
+- 記録用NodeのexecFileSync(git)がsandboxのspawn EPERMで終了1。子プロセスを使わず親シェルでSHAを取得/再照合し、Nodeのos/fsだけで環境JSONを保存。検証本体の子プロセス起動は最初から許可された実行経路で行った。
+- 既存の失敗記録は削除/書き換えず残している。追加資料 `docs/quiescence-ordering-windows-20260920.md` と同名フォルダに6回の成功/失敗をすべて保存。
+
+### [2026-09-20 21:41 JST] Windows最終検証結果
+
+- `npm run check` は21:36:10〜21:38:58 JSTで完走、終了0。lock→lint→全51ファイル1524成功/0失敗（153.33秒）→本番build1752 modules（2.07秒）まで終了要約を確認。既存UI・Worker・評価プリセット・SEEを含む。jsdom navigation未実装通知は出たが失敗0。
+- `git diff --check` と、追加証跡を含む `git diff --cached --check` はともに終了0。今回の差分はLOGと追加docsのみで、ソース・既存テスト・README・設定・依存は変更していない。
+- 新しい証跡の末尾の余分な空行だけを収録時に除去し、本文・測定値・例外・終了コードは維持。正規化前も `../shogi-quiescence-ordering-evidence/windows-20260920-original/` に保存した。
+- 結論: 同条件で両側初回に再現し、後続各2回と通常設定の全体検証が成功したため、PR固有の未解決機能/性能回帰とは判定しない。正確なOS負荷源までは断定しないが、発生範囲はmainにもある初回実行の負荷依存として証拠化できた。無根拠な本体修正やtimeout延長は不要。
+- 全ローカル完了条件（同条件比較・範囲判定・必要時のみ修正・check・新旧ベンチ・diff・記録）を満たした。既存PR #123へ証跡をcommit/pushして本文追記し、更新後CI確認後にReady for reviewへ変更する。新PR作成・mainマージは行わない。
+- 残る注意: 初回負荷で5000msを超える可能性は保証できず、条件が変われば同じ比較手順で再調査する。materialは今回timedの初期局面追加2手で完了深さがoriginalより浅かったため、既定化非推奨を維持する。

@@ -1,0 +1,28 @@
+import fs from 'node:fs';
+import path from 'node:path';
+import { spawnSync } from 'node:child_process';
+const pr = 'C:/Users/tetsu/Documents/Codex/Shogi-App';
+const main = 'C:/Users/tetsu/Documents/Codex/shogi-pr123-windows-main-20260920';
+const evidence = path.join(pr, 'docs/quiescence-ordering-windows-20260920');
+const common = ['shogi-quiescence-search.test.ts','shogi-two-ply-minimax-ai.test.ts','shogi-see-move-ordering.test.ts','shogi-move-ordering-modes.test.ts','shogi-static-exchange-evaluation.test.ts','quiescence-benchmark.test.ts','shogi-quiescence-comparison.test.ts','shogi-time-limited-quiescence-comparison.test.ts'].map(f=>'src/test/'+f);
+const fresh = ['src/test/shogi-quiescence-ordering.test.ts','src/test/quiescence-ordering-benchmark.test.ts'];
+const index = Number(process.argv[2]);
+const side = ['main','pr','pr','main','main','pr'][index - 1];
+if (!side) throw new Error('Expected run 1 through 6');
+const prefix = `compare-${index}-${side}`;
+const logPath=path.join(evidence,prefix+'.txt'), jsonPath=path.join(evidence,prefix+'.json');
+const cwd = side==='main'? main:pr;
+const args = ['node_modules/vitest/vitest.mjs','run',...common,'--config','.pr123-windows.config.ts','--reporter=verbose','--reporter=json',`--outputFile.json=${jsonPath}`];
+const fd=fs.openSync(logPath,'wx');
+fs.writeSync(fd,JSON.stringify({cwd,executable:process.execPath,args,start:new Date().toISOString()})+'\n');
+const start=Date.now();
+const result=spawnSync(process.execPath,args,{cwd,stdio:['ignore',fd,fd],windowsHide:true});
+const report=fs.existsSync(jsonPath)?JSON.parse(fs.readFileSync(jsonPath,'utf8')):null;
+const details=(report?.testResults??[]).flatMap(f=>f.assertionResults.map(a=>({file:path.basename(f.name),name:a.fullName,status:a.status,duration:a.duration,failures:a.failureMessages})))
+  .filter(a=>a.name.includes('持ち駒・棋譜・局面履歴のある入力を両モードで保持する') || a.name.includes('深さ3の途中で詰みへ到達した枝'));
+const summary={index,side,exitCode:result.status,error:result.error?.message,wallMilliseconds:Date.now()-start,success:report?.numPassedTests,failed:report?.numFailedTests,details};
+fs.writeSync(fd,'\n'+JSON.stringify(summary,null,2)+'\n'); fs.closeSync(fd);
+fs.writeFileSync(path.join(evidence,prefix+'-summary.json'),JSON.stringify(summary,null,2)+'\n');
+fs.writeFileSync(path.join(evidence,'recovered-command.txt'),'Recovered from this task tool-call history; counts matched saved focused-tests.txt and focused-rerun.txt.\n'+'npx vitest run '+[...fresh,...common].join(' ')+'\nComparison excludes only the two PR-specific tests missing in main. Same common-file arguments/config and independent 2 workers in all six runs; no other heavy commands launched concurrently.\n');
+console.log(JSON.stringify(summary,null,2));
+process.exitCode=result.status??1;

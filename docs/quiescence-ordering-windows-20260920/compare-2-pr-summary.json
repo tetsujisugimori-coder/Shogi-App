@@ -1,0 +1,26 @@
+{
+  "index": 2,
+  "side": "pr",
+  "exitCode": 1,
+  "wallMilliseconds": 25875,
+  "success": 290,
+  "failed": 1,
+  "details": [
+    {
+      "file": "quiescence-benchmark.test.ts",
+      "name": "比較APIを使用するrunner 持ち駒・棋譜・局面履歴のある入力を両モードで保持する",
+      "status": "passed",
+      "duration": 724.1496999999999,
+      "failures": []
+    },
+    {
+      "file": "shogi-two-ply-minimax-ai.test.ts",
+      "name": "再帰型αβ枝刈り探索 深さ3の途中で詰みへ到達した枝は、それ以上の子局面を生成せず既存の終局評価を返す",
+      "status": "failed",
+      "duration": 5323.0997000000025,
+      "failures": [
+        "Error: STACK_TRACE_ERROR\n    at task (file:///C:/Users/tetsu/Documents/Codex/Shogi-App/node_modules/@vitest/runner/dist/chunk-artifact.js:1784:27)\n    at Object.<anonymous> (file:///C:/Users/tetsu/Documents/Codex/Shogi-App/node_modules/@vitest/runner/dist/chunk-artifact.js:1817:16)\n    at Object.<anonymous> (file:///C:/Users/tetsu/Documents/Codex/Shogi-App/node_modules/@vitest/runner/dist/chunk-artifact.js:1563:28)\n    at chain (file:///C:/Users/tetsu/Documents/Codex/Shogi-App/node_modules/@vitest/runner/dist/chunk-artifact.js:599:14)\n    at C:/Users/tetsu/Documents/Codex/Shogi-App/src/test/shogi-two-ply-minimax-ai.test.ts:1550:3\n    at file:///C:/Users/tetsu/Documents/Codex/Shogi-App/node_modules/@vitest/runner/dist/chunk-artifact.js:1889:40\n    at runWithSuite (file:///C:/Users/tetsu/Documents/Codex/Shogi-App/node_modules/@vitest/runner/dist/chunk-artifact.js:2258:8)\n    at Object.collect (file:///C:/Users/tetsu/Documents/Codex/Shogi-App/node_modules/@vitest/runner/dist/chunk-artifact.js:1889:10)\n    at Object.collect (file:///C:/Users/tetsu/Documents/Codex/Shogi-App/node_modules/@vitest/runner/dist/chunk-artifact.js:1893:54)\n    at processTicksAndRejections (node:internal/process/task_queues:104:5)"
+      ]
+    }
+  ]
+}

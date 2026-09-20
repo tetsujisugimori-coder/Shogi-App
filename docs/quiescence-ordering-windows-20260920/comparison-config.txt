@@ -1,0 +1,23 @@
+import base from './vite.config';
+import { defineConfig } from 'vitest/config';
+import { BaseSequencer, type TestSpecification } from 'vitest/node';
+const order = [
+  'shogi-quiescence-ordering.test.ts', 'quiescence-ordering-benchmark.test.ts',
+  'shogi-quiescence-search.test.ts', 'shogi-two-ply-minimax-ai.test.ts',
+  'shogi-see-move-ordering.test.ts', 'shogi-move-ordering-modes.test.ts',
+  'shogi-static-exchange-evaluation.test.ts', 'quiescence-benchmark.test.ts',
+  'shogi-quiescence-comparison.test.ts', 'shogi-time-limited-quiescence-comparison.test.ts',
+];
+class ComparisonSequencer extends BaseSequencer {
+  async sort(files: TestSpecification[]) {
+    const rank = (file: TestSpecification) => order.indexOf(file.moduleId.replaceAll('\\', '/').split('/').at(-1)!);
+    if (files.some(file => rank(file) < 0)) throw new Error('Unexpected comparison file');
+    const sorted = [...files].sort((a, b) => rank(a) - rank(b));
+    console.log('[comparison-file-order]', JSON.stringify(sorted.map(f => f.moduleId.split('/').at(-1))));
+    return sorted;
+  }
+}
+export default defineConfig(async env => {
+  const config = typeof base === 'function' ? await base(env) : await base;
+  return { ...config, test: { ...config.test, maxWorkers: 2, fileParallelism: true, sequence: { sequencer: ComparisonSequencer } } };
+});

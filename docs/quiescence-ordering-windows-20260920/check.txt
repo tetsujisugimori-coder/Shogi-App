@@ -1,0 +1,52 @@
+
+> shogi-app@0.0.0 check
+> npm run verify:lock && npm run lint && npm test && npm run build
+
+
+> shogi-app@0.0.0 verify:lock
+> node scripts/verify-lockfile.mjs
+
+--- Lockfile Verification Summary ---
+Lockfile Name:           shogi-app
+Lockfile Version:        3
+Total Package Entries:   399
+Inspected Registry Pkgs: 398
+Valid Exceptions:        0
+Missing "version":       0
+Missing "resolved":      0
+Missing "integrity":     0
+
+[verify:lock] SUCCESS: package-lock.json is valid and complete.
+
+
+> shogi-app@0.0.0 lint
+> tsc --noEmit
+
+
+> shogi-app@0.0.0 test
+> vitest run
+
+
+ RUN  v4.1.11 C:/Users/tetsu/Documents/Codex/Shogi-App
+
+Not implemented: navigation to another Document
+
+ Test Files  51 passed (51)
+      Tests  1524 passed (1524)
+   Start at  21:36:21
+   Duration  153.33s (transform 5.88s, setup 4.11s, import 10.92s, tests 257.56s, environment 25.14s)
+
+
+> shogi-app@0.0.0 build
+> vite build
+
+vite v6.4.3 building for production...
+transforming...
+✓ 1752 modules transformed.
+rendering chunks...
+computing gzip size...
+dist/index.html                                                          0.88 kB │ gzip:   0.53 kB
+dist/assets/timeLimitedIterativeDeepeningAlphaBeta.worker-BfeTJski.js   40.36 kB
+dist/assets/index-CnhJq2eD.css                                          65.84 kB │ gzip:  10.79 kB
+dist/assets/index-CVAY-Ewu.js                                          412.29 kB │ gzip: 115.66 kB
+✓ built in 2.07s

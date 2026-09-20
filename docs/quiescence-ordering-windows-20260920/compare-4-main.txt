@@ -1,0 +1,328 @@
+{"cwd":"C:/Users/tetsu/Documents/Codex/shogi-pr123-windows-main-20260920","executable":"C:\\Program Files\\nodejs\\node.exe","args":["node_modules/vitest/vitest.mjs","run","src/test/shogi-quiescence-search.test.ts","src/test/shogi-two-ply-minimax-ai.test.ts","src/test/shogi-see-move-ordering.test.ts","src/test/shogi-move-ordering-modes.test.ts","src/test/shogi-static-exchange-evaluation.test.ts","src/test/quiescence-benchmark.test.ts","src/test/shogi-quiescence-comparison.test.ts","src/test/shogi-time-limited-quiescence-comparison.test.ts","--config",".pr123-windows.config.ts","--reporter=verbose","--reporter=json","--outputFile.json=C:\\Users\\tetsu\\Documents\\Codex\\Shogi-App\\docs\\quiescence-ordering-windows-20260920\\compare-4-main.json"],"start":"2026-09-20T12:29:32.308Z"}
+
+ RUN  v4.1.11 C:/Users/tetsu/Documents/Codex/shogi-pr123-windows-main-20260920
+
+[comparison-file-order] ["shogi-quiescence-search.test.ts","shogi-two-ply-minimax-ai.test.ts","shogi-see-move-ordering.test.ts","shogi-move-ordering-modes.test.ts","shogi-static-exchange-evaluation.test.ts","quiescence-benchmark.test.ts","shogi-quiescence-comparison.test.ts","shogi-time-limited-quiescence-comparison.test.ts"]
+ ✓ src/test/shogi-quiescence-search.test.ts > 静止探索の純粋関数基盤 > 深さ0では既存の静的評価・内訳を返し、着手を生成しない 3ms
+ ✓ src/test/shogi-quiescence-search.test.ts > 静止探索の純粋関数基盤 > 駒取りも王手もない静かな局面ではstand-patを維持する 1ms
+ ✓ src/test/shogi-quiescence-search.test.ts > 静止探索の純粋関数基盤 > 取り返される損な駒取りしかないときはstand-patを選ぶ 2ms
+ ✓ src/test/shogi-quiescence-search.test.ts > 静止探索の純粋関数基盤 > 取り返されない明確な駒取りを採用する 1ms
+ ✓ src/test/shogi-quiescence-search.test.ts > 静止探索の純粋関数基盤 > 交換の取り返しまで読むと、浅い駒得ではなくその葉の評価・内訳を返す 1ms
+ ✓ src/test/shogi-quiescence-search.test.ts > 静止探索の純粋関数基盤 > 固定した評価視点で先手番を最大化し、後手番を最小化する 1ms
+ ✓ src/test/shogi-quiescence-search.test.ts > 静止探索の純粋関数基盤 > 王手中はstand-patを使わず、玉移動・合駒・駒打ちを含む全合法回避を探索する 3ms
+ ✓ src/test/shogi-quiescence-search.test.ts > 静止探索の純粋関数基盤 > 終局局面は既存の終局評価を返し、追加着手を探索しない 0ms
+ ✓ src/test/shogi-quiescence-search.test.ts > 静止探索の純粋関数基盤 > 主変化と再帰は最大戦術深さを超えない 1ms
+ ✓ src/test/shogi-quiescence-search.test.ts > 静止探索の純粋関数基盤 > stand-patと同値の駒取りは不要な主変化にしない 0ms
+ ✓ src/test/shogi-quiescence-search.test.ts > 静止探索の純粋関数基盤 > αβカットオフでは未実行候補を数え、切った候補をPVに含めない 1ms
+ ✓ src/test/shogi-quiescence-search.test.ts > 静止探索の純粋関数基盤 > 凍結した入力・設定を変更せず、繰り返して同じ結果を返す 2ms
+ ✓ src/test/shogi-quiescence-search.test.ts > 静止探索の純粋関数基盤 > 中断確認の例外をそのまま伝播し、不完全なPVへ変換しない 0ms
+ ✓ src/test/shogi-quiescence-search.test.ts > 静止探索の純粋関数基盤 > 不正な最大戦術深さ %p を拒否する 1ms
+ ✓ src/test/shogi-quiescence-search.test.ts > 静止探索の純粋関数基盤 > 不正な最大戦術深さ %p を拒否する 0ms
+ ✓ src/test/shogi-quiescence-search.test.ts > 静止探索の純粋関数基盤 > 不正な最大戦術深さ %p を拒否する 0ms
+ ✓ src/test/shogi-quiescence-search.test.ts > 静止探索の純粋関数基盤 > 不正な最大戦術深さ %p を拒否する 0ms
+ ✓ src/test/shogi-quiescence-search.test.ts > 静止探索の純粋関数基盤 > SEE準備・SEE評価を呼ばず、既存αβの代表結果も変えない 10ms
+ ✓ src/test/shogi-quiescence-search.test.ts > αβ探索の明示的な静止探索接続 > 省略・空optionsでは既存の静的葉を維持し、静止探索統計はすべて0 3ms
+ ✓ src/test/shogi-quiescence-search.test.ts > αβ探索の明示的な静止探索接続 > 深さ0 rootは明示有効時もselectedAction:nullと空PVを維持する 0ms
+ ✓ src/test/shogi-quiescence-search.test.ts > αβ探索の明示的な静止探索接続 > maxTacticalDepth:0は葉を明示選択するが追加局面やPVを作らない 3ms
+ ✓ src/test/shogi-quiescence-search.test.ts > αβ探索の明示的な静止探索接続 > 戦術葉を同じ評価設定と境界で読み、返却PV・内訳・統計を一組で伝播する 11ms
+ ✓ src/test/shogi-quiescence-search.test.ts > αβ探索の明示的な静止探索接続 > 専用の取り返し局面では静的葉の毒入り捕獲を避け、評価を修正する 5ms
+ ✓ src/test/shogi-quiescence-search.test.ts > αβ探索の明示的な静止探索接続 > 反復深化・時間制限・互換2手読み・selectorへ同じoptionsを伝播する 59ms
+ ✓ src/test/shogi-quiescence-search.test.ts > αβ探索の明示的な静止探索接続 > 不正なquiescence設定 %p を探索開始前に拒否する 0ms
+ ✓ src/test/shogi-quiescence-search.test.ts > αβ探索の明示的な静止探索接続 > 不正なquiescence設定 %p を探索開始前に拒否する 0ms
+ ✓ src/test/shogi-quiescence-search.test.ts > αβ探索の明示的な静止探索接続 > 不正なquiescence設定 %p を探索開始前に拒否する 0ms
+ ✓ src/test/shogi-quiescence-search.test.ts > αβ探索の明示的な静止探索接続 > 不正なquiescence設定 %p を探索開始前に拒否する 0ms
+ ✓ src/test/shogi-quiescence-search.test.ts > αβ探索の明示的な静止探索接続 > 不正なquiescence設定 %p を探索開始前に拒否する 0ms
+ ✓ src/test/shogi-quiescence-search.test.ts > αβ探索の明示的な静止探索接続 > 不正なquiescence設定 %p を探索開始前に拒否する 0ms
+ ✓ src/test/shogi-quiescence-search.test.ts > αβ探索の明示的な静止探索接続 > 不正なquiescence設定 %p を探索開始前に拒否する 0ms
+ ✓ src/test/shogi-quiescence-search.test.ts > αβ探索の明示的な静止探索接続 > moveOrderingと独立し、standardでは静止探索有効時もSEEを呼ばない 2ms
+ ✓ src/test/shogi-two-ply-minimax-ai.test.ts > 再帰型αβ探索の手の並べ替え > SEEが高い成り付き捕獲、通常捕獲、非捕獲成り、その他の順と同点の元順を保つ 5ms
+ ✓ src/test/shogi-two-ply-minimax-ai.test.ts > 再帰型αβ探索の手の並べ替え > 駒打ちをその他として扱い、元の候補配列と入力局面を変更しない 1ms
+ ✓ src/test/shogi-two-ply-minimax-ai.test.ts > 再帰型αβ探索の手の並べ替え > root候補は並べ替えず、同点では元の先頭手を選ぶ 4ms
+ ✓ src/test/shogi-two-ply-minimax-ai.test.ts > 再帰型αβ探索の手の並べ替え > 深さ3では並べ替えなしαβより少ない局面を生成し、選択手と評価値を保つ 412ms
+ ✓ src/test/shogi-two-ply-minimax-ai.test.ts > 反復深化αβ探索 > 初期局面の固定深さ3は選択手、評価値、PVとstandardの統計を保つ 90ms
+ ✓ src/test/shogi-two-ply-minimax-ai.test.ts > 反復深化αβ探索 > 初期局面の固定深さ3は選択手、評価値、PVとstatic-exchangeの統計を保つ 122ms
+ ✓ src/test/shogi-two-ply-minimax-ai.test.ts > 反復深化αβ探索 > 最大深さ3では深さ1、2、3を順に完了し、最深反復を最終結果として返す 57ms
+ ✓ src/test/shogi-two-ply-minimax-ai.test.ts > 反復深化αβ探索 > 最大深さ1では深さ1だけを実行し、その結果を返す 3ms
+ ✓ src/test/shogi-two-ply-minimax-ai.test.ts > 反復深化αβ探索 > 前回最善手をroot先頭へ置き、残りは既存の分類順にする 1ms
+ ✓ src/test/shogi-two-ply-minimax-ai.test.ts > 反復深化αβ探索 > 前回最善手が現局面の合法手にない場合は既存root順で続行する 24ms
+ ✓ src/test/shogi-two-ply-minimax-ai.test.ts > 反復深化αβ探索 > 探索順が変わっても同点時は元の合法手順の先頭を選ぶ 3ms
+ ✓ src/test/shogi-two-ply-minimax-ai.test.ts > 反復深化αβ探索 > 深さ別統計を独立して記録し、累計を二重加算しない 31ms
+ ✓ src/test/shogi-two-ply-minimax-ai.test.ts > 反復深化αβ探索 > 専用局面の深さ3でも選択手4,4 -> 4,0と危険度評価込みの-570を保ち、結果と統計は決定的 51ms
+ ✓ src/test/shogi-two-ply-minimax-ai.test.ts > 反復深化αβ探索 > 終局局面でも各反復を安全に完了し、無効な最大深さを拒否する 1ms
+ ✓ src/test/shogi-two-ply-minimax-ai.test.ts > 時間制限付き反復深化αβ探索 > 十分な制限時間では最大深さまで完了し、時間制限なしの結果を保つ 51ms
+ ✓ src/test/shogi-two-ply-minimax-ai.test.ts > 時間制限付き反復深化αβ探索 > 深さ3の再帰中に期限へ達すると、深さ2だけを採用して途中統計を混ぜない 14ms
+ ✓ src/test/shogi-two-ply-minimax-ai.test.ts > 時間制限付き反復深化αβ探索 > 深さ2の探索本体後に期限と同値なら、その完了結果も破棄する 11ms
+ ✓ src/test/shogi-two-ply-minimax-ai.test.ts > 時間制限付き反復深化αβ探索 > 完了反復ごとの時間と、未完了反復を含む全体時間を分離する 9ms
+ ✓ src/test/shogi-two-ply-minimax-ai.test.ts > 時間制限付き反復深化αβ探索 > 0ミリ秒でも深さ1を完了し、深さ2開始前の同値期限を時間切れにする 1ms
+ ✓ src/test/shogi-two-ply-minimax-ai.test.ts > 時間制限付き反復深化αβ探索 > 最大深さ1は制限時間を超えても深さ1を返し、時間切れにしない 1ms
+ ✓ src/test/shogi-two-ply-minimax-ai.test.ts > 時間制限付き反復深化αβ探索 > 有限でない値と負数の時間制限を拒否し、時間切れ以外の例外を伝播する 1ms
+ ✓ src/test/shogi-two-ply-minimax-ai.test.ts > 時間制限付き反復深化αβ探索 > 同じ局面とclock系列では、時間制限付きの結果と統計も決定的に保つ 50ms
+ ✓ src/test/shogi-two-ply-minimax-ai.test.ts > 探索用局面評価 > active/checkでは駒得、駒位置、玉安全度、守られていない駒の危険度を合成する 0ms
+ ✓ src/test/shogi-two-ply-minimax-ai.test.ts > 探索用局面評価 > 玉周辺の利き、視点、カスタム重み、重み0を共通探索評価へ反映し、入力を変更しない 1ms
+ ✓ src/test/shogi-two-ply-minimax-ai.test.ts > 探索用局面評価 > 旧MaterialValueTable形式でも既定の玉安全度を使い、探索経路は共通評価を利用する 0ms
+ ✓ src/test/shogi-two-ply-minimax-ai.test.ts > 探索用局面評価 > 玉が欠けた人工局面では玉安全度を中立のまま合成する 0ms
+ ✓ src/test/shogi-two-ply-minimax-ai.test.ts > 探索用局面評価 > 勝敗理由にかかわらず勝敗を有限の駒得より優先する 0ms
+ ✓ src/test/shogi-two-ply-minimax-ai.test.ts > 探索用局面評価 > 勝敗理由にかかわらず勝敗を有限の駒得より優先する 0ms
+ ✓ src/test/shogi-two-ply-minimax-ai.test.ts > 探索用局面評価 > 勝敗理由にかかわらず勝敗を有限の駒得より優先する 0ms
+ ✓ src/test/shogi-two-ply-minimax-ai.test.ts > 探索用局面評価 > 勝者のない'repetition'を引き分けとして評価する 0ms
+ ✓ src/test/shogi-two-ply-minimax-ai.test.ts > 探索用局面評価 > 勝者のない'five_hundred_move_jishogi'を引き分けとして評価する 0ms
+ ✓ src/test/shogi-two-ply-minimax-ai.test.ts > 探索用局面評価 > 勝者のない'entering_king_draw'を引き分けとして評価する 0ms
+ ✓ src/test/shogi-two-ply-minimax-ai.test.ts > 探索用局面評価 > 終局状態とresultの矛盾を通常の駒得として扱わず、入力も変更しない 0ms
+ ✓ src/test/shogi-two-ply-minimax-ai.test.ts > 2手読みミニマックスAI > 全root候補の最小評価が-∞でも固定順の最初の合法手を返す 7ms
+ ✓ src/test/shogi-two-ply-minimax-ai.test.ts > 2手読みミニマックスAI > 目先の駒得後の取り返しを読んで、1手読みAIとは異なる安全な手を選ぶ 17ms
+ ✓ src/test/shogi-see-move-ordering.test.ts > SEE capture ordering > skips SEE for 0 captures while preserving classification and frozen inputs 7ms
+ ✓ src/test/shogi-see-move-ordering.test.ts > SEE capture ordering > skips SEE for 1 captures while preserving classification and frozen inputs 3ms
+ ✓ src/test/shogi-see-move-ordering.test.ts > SEE capture ordering > sente uses descending moving-side SEE even across promotion classes 6ms
+ ✓ src/test/shogi-see-move-ordering.test.ts > SEE capture ordering > gote uses descending moving-side SEE even across promotion classes 3ms
+ ✓ src/test/shogi-see-move-ordering.test.ts > SEE capture ordering > preserves supplied indexes for equal capture scores 2ms
+ ✓ src/test/shogi-see-move-ordering.test.ts > SEE capture ordering > retains real negative exchanges ahead of quiet promotions, moves and drops 6ms
+ ✓ src/test/shogi-see-move-ordering.test.ts > SEE capture ordering > calls SEE once per capture and never for quiet moves, promotions or drops 2ms
+ ✓ src/test/shogi-see-move-ordering.test.ts > SEE capture ordering > uses custom material values through direct config 60ms
+ ✓ src/test/shogi-two-ply-minimax-ai.test.ts > 2手読みミニマックスAI > 開始手番をrootPlayerに固定し、後手でも同じ最小化応手を読む 13ms
+ ✓ src/test/shogi-two-ply-minimax-ai.test.ts > 2手読みミニマックスAI > 詰みになる最初の手を有限の駒得候補より優先する 10ms
+ ✓ src/test/shogi-two-ply-minimax-ai.test.ts > 2手読みミニマックスAI > カスタム評価表、同点の固定順、空候補、入力局面の非破壊を保つ 6ms
+ ✓ src/test/shogi-two-ply-minimax-ai.test.ts > 2手読みミニマックスAIの探索計測 > 既存の選択手を保ったまま、候補評価と決定的な調査局面数を集約する 27ms
+ ✓ src/test/shogi-two-ply-minimax-ai.test.ts > 2手読みミニマックスAIの探索計測 > 上位候補をAI視点の降順かつ固定順の同点処理で最大3件にする 14ms
+ ✓ src/test/shogi-two-ply-minimax-ai.test.ts > 2手読みミニマックスAIの探索計測 > 後手でも評価と候補順をroot AI視点で返す 25ms
+ ✓ src/test/shogi-two-ply-minimax-ai.test.ts > 2手読みミニマックスAIの探索計測 > 合法手が3件未満でも結果を返し、終局局面では既存どおり手を選ばない 3ms
+ ✓ src/test/shogi-two-ply-minimax-ai.test.ts > 2手読みαβ枝刈り探索 > 通常局面で既存ミニマックスと選択手・選択評価値を一致させ、入力局面を変えない 35ms
+ ✓ src/test/shogi-two-ply-minimax-ai.test.ts > 2手読みαβ枝刈り探索 > 先手・後手とも開始時のroot AI視点を固定し、カスタム駒価値表でもミニマックスと一致する 42ms
+ ✓ src/test/shogi-two-ply-minimax-ai.test.ts > 2手読みαβ枝刈り探索 > 同点では固定順の先頭を選び、全候補が-∞でも最初の合法手を返す 2ms
+ ✓ src/test/shogi-two-ply-minimax-ai.test.ts > 2手読みαβ枝刈り探索 > 詰みの+∞を有限の駒得候補より優先して、ミニマックスと一致する 16ms
+ ✓ src/test/shogi-two-ply-minimax-ai.test.ts > 2手読みαβ枝刈り探索 > 終局済み局面では手を選ばず、枝刈り計測はすべて0にする 0ms
+ ✓ src/test/shogi-two-ply-minimax-ai.test.ts > 2手読みαβ枝刈り探索 > 打ち切ったroot候補数と未実行応手数を、実際に省略した探索局面として数える 1ms
+ ✓ src/test/shogi-two-ply-minimax-ai.test.ts > 2手読みαβ枝刈り探索 > 打ち切りが発生しない終局局面では、打ち切り計測を0のまま保つ 0ms
+ ✓ src/test/shogi-two-ply-minimax-ai.test.ts > 2手読みαβ枝刈り探索 > 注入時計は経過時間だけを測り、決定的な探索結果を変えない 9ms
+ ✓ src/test/shogi-two-ply-minimax-ai.test.ts > 再帰型αβ枝刈り探索 > 駒得が同じ制御局面では、1手読みとαβが位置的に高い歩の前進を選び、参照ミニマックスと一致する 1ms
+ ✓ src/test/shogi-two-ply-minimax-ai.test.ts > 再帰型αβ枝刈り探索 > 深さ2は旧2 plyミニマックスと互換ラッパーの選択手・評価値・統計を保つ 32ms
+ ✓ src/test/shogi-see-move-ordering.test.ts > SEE capture ordering > uses custom material values through options config 42ms
+ ✓ src/test/shogi-see-move-ordering.test.ts > SEE capture ordering > defaults omitted material in options and preserves frozen inputs deterministically 4ms
+ ✓ src/test/shogi-see-move-ordering.test.ts > SEE capture ordering > throws on null instead of substituting a zero score 2ms
+ ✓ src/test/shogi-see-move-ordering.test.ts > SEE capture ordering > propagates SEE errors including non-finite material failures unchanged 3ms
+ ✓ src/test/shogi-see-move-ordering.test.ts > SEE capture ordering > preserves public SEE non-finite validation when multiple captures need comparison 1ms
+ ✓ src/test/shogi-see-move-ordering.test.ts > SEE capture ordering > skips SEE for 0 remaining root captures after moving the previous best first 1ms
+ ✓ src/test/shogi-see-move-ordering.test.ts > SEE capture ordering > skips SEE for 1 remaining root captures after moving the previous best first 0ms
+ ✓ src/test/shogi-see-move-ordering.test.ts > SEE capture ordering > keeps the pre-fix depth-three answer, PV, breakdown and statistics when single captures are skipped 69ms
+ ✓ src/test/shogi-see-move-ordering.test.ts > SEE capture ordering > keeps the previous best first and applies custom SEE only to remaining root captures 2ms
+ ✓ src/test/shogi-see-move-ordering.test.ts > SEE capture ordering > preserves fixed root order without evaluating captures when no previous best exists 8ms
+ ✓ src/test/shogi-see-move-ordering.test.ts > SEE capture ordering > checks interruption before a capture evaluation 1ms
+ ✓ src/test/shogi-see-move-ordering.test.ts > SEE capture ordering > checks interruption after a capture evaluation 1ms
+ ✓ src/test/shogi-see-move-ordering.test.ts > SEE capture ordering > checks interruption before and after every capture, including subsequent shared evaluations 1ms
+ ✓ src/test/shogi-two-ply-minimax-ai.test.ts > 再帰型αβ枝刈り探索 > 深さ0は局面だけを評価して子局面を生成せず、深さ1/2/3はrootを含むply数で読む 38ms
+ ✓ src/test/shogi-two-ply-minimax-ai.test.ts > 再帰型αβ枝刈り探索 > 深さ3は合法手と探索統計を返し、入力局面を破壊せず決定的に完了する 67ms
+ ✓ src/test/shogi-see-move-ordering.test.ts > SEE capture ordering > matches individual public SEE search results and statistics for sente with custom values 136ms
+ ✓ src/test/shogi-see-move-ordering.test.ts > SEE capture ordering > matches individual public SEE search results and statistics for gote with custom values 138ms
+ ✓ src/test/shogi-see-move-ordering.test.ts > SEE capture ordering > discards an iteration whose SEE evaluation crosses the deadline 11ms
+ ✓ src/test/shogi-see-move-ordering.test.ts > SEE capture ordering > counts explored successor positions without counting SEE internal executions 45ms
+ ✓ src/test/shogi-two-ply-minimax-ai.test.ts > 再帰型αβ枝刈り探索 > alpha >= betaのカットオフは結果を変えず、深さ1ではカットオフなしでも正しく探索する 1ms
+ ✓ src/test/shogi-two-ply-minimax-ai.test.ts > 再帰型αβ枝刈り探索 > 終局・合法手なし局面では例外や無限再帰を起こさず、探索統計は探索ごとに初期化する 10ms
+ ✓ src/test/shogi-two-ply-minimax-ai.test.ts > 再帰型αβ枝刈り探索 > 既定の2 ply APIは深さ2のままで、無効な深さは明示的に拒否する 11ms
+ ✓ src/test/shogi-two-ply-minimax-ai.test.ts > 再帰型αβ枝刈り探索 > 深さ3は最大化→最小化→最大化で3 ply先を評価し、枝刈りなし参照探索と選択・評価が一致する 350ms
+ ✓ src/test/shogi-see-move-ordering.test.ts > SEE capture ordering > Worker handler with explicitly injected SEE search matches direct search for standard 124ms
+ ✓ src/test/shogi-see-move-ordering.test.ts > SEE capture ordering > Worker handler with explicitly injected SEE search matches direct search for material-focused 115ms
+ ✓ src/test/shogi-see-move-ordering.test.ts > SEE capture ordering > Worker handler with explicitly injected SEE search matches direct search for king-safety-focused 108ms
+ ✓ src/test/shogi-move-ordering-modes.test.ts > alpha-beta move-ordering modes > defaults to exact main classification and original indexes without any SEE preparation work 12ms
+ ✓ src/test/shogi-move-ordering-modes.test.ts > alpha-beta move-ordering modes > fixed preserves existing calls and propagates explicit SEE through every search entry 40ms
+ ✓ src/test/shogi-move-ordering-modes.test.ts > alpha-beta move-ordering modes > iterative preserves existing calls and propagates explicit SEE through every search entry 29ms
+ ✓ src/test/shogi-move-ordering-modes.test.ts > alpha-beta move-ordering modes > timed preserves existing calls and propagates explicit SEE through every search entry 23ms
+ ✓ src/test/shogi-move-ordering-modes.test.ts > alpha-beta move-ordering modes > select fixed preserves existing calls and propagates explicit SEE through every search entry 22ms
+ ✓ src/test/shogi-move-ordering-modes.test.ts > alpha-beta move-ordering modes > select iterative preserves existing calls and propagates explicit SEE through every search entry 21ms
+ ✓ src/test/shogi-move-ordering-modes.test.ts > alpha-beta move-ordering modes > two ply preserves existing calls and propagates explicit SEE through every search entry 21ms
+ ✓ src/test/shogi-move-ordering-modes.test.ts > alpha-beta move-ordering modes > select two ply preserves existing calls and propagates explicit SEE through every search entry 20ms
+ ✓ src/test/shogi-move-ordering-modes.test.ts > alpha-beta move-ordering modes > fixed rejects unknown modes even when no ordering is needed 1ms
+ ✓ src/test/shogi-move-ordering-modes.test.ts > alpha-beta move-ordering modes > iterative rejects unknown modes even when no ordering is needed 0ms
+ ✓ src/test/shogi-move-ordering-modes.test.ts > alpha-beta move-ordering modes > timed rejects unknown modes even when no ordering is needed 0ms
+ ✓ src/test/shogi-move-ordering-modes.test.ts > alpha-beta move-ordering modes > select fixed rejects unknown modes even when no ordering is needed 0ms
+ ✓ src/test/shogi-move-ordering-modes.test.ts > alpha-beta move-ordering modes > select iterative rejects unknown modes even when no ordering is needed 0ms
+ ✓ src/test/shogi-move-ordering-modes.test.ts > alpha-beta move-ordering modes > two ply rejects unknown modes even when no ordering is needed 0ms
+ ✓ src/test/shogi-move-ordering-modes.test.ts > alpha-beta move-ordering modes > select two ply rejects unknown modes even when no ordering is needed 0ms
+ ✓ src/test/shogi-move-ordering-modes.test.ts > alpha-beta move-ordering modes > node order rejects unknown modes even when no ordering is needed 0ms
+ ✓ src/test/shogi-move-ordering-modes.test.ts > alpha-beta move-ordering modes > root order rejects unknown modes even when no ordering is needed 0ms
+ ✓ src/test/shogi-move-ordering-modes.test.ts > alpha-beta move-ordering modes > standard > preserves recorded depth-three result for 'initial', frozen inputs and determinism 169ms
+ ✓ src/test/shogi-move-ordering-modes.test.ts > alpha-beta move-ordering modes > standard > preserves recorded depth-three result for 'moveOrderingBenefitState', frozen inputs and determinism 67ms
+ ✓ src/test/shogi-move-ordering-modes.test.ts > alpha-beta move-ordering modes > standard > preserves recorded depth-three result for 'singleCapture', frozen inputs and determinism 56ms
+ ✓ src/test/shogi-move-ordering-modes.test.ts > alpha-beta move-ordering modes > standard > preserves recorded depth-three result for 'multipleCaptures', frozen inputs and determinism 40ms
+ ✓ src/test/shogi-move-ordering-modes.test.ts > alpha-beta move-ordering modes > standard > preserves recorded depth-three result for 'nonRootMultipleCaptures', frozen inputs and determinism 88ms
+ ✓ src/test/shogi-move-ordering-modes.test.ts > alpha-beta move-ordering modes > standard > keeps fixed root order, original root tie-breaking and previous best first 2ms
+ ✓ src/test/shogi-move-ordering-modes.test.ts > alpha-beta move-ordering modes > standard > preserves zero-time fallback and discards an interrupted deeper iteration 4ms
+ ✓ src/test/shogi-move-ordering-modes.test.ts > alpha-beta move-ordering modes > static-exchange > preserves recorded depth-three result for 'initial', frozen inputs and determinism 249ms
+ ✓ src/test/shogi-move-ordering-modes.test.ts > alpha-beta move-ordering modes > static-exchange > preserves recorded depth-three result for 'moveOrderingBenefitState', frozen inputs and determinism 67ms
+ ✓ src/test/shogi-move-ordering-modes.test.ts > alpha-beta move-ordering modes > static-exchange > preserves recorded depth-three result for 'singleCapture', frozen inputs and determinism 53ms
+ ✓ src/test/shogi-move-ordering-modes.test.ts > alpha-beta move-ordering modes > static-exchange > preserves recorded depth-three result for 'multipleCaptures', frozen inputs and determinism 39ms
+ ✓ src/test/shogi-move-ordering-modes.test.ts > alpha-beta move-ordering modes > static-exchange > preserves recorded depth-three result for 'nonRootMultipleCaptures', frozen inputs and determinism 85ms
+ ✓ src/test/shogi-move-ordering-modes.test.ts > alpha-beta move-ordering modes > static-exchange > keeps fixed root order, original root tie-breaking and previous best first 2ms
+ ✓ src/test/shogi-move-ordering-modes.test.ts > alpha-beta move-ordering modes > static-exchange > preserves zero-time fallback and discards an interrupted deeper iteration 3ms
+ ✓ src/test/shogi-move-ordering-modes.test.ts > alpha-beta move-ordering modes > Worker remains default standard for standard without a protocol option 9ms
+ ✓ src/test/shogi-move-ordering-modes.test.ts > alpha-beta move-ordering modes > Worker remains default standard for material-focused without a protocol option 9ms
+ ✓ src/test/shogi-move-ordering-modes.test.ts > alpha-beta move-ordering modes > Worker remains default standard for king-safety-focused without a protocol option 8ms
+ ✓ src/test/shogi-two-ply-minimax-ai.test.ts > 再帰型αβ枝刈り探索 > 深さ3の途中で詰みへ到達した枝は、それ以上の子局面を生成せず既存の終局評価を返す 2628ms
+ ✓ src/test/shogi-two-ply-minimax-ai.test.ts > 再帰型αβ枝刈り探索 > 深さ2と深さ3の統計を同じ定義で比較でき、深さ3の同点でも固定順を保つ 278ms
+ ✓ src/test/shogi-two-ply-minimax-ai.test.ts > 再帰型αβ探索の主変化 > 最大化ノードの全探索済み候補が-∞でも、最初の合法候補をPVへ採用する 27ms
+ ✓ src/test/shogi-two-ply-minimax-ai.test.ts > 再帰型αβ探索の主変化 > 最小化ノードの全探索済み候補が+∞でも、最初の合法応手を含むPVを返す 38ms
+ ✓ src/test/shogi-two-ply-minimax-ai.test.ts > 再帰型αβ探索の主変化 > 深さ1から3で選択手から始まる合法なPVを、不変の入力局面から返す 373ms
+ ✓ src/test/shogi-static-exchange-evaluation.test.ts > 共有する開始局面の準備 > 内部経路は公開barrelへ追加しない 1ms
+ ✓ src/test/shogi-static-exchange-evaluation.test.ts > 共有する開始局面の準備 > default価値表で成り・不成を個別評価と対応させ、先後対称かつ準備を1回にする 18ms
+ ✓ src/test/shogi-static-exchange-evaluation.test.ts > 共有する開始局面の準備 > custom価値表で成り・不成を個別評価と対応させ、先後対称かつ準備を1回にする 11ms
+ ✓ src/test/shogi-static-exchange-evaluation.test.ts > 合法手ベースの静的交換評価 (public) > 無防備な歩の一回の捕獲は盤上喪失と持ち駒獲得の駒得差分になる 1ms
+ ✓ src/test/shogi-static-exchange-evaluation.test.ts > 合法手ベースの静的交換評価 (public) > 合法な非捕獲移動はnullを返す 1ms
+ ✓ src/test/shogi-static-exchange-evaluation.test.ts > 合法手ベースの静的交換評価 (public) > 合法な駒打ちはnullを返す 2ms
+ ✓ src/test/shogi-static-exchange-evaluation.test.ts > 合法手ベースの静的交換評価 (public) > 合法手と不一致のフィールドを拒否する: {"player":"gote"} 0ms
+ ✓ src/test/shogi-static-exchange-evaluation.test.ts > 合法手ベースの静的交換評価 (public) > 合法手と不一致のフィールドを拒否する: {"pieceType":"silver"} 0ms
+ ✓ src/test/shogi-static-exchange-evaluation.test.ts > 合法手ベースの静的交換評価 (public) > 合法手と不一致のフィールドを拒否する: {"from":{"row":5,"col":3}} 2ms
+ ✓ src/test/shogi-static-exchange-evaluation.test.ts > 合法手ベースの静的交換評価 (public) > 合法手と不一致のフィールドを拒否する: {"to":{"row":-1,"col":4}} 0ms
+ ✓ src/test/shogi-static-exchange-evaluation.test.ts > 合法手ベースの静的交換評価 (public) > 合法手と不一致のフィールドを拒否する: {"promotion":"promote"} 0ms
+ ✓ src/test/shogi-static-exchange-evaluation.test.ts > 合法手ベースの静的交換評価 (public) > 終局済み開始局面で過去の合法手を受け付けない 0ms
+ ✓ src/test/shogi-static-exchange-evaluation.test.ts > 合法手ベースの静的交換評価 (public) > 歩で飛車を取り返される交換損を評価する 1ms
+ ✓ src/test/shogi-static-exchange-evaluation.test.ts > 合法手ベースの静的交換評価 (public) > 相手は取り返すと損になるなら別の合法手を選んで交換を終了できる 2ms
+ ✓ src/test/shogi-static-exchange-evaluation.test.ts > 合法手ベースの静的交換評価 (public) > 開始側も取り返すと損になるなら現在の駒得差分で終了できる 4ms
+ ✓ src/test/shogi-static-exchange-evaluation.test.ts > 合法手ベースの静的交換評価 (public) > 唯一の合法手が取り返しなら、相手が損をしても任意停止しない 5ms
+ ✓ src/test/shogi-static-exchange-evaluation.test.ts > 合法手ベースの静的交換評価 (public) > 開始側は複数の取り返しと任意成り候補から最大の最終差分を選ぶ 8ms
+ ✓ src/test/shogi-static-exchange-evaluation.test.ts > 合法手ベースの静的交換評価 (public) > 相手は複数の取り返しから最小の最終差分を選び、香車の開き利きも現れる 8ms
+ ✓ src/test/shogi-static-exchange-evaluation.test.ts > 合法手ベースの静的交換評価 (public) > ピンされた金の取り返しを含めない 1ms
+ ✓ src/test/shogi-static-exchange-evaluation.test.ts > 合法手ベースの静的交換評価 (public) > 開き王手を放置する別筋の取り返しを含めない 1ms
+ ✓ src/test/shogi-static-exchange-evaluation.test.ts > 合法手ベースの静的交換評価 (public) > 玉による取り返しは敵の利きの有無を既存合法手に従って扱う: 守り=false 1ms
+ ✓ src/test/shogi-static-exchange-evaluation.test.ts > 合法手ベースの静的交換評価 (public) > 玉による取り返しは敵の利きの有無を既存合法手に従って扱う: 守り=true 0ms
+ ✓ src/test/shogi-static-exchange-evaluation.test.ts > 合法手ベースの静的交換評価 (public) > 最初の駒取りで任意成りの2候補を別々に評価する 1ms
+ ✓ src/test/shogi-static-exchange-evaluation.test.ts > 合法手ベースの静的交換評価 (public) > 最終段へ進む歩は強制成りとして評価し、不成を拒否する 0ms
+ ✓ src/test/shogi-static-exchange-evaluation.test.ts > 合法手ベースの静的交換評価 (public) > 成駒の捕獲は盤上の成駒価値と持ち駒の元の価値を使う 0ms
+ ✓ src/test/shogi-static-exchange-evaluation.test.ts > 合法手ベースの静的交換評価 (public) > カスタム価値表を再帰全体へ渡して既存駒得差分を使う 3ms
+ ✓ src/test/shogi-static-exchange-evaluation.test.ts > 合法手ベースの静的交換評価 (public) > 先後を交換して盤を180度回転しても開始側の点数は一致する 5ms
+ ✓ src/test/shogi-static-exchange-evaluation.test.ts > 合法手ベースの静的交換評価 (public) > 実際の棋譜・履歴・持ち駒・合法手・価値表を凍結しても決定的で非破壊 3ms
+ ✓ src/test/shogi-static-exchange-evaluation.test.ts > 合法手ベースの静的交換評価 (public) > 実行される再帰は対象マスの捕獲だけで、別の捕獲・駒打ち・静かな手を含まない 3ms
+ ✓ src/test/shogi-static-exchange-evaluation.test.ts > 合法手ベースの静的交換評価 (public) > 捕獲で詰んでも勝敗の無限値へ変換せず駒得差分を返す 1ms
+ ✓ src/test/shogi-static-exchange-evaluation.test.ts > 合法手ベースの静的交換評価 (public) > 生成された合法手を実行できない場合は契約違反を通知する: ply=0 1ms
+ ✓ src/test/shogi-static-exchange-evaluation.test.ts > 合法手ベースの静的交換評価 (public) > 生成された合法手を実行できない場合は契約違反を通知する: ply=1 0ms
+ ✓ src/test/shogi-static-exchange-evaluation.test.ts > 合法手ベースの静的交換評価 (public) > 非終局でも合法手がない人工局面では現在差分で終了する 0ms
+ ✓ src/test/shogi-static-exchange-evaluation.test.ts > 合法手ベースの静的交換評価 (public) > 既存履歴によって千日手になった場合は取り返しを続けず駒得差分を返す 1ms
+ ✓ src/test/shogi-static-exchange-evaluation.test.ts > 合法手ベースの静的交換評価 (public) > 有限の駒得差分を作れない価値表は非有限値を返さず拒否: Infinity 0ms
+ ✓ src/test/shogi-static-exchange-evaluation.test.ts > 合法手ベースの静的交換評価 (public) > 有限の駒得差分を作れない価値表は非有限値を返さず拒否: NaN 0ms
+ ✓ src/test/shogi-static-exchange-evaluation.test.ts > 合法手ベースの静的交換評価 (public) > 有限の駒得差分を作れない価値表は非有限値を返さず拒否: 1.7976931348623157e+308 0ms
+ ✓ src/test/shogi-static-exchange-evaluation.test.ts > 合法手ベースの静的交換評価 (prepared) > 無防備な歩の一回の捕獲は盤上喪失と持ち駒獲得の駒得差分になる 0ms
+ ✓ src/test/shogi-static-exchange-evaluation.test.ts > 合法手ベースの静的交換評価 (prepared) > 合法な非捕獲移動はnullを返す 1ms
+ ✓ src/test/shogi-static-exchange-evaluation.test.ts > 合法手ベースの静的交換評価 (prepared) > 合法な駒打ちはnullを返す 1ms
+ ✓ src/test/shogi-static-exchange-evaluation.test.ts > 合法手ベースの静的交換評価 (prepared) > 合法手と不一致のフィールドを拒否する: {"player":"gote"} 0ms
+ ✓ src/test/shogi-static-exchange-evaluation.test.ts > 合法手ベースの静的交換評価 (prepared) > 合法手と不一致のフィールドを拒否する: {"pieceType":"silver"} 0ms
+ ✓ src/test/shogi-static-exchange-evaluation.test.ts > 合法手ベースの静的交換評価 (prepared) > 合法手と不一致のフィールドを拒否する: {"from":{"row":5,"col":3}} 0ms
+ ✓ src/test/shogi-static-exchange-evaluation.test.ts > 合法手ベースの静的交換評価 (prepared) > 合法手と不一致のフィールドを拒否する: {"to":{"row":-1,"col":4}} 0ms
+ ✓ src/test/shogi-static-exchange-evaluation.test.ts > 合法手ベースの静的交換評価 (prepared) > 合法手と不一致のフィールドを拒否する: {"promotion":"promote"} 0ms
+ ✓ src/test/shogi-static-exchange-evaluation.test.ts > 合法手ベースの静的交換評価 (prepared) > 終局済み開始局面で過去の合法手を受け付けない 0ms
+ ✓ src/test/shogi-static-exchange-evaluation.test.ts > 合法手ベースの静的交換評価 (prepared) > 歩で飛車を取り返される交換損を評価する 1ms
+ ✓ src/test/shogi-static-exchange-evaluation.test.ts > 合法手ベースの静的交換評価 (prepared) > 相手は取り返すと損になるなら別の合法手を選んで交換を終了できる 2ms
+ ✓ src/test/shogi-static-exchange-evaluation.test.ts > 合法手ベースの静的交換評価 (prepared) > 開始側も取り返すと損になるなら現在の駒得差分で終了できる 4ms
+ ✓ src/test/shogi-static-exchange-evaluation.test.ts > 合法手ベースの静的交換評価 (prepared) > 唯一の合法手が取り返しなら、相手が損をしても任意停止しない 2ms
+ ✓ src/test/shogi-static-exchange-evaluation.test.ts > 合法手ベースの静的交換評価 (prepared) > 開始側は複数の取り返しと任意成り候補から最大の最終差分を選ぶ 4ms
+ ✓ src/test/shogi-static-exchange-evaluation.test.ts > 合法手ベースの静的交換評価 (prepared) > 相手は複数の取り返しから最小の最終差分を選び、香車の開き利きも現れる 5ms
+ ✓ src/test/shogi-static-exchange-evaluation.test.ts > 合法手ベースの静的交換評価 (prepared) > ピンされた金の取り返しを含めない 1ms
+ ✓ src/test/shogi-static-exchange-evaluation.test.ts > 合法手ベースの静的交換評価 (prepared) > 開き王手を放置する別筋の取り返しを含めない 1ms
+ ✓ src/test/shogi-static-exchange-evaluation.test.ts > 合法手ベースの静的交換評価 (prepared) > 玉による取り返しは敵の利きの有無を既存合法手に従って扱う: 守り=false 1ms
+ ✓ src/test/shogi-static-exchange-evaluation.test.ts > 合法手ベースの静的交換評価 (prepared) > 玉による取り返しは敵の利きの有無を既存合法手に従って扱う: 守り=true 0ms
+ ✓ src/test/shogi-static-exchange-evaluation.test.ts > 合法手ベースの静的交換評価 (prepared) > 最初の駒取りで任意成りの2候補を別々に評価する 1ms
+ ✓ src/test/shogi-static-exchange-evaluation.test.ts > 合法手ベースの静的交換評価 (prepared) > 最終段へ進む歩は強制成りとして評価し、不成を拒否する 0ms
+ ✓ src/test/shogi-static-exchange-evaluation.test.ts > 合法手ベースの静的交換評価 (prepared) > 成駒の捕獲は盤上の成駒価値と持ち駒の元の価値を使う 0ms
+ ✓ src/test/shogi-static-exchange-evaluation.test.ts > 合法手ベースの静的交換評価 (prepared) > カスタム価値表を再帰全体へ渡して既存駒得差分を使う 3ms
+ ✓ src/test/shogi-static-exchange-evaluation.test.ts > 合法手ベースの静的交換評価 (prepared) > 先後を交換して盤を180度回転しても開始側の点数は一致する 5ms
+ ✓ src/test/shogi-static-exchange-evaluation.test.ts > 合法手ベースの静的交換評価 (prepared) > 実際の棋譜・履歴・持ち駒・合法手・価値表を凍結しても決定的で非破壊 2ms
+ ✓ src/test/shogi-static-exchange-evaluation.test.ts > 合法手ベースの静的交換評価 (prepared) > 実行される再帰は対象マスの捕獲だけで、別の捕獲・駒打ち・静かな手を含まない 2ms
+ ✓ src/test/shogi-static-exchange-evaluation.test.ts > 合法手ベースの静的交換評価 (prepared) > 捕獲で詰んでも勝敗の無限値へ変換せず駒得差分を返す 1ms
+ ✓ src/test/shogi-static-exchange-evaluation.test.ts > 合法手ベースの静的交換評価 (prepared) > 生成された合法手を実行できない場合は契約違反を通知する: ply=0 0ms
+ ✓ src/test/shogi-static-exchange-evaluation.test.ts > 合法手ベースの静的交換評価 (prepared) > 生成された合法手を実行できない場合は契約違反を通知する: ply=1 0ms
+ ✓ src/test/shogi-static-exchange-evaluation.test.ts > 合法手ベースの静的交換評価 (prepared) > 非終局でも合法手がない人工局面では現在差分で終了する 0ms
+ ✓ src/test/shogi-static-exchange-evaluation.test.ts > 合法手ベースの静的交換評価 (prepared) > 既存履歴によって千日手になった場合は取り返しを続けず駒得差分を返す 1ms
+ ✓ src/test/shogi-static-exchange-evaluation.test.ts > 合法手ベースの静的交換評価 (prepared) > 有限の駒得差分を作れない価値表は非有限値を返さず拒否: Infinity 0ms
+ ✓ src/test/shogi-static-exchange-evaluation.test.ts > 合法手ベースの静的交換評価 (prepared) > 有限の駒得差分を作れない価値表は非有限値を返さず拒否: NaN 0ms
+ ✓ src/test/shogi-static-exchange-evaluation.test.ts > 合法手ベースの静的交換評価 (prepared) > 有限の駒得差分を作れない価値表は非有限値を返さず拒否: 1.7976931348623157e+308 0ms
+ ✓ src/test/shogi-two-ply-minimax-ai.test.ts > 再帰型αβ探索の主変化 > 終局局面では選択手なしと空のPVを返す 1ms
+ ✓ src/test/shogi-two-ply-minimax-ai.test.ts > 再帰型αβ探索の主変化 > 反復深化では各完了反復と最上位結果が独立したPVを持つ 458ms
+ ✓ src/test/shogi-two-ply-minimax-ai.test.ts > 再帰型αβ探索のPV末端評価内訳 > 固定深さのscore、PV、内訳を同じ末端局面から返し、入力を変更しない 237ms
+ ✓ src/test/shogi-two-ply-minimax-ai.test.ts > 再帰型αβ探索のPV末端評価内訳 > 最大化・最小化の採用候補とαβカットオフ後も、PVと同じ候補の内訳を返す 43ms
+ ✓ src/test/shogi-two-ply-minimax-ai.test.ts > 再帰型αβ探索のPV末端評価内訳 > 反復深化と時間制限探索は完了反復だけの対応する内訳を保持する 219ms
+ ✓ src/test/shogi-two-ply-minimax-ai.test.ts > 再帰型αβ探索のPV末端評価内訳 > 終局の勝ち・負け・引き分けでは空PVでも評価内訳のterminalとtotalを保つ 3ms
+ ✓ src/test/quiescence-benchmark.test.ts > ベンチマークの局面定義 > 安定した一意IDと6種類の目的・日本語名・由来を持ち、毎回独立した同じ局面を生成する 12ms
+ ✓ src/test/quiescence-benchmark.test.ts > ベンチマークの局面定義 > initial: 玉・二歩・行き所・駒数・手番・王手・履歴が整合し、列挙した全合法手を実行できる 7ms
+ ✓ src/test/quiescence-benchmark.test.ts > ベンチマークの局面定義 > pawn-recapture: 玉・二歩・行き所・駒数・手番・王手・履歴が整合し、列挙した全合法手を実行できる 2ms
+ ✓ src/test/quiescence-benchmark.test.ts > ベンチマークの局面定義 > poisoned-rook: 玉・二歩・行き所・駒数・手番・王手・履歴が整合し、列挙した全合法手を実行できる 3ms
+ ✓ src/test/quiescence-benchmark.test.ts > ベンチマークの局面定義 > rook-check: 玉・二歩・行き所・駒数・手番・王手・履歴が整合し、列挙した全合法手を実行できる 1ms
+ ✓ src/test/quiescence-benchmark.test.ts > ベンチマークの局面定義 > promotion-capture: 玉・二歩・行き所・駒数・手番・王手・履歴が整合し、列挙した全合法手を実行できる 2ms
+ ✓ src/test/quiescence-benchmark.test.ts > ベンチマークの局面定義 > gold-drop-evasion: 玉・二歩・行き所・駒数・手番・王手・履歴が整合し、列挙した全合法手を実行できる 2ms
+ ✓ src/test/quiescence-benchmark.test.ts > ベンチマークの局面定義 > pawn-recapture: 捕獲の直後に銀による取り返しが合法である 1ms
+ ✓ src/test/quiescence-benchmark.test.ts > ベンチマークの局面定義 > poisoned-rook: 捕獲の直後に銀による取り返しが合法である 0ms
+ ✓ src/test/quiescence-benchmark.test.ts > ベンチマークの局面定義 > 静かな初期局面・成り捕獲・玉移動・金の合駒の目的が実際の合法手と一致する 2ms
+ ✓ src/test/quiescence-benchmark.test.ts > 比較APIを使用するrunner > fixed: 固定順・独立スナップショット・既定評価・標準順・無効時省略・固定引数を守る 7ms
+ ✓ src/test/quiescence-benchmark.test.ts > 比較APIを使用するrunner > timed: 固定順・独立スナップショット・既定評価・標準順・無効時省略・固定引数を守る 5ms
+ ✓ src/test/quiescence-benchmark.test.ts > 比較APIを使用するrunner > 固定深さの実探索は時間以外の全結果を再現し、入力を変更しない 235ms
+ ✓ src/test/shogi-quiescence-comparison.test.ts > 静止探索設定の独立した固定深さ比較 > 固定順・深さ3・既定評価・standardを使用し、無効ではquiescenceを渡さない 418ms
+ ✓ src/test/quiescence-benchmark.test.ts > 比較APIを使用するrunner > 偽時計で各設定の独立予算を検証し、実時間を待たない 4ms
+ ✓ src/test/quiescence-benchmark.test.ts > 比較APIを使用するrunner > 持ち駒・棋譜・局面履歴のある入力を両モードで保持する 711ms
+ ✓ src/test/quiescence-benchmark.test.ts > 比較APIを使用するrunner > fixed: 第0設定の探索失敗を局面ID・設定・モード付きで報告する 1ms
+ ✓ src/test/quiescence-benchmark.test.ts > 比較APIを使用するrunner > fixed: 第1設定の探索失敗を局面ID・設定・モード付きで報告する 1ms
+ ✓ src/test/quiescence-benchmark.test.ts > 比較APIを使用するrunner > fixed: 第2設定の探索失敗を局面ID・設定・モード付きで報告する 1ms
+ ✓ src/test/quiescence-benchmark.test.ts > 比較APIを使用するrunner > timed: 第0設定の探索失敗を局面ID・設定・モード付きで報告する 1ms
+ ✓ src/test/quiescence-benchmark.test.ts > 比較APIを使用するrunner > timed: 第1設定の探索失敗を局面ID・設定・モード付きで報告する 1ms
+ ✓ src/test/quiescence-benchmark.test.ts > 比較APIを使用するrunner > timed: 第2設定の探索失敗を局面ID・設定・モード付きで報告する 3ms
+ ✓ src/test/quiescence-benchmark.test.ts > 比較APIを使用するrunner > fixed: 不正な結果を既存validatorで拒否し、設定も特定する 2ms
+ ✓ src/test/quiescence-benchmark.test.ts > 比較APIを使用するrunner > timed: 不正な結果を既存validatorで拒否し、設定も特定する 1ms
+ ✓ src/test/quiescence-benchmark.test.ts > 比較APIを使用するrunner > スナップショットへの変更を失敗扱いにし、元入力も監視する 8ms
+ ✓ src/test/quiescence-benchmark.test.ts > 比較APIを使用するrunner > 一局面の失敗後も続行し、重複IDは探索前に拒否する 3ms
+ ✓ src/test/quiescence-benchmark.test.ts > 出力と客観的な集計 > 終局 sente の評価・手なし・空PVを安全に表示する 1ms
+ ✓ src/test/quiescence-benchmark.test.ts > 出力と客観的な集計 > 終局 gote の評価・手なし・空PVを安全に表示する 1ms
+ ✓ src/test/quiescence-benchmark.test.ts > 出力と客観的な集計 > 終局 null の評価・手なし・空PVを安全に表示する 1ms
+ ✓ src/test/quiescence-benchmark.test.ts > 出力と客観的な集計 > 後手視点を先手へ反転し、不正なNaN評価は成功にしない 3ms
+ ✓ src/test/quiescence-benchmark.test.ts > 出力と客観的な集計 > 推奨手の構造的比較・null・失敗除外と各設定の探索量を正しく集計する 2ms
+ ✓ src/test/quiescence-benchmark.test.ts > 出力と客観的な集計 > 最小CLI [] 0ms
+ ✓ src/test/quiescence-benchmark.test.ts > 出力と客観的な集計 > 最小CLI ["fixed"] 0ms
+ ✓ src/test/quiescence-benchmark.test.ts > 出力と客観的な集計 > 最小CLI ["timed"] 0ms
+ ✓ src/test/quiescence-benchmark.test.ts > 出力と客観的な集計 > 最小CLI ["both"] 0ms
+ ✓ src/test/quiescence-benchmark.test.ts > 出力と客観的な集計 > 同一時間の集計で最深反復と全完了反復の通常・静止統計を混同しない 2ms
+ ✓ src/test/quiescence-benchmark.test.ts > 出力と客観的な集計 > 未知CLI "unknown" を拒否する 0ms
+ ✓ src/test/quiescence-benchmark.test.ts > 出力と客観的な集計 > 未知CLI "fixed" を拒否する 0ms
+ ✓ src/test/quiescence-benchmark.test.ts > 出力と客観的な集計 > 未知CLI "--time=1" を拒否する 0ms
+ ✓ src/test/shogi-quiescence-comparison.test.ts > 静止探索設定の独立した固定深さ比較 > 持ち駒・履歴を含む凍結局面を変更せず、PV末端の評価内訳を返す 490ms
+ ✓ src/test/shogi-quiescence-comparison.test.ts > 静止探索設定の独立した固定深さ比較 > 既存の取り返し専用局面では追加2手が毒入り捕獲を見抜く（通常深さ1） 4ms
+ ✓ src/test/shogi-quiescence-comparison.test.ts > 静止探索設定の独立した固定深さ比較 > 金を追加した専用局面の深さ3で読み足しによる手・評価の変化を再現する 220ms
+ ✓ src/test/shogi-quiescence-comparison.test.ts > 静止探索設定の独立した固定深さ比較 > 固定深さ3でもPV末端の毒入り捕獲を追加2手が避ける 230ms
+ ✓ src/test/shogi-quiescence-comparison.test.ts > 静止探索設定の独立した固定深さ比較 > 不正な深さを拒否する: -1 0ms
+ ✓ src/test/shogi-quiescence-comparison.test.ts > 静止探索設定の独立した固定深さ比較 > 不正な深さを拒否する: 0 0ms
+ ✓ src/test/shogi-quiescence-comparison.test.ts > 静止探索設定の独立した固定深さ比較 > 不正な深さを拒否する: 0.5 0ms
+ ✓ src/test/shogi-quiescence-comparison.test.ts > 静止探索設定の独立した固定深さ比較 > 不正な深さを拒否する: Infinity 0ms
+ ✓ src/test/shogi-quiescence-comparison.test.ts > 静止探索設定の独立した固定深さ比較 > 不正な深さを拒否する: NaN 0ms
+ ✓ src/test/shogi-quiescence-comparison.test.ts > 静止探索設定の独立した固定深さ比較 > 第2条件の失敗で全体を失敗させ第3条件へ進まない 21ms
+ ✓ src/test/shogi-time-limited-quiescence-comparison.test.ts > 同一時間の静止探索比較ドメイン > 各API呼出しで時計を読み直し、独立した1000msとスナップショットで直列実行する 19ms
+ ✓ src/test/shogi-time-limited-quiescence-comparison.test.ts > 同一時間の静止探索比較ドメイン > 第2条件で例外が起きると部分結果を返さずhandler全体が失敗する 2ms
+ ✓ src/test/shogi-time-limited-quiescence-comparison.test.ts > 同一時間の静止探索比較ドメイン > 第3条件で例外が起きると部分結果を返さずhandler全体が失敗する 3ms
+ ✓ src/test/shogi-time-limited-quiescence-comparison.test.ts > 同一時間の静止探索比較ドメイン > 持ち駒・棋譜を含む凍結入力を保持する 10ms
+ ✓ src/test/shogi-time-limited-quiescence-comparison.test.ts > 同一時間の静止探索比較ドメイン > 固定条件以外を探索前に拒否する (3, 1000) 0ms
+ ✓ src/test/shogi-time-limited-quiescence-comparison.test.ts > 同一時間の静止探索比較ドメイン > 固定条件以外を探索前に拒否する (4, 999) 0ms
+ ✓ src/test/shogi-time-limited-quiescence-comparison.test.ts > 同一時間の静止探索比較ドメイン > 固定条件以外を探索前に拒否する (NaN, 1000) 0ms
+ ✓ src/test/shogi-time-limited-quiescence-comparison.test.ts > 同一時間の静止探索比較ドメイン > 固定条件以外を探索前に拒否する (4, Infinity) 0ms
+
+ Test Files  8 passed (8)
+      Tests  291 passed (291)
+   Start at  21:29:32
+   Duration  10.24s (transform 2.60s, setup 675ms, import 3.13s, tests 10.73s, environment 3.80s)
+
+JSON report written to C:/Users/tetsu/Documents/Codex/Shogi-App/docs/quiescence-ordering-windows-20260920/compare-4-main.json
+
+{
+  "index": 4,
+  "side": "main",
+  "exitCode": 0,
+  "wallMilliseconds": 11051,
+  "success": 291,
+  "failed": 0,
+  "details": [
+    {
+      "file": "quiescence-benchmark.test.ts",
+      "name": "比較APIを使用するrunner 持ち駒・棋譜・局面履歴のある入力を両モードで保持する",
+      "status": "passed",
+      "duration": 710.6651000000002,
+      "failures": []
+    },
+    {
+      "file": "shogi-two-ply-minimax-ai.test.ts",
+      "name": "再帰型αβ枝刈り探索 深さ3の途中で詰みへ到達した枝は、それ以上の子局面を生成せず既存の終局評価を返す",
+      "status": "passed",
+      "duration": 2628.2321,
+      "failures": []
+    }
+  ]
+}
