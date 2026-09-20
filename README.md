@@ -123,6 +123,31 @@ npm run measure:quiescence-ordering -- timed # 最大4、各条件独立1000ms
 
 今回は`original`の既定値、静止探索の既定無効、通常AI設定、既存`measure:quiescence-suite`の意味・出力、Workerプロトコル、UI、保存形式を変更していません。
 
+### 静止探索内順序付けの複数回A/Bベンチマーク
+
+```bash
+npm run measure:quiescence-ordering-repeated          # bothと同じ
+npm run measure:quiescence-ordering-repeated -- fixed
+npm run measure:quiescence-ordering-repeated -- timed
+npm run measure:quiescence-ordering-repeated -- both
+```
+
+単発の`measure:quiescence-ordering`は従来の各1回・ウォームアップなし・固定順を維持します。新コマンドは同じ6局面、標準評価、通常探索`standard`、追加戦術深さ1/2、静止探索内の`original`/`material`を使用します。fixedは通常深さ3、timedは最大深さ4、各API呼出しに独立した1,000msを与えます。時計の期限や凍結スナップショットを設定間で共有しません。深さ1保証と協調的期限確認により、実時間が1,000msを超える場合があります。
+
+各「局面×fixed/timed×追加深さ」で、各順序設定をウォームアップ3回、本測定8回、直列実行します。局面index・試行indexを0始まりとして、`(局面index + 追加深さ - 1 + 試行index) % 2`が0ならoriginal先行、1ならmaterial先行です。各phaseで試行indexを0から開始し、毎試行交代します。本測定は各設定の先行が4回ずつ、局面と追加深さのどちらを変えても開始順が交代します。乱数は使いません。全体では24比較単位、ウォームアップ144呼出し、本測定384呼出しです。
+
+`TRIAL`行はphase・試行番号（1始まり）・実行順・成否・API全体の参考時間・先手基準評価・推奨手・PV・探索APIの生結果をJSONとして記録します。timedの生結果は最深完了深さ、最大深さ到達、時間切れ、全完了反復を含みます。`Infinity`/`-Infinity`/`NaN`はJSON文字列として保存し、nullへ変換しません。ウォームアップでも入力不変性、全完了反復の合法手APIによるPV再生と末端評価内訳を検証します。参考時間は探索API全体を外側の時計で測り、複製・検証・出力を除き、未完了反復の時間は含みます。探索統計に未完了反復は含めません。
+
+`SUMMARY`は本測定8回だけを集計し、外れ値を除外しません。中央値・四分位数は昇順標本に対する**線形補間（type 7）**です。`h=(n-1)*p`で、0始まりのfloor(h)/ceil(h)の値を小数部分で補間します（p=0.25/0.5/0.75）。例えば1〜8ならQ1=2.75、中央値=4.5、Q3=6.25、IQR=Q3−Q1=3.5。1標本は全分位数がその値、空標本・非有限数の統計入力は拒否します。最小・最大も全標本から求めます。時間の中央値増減率は`(material中央値/original中央値-1)*100`（正は時間増、負は時間減）。original中央値が0なら定義不能としてnullです。
+
+各順序設定について、参考時間の件数・中央値・Q1・Q3・IQR・最小・最大、完了深さ分布、推奨手・先手基準評価の頻度、最初の本測定から推奨手・評価値・PVが異なる件数を出します。手の頻度は表示棋譜が同じでも合法手オブジェクトが違えば別件です。通常・静止探索の各カウンタにも同じ分布統計を適用し、timedでは`deepest`（最深完了反復）と`completedTotals`（各API内の全完了反復合計）を分離します。最大深さ到達回数・時間切れ回数も記録します。`paired`は同じ本測定試行番号でoriginalとmaterialを対応させ、materialの深い／同じ／浅い件数と、推奨手・評価値・PVの変更件数を示します。
+
+fixedでは同じ順序設定の結果（時間以外）が全試行で決定的であることと、original/material間の評価値一致を検証します。順序によって同値手やPVが変わっても、それだけでは失敗にしません。timedでは負荷によって完了深さ・評価・PVが変わるため、両設定間や試行間の結果一致を要求しません。
+
+1回でも失敗した比較単位は`INCOMPLETE`（summary=null）として集計しません。その単位の残りを中止し、取得済みの生結果・エラー・局面/mode/追加深さ/phase/試行/設定の文脈を残して、他の独立単位へ続行します。CLI終了コードは1になります。完全な結果には各単位22呼出しの成功が必要です。
+
+実時間・分布はJIT、GC、OS負荷、実行順、機器に依存します。測定中にテスト・build・別ベンチマークを並列実行しないでください。この数値だけで棋力や最適設定を断定せず、自動的な優劣判定も行いません。materialを既定化せず、静止探索の既定無効も維持します。実時間や訪問数・完了深さをCIの性能合否条件にはしません。測定記録は[反復測定資料](docs/quiescence-ordering-repeated-benchmark.md)、全試行と集計は[生出力](docs/quiescence-ordering-repeated-output.txt)を参照してください。
+
 ## 静止探索（Quiescence Search）の純粋関数基盤
 
 `analyzeQuiescenceSearch(state, perspective, maxTacticalDepth, evaluation?, interruptionCheck?)` は、通常の固定深さ探索が駒取り直後などの不安定な局面で静的評価を確定してしまう探索境界の問題を、限定的に読み足して検証するためのドメインAPIです。開始時に指定した`perspective`を固定し、その側の手番で最大化、相手側で最小化します。非王手局面では既存の静的評価をstand-pat候補として先に置き、合法な駒取り（成り付き捕獲を含む）だけを元の合法手順で読みます。同値ならstand-patを維持します。王手中はstand-patを置かず、既存の合法手生成による玉移動・合駒・駒打ちを含む全回避手を読みます。

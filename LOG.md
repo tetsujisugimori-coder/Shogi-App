@@ -3716,3 +3716,65 @@ PR #1のレビュー指摘を受け、簡易APIの`applyMove`と合法手候補�
 - 全検証は通常設定で直列実行し、別の重い処理は起動していない。全テストとcheckの既存jsdom navigation未実装通知は失敗0と区別して記録。新旧ベンチマークは前日の成功結果を保持し、今回の文書整理では再測定していない。
 - 文書生成用のリポジトリ外ヘルパーは初回構文検査でSyntaxError、終了1。文書生成前にバッククォートのエスケープを修正し、構文検査・生成とも終了0。rgのワイルドカード付きパス指定はos error123で、ディレクトリと`-g`指定へ修正した。機能コードやテストの失敗ではない。
 - 全ローカル検証が成功したため、文書整理のみを通常commit/pushする。push後のHEADに対するCIの確定結果はPR本文へ追記し、開始HEADのCI #169成功と区別する。Ready for reviewを維持し、mainへマージしない。
+
+## [2026-09-21 JST] 静止探索内順序付けの反復A/Bベンチマーク
+
+### 開始確認・調査
+
+- 添付依頼の対象はPR #120/#123の既存6局面・original/materialを用いる独立CLI。開始時main / `a5512a979a6ed723d776583fd76fd083c78fee78`、tracked/untrackedとも変更なし。親ディレクトリとrepo内に追加AGENTS.mdなし。README、過去LOG、既存単発CLI、共通局面、探索API、PV再生と評価内訳検証、既存benchmarkテストを確認。
+- 初回`git fetch origin`はWindows schannelの`SEC_E_NO_CREDENTIALS`で終了128。許可された経路で1回再実行して終了0。`gh pr view 123`でMERGED、main向け、merge SHAが上記HEAD、mergedAt=2026-09-20T20:16:11Zを確認。`git merge-base --is-ancestor`終了0、`git merge --ff-only origin/main`終了0（Already up to date）。新ブランチ`feat/quiescence-ordering-repeated-benchmark`を作成。既存変更の削除/reset/stashなし。
+
+### 設計判断・変更ファイル
+
+- `scripts/benchmarks/quiescenceOrderingSuite.ts`: 単発版の1設定分の探索API呼出し、独立凍結snapshot、入力不変性、PV/末端評価検証を`runOrderingTrial`へ抽出。既存単発CLIの条件・順序・集計・既定動作を維持。validatorと統計キーを再利用し探索ロジックを複製しない。
+- `scripts/benchmarks/quiescenceOrderingRepeated.ts`: 原子的な比較単位は局面×fixed/timed×追加深さ。各設定warmup3、本測定8、phase内で試行順を交代。開始順は局面index+追加深さ-1の偶奇、各設定の先行は本測定4回ずつ。各APIは独立した期限と凍結snapshotを使用。外側の注入可能な時計でAPI全体のみを測定。
+- fixedの同設定は時間を除く全結果の決定性、異設定間は評価値一致を必須とし、同値手/PVの違いは件数で記録。timedは一致を要求せず全完了反復を検証し、最深と合計を分離。生結果を検証前に複製保存し、失敗単位を集計から除外して独立単位へ続行、CLI終了1。
+- 四分位数はtype7線形補間、外れ値除外なし。本測定だけの時間・各探索カウンタの分布、深さ/手/評価の頻度、同試行番号の深い/同じ/浅い件数と手/PV変更件数を出力。非有限評価はJSON文字列保存。0を分母にする時間増減率はnull。
+- `scripts/measure-quiescence-ordering-repeated.ts`と`package.json`: 独立CLIとfixed/timed/both選択、環境・開始/終了・HEAD・dirty状態・実測ソース4ファイルのSHA-256を記録。各TRIALを逐次出力し、各単位のSUMMARY/INCOMPLETE、最後に成否数と終了コードを出す。
+- `src/test/quiescence-ordering-repeated.test.ts`: 決定的fixture、注入時計、合法PVと評価内訳でスケジュール、集計、失敗、入力変更、非有限表示、同値手を含む正しさ境界を検証。実時間待機・実測値の固定期待値・既存テスト緩和・timeout変更なし。
+- `README.md`: 実行例・単発との違い・順序・統計定義・失敗処理・解釈と非対象を追記。`docs/quiescence-ordering-repeated-benchmark.md`と`docs/quiescence-ordering-repeated-output.txt`に実測条件と全試行を保存予定。
+
+### 実装中の検証と切り分け
+
+- 初回`npm run lint`終了1: 新しいテストfixtureの合計統計型、Vitest eachへの空配列渡し型、readonly評価内訳への代入、引き分けGameResultの型にエラー。今回追加コードに限定。fixtureを正しい型・引き分け理由・オブジェクト置換・パラメーター形状に修正し、再lint終了0。プロダクトコードや既存期待値の緩和なし。
+- 新規単独`npm test -- src/test/quiescence-ordering-repeated.test.ts`: 終了0、33/33成功（05:40:07 JST、2.05秒）。fake clockの期限検証でAPI実装の時計呼出し数を参照し、実時間の期待値は使用しない。
+- 設定引数の厳密検証・頻度検証を追加後、`npm test -- src/test/quiescence-ordering-repeated.test.ts src/test/quiescence-ordering-benchmark.test.ts src/test/quiescence-benchmark.test.ts src/test/shogi-quiescence-ordering.test.ts src/test/shogi-quiescence-search.test.ts`: 終了0、5ファイル144/144成功（05:42:09 JST、4.26秒）。通常Vitest設定。
+- `npm run verify:lock`: 終了0、399 entries/registry398、version/resolved/integrity欠落0。`npm run lint`: 終了0。
+- `npm run measure:quiescence-ordering`: 終了0、fixed/timed各6局面24設定、計48条件成功。固定深さの評価一致、全PV・末端評価内訳・入力不変性、timedの全完了反復を検証。生出力はrepo外`../shogi-repeated-benchmark-evidence/legacy.txt`に保持。
+- 重い処理は1つずつ実行し、測定中にテスト/build/別ベンチマークを実行しない。OS常駐プロセスは操作していない。
+
+### [2026-09-21 05:47 JST] fixed完了と失敗表示の追加検証
+
+- 新fixedは05:43:24〜05:46:20 JST、12比較単位・264呼出し（warmup72/本測定192）が全て成功、CLI終了0。全PV・末端評価内訳・入力不変性・固定評価一致・同設定の決定性が成功。各設定の本測定8回全てを採用。
+- fixedの静止訪問（各局面1回分を6局面合計）は追加1手948→712、追加2手681→472で既存測定と一致。時間中央値は12条件中6条件で減少/6条件で増加。同値の手/PV変更は今回実測では0。性能優劣の自動判定や既定化はしない。
+- fixed後のコードレビューで、APIが不正なプリミティブ値を返した場合、保存済み生値へ表示側が`in`を適用すると別例外になる経路を確認。今回追加コード由来であり、`formatRepeatedTrial`の最大深さ表示だけにtypeof objectガードを追加。探索・計時・検証・順序・集計・成功結果の表示は不変。
+- 不正な42/文字列/nullでもTRIAL保存・単位除外・他単位続行・CLI終了1となる3件と、timedの手/評価頻度5対3・初回からの変更3件を確認する1件を追加。関連5ファイルの同じコマンドを再実行して148/148成功（新規37、05:47:20 JST、3.95秒）、終了0。
+- fixed時の実装は最終ソースのこのガード1か所を戻してSHA-256と照合する。timedはガード追加後のソースで実行。成功したfixed試行を都合よく選び直す再測定は行わず全出力を保持し、この差分を資料に明記する。
+
+### [2026-09-21 05:52 JST] timed完了・保存結果の照合
+
+- 新timedは05:47:43〜05:51:28 JST、12比較単位・264呼出し（warmup72/本測定192）が全て成功、CLI終了0。全完了反復のPV合法性・末端評価内訳・入力不変性・最深と合計の統計対応が成功。
+- 本測定96ペアでmaterialが深い4、同じ90、浅い2。差の6ペアは全てgold-drop-evasion。各追加深さでoriginalは深さ2が2回/3が6回、materialは2が1回/3が7回。initialは両設定とも深さ2を各8回、pawn-recapture/poisoned-rookは3を各8回、rook-check/promotion-captureは4を各8回。最大4到達は各設定・各追加深さで16/48回、時間切れ32/48回。
+- 深さ差の6ペアのうち先行設定の方が浅い5ペア、後行設定の方が浅い1ペア。局面・追加深さ・試行番号と実行順を資料に明示。OS負荷/JIT/GC/時間経過/順序のどれが原因かまでは識別できない。
+- repo外の`report.mjs`で保存済みJSONを読み直し、全528 TRIAL成功、24 SUMMARY、各設定warmup3/本測定8/先行4、試行番号重複なし、記録ソースハッシュとの一致を検証して終了0。fixed時のハッシュは表示ガード1か所を戻して照合、timedは最終コードと一致。
+- `docs/quiescence-ordering-repeated-output.txt`へfixed/timed出力を全収録（1,593,888 bytes）。先頭/末尾の空行だけ正規化し、数値・全生結果・順序・集計・開始終了・ソースハッシュは保持。書き込み後の内容完全一致も検証。要約資料には全条件の時間分布・fixed各探索カウンタ・timed深さ分布・改善/同じ/悪化を記録。
+- 見送った項目: material既定化、静止探索既定有効化、UI/Worker/探索/評価/SEE/合法手/保存形式/依存変更、時間性能ゲート、乱数、追加の汎用設定、外れ値除外、有意差・棋力・最適設定の自動判定。1台8標本で既定化の十分な証拠とは判断しない。
+- 次の候補: 別実行日・OS・機器で同条件の直列測定を行い、順序別・時間経過の影響を確認。棋力評価や新しい探索最適化は別課題。
+
+### [2026-09-21 05:55 JST] 最終ローカル検証
+
+| コマンド | 終了コード | 結果 |
+| --- | ---: | --- |
+| 新規37件を含む関連5ファイル（最終） | 0 | 148成功/0失敗、通常設定 |
+| `npm run verify:lock` | 0 | 399 entries/registry398、欠落0 |
+| `npm run lint`（fixture修正後、関連テスト後） | 0 | 型エラー0 |
+| `npm run measure:quiescence-ordering` | 0 | 旧48条件すべて成功 |
+| `npm run measure:quiescence-ordering-repeated -- fixed` | 0 | 12単位264呼出し成功、評価一致・全PV・入力・決定性成功 |
+| `npm run measure:quiescence-ordering-repeated -- timed` | 0 | 12単位264呼出し成功、全完了反復検証成功 |
+| `node ../shogi-repeated-benchmark-evidence/report.mjs` | 0 | 全528試行・順序・保存内容・測定ソースの照合成功 |
+| `npm run check` | 0 | lock→lint→52ファイル1561成功/0失敗（137.71秒）→build1752 modules（1.60秒）まで完走 |
+| `git diff --check` | 0 | 空白エラーなし、Windows改行変換警告のみ |
+
+- check内全体テスト開始05:51:58 JST。UI/Worker/合法手/棋譜/評価/SEEを含む既存機能も全体テストで回帰確認。jsdom navigation未実装通知は既存の通知で、失敗0と区別。全体checkは1回実行、時間超過や未解決テスト失敗なし。重いコマンドは直列。
+- 最終差分はREADME、LOG、package.json、共通単発suite、反復suite、新CLI、新規テスト、要約docs、生出力の9ファイル。domain/application/Worker/components/types/package-lockの差分なし。既存テストの削除/skip/期待値緩和/timeout延長なし。LOGは追記のみ。
+- 完了条件を満たしたため通常commit/push/PR作成へ進む。mainはマージせず維持する。CIは作成後のHEADに対する結果を別途確認し、ローカル成功をCI成功とみなさない。
