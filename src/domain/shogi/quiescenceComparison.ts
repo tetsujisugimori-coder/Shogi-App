@@ -13,11 +13,12 @@ export type QuiescenceComparisonResult = AlphaBetaSearchResult & {
 /** Atomic passes with independent frozen snapshots and the default evaluation. */
 export function analyzeQuiescenceComparison(
   state: BoardState, depth: number, clock?: SearchClock,
+  search = analyzeAlphaBetaSearch,
 ): readonly QuiescenceComparisonResult[] {
   if (!Number.isSafeInteger(depth) || depth < 1) throw new RangeError('Comparison depth must be a positive integer.');
   const start = createComparisonSnapshot(state);
   return QUIESCENCE_COMPARISON_SETTINGS.map((quiescenceMaxTacticalDepth) => ({
-    ...analyzeAlphaBetaSearch(createComparisonSnapshot(start), depth, undefined, clock, {
+    ...search(createComparisonSnapshot(start), depth, undefined, clock, {
       moveOrdering: 'standard',
       ...(quiescenceMaxTacticalDepth === null ? {} : { quiescence: { maxTacticalDepth: quiescenceMaxTacticalDepth } }),
     }),

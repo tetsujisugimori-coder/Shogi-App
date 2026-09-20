@@ -23,7 +23,8 @@ const count = (value: number) => Number.isSafeInteger(value) && value >= 0;
 export function validateTimeLimitedQuiescenceComparison(
   state: BoardState, maxDepth: number, milliseconds: number, value: unknown,
 ): asserts value is readonly TimeLimitedQuiescenceComparisonResult[] {
-  const invalid = (): never => { throw quiescenceComparisonProtocolError('同一時間の静止探索比較結果を検証できませんでした。'); };
+  let setting = 'all';
+  const invalid = (): never => { throw quiescenceComparisonProtocolError('同一時間の静止探索比較結果を検証できませんでした。', setting); };
   if (maxDepth !== TIME_LIMITED_QUIESCENCE_COMPARISON_MAX_DEPTH || milliseconds !== TIME_LIMITED_QUIESCENCE_COMPARISON_MILLISECONDS ||
     !Array.isArray(value) || value.length !== 3) return invalid();
   const legalCount = getLegalActions(state).length;
@@ -46,6 +47,7 @@ export function validateTimeLimitedQuiescenceComparison(
     } else if (!validateAndFormatPrincipalVariation(state, pass, Math.max(depth, pass.principalVariation.length), true)) return invalid();
   };
   for (const [index, entry] of (value as unknown[]).entries()) {
+    setting = String(TIME_LIMITED_QUIESCENCE_COMPARISON_SETTINGS[index] ?? 'disabled');
     if (typeof entry !== 'object' || entry === null) return invalid();
     const result = entry as TimeLimitedQuiescenceComparisonResult;
     const extension = TIME_LIMITED_QUIESCENCE_COMPARISON_SETTINGS[index];
