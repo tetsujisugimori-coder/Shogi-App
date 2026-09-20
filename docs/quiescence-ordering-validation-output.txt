@@ -1,19 +1,19 @@
 
 ===== ordering-initial.txt =====
-failed to load config from C:\Users\tetsu\Documents\Codex\Shogi-App\vite.config.ts
+failed to load config from <PROJECT_ROOT>/vite.config.ts
 
 ⎯⎯⎯⎯⎯⎯⎯ Startup Error ⎯⎯⎯⎯⎯⎯⎯⎯
 Error: spawn EPERM
     at ChildProcess.spawn (node:internal/child_process:458:11)
     at Object.spawn (node:child_process:813:9)
-    at ensureServiceIsRunning (C:\Users\tetsu\Documents\Codex\Shogi-App\node_modules\esbuild\lib\main.js:1978:29)
-    at build (C:\Users\tetsu\Documents\Codex\Shogi-App\node_modules\esbuild\lib\main.js:1876:26)
-    at bundleConfigFile (file:///C:/Users/tetsu/Documents/Codex/Shogi-App/node_modules/vite/dist/node/chunks/dep-Dm0c1Wj2.js:49448:24)
-    at async bundleAndLoadConfigFile (file:///C:/Users/tetsu/Documents/Codex/Shogi-App/node_modules/vite/dist/node/chunks/dep-Dm0c1Wj2.js:49432:19)
-    at async loadConfigFromFile (file:///C:/Users/tetsu/Documents/Codex/Shogi-App/node_modules/vite/dist/node/chunks/dep-Dm0c1Wj2.js:49396:44)
-    at async resolveConfig (file:///C:/Users/tetsu/Documents/Codex/Shogi-App/node_modules/vite/dist/node/chunks/dep-Dm0c1Wj2.js:48891:24)
-    at async _createServer (file:///C:/Users/tetsu/Documents/Codex/Shogi-App/node_modules/vite/dist/node/chunks/dep-Dm0c1Wj2.js:38478:66)
-    at async createViteServer (file:///C:/Users/tetsu/Documents/Codex/Shogi-App/node_modules/vitest/dist/chunks/cli-api.CnMVyzaz.js:8902:17) {
+    at ensureServiceIsRunning (<PROJECT_ROOT>/node_modules/esbuild/lib/main.js:1978:29)
+    at build (<PROJECT_ROOT>/node_modules/esbuild/lib/main.js:1876:26)
+    at bundleConfigFile (<PROJECT_ROOT>/node_modules/vite/dist/node/chunks/dep-Dm0c1Wj2.js:49448:24)
+    at async bundleAndLoadConfigFile (<PROJECT_ROOT>/node_modules/vite/dist/node/chunks/dep-Dm0c1Wj2.js:49432:19)
+    at async loadConfigFromFile (<PROJECT_ROOT>/node_modules/vite/dist/node/chunks/dep-Dm0c1Wj2.js:49396:44)
+    at async resolveConfig (<PROJECT_ROOT>/node_modules/vite/dist/node/chunks/dep-Dm0c1Wj2.js:48891:24)
+    at async _createServer (<PROJECT_ROOT>/node_modules/vite/dist/node/chunks/dep-Dm0c1Wj2.js:38478:66)
+    at async createViteServer (<PROJECT_ROOT>/node_modules/vitest/dist/chunks/cli-api.CnMVyzaz.js:8902:17) {
   errno: -4048,
   code: 'EPERM',
   syscall: 'spawn'
@@ -24,7 +24,7 @@ Error: spawn EPERM
 
 ===== ordering-rerun.txt =====
 
- RUN  v4.1.11 C:/Users/tetsu/Documents/Codex/Shogi-App
+ RUN  v4.1.11 <PROJECT_ROOT>
 
 
  Test Files  1 passed (1)
@@ -35,7 +35,7 @@ Error: spawn EPERM
 
 ===== new-tests.txt =====
 
- RUN  v4.1.11 C:/Users/tetsu/Documents/Codex/Shogi-App
+ RUN  v4.1.11 <PROJECT_ROOT>
 
 
  Test Files  2 passed (2)
@@ -46,7 +46,7 @@ Error: spawn EPERM
 
 ===== focused-tests.txt =====
 
- RUN  v4.1.11 C:/Users/tetsu/Documents/Codex/Shogi-App
+ RUN  v4.1.11 <PROJECT_ROOT>
 
  ❯ src/test/quiescence-benchmark.test.ts (38 tests | 1 failed) 7838ms
      × 持ち駒・棋譜・局面履歴のある入力を両モードで保持する 7299ms
@@ -90,7 +90,7 @@ If this is a long-running test, pass a timeout value as the last argument or con
 
 ===== baseline-focused-tests.txt =====
 
- RUN  v4.1.11 C:/Users/tetsu/Documents/Codex/shogi-quiescence-ordering-baseline
+ RUN  v4.1.11 <MAIN_WORKTREE>
 
 
  Test Files  8 passed (8)
@@ -101,7 +101,7 @@ If this is a long-running test, pass a timeout value as the last argument or con
 
 ===== focused-rerun.txt =====
 
- RUN  v4.1.11 C:/Users/tetsu/Documents/Codex/Shogi-App
+ RUN  v4.1.11 <PROJECT_ROOT>
 
  ❯ src/test/quiescence-benchmark.test.ts (38 tests | 1 failed) 5905ms
      × 持ち駒・棋譜・局面履歴のある入力を両モードで保持する 5383ms
@@ -130,7 +130,7 @@ If this is a long-running test, pass a timeout value as the last argument or con
 
 ===== branch-benchmark-isolated.txt =====
 
- RUN  v4.1.11 C:/Users/tetsu/Documents/Codex/Shogi-App
+ RUN  v4.1.11 <PROJECT_ROOT>
 
 
  Test Files  1 passed (1)

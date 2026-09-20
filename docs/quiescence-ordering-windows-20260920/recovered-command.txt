@@ -1,3 +1,0 @@
-Recovered from this task tool-call history; counts matched saved focused-tests.txt and focused-rerun.txt.
-npx vitest run src/test/shogi-quiescence-ordering.test.ts src/test/quiescence-ordering-benchmark.test.ts src/test/shogi-quiescence-search.test.ts src/test/shogi-two-ply-minimax-ai.test.ts src/test/shogi-see-move-ordering.test.ts src/test/shogi-move-ordering-modes.test.ts src/test/shogi-static-exchange-evaluation.test.ts src/test/quiescence-benchmark.test.ts src/test/shogi-quiescence-comparison.test.ts src/test/shogi-time-limited-quiescence-comparison.test.ts
-Comparison excludes only the two PR-specific tests missing in main. Same common-file arguments/config and independent 2 workers in all six runs; no other heavy commands launched concurrently.

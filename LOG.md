@@ -2338,7 +2338,7 @@ PR #1のレビュー指摘を受け、簡易APIの`applyMove`と合法手候補�
 - Vite開発サーバーとCodex内蔵ブラウザでPC幅1280×1000（実効client幅1265px）とモバイル幅500×1000（実効client幅485px）を確認した。agent-browser CLIは環境のPATHになかったため内蔵ブラウザを使用した。
 - PC幅では初期局面を保存後、7六歩・3四歩を実際に指し、1手目終了局面を再生したまま保存した。保存前後とも `replayHistoryIndex: 1`、実stateの履歴2件、直前手「△3四歩」を維持し、保存ボタンは再生中も有効だった。
 - 再生中に取得した実JSONは `history` 2件、`lastMove: △3四歩`、最新局面の3四に後手歩、先手番、第3手を保持し、表示中の1手目スナップショットではなく最新stateを保存したことを確認した。
-- 現在局面へ戻って先手が投了した後にも保存でき、終局理由 `resignation`、履歴2件、再生スナップショット3件、末尾改行を持つJSONをテキストとしてparseできた。実ダウンロード4件を `C:\Users\tetsu\Downloads` へ取得し、最終v1では `latestState`、`history`、`lastMove`、`result`、両局面履歴、500手待機を含む全主要フィールドがトップレベルにあることも確認した。
+- 現在局面へ戻って先手が投了した後にも保存でき、終局理由 `resignation`、履歴2件、再生スナップショット3件、末尾改行を持つJSONをテキストとしてparseできた。実ダウンロード4件を `<DOWNLOADS>` へ取得し、最終v1では `latestState`、`history`、`lastMove`、`result`、両局面履歴、500手待機を含む全主要フィールドがトップレベルにあることも確認した。
 - モバイル幅では棋譜を閉じた状態でも保存ボタンが表示・操作可能で、上部操作は折り返した。棋譜を開いた状態も含めdocumentのclient幅とscroll幅はともに485pxで横スクロールなし。盤・棋譜を圧迫する重なりはなかった。
 - 両幅でViteエラーオーバーレイなし、ブラウザconsoleのwarning / error 0件。Object URL解放は単体テストで確認した（ブラウザのdownloadイベント待機APIは標準Blobダウンロードを捕捉せずタイムアウトしたが、実ファイル生成はファイルシステムで確認できた）。
 
@@ -3551,7 +3551,7 @@ PR #1のレビュー指摘を受け、簡易APIの`applyMove`と合法手候補�
 
 - 依頼: PR #120の6局面を再利用し、合法候補集合・評価・戦術深さを維持したまま静止探索内だけをoriginal/materialで比較する。検証成功後のcommit/push/PRは許可されているが、既存問題・環境依存・原因不明の失敗は一旦停止する条件がある。
 - 開始ブランチmain、HEAD `032622f4f23f90198681d745ff71c2ea5ca0261e`、`git status --short --branch` は `## main...origin/main`、tracked/untrackedとも変更なし。diffも空。
-- C:\からリポジトリまでの親ディレクトリとリポジトリ内を確認し、追加AGENTS.mdは見つからなかった。`rg --files -g AGENTS.md`は該当なしで終了1。ユーザー提示の日時記載指示に従う。
+- ファイルシステムのルートからリポジトリまでの親ディレクトリとリポジトリ内を確認し、追加AGENTS.mdは見つからなかった。`rg --files -g AGENTS.md`は該当なしで終了1。ユーザー提示の日時記載指示に従う。
 - 最初の `git fetch origin` はschannel `SEC_E_NO_CREDENTIALS` で終了128。資格情報が利用できる許可された経路で再実行し終了0。
 - `gh pr view 120 --json number,state,mergeCommit,url`でMERGEDと上記merge SHAを確認。`git merge-base --is-ancestor 032622f4f23f90198681d745ff71c2ea5ca0261e origin/main`終了0。origin/mainは同じSHA。`git merge --ff-only origin/main`終了0（Already up to date）。`feat/quiescence-lightweight-ordering`を作成した。
 - README/LOG、静止探索・通常αβ・材料評価・比較API・既存validator・PV再生・6局面fixture・関連テストを確認。過去のメモリは静止探索の境界と統計分離の確認に使い、現在のコードで照合した。
@@ -3639,11 +3639,11 @@ PR #1のレビュー指摘を受け、簡易APIの`applyMove`と合法手候補�
 
 - 依頼は既存PR #123のWindows時間超過の切り分けと必要時のみの修正。新PR作成・mainへのマージは行わず、条件を満たした場合のみReady for reviewへ変更する。
 - 開始時 `feat/quiescence-lightweight-ordering` / `2f9f1920d40445a1e796aeb87526d04d5a9d5e84`、作業ツリーはクリーン。親ディレクトリおよびrepo内に追加AGENTS.mdなし。fetch終了0、origin/main `032622f4f23f90198681d745ff71c2ea5ca0261e`、origin作業ブランチ/PR HEADはローカルと同じ。PRはOPEN/Draft。
-- CI run #168 (35510024792) のHEADとmacOS/Ubuntuの各lock/lint/test/build成功をAPIで確認。JSONは `docs/quiescence-ordering-windows-20260920/ci-run-168.json`。Windowsの成功の代用にはしない。
+- CI run #168 (35510024792) のHEADとmacOS/Ubuntuの各lock/lint/test/build成功をAPIで確認。CI結果は `docs/quiescence-ordering-windows-20260920.md` に集約。Windowsの成功の代用にはしない。
 - Windows 11 Home 10.0.26200 / Intel Core i7-14650HX (24論理CPU) / Node v24.20.0 / npm11.17.0。両側同じnode.exeを使用。
 - 既存のjunction共有worktreeを変更せず、新たに `../shogi-pr123-windows-main-20260920` をorigin/mainのdetached worktreeとして作成。PR側npm ciは302 packages/45秒、main側は302 packages/35秒、各終了0。node_modulesは別の実ディレクトリで、symlink/junctionでないこととVitestの実体パスを確認。
 - 両lockfile SHA-256 `5e8430b71c59da6d0bf9018c0c2910312da375a97ff194b2e332903844c97c57`、両インストール済みnode_modules/.package-lock.json SHA-256 `a9f1deb316eb3cd4647d76519f111403dd507d47e97ab102b80fe13a66221ed8`。dependencies/devDependenciesも一致。共通8テスト/setup/vite.configにもmainとの差分なし。
-- 前回の集中10ファイルの正確なコマンドはこのタスクのtool-call履歴から復元し、LOG/保存済みfocused出力の件数と照合した。新規2ファイルはmainに存在しないためコピーせず、比較は共通8ファイル（291件）で揃えた。正確な一覧は追加資料と `recovered-command.txt` に保存。
+- 前回の集中10ファイルの正確なコマンドはこのタスクのtool-call履歴から復元し、LOG/保存済みfocused出力の件数と照合した。新規2ファイルはmainに存在しないためコピーせず、比較は共通8ファイル（291件）で揃えた。正確な一覧と再実行コマンドは `docs/quiescence-ordering-windows-20260920.md` に集約。
 - 既定Vitest sequencerが失敗/実時間キャッシュで順を変えることをインストール済みソースで確認。比較6回だけ、元configを継承した同一内容の一時configで8ファイルの投入順とmaxWorkers:2/fileParallelism:trueを固定。timeoutは既存5000ms、テスト本文/環境/setup/隔離は維持。2ワーカー内の完了順や重なりまで固定したとは主張しない。
 - main→PR→PR→main→main→PRを厳密に直列実行。各プロセスの終了後だけ次を開始し、他のVitest/build/benchmark/E2Eは並行しない。ユーザーの常駐プロセスは停止していない。予定6回を成功までの無制限再実行に変えない。
 
@@ -3661,7 +3661,7 @@ PR #1のレビュー指摘を受け、簡易APIの`applyMove`と合法手候補�
 - PR固有の性能回帰を示す結果なし。main/PRの各初回だけ同じ詰み枝テストが約5.3秒で超過し、後続2回ずつは変更なしで成功した。値・選択手・PV等の機能assertion不一致は報告されていない。benchmark側の過去7.3/5.4秒超過は今回6回とも再現しない。
 - 発生範囲は独立npm ci後の各ディレクトリ初回。既存の深さ3全合法枝の参照minimaxという重いテストがWindowsの初回実行負荷・実行条件に依存している。特定のOS処理、JIT、キャッシュ、ウイルス対策等の物理的原因までは特定していない。過去benchmark超過の正確な負荷源も断定しない。
 - 片側だけ継続的に遅いという条件を満たさないため、材料表解決・静止探索等の本体変更は行わない。mainが複数回にわたり閾値付近という条件も満たさず、fixture/局所timeout/グローバル設定/skip/期待値も変更しない。追加するのは証跡と説明だけ。READMEは仕様変更がないので維持。
-- 一時configは保存コピーとハッシュが一致することを確認して両側から削除。証跡としてconfigとrunnerのテキストを保存。既存worktreeは触らず、今回の独立main worktreeは再現用に保持。
+- 一時configは保存コピーとハッシュが一致することを確認して両側から削除。検証時にconfigとrunnerのテキストを保存し、最終ツリーでは要約文書へ比較configとコマンドを集約。既存worktreeは触らず、今回の独立main worktreeは再現用に保持。
 
 ### 通常設定での検証（全体check前まで）
 
@@ -3671,7 +3671,7 @@ PR #1のレビュー指摘を受け、簡易APIの`applyMove`と合法手候補�
 - `measure:quiescence-ordering -- fixed` は24条件成功/失敗0、終了0。12ペアの評価一致・全PV合法性・末端内訳・入力不変性が成功。静止訪問948→712 / 681→472、カット1042→1102 / 714→546で旧実測と同じ。
 - fixed参考時間は追加1手883.2→802.6ms、追加2手563.1→1358.0ms。金打ち合駒の追加2手materialは983.4ms、original130.2msより遅い結果も保存。
 - `measure:quiescence-ordering -- timed` は24条件成功/失敗0、終了0。未完了反復の不採用と最深/合計統計の対応を検証。初期局面の追加2手originalは深さ3、materialは深さ2となった。他は両モード同じ深さ。既定化非推奨は維持。
-- 旧 `measure:quiescence-suite` は36条件成功/失敗0、終了0。各コマンドの開始/終了/終了コードはvalidation-results.jsonl、生出力は同フォルダ。性能値はCI期待値にしていない。
+- 旧 `measure:quiescence-suite` は36条件成功/失敗0、終了0。検証時の生出力・開始/終了・終了コードを確認し、最終ツリーでは要約文書に結果を集約。性能値はCI期待値にしていない。
 - 全体 `npm run check` を通常configで直列実行中。最終結果は後段に追記し、単独成功/CI成功で代用しない。
 
 ### 調査経路の失敗
@@ -3679,7 +3679,7 @@ PR #1のレビュー指摘を受け、簡易APIの`applyMove`と合法手候補�
 - OS/CPUのGet-CimInstanceはアクセス拒否。安全な読取代替のNode標準os APIで情報取得した。情報取得失敗をテスト失敗と扱わない。
 - rgのワイルドカードをパスとして渡した2回の調査はWindows os error123。ディレクトリ＋-g指定へ修正して対象ソースを確認。
 - 記録用NodeのexecFileSync(git)がsandboxのspawn EPERMで終了1。子プロセスを使わず親シェルでSHAを取得/再照合し、Nodeのos/fsだけで環境JSONを保存。検証本体の子プロセス起動は最初から許可された実行経路で行った。
-- 既存の失敗記録は削除/書き換えず残している。追加資料 `docs/quiescence-ordering-windows-20260920.md` と同名フォルダに6回の成功/失敗をすべて保存。
+- 既存の失敗記録は削除/書き換えず残している。最終ツリーの追加資料 `docs/quiescence-ordering-windows-20260920.md` に6回の成功/失敗をすべて残した。
 
 ### [2026-09-20 21:41 JST] Windows最終検証結果
 
@@ -3689,3 +3689,30 @@ PR #1のレビュー指摘を受け、簡易APIの`applyMove`と合法手候補�
 - 結論: 同条件で両側初回に再現し、後続各2回と通常設定の全体検証が成功したため、PR固有の未解決機能/性能回帰とは判定しない。正確なOS負荷源までは断定しないが、発生範囲はmainにもある初回実行の負荷依存として証拠化できた。無根拠な本体修正やtimeout延長は不要。
 - 全ローカル完了条件（同条件比較・範囲判定・必要時のみ修正・check・新旧ベンチ・diff・記録）を満たした。既存PR #123へ証跡をcommit/pushして本文追記し、更新後CI確認後にReady for reviewへ変更する。新PR作成・mainマージは行わない。
 - 残る注意: 初回負荷で5000msを超える可能性は保証できず、条件が変われば同じ比較手順で再調査する。materialは今回timedの初期局面追加2手で完了深さがoriginalより浅かったため、既定化非推奨を維持する。
+
+## [2026-09-21 05:03 JST] PR #123 最終リポジトリの文書整理
+
+- 開始時は `feat/quiescence-lightweight-ordering`、作業ツリーはクリーン。fetch後もHEAD・origin作業ブランチ・PR HEADは `e2b63ae621cdfcd14a6f263cae64a414ed93910b`、origin/mainは `032622f4f23f90198681d745ff71c2ea5ca0261e`。PRはOPEN / Ready for review、54ファイル・追加4839行・削除25行。親ディレクトリとrepo内に追加AGENTS.mdなし。
+- `git ls-files docs/quiescence-ordering-windows-20260920` と実ディレクトリを照合し、指定の検証証跡38ファイルだけを削除。リポジトリ外の元証跡・既存worktree・ユーザーの変更は保持し、履歴書き換えは行わない。
+- [Windows要約](docs/quiescence-ordering-windows-20260920.md) に独立node_modules、共通8ファイル、同一2ワーカー設定、直列6回の表、再実行コマンド、集中10ファイル332成功、全体checkの51ファイル1524成功、新旧ベンチマーク成功を集約。初回失敗記録と既存ベンチマーク文書・出力は残した。
+- Windows再検証の結論は変更なし。main/PR双方の初回だけ詰み枝テストが約5.3秒で超過し、後続各2回は約2.0〜2.6秒で成功、benchmark対象は全6回成功。PR固有の性能回帰を示す証拠はなく、本体修正は不要。Windows初回の負荷依存は残る。materialは既定化せず、実時間をCIの固定期待値にしない。
+- パス置換は上記要約、`docs/quiescence-ordering-validation-output.txt`、本LOGに限定。PR rootを `<PROJECT_ROOT>`、main比較rootを `<MAIN_WORKTREE>`、過去のダウンロード先を `<DOWNLOADS>` とし、Node実行ファイルは両側同一と記載。例外名・スタックの相対位置・測定値・終了コード・テスト名・SHAは維持。既存記録の参照先だけ要約へ修正した。
+- ソース・テスト・scripts・README・設定・依存関係に開始HEADからの差分なし。PRの54テキストファイルを削除前に機密検査し、実トークン・Authorization/Bearerの秘密値なし。認証変数名は過去の権限エラーの説明のみ。
+- CI run #169（35511360040）は開始HEADでmacOS・Ubuntuともlock・型チェック・全テスト・build成功を再確認。整理後のCIはpush後に別途確認する。Ready for reviewは維持し、新PR作成・mainマージは行わない。
+- 編集後のstatus・diff stat/name-statusを確認。`git diff --check` / `git diff --cached --check` は終了0、削除ディレクトリのGit管理ファイルは0件。検証結果は以下へ追記する。今回の実行ログはリポジトリ外の `../shogi-pr123-docs-cleanup-evidence/` に保存する。
+
+### [2026-09-21 05:07 JST] 整理後の最終ローカル検証
+
+| コマンド | 終了 | 結果 |
+| --- | ---: | --- |
+| `npm run verify:lock` | 0 | 399 entries、registry398、欠落0 |
+| `npm run lint` | 0 | 型チェック成功 |
+| `npm test` | 0 | 51ファイル1524成功/0失敗、65.36秒 |
+| `npm run build` | 0 | 1752 modules、1.82秒 |
+| `npm run check`（上記の後に実行） | 0 | lock→lint→51ファイル1524成功/0失敗（66.57秒）→build1752 modules（1.61秒）まで完走 |
+| `git diff --check` / `git diff --cached --check` | 0 / 0 | 空白エラーなし |
+| 残るPRテキスト16ファイルのパス・機密情報・ローカルMarkdownリンク検査 | 0 | 問題なし、比較表6行は整理前と一致、掲載PowerShellコマンドの構文エラー0 |
+
+- 全検証は通常設定で直列実行し、別の重い処理は起動していない。全テストとcheckの既存jsdom navigation未実装通知は失敗0と区別して記録。新旧ベンチマークは前日の成功結果を保持し、今回の文書整理では再測定していない。
+- 文書生成用のリポジトリ外ヘルパーは初回構文検査でSyntaxError、終了1。文書生成前にバッククォートのエスケープを修正し、構文検査・生成とも終了0。rgのワイルドカード付きパス指定はos error123で、ディレクトリと`-g`指定へ修正した。機能コードやテストの失敗ではない。
+- 全ローカル検証が成功したため、文書整理のみを通常commit/pushする。push後のHEADに対するCIの確定結果はPR本文へ追記し、開始HEADのCI #169成功と区別する。Ready for reviewを維持し、mainへマージしない。
