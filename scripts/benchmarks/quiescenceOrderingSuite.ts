@@ -17,13 +17,13 @@ export const ORDERING_SETTINGS = [
   { maxTacticalDepth: 2, moveOrdering: 'original' },
   { maxTacticalDepth: 2, moveOrdering: 'material' },
 ] as const;
-type Setting = typeof ORDERING_SETTINGS[number];
-type SearchResult = AlphaBetaSearchResult | TimeLimitedIterativeDeepeningAlphaBetaSearchResult;
+export type Setting = typeof ORDERING_SETTINGS[number];
+export type SearchResult = AlphaBetaSearchResult | TimeLimitedIterativeDeepeningAlphaBetaSearchResult;
 export type OrderingResult = { setting: Setting; search: SearchResult; pv: string[] };
 export type OrderingCase = { position: BenchmarkPosition; mode: BenchmarkMode } & (
   { ok: true; turn: BoardState['turn']; results: OrderingResult[] } | { ok: false; error: string }
 );
-const statisticKeys = [
+export const statisticKeys = [
   ['visitedPositionCount', 'totalVisitedPositionCount'], ['cutoffCount', 'totalCutoffCount'],
   ['skippedActionCount', 'totalSkippedActionCount'], ['quiescenceLeafCount', 'totalQuiescenceLeafCount'],
   ['quiescenceVisitedPositionCount', 'totalQuiescenceVisitedPositionCount'],
@@ -63,7 +63,7 @@ function validatePass(state: BoardState, result: AlphaBetaSearchResult, depth: n
   return pv;
 }
 
-function validateResult(state: BoardState, result: SearchResult, mode: BenchmarkMode, extension: number): string[] {
+export function validateOrderingResult(state: BoardState, result: SearchResult, mode: BenchmarkMode, extension: number): string[] {
   if (mode === 'fixed') return validatePass(state, result, 3, extension);
   assert.ok('iterations' in result, '完了反復なし');
   assert.equal(result.requestedMaxDepth, 4);
@@ -82,6 +82,27 @@ function validateResult(state: BoardState, result: SearchResult, mode: Benchmark
   return validatePass(state, result, result.completedDepth, extension);
 }
 
+/** Shared single API call for both CLIs. Each invocation owns a new frozen
+ * snapshot; the timed API creates its own deadline. Capture before validation
+ * so the repeated runner can retain even invalid returned results. */
+export function runOrderingTrial(input: BoardState, mode: BenchmarkMode, setting: Setting,
+  dependencies: BenchmarkDependencies = {}, capture?: (search: SearchResult) => void): OrderingResult {
+  const before = structuredClone(input);
+  const snapshot = createComparisonSnapshot(input);
+  const snapshotBefore = structuredClone(snapshot);
+  try {
+    const options = { moveOrdering: 'standard', quiescence: { ...setting } } as const;
+    const search = mode === 'fixed'
+      ? (dependencies.fixedSearch ?? analyzeAlphaBetaSearch)(snapshot, 3, undefined, dependencies.clock, options)
+      : (dependencies.timedSearch ?? analyzeTimeLimitedIterativeDeepeningAlphaBetaSearch)(snapshot, 4, 1000, undefined, dependencies.clock, options);
+    capture?.(search);
+    return { setting, search, pv: validateOrderingResult(snapshot, search, mode, setting.maxTacticalDepth) };
+  } finally {
+    assert.deepStrictEqual(snapshot, snapshotBefore, '探索スナップショットが変更されました');
+    assert.deepStrictEqual(input, before, '入力局面が変更されました');
+  }
+}
+
 /** A four-setting case is atomic; failed cases retain context but no aggregates. */
 export function runOrderingCase(position: BenchmarkPosition, mode: BenchmarkMode, dependencies: BenchmarkDependencies = {}): OrderingCase {
   let stage = '局面生成';
@@ -92,18 +113,7 @@ export function runOrderingCase(position: BenchmarkPosition, mode: BenchmarkMode
     try {
       for (const setting of ORDERING_SETTINGS) {
         stage = `追加${setting.maxTacticalDepth}手 ordering=${setting.moveOrdering}`;
-        const snapshot = createComparisonSnapshot(input);
-        const snapshotBefore = structuredClone(snapshot);
-        let search: SearchResult;
-        try {
-          const options = { moveOrdering: 'standard', quiescence: { ...setting } } as const;
-          search = mode === 'fixed'
-            ? (dependencies.fixedSearch ?? analyzeAlphaBetaSearch)(snapshot, 3, undefined, dependencies.clock, options)
-            : (dependencies.timedSearch ?? analyzeTimeLimitedIterativeDeepeningAlphaBetaSearch)(snapshot, 4, 1000, undefined, dependencies.clock, options);
-        } finally {
-          assert.deepStrictEqual(snapshot, snapshotBefore, '探索スナップショットが変更されました');
-        }
-        results.push({ setting, search, pv: validateResult(snapshot, search, mode, setting.maxTacticalDepth) });
+        results.push(runOrderingTrial(input, mode, setting, dependencies));
       }
       if (mode === 'fixed') for (const i of [0, 2]) {
         stage = `追加${results[i].setting.maxTacticalDepth}手 original→material 評価一致`;
