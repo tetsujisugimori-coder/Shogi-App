@@ -3544,3 +3544,83 @@ PR #1のレビュー指摘を受け、簡易APIの`applyMove`と合法手候補�
 
 - すべて終了要約と終了コードを取得した。テスト出力の既存jsdom navigation未実装通知は残るが、失敗は0。追加ベンチマークはCI checkへ組み込まず、実時間を合否条件にしない。
 - 全体テストの初回失敗と最終成功を区別して上記に記録した。ローカル証跡はリポジトリ隣の `shogi-quiescence-suite-evidence/`（focused-tests.txt、npm-test.txt、npm-test-final.txt、build.txt、check.txt等）。参考実測のみdocsへ収録する。
+
+## [2026-09-20] 静止探索内の軽量材料順序付けとA/B測定（検証途中で停止）
+
+### 開始確認
+
+- 依頼: PR #120の6局面を再利用し、合法候補集合・評価・戦術深さを維持したまま静止探索内だけをoriginal/materialで比較する。検証成功後のcommit/push/PRは許可されているが、既存問題・環境依存・原因不明の失敗は一旦停止する条件がある。
+- 開始ブランチmain、HEAD `032622f4f23f90198681d745ff71c2ea5ca0261e`、`git status --short --branch` は `## main...origin/main`、tracked/untrackedとも変更なし。diffも空。
+- C:\からリポジトリまでの親ディレクトリとリポジトリ内を確認し、追加AGENTS.mdは見つからなかった。`rg --files -g AGENTS.md`は該当なしで終了1。ユーザー提示の日時記載指示に従う。
+- 最初の `git fetch origin` はschannel `SEC_E_NO_CREDENTIALS` で終了128。資格情報が利用できる許可された経路で再実行し終了0。
+- `gh pr view 120 --json number,state,mergeCommit,url`でMERGEDと上記merge SHAを確認。`git merge-base --is-ancestor 032622f4f23f90198681d745ff71c2ea5ca0261e origin/main`終了0。origin/mainは同じSHA。`git merge --ff-only origin/main`終了0（Already up to date）。`feat/quiescence-lightweight-ordering`を作成した。
+- README/LOG、静止探索・通常αβ・材料評価・比較API・既存validator・PV再生・6局面fixture・関連テストを確認。過去のメモリは静止探索の境界と統計分離の確認に使い、現在のコードで照合した。
+
+### 設計判断と変更ファイル
+
+- `src/domain/shogi/quiescenceOrdering.ts`: 既存候補配列だけを扱う安定ソート。比較キーは捕獲優先、獲得する相手駒の盤上価値＋持ち駒へ移る生駒価値の降順、成り材料増加の降順、動かす駒の盤上価値の昇順、元indexの昇順。非捕獲応手は全て同順位で元順を維持する。
+- 盤上価値は `getBoardPieceMaterialValue`、持ち駒価値は既存material評価と同じ `table.unpromoted`。と金500＋歩100と銀400＋銀400を区別する。カスタム表は `resolveSearchMaterialValueTable` で既存評価と共用。
+- `quiescenceSearch.ts`: 従来の候補集合を作った後、stand-patでカットできなかった場合だけ材料順を適用。非王手は捕獲だけ、王手は全合法応手。終局、深さ0、stand-pat、αβ境界、カット条件、統計定義は維持。末尾の省略可能なmode引数を追加し、省略時original。
+- `twoPlyAlphaBetaAi.ts`: `AlphaBetaQuiescenceOptions.moveOrdering?`を追加。maxTacticalDepthだけの呼び出しと互換。未知のown key（symbol含む）、型、不正modeは時計・探索開始前に拒否。固定深さ・反復深化・時間制限・2手互換・selectorに伝播。`index.ts`からmode型をexport。
+- SEEは再帰交換評価の費用を重ねず、材料だけで軽量に並べる目的のため不使用。並べ替えから子局面実行、再評価、合法手再生成、再帰、SEE、キャッシュは呼ばない。装飾とsort比較の中断確認で例外を伝播。通常static-exchange実装は変更しない。
+- `scripts/benchmarks/quiescenceOrderingSuite.ts` / `scripts/measure-quiescence-ordering.ts` / `package.json`: 専用 `measure:quiescence-ordering` を追加。既存6局面、既存snapshot・探索API・PV表記を再利用。fixed深さ3、timed最大4・各設定独立1000ms、追加1手original/material→追加2手original/material、標準評価・通常standard。全48条件。
+- 各設定の凍結snapshotと入力原本を検証。全完了PVを再実行して合法性と評価内訳全体を照合し、fixedのペア評価が不一致なら失敗。timedは最深完了反復との一致、各反復の深さ、合計統計も検証。結果検証・表示時間は探索時間に含まない。4設定一組が成功した場合のみ集計し、失敗時は局面ID・モード・追加手数・順序付きエラーを残す。
+- `src/test/shogi-quiescence-ordering.test.ts` / `src/test/quiescence-ordering-benchmark.test.ts`: 新規41件。元順・材料各比較キー・安定同点・回転対称・成駒・カスタム表・全王手応手・非王手捕獲限定・SEE準備/評価spy・入力凍結・再現性・不正設定・中断・API伝播・PV末端整合・条件順/数/独立snapshot/期限/集計/失敗文脈を検証。6代表局面の追加1/2手で固定通常深さ1の評価同一を自動検証し、固定通常深さ3は48条件の実測内で12ペアを検証。
+- 時間制限テストは注入時計。実時間、実測訪問数、実測完了深さをCI固定値にしない。既存テストの変更・削除・skip追加・期待値緩和・タイムアウト延長なし。
+- READMEに目的・設定・比較キー・SEE不使用・候補非削除・CLI・数値解釈・既定値維持を追記。docsに環境、対象HEAD＋未コミット差分であること、探索/測定ソースのSHA-256、全局面の実測表、生出力、検証途中で停止した状態を保存。
+- Worker/UI/評価プリセット/通常AIの既定値/棋譜/保存/依存/既存ベンチマーク実装は変更なし。
+
+### 実測結果
+
+- 2026-09-20 20:10:43.742 JST。Windows 10.0.26200、Intel Core i7-14650HX、Node v24.20.0、npm11.17.0。各条件1回・ウォームアップなし・固定順。詳細は `docs/quiescence-ordering-benchmark.md`。
+- 新A/B終了0、fixed24＋timed24成功、失敗0。fixed12ペアの評価値一致、推奨手/PVも全て同一。timed12ペアも推奨手/評価/PV/完了深さの変化なし。入力不変性と全完了反復PVの再生・末端内訳検証が成功。
+- fixedの静止訪問数は追加1手948→712（24.9%減）、追加2手681→472（30.7%減）。カット1042→1102 / 714→546、skip1482→1718 / 1384→1001。通常訪問6034 / 4088は両モード同じ。追加2手のカット減は先の部分木自体を訪問しなくなるためで、カット数だけで評価しない。
+- fixed参考時間合計は追加1手1662.9→1964.4ms（18.1%増）、追加2手1841.8→1719.2ms（6.7%減）。金打ちの合駒の追加1手は訪問146→146のまま870.5→1250.8ms。改善なし・悪化の例も全件残す。原因を順序付け費用だけと断定しない。
+- timedの完了深さは全設定で2/3/3/4/4/2。改善0/12ペア。全完了静止訪問432→368 / 388→334、カット314→346 / 303→313、skip686→750 / 657→711。参考時間合計5602.2→5413.2ms / 5840.1→5813.5ms。時間切れの未完了反復は結果/統計に採用しない。
+- 旧 `measure:quiescence-suite` も終了0、36設定成功。fixedの追加1/2手統計は新A/Bのoriginalと一致。同一時間は環境依存で、過去の実測を固定期待値にはしない。旧コマンド実行末尾には型チェック等が重なった可能性があり、新旧の別実行間の時間を比較しない。
+- 採用判断: 効果が局面依存なので実験設定のまま維持。訪問減だけでは既定化を推奨しない。同一時間深さ改善なし、固定深さ追加1手は参考総時間増。次の候補は6局面を維持した複数回・ウォームアップ・順序交代での分散計測。
+
+### 開発中の失敗と切り分け
+
+- 初期コード調査で `Get-Content src/test/quiescence-search.test.ts` は存在しないパスのため失敗。`rg --files`で実際の `shogi-quiescence-search.test.ts` を特定して読み直した。調査バッチ自体の終了コードは後続コマンドの0であり、当該読み取りは失敗として記録する。
+- 初回新規テストはesbuildの `spawn EPERM` で起動不能、終了1、テスト未実行。許可された経路で同じテストを再実行すると28/28成功・終了0。ベンチマークテスト追加後は39/39成功・終了0。さらに2件追加後の41件は下記集中実行でも全て成功。
+- 最初の集中実行（10ファイル）は330成功/2失敗、43.88秒、終了1。既存 `quiescence-benchmark.test.ts:167` の「持ち駒・棋譜・局面履歴のある入力を両モードで保持する」が7299ms、既存 `shogi-two-ply-minimax-ai.test.ts:1550` の「深さ3の途中で詰みへ到達した枝…」が8744msで、既存5000ms制限を超えた。
+- main `032622f...` を `../shogi-quiescence-ordering-baseline` の独立detached worktreeへ展開。同一依存へのnode_modules junctionを使用し、mainの既存関連8ファイルを実行。291/291成功・8.41秒・終了0。mainでは同じ時間超過を再現できなかった。
+- コード/テスト/設定を変えず、変更ブランチで同じ10ファイルを再実行。331成功/1失敗・14.52秒・終了1。minimax側は成功したが、既存benchmarkの同じテストは5383msで時間超過が残った。
+- 該当benchmarkファイルだけを変更ブランチで実行すると38/38成功・1.59秒・終了0（ファイルのtests時間1.03秒）。複数ファイル実行時の負荷/実行組み合わせへの依存が疑われるが、OS・テスト順・今回の変更の因果は未確定。main8ファイルと変更側10ファイルで組み合わせが異なるため、それだけで回帰でないとは断言しない。
+- この段階で依頼の「原因不明、環境依存の場合は無理に直さず一旦停止」に従って停止。テスト内容・実行設定に対する修正は行っていない。成功するまで繰り返したり、単独成功を全体成功の代用にはしない。
+- Pythonで実測一覧をコンソール表示した際に日本語が端末エンコードで文字化けしたが、UTF-8保存済み生出力はPowerShellのGet-Contentで正常表示を確認。資料はUTF-8で保存。
+
+### 検証結果と残る項目
+
+| コマンド | 終了 | 成功/失敗・範囲 |
+| --- | ---: | --- |
+| `npm run verify:lock` | 0 | 399 entries / registry398、欠落0 |
+| `npm run lint`（初回/追加テスト後） | 0 / 0 | 型エラー0 |
+| 新規ordering単独テスト（許可経路） | 0 | 28成功/0失敗 |
+| 新規2ファイル（後の2件追加前） | 0 | 39成功/0失敗 |
+| 集中10ファイル（初回） | 1 | 330成功/2失敗 |
+| mainの既存関連8ファイル | 0 | 291成功/0失敗 |
+| 集中10ファイル（同一コード再実行） | 1 | 331成功/1失敗。新規41件は全て成功 |
+| 変更側の既存benchmarkファイル単独 | 0 | 38成功/0失敗 |
+| `npm run measure:quiescence-ordering` | 0 | 48設定成功/0失敗、評価一致・入力・PV検証成功 |
+| `npm run measure:quiescence-suite` | 0 | 36設定成功/0失敗 |
+| `git diff --check` | 0 | 空白エラー0。Windows改行変換の警告のみ |
+| `npm test` | 未実行 | 原因未確定の集中失敗で停止 |
+| `npm run build` | 未実行 | 同上 |
+| `npm run check` | 未実行 | 同上 |
+| 既存UI/Worker回帰テスト | 未実行 | 全体テスト前に停止したため未検証 |
+| CI | 未実行 | commit/push/PR未作成 |
+
+- `docs/quiescence-ordering-validation-output.txt` に失敗と切り分けの生出力を保存。その他の各コマンドの証跡は `../shogi-quiescence-ordering-evidence/` に保持。
+- 変更は未コミットの作業ブランチに保持。コミットSHA/PR番号なし。mainへのマージなし。比較用worktreeは診断再開用に残し、既存作業をreset/stash/削除していない。
+- 残る制約: 集中テストの時間超過の因果未確定、全体/UI/Worker/build/check/CI未検証、性能測定は各条件1回。再開する場合はmainと変更側の同一ファイル構成・同一負荷で比較し、原因を特定してから必要な検証を完了する。
+- 最終判断: 順序付けとA/B測定は実装済みだが、品質ゲート未完了のためマージ可能/PR作成可能とは判定しない。既定化は推奨せずoriginalを維持する。
+
+### [2026-09-20 21:10 JST] 明示的な追指示によるPR提出
+
+- ユーザーから「PRの作成をお願いします」と追指示を受領。前回の停止状態と未解決の検証結果を明記し、ドラフトPRとしてcommit/push/提出する方針とした。品質ゲート通過・マージ可能という判断には変更しない。
+- ブランチ `feat/quiescence-lightweight-ordering`、HEAD `032622f4f23f90198681d745ff71c2ea5ca0261e`、差分15ファイルは前回の実装・テスト・資料のみ。同ブランチの既存PRは0件。`git diff --check`終了0。ソース変更は追加せず、測定資料の状態表示とこの追記だけを更新。
+- テストは再実行せず、前回のlock/lint成功、集中331成功/1失敗、新A/B48条件成功、旧36条件成功を正確に引き継ぐ。全体テスト・build・check・UI/Worker回帰のローカル未実施をPR本文に残す。CIは提出後のGitHub結果で別途確認する。
+- mainへの自動マージは行わない。測定・失敗の生出力、比較用worktree、既存の失敗記録を保持する。
+- ステージ後の `git diff --cached --check` で、新規の検証生出力末尾の余分な空行を検出し終了2。前回の未追跡ファイルは通常のdiff対象外だった。記録内容は変えず末尾空行だけを正規化し、再確認する。

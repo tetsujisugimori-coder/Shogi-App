@@ -9,6 +9,7 @@ import {
 } from './materialEvaluation';
 import { cloneBoardState } from './replay';
 import { analyzeQuiescenceSearchWithinBounds } from './quiescenceSearch';
+import { resolveQuiescenceMoveOrdering, type QuiescenceMoveOrderingMode } from './quiescenceOrdering';
 import { prepareStaticExchangeEvaluation } from './staticExchangeEvaluation';
 import {
   evaluateSearchPositionBreakdown,
@@ -27,6 +28,8 @@ export type AlphaBetaMoveOrderingMode = 'standard' | 'static-exchange';
 /** Explicit opt-in tactical extension at ordinary alpha-beta leaves. */
 export interface AlphaBetaQuiescenceOptions {
   readonly maxTacticalDepth: number;
+  /** Omitted retains legal generation order. Independent of ordinary moveOrdering. */
+  readonly moveOrdering?: QuiescenceMoveOrderingMode;
 }
 
 /** Optional trailing configuration; existing callers keep standard ordering. */
@@ -43,19 +46,19 @@ function resolveMoveOrdering(options: AlphaBetaSearchOptions | undefined): Alpha
   throw new RangeError(`Unsupported alpha-beta move ordering mode: ${String(mode)}`);
 }
 
-function resolveQuiescenceMaxTacticalDepth(options: AlphaBetaSearchOptions | undefined): number | undefined {
+function resolveQuiescenceOptions(options: AlphaBetaSearchOptions | undefined): AlphaBetaQuiescenceOptions | undefined {
   const quiescence = options?.quiescence;
   if (quiescence === undefined) return undefined;
   if (quiescence === null || typeof quiescence !== 'object' || Array.isArray(quiescence) ||
-    Object.keys(quiescence).some((key) => key !== 'maxTacticalDepth')) {
-    throw new RangeError('Alpha-beta quiescence options must contain only maxTacticalDepth.');
+    Reflect.ownKeys(quiescence).some((key) => key !== 'maxTacticalDepth' && key !== 'moveOrdering')) {
+    throw new RangeError('Alpha-beta quiescence options must contain only maxTacticalDepth and optional moveOrdering.');
   }
   const maxTacticalDepth = (quiescence as AlphaBetaQuiescenceOptions).maxTacticalDepth;
   if (typeof maxTacticalDepth !== 'number' || !Number.isFinite(maxTacticalDepth) ||
     !Number.isInteger(maxTacticalDepth) || maxTacticalDepth < 0) {
     throw new RangeError('Alpha-beta quiescence maximum tactical depth must be a finite non-negative integer measured in ply.');
   }
-  return maxTacticalDepth;
+  return { maxTacticalDepth, moveOrdering: resolveQuiescenceMoveOrdering(quiescence.moveOrdering) };
 }
 
 /**
@@ -385,7 +388,7 @@ function searchAlphaBetaNode(
   statistics: SearchStatistics,
   interruptionCheck: SearchInterruptionCheck,
   moveOrdering: AlphaBetaMoveOrderingMode,
-  quiescenceMaxTacticalDepth: number | undefined
+  quiescenceOptions: AlphaBetaQuiescenceOptions | undefined
 ): SearchNodeResult {
   interruptionCheck?.();
   if (state.status === 'ended') {
@@ -397,13 +400,14 @@ function searchAlphaBetaNode(
     };
   }
   if (remainingDepth === 0) {
-    if (quiescenceMaxTacticalDepth === undefined) {
+    if (quiescenceOptions === undefined) {
       const evaluationBreakdown = evaluateSearchPositionBreakdown(state, rootPlayer, valueTable);
       return { evaluation: evaluationBreakdown.total, principalVariation: [], evaluationBreakdown };
     }
     statistics.quiescenceLeafCount += 1;
     const quiescence = analyzeQuiescenceSearchWithinBounds(
-      state, rootPlayer, quiescenceMaxTacticalDepth, valueTable, interruptionCheck, alpha, beta
+      state, rootPlayer, quiescenceOptions.maxTacticalDepth, valueTable, interruptionCheck, alpha, beta,
+      quiescenceOptions.moveOrdering
     );
     statistics.quiescenceVisitedPositionCount += quiescence.visitedPositionCount;
     statistics.quiescenceCutoffCount += quiescence.cutoffCount;
@@ -447,7 +451,7 @@ function searchAlphaBetaNode(
       statistics,
       interruptionCheck,
       moveOrdering,
-      quiescenceMaxTacticalDepth
+      quiescenceOptions
     );
 
     const candidatePrincipalVariation = [
@@ -497,7 +501,7 @@ function searchAlphaBeta(
   previousBestAction: LegalAction | null = null,
   interruptionCheck: SearchInterruptionCheck = undefined,
   moveOrdering: AlphaBetaMoveOrderingMode = 'standard',
-  quiescenceMaxTacticalDepth: number | undefined = undefined
+  quiescenceOptions: AlphaBetaQuiescenceOptions | undefined = undefined
 ): UnmeasuredAlphaBetaSearchResult {
   validateSearchDepth(depth);
   const rootPlayer = state.turn;
@@ -568,7 +572,7 @@ function searchAlphaBeta(
       statistics,
       interruptionCheck,
       moveOrdering,
-      quiescenceMaxTacticalDepth
+      quiescenceOptions
     );
 
     // A root candidate searched after a higher-index PV candidate can be cut
@@ -588,7 +592,7 @@ function searchAlphaBeta(
         statistics,
         interruptionCheck,
         moveOrdering,
-        quiescenceMaxTacticalDepth
+        quiescenceOptions
       );
     }
 
@@ -639,10 +643,10 @@ export function analyzeAlphaBetaSearch(
   options?: AlphaBetaSearchOptions
 ): AlphaBetaSearchResult {
   const moveOrdering = resolveMoveOrdering(options);
-  const quiescenceMaxTacticalDepth = resolveQuiescenceMaxTacticalDepth(options);
+  const quiescenceOptions = resolveQuiescenceOptions(options);
   const startedAt = clock();
   const searchResult = searchAlphaBeta(
-    state, depth, valueTable, null, undefined, moveOrdering, quiescenceMaxTacticalDepth
+    state, depth, valueTable, null, undefined, moveOrdering, quiescenceOptions
   );
   return {
     ...searchResult,
@@ -665,7 +669,7 @@ export function analyzeIterativeDeepeningAlphaBetaSearch(
   options?: AlphaBetaSearchOptions
 ): IterativeDeepeningAlphaBetaSearchResult {
   const moveOrdering = resolveMoveOrdering(options);
-  const quiescenceMaxTacticalDepth = resolveQuiescenceMaxTacticalDepth(options);
+  const quiescenceOptions = resolveQuiescenceOptions(options);
   validateIterativeDeepeningMaxDepth(maxDepth);
   const startedAt = clock();
   const iterations: IterativeDeepeningAlphaBetaIterationResult[] = [];
@@ -674,7 +678,7 @@ export function analyzeIterativeDeepeningAlphaBetaSearch(
   for (let depth = 1; depth <= maxDepth; depth += 1) {
     const iterationStartedAt = clock();
     const searchResult = searchAlphaBeta(
-      state, depth, valueTable, previousBestAction, undefined, moveOrdering, quiescenceMaxTacticalDepth
+      state, depth, valueTable, previousBestAction, undefined, moveOrdering, quiescenceOptions
     );
     const iteration = {
       ...searchResult,
@@ -728,7 +732,7 @@ export function analyzeTimeLimitedIterativeDeepeningAlphaBetaSearch(
   options?: AlphaBetaSearchOptions
 ): TimeLimitedIterativeDeepeningAlphaBetaSearchResult {
   const moveOrdering = resolveMoveOrdering(options);
-  const quiescenceMaxTacticalDepth = resolveQuiescenceMaxTacticalDepth(options);
+  const quiescenceOptions = resolveQuiescenceOptions(options);
   validateIterativeDeepeningMaxDepth(maxDepth);
   validateSearchTimeLimitMilliseconds(timeLimitMilliseconds);
   const startedAt = clock();
@@ -754,7 +758,7 @@ export function analyzeTimeLimitedIterativeDeepeningAlphaBetaSearch(
           ? () => throwIfSearchTimeLimitReached(clock, startedAt, timeLimitMilliseconds)
           : undefined,
         moveOrdering,
-        quiescenceMaxTacticalDepth
+        quiescenceOptions
       );
       const iterationFinishedAt = clock();
       if (depth >= 2) {
@@ -815,7 +819,7 @@ export function selectBestAlphaBetaAction(
   options?: AlphaBetaSearchOptions
 ): LegalAction | null {
   return searchAlphaBeta(
-    state, depth, valueTable, null, undefined, resolveMoveOrdering(options), resolveQuiescenceMaxTacticalDepth(options)
+    state, depth, valueTable, null, undefined, resolveMoveOrdering(options), resolveQuiescenceOptions(options)
   ).selectedAction;
 }
 

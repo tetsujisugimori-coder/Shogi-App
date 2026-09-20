@@ -8,8 +8,10 @@ import { isPlayerInCheck } from './checkmate';
 import { executeLegalAction, getLegalActions, type LegalAction } from './legalActions';
 import { DEFAULT_MATERIAL_VALUE_TABLE } from './materialEvaluation';
 import { cloneBoardState } from './replay';
+import { orderQuiescenceCandidates, resolveQuiescenceMoveOrdering, type QuiescenceMoveOrderingMode } from './quiescenceOrdering';
 import {
   evaluateSearchPositionBreakdown,
+  resolveSearchMaterialValueTable,
   type SearchEvaluationBreakdown,
   type SearchEvaluationConfig,
 } from './twoPlyMinimaxAi';
@@ -83,7 +85,8 @@ function searchNode(
   beta: number,
   evaluation: SearchEvaluationConfig,
   statistics: SearchStatistics,
-  interruptionCheck: QuiescenceSearchInterruptionCheck
+  interruptionCheck: QuiescenceSearchInterruptionCheck,
+  moveOrdering: QuiescenceMoveOrderingMode
 ): SearchNodeResult {
   interruptionCheck?.();
   const staticBreakdown = evaluateSearchPositionBreakdown(state, perspective, evaluation);
@@ -122,9 +125,12 @@ function searchNode(
     }
   }
 
+  const orderedCandidates = moveOrdering === 'original' ? candidates : orderQuiescenceCandidates(
+    state, candidates, moveOrdering, resolveSearchMaterialValueTable(evaluation), interruptionCheck
+  );
   for (let actionIndex = 0; actionIndex < candidates.length; actionIndex += 1) {
     interruptionCheck?.();
-    const action = candidates[actionIndex];
+    const action = orderedCandidates[actionIndex];
     const child = executeSearchAction(state, action);
     statistics.visitedPositionCount += 1;
     interruptionCheck?.();
@@ -136,7 +142,8 @@ function searchNode(
       beta,
       evaluation,
       statistics,
-      interruptionCheck
+      interruptionCheck,
+      moveOrdering
     );
 
     const adoptsCandidate = isInCheck && selectedBreakdown === null ||
@@ -173,7 +180,8 @@ export function analyzeQuiescenceSearch(
   perspective: Player,
   maxTacticalDepth: number,
   evaluation: SearchEvaluationConfig = DEFAULT_MATERIAL_VALUE_TABLE,
-  interruptionCheck: QuiescenceSearchInterruptionCheck = undefined
+  interruptionCheck: QuiescenceSearchInterruptionCheck = undefined,
+  moveOrdering: QuiescenceMoveOrderingMode = 'original'
 ): QuiescenceSearchResult {
   return analyzeQuiescenceSearchWithinBounds(
     state,
@@ -182,7 +190,8 @@ export function analyzeQuiescenceSearch(
     evaluation,
     interruptionCheck,
     Number.NEGATIVE_INFINITY,
-    Number.POSITIVE_INFINITY
+    Number.POSITIVE_INFINITY,
+    moveOrdering
   );
 }
 
@@ -198,9 +207,11 @@ export function analyzeQuiescenceSearchWithinBounds(
   evaluation: SearchEvaluationConfig,
   interruptionCheck: QuiescenceSearchInterruptionCheck,
   alpha: number,
-  beta: number
+  beta: number,
+  moveOrdering: QuiescenceMoveOrderingMode = 'original'
 ): QuiescenceSearchResult {
   validateMaxTacticalDepth(maxTacticalDepth);
+  const resolvedOrdering = resolveQuiescenceMoveOrdering(moveOrdering);
   const statistics: SearchStatistics = { visitedPositionCount: 0, cutoffCount: 0, skippedActionCount: 0 };
   const result = searchNode(
     state,
@@ -210,7 +221,8 @@ export function analyzeQuiescenceSearchWithinBounds(
     beta,
     evaluation,
     statistics,
-    interruptionCheck
+    interruptionCheck,
+    resolvedOrdering
   );
   return {
     selectedEvaluation: result.evaluation,
