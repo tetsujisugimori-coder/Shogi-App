@@ -3624,3 +3624,11 @@ PR #1のレビュー指摘を受け、簡易APIの`applyMove`と合法手候補�
 - テストは再実行せず、前回のlock/lint成功、集中331成功/1失敗、新A/B48条件成功、旧36条件成功を正確に引き継ぐ。全体テスト・build・check・UI/Worker回帰のローカル未実施をPR本文に残す。CIは提出後のGitHub結果で別途確認する。
 - mainへの自動マージは行わない。測定・失敗の生出力、比較用worktree、既存の失敗記録を保持する。
 - ステージ後の `git diff --cached --check` で、新規の検証生出力末尾の余分な空行を検出し終了2。前回の未追跡ファイルは通常のdiff対象外だった。記録内容は変えず末尾空行だけを正規化し、再確認する。
+
+### [2026-09-20 21:13 JST] ドラフトPR作成結果
+
+- 実装コミット `d6bd796a36257c427cab0ee1f46617df5e157035` を作成し、`git push -u origin feat/quiescence-lightweight-ordering` は終了0。ステージ済み全15ファイルの `git diff --cached --check` も終了0。
+- 初回 `gh pr create` は `Resource not accessible by personal access token (createPullRequest)` で終了1。環境PATの権限不足と切り分け、このコマンドだけGH_TOKEN/GITHUB_TOKENを外し、保存済みCLI認証で再実行すると終了0。トークン値は出力・保存せず、元の環境値はfinallyで復元。
+- Draft PR #123: https://github.com/tetsujisugimori-coder/Shogi-App/pull/123 。OPEN、isDraft:true、headRefOidが実装コミットと一致することを確認し、このCodexタスクへ添付した。
+- 21:13 JST時点のCIはubuntuがIN_PROGRESS、macOSがQUEUED。完了/成功とは扱わない。ローカル集中テストの未解決失敗、全体/build/check/UI/Worker未検証、性能結果と既定化非推奨をPR本文へ明記した。
+- PR作成後の作業ツリーはクリーン、ローカルとoriginの作業ブランチは同じコミット。以下のログ追記も別のdocsコミットとしてpushする。マージは行わない。
