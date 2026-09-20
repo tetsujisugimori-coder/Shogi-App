@@ -12,6 +12,7 @@ export * from './materialAi';
 export * from './twoPlyMinimaxAi';
 export * from './twoPlyAlphaBetaAi';
 export * from './quiescenceSearch';
+export type { QuiescenceMoveOrderingMode } from './quiescenceOrdering';
 export * from './validation';
 export * from './promotion';
 export * from './gameState';

@@ -1,0 +1,139 @@
+
+===== ordering-initial.txt =====
+failed to load config from <PROJECT_ROOT>/vite.config.ts
+
+⎯⎯⎯⎯⎯⎯⎯ Startup Error ⎯⎯⎯⎯⎯⎯⎯⎯
+Error: spawn EPERM
+    at ChildProcess.spawn (node:internal/child_process:458:11)
+    at Object.spawn (node:child_process:813:9)
+    at ensureServiceIsRunning (<PROJECT_ROOT>/node_modules/esbuild/lib/main.js:1978:29)
+    at build (<PROJECT_ROOT>/node_modules/esbuild/lib/main.js:1876:26)
+    at bundleConfigFile (<PROJECT_ROOT>/node_modules/vite/dist/node/chunks/dep-Dm0c1Wj2.js:49448:24)
+    at async bundleAndLoadConfigFile (<PROJECT_ROOT>/node_modules/vite/dist/node/chunks/dep-Dm0c1Wj2.js:49432:19)
+    at async loadConfigFromFile (<PROJECT_ROOT>/node_modules/vite/dist/node/chunks/dep-Dm0c1Wj2.js:49396:44)
+    at async resolveConfig (<PROJECT_ROOT>/node_modules/vite/dist/node/chunks/dep-Dm0c1Wj2.js:48891:24)
+    at async _createServer (<PROJECT_ROOT>/node_modules/vite/dist/node/chunks/dep-Dm0c1Wj2.js:38478:66)
+    at async createViteServer (<PROJECT_ROOT>/node_modules/vitest/dist/chunks/cli-api.CnMVyzaz.js:8902:17) {
+  errno: -4048,
+  code: 'EPERM',
+  syscall: 'spawn'
+}
+
+
+
+
+===== ordering-rerun.txt =====
+
+ RUN  v4.1.11 <PROJECT_ROOT>
+
+
+ Test Files  1 passed (1)
+      Tests  28 passed (28)
+   Start at  20:08:49
+   Duration  1.01s (transform 243ms, setup 200ms, import 269ms, tests 408ms, environment 0ms)
+
+
+===== new-tests.txt =====
+
+ RUN  v4.1.11 <PROJECT_ROOT>
+
+
+ Test Files  2 passed (2)
+      Tests  39 passed (39)
+   Start at  20:10:22
+   Duration  921ms (transform 494ms, setup 184ms, import 571ms, tests 636ms, environment 0ms)
+
+
+===== focused-tests.txt =====
+
+ RUN  v4.1.11 <PROJECT_ROOT>
+
+ ❯ src/test/quiescence-benchmark.test.ts (38 tests | 1 failed) 7838ms
+     × 持ち駒・棋譜・局面履歴のある入力を両モードで保持する 7299ms
+ ❯ src/test/shogi-two-ply-minimax-ai.test.ts (69 tests | 1 failed) 16682ms
+     × 深さ3の途中で詰みへ到達した枝は、それ以上の子局面を生成せず既存の終局評価を返す 8744ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 2 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/test/quiescence-benchmark.test.ts > 比較APIを使用するrunner > 持ち駒・棋譜・局面履歴のある入力を両モードで保持する
+Error: Test timed out in 5000ms.
+If this is a long-running test, pass a timeout value as the last argument or configure it globally with "testTimeout".
+ ❯ src/test/quiescence-benchmark.test.ts:167:3
+    165|   });
+    166|
+    167|   it('持ち駒・棋譜・局面履歴のある入力を両モードで保持する', () => {
+       |   ^
+    168|     const initial = position('pawn-recapture').create();
+    169|     const capture = getLegalActions(initial).find(a => a.kind === 'mov…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/2]⎯
+
+ FAIL  src/test/shogi-two-ply-minimax-ai.test.ts > 再帰型αβ枝刈り探索 > 深さ3の途中で詰みへ到達した枝は、それ以上の子局面を生成せず既存の終局評価を返す
+Error: Test timed out in 5000ms.
+If this is a long-running test, pass a timeout value as the last argument or configure it globally with "testTimeout".
+ ❯ src/test/shogi-two-ply-minimax-ai.test.ts:1550:3
+    1548|   });
+    1549|
+    1550|   it('深さ3の途中で詰みへ到達した枝は、それ以上の子局面を生成せず既存の終局評価を返す', () => {
+       |   ^
+    1551|     const state = createState([
+    1552|       { row: 8, col: 4, piece: piece('sente-king', 'king', 'sente') },
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/2]⎯
+
+
+ Test Files  2 failed | 8 passed (10)
+      Tests  2 failed | 330 passed (332)
+   Start at  20:13:28
+   Duration  43.88s (transform 3.98s, setup 1.68s, import 4.84s, tests 29.74s, environment 10.21s)
+
+
+===== baseline-focused-tests.txt =====
+
+ RUN  v4.1.11 <MAIN_WORKTREE>
+
+
+ Test Files  8 passed (8)
+      Tests  291 passed (291)
+   Start at  20:15:13
+   Duration  8.41s (transform 828ms, setup 731ms, import 1.18s, tests 8.75s, environment 4.09s)
+
+
+===== focused-rerun.txt =====
+
+ RUN  v4.1.11 <PROJECT_ROOT>
+
+ ❯ src/test/quiescence-benchmark.test.ts (38 tests | 1 failed) 5905ms
+     × 持ち駒・棋譜・局面履歴のある入力を両モードで保持する 5383ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/test/quiescence-benchmark.test.ts > 比較APIを使用するrunner > 持ち駒・棋譜・局面履歴のある入力を両モードで保持する
+Error: Test timed out in 5000ms.
+If this is a long-running test, pass a timeout value as the last argument or configure it globally with "testTimeout".
+ ❯ src/test/quiescence-benchmark.test.ts:167:3
+    165|   });
+    166|
+    167|   it('持ち駒・棋譜・局面履歴のある入力を両モードで保持する', () => {
+       |   ^
+    168|     const initial = position('pawn-recapture').create();
+    169|     const capture = getLegalActions(initial).find(a => a.kind === 'mov…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed | 9 passed (10)
+      Tests  1 failed | 331 passed (332)
+   Start at  20:17:30
+   Duration  14.52s (transform 3.36s, setup 890ms, import 4.07s, tests 17.43s, environment 3.89s)
+
+
+===== branch-benchmark-isolated.txt =====
+
+ RUN  v4.1.11 <PROJECT_ROOT>
+
+
+ Test Files  1 passed (1)
+      Tests  38 passed (38)
+   Start at  20:18:24
+   Duration  1.59s (transform 305ms, setup 88ms, import 342ms, tests 1.03s, environment 0ms)

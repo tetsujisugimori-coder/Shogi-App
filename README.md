@@ -94,6 +94,35 @@ npm run measure:quiescence-suite -- both  # 両方を明示
 
 数値や推奨手の変化は棋力や設定の優劣を直接示しません。「勝者」「最強設定」や最適設定を自動判定せず、静止探索を既定で有効にもしません。**実時間は環境依存の参考値であり、CIの時間上限・合否条件に使いません。** 参考実測は [docs/quiescence-position-benchmark.md](docs/quiescence-position-benchmark.md) を参照してください。
 
+## 静止探索内の軽量な候補手順序付け
+
+静止探索の候補を材料価値で並べ、既存のαβカットを早められるか観察する実験設定です。`quiescence.moveOrdering`は省略時および`original`指定時に従来の合法手生成順を保持し、`material`を明示した場合だけ並べ替えます。通常αβの`moveOrdering`とは独立です。
+
+```ts
+analyzeAlphaBetaSearch(state, 3, undefined, undefined, {
+  moveOrdering: 'standard',
+  quiescence: { maxTacticalDepth: 2, moveOrdering: 'material' },
+});
+```
+
+`material`は捕獲について、①相手駒の盤上価値＋取得する生駒の持ち駒価値が高い、②成りの材料増加が大きい、③動かす駒の盤上価値が低い、④元の合法手順、の順に安定・決定的に並べます。例えばと金は盤上500＋持ち駒の歩100、銀は400＋400です。カスタム材料表も既存評価と同じ表を使います。王手中は捕獲を先に置き、玉移動・盤上の合駒・駒打ちを含む全非捕獲応手は元の相対順を保ちます。
+
+両モードとも候補集合を変更・削除しません。非王手時の駒取り限定、王手時の全合法応手、stand-pat、評価関数、最大戦術深さ、既存αβカットの契約を維持します。並べ替えは子局面の実行・再評価・合法手の再生成・再帰・SEE・キャッシュを使いません。stand-patでカットできる葉は並べ替えません。単独APIにも末尾の省略可能な`moveOrdering`引数を追加しています。不正なモード・型・静止探索設定の未知キーは探索開始前に拒否します。
+
+```bash
+npm run measure:quiescence-ordering          # fixed → timed、全48条件
+npm run measure:quiescence-ordering -- fixed # 通常深さ3
+npm run measure:quiescence-ordering -- timed # 最大4、各条件独立1000ms
+```
+
+上記の既存6局面・標準評価・通常`standard`順で、追加1手original→material→追加2手original→materialの順に各1回、ウォームアップなしで測定します。各条件は独立した凍結スナップショットから開始し、入力の不変性、推奨手/PVの合法性、全完了反復のPV末端と評価内訳の一致を検証します。固定深さで両モードの評価が異なれば失敗です。失敗した4条件一組は集計から除外し、局面・追加手数・順序モード付きのエラーを残して次の局面へ進み、CLIは終了1を返します。
+
+出力は日本語局面名・推奨手・先手評価・PV・完了深さ・参考時間・通常/静止統計・各ペアの変化・設定別集計を含みます。同一時間は未完了反復を採用せず、採用した最深完了反復と全完了反復合計を分離します。時間には未完了反復を含み、検証・表示時間は含みません。深さ1保証と協調的中断のため1000msは厳密な上限ではありません。
+
+固定深さでは同評価のPVが変わる可能性があります。同一時間では完了深さが変わり、評価や推奨手の違いも生じ得ます。訪問数の減少だけで成功とせず、並べ替え費用・実時間も合わせて判断してください。実時間はOS・CPU・JIT・実行順で変動する参考値で、CIの固定期待値にはしません。測定資料は[docs/quiescence-ordering-benchmark.md](docs/quiescence-ordering-benchmark.md)です。
+
+今回は`original`の既定値、静止探索の既定無効、通常AI設定、既存`measure:quiescence-suite`の意味・出力、Workerプロトコル、UI、保存形式を変更していません。
+
 ## 静止探索（Quiescence Search）の純粋関数基盤
 
 `analyzeQuiescenceSearch(state, perspective, maxTacticalDepth, evaluation?, interruptionCheck?)` は、通常の固定深さ探索が駒取り直後などの不安定な局面で静的評価を確定してしまう探索境界の問題を、限定的に読み足して検証するためのドメインAPIです。開始時に指定した`perspective`を固定し、その側の手番で最大化、相手側で最小化します。非王手局面では既存の静的評価をstand-pat候補として先に置き、合法な駒取り（成り付き捕獲を含む）だけを元の合法手順で読みます。同値ならstand-patを維持します。王手中はstand-patを置かず、既存の合法手生成による玉移動・合駒・駒打ちを含む全回避手を読みます。
