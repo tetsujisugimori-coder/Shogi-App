@@ -3778,3 +3778,10 @@ PR #1のレビュー指摘を受け、簡易APIの`applyMove`と合法手候補�
 - check内全体テスト開始05:51:58 JST。UI/Worker/合法手/棋譜/評価/SEEを含む既存機能も全体テストで回帰確認。jsdom navigation未実装通知は既存の通知で、失敗0と区別。全体checkは1回実行、時間超過や未解決テスト失敗なし。重いコマンドは直列。
 - 最終差分はREADME、LOG、package.json、共通単発suite、反復suite、新CLI、新規テスト、要約docs、生出力の9ファイル。domain/application/Worker/components/types/package-lockの差分なし。既存テストの削除/skip/期待値緩和/timeout延長なし。LOGは追記のみ。
 - 完了条件を満たしたため通常commit/push/PR作成へ進む。mainはマージせず維持する。CIは作成後のHEADに対する結果を別途確認し、ローカル成功をCI成功とみなさない。
+
+### [2026-09-21 05:56 JST] commit・push・PR作成
+
+- 全9ファイルを指定してstageし、`git diff --cached --check`終了0。通常commit `d47f0a547413ef3637f68bf09271ab3aacf2e6cc`（feat(shogi): add repeated quiescence ordering benchmark）を作成、終了0。`git push -u origin feat/quiescence-ordering-repeated-benchmark`終了0。ローカルHEADとorigin作業ブランチSHAの一致、作業ツリーcleanを確認。
+- 初回`gh pr create --base main --head feat/quiescence-ordering-repeated-benchmark ... --body-file ...`は`Resource not accessible by personal access token (createPullRequest)`、終了1。環境PATの権限不足として切り分け、当該コマンドだけGH_TOKEN/GITHUB_TOKENを外し保存済みCLI認証で1回再実行して終了0。元の環境変数はfinallyで復元し、値は出力・保存していない。
+- 通常PR #125を作成: https://github.com/tetsujisugimori-coder/Shogi-App/pull/125 。OPEN、isDraft=false、headRefOid=d47f0a547413ef3637f68bf09271ab3aacf2e6ccをAPI確認しCodexタスクへ添付。目的・非対象・試行数・順序・統計定義・全検証・実測・制約を本文に記載。mainへマージしていない。
+- 05:56:36 JST時点のCI run 35537123521はUbuntu IN_PROGRESS/macOS QUEUEDであり、この時点では成功扱いにしない。本追記だけをdocs commit/pushし、更新後HEADに対するCI確定結果はPR本文と最終報告に記載する。ソース・テスト・測定生出力は実装commitと同一であり、文書追記のみで重い検証は重複実行しない。
