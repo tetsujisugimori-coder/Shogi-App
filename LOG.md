@@ -4022,3 +4022,8 @@ PR #1のレビュー指摘を受け、簡易APIの`applyMove`と合法手候補�
 - 変更は8ファイルのみ: scripts/benchmarks/quiescenceOrderingSelfPlay.ts、scripts/measure-quiescence-ordering-self-play.ts、src/test/quiescence-ordering-self-play.test.ts、docs/quiescence-ordering-self-play.md、docs/quiescence-ordering-self-play-output.txt、README.md、LOG.md、package.json。生出力は1343655 bytes。既存domain/Worker/UI/交換形式/依存/CI設定に差分なし。
 - 測定完了後の変更は結果資料とLOGのみ。検証済み測定ソース/テストは変更していない。git diff --check終了0。今回8ファイルだけ明示stageし、staged検査後に通常commit/push/Issue #133をClosesするmain向け通常PRを作成する。mainへマージしない。
 - 既存LOGのPR #130/#132作成時に環境PATのcreatePullRequest権限不足が記録されているため、PR作成/編集は子プロセスのみGH_TOKEN/GITHUB_TOKENを渡さず保存済みCLI認証を選択する予定。認証値の表示・変更・保存は行わない。
+### commit・push・通常PR
+
+- 明示した8ファイルのgit diff --cached --check終了0。通常commit 326a7a558e10b460481558aec2150e52bd3b89ed（feat(shogi): add quiescence ordering self-play benchmark）、git push -u origin feat/quiescence-ordering-self-play-benchmarkとも終了0。
+- 保存済みCLI認証を子プロセスだけで選択し、gh pr create --base main --head feat/quiescence-ordering-self-play-benchmark --body-file <一時本文>終了0。通常PR #134を作成しCloses #133で関連付け、タスクへ添付した: https://github.com/tetsujisugimori-coder/Shogi-App/pull/134 。mainは未マージ。
+- この公開操作の記録だけを別の通常commit/pushする。製品コード・テスト・実測ソースには変更なし。最終HEADのCI確定結果はPR本文と最終報告へ記録し、CI結果の記録によるHEAD変更を繰り返さない。
