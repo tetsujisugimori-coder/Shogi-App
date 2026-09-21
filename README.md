@@ -171,6 +171,33 @@ analyzeAlphaBetaSearch(state, 3, undefined, undefined, {
 
 静止探索は専用の取り返し局面で地平線問題を修正しますが、候補生成とαβ探索量を増やします。再現可能な5局面・固定深さ3の参考測定は`npx tsx scripts/measure-alpha-beta-quiescence.ts`、記録は[docs/alpha-beta-quiescence-performance.md](docs/alpha-beta-quiescence-performance.md)を参照してください。実時間は環境依存でありCIの合否条件にはしません。
 
+## AI同士の研究用1局実行器
+
+`runSelfPlayGame`（`src/domain/shogi/selfPlayGame.ts`、domain barrelからもexport）は、開始局面と先手・後手それぞれの同期探索関数・設定、相対的な安全上限`maxPlies`を受け取る純粋関数APIです。探索関数と時計を決定的にすれば再現可能な1局を実行できます。
+
+```ts
+const search = (state: BoardState, settings: { maxDepth: number; milliseconds: number }) =>
+  analyzeTimeLimitedIterativeDeepeningAlphaBetaSearch(
+    state, settings.maxDepth, settings.milliseconds,
+  );
+const game = runSelfPlayGame({
+  initialState,
+  sente: { search, settings: { maxDepth: 3, milliseconds: 100 } },
+  gote: { search, settings: { maxDepth: 4, milliseconds: 200 } },
+  maxPlies: 200,
+});
+```
+
+先後で別の探索方式も注入できます。返却境界`SelfPlaySearchResult`は既存の時間制限付き反復深化αβ結果の必要項目を利用し、他方式で得られない観測値は明示的に`null`とします。評価は着手側の視点です。各plyに1始まり番号、プレイヤー、着手前`createPositionKey`、合法手、評価、完了深さ、探索時間、時間切れ、最深反復/全完了反復の通常・静止探索統計、PV、評価内訳を保存します。時間は探索が返した値で、実行器の検証や複製時間を含みません。破棄された未完了反復の統計は含めません。
+
+結果は`status: 'ended'`（既存`GameResult`付き）、`'max_plies'`（研究上の打ち切り）、`'failed'`（失敗情報付き）を区別し、すべて`plies`と`finalState`を返します。**最大ply到達はゲーム上の引き分けではなく、500手規定とも別です。** `maxPlies`は有限な0以上の整数のみ受理し、不正値は`failed / invalid_max_plies`。0なら探索せず打ち切り、終局済みなら0手で`ended`を返します。上限の最後の着手で終局した場合も`ended`を優先します。
+
+既存の`getLegalActions`、意味的比較`areLegalActionsEqual`、`executeLegalAction`を通して着手し、詰み・千日手・連続王手・500手規定などの終局処理を再利用します。探索の指し手なし、非合法手、手番不一致、壊れた観測値/PV、入力変更、例外は勝敗へ変換せず、`failure`に発生ply・手番・stage・code・messageを残します。正常に適用できた手と最後の正常局面は保持します。
+
+開始局面は既存`cloneBoardState`で複製し、各探索へ独立した再帰的に凍結済みのProxyを渡します。書き込みを試みた場合は例外を探索側が捕捉しても検出します。探索内で作業用の可変局面が必要なら`cloneBoardState(state)`を使ってください（Proxyは`structuredClone`不可）。記録・PV・評価内訳・最終局面は元データから分離されます。開始局面は既存ドメインの有効な`BoardState`を前提とし、設定と探索関数自身の副作用・終了性は注入側の責務です。同期APIなので、戻ってこない探索を`maxPlies`で中断することはできません。
+
+今回はUI、Worker、複数局集計、勝率判定、保存形式変更、探索方式の実測を含みません。投了・合意持将棋・入玉宣言を自動選択する方針も追加せず、それらで終局済みの開始局面は既存結果を保持します。次段階では先後を交代するA/B対局の実行基盤として利用する予定です。
+
 ## Shogi-App JSON Exchange Format
 
 外部アプリとの交換には、研究セッション全体を表す `shogi-app-game-record-session` / `version: 1` を推奨します。これは本譜 `mainline` と兄弟分岐 `branches`、選択中の `selectedRecordId` を含みます。各 `mainline` と `branches[].record` は、単局形式 `shogi-app-game-record` / `version: 1` です。
