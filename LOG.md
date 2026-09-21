@@ -3897,3 +3897,9 @@ PR #1のレビュー指摘を受け、簡易APIの`applyMove`と合法手候補�
 - `gh pr create --base main --head feat/self-play-paired-ab-runner --title 'feat(shogi): 先後交代A/B対局ペア実行器を追加' --body-file <一時本文ファイル>`初回は終了1、環境PATのcreatePullRequest権限不足（Resource not accessible by personal access token）。認証情報を表示・保存・変更せず、子プロセスだけ環境のGH_TOKEN/GITHUB_TOKENを渡さず保存済みCLI認証を使用して同じ引数で1回再試行し終了0。親プロセスの環境は変更していない。
 - `gh pr list --head feat/self-play-paired-ab-runner --json number,url,state,isDraft,headRefOid`終了0。PR #130がOPEN、isDraft=false、実装commitとheadRefOid一致を確認: https://github.com/tetsujisugimori-coder/Shogi-App/pull/130 。タスクへPRを添付済み。mainは未マージ。
 - 公開操作の失敗も記録するため、このLOG追記だけを別の通常commitとしてpushする。製品コード・テストは全検証済みのまま。追記後の最終HEADのCI確定結果はPR本文・最終報告に記録する。
+
+### [2026-09-21 21:05 JST] CI確認時の環境エラー
+
+- LOG追記commit `bec370db09d2760ea6e6c5ecc01c3491bdd2819c`のpush終了0。CI run 35597175047はUbuntu/macOSともsuccess。両環境54ファイル成功、lock/lint/buildとmacOS固有fsevents検証も成功。PRはOPEN/isDraft=false、mergeStateStatus=CLEAN、headRefOid一致を確認。
+- `gh run view 35597175047 --log`の初回取得はGitHub CLI標準キャッシュへの書き込みAccess is deniedで終了1。許可された経路で同コマンドを1回再試行し終了0、両OSのログを取得。製品・テスト・CIの失敗ではない。
+- 失敗したコマンドの記録要件を満たすため、この監査追記のみ通常commit/pushする。`git diff --check`とstaged差分検査を行い、追記後HEADのCI完了を確認して確定結果をPR本文と最終報告へ残す。検証済み製品コード・テストに追加変更なし。
