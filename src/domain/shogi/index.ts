@@ -3,6 +3,7 @@ export * from './attacks';
 export * from './moves';
 export * from './legalActions';
 export * from './randomAi';
+export * from './selfPlayGame';
 export * from './materialEvaluation';
 export { evaluateStaticExchange } from './staticExchangeEvaluation';
 export * from './pieceSquareEvaluation';

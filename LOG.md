@@ -3785,3 +3785,53 @@ PR #1のレビュー指摘を受け、簡易APIの`applyMove`と合法手候補�
 - 初回`gh pr create --base main --head feat/quiescence-ordering-repeated-benchmark ... --body-file ...`は`Resource not accessible by personal access token (createPullRequest)`、終了1。環境PATの権限不足として切り分け、当該コマンドだけGH_TOKEN/GITHUB_TOKENを外し保存済みCLI認証で1回再実行して終了0。元の環境変数はfinallyで復元し、値は出力・保存していない。
 - 通常PR #125を作成: https://github.com/tetsujisugimori-coder/Shogi-App/pull/125 。OPEN、isDraft=false、headRefOid=d47f0a547413ef3637f68bf09271ab3aacf2e6ccをAPI確認しCodexタスクへ添付。目的・非対象・試行数・順序・統計定義・全検証・実測・制約を本文に記載。mainへマージしていない。
 - 05:56:36 JST時点のCI run 35537123521はUbuntu IN_PROGRESS/macOS QUEUEDであり、この時点では成功扱いにしない。本追記だけをdocs commit/pushし、更新後HEADに対するCI確定結果はPR本文と最終報告に記載する。ソース・テスト・測定生出力は実装commitと同一であり、文書追記のみで重い検証は重複実行しない。
+
+## [2026-09-21 JST] AI同士の研究用1局実行器
+
+### 開始状態と調査
+
+- 開始時ブランチmain、HEAD `005852e9b00cfea42745cdebd6c746d9690af60a`。tracked/untrackedとも変更なし。親ディレクトリ（ドライブrootからcwdまで）とrepo内のAGENTS.mdを探索し、追加ファイルなし。ユーザー提示の「回答の最後に日時」を適用。既存変更・workの削除、stash、resetなし。
+- `git fetch origin`初回はschannel `SEC_E_NO_CREDENTIALS`、終了128。許可された実行経路で1回再試行し終了0。`gh pr view 125 --json state,mergedAt,mergeCommit,url`終了0、MERGED、merge SHAは上記HEAD、mergedAt `2026-09-20T21:13:08Z`。`git merge-base --is-ancestor main origin/main`終了0、`git merge --ff-only origin/main`終了0（Already up to date）。mainとorigin/mainは同一SHA。
+- `git switch -c feat/ai-self-play-game-runner`終了0。`gh issue create`初回は環境PATのcreateIssue権限不足、終了1。同コマンドだけGH_TOKEN/GITHUB_TOKENを一時的に外し保存済みCLI認証で1回再試行、終了0、Issue #127作成。値は出力せずfinallyで環境を復元。Issue: https://github.com/tetsujisugimori-coder/Shogi-App/issues/127
+- 既存のBoardState/LegalAction/GameResult、getLegalActions、areLegalActionsEqual、executeLegalAction、adjudicateAfterLegalMove、createPositionKey、cloneBoardState、createComparisonSnapshot、analyzeTimeLimitedIterativeDeepeningAlphaBetaSearchと統計/PV/評価内訳を確認。README・LOG、既存ベンチマークの独立CLI責務、Worker/UIのPVと評価内訳検証も参照。
+- 着手APIから詰み→千日手（連続王手を含む）→500手規定へ既存adjudicationが進む。投了、合意持将棋、入玉宣言は別の公開APIであり、今回のLegalActionによる実行器は自動宣言方針を持たない。これらによって終局済みの開始局面は既存結果を保持する。
+
+### 型・責務と実装
+
+- `src/domain/shogi/selfPlayGame.ts`に同期の純粋関数`runSelfPlayGame`、SelfPlayParticipant、SelfPlaySearchResult、SelfPlayPlyRecord、SelfPlayFailure、SelfPlayGameResultを追加。index.tsから公開。先後の設定型も独立に推論し、探索関数と設定を別々に渡せる。既存timed探索結果は構造的にそのまま利用可能。新しい探索方式は必要項目だけを返すadapterを注入する。
+- 記録項目は既存timed結果型のPick/マップ型で定義。取得できない観測値は必須フィールドのnullで明示し、0や架空の時間に置換しない。最深/全完了反復、通常/静止の7組の統計を区別。完了深さ、探索自身が返す時間、時間切れ、PV、評価内訳、着手前キーを記録。探索内部の全iterations配列は保存しない。
+- 開始局面・各探索入力・着手作業用局面・最終局面はcloneBoardStateで分離。各探索入力の全レコード/配列を再帰的にfreeze+Proxy化し、set/delete/defineProperty/setPrototypeOf/preventExtensionsの試みを記録して例外化する。検索側が例外を捕捉してもinput_mutation失敗。descriptorから取得した子にも同じ保護が働く。作業用可変局面はcloneBoardStateで作成できる。ProxyはstructuredCloneできないことをREADMEへ明記。
+- getLegalActionsの候補をareLegalActionsEqualで照合。座標、駒種、成り、手番、打つ駒の代表IDなど既存比較仕様を維持し、候補の複製だけをexecuteLegalActionへ渡す。盤面編集やルール複製は行わない。PVも独立局面で同じ公開APIから合法性を検証する。評価値には既存の終局Infinity/-Infinityを許容し、NaN・不正な統計・内訳矛盾を拒否する。
+- 結果はended（GameResult付き）/max_plies/failed。最大plyはこの呼出しからの相対値で、500手規定や引き分けへ変換しない。最後の許可着手で終局した場合はended優先。上限0は探索しない。不正な上限は明示的なinvalid_max_plies。
+- 既存設計には探索の例外とexecuteLegalActionの判別可能な結果型の両方がある。今回は途中までの正常棋譜・最終正常局面を失わない要件から判別可能な失敗を採用。ply/player/stage/code/messageを残し、探索例外はメッセージを保存する。型に適合した有効な開始BoardStateを前提とし、探索関数自身の停止性や設定の副作用は注入側の責務。
+- `src/test/shogi-self-play-game.test.ts`に決定的な52件。交互の呼出し、別設定、後手開始、既存timed探索+注入時計、合法な移動/成り/捕獲/打ち、詰み/千日手/連続王手/500手、終局済み、0/不正上限、壊れた結果/数値/PV/内訳、入力変更10経路、例外、途中失敗、参照分離、各plyの全統計・キーを検証。実時間待機や性能しきい値なし。
+- READMEにAPI使用例、型/終了状態、入力不変性、合法手・終局の再利用、同期APIの制約、非対象と次段階を追記。
+
+### 実装中の失敗・再検証
+
+- 初回lint（tsc）終了2: 新規fixtureのvi.fn(observation)が第2引数をLegalActionとして推論し、探索設定number/nullと競合。fixtureを1引数のラッパーへ修正し、再lint終了0。製品コード・既存テストの緩和なし。
+- 初回新規テスト起動はesbuild `spawn EPERM`で終了1。テスト自体は未実行。許可された実行経路で同コマンドを再実行し終了0、初期49/49成功（19:55:29 JST、1.87秒）。
+- 調査で存在しない.tsのテスト名をGet-Contentしたためエラー。rg --filesで実際の.tsx名を確認して読み直し。PowerShellで`src/test/*.ts`をrgへ渡した探索はos error 123、終了1。ディレクトリ指定へ戻し、内容やコードを推測で変更していない。
+- 追加境界3件を含む関連検証: `npm test -- src/test/shogi-self-play-game.test.ts src/test/shogi-legal-actions.test.ts src/test/shogi-checkmate.test.tsx src/test/shogi-repetition.test.tsx src/test/shogi-move-limit-jishogi.test.tsx src/test/shogi-two-ply-minimax-ai.test.ts src/test/shogi-quiescence-search.test.ts src/test/shogi-drop.test.tsx src/test/shogi.test.tsx` 終了0、9ファイル473/473成功（新規52、19:56:27 JST、10.12秒）。
+- `git diff --check`終了0。WindowsのLF→CRLF警告は空白エラーと区別。標準`npm run check`でlock→lint→全体テスト→buildを順番に実行し、確定結果を以下へ記録する。
+
+### 非対象と次段階
+
+- UI、Worker/プロトコル/プール、複数局/勝率/Elo、ランダム局面・定跡、先後交代実験、original/material実測、JSON/KIF形式、既定AI/静止/ordering設定、SEE/評価/合法手/終局規則、置換表/キャッシュ/make-unmake、新規依存は変更しない。
+- 次段階は同じ開始局面・独立した設定と時計を指定し先後交代のA/B対局へ接続する。同期探索の中断やWorker実行、宣言/投了方針、複数局集計は別課題。
+
+### [2026-09-21 20:00 JST] 最終ローカル検証
+
+| コマンド | 終了コード | 結果 |
+| --- | ---: | --- |
+| 新規単独テスト（初期49件） | 0 | 1ファイル49/49成功 |
+| 新規52件を含む関連テスト（上記9ファイル） | 0 | 473/473成功 |
+| `npm run check` | 0 | lock→lint→全体test→buildまで完走 |
+| check内 `npm run verify:lock` | 0 | 399 entries、registry398、version/resolved/integrity欠落0 |
+| check内 `npm run lint` | 0 | 型エラー0 |
+| check内 `npm test` | 0 | 53ファイル1613/1613成功、19:57:43 JST開始、148.06秒 |
+| check内 `npm run build` | 0 | 1753 modules、1.76秒 |
+| `git diff --check` | 0 | 空白エラーなし |
+
+- 全体は既存の通常設定で実行。既存のjsdom navigation未実装通知が1件出たが、テスト失敗0・終了0。UI/Worker/合法手/ルール/探索/棋譜の回帰なし。テスト削除・skip・期待値緩和・timeout延長・依存変更なし。重い検証は直列で実行。
+- 最終変更はselfPlayGame.ts、新規テスト、domain index、README、LOGの5ファイル。今回のファイルだけ明示的にstageして通常commit/push/PRを作成する。mainへマージしない。PR作成後の最終HEADのCIは、commit後の文書追記によるHEAD変更を避け、PR本文と最終報告へ確定結果を記録する。
