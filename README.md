@@ -219,7 +219,29 @@ const pair = runPairedSelfPlayMatch({
 
 入力保護と複製は1局実行器を再利用し、開始局面を変更せず、両局の最終局面・履歴・持ち駒・局面履歴/スナップショット・指し手・PV・評価内訳を参照共有しません。時計・乱数・設定や探索関数の副作用と終了性は注入側の責務です。時間制限付き探索は呼び出しごとに独立して開始し、状態を持つ時計を使う場合も注入側で独立性を確保してください。同期探索が戻らない場合の強制中断はありません。
 
-今回は多数局や複数ペアの自動実行、勝率・Elo・統計解析、ランダム開始局面、Worker・並列化・UI、`original`対`material`の実測を含みません。次段階は複数ペア集計、または`original`対`material`の実対局測定です。
+1ペア実行器は勝率・Elo・統計解析、ランダム開始局面、Worker・並列化・UI、`original`対`material`の実測を含みません。複数ペアの実行には以下のAPIを使います。
+
+### 複数の先後交代A/B対局ペア実行器
+
+`runRepeatedPairedSelfPlayMatches`（`src/domain/shogi/repeatedPairedSelfPlayMatches.ts`、domain barrelからexport）は、既存`runPairedSelfPlayMatch`を指定回数だけ同期・順次実行する研究用の純粋関数APIです。`pairCount`は**2局1組のペア数**で、全ペアが同じ開始局面から独立して始まります。A/Bの探索関数・設定型と`maxPlies`はそのまま渡します。上の`search`を使う例:
+
+```ts
+const repeated = runRepeatedPairedSelfPlayMatches({
+  initialState,
+  a: { search, settings: { maxDepth: 3, milliseconds: 100 } },
+  b: { search, settings: { maxDepth: 4, milliseconds: 200 } },
+  maxPlies: 200,
+  pairCount: 3, // 計6局
+});
+// repeated.pairs: 実行順に { pairNumber: 1..3, result: PairedSelfPlayMatchResult }
+// repeated.summary: aWins, bWins, draws, maxPlies, failures（すべてbigint）
+const total = Object.values(repeated.summary).reduce((sum, count) => sum + count, 0n);
+// total === 6n（BigInt(repeated.pairs.length) * 2n）
+```
+
+各ペアの完全な結果（各局のoutcome・履歴・最終局面・ply別探索情報・PV・評価内訳）を保持し、既存ペアのsummaryからA勝・B勝・引き分け・最大ply打ち切り・失敗を別々に数えます。失敗・打ち切り後も後続ペアを続行し、5件数の合計は常にペア数の2倍です。`pairCount`は0以上の有限な安全整数だけを受け入れ、不正な型・値は開始前に`RangeError`で拒否します。0なら探索を呼ばず、空のpairsと全件数`0n`を返します。恣意的な上限は設けず、2倍した総局数の精度を守るため集計だけ`bigint`とします（個別ペアのsummaryは従来の`number`）。全結果をメモリに保持するため、実行可能な規模はメモリ・実行時間に依存します。
+
+入力不変性と局間・ペア間の参照分離は既存1局実行器の複製境界を利用します。時計・乱数・状態を持つ探索・設定オブジェクトの副作用と独立性・終了性は呼び出し側の責務で、暗黙の再生成やリセットはしません。既存APIが投げる例外はそのまま伝播します。今回は勝率・得点率・Elo・統計解析・実対局測定・複数開始局面・並列化・Worker・UI・出力形式を含みません。次段階で`original`対`material`などの複数ペア実対局測定に使用する予定です。
 
 ## Shogi-App JSON Exchange Format
 
