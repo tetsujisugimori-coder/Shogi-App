@@ -3964,3 +3964,61 @@ PR #1のレビュー指摘を受け、簡易APIの`applyMove`と合法手候補�
 - `gh pr create --base main --head feat/repeated-paired-self-play-runner --title 'feat(shogi): 複数の先後交代A/B対局ペア実行器を追加' --body-file <一時本文ファイル>`初回は終了1、環境PATのcreatePullRequest権限不足（Resource not accessible by personal access token）。子プロセスだけGH_TOKEN/GITHUB_TOKENを渡さず既存の保存済みCLI認証を選択し、同引数で1回再試行して終了0。認証値の表示・変更・保存、親環境の変更なし。
 - 通常PR #132を作成し、Issue #131をClosesで関連付け、タスクへ添付した: https://github.com/tetsujisugimori-coder/Shogi-App/pull/132 。`gh pr view 132 --json state,isDraft,headRefOid,baseRefName,url,statusCheckRollup`終了0、OPEN/isDraft=false/base=main、実装SHA一致。mainは未マージ。
 - 公開操作の失敗・回復も記録するため、このLOG追記だけを通常commit/pushする。製品・テストは検証済みのまま。追記後の最終HEADに対するCI結果をPR本文と最終報告に確定記載する。
+## [2026-09-22 JST] 静止探索順の複数ペア実対局測定（Issue #133）
+
+### 開始・調査中
+
+- 開始main、HEAD aaff0edf412ec43d3ed7698b05ea9597941e2fce。status --short --untracked-files=allは空、親階層AGENTS.mdなし、repo内検索はno-match（終了1）。既存作業の削除・上書き・stash・resetなし。
+- git fetch origin初回終了128、schannel SEC_E_NO_CREDENTIALS。許可された経路で同コマンドを再実行し終了0。
+- PR #132はMERGED（2026-09-21T18:36:25Z）、merge commit aaff0ed。origin/mainへの祖先確認終了0、git merge --ff-only origin/main終了0（Already up to date）。固定SHA checkoutなし。
+- 同目的の既存Issue #133を使用: https://github.com/tetsujisugimori-coder/Shogi-App/issues/133 。git switch -c feat/quiescence-ordering-self-play-benchmark終了0。
+- selfPlayGame / pairedSelfPlayMatch / repeatedPairedSelfPlayMatchesを読了。合法手・検証・先後対応・終局・反復は既存APIの責務。測定は既存時間制限探索の結果を直接返し、独立した集計/直列CLIを追加する方針。
+- quiescenceOrderingRepeated / measure-quiescence-ordering-repeated / quiescenceOrdering / searchEvaluationPresets / package.jsonと直前LOGを確認。JSON非有限数は既存と同じ文字列表現、bigintも十進文字列にする。
+### 調査・設計・実装
+
+- 指定の探索/順序付け/評価プリセット、既存ベンチマーク、自己対局52件・ペア23件・複数ペア37件・反復測定テストのfixture/契約、README関連節、CI/Pagesワークフロー、tsconfigを確認。CIはUbuntu/macOSのlock/lint/test/buildで、測定コマンドは呼ばない。
+- 調査中のrg src/utils/board*は存在しないパスでエラー。初期局面factoryの正しい定義src/types/shogi.tsを既存テストから確認。AGENTS.mdはhidden込みrepo検索でも該当なし。
+- scripts/benchmarks/quiescenceOrderingSelfPlay.ts: 固定設定を一か所に凍結定義、A/Bの差はquiescenceMoveOrderingのみ。既存時間制限探索を直接返し、既存複数ペアAPIへ委譲。盤面/着手/終局/先後の再実装なし。
+- 集計は各plyの参加者を既存座席情報から選別。最深/全完了反復、通常/静止を分離。観測値nullは合計nullと欠測件数、undefined/不正値は集計エラー。整数カウンタはbigint加算。時間は有限値検証。raw RECORDを集計前に出力して集計失敗時も保持。
+- 指し手の意味的フィールドを固定順配列にしてSHA-256。時間・勝敗・探索観測を含めず、drop駒IDは既存LegalActionの同一性に合わせて保持。空/部分棋譜も結果と一緒に区別して保存する。
+- scripts/measure-quiescence-ordering-self-play.ts: RUN/CONFIG/RECORD/GAME/SUMMARY/END構造化行、日本語の目的・限界、環境・HEAD/dirty・使用ソースSHA-256。domain全tsと型/測定ソースをhash対象に含める。package.jsonへmeasure:quiescence-ordering-self-play追加（check/CIから呼ばない）。外部依存なし。
+- 新規テストは探索・時計・実行器を注入し、実時間待機なしで配線/3ペア/先後別観測/5 outcome/失敗継続/不変性/再現性/欠測拒否/シグネチャ/JSONを確認する。
+### 新規テストの初回検証・修正
+
+- npm test -- src/test/quiescence-ordering-self-play.test.ts 初回終了1、esbuild spawn EPERMで未実行。許可経路の再実行は終了1、26件中25成功・1失敗。
+- 失敗は新規テストの初期局面比較。createInitialBoardStateは毎回別のrecordIdを発行するため、別々の生成結果を完全一致させたfixtureが不適切。factoryをspyして実際の平手局面を返し、引数なし1回の呼出しと実行器への同一参照委譲を検証するよう修正。製品コード・既存テスト・性能条件の変更なし。
+### ローカル検証（進行中）
+
+- 新規単独再実行終了0、26/26成功（06:46:48 JST開始、27.88秒）。
+- 関連実行は終了0、5ファイル175/175成功（新規26、自己対局52、ペア23、複数ペア37、反復測定37）。指定したquiescence-ordering.test.ts / shogi-two-ply-alpha-beta-ai.test.tsは実在せず未一致だったため、この2つを実行済みとは扱わない。
+- 実在パスで補完: npm test -- src/test/shogi-quiescence-ordering.test.ts src/test/quiescence-ordering-benchmark.test.ts src/test/shogi-two-ply-minimax-ai.test.ts 終了0、3ファイル110/110成功、5.68秒。関連は合計8ファイル285件。
+- npm run lint初回終了1、TS2322。新規集計fixtureのGameResultを独立した条件式のフィールドで作り、判別unionを失っていたテスト型の問題。引き分け/詰みのオブジェクト全体で分岐する型安全なfixtureに修正。期待outcomeと製品実装は変更なし。
+### 全体検証完了・実測開始前
+
+- 修正後npm run lint終了0。npm run check終了0、lock399 entries/registry398・欠落0、lint成功、56ファイル1699/1699テスト成功（06:49:24 JST開始、166.03秒）、build1755 modules/1.70秒。既存のjsdom navigation通知1件は失敗ではない。ログは一時ファイルshogi-self-play-check.logへ保存した。
+- READMEとdocs/quiescence-ordering-self-play.mdへ目的・固定条件・出力契約・欠測/打ち切り・深さ1除外・同一棋譜の非独立性・対象外/次段階を記載。
+- 実測は基点aaff0ed上の未commitソースで1回のみ実施予定。全体check完了後にgit diff --check、続いてmeasure:quiescence-ordering-self-play。A=original/B=material、平手/standard評価/通常standard/静止追加1/最大4/100ms/120ply/3ペア。同期直列、ウォームアップなし。他のテスト/build/測定は並行しない。
+### 実測中の観察
+
+- 実測開始2026-09-21T21:52:50.043Z（09/22 06:52:50 JST）。Node v24.20.0/npm11.17.0、win32 10.0.26200 x64、Intel Core i7-14650HX。RUNにdirty=trueとdomain全tsを含むsourceSha256を保存。
+- CLIは既存同期実行器完了後に6局分を出力するため、実行中に局ごとの出力増加はない。process ID30116のCPU時間が14.70→87.92秒へ増加し、CPU処理継続を確認。探索の深さ1は期限除外、実行器にも複製/合法性/PV検証の時間がある。処理停止と判断せず、条件縮小や再実行なしで続行。テスト/build/他ベンチマークは起動していない。
+- 約10分時点でCPU時間458.12秒。quiescenceSearch.tsの終了条件を追加読取: remainingDepthは各再帰で1減り、0なら王手中でもstatic評価で終了。通常探索も有限の深さ/候補ループ、各局は適用済み120plyで打ち切る既存契約。深さを延長し続ける分岐は確認されない。同期APIに進捗callbackはないため現在の局番号/深さの断定はせず、実測出力から事後に深さ1超過を確認する。
+- 07:12:12 JST時点（開始約19分23秒）でも同一processが継続。CPU累積939.81秒、WorkingSet294883328 bytes。メモリは約280MiB前後、明らかな増加傾向なし。現在局面/進捗はAPIから取得できないため推測しない。条件変更・追加実測・並行重負荷なし。
+- 07:17:05 JST CPU1216.89秒。追加読取でcloneBoardStateがhistory/positionHistory/全positionSnapshotsを複製し、通常・静止探索のexecuteSearchActionが候補着手ごとにそれを呼ぶことを確認。対局履歴とともに複製量が増える構造は長時間化の候補要因だが、この実行のprofileによる寄与率の特定ではない。探索本体/履歴契約は対象外のため変更しない。
+- 07:34:00 JST（開始約41分）CPU2183.00秒、WorkingSet340901888 bytes。処理継続を確認。中間局番号は取得できず残時間の推測はしない。採用条件を変えず、同一CLIプロセスの完了を待つ。
+- 07:51:26 JST（開始約59分）CPU3180.17秒、WorkingSet355266560 bytes。継続中、結果未返却。重負荷の並行実行なし。追加のAGENTS.md検索を--hidden --no-ignoreでも行い、node_modules/.git/dist以外に該当なしを再確認。
+- 08:04:01 JST CPU3897.55秒。dropRules.ts/checkmate.tsを追加読取。打ち歩詰め応手は有限の9x9盤上手のみを調べ、駒打ち応手の再帰には戻らない。静的な終了経路確認であり、実行中のstack/profile観測ではない。現在の局面や深さを断定しない。
+### 実測完了・保存結果の監査
+
+- npm run measure:quiescence-ordering-self-playを1回、条件変更なしで完走。終了0。開始2026-09-21T21:52:50.043Z、終了2026-09-21T23:14:28.662Z（JST 09/22 06:52:50〜08:14:28）、全体4898.619秒（約81分39秒）。テスト/build/別ベンチマークの同時実行なし。
+- 3ペア6局はすべて99plyの先手詰み勝ち。順にa_win/b_win/a_win/b_win/a_win/b_win。A勝3/B勝3/引き分け0/最大ply0/失敗0。総局数6とoutcome合計6一致。
+- ユニーク棋譜1、重複5、頻度6。全局のSHA-256はf027f84718e1df3f51465368912556e7a66d19f8a6e4aa9f4ad032c7ed7407e4。独立した6標本ではなく、先後を交換した同一棋譜の反復であり棋力差を断定できない。
+- A/B各297着手、完了深さはすべて1、タイムアウト各297。A時間2534920.7918ms、B時間2336441.1053ms（丸め前は生出力）。全594着手が100ms超過、最大44176.7393ms。深さ1の完了を期限から除外する既存契約どおりで、実測の長時間化が深さ1の処理に表れている。探索時間合計約4871.362秒で全体の大部分を占める。複製/合法手生成/評価の個別寄与率はprofileしておらず断定しない。
+- 最深/全完了反復統計は今回全件深さ1のため同値。通常訪問A/B各29322、静止開始葉各29316、静止訪問A16887/B13584、静止cutoff A21180/B22161、静止skip A38526/B41829。通常cutoff/skipは双方0。欠測全項目0。先後別の詳細と全plyを生出力に保存。
+- 一時監査スクリプトverify-shogi-self-play-output.mjsを実測終了後に実行、終了0。RUN/CONFIG/6 RECORD/6 GAME/SUMMARY/END、先後・ペア/局順、outcome件数、全594plyからのA/B・先後・各局の時間/深さ/timeout/全14統計再計算、指し手列からのsignature再計算、重複頻度、主要ソース51ファイルのSHA-256現物一致を確認。監査結果を一時shogi-self-play-audit.jsonへ保存し、docs要約を生出力から生成した。
+- 実測は失敗・停止ではなく完了。条件縮小・追加測定・探索改造なし。実時間をCI合否条件にしない。次段階は複数開始局面/定跡分岐を使う対局スイート。今回だけで勝率/Elo/有意差/最適順序/既定化/廃止を判断しない。
+### 最終差分レビュー・公開準備
+
+- 変更は8ファイルのみ: scripts/benchmarks/quiescenceOrderingSelfPlay.ts、scripts/measure-quiescence-ordering-self-play.ts、src/test/quiescence-ordering-self-play.test.ts、docs/quiescence-ordering-self-play.md、docs/quiescence-ordering-self-play-output.txt、README.md、LOG.md、package.json。生出力は1343655 bytes。既存domain/Worker/UI/交換形式/依存/CI設定に差分なし。
+- 測定完了後の変更は結果資料とLOGのみ。検証済み測定ソース/テストは変更していない。git diff --check終了0。今回8ファイルだけ明示stageし、staged検査後に通常commit/push/Issue #133をClosesするmain向け通常PRを作成する。mainへマージしない。
+- 既存LOGのPR #130/#132作成時に環境PATのcreatePullRequest権限不足が記録されているため、PR作成/編集は子プロセスのみGH_TOKEN/GITHUB_TOKENを渡さず保存済みCLI認証を選択する予定。認証値の表示・変更・保存は行わない。
