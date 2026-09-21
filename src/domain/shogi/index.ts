@@ -4,6 +4,7 @@ export * from './moves';
 export * from './legalActions';
 export * from './randomAi';
 export * from './selfPlayGame';
+export * from './pairedSelfPlayMatch';
 export * from './materialEvaluation';
 export { evaluateStaticExchange } from './staticExchangeEvaluation';
 export * from './pieceSquareEvaluation';
