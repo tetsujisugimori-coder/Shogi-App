@@ -196,7 +196,30 @@ const game = runSelfPlayGame({
 
 開始局面は既存`cloneBoardState`で複製し、各探索へ独立した再帰的に凍結済みのProxyを渡します。書き込みを試みた場合は例外を探索側が捕捉しても検出します。探索内で作業用の可変局面が必要なら`cloneBoardState(state)`を使ってください（Proxyは`structuredClone`不可）。記録・PV・評価内訳・最終局面は元データから分離されます。開始局面は既存ドメインの有効な`BoardState`を前提とし、設定と探索関数自身の副作用・終了性は注入側の責務です。同期APIなので、戻ってこない探索を`maxPlies`で中断することはできません。
 
-今回はUI、Worker、複数局集計、勝率判定、保存形式変更、探索方式の実測を含みません。投了・合意持将棋・入玉宣言を自動選択する方針も追加せず、それらで終局済みの開始局面は既存結果を保持します。次段階では先後を交代するA/B対局の実行基盤として利用する予定です。
+1局実行器はUI、Worker、複数局集計、勝率判定、保存形式変更、探索方式の実測を含みません。投了・合意持将棋・入玉宣言を自動選択する方針も追加せず、それらで終局済みの開始局面は既存結果を保持します。以下のペア実行器もこのAPIを再利用します。
+
+### 先後交代A/B対局ペア実行器
+
+`runPairedSelfPlayMatch`（`src/domain/shogi/pairedSelfPlayMatch.ts`、domain barrelからexport）は、同じ開始局面から**1局目はA先手・B後手、2局目はB先手・A後手**として、`runSelfPlayGame`を順に2回呼ぶ同期の純粋関数APIです。`BoardState.turn`を尊重し、盤面・駒の所有者・手番を変換しません。A/Bには別々の探索関数・設定型を指定できます。上の`search`を使う例:
+
+```ts
+const pair = runPairedSelfPlayMatch({
+  initialState,
+  a: { search, settings: { maxDepth: 3, milliseconds: 100 } },
+  b: { search, settings: { maxDepth: 4, milliseconds: 200 } },
+  maxPlies: 200,
+});
+// pair.games[0]: gameNumber=1, sente='A', gote='B'
+// pair.games[1]: gameNumber=2, sente='B', gote='A'
+// 各局: result（完全なSelfPlayGameResult）, outcome
+// pair.summary: aWins, bWins, draws, maxPlies, failures（合計2）
+```
+
+`games`は順序固定の2要素タプルで、局番号から座席を型で識別できます。`outcome`は`a_win / b_win / draw / max_plies / failed`。`ended`のときだけ既存`GameResult.winner`を座席対応でA/Bへ変換し、最大ply打ち切り・失敗を勝敗や引き分けへ変換しません。ペア全体の勝者は判定しません。1局目が失敗・打ち切りでも2局目を独立実行し、同じ`maxPlies`を未加工で渡します。
+
+入力保護と複製は1局実行器を再利用し、開始局面を変更せず、両局の最終局面・履歴・持ち駒・局面履歴/スナップショット・指し手・PV・評価内訳を参照共有しません。時計・乱数・設定や探索関数の副作用と終了性は注入側の責務です。時間制限付き探索は呼び出しごとに独立して開始し、状態を持つ時計を使う場合も注入側で独立性を確保してください。同期探索が戻らない場合の強制中断はありません。
+
+今回は多数局や複数ペアの自動実行、勝率・Elo・統計解析、ランダム開始局面、Worker・並列化・UI、`original`対`material`の実測を含みません。次段階は複数ペア集計、または`original`対`material`の実対局測定です。
 
 ## Shogi-App JSON Exchange Format
 
