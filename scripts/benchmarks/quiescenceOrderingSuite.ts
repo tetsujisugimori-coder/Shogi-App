@@ -17,7 +17,7 @@ export const ORDERING_SETTINGS = [
   { maxTacticalDepth: 2, moveOrdering: 'original' },
   { maxTacticalDepth: 2, moveOrdering: 'material' },
 ] as const;
-export type Setting = typeof ORDERING_SETTINGS[number];
+export type Setting = (typeof ORDERING_SETTINGS)[number] & { readonly killerMoves?: boolean };
 export type SearchResult = AlphaBetaSearchResult | TimeLimitedIterativeDeepeningAlphaBetaSearchResult;
 export type OrderingResult = { setting: Setting; search: SearchResult; pv: string[] };
 export type OrderingCase = { position: BenchmarkPosition; mode: BenchmarkMode } & (
@@ -91,7 +91,9 @@ export function runOrderingTrial(input: BoardState, mode: BenchmarkMode, setting
   const snapshot = createComparisonSnapshot(input);
   const snapshotBefore = structuredClone(snapshot);
   try {
-    const options = { moveOrdering: 'standard', quiescence: { ...setting } } as const;
+    const { killerMoves, ...quiescence } = setting;
+    const options = { moveOrdering: 'standard', quiescence,
+      ...(killerMoves === undefined ? {} : { killerMoves }) } as const;
     const search = mode === 'fixed'
       ? (dependencies.fixedSearch ?? analyzeAlphaBetaSearch)(snapshot, 3, undefined, dependencies.clock, options)
       : (dependencies.timedSearch ?? analyzeTimeLimitedIterativeDeepeningAlphaBetaSearch)(snapshot, 4, 1000, undefined, dependencies.clock, options);
