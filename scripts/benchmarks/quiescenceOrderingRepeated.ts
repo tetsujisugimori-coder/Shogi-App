@@ -37,11 +37,15 @@ export interface RepeatedCase {
   error?: string;
 }
 
+/** Deterministically balances which member of a pair is invoked first. */
+export function alternatingPairOrder<T extends string>(first: T, second: T, offset: number): readonly [T, T] {
+  return offset % 2 === 0 ? [first, second] : [second, first];
+}
+
 /** Zero-based position/depth indices balance the first setting across both
  * dimensions. Each phase restarts at trial 1; eight measurements give 4/4. */
 export function trialOrder(positionIndex: number, extension: 1 | 2, trialIndex: number): readonly Ordering[] {
-  return (positionIndex + extension - 1 + trialIndex) % 2 === 0
-    ? ['original', 'material'] : ['material', 'original'];
+  return alternatingPairOrder('original', 'material', positionIndex + extension - 1 + trialIndex);
 }
 
 export function parseRepeatedModes(args: readonly string[]): BenchmarkMode[] {
