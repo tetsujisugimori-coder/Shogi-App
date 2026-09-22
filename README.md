@@ -166,6 +166,18 @@ npm run measure:quiescence-ordering-self-play
 
 UI/Worker、通常対局設定、探索本体、評価係数、SEE、交換形式、乱数、並列対局、定跡生成は対象外です。次段階は複数開始局面または定跡分岐を使った対局スイートです。[測定資料](docs/quiescence-ordering-self-play.md)と[生出力](docs/quiescence-ordering-self-play-output.txt)を参照してください。
 
+### 複数開始局面・先後交代セルフプレイスイート基盤
+
+```sh
+npm run measure:quiescence-ordering-self-play-suite
+```
+
+これは実測結果を同梱しない、研究用の固定3局面スイートです。平手、`▲7六歩 △3四歩 ▲2六歩 △8四歩`後、`▲2六歩 △8四歩 ▲2五歩 △8五歩`後を、公開された合法手列挙・着手APIで平手から再生して作ります。各局面で既存のA=`original`/B=`material`先後交代ペアを1組、定義順に同期・直列で実行します。探索設定は既存の`SELF_PLAY_CONFIG`を再利用し、通常対局や探索の既定値を変えません。
+
+CLIは`RUN / SUITE_CONFIG / SCENARIO_START / RECORD / GAME / SCENARIO_SUMMARY / SUITE_SUMMARY / END`のJSON行を出力します。開始局面キーと指し手列を組み合わせたSHA-256署名で、同じ指し手列でも開始局面が違えば区別します。`failed`と`max_plies`は観測結果として継続・集計しますが、runner例外または集計不変条件違反では対象`scenarioId`を示して失敗し、不完全な`SUITE_SUMMARY`は出しません。
+
+同一開始局面の反復は独立標本ではなく、複数局面でも棋力差・勝率・Elo・統計的有意差を証明しません。100msは深さ1の既存契約により厳密な実行上限ではありません。この基盤では長時間の実探索測定を実行しておらず、次段階は少数局面によるパイロット測定です。詳細は[設計資料](docs/quiescence-ordering-self-play-suite.md)を参照してください。
+
 ## 静止探索（Quiescence Search）の純粋関数基盤
 
 `analyzeQuiescenceSearch(state, perspective, maxTacticalDepth, evaluation?, interruptionCheck?)` は、通常の固定深さ探索が駒取り直後などの不安定な局面で静的評価を確定してしまう探索境界の問題を、限定的に読み足して検証するためのドメインAPIです。開始時に指定した`perspective`を固定し、その側の手番で最大化、相手側で最小化します。非王手局面では既存の静的評価をstand-pat候補として先に置き、合法な駒取り（成り付き捕獲を含む）だけを元の合法手順で読みます。同値ならstand-patを維持します。王手中はstand-patを置かず、既存の合法手生成による玉移動・合駒・駒打ちを含む全回避手を読みます。

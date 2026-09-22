@@ -4027,3 +4027,24 @@ PR #1のレビュー指摘を受け、簡易APIの`applyMove`と合法手候補�
 - 明示した8ファイルのgit diff --cached --check終了0。通常commit 326a7a558e10b460481558aec2150e52bd3b89ed（feat(shogi): add quiescence ordering self-play benchmark）、git push -u origin feat/quiescence-ordering-self-play-benchmarkとも終了0。
 - 保存済みCLI認証を子プロセスだけで選択し、gh pr create --base main --head feat/quiescence-ordering-self-play-benchmark --body-file <一時本文>終了0。通常PR #134を作成しCloses #133で関連付け、タスクへ添付した: https://github.com/tetsujisugimori-coder/Shogi-App/pull/134 。mainは未マージ。
 - この公開操作の記録だけを別の通常commit/pushする。製品コード・テスト・実測ソースには変更なし。最終HEADのCI確定結果はPR本文と最終報告へ記録し、CI結果の記録によるHEAD変更を繰り返さない。
+
+## [2026-09-22 JST] 複数開始局面・定跡分岐の先後交代セルフプレイスイート基盤
+
+### 設計・変更
+
+- 基点はPR #134を含むmain `4969c32`。作業ツリーは開始時に空で、`feat/multi-position-self-play-suite`を作成した。`git fetch origin main`はWindows認証経路の`SEC_E_NO_CREDENTIALS`で更新確認できなかったが、ローカル`origin/main`は基点と同一だった。既存の実装を作り直さず、PR #134の`SELF_PLAY_CONFIG`、参加者生成、観測集計、先後交代ペア実行器を再利用した。
+- `scripts/benchmarks/quiescenceOrderingSelfPlayScenarios.ts`に、平手、▲7六歩 △3四歩 ▲2六歩 △8四歩後、▲2六歩 △8四歩 ▲2五歩 △8五歩後の固定カタログを追加した。定跡局面は平手から公開`getLegalActions`/`executeLegalAction`で、from/to/駒種/手番/成りを意味的に照合して再生する。手の不在・重複・適用失敗は局面IDと手順番号を含むエラーにし、人工盤面や直接配列変更は行わない。
+- `scripts/benchmarks/quiescenceOrderingSelfPlaySuite.ts`に、定義順の同期・直列スイートを追加した。各局面は既存`runPairedSelfPlayMatch`を1回呼び、2局のA/B先後交代、failed/max_plies保持、局面別とsuite全体のbigint outcome不変条件を維持する。runner例外と集計不変条件は`scenarioId`付きで失敗し、不完全なsuite summaryを返さない。
+- 既存の指し手列署名を維持し、`createPositionKey(initialState)`と既存指し手列署名を組み合わせたSHA-256複合署名を追加した。局面別/全体のユニーク数、重複局数、対象局頻度を集計し、同一手順でも開始局面が異なれば区別する。
+- 独立CLI `measure:quiescence-ordering-self-play-suite`、README、`docs/quiescence-ordering-self-play-suite.md`、偽runner/短い決定的対局による新規テストを追加した。探索本体、評価、時間制限意味、通常対局既定値、Worker/UI、外部依存は変更していない。
+
+### 検証
+
+| コマンド | 終了コード | 結果 |
+| --- | ---: | --- |
+| 関連セルフプレイ4ファイル | 0 | 92/92テスト成功 |
+| `npm run lint` | 0 | TypeScriptエラー0 |
+| `npm run check` | 0 | lockfile検証、lint、57ファイル1705/1705テスト、build（1755 modules）成功 |
+
+- 実探索による長時間の単一局面測定および新規スイート測定は実行していない。今回の変更は測定基盤だけであり、勝率、Elo、棋力差、統計的有意差、性能改善を記録・判定していない。
+- 次段階は、この固定3局面を少数で使うパイロット測定。実施時も100msが深さ1では厳密な上限ではない既存契約、同一局面内の反復を独立標本とみなさない境界、failed/null観測の保持を守る。
