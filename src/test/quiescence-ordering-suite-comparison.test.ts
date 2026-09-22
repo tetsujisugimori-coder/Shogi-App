@@ -2,6 +2,7 @@
 import { describe, expect, it } from 'vitest';
 import { createPositionKey } from '../domain/shogi/repetition';
 import { getLegalActions } from '../domain/shogi/legalActions';
+import { analyzeAlphaBetaSearch } from '../domain/shogi/twoPlyAlphaBetaAi';
 import { QUIESCENCE_ORDERING_SELF_PLAY_SCENARIOS, type SelfPlayScenario } from '../../scripts/benchmarks/quiescenceOrderingSelfPlayScenarios';
 import { defaultSuiteComparisonConfig, formatSuiteComparison, parseSuiteComparisonMode, runSuiteComparison,
   runSuiteComparisonCli, serializeSuiteComparison, type SuiteComparisonDependencies } from '../../scripts/benchmarks/quiescenceOrderingSuiteComparison';
@@ -30,6 +31,12 @@ function fixtureDependencies(options: { readonly infiniteCandidateEvaluation?: b
       return { setting, search, pv: [candidate ? 'candidate-action' : 'baseline-action'] };
     },
   };
+}
+
+function endedScenario(id: string): SelfPlayScenario {
+  const scenario = QUIESCENCE_ORDERING_SELF_PLAY_SCENARIOS[0];
+  return { ...scenario, id, create: () => ({ ...scenario.create(), status: 'ended',
+    result: { winner: 'sente', loser: 'gote', endReason: 'resignation' } }) };
 }
 
 describe('multi-position A/B search suite comparison', () => {
@@ -87,6 +94,52 @@ describe('multi-position A/B search suite comparison', () => {
     expect(failed.trials.at(-1)).toMatchObject({ side: 'candidate', ok: false, error: expect.stringContaining('fixture candidate failure') });
     expect(result.positions[2].ok).toBe(true);
     expect(formatSuiteComparison(result)).toContain('ERROR scenario=rook-pawn-opening-76-34-26-84');
+  });
+
+  it('keeps every failed position, null aggregate metrics, and CLI JSON when no position completes', () => {
+    const scenarios = QUIESCENCE_ORDERING_SELF_PLAY_SCENARIOS;
+    const dependencies: SuiteComparisonDependencies = { trialRunner: () => { throw new Error('fixture all failure'); } };
+    const result = runSuiteComparison(defaultSuiteComparisonConfig('fixed'), dependencies, scenarios);
+    expect(result.summary).toMatchObject({ targetPositionCount: 3, completedPositionCount: 0, errorCount: 3,
+      selectedActionChangedPositionCount: 0 });
+    const unavailable = { baseline: null, candidate: null, difference: null, percentChange: null };
+    expect(result.summary.metrics).toEqual({ completedDepth: unavailable, searchPositionCount: unavailable,
+      cutoffCount: unavailable, elapsedMilliseconds: unavailable });
+    expect(result.positions).toHaveLength(3);
+    expect(result.positions.every((position) => !position.ok && position.trials.length === 1 &&
+      position.trials[0].error?.includes('fixture all failure'))).toBe(true);
+    const output: string[] = [];
+    expect(runSuiteComparisonCli(['fixed'], dependencies, scenarios, line => output.push(line))).toBe(1);
+    expect(output[0]).toContain('正常完了=0; エラー=3');
+    for (const scenario of scenarios) expect(output[0]).toContain(`${scenario.id}: ERROR`);
+    const serialized = output.at(-1)!.slice('JSON '.length);
+    expect(JSON.parse(serialized).positions.map((position: { scenarioId: string }) => position.scenarioId))
+      .toEqual(scenarios.map((scenario) => scenario.id));
+  });
+
+  it('allows an empty scenario list without inventing aggregate values', () => {
+    const result = runSuiteComparison(defaultSuiteComparisonConfig('fixed'), fixtureDependencies(), []);
+    expect(result.summary).toMatchObject({ targetPositionCount: 0, completedPositionCount: 0, errorCount: 0,
+      selectedActionChangedPositionCount: 0 });
+    expect(result.summary.metrics.completedDepth).toEqual({ baseline: null, candidate: null, difference: null, percentChange: null });
+  });
+
+  it('retains a captured raw result when default validation fails and continues later positions', () => {
+    const scenarios = [endedScenario('validation-failure'), endedScenario('continues-after-validation-failure')];
+    let call = 0;
+    const result = runSuiteComparison(defaultSuiteComparisonConfig('fixed'), {
+      fixedSearch: (...args) => {
+        const search = analyzeAlphaBetaSearch(...args);
+        return call++ === 0 ? { ...search, rootLegalActionCount: 1 } : search;
+      },
+    }, scenarios);
+    const failed = result.positions[0];
+    expect(failed).toMatchObject({ scenarioId: 'validation-failure', ok: false });
+    expect(failed.trials[0]).toMatchObject({ ok: false, search: { rootLegalActionCount: 1 },
+      error: expect.stringContaining('root合法手数') });
+    expect(result.positions[1].ok).toBe(true);
+    expect(result.summary).toMatchObject({ completedPositionCount: 1, errorCount: 1 });
+    expect(JSON.parse(serializeSuiteComparison(result)).positions[0].trials[0].search.rootLegalActionCount).toBe(1);
   });
 
   it('has a JSON-safe boundary and text output with the suite aggregate before notable position differences', () => {

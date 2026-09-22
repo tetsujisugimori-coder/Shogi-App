@@ -104,7 +104,7 @@ export interface SuiteComparisonResult {
 
 /** A narrow seam lets tests control measurements without changing the search engine. */
 export type SuiteComparisonTrialRunner = (input: BoardState, mode: BenchmarkMode, setting: Setting,
-  dependencies: RepeatedDependencies) => OrderingResult;
+  dependencies: RepeatedDependencies, capture?: (search: SearchResult) => void) => OrderingResult;
 export interface SuiteComparisonDependencies extends RepeatedDependencies {
   readonly trialRunner?: SuiteComparisonTrialRunner;
 }
@@ -203,8 +203,15 @@ function runPositionComparison(scenario: SelfPlayScenario, executionOrder: numbe
           const trial: SuiteComparisonTrial = { phase, trial: index + 1, order, orderIndex, side, ok: false };
           trials.push(trial);
           try {
-            const result = runner(input, config.mode, setting, dependencies);
-            trial.search = structuredClone(result.search);
+            // runOrderingTrial invokes capture before result validation. Retain an
+            // independent raw snapshot even when that validation then throws.
+            const result = runner(input, config.mode, setting, dependencies, search => {
+              trial.search = structuredClone(search);
+            });
+            const returnedSearch = structuredClone(result.search);
+            assert.ok(trial.search === undefined || isDeepStrictEqual(trial.search, returnedSearch),
+              'capture結果と正常終了結果の検索データが一致しません');
+            trial.search = returnedSearch;
             trial.pv = [...result.pv];
             trial.ok = true;
           } catch (error) {
@@ -230,6 +237,9 @@ function runPositionComparison(scenario: SelfPlayScenario, executionOrder: numbe
 }
 
 function aggregateMetric(positions: readonly PositionComparison[], metric: MetricName): MetricDifference {
+  // A suite with no completed position still has a useful structured failure
+  // report. There is no representative numeric value for any metric.
+  if (positions.length === 0) return emptyDifference();
   const baseline = positions.map((position) => position.baseline![metric]);
   const candidate = positions.map((position) => position.candidate![metric]);
   if (!baseline.every((value): value is number => value !== null) || !candidate.every((value): value is number => value !== null)) return emptyDifference();

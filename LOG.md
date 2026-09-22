@@ -1,5 +1,19 @@
 # SHOGI-APP 開発ログ
 
+## [2026-09-23] PR #138 失敗記録契約の補正
+
+### 原因・修正
+
+- 全局面が失敗した場合、完了局面の空配列を`aggregateMetric()`が`describeNumbers()`へ渡して例外にしていた。そのため本来返すべき局面別失敗記録、テキスト、および`JSON`行まで失われた。完了局面が0件なら4指標すべてのbaseline/candidate/difference/percentChangeを`null`で返すようにし、局面単位失敗と開始前の設定・重複ID例外の境界は維持した。
+- `runOrderingTrial()`が検証前に提供しているcapture境界を比較試行器の任意第5引数へ通し、capture時点で`SearchResult`を`structuredClone()`して保存する。検証に失敗しても`ok=false`、phase/trial/side/order/orderIndex/errorと生検索結果を同じtrialに残す。成功時は返却値も別に複製し、capture値との一致を確認してから保持する。
+
+### 境界テスト・確認
+
+- 全局面で注入trial runnerが失敗する回帰テストを追加し、全失敗局面、件数、全metricの`null`、テキスト中の各`ERROR`、CLI終了1と解析可能な`JSON`行を確認する。空シナリオ配列も集計例外なく未算出metricを返す。
+- デフォルト`runOrderingTrial()`経路に、最初だけ検証不能な`fixedSearch`結果を返すテストを追加した。capture済み`search`がJSON後も残ること、失敗局面が集計から外れること、後続の独立局面が完走することを確認する。
+- `npm run lint`、`npm run verify:lock`（registry 398、欠落0）、`npm run build`、`git diff --check`は成功した。通常sandboxのVitest/Vite起動は既知のesbuild `spawn EPERM`で失敗するため、許可経路で`npm test -- src/test/quiescence-ordering-suite-comparison.test.ts`（9件）と関連3ファイル（52件）を終了要約付きで成功確認した。`npm test`と`npm run check`も実行し、後者ではlockfile検証とlintの完了後、いずれもVitest開始表示まで確認したが、この環境では終了要約・終了コードを回収できなかったため成功扱いにはしない。
+- 実時間・探索量の変化だけで棋力向上を意味しないという既存の解釈境界は変更していない。
+
 ## [2026-09-23] 複数開始局面 A/B 探索設定比較
 
 ### 実装・設計判断
