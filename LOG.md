@@ -1,5 +1,36 @@
 # SHOGI-APP 開発ログ
 
+## [2026-09-23] PR #138 失敗記録契約の補正
+
+### 原因・修正
+
+- 全局面が失敗した場合、完了局面の空配列を`aggregateMetric()`が`describeNumbers()`へ渡して例外にしていた。そのため本来返すべき局面別失敗記録、テキスト、および`JSON`行まで失われた。完了局面が0件なら4指標すべてのbaseline/candidate/difference/percentChangeを`null`で返すようにし、局面単位失敗と開始前の設定・重複ID例外の境界は維持した。
+- `runOrderingTrial()`が検証前に提供しているcapture境界を比較試行器の任意第5引数へ通し、capture時点で`SearchResult`を`structuredClone()`して保存する。検証に失敗しても`ok=false`、phase/trial/side/order/orderIndex/errorと生検索結果を同じtrialに残す。成功時は返却値も別に複製し、capture値との一致を確認してから保持する。
+
+### 境界テスト・確認
+
+- 全局面で注入trial runnerが失敗する回帰テストを追加し、全失敗局面、件数、全metricの`null`、テキスト中の各`ERROR`、CLI終了1と解析可能な`JSON`行を確認する。空シナリオ配列も集計例外なく未算出metricを返す。
+- デフォルト`runOrderingTrial()`経路に、最初だけ検証不能な`fixedSearch`結果を返すテストを追加した。capture済み`search`がJSON後も残ること、失敗局面が集計から外れること、後続の独立局面が完走することを確認する。
+- `npm run lint`、`npm run verify:lock`（registry 398、欠落0）、`npm run build`、`git diff --check`は成功した。通常sandboxのVitest/Vite起動は既知のesbuild `spawn EPERM`で失敗するため、許可経路で`npm test -- src/test/quiescence-ordering-suite-comparison.test.ts`（9件）と関連3ファイル（52件）を終了要約付きで成功確認した。`npm test`と`npm run check`も実行し、後者ではlockfile検証とlintの完了後、いずれもVitest開始表示まで確認したが、この環境では終了要約・終了コードを回収できなかったため成功扱いにはしない。
+- 実時間・探索量の変化だけで棋力向上を意味しないという既存の解釈境界は変更していない。
+
+## [2026-09-23] 複数開始局面 A/B 探索設定比較
+
+### 実装・設計判断
+
+- PR #136を含むlocal `main`/`origin/main`の`479e2e5`とクリーンな作業ツリーを確認してから、`feat/quiescence-suite-ab-comparison`を作成した。network経由の`git fetch origin main`はWindows資格情報の`SEC_E_NO_CREDENTIALS`で失敗したが、ローカル参照一致とGitHub APIでPR #136のマージを確認した。
+- `quiescenceOrderingSuiteComparison.ts`を追加し、PR #136の`QUIESCENCE_ORDERING_SELF_PLAY_SCENARIOS`、既存の`runOrderingTrial`、3 warmup/8 measurement、type 7中央値を再利用した。探索エンジン、評価関数、Worker、UIは複製・変更していない。baseline/candidateは配列位置でなく名前付き`NamedSearchSetting`で保持する。
+- 既定はbaseline=`original`、candidate=`material`、静止探索追加1手である。fixedは既存の通常深さ3、timedは最大深さ4/各呼出し独立1,000msをそのまま使う。各局面・phaseで設定の先行順を決定的に交互化し、本測定8回は両設定が各4回先行する。各呼出しは既存実行器の独立スナップショットであり、時計・期限を共有しない。
+- 局面別には最初の本測定の選択手/評価、選択手頻度、深さ・探索局面数・cutoff・時間の中央値、時間切れ/完了件数、生試行、candidate-baseline差分を残す。timedの探索局面数/cutoffは全完了反復合計、fixedは唯一の完了反復を使う。全体では深さ・時間を局面中央値の中央値、探索局面数/cutoffを局面中央値の合計にした。
+- 増減率は`(candidate-baseline)/baseline*100`で、baseline=0、欠測、非有限値なら`null`とした。JSON境界では非有限評価値を文字列として保全する。局面単位の失敗は生試行と文脈を残して集計対象から外し、後続局面を続行してエラー数と終了コード1で通知する。重複ID・不正な名前付き設定は開始前の致命的エラーである。
+
+### 確認・制限
+
+- `npm run lint`は成功した。追加した`src/test/quiescence-ordering-suite-comparison.test.ts`は、探索試行器を注入して公平条件、中央値、選択手/評価/統計差分、baseline=0のnull率、部分失敗継続、JSON安全化、テキスト/CLIを実時間なしで検証する。最初のsandbox実行は既存Windowsのesbuild `spawn EPERM`で開始不能だったため、許可経路で再実行し6件成功した。
+- 関連3ファイルの再実行は49件成功、`npm run verify:lock`と`npm run build`も成功した。`npm test`および`npm run check`はVitestの開始表示まで確認できたが、この実行環境では終了要約/終了コードを回収できなかった。起動したNode子プロセスの終了は確認したが、完了を推測して成功扱いにはしない。通常経路の実探索CLIもesbuild `spawn EPERM`、許可経路は`RUN`後に完了出力を回収できず、実測成功としては記録しない。
+- 追加CLIは`npm run measure:quiescence-ordering-suite-comparison -- [fixed|timed]`で、まず簡潔な全体/局面別テキスト、続けて同じ構造の`JSON`行を出す。READMEと専用資料に定義・出力・失敗契約を記録した。
+- 勝者、合格/不合格、正解手、棋力/Elo/有意差、CI性能閾値、UI、Memo-Nexus連携、探索アルゴリズム・評価関数、実戦局面の大量追加は実装していない。特に探索局面数が減っても、それだけで棋力向上を意味しない。実時間・探索量・完了深さはOS負荷/JIT/GC等の影響を受ける参考値である。
+
 ## [2026-09-19] αβ探索の静止探索オプトイン
 
 ### 実装・契約

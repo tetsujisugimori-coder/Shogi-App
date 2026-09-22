@@ -178,6 +178,20 @@ CLIは`RUN / SUITE_CONFIG / SCENARIO_START / RECORD / GAME / SCENARIO_SUMMARY / 
 
 同一開始局面の反復は独立標本ではなく、複数局面でも棋力差・勝率・Elo・統計的有意差を証明しません。100msは深さ1の既存契約により厳密な実行上限ではありません。この基盤では長時間の実探索測定を実行しておらず、次段階は少数局面によるパイロット測定です。詳細は[設計資料](docs/quiescence-ordering-self-play-suite.md)を参照してください。
 
+### 複数開始局面の A/B 探索設定比較
+
+```sh
+npm run measure:quiescence-ordering-suite-comparison          # timed（既定）
+npm run measure:quiescence-ordering-suite-comparison -- fixed
+npm run measure:quiescence-ordering-suite-comparison -- timed
+```
+
+PR #136の同じ固定3局面を、名前付きのbaseline=`original`とcandidate=`material`（既定ではともに静止探索追加1手）で比較する開発用CLIです。既存の単一探索実行器を再利用し、fixedなら通常深さ3、timedなら最大深さ4と各呼出しに独立した1,000msを両設定へ等しく適用します。各局面で3回のウォームアップ後に各設定を8回測定し、決定的な交互順序で本測定の先行回数を4回ずつにします。各呼出しは独立した凍結スナップショットを使います。
+
+テキストはまず対象局面数・完了数・エラー数・選択手変更数と、深さ・探索局面数・カットオフ数・時間のbaseline→candidate差分を表示し、その後に選択手、評価、またはエラーのある局面を示します。続く`JSON`行は、局面別の選択手/評価/統計/時間切れ件数、8試行の生データ、差分・増減率、全体集計を再利用可能な形で保持します。数値は本測定8回のtype 7中央値で、timedの探索局面数・カットオフ数は全完了反復合計、fixedは唯一の完了反復です。全体では深さ・時間は局面中央値の中央値、探索局面数・カットオフ数は局面中央値の合計です。差分は`candidate - baseline`、増減率は`(candidate - baseline) / baseline * 100`であり、baselineが0・欠測・非有限なら`null`です。
+
+局面ごとの失敗は試行済みデータとエラーを残して後続局面を続行し、失敗局面を全体数値へ混ぜずに終了コード1を返します。重複局面IDや不正な設定は開始前に失敗します。これは勝者・合格/不合格・正解手・棋力・Elo・統計的有意差を自動判定する機能ではありません。**探索局面数の減少だけでは棋力向上を意味しません。** UI、Worker、通常探索の既定値、評価関数、CI性能閾値は変更しません。詳細は[設計資料](docs/quiescence-ordering-suite-comparison.md)を参照してください。
+
 ## 静止探索（Quiescence Search）の純粋関数基盤
 
 `analyzeQuiescenceSearch(state, perspective, maxTacticalDepth, evaluation?, interruptionCheck?)` は、通常の固定深さ探索が駒取り直後などの不安定な局面で静的評価を確定してしまう探索境界の問題を、限定的に読み足して検証するためのドメインAPIです。開始時に指定した`perspective`を固定し、その側の手番で最大化、相手側で最小化します。非王手局面では既存の静的評価をstand-pat候補として先に置き、合法な駒取り（成り付き捕獲を含む）だけを元の合法手順で読みます。同値ならstand-patを維持します。王手中はstand-patを置かず、既存の合法手生成による玉移動・合駒・駒打ちを含む全回避手を読みます。
