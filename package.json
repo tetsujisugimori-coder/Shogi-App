@@ -20,6 +20,7 @@
     "measure:quiescence-suite": "tsx scripts/measure-quiescence-suite.ts",
     "measure:quiescence-ordering": "tsx scripts/measure-quiescence-ordering.ts",
     "measure:quiescence-ordering-repeated": "tsx scripts/measure-quiescence-ordering-repeated.ts",
+    "measure:quiescence-ordering-self-play": "tsx scripts/measure-quiescence-ordering-self-play.ts",
     "check": "npm run verify:lock && npm run lint && npm test && npm run build"
   },
   "dependencies": {
