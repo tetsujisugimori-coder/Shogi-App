@@ -1,14 +1,14 @@
 # 時間制限付き探索フォールバック実対局測定
 
 条件: 平手固定、1ペア2局、最大4手、各手100ms、最大深さ4、評価standard、通常手順standard、静止追加1手／original。
-実行: 同期直列、奇数ペアはAB→BA、偶数ペアはBA→AB。全体実経過 913.40ms。
+実行: 同期直列、奇数ペアはAB→BA、偶数ペアはBA→AB。全体実経過 1003.15ms。
 結果: A勝0、B勝0、引分0、最大手数打切2、失敗0。合計8着手。
 
 | 参加者 | 着手 | fallback | 率 | 実時間超過 | 超過中央値ms | 超過最大ms |
 | --- | ---: | ---: | ---: | ---: | ---: | ---: |
-| A | 4 | 0 | 0.0% | 4/4 | 0.42 | 0.61 |
+| A | 4 | 0 | 0.0% | 4/4 | 0.22 | 0.59 |
 A fallback手数: なし。深さ分布 {"1":4}、手数帯 {"1-20":{"moves":4,"fallbacks":0}}、超過分布 {"withinLimit":0,"over0to5":4,"over5to20":0,"over20to100":0,"over100":0}。
-| B | 4 | 0 | 0.0% | 4/4 | 0.14 | 0.53 |
+| B | 4 | 0 | 0.0% | 4/4 | 0.13 | 0.48 |
 B fallback手数: なし。深さ分布 {"1":4}、手数帯 {"1-20":{"moves":4,"fallbacks":0}}、超過分布 {"withinLimit":0,"over0to5":4,"over5to20":0,"over20to100":0,"over100":0}。
 
 fallbackあり 0局 {"aWins":0,"bWins":0,"draws":0,"maxPlies":0,"failures":0}。fallbackなし 2局 {"aWins":0,"bWins":0,"draws":0,"maxPlies":2,"failures":0}。
