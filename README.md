@@ -1,5 +1,35 @@
 # SHOGI-APP
 
+## 時間制限付き探索の実対局フォールバック測定（2026-09-24）
+
+PR #152マージ後の`main`（`eeae079`）を基点にした、研究用の同期直列CLIです。既存のself-playゲーム／先後交代ペアを使い、対局ルール、評価関数、探索の手の選択、通常対局設定は変更しません。A/Bは同じ最大深さ4、standard評価、通常standard手順、静止探索追加1手／original手順、同じ1手当たり指定時間を受けます。平手初期局面を全局で固定し、奇数ペアはA先手→B先手、偶数ペアはB先手→A先手の順に実行します。反復順によるウォームアップ偏りを抑えますが、OS負荷・JIT・GCの影響は残ります。
+
+```powershell
+git status --porcelain=v1  # 空であることを確認
+git rev-parse HEAD
+$runDir = Join-Path $env:TEMP ('shogi-fallback-' + [guid]::NewGuid().ToString('N'))
+New-Item -ItemType Directory -Path $runDir | Out-Null
+npm run measure:timed-fallback-self-play -- --out "$runDir\smoke.jsonl" --pairs 1 --max-plies 4 --limit-ms 100
+npm run measure:timed-fallback-self-play -- --out "$runDir\main-100ms.jsonl" --pairs 2 --max-plies 120 --limit-ms 100
+npm run measure:timed-fallback-self-play -- --out "$runDir\reference-1000ms.jsonl" --pairs 1 --max-plies 40 --limit-ms 1000
+npm run audit:timed-fallback-self-play -- "$runDir\smoke.jsonl"
+npm run audit:timed-fallback-self-play -- "$runDir\main-100ms.jsonl"
+npm run audit:timed-fallback-self-play -- "$runDir\reference-1000ms.jsonl"
+```
+
+`--out`は必須で既存ファイルを上書きしません。同名の`.md`にも人が読める集計を出します。`--pairs`、`--max-plies`、`--limit-ms`、`--max-depth`、`--q-depth`を指定できます。出力先はリポジトリ外にし、各JSONLの最初の`config`行で`head`が測定コードのコミットSHA、`dirty`が`false`であることを確認してから成果物へ反映します。JSONLには環境・HEAD・作業ツリー状態・設定・初期局面ハッシュ、局ごとの全着手、集計、終了時刻を保存します。各着手には参加者、手数、指定時間、探索API内`elapsedMilliseconds`、呼び出し全体の`actualElapsedMilliseconds`、完了深さ、時間切れ、`resultSource`、実際の合法手を記録します。合法手を返したfallbackは着手として数え、終局して着手が存在しない場合は分母に入れません。fallbackの評価値・内訳は`null`、PVは空のままです。auditはJSONLから全着手を再生して合法性と集計の再現を確認します。長時間測定はCIで自動実行しません。
+
+実測に使ったコードは`dc8b2ec4fbc3c7922a2eb7c723260c24cfe249e1`です。作業ツリーがクリーンな状態からリポジトリ外へ出力し、3条件すべてのJSONLで`head`がこのSHA、`dirty`が`false`であることを確認してから既存ファイルへ反映しました。環境はWindows 10.0.26200 x64、Intel Core i7-14650HX、Node v24.20.0、同じ平手初期局面、同期直列です。スモークは100ms・1ペア・4手上限で2局8着手、fallback 0、実行1.0秒でした。[スモーク生データ](docs/benchmarks/timed-fallback-smoke-20260924.jsonl)／[集計](docs/benchmarks/timed-fallback-smoke-20260924.md)。主条件は100ms・2ペア4局・120手上限で92.9秒、参考条件は1,000ms・1ペア2局・40手上限で82.0秒です。全3条件のJSONLで568着手を合法手として再生し、保存済み集計を再計算できました。
+
+| 条件 | 局数・着手 | fallback | 対局結果 | 呼び出し実時間の超過 | 実時間の最大 |
+| --- | ---: | ---: | --- | ---: | ---: |
+| 100ms主条件 | 4局・480手 | A 221/240（92.1%）、B 222/240（92.5%） | 120手打切4、勝敗・引分0 | 100ms超480/480、105ms超311/480、200ms超159/480 | 333.57ms |
+| 1,000ms参考 | 2局・80手 | A 6/40（15.0%）、B 6/40（15.0%） | 40手打切2、勝敗・引分0 | 1,000ms超80/80、1,005ms超10/80、1,100ms超0 | 1,009.32ms |
+
+100msでのfallbackは合計443/480手（92.3%）で、1～20手60/80、21～40手70/80、41～60手76/80、61～80手80/80、81～100手77/80、101～120手80/80でした。1,000msでは合計12/80手（15.0%）で、1～20手0/40、21～40手12/40です。後半ほど多い観測ですが、各条件の開始局面と到達棋譜は同一・相関しており、独立標本として扱いません。[100ms生データ](docs/benchmarks/timed-fallback-100ms-20260924.jsonl)／[集計](docs/benchmarks/timed-fallback-100ms-20260924.md)、[1,000ms生データ](docs/benchmarks/timed-fallback-1000ms-20260924.jsonl)／[集計](docs/benchmarks/timed-fallback-1000ms-20260924.md)に、各局・参加者の深さ、手数帯、超過幅の分布があります。
+
+両参加者は同じ探索設定で、100msの全4局にfallbackが発生し、全局が120手で打切でした。このデータからfallbackと勝敗の関連や棋力改善・悪化は判断できません。次は到達局面を増やして終局までの対局数を確保し、手数帯ごとのfallbackと成績を比較する必要があります。100msでの大きな超過は、協調的deadlineが同期処理の途中を強制停止できないことと整合しますが、各処理の寄与率は未測定です。公平な「同一時間」比較には、指定時間だけでなくAPI内時間・呼び出し実時間・超過率の分布、対局の打切率、実行環境と順序を揃える必要があります。PR #150以前の旧方式は100ms指定でも深さ1完走により大幅超過し得るため、旧版の対局勝率比較は今回実行していません。旧版を安全に隔離して実時間条件を揃えた対局は別課題です。
+
 ## 時間制限付き探索の協調的deadline制御（2026-09-24）
 
 時間制限付き反復深化αβ探索は、API内の時計をroot合法手生成の前に開始し、`getLegalActions(state)`の既存順序の先頭手を決定的なfallbackとして確保します。深さ1を含むすべての反復、通常探索、手並べ替え、静止探索、再探索で同じdeadline確認を使います。期限に達した反復は丸ごと破棄し、最後の完了反復を返します。完了反復がなければ`completedDepth=0`、`depth=0`、`iterations=[]`、`resultSource='fallback'`、`timedOut=true`を返し、合法手があればその先頭手を選びます。この場合、`selectedEvaluation`と`evaluationBreakdown`は`null`、PVは空、完了統計は0です。終局または合法手なしではfallback手は`null`です。Worker経由でも同じ結果を返し、通常対局ではfallbackを合法手として着手します。self-play記録には`resultSource`も残します。
