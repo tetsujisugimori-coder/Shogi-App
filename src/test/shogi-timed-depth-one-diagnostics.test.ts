@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { replayPositions } from '../../scripts/benchmarks/timedDepthOneDiagnostics';
 import { SearchDiagnostics } from '../domain/shogi/searchDiagnostics';
+import { protectSearchInput } from '../domain/shogi/selfPlayGame';
 import { analyzeAlphaBetaSearch } from '../domain/shogi/twoPlyAlphaBetaAi';
 import { resolveSearchEvaluationPreset } from '../domain/shogi/searchEvaluationPresets';
 
@@ -16,7 +17,7 @@ describe('timed depth-one diagnostic inputs and invariants', () => {
 
   it('preserves fixed-depth action, evaluation and PV with the optional probe', () => {
     const { positions } = replayPositions();
-    const state = positions[0].state;
+    const state = protectSearchInput(positions[0].state).snapshot;
     const evaluation = resolveSearchEvaluationPreset('standard');
     const options = { moveOrdering: 'standard' as const,
       quiescence: { maxTacticalDepth: 1, moveOrdering: 'original' as const } };

@@ -5,6 +5,7 @@ import { arch, cpus, platform, release } from 'node:os';
 import { dirname, resolve } from 'node:path';
 import { performance } from 'node:perf_hooks';
 import { SearchDiagnostics } from '../src/domain/shogi/searchDiagnostics';
+import { protectSearchInput } from '../src/domain/shogi/selfPlayGame';
 import { analyzeAlphaBetaSearch, analyzeTimeLimitedIterativeDeepeningAlphaBetaSearch } from '../src/domain/shogi/twoPlyAlphaBetaAi';
 import { resolveSearchEvaluationPreset } from '../src/domain/shogi/searchEvaluationPresets';
 import { POSITION_IDS, replayPositions, summarizeSamples, type Sample } from './benchmarks/timedDepthOneDiagnostics';
@@ -52,13 +53,15 @@ try {
       for (let index = 0; index < warmups + measurements; index++) {
         for (const probe of index % 2 === 0 ? [false, true] : [true, false]) {
           const diagnostics = probe ? new SearchDiagnostics() : undefined;
+          const input = protectSearchInput(position.state);
           const start = performance.now();
           const result = mode === 'timed'
-            ? analyzeTimeLimitedIterativeDeepeningAlphaBetaSearch(position.state, 4, 100, evaluation,
+            ? analyzeTimeLimitedIterativeDeepeningAlphaBetaSearch(input.snapshot, 4, 100, evaluation,
               performance.now.bind(performance), options, diagnostics)
-            : analyzeAlphaBetaSearch(position.state, 1, evaluation,
+            : analyzeAlphaBetaSearch(input.snapshot, 1, evaluation,
               performance.now.bind(performance), options, diagnostics);
           const actualElapsedMilliseconds = performance.now() - start;
+          assert.equal(input.wasMutated(), false);
           const finished = diagnostics?.finish();
           const sample: Sample = { type: 'sample', positionId: position.id, band: position.band, mode, probe,
             phase: index < warmups ? 'warmup' : 'measurement', run: index < warmups ? index + 1 : index - warmups + 1,
@@ -87,7 +90,7 @@ try {
   emit({ type: 'end', endedAt: new Date().toISOString() });
   const lines = ['# 深さ1・期限超過の工程診断', '',
     `コードSHA: ${head}。保存棋譜SHA256: ${sourceSha256}。${positions.length}局面、ウォームアップ${warmups}回、本測定${measurements}回。`,
-    '時間は入れ子を差し引いた排他的な区分です。quiescenceはその内部の合法手生成、評価、並べ替え、着手適用を含みます。normal-otherは通常探索の残り、api-otherはAPI全体との差です。診断のタイマー読み自体は主に外側の区分に含まれます。',
+    '実対局と同じ再帰Proxyで保護した探索入力を、呼び出し時計の外で構築します。時間は入れ子を差し引いた排他的な区分です。quiescenceはその内部の合法手生成、評価、並べ替え、着手適用を含みます。normal-otherは通常探索の残り、api-otherは診断開始からfinishまでの残差です。診断のタイマー読み自体は主に外側の区分に含まれます。',
     'deadlineをまたいだ工程と、次の確認で中断を検知した工程は異なり得ます。', '',
     '| 局面帯 | 条件 | 診断 | 本測定 | 深さ1完走 | fallback | 実時間中央値ms | 最大ms | 105ms超 |',
     '| --- | --- | --- | ---: | ---: | ---: | ---: | ---: | ---: |'];

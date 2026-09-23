@@ -65,7 +65,7 @@ export type SelfPlayGameResult = SelfPlayGameRecord & (
 
 /** Frozen proxy children also protect access through property descriptors.
  * Traps remember attempted writes even when the search catches the exception. */
-function protectSearchInput(state: BoardState) {
+export function protectSearchInput(state: BoardState) {
   let attemptedMutation = false;
   const reject = (): never => {
     attemptedMutation = true;
