@@ -20,6 +20,15 @@ export const ORDERING_SETTINGS = [
 export type Setting = (typeof ORDERING_SETTINGS)[number] & { readonly killerMoves?: boolean };
 export type SearchResult = AlphaBetaSearchResult | TimeLimitedIterativeDeepeningAlphaBetaSearchResult;
 export type OrderingResult = { setting: Setting; search: SearchResult; pv: string[] };
+/** Per-invocation timed-search inputs. They are never retained as global state. */
+export interface TimedSearchOptions {
+  readonly timeLimitMilliseconds: number;
+  readonly maxDepth: number;
+}
+export const DEFAULT_TIMED_SEARCH_OPTIONS: TimedSearchOptions = Object.freeze({
+  timeLimitMilliseconds: 1000,
+  maxDepth: 4,
+});
 export type OrderingCase = { position: BenchmarkPosition; mode: BenchmarkMode } & (
   { ok: true; turn: BoardState['turn']; results: OrderingResult[] } | { ok: false; error: string }
 );
@@ -63,12 +72,13 @@ function validatePass(state: BoardState, result: AlphaBetaSearchResult, depth: n
   return pv;
 }
 
-export function validateOrderingResult(state: BoardState, result: SearchResult, mode: BenchmarkMode, extension: number): string[] {
+export function validateOrderingResult(state: BoardState, result: SearchResult, mode: BenchmarkMode, extension: number,
+  timedOptions: TimedSearchOptions = DEFAULT_TIMED_SEARCH_OPTIONS): string[] {
   if (mode === 'fixed') return validatePass(state, result, 3, extension);
   assert.ok('iterations' in result, '完了反復なし');
-  assert.equal(result.requestedMaxDepth, 4);
-  assert.ok(Number.isSafeInteger(result.completedDepth) && result.completedDepth >= 1 && result.completedDepth <= 4);
-  assert.equal(result.timedOut, result.completedDepth < 4);
+  assert.equal(result.requestedMaxDepth, timedOptions.maxDepth);
+  assert.ok(Number.isSafeInteger(result.completedDepth) && result.completedDepth >= 1 && result.completedDepth <= timedOptions.maxDepth);
+  assert.equal(result.timedOut, result.completedDepth < timedOptions.maxDepth);
   assert.equal(result.iterations.length, result.completedDepth);
   result.iterations.forEach((pass, i) => validatePass(state, pass, i + 1, extension));
   const deepest = result.iterations[result.completedDepth - 1];
@@ -86,7 +96,8 @@ export function validateOrderingResult(state: BoardState, result: SearchResult, 
  * snapshot; the timed API creates its own deadline. Capture before validation
  * so the repeated runner can retain even invalid returned results. */
 export function runOrderingTrial(input: BoardState, mode: BenchmarkMode, setting: Setting,
-  dependencies: BenchmarkDependencies = {}, capture?: (search: SearchResult) => void): OrderingResult {
+  dependencies: BenchmarkDependencies = {}, capture?: (search: SearchResult) => void,
+  timedOptions: TimedSearchOptions = DEFAULT_TIMED_SEARCH_OPTIONS): OrderingResult {
   const before = structuredClone(input);
   const snapshot = createComparisonSnapshot(input);
   const snapshotBefore = structuredClone(snapshot);
@@ -96,9 +107,10 @@ export function runOrderingTrial(input: BoardState, mode: BenchmarkMode, setting
       ...(killerMoves === undefined ? {} : { killerMoves }) } as const;
     const search = mode === 'fixed'
       ? (dependencies.fixedSearch ?? analyzeAlphaBetaSearch)(snapshot, 3, undefined, dependencies.clock, options)
-      : (dependencies.timedSearch ?? analyzeTimeLimitedIterativeDeepeningAlphaBetaSearch)(snapshot, 4, 1000, undefined, dependencies.clock, options);
+      : (dependencies.timedSearch ?? analyzeTimeLimitedIterativeDeepeningAlphaBetaSearch)(snapshot, timedOptions.maxDepth,
+        timedOptions.timeLimitMilliseconds, undefined, dependencies.clock, options);
     capture?.(search);
-    return { setting, search, pv: validateOrderingResult(snapshot, search, mode, setting.maxTacticalDepth) };
+    return { setting, search, pv: validateOrderingResult(snapshot, search, mode, setting.maxTacticalDepth, timedOptions) };
   } finally {
     assert.deepStrictEqual(snapshot, snapshotBefore, '探索スナップショットが変更されました');
     assert.deepStrictEqual(input, before, '入力局面が変更されました');

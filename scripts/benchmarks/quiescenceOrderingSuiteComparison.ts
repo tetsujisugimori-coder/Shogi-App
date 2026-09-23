@@ -6,7 +6,8 @@ import type { BoardState } from '../../src/types/shogi';
 import { QUIESCENCE_ORDERING_SELF_PLAY_SCENARIOS, type SelfPlayScenario } from './quiescenceOrderingSelfPlayScenarios';
 import { WARMUP_COUNT, MEASUREMENT_COUNT, alternatingPairOrder, describeNumbers, rawJson,
   type RepeatedDependencies } from './quiescenceOrderingRepeated';
-import { runOrderingTrial, type OrderingResult, type SearchResult, type Setting } from './quiescenceOrderingSuite';
+import { DEFAULT_TIMED_SEARCH_OPTIONS, runOrderingTrial, type OrderingResult, type SearchResult, type Setting,
+  type TimedSearchOptions } from './quiescenceOrderingSuite';
 import type { BenchmarkMode } from './quiescenceSuite';
 
 export type ComparisonSide = 'baseline' | 'candidate';
@@ -38,6 +39,8 @@ export const KILLER_MOVE_SUITE_COMPARISON_CONFIG = Object.freeze({
 
 export interface SuiteComparisonConfig {
   readonly mode: BenchmarkMode;
+  readonly timeLimitMilliseconds: number;
+  readonly maxDepth: number;
   readonly baseline: NamedSearchSetting;
   readonly candidate: NamedSearchSetting;
 }
@@ -73,6 +76,8 @@ export interface SideObservationSummary extends SideMetrics {
   readonly timedOutCount: number;
   readonly completedCount: number;
   readonly timeoutUnavailableCount: number;
+  /** Measurement-only, valid completed depths in ascending numeric order. */
+  readonly completedDepthDistribution: Array<{ readonly depth: number; readonly count: number }>;
 }
 
 export interface MetricDifference {
@@ -114,7 +119,8 @@ export interface SuiteComparisonResult {
 
 /** A narrow seam lets tests control measurements without changing the search engine. */
 export type SuiteComparisonTrialRunner = (input: BoardState, mode: BenchmarkMode, setting: Setting,
-  dependencies: RepeatedDependencies, capture?: (search: SearchResult) => void) => OrderingResult;
+  dependencies: RepeatedDependencies, capture?: (search: SearchResult) => void,
+  timedOptions?: TimedSearchOptions) => OrderingResult;
 export interface SuiteComparisonDependencies extends RepeatedDependencies {
   readonly trialRunner?: SuiteComparisonTrialRunner;
 }
@@ -151,6 +157,18 @@ function searchTimedOut(search: SearchResult): boolean | null {
   return 'timedOut' in search ? search.timedOut : false;
 }
 
+function completedDepthDistribution(measurements: readonly SuiteComparisonTrial[]): Array<{ readonly depth: number; readonly count: number }> {
+  const counts = new Map<number, number>();
+  for (const trial of measurements) {
+    const depth = trial.search ? finite(trial.search.depth) : null;
+    // Failed/null/non-integral observations are intentionally not recoded.
+    if (depth === null || !Number.isSafeInteger(depth) || depth < 1) continue;
+    counts.set(depth, (counts.get(depth) ?? 0) + 1);
+  }
+  return [...counts.entries()].sort(([left], [right]) => left - right)
+    .map(([depth, count]) => ({ depth, count }));
+}
+
 function summarizeSide(trials: readonly SuiteComparisonTrial[], side: ComparisonSide): SideObservationSummary {
   const measurements = trials.filter((trial) => trial.phase === 'measurement' && trial.side === side);
   assert.equal(measurements.length, MEASUREMENT_COUNT, `${side} measurement count`);
@@ -179,6 +197,7 @@ function summarizeSide(trials: readonly SuiteComparisonTrial[], side: Comparison
     timedOutCount: timeoutValues.filter((value) => value === true).length,
     completedCount: timeoutValues.filter((value) => value === false).length,
     timeoutUnavailableCount: timeoutValues.filter((value) => value === null).length,
+    completedDepthDistribution: completedDepthDistribution(measurements),
     completedDepth: median('completedDepth'), searchPositionCount: median('searchPositionCount'),
     cutoffCount: median('cutoffCount'), skippedActionCount: median('skippedActionCount'),
     elapsedMilliseconds: median('elapsedMilliseconds'),
@@ -220,7 +239,7 @@ function runPositionComparison(scenario: SelfPlayScenario, executionOrder: numbe
             // independent raw snapshot even when that validation then throws.
             const result = runner(input, config.mode, setting, dependencies, search => {
               trial.search = structuredClone(search);
-            });
+            }, { timeLimitMilliseconds: config.timeLimitMilliseconds, maxDepth: config.maxDepth });
             const returnedSearch = structuredClone(result.search);
             assert.ok(trial.search === undefined || isDeepStrictEqual(trial.search, returnedSearch),
               'capture結果と正常終了結果の検索データが一致しません');
@@ -264,6 +283,10 @@ function aggregateMetric(positions: readonly PositionComparison[], metric: Metri
 
 function validateConfig(config: SuiteComparisonConfig): void {
   assert.ok(config.mode === 'fixed' || config.mode === 'timed', 'Comparison mode must be fixed or timed.');
+  assert.ok(Number.isSafeInteger(config.timeLimitMilliseconds) && config.timeLimitMilliseconds > 0,
+    'Comparison timeLimitMilliseconds must be a positive integer.');
+  assert.ok(Number.isSafeInteger(config.maxDepth) && config.maxDepth >= 1,
+    'Comparison maxDepth must be an integer of at least 1.');
   assert.ok(config.baseline.id.length > 0 && config.candidate.id.length > 0, 'Comparison setting IDs are required.');
   assert.notEqual(config.baseline.id, config.candidate.id, 'Baseline and candidate IDs must differ.');
   for (const [side, named] of Object.entries({ baseline: config.baseline, candidate: config.candidate }) as
@@ -294,11 +317,11 @@ export function runSuiteComparison(config: SuiteComparisonConfig,
 }
 
 export function defaultSuiteComparisonConfig(mode: BenchmarkMode = 'timed'): SuiteComparisonConfig {
-  return { mode, baseline: SUITE_COMPARISON_CONFIG.baseline, candidate: SUITE_COMPARISON_CONFIG.candidate };
+  return { mode, ...DEFAULT_TIMED_SEARCH_OPTIONS, baseline: SUITE_COMPARISON_CONFIG.baseline, candidate: SUITE_COMPARISON_CONFIG.candidate };
 }
 
 export function defaultKillerMoveSuiteComparisonConfig(mode: BenchmarkMode = 'timed'): SuiteComparisonConfig {
-  return { mode, baseline: KILLER_MOVE_SUITE_COMPARISON_CONFIG.baseline,
+  return { mode, ...DEFAULT_TIMED_SEARCH_OPTIONS, baseline: KILLER_MOVE_SUITE_COMPARISON_CONFIG.baseline,
     candidate: KILLER_MOVE_SUITE_COMPARISON_CONFIG.candidate };
 }
 
@@ -310,25 +333,29 @@ export function parseSuiteComparisonMode(args: readonly string[]): BenchmarkMode
 
 const value = (metric: MetricDifference) => metric.difference === null
   ? '未算出' : `${metric.baseline}→${metric.candidate} (差=${metric.difference}, 率=${metric.percentChange === null ? '未算出' : `${metric.percentChange}%`})`;
+const describeSetting = (named: NamedSearchSetting) => `${named.id}=${rawJson(named.setting)}`;
+const describeDepthDistribution = (distribution: readonly { readonly depth: number; readonly count: number }[]) =>
+  distribution.length === 0 ? 'なし' : distribution.map(({ depth, count }) => `depth ${depth}×${count}`).join('、');
 
 /** Human-facing rendering deliberately reports measurements only; it never names a winner. */
 export function formatSuiteComparison(result: SuiteComparisonResult): string {
   const summary = result.summary;
   const lines = [
     'A/B 探索設定スイート比較',
+    `mode=${result.config.mode}; timeLimitMilliseconds=${result.config.timeLimitMilliseconds}; maxDepth=${result.config.maxDepth}`,
+    `baseline設定=${describeSetting(result.config.baseline)}; candidate設定=${describeSetting(result.config.candidate)}`,
     `対象局面=${summary.targetPositionCount}; 正常完了=${summary.completedPositionCount}; エラー=${summary.errorCount}; 選択手変更=${summary.selectedActionChangedPositionCount}`,
     `到達深さ（局面中央値の中央値）: ${value(summary.metrics.completedDepth)}`,
     `探索局面数（局面中央値の合計）: ${value(summary.metrics.searchPositionCount)}`,
     `カットオフ数（局面中央値の合計）: ${value(summary.metrics.cutoffCount)}`,
     `スキップ手数（局面中央値の合計）: ${value(summary.metrics.skippedActionCount)}`,
     `経過時間ms（局面中央値の中央値）: ${value(summary.metrics.elapsedMilliseconds)}`,
-    '局面別の主な差分:',
+    '局面別の本測定:',
   ];
-  const notable = result.positions.filter((position) => !position.ok || position.selectedActionMatches === false || position.evaluation.difference !== 0);
-  if (notable.length === 0) lines.push('  該当なし');
-  for (const position of notable) {
+  if (result.positions.length === 0) lines.push('  該当なし');
+  for (const position of result.positions) {
     if (!position.ok) { lines.push(`  ${position.scenarioId}: ERROR ${position.error}`); continue; }
-    lines.push(`  ${position.scenarioId}: 手=${position.baseline!.selectedActionLabel}→${position.candidate!.selectedActionLabel}; 一致=${position.selectedActionMatches}; 評価差=${position.evaluation.difference ?? '未算出'}; 深さ差=${position.metrics.completedDepth.difference ?? '未算出'}; 探索局面数差=${position.metrics.searchPositionCount.difference ?? '未算出'}; cutoff差=${position.metrics.cutoffCount.difference ?? '未算出'}; skip差=${position.metrics.skippedActionCount.difference ?? '未算出'}; 時間差ms=${position.metrics.elapsedMilliseconds.difference ?? '未算出'}; timeout=${position.baseline!.timedOutCount}→${position.candidate!.timedOutCount}`);
+    lines.push(`  ${position.scenarioId}: 手=${position.baseline!.selectedActionLabel}→${position.candidate!.selectedActionLabel}; 評価=${position.baseline!.selectedEvaluation}→${position.candidate!.selectedEvaluation}; 完了深さ中央値=${position.baseline!.completedDepth}→${position.candidate!.completedDepth}; 深さ分布=${describeDepthDistribution(position.baseline!.completedDepthDistribution)}→${describeDepthDistribution(position.candidate!.completedDepthDistribution)}; 探索局面数=${position.baseline!.searchPositionCount}→${position.candidate!.searchPositionCount}; cutoff=${position.baseline!.cutoffCount}→${position.candidate!.cutoffCount}; skip=${position.baseline!.skippedActionCount}→${position.candidate!.skippedActionCount}; 経過時間ms=${position.baseline!.elapsedMilliseconds}→${position.candidate!.elapsedMilliseconds}; timeout=${position.baseline!.timedOutCount}→${position.candidate!.timedOutCount}`);
   }
   return lines.join('\n');
 }
@@ -341,6 +368,75 @@ export function runSuiteComparisonCli(args: readonly string[], dependencies: Sui
   configForMode: (mode: BenchmarkMode) => SuiteComparisonConfig = defaultSuiteComparisonConfig): 0 | 1 {
   try {
     const result = runSuiteComparison(configForMode(parseSuiteComparisonMode(args)), dependencies, scenarios);
+    write(formatSuiteComparison(result));
+    write(`JSON ${serializeSuiteComparison(result)}`);
+    return result.summary.errorCount === 0 ? 0 : 1;
+  } catch (error) {
+    write(`ERROR ${message(error)}`);
+    return 1;
+  }
+}
+
+export interface KillerMoveSuiteComparisonCliArguments {
+  readonly mode: BenchmarkMode;
+  readonly timeLimitMilliseconds: number;
+  readonly maxDepth: number;
+}
+
+const killerMoveCliUsage = 'Usage: npm run measure:killer-move-suite-comparison -- [fixed|timed] [--time-limit-ms <positive integer>] [--max-depth <integer >= 1>]';
+
+function parsePositiveInteger(option: string, raw: string | undefined, minimum: number): number {
+  if (raw === undefined || raw.startsWith('--') || !/^(?:0|[1-9]\d*)$/.test(raw)) {
+    throw new Error(`${option} must be an integer${minimum === 1 ? ' of at least 1' : ' greater than 0'}. ${killerMoveCliUsage}`);
+  }
+  const parsed = Number(raw);
+  if (!Number.isSafeInteger(parsed) || parsed < minimum) {
+    throw new Error(`${option} must be an integer${minimum === 1 ? ' of at least 1' : ' greater than 0'}. ${killerMoveCliUsage}`);
+  }
+  return parsed;
+}
+
+/** Parses the killer-only timed options without altering the established mode parser. */
+export function parseKillerMoveSuiteComparisonCliArguments(args: readonly string[]): KillerMoveSuiteComparisonCliArguments {
+  let mode: BenchmarkMode = 'timed';
+  let explicitMode = false;
+  let timeLimitMilliseconds = DEFAULT_TIMED_SEARCH_OPTIONS.timeLimitMilliseconds;
+  let maxDepth = DEFAULT_TIMED_SEARCH_OPTIONS.maxDepth;
+  let sawTimedOption = false;
+  for (let index = 0; index < args.length; index++) {
+    const argument = args[index];
+    if (argument === 'fixed' || argument === 'timed') {
+      if (explicitMode) throw new Error(`Mode may be specified only once. ${killerMoveCliUsage}`);
+      mode = argument;
+      explicitMode = true;
+      continue;
+    }
+    if (argument === '--time-limit-ms') {
+      if (sawTimedOption && args.slice(0, index).includes('--time-limit-ms')) throw new Error(`--time-limit-ms may be specified only once. ${killerMoveCliUsage}`);
+      timeLimitMilliseconds = parsePositiveInteger(argument, args[++index], 1);
+      sawTimedOption = true;
+      continue;
+    }
+    if (argument === '--max-depth') {
+      if (args.slice(0, index).includes('--max-depth')) throw new Error(`--max-depth may be specified only once. ${killerMoveCliUsage}`);
+      maxDepth = parsePositiveInteger(argument, args[++index], 1);
+      sawTimedOption = true;
+      continue;
+    }
+    throw new Error(`Unknown argument: ${argument}. ${killerMoveCliUsage}`);
+  }
+  if (mode === 'fixed' && sawTimedOption) throw new Error(`Timed-only options cannot be used with fixed mode. ${killerMoveCliUsage}`);
+  return { mode, timeLimitMilliseconds, maxDepth };
+}
+
+/** Killer CLI extension; the shared comparison CLI deliberately keeps its legacy grammar. */
+export function runKillerMoveSuiteComparisonCli(args: readonly string[], dependencies: SuiteComparisonDependencies = {},
+  scenarios = QUIESCENCE_ORDERING_SELF_PLAY_SCENARIOS, write: (line: string) => void = console.log,
+  configForMode: (mode: BenchmarkMode) => SuiteComparisonConfig = defaultKillerMoveSuiteComparisonConfig): 0 | 1 {
+  try {
+    const parsed = parseKillerMoveSuiteComparisonCliArguments(args);
+    const base = configForMode(parsed.mode);
+    const result = runSuiteComparison({ ...base, timeLimitMilliseconds: parsed.timeLimitMilliseconds, maxDepth: parsed.maxDepth }, dependencies, scenarios);
     write(formatSuiteComparison(result));
     write(`JSON ${serializeSuiteComparison(result)}`);
     return result.summary.errorCount === 0 ? 0 : 1;
