@@ -7,7 +7,6 @@ import { executeLegalAction, getLegalActions, type LegalAction } from './legalAc
 import {
   DEFAULT_MATERIAL_VALUE_TABLE,
 } from './materialEvaluation';
-import { cloneBoardState } from './replay';
 import { analyzeQuiescenceSearchWithinBounds } from './quiescenceSearch';
 import { resolveQuiescenceMoveOrdering, type QuiescenceMoveOrderingMode } from './quiescenceOrdering';
 import { prepareStaticExchangeEvaluation } from './staticExchangeEvaluation';
@@ -169,7 +168,10 @@ interface SearchStatistics {
 }
 
 function executeSearchAction(state: BoardState, action: LegalAction): BoardState {
-  const execution = executeLegalAction(cloneBoardState(state), action);
+  // The public executor validates the action and constructs a new state. Its
+  // move/drop paths never mutate the supplied state, so cloning the entire
+  // replay history first only duplicates work for every searched successor.
+  const execution = executeLegalAction(state, action);
   if (execution.type !== 'applied') {
     throw new Error('A generated legal action could not be executed during alpha-beta search.');
   }

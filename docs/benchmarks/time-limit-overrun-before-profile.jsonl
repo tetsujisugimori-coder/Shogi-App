@@ -1,0 +1,3 @@
+{"mode":"profile","position":"initial","legalActionCount":30,"repetitions":3,"totals":{"legalActions":0.6619000000000028,"clone":0.4692999999999188,"execute":4.165099999999711,"evaluate":1.7309000000001333,"depthOne":7.44399999999996}}
+{"mode":"profile","position":"quiet-double-static-rook-middlegame","legalActionCount":30,"repetitions":3,"totals":{"legalActions":0.830600000000004,"clone":5.056800000000067,"execute":5.0919000000000665,"evaluate":2.4538999999998055,"depthOne":12.193600000000004}}
+{"mode":"profile","position":"check-evasion-endgame","legalActionCount":11,"repetitions":3,"totals":{"legalActions":1.4563999999999169,"clone":0.25569999999981974,"execute":1.237300000000289,"evaluate":0.6131999999996083,"depthOne":3.1216000000000577}}
