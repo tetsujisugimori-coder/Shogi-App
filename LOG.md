@@ -1,5 +1,30 @@
 # SHOGI-APP 開発ログ
 
+## [2026-09-23 JST] PR #146 の手・評価の表示定義を補正
+
+- `scripts/benchmarks/quiescenceOrderingSuiteComparison.ts`の`summarizeSide()`は手・評価に各側の最初の本測定1回を使い、深さ・訪問局面数・cutoff・skip・経過時間は8回の中央値を使う。`selectedActionChangedPositionCount`は初回同士の選択手比較である。この定義を`docs/killer-move-suite-comparison.md`の表見出し・注記・本文、PR本文に明記した。比較処理と未加工ログは変更していない。
+- 未加工JSONの`phase=measurement`だけを数え直すと、5秒の`standard-hirate`評価はOFFが214×1・0×7、ONが0×8。表の214→0は初回値で、8回の代表的な評価差ではない。5秒の静かな中盤も手・評価が揺れたため頻度表に記録した。
+- 10秒の`check-evasion-endgame`は初回の手・評価が両側とも`△6一玉 / -487`だが、8回ではOFFが`△5三金 / -104`×6・`△6一玉 / -487`×2、ONが`△5三金 / -104`×3・`△6一玉 / -487`×5だった。したがって「選択手変更0」は初回同士の結果であり、8回全体の分布一致を意味しない。10秒の飛車先交換でもOFF評価-1×7・399×1を確認し、文書に記録した。
+- 修正したファイルは`docs/killer-move-suite-comparison.md`と`LOG.md`、およびPR #146本文である。両ログの全14局面行・28側、各側の本測定8回を再集計し、手・評価頻度（揺れのある6側）、初回値、深さ分布、数値中央値、timeout、各条件の対象7・正常7・エラー0と文書を機械的に照合して成功した。`git diff --check`も終了0だった。PRのCIは新コミット後に確認する。
+- 手・評価の頻度と初回比較件数を集計結果で別名・別表示にする案は、別PR向け課題とする。今回、探索本体・集計仕様・未加工ログは変更しない。
+
+## [2026-09-23 JST] キラームーブOFF/ON固定7局面の5秒・10秒測定
+
+### 目的・条件・実行環境
+
+- PR #144の固定7局面（opening 3、middlegame 2、endgame 2。sente 5、gote 2）に、従来は序盤3局面だけで行った時間制限比較を拡張した。中心の判断材料は各局面の本測定8回の完了深さ分布であり、深さの違う結果の訪問局面数を単純な効率比較に使わない。
+- 最新mainから`docs/killer-move-seven-position-timed-results`を作成した。測定HEADは`eaa63ebff02117248e197071316bec7292523cf3`で、5秒・10秒とも`RUN`に`dirty: false`、同じ5対象ファイルのSHA-256、Node v24.20.0、npm 11.17.0、Windows 10.0.26200 x64、Intel Core i7-14650HXを記録した。
+- 測定前に`npx vitest run src/test/quiescence-ordering-self-play-suite.test.ts src/test/quiescence-ordering-suite-comparison.test.ts`を実行し、2ファイル22件が終了0で成功した。通常サンドボックスではesbuildの`spawn EPERM`で起動不能だったため、許可経路で同じコマンドを再実行して終了要約を回収した。
+- 5秒は`npm run measure:killer-move-suite-comparison -- timed --time-limit-ms 5000 --max-depth 4`を17:54:17.871〜18:07:13.652 JST、10秒は同じコマンドの`--time-limit-ms 10000`を18:08:01.895〜18:33:09.133 JSTに、この順で直列実行した。各条件は3 warmup、8本測定、OFF/ON交互、OFF先行4・ON先行4、最大深さ4、baseline=`killer-off`、candidate=`killer-on`である。測定中にテスト、build、別ベンチマークを並行実行していない。
+- 記録追加後の`npm run check`は終了0。lockfile検証、`tsc --noEmit`、59ファイル1725テスト、Vite build（1755 modules）が成功した。続く`git diff --check`も終了0で、空白エラーはない（GitのLF/CRLF注意表示のみ）。
+
+### 結果と範囲
+
+- 両条件とも対象7、正常完了7、エラー0、終了コード0。完全な未加工出力（`RUN`、人間向け集計、`JSON`、`END`）は`docs/benchmarks/killer-move-seven-position-5000ms.txt`と`docs/benchmarks/killer-move-seven-position-10000ms.txt`へ保存した。JSONと人間向け集計について、対象・正常・エラー件数、7局面、phase、sideToMove、8本測定の存在を機械的に照合した。
+- 5秒の完了深さ中央値は、ON上昇が`rook-pawn-exchange-26-84-25-85`（2→3）1件、同一6件、低下0件。初回測定同士の選択手変更は同局面（▲7六歩/214→▲2四歩/-1）だけで、`standard-hirate`は初回評価のみ214→0だった。平手OFFの評価214は8回中1回だけであり、初回差を8回の代表値とは扱わない。静かな中盤にも手・評価の揺れがある。timeoutは静かな中盤がOFF 7/ON 8、それ以外は全局面8/8で、エラーはない。
+- 10秒の完了深さ中央値は、ON上昇が`check-evasion-endgame`（2→3）1件、同一6件、低下0件。初回測定同士の手・評価は全局面で一致した。ただし王手回避局面の8回ではOFFの`△5三金 / -104`が6回、ONの`△6一玉 / -487`が5回と分布が異なる。飛車先交換のOFF評価も1回だけ399となった。timeoutは飛車先交換局面がOFF 7/ON 8、それ以外は全局面8/8、エラーはない。
+- これらは固定7局面（phase別に3/2/2件）と同一環境での観測である。棋力、Elo、統計的有意差、一般的な性能改善、キラームーブの既定ON化、通常対局・UIへの採用は結論しない。探索本体、キラームーブ実装・既定OFF、反復深化、SEE、静止探索、評価、合法手、fixture、Worker、UI、依存関係・lockfileは変更していない。詳細表と解釈制約は`docs/killer-move-suite-comparison.md`に記録した。
+
 ## [2026-09-23] キラームーブ比較7局面の局面実態補正
 
 ### 原因・修正
