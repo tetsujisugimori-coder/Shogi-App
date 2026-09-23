@@ -23,7 +23,9 @@ type ObservationKey = StatisticKey | 'selectedEvaluation' | 'completedDepth' |
  */
 export type SelfPlaySearchResult = Pick<TimeLimitedIterativeDeepeningAlphaBetaSearchResult, 'selectedAction'> & {
   [K in ObservationKey]: TimeLimitedIterativeDeepeningAlphaBetaSearchResult[K] | null;
-} & { resultSource?: TimeLimitedIterativeDeepeningAlphaBetaSearchResult['resultSource'] };
+} & { resultSource?: TimeLimitedIterativeDeepeningAlphaBetaSearchResult['resultSource'];
+  /** Measured by the caller around the entire search API invocation. */
+  actualElapsedMilliseconds?: number };
 
 export interface SelfPlayParticipant<Settings> {
   settings: Settings;
@@ -120,6 +122,8 @@ function validateObservations(state: BoardState, result: SelfPlaySearchResult): 
   if (result.completedDepth !== null && !count(result.completedDepth)) invalid('completedDepth');
   if (result.elapsedMilliseconds !== null &&
     (typeof result.elapsedMilliseconds !== 'number' || !Number.isFinite(result.elapsedMilliseconds) || result.elapsedMilliseconds < 0)) invalid('elapsedMilliseconds');
+  if (result.actualElapsedMilliseconds !== undefined &&
+    (typeof result.actualElapsedMilliseconds !== 'number' || !Number.isFinite(result.actualElapsedMilliseconds) || result.actualElapsedMilliseconds < 0)) invalid('actualElapsedMilliseconds');
   if (result.timedOut !== null && typeof result.timedOut !== 'boolean') invalid('timedOut');
   for (const [key, total] of statisticPairs) {
     if ((result[key] !== null && !count(result[key])) || (result[total] !== null && !count(result[total])) ||
@@ -214,6 +218,7 @@ export function runSelfPlayGame<SenteSettings, GoteSettings>(options: {
         principalVariation: result.principalVariation?.map(cloneAction) ?? null,
         evaluationBreakdown: result.evaluationBreakdown === null ? null : { ...result.evaluationBreakdown },
         ...(result.resultSource === undefined ? {} : { resultSource: result.resultSource }),
+        ...(result.actualElapsedMilliseconds === undefined ? {} : { actualElapsedMilliseconds: result.actualElapsedMilliseconds }),
       };
     } catch (error) {
       return fail('result', 'invalid_result', error instanceof Error ? error.message : String(error));

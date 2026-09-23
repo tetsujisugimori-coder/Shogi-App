@@ -25,6 +25,8 @@
     "measure:quiescence-ordering-suite-comparison": "tsx scripts/measure-quiescence-ordering-suite-comparison.ts",
     "measure:killer-move-suite-comparison": "tsx scripts/measure-killer-move-suite-comparison.ts",
     "measure:time-limit-stress": "tsx scripts/measure-time-limit-stress.ts",
+    "measure:timed-fallback-self-play": "tsx scripts/measure-timed-fallback-self-play.ts",
+    "audit:timed-fallback-self-play": "tsx scripts/audit-timed-fallback-self-play.ts",
     "check": "npm run verify:lock && npm run lint && npm test && npm run build"
   },
   "dependencies": {
