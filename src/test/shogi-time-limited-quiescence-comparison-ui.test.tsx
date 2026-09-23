@@ -249,7 +249,7 @@ describe('同一時間の静止探索比較UI', () => {
 
   it.each(['内訳', 'PV', '不足', '深さ'] as const)('不正な%sは部分表示せず盤面・棋譜を維持する', async (kind) => {
     const user = userEvent.setup(); const bad = structuredClone(results);
-    if (kind === '内訳') Object.assign(bad[0].evaluationBreakdown, { total: 99999 });
+    if (kind === '内訳') Object.assign(bad[0].evaluationBreakdown!, { total: 99999 });
     if (kind === 'PV') bad[0].principalVariation[1] = bad[0].principalVariation[0];
     if (kind === '深さ') bad[0].depth = 2;
     render(<ShogiResearchScreen timeLimitedQuiescenceComparisonRunner={async () => kind === '不足' ? bad.slice(0, 2) : bad} />);

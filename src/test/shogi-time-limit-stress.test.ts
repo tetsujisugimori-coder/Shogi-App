@@ -65,12 +65,13 @@ describe('time-limit stress measurement', () => {
     expect(sample).toMatchObject({
       type: 'sample', positionId: position.id, origin: 'saved-self-play', historyPly: 50,
       mode: 'quiescence-1', phase: 'measurement', run: 3, timeLimitMilliseconds: 100,
-      actualElapsedMilliseconds: 110, completedDepth: 1, timedOut: true,
+      actualElapsedMilliseconds: 110, completedDepth: 0, timedOut: true, resultSource: 'fallback',
     });
     for (const key of ['rootLegalActionCount', 'visitedPositionCount', 'quiescenceVisitedPositionCount',
       'totalVisitedPositionCount', 'totalQuiescenceVisitedPositionCount', 'depthOneElapsedMilliseconds',
       'selectedAction'] as const) expect(sample[key]).toBeDefined();
     expect(sample.selectedAction).not.toBeNull();
+    expect(sample.depthOneElapsedMilliseconds).toBeNull();
     expect(sample.totalVisitedPositionCount).toBe(sample.visitedPositionCount);
     expect(sample.totalQuiescenceVisitedPositionCount).toBe(sample.quiescenceVisitedPositionCount);
     expect(JSON.stringify(state)).toBe(snapshot);

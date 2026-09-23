@@ -306,6 +306,24 @@ describe('時間制限付き反復深化αβ探索Workerの純粋処理', () => 
 });
 
 describe('時間制限付き反復深化αβ探索Workerクライアント', () => {
+  it('深さ0のfallback結果をstructured clone経由で成功として返す', async () => {
+    const fake = createFakeWorker();
+    const client = createTimeLimitedIterativeDeepeningAlphaBetaSearchWorkerClient({
+      workerFactory: () => fake.worker, requestIdFactory: () => 'fallback-request',
+    });
+    const state = createInitialBoardState();
+    const pending = client.run(state, 2, 0);
+    const response = handleTimeLimitedIterativeDeepeningAlphaBetaSearchWorkerRequest(
+      request({ state, maxDepth: 2, timeLimitMilliseconds: 0, requestId: 'fallback-request',
+        evaluationPresetId: DEFAULT_SEARCH_EVALUATION_PRESET_ID })
+    );
+    fake.emitMessage(structuredClone(response));
+    await expect(pending).resolves.toMatchObject({ completedDepth: 0, depth: 0,
+      timedOut: true, resultSource: 'fallback', selectedEvaluation: null,
+      evaluationBreakdown: null, principalVariation: [], iterations: [] });
+    expect(fake.terminate).toHaveBeenCalledTimes(1);
+  });
+
   it.each(SEARCH_EVALUATION_PRESET_IDS)('選択IDを要求へ渡し、そのIDを持つ応答だけを採用する: %s', async (id) => {
     const fake = createFakeWorker();
     const client = createTimeLimitedIterativeDeepeningAlphaBetaSearchWorkerClient({ workerFactory: () => fake.worker, requestIdFactory: () => 'preset-request' });

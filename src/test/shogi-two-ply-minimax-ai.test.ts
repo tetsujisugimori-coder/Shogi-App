@@ -269,7 +269,7 @@ function expectEvaluationBreakdownToMatchPrincipalVariation(
   result: {
     selectedEvaluation: number | null;
     principalVariation: readonly LegalAction[];
-    evaluationBreakdown: ReturnType<typeof evaluateSearchPositionBreakdown>;
+    evaluationBreakdown: ReturnType<typeof evaluateSearchPositionBreakdown> | null;
   },
   evaluation?: SearchEvaluationConfig
 ): void {
@@ -278,7 +278,7 @@ function expectEvaluationBreakdownToMatchPrincipalVariation(
 
   expect(result.evaluationBreakdown).toEqual(expected);
   if (result.selectedEvaluation !== null) {
-    expect(result.selectedEvaluation).toBe(result.evaluationBreakdown.total);
+    expect(result.selectedEvaluation).toBe(result.evaluationBreakdown?.total);
   }
 }
 
@@ -849,19 +849,80 @@ describe('時間制限付き反復深化αβ探索', () => {
     const result = analyzeTimeLimitedIterativeDeepeningAlphaBetaSearch(state, 3, 30, undefined, clock);
 
     expect(result).toMatchObject({ completedDepth: 2, timedOut: true, elapsedMilliseconds: 37 });
-    expect(result.iterations.map((iteration) => iteration.elapsedMilliseconds)).toEqual([3, 10]);
+    expect(result.iterations.map((iteration) => iteration.elapsedMilliseconds)).toEqual([5, 10]);
     expect(result.elapsedMilliseconds).not.toBe(result.iterations[1].elapsedMilliseconds);
   });
 
-  it('0ミリ秒でも深さ1を完了し、深さ2開始前の同値期限を時間切れにする', () => {
+  it('0ミリ秒では探索せず、先頭合法手を未評価のfallbackとして返す', () => {
     const state = recaptureTrapState();
     const result = analyzeTimeLimitedIterativeDeepeningAlphaBetaSearch(state, 2, 0, undefined, () => 0);
 
-    expect(result).toMatchObject({ completedDepth: 1, timedOut: true });
-    expect(result.iterations.map((iteration) => iteration.depth)).toEqual([1]);
+    expect(result).toMatchObject({ completedDepth: 0, depth: 0, timedOut: true, resultSource: 'fallback',
+      selectedAction: getLegalActions(state)[0], selectedEvaluation: null, evaluationBreakdown: null,
+      principalVariation: [], rootLegalActionCount: getLegalActions(state).length });
+    expect(result.iterations).toEqual([]);
+    expect(result.visitedPositionCount).toBe(0);
+    expect(result.totalVisitedPositionCount).toBe(0);
   });
 
-  it('最大深さ1は制限時間を超えても深さ1を返し、時間切れにしない', () => {
+  it('root合法手の準備時間も期限に含め、深さ1の途中結果を採用しない', () => {
+    const state = recaptureTrapState();
+    let reads = 0;
+    const expiredDuringSetup = analyzeTimeLimitedIterativeDeepeningAlphaBetaSearch(
+      state, 2, 10, undefined, () => ++reads === 1 ? 0 : 10
+    );
+    expect(expiredDuringSetup).toMatchObject({ completedDepth: 0, elapsedMilliseconds: 10,
+      resultSource: 'fallback', selectedAction: getLegalActions(state)[0] });
+
+    reads = 0;
+    const interrupted = analyzeTimeLimitedIterativeDeepeningAlphaBetaSearch(
+      state, 2, 10, undefined, () => ++reads >= 5 ? 10 : 0
+    );
+    expect(reads).toBeGreaterThanOrEqual(5);
+    expect(interrupted).toMatchObject({ completedDepth: 0, timedOut: true, resultSource: 'fallback',
+      selectedAction: getLegalActions(state)[0], selectedEvaluation: null, evaluationBreakdown: null,
+      principalVariation: [], visitedPositionCount: 0, totalVisitedPositionCount: 0 });
+    expect(interrupted.iterations).toEqual([]);
+  });
+
+  it('深さ1の静止探索中に期限へ達しても完了統計へ混ぜない', () => {
+    const state = recaptureTrapState();
+    let reads = 0;
+    const result = analyzeTimeLimitedIterativeDeepeningAlphaBetaSearch(
+      state, 2, 10, undefined, () => ++reads >= 6 ? 10 : 0,
+      { quiescence: { maxTacticalDepth: 1 } }
+    );
+    expect(reads).toBeGreaterThanOrEqual(6);
+    expect(result).toMatchObject({ completedDepth: 0, timedOut: true, resultSource: 'fallback',
+      selectedAction: getLegalActions(state)[0], quiescenceLeafCount: 0,
+      quiescenceVisitedPositionCount: 0, totalQuiescenceLeafCount: 0,
+      totalQuiescenceVisitedPositionCount: 0 });
+    expect(result.iterations).toEqual([]);
+  });
+
+  it('終局の0ミリ秒は手なしfallbackを返し、凍結入力を変えない', () => {
+    const state = recaptureTrapState();
+    const ended = { ...state, status: 'ended' as const,
+      result: { winner: null, loser: null, endReason: 'repetition' as const } };
+    const freeze = (value: unknown): void => {
+      if (value && typeof value === 'object' && !Object.isFrozen(value)) {
+        Object.values(value).forEach(freeze);
+        Object.freeze(value);
+      }
+    };
+    freeze(state);
+    freeze(ended);
+    const snapshot = JSON.stringify(state);
+    const first = analyzeTimeLimitedIterativeDeepeningAlphaBetaSearch(state, 2, 0, undefined, () => 0);
+    const second = analyzeTimeLimitedIterativeDeepeningAlphaBetaSearch(state, 2, 0, undefined, () => 0);
+    expect(first.selectedAction).toEqual(getLegalActions(state)[0]);
+    expect(second.selectedAction).toEqual(first.selectedAction);
+    expect(JSON.stringify(state)).toBe(snapshot);
+    expect(analyzeTimeLimitedIterativeDeepeningAlphaBetaSearch(ended, 2, 0, undefined, () => 0))
+      .toMatchObject({ selectedAction: null, completedDepth: 0, resultSource: 'fallback' });
+  });
+
+  it('最大深さ1も期限切れならfallbackを返す', () => {
     const state = recaptureTrapState();
     const readings = [0, 1, 2, 3];
     const result = analyzeTimeLimitedIterativeDeepeningAlphaBetaSearch(
@@ -872,8 +933,8 @@ describe('時間制限付き反復深化αβ探索', () => {
       () => readings.shift() ?? 3
     );
 
-    expect(result).toMatchObject({ requestedMaxDepth: 1, completedDepth: 1, timedOut: false });
-    expect(result.iterations).toHaveLength(1);
+    expect(result).toMatchObject({ requestedMaxDepth: 1, completedDepth: 0, timedOut: true, resultSource: 'fallback' });
+    expect(result.iterations).toHaveLength(0);
   });
 
   it('有限でない値と負数の時間制限を拒否し、時間切れ以外の例外を伝播する', () => {
@@ -1769,15 +1830,12 @@ describe('再帰型αβ探索のPV末端評価内訳', () => {
     expect(iterative.evaluationBreakdown).toEqual(iterative.iterations[2].evaluationBreakdown);
     expect(iterative.evaluationBreakdown).not.toBe(iterative.iterations[2].evaluationBreakdown);
 
-    const depthOne = analyzeAlphaBetaSearch(state, 1, undefined, () => 0);
     const timedOut = analyzeTimeLimitedIterativeDeepeningAlphaBetaSearch(state, 3, 0, undefined, () => 0);
 
-    expect(timedOut).toMatchObject({ completedDepth: 1, timedOut: true });
-    expect(timedOut.iterations).toHaveLength(1);
-    expect(timedOut.selectedEvaluation).toBe(depthOne.selectedEvaluation);
-    expect(timedOut.principalVariation).toEqual(depthOne.principalVariation);
-    expect(timedOut.evaluationBreakdown).toEqual(depthOne.evaluationBreakdown);
-    expectEvaluationBreakdownToMatchPrincipalVariation(state, timedOut);
+    expect(timedOut).toMatchObject({ completedDepth: 0, timedOut: true, resultSource: 'fallback',
+      selectedAction: getLegalActions(state)[0], selectedEvaluation: null, evaluationBreakdown: null,
+      principalVariation: [] });
+    expect(timedOut.iterations).toHaveLength(0);
   });
 
   it('終局の勝ち・負け・引き分けでは空PVでも評価内訳のterminalとtotalを保つ', () => {

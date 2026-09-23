@@ -1,6 +1,22 @@
 # SHOGI-APP
 
-## 時間制限付き通常探索の実戦系ストレス測定（2026-09-23）
+## 時間制限付き探索の協調的deadline制御（2026-09-24）
+
+時間制限付き反復深化αβ探索は、API内の時計をroot合法手生成の前に開始し、`getLegalActions(state)`の既存順序の先頭手を決定的なfallbackとして確保します。深さ1を含むすべての反復、通常探索、手並べ替え、静止探索、再探索で同じdeadline確認を使います。期限に達した反復は丸ごと破棄し、最後の完了反復を返します。完了反復がなければ`completedDepth=0`、`depth=0`、`iterations=[]`、`resultSource='fallback'`、`timedOut=true`を返し、合法手があればその先頭手を選びます。この場合、`selectedEvaluation`と`evaluationBreakdown`は`null`、PVは空、完了統計は0です。終局または合法手なしではfallback手は`null`です。Worker経由でも同じ結果を返し、通常対局ではfallbackを合法手として着手します。self-play記録には`resultSource`も残します。
+
+`elapsedMilliseconds`はroot合法手生成と中断した反復を含むAPI内の経過時間です。外部ベンチの`actualElapsedMilliseconds`は呼び出し直前から復帰直後までを測ります。JavaScriptの同期処理なので、合法手生成やdeadline確認間の単一処理、OS負荷、JIT、GCを強制的に中断できません。これは協調的なdeadline制御であり、hard realtimeや「100ms以内に必ず復帰する」という保証ではありません。外部の`AbortSignal`によるWorker終了は内部deadlineとは別の操作です。
+
+PR #150と同じ5局面、通常／静止追加1手、最大深さ4、100／1,000ms、各条件2回ウォームアップ・5回本測定を直列再実行しました。生データは[`docs/benchmarks/time-limit-stress-cooperative-20260924.jsonl`](docs/benchmarks/time-limit-stress-cooperative-20260924.jsonl)です。`depthOneElapsedMilliseconds`は深さ1未完了時に`null`で、未完了反復の所要時間を深さ1完了時間と偽りません。
+
+| 対象100ms条件 | 変更前 PR #150 | 変更後 |
+| --- | --- | --- |
+| 保存済み実対局50手＋静止追加1手、本測定5回の実経過 | 344.20～366.78ms、中央値355.93ms | 100.51～103.24ms、中央値102.00ms |
+| 完了深さ・時間切れ | 深さ1・`true` ×5 | 深さ0 fallback・`true` ×5 |
+| 300ms以上 | 5/5 | 0/5 |
+
+変更後の100ms本測定全50回の実経過は100.08～106.51msで、300ms以上は0回です。深さ0 fallbackは25回、深さ1完了は20回、深さ2完了は5回でした。測定環境はWindows x64、Intel Core i7-14650HX、Node v24.20.0。これらは当該実行の観測値であり、合否用の時間閾値や棋力改善の根拠にはしません。
+
+## 時間制限付き通常探索の実戦系ストレス測定（変更前、2026-09-23）
 
 PR #148 後の既存探索を、通常探索／静止探索追加1手（既定の original 順序）、最大深さ4、100ms／1,000msで直列測定しました。各局面・条件でウォームアップ2回の後、本測定5回です。局面生成とウォームアップは各探索呼出しの実経過時間に含めず、`performance.now()`で呼出し直前から復帰直後までを測ります。生データは [`docs/benchmarks/time-limit-stress-20260923.jsonl`](docs/benchmarks/time-limit-stress-20260923.jsonl) に保存しました。`config`、`position`、`sample`（`phase`でウォームアップと本測定を区別）、100msの`summary`、`end`の順です。
 
@@ -102,7 +118,7 @@ node scripts/verify-evaluation-presets-browser.mjs http://127.0.0.1:4173/Shogi-A
 
 「静止探索を同じ1秒で比較」は、固定深さ3の比較とは別に、実際の時間制限AIと同じ**最大深さ4 ply・各条件1,000ms**で比較します。「静止探索なし／追加1手／追加2手」の順に、同じ開始局面から独立したスナップショットを作り、標準評価・`standard`手順並べ替えで直列実行します。各条件は独立した1秒を持ち、3条件で1秒を共有しません。
 
-全体では約3秒以上かかる場合があります。探索は深さ1を最低保証し、期限確認は協調的に行うため、1,000msは厳密な実行時間の上限ではありません。固定深さ比較では通常深さを揃え、同一時間比較では読み足し量と時間内に完了できる通常深さの交換条件を観察できます。推奨手、先手評価、完了深さ／最大深さ、時間切れ、合法な主変化を表示し、通常探索と静止探索を分け、最深完了反復と全完了反復合計も分けて表示します。API全体の参考処理時間は未完了反復も含みますが、統計は完了反復だけで、Worker起動・通信・応答検証・描画時間は含みません。
+全体では約3秒以上かかる場合があります。探索は深さ1から協調的に期限を確認しますが、1,000msは厳密な実行時間の上限ではありません。固定深さ比較では通常深さを揃え、同一時間比較では読み足し量と時間内に完了できる通常深さの交換条件を観察できます。推奨手、先手評価、完了深さ／最大深さ、時間切れ、合法な主変化を表示し、通常探索と静止探索を分け、最深完了反復と全完了反復合計も分けて表示します。API全体の参考処理時間は未完了反復も含みますが、統計は完了反復だけで、Worker起動・通信・応答検証・描画時間は含みません。
 
 専用Workerで3条件の成功と厳密な応答検証がすべて完了した場合のみ一括表示します。「同一時間の静止探索比較を中止」でWorkerを終了し、古い応答を無視します。単独AI・評価プリセット比較・固定深さ比較とは同時実行しません。開始・中止・成功だけでは盤面、棋譜、保存データ、既存の比較結果を変えず、局面変更時に古い結果を無効化します。
 
@@ -130,7 +146,7 @@ npm run measure:quiescence-suite -- both  # 両方を明示
 
 初期局面以外は観察用の疎な構成局面です。未配置の駒は盤外で、持ち駒として使えません。実戦棋譜からの到達を主張せず、正解手も指定しません。既存静止探索テスト・旧測定の配置を参考に、二歩や玉の重複を避け、現在の盤面と手番に対応する局面履歴・再生スナップショットを作ります。個別の由来と目的は `scripts/benchmarks/quiescencePositions.ts` に記載しています。旧測定スクリプトとその測定条件は維持します。
 
-固定深さは**通常深さ3**を揃えて再現性を観察します。同一時間は**最大深さ4、各設定に独立した1,000ms**を与えます。3設定で1秒を共有しません。どちらも静止探索なし→追加1手→追加2手の順に、独立した凍結スナップショットから直列実行します。無効条件はquiescenceオプション自体を省略します。各局面・設定を1回ずつ測定し、ウォームアップはありません。深さ1の最低保証と協調的な期限確認があるため、1,000msは厳密な時間上限ではありません。同一時間では完了深さ・推奨手も実行環境やJIT、実行順で変わり得ます。
+固定深さは**通常深さ3**を揃えて再現性を観察します。同一時間は**最大深さ4、各設定に独立した1,000ms**を与えます。3設定で1秒を共有しません。どちらも静止探索なし→追加1手→追加2手の順に、独立した凍結スナップショットから直列実行します。無効条件はquiescenceオプション自体を省略します。各局面・設定を1回ずつ測定し、ウォームアップはありません。深さ1から協調的に期限を確認しますが、1,000msは厳密な時間上限ではありません。同一時間では完了深さ・推奨手も実行環境やJIT、実行順で変わり得ます。
 
 出力は日本語の整形テキストです。局面ID・目的、推奨手、先手基準の評価、PV、参考時間と通常／静止の統計を示します。同一時間では最深完了反復と全完了反復合計を分離します。参考時間には未完了反復の処理を含み、統計には含みません。結果検証・表示時間も計測外です。`+∞`／`-∞`、0、手なし、空PVを明示し、不正結果を成功にしません。
 
@@ -478,7 +494,7 @@ const total = Object.values(repeated.summary).reduce((sum, count) => sum + count
     - `analyzeAlphaBetaSearch(state, depth, evaluation?, clock?, options?)` と `selectBestAlphaBetaAction(state, depth, evaluation?, options?)` は、深さをply単位で受け取る再帰型αβ探索である。指定深さはrootのAI着手を含み、深さ1はAI着手だけ、深さ2はAI→相手、深さ3はAI→相手→AIを読む（「3手ずつ読む」意味ではない）。開始時の `state.turn` をrootPlayerとして固定し、rootPlayer側を最大化、相手側を最小化する。各子局面は既存の複製・合法手・着手APIで生成し、残り深さ0または終局では`evaluateSearchPositionBreakdown()`を一度だけ呼び、その`total`を評価値として返す。評価値、PV、PV末端の`evaluationBreakdown`は同じ採用候補から一組で伝播するため、通常の選択結果では`selectedEvaluation === evaluationBreakdown.total`となる。末尾の`AlphaBetaSearchOptions.moveOrdering`は評価設定・プリセットと独立し、既定は`standard`、明示選択は`static-exchange`、不明値は例外になる。既存の引数順と省略時の呼び出しは互換。`standard`ではSEE導入前と同じ「駒取りかつ成り、通常の駒取り、非駒取りの成り、その他（駒打ちを含む）」の順にし、分類内は元のインデックス順を維持する。SEE準備・価値表解決は行わない。`static-exchange`ではすべての駒取りを着手側視点のSEE降順にし、同点は元順、その後に非駒取り成り・その他を続ける。捕獲2手以上の場合だけ開始合法手と基準駒得を共有して各候補を1回評価し、0～1手ではSEEを呼ばない。反復深化rootでは前回最善手を除いた残り候補でこの件数を判定する。探索評価と共通の設定解決から得た駒価値表（直接指定・options内指定・既定表）を使用する。`alpha >= beta`で残り候補を打ち切る。root候補は並べ替えず、厳密比較により同点では元の先頭の合法手を維持する。探索ごとにrootを除く実生成局面数、打ち切り回数、未実行候補数と、選択手から最大指定plyまでの `principalVariation`（主変化）を返す。PVは選択手で始まり、実際に探索した最善枝だけを含む
     - 明示SEEの例: `analyzeAlphaBetaSearch(state, 3, undefined, undefined, { moveOrdering: 'static-exchange' })`。時間制限探索では第6引数、select系は既存の評価設定の次、互換2手読みanalyzeはclockの次に同じオプションを渡す。省略時はすべて`standard`になる。
     - `analyzeIterativeDeepeningAlphaBetaSearch(state, maxDepth, evaluation?, clock?, options?)` と `selectBestIterativeDeepeningAlphaBetaAction(state, maxDepth, evaluation?, options?)` は、深さ1から最大深さまで同じ再帰型αβ探索を完了順に実行する時間制限なしの反復深化である。各深さの結果は `iterations` に保存し、各反復と最終結果は対応するPV末端の`evaluationBreakdown`を持つ。最終結果と通常の探索統計は最深反復だけ、`totalVisitedPositionCount`・`totalCutoffCount`・`totalSkippedActionCount` は全反復の合計を表す。次の深さでは前回最善手をroot先頭に置き、残り候補は同じ`moveOrdering`設定の順で調べるが、同点時は元のroot合法手順の先頭を選ぶ
-    - `analyzeTimeLimitedIterativeDeepeningAlphaBetaSearch(state, maxDepth, timeLimitMilliseconds, evaluation?, clock?, options?)` は、有限かつ0以上のミリ秒制限を受ける時間制限付き反復深化である。深さ1は0ミリ秒でも必ず完了する最低保証とし、深さ2以降で期限に達した場合は進行中の反復を破棄して、最後に完了した深さの指し手・評価・通常統計・PV・`evaluationBreakdown`だけを返す。`iterations` と `total*` 統計には完了した反復だけを含め、最上位の `elapsedMilliseconds` は破棄した未完了反復も含むAPI呼び出し全体の経過時間である。各 `iterations` 要素の `elapsedMilliseconds` はその完了反復単体の時間を表す
+    - `analyzeTimeLimitedIterativeDeepeningAlphaBetaSearch(state, maxDepth, timeLimitMilliseconds, evaluation?, clock?, options?)` は、有限かつ0以上のミリ秒制限を受ける時間制限付き反復深化である。root合法手の先頭をfallbackとして確保し、深さ1から同じ協調的deadlineを確認する。期限に達した反復は破棄し、最後の完了反復があればその指し手・評価・統計・PV・内訳を返す。完了反復がなければ`completedDepth=0`、`resultSource='fallback'`、評価・内訳なし、空PV・完了統計0を返す。`iterations`と`total*`統計には完了反復だけを含め、最上位の`elapsedMilliseconds`はroot合法手生成と破棄した未完了反復を含むAPI内経過時間である。各`iterations`要素の`elapsedMilliseconds`はその完了反復単体の時間を表す
     - `runTimeLimitedIterativeDeepeningAlphaBetaSearchInWorker(state, maxDepth, timeLimitMilliseconds, signal?)` は、既定の`standard`による時間制限付き反復深化をViteのmodule Web Workerで1要求ごとに1つ実行し（WorkerプロトコルやUIには手順モードを追加しない）、`Promise<TimeLimitedIterativeDeepeningAlphaBetaSearchResult>` で返す非同期基盤である。`BoardState`と結果はJSON化せず構造化クローンで送受信するため、終局評価の `Infinity` / `-Infinity` とPV末端の全`evaluationBreakdown`項目を保つ。省略可能な`AbortSignal`が中止されると、専用Workerを`terminate()`して途中結果を返さず、`TimeLimitedIterativeDeepeningAlphaBetaSearchWorkerAbortError`（`name === 'AbortError'`）でrejectする。成功、探索失敗、Workerの`error` / `messageerror`、送信失敗、`requestId`不一致のいずれでもWorkerを確実に終了し、呼び出し側へ成功または明示エラーを一度だけ返す。Worker未対応環境や生成失敗では同期探索へフォールバックしない
     - 研究画面には既存の「2手読みAIに指させる」と並べて「時間制限AIに指させる」を置く。後者は最大深さ4・制限1,000 msで一手だけ探索し、思考中表示と中止操作を提供する。探索開始局面と単調増加する世代番号を保持し、新しい対局、JSON/KIF読込、分岐切替、棋譜再生位置の移動、アンマウントでは中止して、遅延した古い結果を盤面へ適用しない。Workerが返した`selectedAction`とPVを開始局面から逐次検証し、PVの先頭一致・深さ上限・各手の合法な再実行を通過した時だけ一手を記録して結果パネルを表示する。実盤面へ適用するのは選択手だけで、PVは「AIの読み筋」として局面ごとの棋譜表記で確認できる。通常の開始局面で`selectedAction`がない場合、PV検証、または着手適用に失敗した場合は盤面を変えずエラー表示にする。途中結果は返さない。結果パネルは最深完了反復の統計と`total*`の全反復合計を別の表示名にする
     - **AIの判断（評価内訳）**: 棋譜・AI思考結果の近くに、全画面幅で初期状態を閉じた折りたたみパネルを表示する。推奨手、評価値、時間制限AIの主変化、駒得・位置・玉の安全・守られていない駒の4項目と内訳合計を確認できる。これは直前のAI着手を選んだ探索の末端評価であり、現在表示中の盤面をUIで再評価した値ではない。2手読みも採用手への最悪応手（途中終局時はその局面）の既存`SearchEvaluationBreakdown`を返し、選択手なしなら内訳は`null`とする。探索内部は開始時の手番基準のまま、画面の評価値・各内訳・上位候補を単一の表示関数で先手基準（＋は先手有利、−は後手有利、0は互角）へ統一する。終局では通常4項目を0とし、勝敗の±∞／引き分け0が優先されることを明示する。内訳が欠落・不正・合計不一致なら「内訳は利用できません」と表示する。探索開始時は古い結果を消して「解析中」、中断・エラー・新規対局・読込・分岐切替・通常着手・終局操作・棋譜再生時は結果を破棄する。WorkerのrequestId照合と画面の世代番号／AbortSignal／開始局面による既存の遅延結果排除を内訳にも適用する。新しい評価項目や重み調整、探索仕様、保存形式の変更は行わない。

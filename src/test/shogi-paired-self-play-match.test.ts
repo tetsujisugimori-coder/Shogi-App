@@ -296,6 +296,8 @@ describe('runPairedSelfPlayMatch', () => {
       a: { search, settings: { maxDepth: 1 } }, b: { search, settings: { maxDepth: 2 } } });
     expectSummary(result, ['max_plies', 'max_plies']);
     expect(new Set(clocks).size).toBe(4);
-    expect(result.games.map((g) => g.result.plies.map((p) => p.timedOut))).toEqual([[false, true], [true, false]]);
+    expect(result.games.map((g) => g.result.plies.map((p) => p.timedOut))).toEqual([[true, true], [true, true]]);
+    expect(result.games.every((g) => g.result.plies.every((p) => p.completedDepth === 0 &&
+      p.resultSource === 'fallback'))).toBe(true);
   });
 });

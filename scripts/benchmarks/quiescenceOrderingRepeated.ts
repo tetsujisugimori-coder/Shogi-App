@@ -184,7 +184,7 @@ export function summarizeRepeatedCase(entry: RepeatedCase) {
       maxDepthReached: entry.mode === 'timed' ? trials.filter(t => t.search!.depth === 4).length : null,
       timedOut: entry.mode === 'timed' ? trials.filter(t => 'timedOut' in t.search! && t.search.timedOut).length : null,
       actions: frequencies(trials, t => rawJson(t.search!.selectedAction), t => t.pv?.[0] ?? '手なし'),
-      evaluations: frequencies(trials, t => formatSenteEvaluation(t.search!.selectedEvaluation ?? t.search!.evaluationBreakdown.total, entry.turn!)),
+      evaluations: frequencies(trials, t => formatSenteEvaluation(t.search!.selectedEvaluation ?? t.search!.evaluationBreakdown?.total ?? null, entry.turn!)),
       changesFromFirst: changeCounts(trials), deepest: statistics(false),
       completedTotals: entry.mode === 'timed' ? statistics(true) : null,
     };
@@ -205,8 +205,11 @@ export function summarizeRepeatedCase(entry: RepeatedCase) {
 
 export function formatRepeatedTrial(entry: RepeatedCase, trial: Trial) {
   return `TRIAL ${rawJson({ position: entry.position.id, mode: entry.mode, extension: entry.extension, ...trial,
-    senteEvaluation: trial.ok && trial.search ? formatSenteEvaluation(trial.search.selectedEvaluation ?? trial.search.evaluationBreakdown.total, entry.turn!) : null,
-    selectedActionLabel: trial.pv?.[0] ?? '手なし', pvLabel: trial.pv?.join(' ') || '手順なし',
+    senteEvaluation: trial.ok && trial.search ? formatSenteEvaluation(trial.search.selectedEvaluation ?? trial.search.evaluationBreakdown?.total ?? null, entry.turn!) : null,
+    selectedActionLabel: trial.pv?.[0] ?? '手なし',
+    pvLabel: trial.search !== null && typeof trial.search === 'object' &&
+      'resultSource' in trial.search && trial.search.resultSource === 'fallback'
+      ? '未探索' : trial.pv?.join(' ') || '手順なし',
     maxDepthReached: trial.search && typeof trial.search === 'object' && 'iterations' in trial.search ? trial.search.completedDepth === 4 : null,
   })}`;
 }

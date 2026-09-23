@@ -23,7 +23,8 @@ describe('同一時間の静止探索比較ドメイン', () => {
     const found = analyzeTimeLimitedQuiescenceComparison(state, 4, 1000, clock, search);
     expect(events).toEqual(['start', 'end', 'start', 'end', 'start', 'end']);
     expect(found.map(r => r.quiescenceMaxTacticalDepth)).toEqual([null, 1, 2]);
-    expect(found.map(r => r.completedDepth)).toEqual([1, 1, 1]);
+    expect(found.map(r => r.completedDepth)).toEqual([0, 0, 0]);
+    expect(found.map(r => r.resultSource)).toEqual(['fallback', 'fallback', 'fallback']);
     expect(found.map(r => r.elapsedMilliseconds)).toEqual([2400, 2400, 2400]);
     expect(starts).toEqual([0, 3000, 6000]);
     expect(new Set(search.mock.calls.map(c => c[0])).size).toBe(3);

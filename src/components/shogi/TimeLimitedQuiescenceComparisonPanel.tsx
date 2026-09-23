@@ -31,7 +31,7 @@ export function TimeLimitedQuiescenceComparisonPanel({ display, state }: {
   return <section aria-labelledby="time-limited-quiescence-title" className="mx-auto mt-4 w-full min-w-0 max-w-6xl rounded border border-sky-800/70 bg-sky-950/30 p-3 text-xs text-sky-100 [overflow-wrap:anywhere]">
     <h2 id="time-limited-quiescence-title" className="font-serif text-sm">同一時間の静止探索比較</h2>
     <p className="mt-2 text-stone-300">同一局面・標準評価・最大深さ4で、各条件に独立した1秒を与えて順番に解析します。盤面には着手しません。</p>
-    <p className="mt-1 text-stone-400">全体では約3秒以上かかる場合があります。深さ1の最低保証と協調的な期限確認のため、各条件も1秒を超える場合があります。</p>
+    <p className="mt-1 text-stone-400">全体では約3秒以上かかる場合があります。各条件は深さ1から協調的に期限を確認しますが、単一の同期処理やOS負荷により1秒を超える場合があります。</p>
     <p className="mt-1 text-stone-400">時間だけで棋力や設定の優劣を判断せず、最適設定を自動選択しません。主変化は完了深さに静止探索の追加手数を加えた長さまで伸びる場合があります。</p>
     <p className="mt-1 text-stone-400">参考処理時間は探索API全体（未完了反復を含む）です。Worker起動・通信・描画は含みません。統計は完了反復のみです。</p>
     {state.kind === 'thinking' && <p role="status" className="mt-2">静止探索の3条件を順番に解析中（各1秒）</p>}
@@ -46,12 +46,13 @@ export function TimeLimitedQuiescenceComparisonPanel({ display, state }: {
             <h3 className="text-sm font-semibold">{name}</h3>
             <dl className="grid grid-cols-2 gap-2">
               <dt>推奨手</dt><dd>{principalVariationNotations[0] ?? '指せる手はありません'}</dd>
-              <dt>評価値</dt><dd>先手 {formatSenteEvaluation(result.selectedEvaluation ?? result.evaluationBreakdown.total, display.perspective)}</dd>
+              <dt>評価値</dt><dd>{result.resultSource === 'fallback' ? '未評価' : `先手 ${formatSenteEvaluation(result.selectedEvaluation ?? result.evaluationBreakdown?.total ?? null, display.perspective)}`}</dd>
               <dt>完了深さ／指定最大深さ</dt><dd>{result.completedDepth} / {result.requestedMaxDepth} ply</dd>
               <dt>時間切れ</dt><dd>{result.timedOut ? 'あり' : 'なし（最大深さ完了）'}</dd>
               <dt>API全体の参考処理時間</dt><dd>{result.elapsedMilliseconds.toFixed(1)} ms</dd>
             </dl>
-            <div><h4>主変化</h4>{principalVariationNotations.length > 0
+            <div><h4>主変化</h4>{result.resultSource === 'fallback'
+              ? <p>未探索</p> : principalVariationNotations.length > 0
               ? <ol className="mt-1 list-decimal space-y-1 pl-5">{principalVariationNotations.map((notation, index) => <li key={index}>{notation}</li>)}</ol>
               : <p>手順なし</p>}</div>
             {([false, true] as const).map((total) => <Fragment key={String(total)}>

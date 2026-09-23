@@ -50,6 +50,8 @@ import {
   analyzeTwoPlyMinimaxSearch,
   cloneBoardState,
   executeLegalAction,
+  getLegalActions,
+  areLegalActionsEqual,
   MAX_SHOGI_GAME_RECORD_SESSION_FILE_BYTES,
   MAX_KIF_FILE_BYTES,
   PromotionStatus,
@@ -1003,8 +1005,10 @@ export const ShogiResearchScreen: React.FC<ShogiResearchScreenProps> = ({
       if (!isSameComparisonPosition(snapshot, job.state)) throw new Error('比較の開始局面が変更されました。');
       validateTimeLimitedQuiescenceComparison(snapshot, TIME_LIMITED_QUIESCENCE_COMPARISON_MAX_DEPTH, TIME_LIMITED_QUIESCENCE_COMPARISON_MILLISECONDS, results);
       const entries = results.map((result) => ({ result,
-        principalVariationNotations: result.selectedAction
-          ? validateAndFormatPrincipalVariation(snapshot, result, result.depth + (result.quiescenceMaxTacticalDepth ?? 0))! : [],
+        principalVariationNotations: result.resultSource === 'fallback'
+          ? result.selectedAction ? [formatLegalActionNotation(snapshot, result.selectedAction)] : []
+          : result.selectedAction
+            ? validateAndFormatPrincipalVariation(snapshot, result, result.depth + (result.quiescenceMaxTacticalDepth ?? 0))! : [],
       }));
       activeWorkerSearchRef.current = null;
       setTimeLimitedQuiescenceComparisonDisplay({ perspective: snapshot.turn, entries });
@@ -1124,7 +1128,15 @@ export const ShogiResearchScreen: React.FC<ShogiResearchScreenProps> = ({
           return;
         }
 
-        const principalVariationNotations = validateAndFormatPrincipalVariation(searchState, result, result.completedDepth);
+        const rootActions = result.resultSource === 'fallback' ? getLegalActions(searchState) : null;
+        const fallbackValid = rootActions !== null && result.completedDepth === 0 && result.depth === 0 &&
+          result.iterations.length === 0 && result.rootLegalActionCount === rootActions.length &&
+          result.selectedEvaluation === null && result.evaluationBreakdown === null &&
+          result.principalVariation.length === 0 && result.timedOut &&
+          rootActions[0] !== undefined && areLegalActionsEqual(rootActions[0], result.selectedAction);
+        const principalVariationNotations = result.resultSource === 'fallback'
+          ? fallbackValid ? [] : null
+          : validateAndFormatPrincipalVariation(searchState, result, result.completedDepth);
         if (!principalVariationNotations) {
           activeWorkerSearchRef.current = null;
           setWorkerSearchState({
@@ -1148,7 +1160,9 @@ export const ShogiResearchScreen: React.FC<ShogiResearchScreenProps> = ({
           return;
         }
 
-        const selectedNotation = principalVariationNotations[0];
+        const selectedNotation = result.resultSource === 'fallback'
+          ? formatLegalActionNotation(searchState, result.selectedAction)
+          : principalVariationNotations[0];
         setBoardState(execution.state);
         setSelection({ kind: 'none' });
         setPendingPromotion(null);

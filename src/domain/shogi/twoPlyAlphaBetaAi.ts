@@ -131,10 +131,15 @@ export interface IterativeDeepeningAlphaBetaSearchResult extends AlphaBetaSearch
  * The top-level elapsed time includes work discarded from an interrupted pass.
  */
 export interface TimeLimitedIterativeDeepeningAlphaBetaSearchResult
-  extends IterativeDeepeningAlphaBetaSearchResult {
+  extends Omit<IterativeDeepeningAlphaBetaSearchResult, 'evaluationBreakdown'> {
+  /** Null only when no iteration completed; no leaf was evaluated for the fallback. */
+  evaluationBreakdown: SearchEvaluationBreakdown | null;
   requestedMaxDepth: number;
+  /** Zero means no iteration completed. */
   completedDepth: number;
+  /** True when the deadline interrupted or prevented a requested iteration. */
   timedOut: boolean;
+  resultSource: 'completed-iteration' | 'fallback';
 }
 
 /** Backward-compatible measurements for the established two-ply API. */
@@ -559,7 +564,8 @@ function searchAlphaBeta(
   interruptionCheck: SearchInterruptionCheck = undefined,
   moveOrdering: AlphaBetaMoveOrderingMode = 'standard',
   quiescenceOptions: AlphaBetaQuiescenceOptions | undefined = undefined,
-  killerMoveHistory: KillerMoveHistory | undefined = undefined
+  killerMoveHistory: KillerMoveHistory | undefined = undefined,
+  suppliedRootActions: readonly LegalAction[] | undefined = undefined
 ): UnmeasuredAlphaBetaSearchResult {
   validateSearchDepth(depth);
   const rootPlayer = state.turn;
@@ -586,7 +592,7 @@ function searchAlphaBeta(
     };
   }
 
-  const rootActions = getLegalActions(state);
+  const rootActions = suppliedRootActions ?? getLegalActions(state);
   if (rootActions.length === 0) {
     const evaluationBreakdown = evaluateSearchPositionBreakdown(state, rootPlayer, valueTable);
     return {
@@ -784,10 +790,9 @@ export function analyzeIterativeDeepeningAlphaBetaSearch(
 }
 
 /**
- * Completes depth 1, then searches deeper iterative passes only while the
- * supplied time limit remains. An interrupted pass is discarded completely so
- * the returned action, fixed-depth statistics, and iteration totals always
- * describe completed work.
+ * Reserves the first root legal action before searching. Every depth uses the
+ * same cooperative deadline. A single synchronous operation (including legal
+ * action generation) cannot be preempted between checks.
  */
 export function analyzeTimeLimitedIterativeDeepeningAlphaBetaSearch(
   state: BoardState,
@@ -803,6 +808,8 @@ export function analyzeTimeLimitedIterativeDeepeningAlphaBetaSearch(
   validateIterativeDeepeningMaxDepth(maxDepth);
   validateSearchTimeLimitMilliseconds(timeLimitMilliseconds);
   const startedAt = clock();
+  const rootActions = getLegalActions(state);
+  const fallbackAction = rootActions[0] ?? null;
   const iterations: IterativeDeepeningAlphaBetaIterationResult[] = [];
   let previousBestAction: LegalAction | null = null;
   const killerMoveHistory = killerMoves ? new KillerMoveHistory() : undefined;
@@ -810,11 +817,7 @@ export function analyzeTimeLimitedIterativeDeepeningAlphaBetaSearch(
 
   for (let depth = 1; depth <= maxDepth; depth += 1) {
     try {
-      // Depth 1 is deliberately exempt: it is the legal-action fallback even
-      // for a zero-millisecond limit. All later passes check before beginning.
-      if (depth >= 2) {
-        throwIfSearchTimeLimitReached(clock, startedAt, timeLimitMilliseconds);
-      }
+      throwIfSearchTimeLimitReached(clock, startedAt, timeLimitMilliseconds);
 
       const iterationStartedAt = clock();
       const searchResult = searchAlphaBeta(
@@ -822,17 +825,14 @@ export function analyzeTimeLimitedIterativeDeepeningAlphaBetaSearch(
         depth,
         valueTable,
         previousBestAction,
-        depth >= 2
-          ? () => throwIfSearchTimeLimitReached(clock, startedAt, timeLimitMilliseconds)
-          : undefined,
+        () => throwIfSearchTimeLimitReached(clock, startedAt, timeLimitMilliseconds),
         moveOrdering,
         quiescenceOptions,
-        killerMoveHistory
+        killerMoveHistory,
+        rootActions
       );
       const iterationFinishedAt = clock();
-      if (depth >= 2) {
-        throwIfSearchTimeLimitReachedAt(iterationFinishedAt, startedAt, timeLimitMilliseconds);
-      }
+      throwIfSearchTimeLimitReachedAt(iterationFinishedAt, startedAt, timeLimitMilliseconds);
       const iteration = {
         ...searchResult,
         principalVariation: clonePrincipalVariation(searchResult.principalVariation),
@@ -852,13 +852,28 @@ export function analyzeTimeLimitedIterativeDeepeningAlphaBetaSearch(
 
   const deepestIteration = iterations[iterations.length - 1];
   return {
-    ...deepestIteration,
-    principalVariation: clonePrincipalVariation(deepestIteration.principalVariation),
-    evaluationBreakdown: cloneSearchEvaluationBreakdown(deepestIteration.evaluationBreakdown),
+    ...(deepestIteration ?? {
+      selectedAction: fallbackAction === null ? null : cloneLegalAction(fallbackAction),
+      selectedEvaluation: null,
+      principalVariation: [],
+      evaluationBreakdown: null,
+      rootLegalActionCount: rootActions.length,
+      visitedPositionCount: 0,
+      depth: 0,
+      cutoffCount: 0,
+      skippedActionCount: 0,
+      quiescenceLeafCount: 0,
+      quiescenceVisitedPositionCount: 0,
+      quiescenceCutoffCount: 0,
+      quiescenceSkippedActionCount: 0,
+    }),
+    principalVariation: deepestIteration ? clonePrincipalVariation(deepestIteration.principalVariation) : [],
+    evaluationBreakdown: deepestIteration ? cloneSearchEvaluationBreakdown(deepestIteration.evaluationBreakdown) : null,
     elapsedMilliseconds: Math.max(0, clock() - startedAt),
     requestedMaxDepth: maxDepth,
-    completedDepth: deepestIteration.depth,
+    completedDepth: deepestIteration?.depth ?? 0,
     timedOut,
+    resultSource: deepestIteration ? 'completed-iteration' : 'fallback',
     iterations,
     totalVisitedPositionCount: iterations.reduce(
       (total, iteration) => total + iteration.visitedPositionCount,

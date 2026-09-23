@@ -25,14 +25,15 @@ export function AiJudgmentPanel({ search, thinking }: AiJudgmentPanelProps) {
         <div className="mt-2 min-w-0 space-y-3 break-words [overflow-wrap:anywhere]">
           <p>評価設定: {isSearchEvaluationPresetId(search.result.evaluationPresetId)
             ? SEARCH_EVALUATION_PRESET_DISPLAY[search.result.evaluationPresetId].name : '不明'}</p>
-          <p className="text-stone-400">内訳は評価係数を適用した後の寄与値です。</p>
+          {breakdown && <><p className="text-stone-400">内訳は評価係数を適用した後の寄与値です。</p>
           <p className="text-stone-300">先手基準：＋は先手有利、−は後手有利、0は互角です。</p>
-          <p className="text-stone-400">直前のAI着手を選んだ探索の末端評価です。現在の盤面そのものの評価ではありません。</p>
+          <p className="text-stone-400">直前のAI着手を選んだ探索の末端評価です。現在の盤面そのものの評価ではありません。</p></>}
           <dl className="grid grid-cols-[minmax(0,1fr)_minmax(0,1fr)] gap-x-3 gap-y-2">
             <dt>推奨手</dt><dd>{search.selectedNotation}</dd>
-            <dt>評価値</dt><dd>先手 {formatSenteEvaluation(search.result.selectedEvaluation, search.perspective)}</dd>
+            <dt>評価値</dt><dd>{search.kind === 'time-limited-worker' && search.result.resultSource === 'fallback'
+              ? '未評価（合法手を選択）' : `先手 ${formatSenteEvaluation(search.result.selectedEvaluation, search.perspective)}`}</dd>
           </dl>
-          {search.kind === 'time-limited-worker' && (
+          {search.kind === 'time-limited-worker' && search.result.resultSource === 'completed-iteration' && (
             <div>
               <h3 className="font-medium">AIの読み筋</h3>
               <p className="mt-1 text-stone-400">完了深さ {search.result.completedDepth} ply 中 {search.principalVariationNotations.length} 手順</p>

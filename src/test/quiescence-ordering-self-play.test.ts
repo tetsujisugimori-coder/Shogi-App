@@ -34,7 +34,7 @@ function searchFixture(state: BoardState, material = false): alphaBeta.TimeLimit
     quiescenceCutoffCount: index + 6, quiescenceSkippedActionCount: index + 7,
   }));
   return { ...iterations.at(-1)!, iterations, completedDepth, requestedMaxDepth: 4,
-    timedOut: !material, elapsedMilliseconds: material ? 7 : 5,
+    timedOut: !material, resultSource: 'completed-iteration', elapsedMilliseconds: material ? 7 : 5,
     ...Object.fromEntries(statisticKeys.map(([key, sum]) => [sum, iterations.reduce((n, r) => n + r[key], 0)])) as
       Record<typeof statisticKeys[number][1], number>,
   };

@@ -6,6 +6,7 @@ import userEvent from '@testing-library/user-event';
 import { describe, expect, it, vi } from 'vitest';
 import { ShogiResearchScreen } from '../components/shogi/ShogiResearchScreen';
 import {
+  analyzeTimeLimitedIterativeDeepeningAlphaBetaSearch,
   executeLegalAction,
   executeMove,
   getLegalActions,
@@ -74,6 +75,7 @@ function workerResult(selectedAction: LegalAction | null): PresetTimeLimitedSear
     requestedMaxDepth: 4,
     completedDepth: 3,
     timedOut: true,
+    resultSource: 'completed-iteration',
   };
 }
 
@@ -123,6 +125,25 @@ function createFourMoveState() {
 }
 
 describe('時間制限Worker AIの盤面UI接続', () => {
+  it('深さ1未完了のfallback手を着手し、評価値とPVを捏造して表示しない', async () => {
+    const fallback = analyzeTimeLimitedIterativeDeepeningAlphaBetaSearch(
+      createInitialBoardState(), 4, 0, undefined, () => 0
+    );
+    const result: PresetTimeLimitedSearchResult = {
+      ...fallback, evaluationPresetId: DEFAULT_SEARCH_EVALUATION_PRESET_ID,
+      quiescenceMaxTacticalDepth: null,
+    };
+    const user = userEvent.setup();
+    render(<ShogiResearchScreen workerSearchRunner={vi.fn().mockResolvedValue(result)} />);
+    await user.click(workerButton());
+    expect(document.getElementById('shogi-research-screen')).toHaveAttribute('data-history-count', '1');
+    expect(document.getElementById('shogi-research-screen')).toHaveAttribute('data-ai-search-depth', '0');
+    expect(screen.getByText('合法手 fallback')).toBeVisible();
+    await user.click(screen.getByText('AIの判断'));
+    expect(screen.getByText('未評価（合法手を選択）')).toBeVisible();
+    expect(screen.queryByText('AIの読み筋')).not.toBeInTheDocument();
+  });
+
   it('静止探索は初期状態で無効、選択値を固定してWorkerへ渡し、変更時に古い結果を消去する', async () => {
     const user = userEvent.setup();
     const first = deferred<PresetTimeLimitedSearchResult>();

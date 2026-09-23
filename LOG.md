@@ -1,5 +1,14 @@
 # SHOGI-APP 開発ログ
 
+## [2026-09-24 JST] 時間制限付き反復深化αβ探索を深さ1から期限対象へ変更
+
+- PR #150マージ後の`main`（`4577e31`）を基点とした。探索高速化・評価・手順モードは変更しない。`src/domain/shogi/twoPlyAlphaBetaAi.ts`では時計をroot合法手生成の前に開始し、既存順序の先頭合法手をfallbackにする。root合法手配列は各反復へ渡して重複生成を避ける。深さ1も以降の反復と同じinterruptionCheckを受け、root候補、通常探索、手並べ替え、SEE、静止探索、再探索に既存の中断経路を通す。各反復の終了直後も期限判定し、未完了反復は結果・統計に入れない。
+- `TimeLimitedIterativeDeepeningAlphaBetaSearchResult`は評価内訳だけnullableに変更し、`resultSource`で完了反復とfallbackを区別する。探索未完了は`completedDepth=depth=0`、`iterations=[]`、合法手があれば先頭手、`selectedEvaluation=null`、`evaluationBreakdown=null`、空PV、最深・合計の完了統計0、`timedOut=true`とする。終局／合法手なしのfallback手はnull。完了反復がある場合、最深統計は最後の完了反復、`total*`は完了反復の合計という既存の意味を維持する。最上位の`elapsedMilliseconds`はroot合法手生成と未完了探索を含むAPI内経過時間である。
+- Workerの要求・成功応答は新結果型をそのまま構造化クローンする。内部deadlineは成功応答の`timedOut`であり、外部`AbortSignal`のWorker終了・rejectとは区別する。通常対局のUIはfallback手を合法性確認して着手し、未評価と表示してPV・内訳を作らない。時間制限付き静止探索比較のvalidatorと表示も深さ0を受け入れる。self-playの棋譜は通常の合法着手として保存し、探索メタデータに`resultSource='fallback'`、深さ0、timeout、評価なし、空PVを保存する。既存の記録でsource未指定の経路は従来形式のままにする。
+- PR #150の測定を同じ条件で直列再実行し、生データを`docs/benchmarks/time-limit-stress-cooperative-20260924.jsonl`へ保存した。問題の保存済み実対局50手＋静止追加1手＋100msは、変更前の本測定5/5が344.20～366.78ms（中央値355.93ms、深さ1完了）から、変更後5/5が100.51～103.24ms（中央値102.00ms、深さ0 fallback）となった。300ms以上は5/5→0/5。変更後の100ms本測定全50回は100.08～106.51ms、300ms以上0回、深さ0 fallback 25回／深さ1完了20回／深さ2完了5回。`depthOneElapsedMilliseconds`は深さ1未完了時にnullを記録する。
+- 偽clockで0ms、合法手準備後の期限、深さ1途中、深さ1の静止探索中断、完了深さへの復帰、maxDepth完了、終局、fallback決定性、凍結入力を検証した。Worker経由の深さ0構造化クローン、通常対局UIの着手・未評価表示、self-play記録のsourceも検証した。100ms/1,000msはhard realtime上限ではなく、合法手生成・deadline確認間の単一同期処理、OS負荷、JIT、GCは強制中断できない。未完了探索量の別集計やWorker強制terminateによる期限制御、棋力改善は今回の対象外とする。
+- `npm run check`は終了0。lockfile検証、TypeScript型検査、全61ファイル・1,735テスト、Vite本番buildが成功した。初回の全体チェックは旧深さ1保証を仮定する偽clockテストと無効ベンチ結果の表示処理で7件失敗し、契約差と表示経路の実装不備を区別して修正した。該当6ファイル118件を再実行して成功し、その後の全体チェックで成功を確認した。
+
 ## [2026-09-23 JST] 時間制限付きαβ探索の候補手ごとの重複複製を削減
 
 - `src/domain/shogi/twoPlyAlphaBetaAi.ts`と`src/domain/shogi/quiescenceSearch.ts`の`executeSearchAction()`で、`executeLegalAction()`前の局面全体複製を削除した。公開着手APIは着手の合法性を再確認し、盤・履歴・終局判定を入力を変更せず新局面に構築する。深さ1保証、深さ2以降の協調的期限確認、未完了反復の破棄、Worker/UI/実対局CLIの設定・結果型は変更していない。

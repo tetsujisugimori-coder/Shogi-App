@@ -10,7 +10,7 @@ import { analyzeAlphaBetaSearch, analyzeTimeLimitedIterativeDeepeningAlphaBetaSe
 import type { SearchClock } from '../../src/domain/shogi/twoPlyMinimaxAi';
 import { validateQuiescenceComparison } from '../../src/application/quiescenceComparisonValidation';
 import { validateTimeLimitedQuiescenceComparison } from '../../src/application/timeLimitedQuiescenceComparisonValidation';
-import { validateAndFormatPrincipalVariation } from '../../src/application/searchPrincipalVariation';
+import { formatLegalActionNotation, validateAndFormatPrincipalVariation } from '../../src/application/searchPrincipalVariation';
 import { formatSenteEvaluation } from '../../src/components/shogi/searchEvaluationDisplay';
 import { QUIESCENCE_BENCHMARK_POSITIONS, type BenchmarkPosition } from './quiescencePositions';
 
@@ -88,7 +88,8 @@ export function runBenchmarkSuite(modes: readonly BenchmarkMode[], dependencies:
   return cases;
 }
 
-function stats(result: AlphaBetaSearchResult) {
+function stats(result: Pick<AlphaBetaSearchResult, 'visitedPositionCount' | 'cutoffCount' | 'skippedActionCount' |
+  'quiescenceLeafCount' | 'quiescenceVisitedPositionCount' | 'quiescenceCutoffCount' | 'quiescenceSkippedActionCount'>) {
   return [result.visitedPositionCount, result.cutoffCount, result.skippedActionCount,
     result.quiescenceLeafCount, result.quiescenceVisitedPositionCount, result.quiescenceCutoffCount, result.quiescenceSkippedActionCount];
 }
@@ -106,10 +107,12 @@ export function formatBenchmarkCase(entry: BenchmarkCase): string {
   const lines = [`\n## ${entry.mode} / ${entry.position.id} / ${entry.position.name}`, entry.position.observation];
   if (!entry.ok) return [...lines, `ERROR: ${entry.error}`].join('\n');
   for (const result of entry.results) {
-    const pv = result.selectedAction === null ? [] : validateAndFormatPrincipalVariation(entry.state, result,
-      Math.max(result.depth, result.principalVariation.length), true);
+    const pv = result.selectedAction === null ? [] : 'resultSource' in result && result.resultSource === 'fallback'
+      ? [formatLegalActionNotation(entry.state, result.selectedAction)]
+      : validateAndFormatPrincipalVariation(entry.state, result,
+        Math.max(result.depth, result.principalVariation.length), true);
     if (!pv) throw new Error(`position=${entry.position.id} mode=${entry.mode} setting=${result.quiescenceMaxTacticalDepth ?? 'disabled'}: PV表示検証失敗`);
-    lines.push(`- ${settingName(result.quiescenceMaxTacticalDepth)}: 推奨手=${pv[0] ?? '手なし'}; 先手評価=${formatSenteEvaluation(result.selectedEvaluation ?? result.evaluationBreakdown.total, entry.state.turn)}; PV=${pv.join(' ') || '手順なし'}; 参考時間=${result.elapsedMilliseconds.toFixed(1)}ms`);
+    lines.push(`- ${settingName(result.quiescenceMaxTacticalDepth)}: 推奨手=${pv[0] ?? '手なし'}; 先手評価=${formatSenteEvaluation(result.selectedEvaluation ?? result.evaluationBreakdown?.total ?? null, entry.state.turn)}; PV=${'resultSource' in result && result.resultSource === 'fallback' ? '未探索' : pv.join(' ') || '手順なし'}; 参考時間=${result.elapsedMilliseconds.toFixed(1)}ms`);
     if ('completedDepth' in result) {
       lines.push(`  完了深さ=${result.completedDepth}/${result.requestedMaxDepth}; 時間切れ=${result.timedOut ? 'あり' : 'なし'}`,
         `  最深完了反復: ${formatStats(stats(result))}`, `  全完了反復合計: ${formatStats(totalStats(result))}`);
