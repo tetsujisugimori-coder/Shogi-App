@@ -6,6 +6,7 @@ import { analyzeAlphaBetaSearch } from '../domain/shogi/twoPlyAlphaBetaAi';
 import { QUIESCENCE_ORDERING_SELF_PLAY_SCENARIOS, type SelfPlayScenario } from '../../scripts/benchmarks/quiescenceOrderingSelfPlayScenarios';
 import { defaultSuiteComparisonConfig, formatSuiteComparison, parseSuiteComparisonMode, runSuiteComparison,
   runSuiteComparisonCli, serializeSuiteComparison, defaultKillerMoveSuiteComparisonConfig,
+  parseKillerMoveSuiteComparisonCliArguments, runKillerMoveSuiteComparisonCli,
   type SuiteComparisonDependencies } from '../../scripts/benchmarks/quiescenceOrderingSuiteComparison';
 import type { SearchResult } from '../../scripts/benchmarks/quiescenceOrderingSuite';
 
@@ -152,8 +153,8 @@ describe('multi-position A/B search suite comparison', () => {
     const serialized = serializeSuiteComparison(result);
     expect(JSON.parse(serialized).positions[0].candidate.selectedEvaluation).toBe('Infinity');
     const text = formatSuiteComparison(result);
-    expect(text).toMatch(/^A\/B 探索設定スイート比較\n対象局面=1;/);
-    expect(text).toContain('局面別の主な差分:');
+    expect(text).toMatch(/^A\/B 探索設定スイート比較\nmode=fixed; timeLimitMilliseconds=1000; maxDepth=4/);
+    expect(text).toContain('局面別の本測定:');
     expect(text).toContain('standard-hirate: 手=baseline-action→candidate-action');
   });
 
@@ -170,10 +171,91 @@ describe('multi-position A/B search suite comparison', () => {
 
   it('builds a balanced killer OFF/ON configuration without changing quiescence or ordinary ordering', () => {
     const config = defaultKillerMoveSuiteComparisonConfig('timed');
-    expect(config.baseline).toEqual({ id: 'killer-off', setting: { maxTacticalDepth: 1, moveOrdering: 'original', killerMoves: false } });
-    expect(config.candidate).toEqual({ id: 'killer-on', setting: { maxTacticalDepth: 1, moveOrdering: 'original', killerMoves: true } });
+    expect(config).toMatchObject({ mode: 'timed', timeLimitMilliseconds: 1000, maxDepth: 4,
+      baseline: { id: 'killer-off', setting: { maxTacticalDepth: 1, moveOrdering: 'original', killerMoves: false } },
+      candidate: { id: 'killer-on', setting: { maxTacticalDepth: 1, moveOrdering: 'original', killerMoves: true } } });
     const result = runSuiteComparison(config, fixtureDependencies(), [QUIESCENCE_ORDERING_SELF_PLAY_SCENARIOS[0]]);
     expect(result.positions[0].ok).toBe(true);
+  });
+
+  it('parses killer timed budgets in either option order and preserves the legacy timed defaults', () => {
+    expect(parseKillerMoveSuiteComparisonCliArguments([])).toEqual({ mode: 'timed', timeLimitMilliseconds: 1000, maxDepth: 4 });
+    expect(parseKillerMoveSuiteComparisonCliArguments(['timed'])).toEqual({ mode: 'timed', timeLimitMilliseconds: 1000, maxDepth: 4 });
+    expect(parseKillerMoveSuiteComparisonCliArguments(['timed', '--time-limit-ms', '5000', '--max-depth', '4']))
+      .toEqual({ mode: 'timed', timeLimitMilliseconds: 5000, maxDepth: 4 });
+    expect(parseKillerMoveSuiteComparisonCliArguments(['--max-depth', '4', '--time-limit-ms', '10000', 'timed']))
+      .toEqual({ mode: 'timed', timeLimitMilliseconds: 10000, maxDepth: 4 });
+    expect(parseSuiteComparisonMode([])).toBe('timed');
+    expect(parseSuiteComparisonMode(['fixed'])).toBe('fixed');
+    expect(parseSuiteComparisonMode(['timed'])).toBe('timed');
+  });
+
+  it('rejects malformed, duplicate, unknown, and fixed-mode timed-only killer CLI arguments before running', () => {
+    const invalid = [
+      ['timed', '--time-limit-ms'], ['timed', '--time-limit-ms', '0'], ['timed', '--time-limit-ms', '-1'],
+      ['timed', '--time-limit-ms', '1.5'], ['timed', '--time-limit-ms', 'NaN'], ['timed', '--time-limit-ms', 'Infinity'],
+      ['timed', '--time-limit-ms', 'word'], ['timed', '--time-limit-ms', '5', '--time-limit-ms', '6'],
+      ['timed', '--max-depth', '0'], ['timed', '--max-depth', '-1'], ['timed', '--max-depth', '1.5'],
+      ['timed', '--max-depth', 'NaN'], ['timed', '--max-depth', 'Infinity'], ['timed', '--max-depth', 'word'],
+      ['timed', '--max-depth', '4', '--max-depth', '5'], ['timed', '--unexpected'],
+      ['fixed', '--time-limit-ms', '5000'], ['fixed', '--max-depth', '4'],
+    ];
+    for (const args of invalid) expect(() => parseKillerMoveSuiteComparisonCliArguments(args)).toThrow('Usage:');
+    let ran = false;
+    const output: string[] = [];
+    expect(runKillerMoveSuiteComparisonCli(['fixed', '--max-depth', '4'], { trialRunner: () => {
+      ran = true;
+      throw new Error('must not run');
+    } }, [], line => output.push(line))).toBe(1);
+    expect(ran).toBe(false);
+    expect(output).toEqual([expect.stringContaining('Timed-only options cannot be used')]);
+  });
+
+  it('propagates each requested timed budget identically to killer OFF and ON without mutating source settings', () => {
+    const calls: Array<{ killerMoves: boolean | undefined; timed: unknown; input: unknown; setting: Record<string, unknown> }> = [];
+    const dependencies: SuiteComparisonDependencies = {
+      trialRunner: (input, mode, setting, _dependencies, _capture, timed) => {
+        calls.push({ killerMoves: setting.killerMoves, timed, input: structuredClone(input), setting: { ...setting } });
+        const action = getLegalActions(input)[0] ?? null;
+        return { setting, search: { depth: 3, selectedAction: action, selectedEvaluation: 0, elapsedMilliseconds: 1,
+          visitedPositionCount: 1, cutoffCount: 1, skippedActionCount: 1 } as SearchResult, pv: ['fixture-action'] };
+      },
+    };
+    for (const [milliseconds, maxDepth] of [[5000, 4], [10000, 4]] as const) {
+      calls.length = 0;
+      const output: string[] = [];
+      expect(runKillerMoveSuiteComparisonCli(['timed', '--time-limit-ms', String(milliseconds), '--max-depth', String(maxDepth)],
+        dependencies, [QUIESCENCE_ORDERING_SELF_PLAY_SCENARIOS[0]], line => output.push(line))).toBe(0);
+      expect(calls).toHaveLength(22);
+      expect(calls.map((call) => call.timed)).toEqual(Array(22).fill({ timeLimitMilliseconds: milliseconds, maxDepth }));
+      expect(calls.filter((call) => call.killerMoves === false)).toHaveLength(11);
+      expect(calls.filter((call) => call.killerMoves === true)).toHaveLength(11);
+      expect(calls.map((call) => ({ ...call.setting, killerMoves: undefined }))).toEqual(Array(22).fill({ maxTacticalDepth: 1, moveOrdering: 'original', killerMoves: undefined }));
+      const json = JSON.parse(output.at(-1)!.slice('JSON '.length));
+      expect(json.config).toMatchObject({ mode: 'timed', timeLimitMilliseconds: milliseconds, maxDepth });
+      expect(output[0]).toContain(`timeLimitMilliseconds=${milliseconds}; maxDepth=${maxDepth}`);
+    }
+  });
+
+  it('aggregates only measurement completed depths in deterministic ascending distributions and emits them in text and JSON', () => {
+    const calls = new Map<boolean, number>();
+    const result = runSuiteComparison({ ...defaultKillerMoveSuiteComparisonConfig('timed'), timeLimitMilliseconds: 5000, maxDepth: 4 }, {
+      trialRunner: (input, _mode, setting) => {
+        const killerMoves = setting.killerMoves === true;
+        const call = (calls.get(killerMoves) ?? 0) + 1;
+        calls.set(killerMoves, call);
+        const measurement = call - 3;
+        const depth = measurement === 2 ? null : killerMoves ? (measurement % 2 === 0 ? 3 : 2) : (measurement % 2 === 0 ? 2 : 3);
+        return { setting, search: { depth, selectedAction: getLegalActions(input)[0] ?? null, selectedEvaluation: 0,
+          elapsedMilliseconds: 1, visitedPositionCount: 1, cutoffCount: 1, skippedActionCount: 1 } as unknown as SearchResult, pv: ['fixture-action'] };
+      },
+    }, [QUIESCENCE_ORDERING_SELF_PLAY_SCENARIOS[0]]);
+    expect(result.positions[0].baseline?.completedDepthDistribution).toEqual([{ depth: 2, count: 3 }, { depth: 3, count: 4 }]);
+    expect(result.positions[0].candidate?.completedDepthDistribution).toEqual([{ depth: 2, count: 4 }, { depth: 3, count: 3 }]);
+    const text = formatSuiteComparison(result);
+    expect(text).toContain('深さ分布=depth 2×3、depth 3×4→depth 2×4、depth 3×3');
+    expect(JSON.parse(serializeSuiteComparison(result)).positions[0].baseline.completedDepthDistribution)
+      .toEqual([{ depth: 2, count: 3 }, { depth: 3, count: 4 }]);
   });
 
   it('fails fatal duplicate scenario configuration before beginning a suite', () => {

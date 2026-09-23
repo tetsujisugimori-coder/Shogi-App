@@ -212,9 +212,11 @@ analyzeTimeLimitedIterativeDeepeningAlphaBetaSearch(state, 4, 1000, undefined, u
 npm run measure:killer-move-suite-comparison          # timed（既定）
 npm run measure:killer-move-suite-comparison -- fixed
 npm run measure:killer-move-suite-comparison -- timed
+npm run measure:killer-move-suite-comparison -- timed --time-limit-ms 5000 --max-depth 4
+npm run measure:killer-move-suite-comparison -- timed --time-limit-ms 10000 --max-depth 4
 ```
 
-このCLIは既存の固定3局面・交互実行・ウォームアップ3回・本測定8回・独立凍結スナップショットを再利用し、baseline=`killer-off` と candidate=`killer-on` のみを変えます。通常の順序は`standard`、静止探索は追加1手・`original`、評価は標準のままです。局面別・集計で選択手、評価値、完了深さ、探索局面数、cutoff、skip、経過時間、time out件数をJSONと整形テキストへ残します。fixedでは評価値の不一致を失敗にし、timedでは時間・探索量・深さをCIの性能閾値に使いません。結果は局面依存・実行環境依存の観測であり、これだけで棋力向上や既定有効化を判断しません。
+timedは`--time-limit-ms <正の整数>`と`--max-depth <1以上の整数>`を受け付け、省略時は従来どおり各呼出し独立の1,000ms・最大深さ4です。これらはfixedでは指定できず、値なし・0・負数・小数・非数・重複・未知オプションは測定開始前に使用例付きで失敗します。このCLIは既存の固定3局面・交互実行・ウォームアップ3回・本測定8回・独立凍結スナップショットを再利用し、baseline=`killer-off` と candidate=`killer-on` のみを変えます。通常の順序は`standard`、静止探索は追加1手・`original`、評価は標準のままです。局面別・集計で設定、選択手、評価値、完了深さ、測定だけの昇順深さ分布、探索局面数、cutoff、skip、経過時間、time out件数と全試行の生データをJSONと整形テキストへ残します。fixedでは評価値の不一致を失敗にし、timedでは時間・探索量・深さをCIの性能閾値に使いません。結果は局面依存・実行環境依存の観測であり、これだけで棋力向上や既定有効化を判断しません。
 
 ## 静止探索（Quiescence Search）の純粋関数基盤
 
