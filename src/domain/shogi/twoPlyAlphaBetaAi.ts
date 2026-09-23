@@ -10,6 +10,7 @@ import {
 import { analyzeQuiescenceSearchWithinBounds } from './quiescenceSearch';
 import { resolveQuiescenceMoveOrdering, type QuiescenceMoveOrderingMode } from './quiescenceOrdering';
 import { prepareStaticExchangeEvaluation } from './staticExchangeEvaluation';
+import { measured, type SearchDiagnostics } from './searchDiagnostics';
 import {
   evaluateSearchPositionBreakdown,
   resolveSearchMaterialValueTable,
@@ -327,7 +328,8 @@ function orderAlphaBetaNodeActionsByMode(
   evaluation: SearchEvaluationConfig,
   interruptionCheck: SearchInterruptionCheck,
   moveOrdering: AlphaBetaMoveOrderingMode,
-  killerMoves: readonly LegalAction[] = []
+  killerMoves: readonly LegalAction[] = [],
+  diagnostics?: SearchDiagnostics
 ): LegalAction[] {
   const killerRank = (action: LegalAction): number => {
     if (!isAlphaBetaQuietAction(state, action)) return 2;
@@ -370,8 +372,8 @@ function orderAlphaBetaNodeActionsByMode(
     let evaluateCapture: ReturnType<typeof prepareStaticExchangeEvaluation> | undefined;
     for (const candidate of captures) {
       interruptionCheck?.();
-      evaluateCapture ??= prepareStaticExchangeEvaluation(state, materialValueTable);
-      const score = evaluateCapture(candidate.action);
+      evaluateCapture ??= measured(diagnostics, 'see', () => prepareStaticExchangeEvaluation(state, materialValueTable));
+      const score = measured(diagnostics, 'see', () => evaluateCapture!(candidate.action));
       if (score === null) {
         throw new Error('Alpha-beta capture ordering contract violated: legal capture returned null SEE.');
       }
@@ -409,7 +411,8 @@ function orderIterativeDeepeningRootActionsByMode(
   previousBestAction: LegalAction | null,
   evaluation: SearchEvaluationConfig,
   interruptionCheck: SearchInterruptionCheck,
-  moveOrdering: AlphaBetaMoveOrderingMode
+  moveOrdering: AlphaBetaMoveOrderingMode,
+  diagnostics?: SearchDiagnostics
 ): LegalAction[] {
   if (previousBestAction === null) return [...actions];
 
@@ -418,7 +421,7 @@ function orderIterativeDeepeningRootActionsByMode(
 
   const previousBest = actions[previousBestIndex];
   const remainingActions = actions.filter((_, index) => index !== previousBestIndex);
-  return [previousBest, ...orderAlphaBetaNodeActionsByMode(state, remainingActions, evaluation, interruptionCheck, moveOrdering)];
+  return [previousBest, ...orderAlphaBetaNodeActionsByMode(state, remainingActions, evaluation, interruptionCheck, moveOrdering, [], diagnostics)];
 }
 
 /**
@@ -445,7 +448,8 @@ function searchAlphaBetaNode(
   moveOrdering: AlphaBetaMoveOrderingMode,
   quiescenceOptions: AlphaBetaQuiescenceOptions | undefined,
   killerMoveHistory: KillerMoveHistory | undefined,
-  ply: number
+  ply: number,
+  diagnostics?: SearchDiagnostics
 ): SearchNodeResult {
   interruptionCheck?.();
   if (state.status === 'ended') {
@@ -462,10 +466,10 @@ function searchAlphaBetaNode(
       return { evaluation: evaluationBreakdown.total, principalVariation: [], evaluationBreakdown };
     }
     statistics.quiescenceLeafCount += 1;
-    const quiescence = analyzeQuiescenceSearchWithinBounds(
+    const quiescence = measured(diagnostics, 'quiescence', () => analyzeQuiescenceSearchWithinBounds(
       state, rootPlayer, quiescenceOptions.maxTacticalDepth, valueTable, interruptionCheck, alpha, beta,
       quiescenceOptions.moveOrdering
-    );
+    ));
     statistics.quiescenceVisitedPositionCount += quiescence.visitedPositionCount;
     statistics.quiescenceCutoffCount += quiescence.cutoffCount;
     statistics.quiescenceSkippedActionCount += quiescence.skippedActionCount;
@@ -476,9 +480,10 @@ function searchAlphaBetaNode(
     };
   }
 
-  const actions = orderAlphaBetaNodeActionsByMode(
-    state, getLegalActions(state), valueTable, interruptionCheck, moveOrdering, killerMoveHistory?.actionsAt(ply)
-  );
+  const legalActions = measured(diagnostics, 'normal-legal', () => getLegalActions(state));
+  const actions = measured(diagnostics, 'normal-order', () => orderAlphaBetaNodeActionsByMode(
+    state, legalActions, valueTable, interruptionCheck, moveOrdering, killerMoveHistory?.actionsAt(ply), diagnostics
+  ));
   // All reachable no-legal-action positions are marked ended by the existing
   // rules. Treat a malformed in-progress position as a leaf as well, rather
   // than recursing forever or throwing after a valid API result of [].
@@ -497,7 +502,7 @@ function searchAlphaBetaNode(
   let hasExploredAction = false;
   for (let actionIndex = 0; actionIndex < actions.length; actionIndex += 1) {
     interruptionCheck?.();
-    const child = executeSearchAction(state, actions[actionIndex]);
+    const child = measured(diagnostics, 'normal-execute', () => executeSearchAction(state, actions[actionIndex]));
     statistics.visitedPositionCount += 1;
     const childResult = searchAlphaBetaNode(
       child,
@@ -512,7 +517,8 @@ function searchAlphaBetaNode(
       moveOrdering,
       quiescenceOptions,
       killerMoveHistory,
-      ply + 1
+      ply + 1,
+      diagnostics
     );
 
     const candidatePrincipalVariation = [
@@ -565,7 +571,8 @@ function searchAlphaBeta(
   moveOrdering: AlphaBetaMoveOrderingMode = 'standard',
   quiescenceOptions: AlphaBetaQuiescenceOptions | undefined = undefined,
   killerMoveHistory: KillerMoveHistory | undefined = undefined,
-  suppliedRootActions: readonly LegalAction[] | undefined = undefined
+  suppliedRootActions: readonly LegalAction[] | undefined = undefined,
+  diagnostics?: SearchDiagnostics
 ): UnmeasuredAlphaBetaSearchResult {
   validateSearchDepth(depth);
   const rootPlayer = state.turn;
@@ -592,7 +599,7 @@ function searchAlphaBeta(
     };
   }
 
-  const rootActions = suppliedRootActions ?? getLegalActions(state);
+  const rootActions = suppliedRootActions ?? measured(diagnostics, 'root-legal', () => getLegalActions(state));
   if (rootActions.length === 0) {
     const evaluationBreakdown = evaluateSearchPositionBreakdown(state, rootPlayer, valueTable);
     return {
@@ -605,9 +612,9 @@ function searchAlphaBeta(
       ...statistics,
     };
   }
-  const orderedRootActions = orderIterativeDeepeningRootActionsByMode(
-    state, rootActions, previousBestAction, valueTable, interruptionCheck, moveOrdering
-  );
+  const orderedRootActions = measured(diagnostics, 'normal-order', () => orderIterativeDeepeningRootActionsByMode(
+    state, rootActions, previousBestAction, valueTable, interruptionCheck, moveOrdering, diagnostics
+  ));
   const indexedRootActions = orderedRootActions.map((action) => ({
     action,
     originalIndex: rootActions.indexOf(action),
@@ -623,7 +630,7 @@ function searchAlphaBeta(
   for (const { action: rootAction, originalIndex } of indexedRootActions) {
     interruptionCheck?.();
     const alphaBeforeCandidate = alpha;
-    const afterRootAction = executeSearchAction(state, rootAction);
+    const afterRootAction = measured(diagnostics, 'normal-execute', () => executeSearchAction(state, rootAction));
     statistics.visitedPositionCount += 1;
     let candidateResult = searchAlphaBetaNode(
       afterRootAction,
@@ -638,7 +645,8 @@ function searchAlphaBeta(
       moveOrdering,
       quiescenceOptions,
       killerMoveHistory,
-      1
+      1,
+      diagnostics
     );
 
     // A root candidate searched after a higher-index PV candidate can be cut
@@ -660,7 +668,8 @@ function searchAlphaBeta(
         moveOrdering,
         quiescenceOptions,
         killerMoveHistory,
-        1
+          1,
+          diagnostics
       );
     }
 
@@ -708,16 +717,18 @@ export function analyzeAlphaBetaSearch(
   depth: number,
   valueTable: SearchEvaluationConfig = DEFAULT_MATERIAL_VALUE_TABLE,
   clock: SearchClock = defaultSearchClock,
-  options?: AlphaBetaSearchOptions
+  options?: AlphaBetaSearchOptions,
+  diagnostics?: SearchDiagnostics
 ): AlphaBetaSearchResult {
   const moveOrdering = resolveMoveOrdering(options);
   const killerMoves = resolveKillerMoves(options);
   const quiescenceOptions = resolveQuiescenceOptions(options);
   const startedAt = clock();
-  const searchResult = searchAlphaBeta(
+  diagnostics?.begin(startedAt);
+  const searchResult = measured(diagnostics, 'normal-other', () => searchAlphaBeta(
     state, depth, valueTable, null, undefined, moveOrdering, quiescenceOptions,
-    killerMoves ? new KillerMoveHistory() : undefined
-  );
+    killerMoves ? new KillerMoveHistory() : undefined, undefined, diagnostics
+  ));
   return {
     ...searchResult,
     principalVariation: clonePrincipalVariation(searchResult.principalVariation),
@@ -800,7 +811,8 @@ export function analyzeTimeLimitedIterativeDeepeningAlphaBetaSearch(
   timeLimitMilliseconds: number,
   valueTable: SearchEvaluationConfig = DEFAULT_MATERIAL_VALUE_TABLE,
   clock: SearchClock = defaultSearchClock,
-  options?: AlphaBetaSearchOptions
+  options?: AlphaBetaSearchOptions,
+  diagnostics?: SearchDiagnostics
 ): TimeLimitedIterativeDeepeningAlphaBetaSearchResult {
   const moveOrdering = resolveMoveOrdering(options);
   const killerMoves = resolveKillerMoves(options);
@@ -808,7 +820,8 @@ export function analyzeTimeLimitedIterativeDeepeningAlphaBetaSearch(
   validateIterativeDeepeningMaxDepth(maxDepth);
   validateSearchTimeLimitMilliseconds(timeLimitMilliseconds);
   const startedAt = clock();
-  const rootActions = getLegalActions(state);
+  diagnostics?.begin(startedAt, timeLimitMilliseconds);
+  const rootActions = measured(diagnostics, 'root-legal', () => getLegalActions(state));
   const fallbackAction = rootActions[0] ?? null;
   const iterations: IterativeDeepeningAlphaBetaIterationResult[] = [];
   let previousBestAction: LegalAction | null = null;
@@ -820,17 +833,22 @@ export function analyzeTimeLimitedIterativeDeepeningAlphaBetaSearch(
       throwIfSearchTimeLimitReached(clock, startedAt, timeLimitMilliseconds);
 
       const iterationStartedAt = clock();
-      const searchResult = searchAlphaBeta(
+       const check = () => {
+         try { throwIfSearchTimeLimitReached(clock, startedAt, timeLimitMilliseconds); }
+         catch (error) { if (error instanceof SearchDeadlineExceeded) diagnostics?.interrupted(); throw error; }
+       };
+       const searchResult = measured(diagnostics, 'normal-other', () => searchAlphaBeta(
         state,
         depth,
         valueTable,
         previousBestAction,
-        () => throwIfSearchTimeLimitReached(clock, startedAt, timeLimitMilliseconds),
+         check,
         moveOrdering,
         quiescenceOptions,
         killerMoveHistory,
-        rootActions
-      );
+         rootActions,
+         diagnostics
+       ));
       const iterationFinishedAt = clock();
       throwIfSearchTimeLimitReachedAt(iterationFinishedAt, startedAt, timeLimitMilliseconds);
       const iteration = {
@@ -842,7 +860,8 @@ export function analyzeTimeLimitedIterativeDeepeningAlphaBetaSearch(
       iterations.push(iteration);
       previousBestAction = iteration.selectedAction;
     } catch (error) {
-      if (error instanceof SearchDeadlineExceeded) {
+       if (error instanceof SearchDeadlineExceeded) {
+         if (diagnostics?.interruptedPhase === null) diagnostics.interrupted();
         timedOut = true;
         break;
       }

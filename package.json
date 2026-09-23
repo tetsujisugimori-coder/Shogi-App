@@ -26,6 +26,8 @@
     "measure:killer-move-suite-comparison": "tsx scripts/measure-killer-move-suite-comparison.ts",
     "measure:time-limit-stress": "tsx scripts/measure-time-limit-stress.ts",
     "measure:timed-fallback-self-play": "tsx scripts/measure-timed-fallback-self-play.ts",
+    "measure:timed-depth-one": "tsx scripts/measure-timed-depth-one-diagnostics.ts",
+    "audit:timed-depth-one": "tsx scripts/audit-timed-depth-one-diagnostics.ts",
     "audit:timed-fallback-self-play": "tsx scripts/audit-timed-fallback-self-play.ts",
     "check": "npm run verify:lock && npm run lint && npm test && npm run build"
   },

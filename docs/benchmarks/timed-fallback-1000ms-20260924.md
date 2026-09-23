@@ -7,8 +7,10 @@
 | 参加者 | 着手 | fallback | 率 | 実時間超過 | 超過中央値ms | 超過最大ms |
 | --- | ---: | ---: | ---: | ---: | ---: | ---: |
 | A | 40 | 6 | 15.0% | 40/40 | 1.42 | 7.99 |
-A fallback手数: 30, 32, 34, 36, 38, 40。深さ分布 {"0":6,"1":29,"2":5}、手数帯 {"1-20":{"moves":20,"fallbacks":0},"21-40":{"moves":20,"fallbacks":6}}、超過分布 {"withinLimit":0,"over0to5":34,"over5to20":6,"over20to100":0,"over100":0}。
 | B | 40 | 6 | 15.0% | 40/40 | 1.69 | 9.32 |
+
+A fallback手数: 30, 32, 34, 36, 38, 40。深さ分布 {"0":6,"1":29,"2":5}、手数帯 {"1-20":{"moves":20,"fallbacks":0},"21-40":{"moves":20,"fallbacks":6}}、超過分布 {"withinLimit":0,"over0to5":34,"over5to20":6,"over20to100":0,"over100":0}。
+
 B fallback手数: 27, 31, 33, 35, 37, 39。深さ分布 {"0":6,"1":27,"2":7}、手数帯 {"1-20":{"moves":20,"fallbacks":0},"21-40":{"moves":20,"fallbacks":6}}、超過分布 {"withinLimit":0,"over0to5":36,"over5to20":4,"over20to100":0,"over100":0}。
 
 fallbackあり 1局 {"aWins":0,"bWins":0,"draws":0,"maxPlies":1,"failures":0}。fallbackなし 1局 {"aWins":0,"bWins":0,"draws":0,"maxPlies":1,"failures":0}。
