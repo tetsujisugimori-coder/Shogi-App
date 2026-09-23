@@ -7,7 +7,6 @@ import type { BoardState, Player } from '../../types/shogi';
 import { isPlayerInCheck } from './checkmate';
 import { executeLegalAction, getLegalActions, type LegalAction } from './legalActions';
 import { DEFAULT_MATERIAL_VALUE_TABLE } from './materialEvaluation';
-import { cloneBoardState } from './replay';
 import { orderQuiescenceCandidates, resolveQuiescenceMoveOrdering, type QuiescenceMoveOrderingMode } from './quiescenceOrdering';
 import {
   evaluateSearchPositionBreakdown,
@@ -58,7 +57,8 @@ function cloneBreakdown(breakdown: SearchEvaluationBreakdown): SearchEvaluationB
 }
 
 function executeSearchAction(state: BoardState, action: LegalAction): BoardState {
-  const execution = executeLegalAction(cloneBoardState(state), action);
+  // executeLegalAction already creates a successor without changing state.
+  const execution = executeLegalAction(state, action);
   if (execution.type !== 'applied') {
     throw new Error('A generated legal action could not be executed during quiescence search.');
   }
