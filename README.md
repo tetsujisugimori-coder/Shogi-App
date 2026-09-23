@@ -1,5 +1,23 @@
 # SHOGI-APP
 
+## 深さ1と100ms超過の工程診断（2026-09-24）
+
+PR #154の[保存済み100ms棋譜](docs/benchmarks/timed-fallback-100ms-20260924.jsonl)から7局面を合法手で再生します。`g1-p5`、`g1-p30`が序盤、`g2-p54`、`g3-p55`が中盤、`g4-p89`、`g2-p92`、`g1-p115`が後半です。`g1-p5`・`g2-p54`・`g2-p92`は元の棋譜で深さ1以上を完走し、ほかはfallbackでした。`g1-p115`は元の最大実時間333.57msの手です。局面IDの`g`は保存棋譜のexecutionIndex、`p`は次の着手番号です。初期局面から直前まで全手を`executeLegalAction`で再生し、`history`、`positionHistory`、`positionSnapshots`を含む状態を保持します。各着手前のpositionKeyと、元棋譜の合法手を照合します。
+
+`SearchDiagnostics`は任意指定時だけ有効です。root合法手生成、通常探索の合法手生成、並べ替え、SEE、着手適用、通常探索その他、静止探索を測ります。入れ子の時間は外側から差し引き、静止探索にはその内部の合法手生成・評価・着手適用を含めます。APIその他はAPI全時間から工程合計を引いた残差です。工程タイマーの読み取り負荷は主に外側の区分に入り、診断OFF/ON比較で測ります。100msをまたいだ工程と、その後の協調的確認で中断を検知した工程は別フィールドです。標準手順ではSEEを呼びません。
+
+```powershell
+npm run measure:timed-depth-one -- --out "$env:TEMP\depth-one-smoke.jsonl" --smoke
+npm run audit:timed-depth-one -- "$env:TEMP\depth-one-smoke.jsonl"
+git status --porcelain=v1  # 本測定前は空
+npm run measure:timed-depth-one -- --out "$env:TEMP\depth-one-main.jsonl"
+npm run audit:timed-depth-one -- "$env:TEMP\depth-one-main.jsonl"
+```
+
+出力は既存ファイルを上書きしません。2回ウォームアップ後に各条件5回を同一PC・同期直列で実行し、診断OFF/ONの先行順を交互にします。100ms・最大深さ4と中断されない固定深さ1を併記し、固定深さでは全反復の選択手・評価・PV一致を確認します。1,000msはこの診断では必須条件とせず、元のPR #154の参考測定を参照します。生データは環境・コードSHA・dirty状態・設定・棋譜SHA・局面ハッシュ・各回のAPI内／実時間・深さ・結果・工程時間／回数・中断箇所を含みます。`audit`で保存済み集計を生データから再計算します。長時間測定は通常CIに追加しません。
+
+実測結果: 本測定後に追記します。
+
 ## 時間制限付き探索の実対局フォールバック測定（2026-09-24）
 
 PR #152マージ後の`main`（`eeae079`）を基点にした、研究用の同期直列CLIです。既存のself-playゲーム／先後交代ペアを使い、対局ルール、評価関数、探索の手の選択、通常対局設定は変更しません。A/Bは同じ最大深さ4、standard評価、通常standard手順、静止探索追加1手／original手順、同じ1手当たり指定時間を受けます。平手初期局面を全局で固定し、奇数ペアはA先手→B先手、偶数ペアはB先手→A先手の順に実行します。反復順によるウォームアップ偏りを抑えますが、OS負荷・JIT・GCの影響は残ります。
