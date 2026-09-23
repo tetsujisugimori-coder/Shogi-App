@@ -1,5 +1,22 @@
 # SHOGI-APP 開発ログ
 
+## [2026-09-23 JST] キラームーブOFF/ON固定7局面の5秒・10秒測定
+
+### 目的・条件・実行環境
+
+- PR #144の固定7局面（opening 3、middlegame 2、endgame 2。sente 5、gote 2）に、従来は序盤3局面だけで行った時間制限比較を拡張した。中心の判断材料は各局面の本測定8回の完了深さ分布であり、深さの違う結果の訪問局面数を単純な効率比較に使わない。
+- 最新mainから`docs/killer-move-seven-position-timed-results`を作成した。測定HEADは`eaa63ebff02117248e197071316bec7292523cf3`で、5秒・10秒とも`RUN`に`dirty: false`、同じ5対象ファイルのSHA-256、Node v24.20.0、npm 11.17.0、Windows 10.0.26200 x64、Intel Core i7-14650HXを記録した。
+- 測定前に`npx vitest run src/test/quiescence-ordering-self-play-suite.test.ts src/test/quiescence-ordering-suite-comparison.test.ts`を実行し、2ファイル22件が終了0で成功した。通常サンドボックスではesbuildの`spawn EPERM`で起動不能だったため、許可経路で同じコマンドを再実行して終了要約を回収した。
+- 5秒は`npm run measure:killer-move-suite-comparison -- timed --time-limit-ms 5000 --max-depth 4`を17:54:17.871〜18:07:13.652 JST、10秒は同じコマンドの`--time-limit-ms 10000`を18:08:01.895〜18:33:09.133 JSTに、この順で直列実行した。各条件は3 warmup、8本測定、OFF/ON交互、OFF先行4・ON先行4、最大深さ4、baseline=`killer-off`、candidate=`killer-on`である。測定中にテスト、build、別ベンチマークを並行実行していない。
+- 記録追加後の`npm run check`は終了0。lockfile検証、`tsc --noEmit`、59ファイル1725テスト、Vite build（1755 modules）が成功した。続く`git diff --check`も終了0で、空白エラーはない（GitのLF/CRLF注意表示のみ）。
+
+### 結果と範囲
+
+- 両条件とも対象7、正常完了7、エラー0、終了コード0。完全な未加工出力（`RUN`、人間向け集計、`JSON`、`END`）は`docs/benchmarks/killer-move-seven-position-5000ms.txt`と`docs/benchmarks/killer-move-seven-position-10000ms.txt`へ保存した。JSONと人間向け集計について、対象・正常・エラー件数、7局面、phase、sideToMove、8本測定の存在を機械的に照合した。
+- 5秒の完了深さ中央値は、ON上昇が`rook-pawn-exchange-26-84-25-85`（2→3）1件、同一6件、低下0件。選択手変更は同局面（▲7六歩/214→▲2四歩/-1）だけで、`standard-hirate`は手は同じで評価のみ214→0だった。timeoutは静かな中盤がOFF 7/ON 8、それ以外は全局面8/8で、エラーはない。
+- 10秒の完了深さ中央値は、ON上昇が`check-evasion-endgame`（2→3）1件、同一6件、低下0件。選択手・評価の変化はなく、timeoutは飛車先交換局面がOFF 7/ON 8、それ以外は全局面8/8、エラーはない。
+- これらは固定7局面（phase別に3/2/2件）と同一環境での観測である。棋力、Elo、統計的有意差、一般的な性能改善、キラームーブの既定ON化、通常対局・UIへの採用は結論しない。探索本体、キラームーブ実装・既定OFF、反復深化、SEE、静止探索、評価、合法手、fixture、Worker、UI、依存関係・lockfileは変更していない。詳細表と解釈制約は`docs/killer-move-suite-comparison.md`に記録した。
+
 ## [2026-09-23] キラームーブ比較7局面の局面実態補正
 
 ### 原因・修正
