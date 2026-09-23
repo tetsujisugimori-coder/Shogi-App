@@ -52,10 +52,23 @@ export function validateTimeLimitedQuiescenceComparison(
     const result = entry as TimeLimitedQuiescenceComparisonResult;
     const extension = TIME_LIMITED_QUIESCENCE_COMPARISON_SETTINGS[index];
     if (result.quiescenceMaxTacticalDepth !== extension || result.requestedMaxDepth !== maxDepth ||
-      !Number.isSafeInteger(result.completedDepth) || result.completedDepth < 1 || result.completedDepth > maxDepth ||
+      !Number.isSafeInteger(result.completedDepth) || result.completedDepth < 0 || result.completedDepth > maxDepth ||
       typeof result.timedOut !== 'boolean' || result.timedOut !== (result.completedDepth < maxDepth) ||
       !Array.isArray(result.iterations) || result.iterations.length !== result.completedDepth) return invalid();
-    validatePass(result, result.completedDepth, extension);
+    if (result.completedDepth === 0) {
+      const fallback = legalCount === 0 ? null : getLegalActions(state)[0];
+      if (result.resultSource !== 'fallback' || result.depth !== 0 ||
+        !Number.isFinite(result.elapsedMilliseconds) || result.elapsedMilliseconds < 0 ||
+        result.rootLegalActionCount !== legalCount || result.selectedEvaluation !== null ||
+        result.evaluationBreakdown !== null || !Array.isArray(result.principalVariation) ||
+        result.principalVariation.length !== 0 ||
+        (fallback === null ? result.selectedAction !== null :
+          !result.selectedAction || !areLegalActionsEqual(result.selectedAction, fallback)) ||
+        statistics.some(([key, total]) => result[key] !== 0 || result[total] !== 0)) return invalid();
+      continue;
+    }
+    if (result.resultSource !== 'completed-iteration' || result.evaluationBreakdown === null) return invalid();
+    validatePass(result as AlphaBetaSearchResult, result.completedDepth, extension);
     for (const [i, pass] of result.iterations.entries()) validatePass(pass, i + 1, extension);
     const deepest: AlphaBetaSearchResult = result.iterations[result.completedDepth - 1];
     if (statistics.some(([key, total]) => result[key] !== deepest[key] || !count(result[total]) ||
@@ -64,6 +77,6 @@ export function validateTimeLimitedQuiescenceComparison(
       result.principalVariation.length !== deepest.principalVariation.length ||
       result.principalVariation.some((action, i) => !areLegalActionsEqual(action, deepest.principalVariation[i])) ||
       (Object.keys(deepest.evaluationBreakdown) as (keyof typeof deepest.evaluationBreakdown)[])
-        .some((key) => result.evaluationBreakdown[key] !== deepest.evaluationBreakdown[key])) return invalid();
+        .some((key) => result.evaluationBreakdown![key] !== deepest.evaluationBreakdown[key])) return invalid();
   }
 }

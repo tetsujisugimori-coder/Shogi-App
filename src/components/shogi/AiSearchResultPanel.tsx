@@ -45,6 +45,8 @@ export function AiSearchResultPanel({ search }: AiSearchResultPanelProps) {
         <dl className="mt-2 grid grid-cols-[minmax(0,2fr)_minmax(0,1fr)] gap-x-3 gap-y-1 text-xs">
           <dt className="text-stone-400">完了深さ</dt>
           <dd className="text-sky-100">{result.completedDepth}</dd>
+          <dt className="text-stone-400">着手の出所</dt>
+          <dd className="text-sky-100">{result.resultSource === 'fallback' ? '合法手 fallback' : '完了した探索'}</dd>
           <dt className="text-stone-400">指定最大深さ</dt>
           <dd className="text-sky-100">{result.requestedMaxDepth}</dd>
           <dt className="text-stone-400">API全体の経過時間</dt>

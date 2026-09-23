@@ -23,7 +23,7 @@ type ObservationKey = StatisticKey | 'selectedEvaluation' | 'completedDepth' |
  */
 export type SelfPlaySearchResult = Pick<TimeLimitedIterativeDeepeningAlphaBetaSearchResult, 'selectedAction'> & {
   [K in ObservationKey]: TimeLimitedIterativeDeepeningAlphaBetaSearchResult[K] | null;
-};
+} & { resultSource?: TimeLimitedIterativeDeepeningAlphaBetaSearchResult['resultSource'] };
 
 export interface SelfPlayParticipant<Settings> {
   settings: Settings;
@@ -110,6 +110,12 @@ function isAction(value: unknown): value is LegalAction {
 
 function validateObservations(state: BoardState, result: SelfPlaySearchResult): void {
   const invalid = (field: string): never => { throw new TypeError(`Invalid self-play search result: ${field}.`); };
+  if (result.resultSource !== undefined && result.resultSource !== 'fallback' &&
+    result.resultSource !== 'completed-iteration') invalid('resultSource');
+  if (result.resultSource === 'fallback' && (result.completedDepth !== 0 || !result.timedOut ||
+    result.selectedEvaluation !== null || result.evaluationBreakdown !== null ||
+    result.principalVariation?.length !== 0 || statisticPairs.some(([key, total]) =>
+      result[key] !== 0 || result[total] !== 0))) invalid('fallback');
   if (result.selectedEvaluation !== null && !score(result.selectedEvaluation)) invalid('selectedEvaluation');
   if (result.completedDepth !== null && !count(result.completedDepth)) invalid('completedDepth');
   if (result.elapsedMilliseconds !== null &&
@@ -132,6 +138,7 @@ function validateObservations(state: BoardState, result: SelfPlaySearchResult): 
       [material, pieceSquare, kingSafety, undefendedPieceSafety].some((v) => v !== 0)) invalid('evaluationBreakdown.terminal');
   }
   const pv = result.principalVariation;
+  if (result.resultSource === 'fallback') return;
   if (pv === null) return;
   if (!Array.isArray(pv) || pv.length === 0 || !pv.every(isAction) ||
     !areLegalActionsEqual(pv[0], result.selectedAction!)) invalid('principalVariation');
@@ -206,6 +213,7 @@ export function runSelfPlayGame<SenteSettings, GoteSettings>(options: {
         elapsedMilliseconds: result.elapsedMilliseconds, timedOut: result.timedOut, ...statistics,
         principalVariation: result.principalVariation?.map(cloneAction) ?? null,
         evaluationBreakdown: result.evaluationBreakdown === null ? null : { ...result.evaluationBreakdown },
+        ...(result.resultSource === undefined ? {} : { resultSource: result.resultSource }),
       };
     } catch (error) {
       return fail('result', 'invalid_result', error instanceof Error ? error.message : String(error));

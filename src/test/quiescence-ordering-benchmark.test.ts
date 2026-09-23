@@ -55,13 +55,14 @@ describe('quiescence ordering A/B suite', () => {
     for (const result of entry.results) {
       const s = result.search;
       if (!('iterations' in s)) throw new Error('Expected timed result');
-      expect(s.completedDepth).toBe(1); // Determined by fake clock, never wall time.
+      expect(s.completedDepth).toBe(0); // Determined by fake clock, never wall time.
+      expect(s.resultSource).toBe('fallback');
       expect(s.timedOut).toBe(true);
-      expect(s.iterations).toHaveLength(1);
-      expect(s.totalVisitedPositionCount).toBe(s.iterations[0].visitedPositionCount);
-      expect(s.totalQuiescenceVisitedPositionCount).toBe(s.iterations[0].quiescenceVisitedPositionCount);
+      expect(s.iterations).toHaveLength(0);
+      expect(s.totalVisitedPositionCount).toBe(0);
+      expect(s.totalQuiescenceVisitedPositionCount).toBe(0);
     }
-    expect(formatOrderingCase(entry)).toContain('採用反復=1/4; 完了反復=[1]');
+    expect(formatOrderingCase(entry)).toContain('採用反復=0/4; 完了反復=[]');
   });
   it.each(ORDERING_SETTINGS.map((s, i) => [s.moveOrdering, s.maxTacticalDepth, i] as const))('reports failed %s +%i and excludes partial cases', (_ordering, _depth, index) => {
     let calls = 0;

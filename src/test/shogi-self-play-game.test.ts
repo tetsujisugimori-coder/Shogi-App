@@ -107,9 +107,10 @@ describe('runSelfPlayGame', () => {
       gote: { search, settings: { maxDepth: 2, milliseconds: 0 } },
     });
     expect(result.status).toBe('max_plies');
-    expect(result.plies.map((r) => r.completedDepth)).toEqual([1, 1]);
-    expect(result.plies.map((r) => r.timedOut)).toEqual([false, true]);
-    expect(result.plies.every((r) => r.principalVariation?.length === 1)).toBe(true);
+    expect(result.plies.map((r) => r.completedDepth)).toEqual([0, 0]);
+    expect(result.plies.map((r) => r.timedOut)).toEqual([true, true]);
+    expect(result.plies.map((r) => r.resultSource)).toEqual(['fallback', 'fallback']);
+    expect(result.plies.every((r) => r.principalVariation?.length === 0 && r.evaluationBreakdown === null)).toBe(true);
   });
 
   it('stops on mate at the limit and preserves the existing decisive result, including a drop', () => {
@@ -170,7 +171,7 @@ describe('runSelfPlayGame', () => {
   it('preserves infinite terminal evaluation and its independently copied breakdown', () => {
     const initialState = position(); initialState.moveNumber = 500;
     const result = run(initialState, 1, (s) =>
-      analyzeTimeLimitedIterativeDeepeningAlphaBetaSearch(s, 1, 0, undefined, () => 0));
+      analyzeTimeLimitedIterativeDeepeningAlphaBetaSearch(s, 1, 1000, undefined, () => 0));
     expect(result.status).toBe('ended');
     expect(result.plies[0]).toMatchObject({ selectedEvaluation: 0, evaluationBreakdown: { terminal: 'draw', total: 0 } });
     const mateState = position();

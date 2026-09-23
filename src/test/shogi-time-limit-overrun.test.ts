@@ -12,7 +12,7 @@ function freezeDeep<T>(value: T): T {
 }
 
 describe('時間制限探索の局面複製削減', () => {
-  it('履歴を持つ凍結中盤でも公開着手経路と探索は入力を変更せず、深さ1保証を保つ', () => {
+  it('履歴を持つ凍結中盤でも公開着手経路と探索は入力を変更せず、深さ1結果とfallbackを分ける', () => {
     const position = QUIESCENCE_ORDERING_SELF_PLAY_SCENARIOS.find(
       (scenario) => scenario.id === 'quiet-double-static-rook-middlegame'
     );
@@ -26,8 +26,9 @@ describe('時間制限探索の局面複製削減', () => {
 
     const options = { quiescence: { maxTacticalDepth: 1 } } as const;
     const fixed = analyzeAlphaBetaSearch(state, 1, undefined, () => 0, options);
-    const timed = analyzeTimeLimitedIterativeDeepeningAlphaBetaSearch(state, 2, 0, undefined, () => 0, options);
-    expect(timed).toMatchObject({ completedDepth: 1, timedOut: true, requestedMaxDepth: 2 });
+    const timed = analyzeTimeLimitedIterativeDeepeningAlphaBetaSearch(state, 1, 1000, undefined, () => 0, options);
+    expect(timed).toMatchObject({ completedDepth: 1, timedOut: false, requestedMaxDepth: 1,
+      resultSource: 'completed-iteration' });
     expect(timed.iterations).toHaveLength(1);
     expect(timed.selectedAction).toEqual(fixed.selectedAction);
     expect(timed.selectedEvaluation).toBe(fixed.selectedEvaluation);
@@ -44,6 +45,10 @@ describe('時間制限探索の局面複製削減', () => {
     ] as const) {
       expect(timed[total]).toBe(timed.iterations[0][field]);
     }
+    const fallback = analyzeTimeLimitedIterativeDeepeningAlphaBetaSearch(state, 2, 0, undefined, () => 0, options);
+    expect(fallback).toMatchObject({ completedDepth: 0, timedOut: true, resultSource: 'fallback',
+      selectedAction: firstAction, selectedEvaluation: null, evaluationBreakdown: null,
+      principalVariation: [], totalVisitedPositionCount: 0 });
     expect(JSON.stringify(state)).toBe(snapshot);
   });
 });

@@ -1,4 +1,5 @@
 import type { BoardState } from '../types/shogi';
+import type { SearchEvaluationBreakdown } from '../domain/shogi/twoPlyMinimaxAi';
 import { areLegalActionsEqual, cloneBoardState, executeLegalAction, getLegalActions,
   generateMoveNotation, generateDropNotation, type LegalAction, type AlphaBetaSearchResult } from '../domain/shogi';
 
@@ -22,7 +23,9 @@ export function formatLegalActionNotation(state: BoardState, action: LegalAction
  */
 export function validateAndFormatPrincipalVariation(
   state: BoardState,
-  result: Pick<AlphaBetaSearchResult, 'selectedAction' | 'principalVariation' | 'evaluationBreakdown'>,
+  result: Pick<AlphaBetaSearchResult, 'selectedAction' | 'principalVariation'> & {
+    evaluationBreakdown: SearchEvaluationBreakdown | null;
+  },
   depth: number,
   requireSearchLeaf = false,
 ): string[] | null {
@@ -51,7 +54,7 @@ export function validateAndFormatPrincipalVariation(
       if (replayState.status === 'ended' && !replayState.result) return null;
       const terminal = replayState.status !== 'ended' ? null : replayState.result!.winner === null
         ? 'draw' : replayState.result!.winner === state.turn ? 'win' : 'loss';
-      if (result.evaluationBreakdown.terminal !== terminal) return null;
+      if (result.evaluationBreakdown?.terminal !== terminal) return null;
     }
     return notations;
   } catch {

@@ -159,7 +159,8 @@ describe('比較APIを使用するrunner', () => {
     expect(starts[1]).toBeGreaterThan(starts[0]);
     expect(starts[2]).toBeGreaterThan(starts[1]);
     if (!entry.ok) throw new Error(entry.error);
-    expect(entry.results.every(r => 'completedDepth' in r && r.completedDepth === 1 && r.timedOut)).toBe(true);
+    expect(entry.results.every(r => 'completedDepth' in r && r.completedDepth === 0 &&
+      r.resultSource === 'fallback' && r.timedOut)).toBe(true);
     expect(formatBenchmarkCase(entry)).toContain('全完了反復合計');
     expect(summarizeBenchmark([entry], 'timed')).toMatchObject({ errorCount: 0, maxDepthUnreachedCount: 1 });
   });

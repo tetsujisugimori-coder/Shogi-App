@@ -6,7 +6,7 @@ import { cloneBoardState } from '../../src/domain/shogi/replay';
 import { evaluateSearchPositionBreakdown } from '../../src/domain/shogi/twoPlyMinimaxAi';
 import { analyzeAlphaBetaSearch, analyzeTimeLimitedIterativeDeepeningAlphaBetaSearch,
   type AlphaBetaSearchResult, type TimeLimitedIterativeDeepeningAlphaBetaSearchResult } from '../../src/domain/shogi/twoPlyAlphaBetaAi';
-import { validateAndFormatPrincipalVariation } from '../../src/application/searchPrincipalVariation';
+import { formatLegalActionNotation, validateAndFormatPrincipalVariation } from '../../src/application/searchPrincipalVariation';
 import { formatSenteEvaluation } from '../../src/components/shogi/searchEvaluationDisplay';
 import { QUIESCENCE_BENCHMARK_POSITIONS, type BenchmarkPosition } from './quiescencePositions';
 import type { BenchmarkDependencies, BenchmarkMode } from './quiescenceSuite';
@@ -74,12 +74,28 @@ function validatePass(state: BoardState, result: AlphaBetaSearchResult, depth: n
 
 export function validateOrderingResult(state: BoardState, result: SearchResult, mode: BenchmarkMode, extension: number,
   timedOptions: TimedSearchOptions = DEFAULT_TIMED_SEARCH_OPTIONS): string[] {
-  if (mode === 'fixed') return validatePass(state, result, 3, extension);
+  if (mode === 'fixed') {
+    assert.ok(!('iterations' in result), '固定深さ結果');
+    return validatePass(state, result, 3, extension);
+  }
   assert.ok('iterations' in result, '完了反復なし');
   assert.equal(result.requestedMaxDepth, timedOptions.maxDepth);
-  assert.ok(Number.isSafeInteger(result.completedDepth) && result.completedDepth >= 1 && result.completedDepth <= timedOptions.maxDepth);
+  assert.ok(Number.isSafeInteger(result.completedDepth) && result.completedDepth >= 0 && result.completedDepth <= timedOptions.maxDepth);
   assert.equal(result.timedOut, result.completedDepth < timedOptions.maxDepth);
   assert.equal(result.iterations.length, result.completedDepth);
+  if (result.completedDepth === 0) {
+    const legal = getLegalActions(state);
+    assert.equal(result.resultSource, 'fallback');
+    assert.equal(result.depth, 0);
+    assert.equal(result.rootLegalActionCount, legal.length);
+    assert.deepStrictEqual(result.selectedAction, legal[0] ?? null);
+    assert.equal(result.selectedEvaluation, null);
+    assert.equal(result.evaluationBreakdown, null);
+    assert.deepStrictEqual(result.principalVariation, []);
+    assert.ok(statisticKeys.every(([key, total]) => result[key] === 0 && result[total] === 0));
+    return result.selectedAction ? [formatLegalActionNotation(state, result.selectedAction)] : [];
+  }
+  assert.equal(result.resultSource, 'completed-iteration');
   result.iterations.forEach((pass, i) => validatePass(state, pass, i + 1, extension));
   const deepest = result.iterations[result.completedDepth - 1];
   const { elapsedMilliseconds: _elapsed, ...selected } = result;
@@ -89,7 +105,8 @@ export function validateOrderingResult(state: BoardState, result: SearchResult, 
   for (const [key, total] of statisticKeys) {
     assert.equal(result[total], result.iterations.reduce((sum, pass) => sum + pass[key], 0), `完了反復合計:${total}`);
   }
-  return validatePass(state, result, result.completedDepth, extension);
+  assert.ok(result.evaluationBreakdown);
+  return validatePass(state, result as AlphaBetaSearchResult, result.completedDepth, extension);
 }
 
 /** Shared single API call for both CLIs. Each invocation owns a new frozen
@@ -154,20 +171,20 @@ export function runOrderingSuite(modes: readonly BenchmarkMode[], dependencies: 
   return cases;
 }
 
-const evaluation = (entry: OrderingResult, turn: BoardState['turn']) => formatSenteEvaluation(entry.search.selectedEvaluation ?? entry.search.evaluationBreakdown.total, turn);
+const evaluation = (entry: OrderingResult, turn: BoardState['turn']) => formatSenteEvaluation(entry.search.selectedEvaluation ?? entry.search.evaluationBreakdown?.total ?? null, turn);
 export function formatOrderingCase(entry: OrderingCase): string {
   const lines = [`\n## ${entry.mode} / ${entry.position.id} / ${entry.position.name}`];
   if (!entry.ok) return [...lines, `ERROR: ${entry.error}`].join('\n');
   const turn = entry.turn;
   for (const r of entry.results) {
     const s = r.search;
-    lines.push(`追加${r.setting.maxTacticalDepth}手 ${r.setting.moveOrdering}: 推奨手=${r.pv[0] ?? '手なし'}; 先手評価=${evaluation(r, turn)}; PV=${r.pv.join(' ') || '手順なし'}; 完了深さ=${s.depth}; 参考時間=${s.elapsedMilliseconds.toFixed(1)}ms`,
+    lines.push(`追加${r.setting.maxTacticalDepth}手 ${r.setting.moveOrdering}: 推奨手=${r.pv[0] ?? '手なし'}; 先手評価=${evaluation(r, turn)}; PV=${'resultSource' in s && s.resultSource === 'fallback' ? '未探索' : r.pv.join(' ') || '手順なし'}; 完了深さ=${s.depth}; 参考時間=${s.elapsedMilliseconds.toFixed(1)}ms`,
       `  最深完了: ${formatCounts(counts(s))}`);
     if ('iterations' in s) lines.push(`  採用反復=${s.completedDepth}/${s.requestedMaxDepth}; 完了反復=[${s.iterations.map(p => p.depth)}]; 時間切れ=${s.timedOut}; 全完了合計: ${formatCounts(counts(s, true))}`);
   }
   for (const i of [0, 2]) {
     const a = entry.results[i], b = entry.results[i + 1];
-    lines.push(`追加${a.setting.maxTacticalDepth}手 original→material: 推奨手=${a.pv[0] ?? '手なし'}→${b.pv[0] ?? '手なし'}; 評価=${evaluation(a, turn)}→${evaluation(b, turn)}; 完了深さ=${a.search.depth}→${b.search.depth}; PV=${a.pv.join(' ') || '手順なし'} → ${b.pv.join(' ') || '手順なし'}`);
+    lines.push(`追加${a.setting.maxTacticalDepth}手 original→material: 推奨手=${a.pv[0] ?? '手なし'}→${b.pv[0] ?? '手なし'}; 評価=${evaluation(a, turn)}→${evaluation(b, turn)}; 完了深さ=${a.search.depth}→${b.search.depth}; PV=${'resultSource' in a.search && a.search.resultSource === 'fallback' ? '未探索' : a.pv.join(' ') || '手順なし'} → ${'resultSource' in b.search && b.search.resultSource === 'fallback' ? '未探索' : b.pv.join(' ') || '手順なし'}`);
   }
   return lines.join('\n');
 }

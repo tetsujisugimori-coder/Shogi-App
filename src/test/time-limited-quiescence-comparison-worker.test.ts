@@ -65,7 +65,7 @@ describe('比較Workerのアトミックな通信と終了', () => {
     const pending = client.run(ended, 4, 1000);
     worker.message(handleTimeLimitedQuiescenceComparisonWorkerRequest(worker.postMessage.mock.calls[0][0],
       (s, depth, ms) => analyzeTimeLimitedQuiescenceComparison(s, depth, ms, () => 0)));
-    expect((await pending).map((result) => result.evaluationBreakdown.total))
+    expect((await pending).map((result) => result.evaluationBreakdown?.total))
       .toEqual(Array(3).fill(winner === 'sente' ? Infinity : winner === 'gote' ? -Infinity : 0));
   });
 
@@ -88,7 +88,7 @@ describe('比較Workerのアトミックな通信と終了', () => {
       r.results[0].selectedEvaluation = Infinity;
       r.results[0].evaluationBreakdown = { material: 0, pieceSquare: 0, kingSafety: 0, undefendedPieceSafety: 0, total: Infinity, terminal: 'win' };
     }],
-    ['内訳合計', (r) => { Object.assign(r.results[0].evaluationBreakdown, { total: r.results[0].evaluationBreakdown.total + 1 }); }],
+    ['内訳合計', (r) => { Object.assign(r.results[0].evaluationBreakdown!, { total: r.results[0].evaluationBreakdown!.total + 1 }); }],
     ['内訳なし', (r) => { Object.assign(r.results[0], { evaluationBreakdown: null }); }],
     ['NaN', (r) => { r.results[0].selectedEvaluation = NaN; }],
     ['静止探索負数', (r) => { r.results[1].quiescenceLeafCount = -1; }],

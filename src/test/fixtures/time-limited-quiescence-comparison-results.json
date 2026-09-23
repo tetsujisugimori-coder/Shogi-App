@@ -80,6 +80,7 @@
       "elapsedMilliseconds": 0,
       "requestedMaxDepth": 4,
       "completedDepth": 3,
+      "resultSource": "completed-iteration",
       "timedOut": true,
       "iterations": [
         {
@@ -367,6 +368,7 @@
       "elapsedMilliseconds": 0,
       "requestedMaxDepth": 4,
       "completedDepth": 2,
+      "resultSource": "completed-iteration",
       "timedOut": true,
       "iterations": [
         {
@@ -603,6 +605,7 @@
       "elapsedMilliseconds": 0,
       "requestedMaxDepth": 4,
       "completedDepth": 4,
+      "resultSource": "completed-iteration",
       "timedOut": false,
       "iterations": [
         {
@@ -985,6 +988,7 @@
       "elapsedMilliseconds": 0,
       "requestedMaxDepth": 4,
       "completedDepth": 3,
+      "resultSource": "completed-iteration",
       "timedOut": true,
       "iterations": [
         {
@@ -1272,6 +1276,7 @@
       "elapsedMilliseconds": 0,
       "requestedMaxDepth": 4,
       "completedDepth": 2,
+      "resultSource": "completed-iteration",
       "timedOut": true,
       "iterations": [
         {
@@ -1508,6 +1513,7 @@
       "elapsedMilliseconds": 0,
       "requestedMaxDepth": 4,
       "completedDepth": 4,
+      "resultSource": "completed-iteration",
       "timedOut": false,
       "iterations": [
         {
@@ -1890,6 +1896,7 @@
       "elapsedMilliseconds": 0,
       "requestedMaxDepth": 4,
       "completedDepth": 3,
+      "resultSource": "completed-iteration",
       "timedOut": true,
       "iterations": [
         {
@@ -2177,6 +2184,7 @@
       "elapsedMilliseconds": 0,
       "requestedMaxDepth": 4,
       "completedDepth": 2,
+      "resultSource": "completed-iteration",
       "timedOut": true,
       "iterations": [
         {
@@ -2413,6 +2421,7 @@
       "elapsedMilliseconds": 0,
       "requestedMaxDepth": 4,
       "completedDepth": 4,
+      "resultSource": "completed-iteration",
       "timedOut": false,
       "iterations": [
         {
@@ -2795,6 +2804,7 @@
       "elapsedMilliseconds": 0,
       "requestedMaxDepth": 4,
       "completedDepth": 3,
+      "resultSource": "completed-iteration",
       "timedOut": true,
       "iterations": [
         {
@@ -3082,6 +3092,7 @@
       "elapsedMilliseconds": 0,
       "requestedMaxDepth": 4,
       "completedDepth": 2,
+      "resultSource": "completed-iteration",
       "timedOut": true,
       "iterations": [
         {
@@ -3332,6 +3343,7 @@
       "elapsedMilliseconds": 0,
       "requestedMaxDepth": 4,
       "completedDepth": 4,
+      "resultSource": "completed-iteration",
       "timedOut": false,
       "iterations": [
         {

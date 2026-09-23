@@ -42,6 +42,7 @@ function pass(state: BoardState, depth: number, variant: 'first' | 'last' | 'cap
 function timed(state: BoardState, depth: number, variant: 'first' | 'last' = 'first'): TimeLimitedIterativeDeepeningAlphaBetaSearchResult {
   const iterations = Array.from({ length: depth }, (_, i) => pass(state, i + 1, variant));
   return { ...iterations.at(-1)!, iterations, requestedMaxDepth: 4, completedDepth: depth, timedOut: depth < 4,
+    resultSource: 'completed-iteration',
     ...Object.fromEntries(statisticKeys.map(([key, sum]) => [sum, iterations.reduce((n, r) => n + r[key], 0)])) as Record<typeof statisticKeys[number][1], number>,
   };
 }
@@ -109,9 +110,10 @@ describe('repeated ordering schedule and isolation', () => {
     for (const trial of entry.trials) {
       const result = trial.search as TimeLimitedIterativeDeepeningAlphaBetaSearchResult;
       // Fake-clock consequence, never an expectation on real runtime/depth.
-      expect(result.completedDepth).toBe(1); expect(result.timedOut).toBe(true);
+      expect(result.completedDepth).toBe(0); expect(result.timedOut).toBe(true);
+      expect(result.resultSource).toBe('fallback');
       expect(result.elapsedMilliseconds).toBe(2400);
-      expect(result.iterations).toHaveLength(1);
+      expect(result.iterations).toHaveLength(0);
     }
   });
   it.each([['fixed', ['fixed']], ['timed', ['timed']], ['both', ['fixed', 'timed']]])('selects CLI %s', (arg, modes) => {

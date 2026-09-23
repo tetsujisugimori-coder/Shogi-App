@@ -28,7 +28,8 @@ export interface StressSample {
   quiescenceVisitedPositionCount: number;
   totalVisitedPositionCount: number;
   totalQuiescenceVisitedPositionCount: number;
-  depthOneElapsedMilliseconds: number;
+  depthOneElapsedMilliseconds: number | null;
+  resultSource: TimeLimitedIterativeDeepeningAlphaBetaSearchResult['resultSource'];
   selectedAction: TimeLimitedIterativeDeepeningAlphaBetaSearchResult['selectedAction'];
 }
 
@@ -54,7 +55,11 @@ export function measureStressSample(args: {
   const legal = getLegalActions(args.state);
   if (result.rootLegalActionCount !== args.rootLegalActionCount || legal.length !== args.rootLegalActionCount ||
     result.selectedAction === null || !legal.some((action) => areLegalActionsEqual(action, result.selectedAction!)) ||
-    result.iterations.length !== result.completedDepth || result.iterations[0]?.depth !== 1) {
+    result.iterations.length !== result.completedDepth ||
+    (result.completedDepth > 0 && result.iterations[0]?.depth !== 1) ||
+    (result.completedDepth === 0 && (result.resultSource !== 'fallback' || !result.timedOut ||
+      result.selectedEvaluation !== null || result.evaluationBreakdown !== null || result.principalVariation.length !== 0)) ||
+    (result.completedDepth > 0 && result.resultSource !== 'completed-iteration')) {
     throw new Error(`${args.position.id}: search result or root position is invalid`);
   }
   return {
@@ -67,7 +72,8 @@ export function measureStressSample(args: {
     quiescenceVisitedPositionCount: result.quiescenceVisitedPositionCount,
     totalVisitedPositionCount: result.totalVisitedPositionCount,
     totalQuiescenceVisitedPositionCount: result.totalQuiescenceVisitedPositionCount,
-    depthOneElapsedMilliseconds: result.iterations[0].elapsedMilliseconds,
+    depthOneElapsedMilliseconds: result.iterations[0]?.elapsedMilliseconds ?? null,
+    resultSource: result.resultSource,
     selectedAction: result.selectedAction,
   };
 }
