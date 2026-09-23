@@ -1,5 +1,8 @@
-import { createInitialBoardState, type BoardState, type PieceType, type Player } from '../../src/types/shogi';
+import { createInitialBoardState, type BoardState, type Piece, type PieceType, type Player } from '../../src/types/shogi';
+import { isPlayerInCheck } from '../../src/domain/shogi/checkmate';
 import { executeLegalAction, getLegalActions, type LegalAction } from '../../src/domain/shogi/legalActions';
+import { normalizePositionHistory } from '../../src/domain/shogi/repetition';
+import { normalizePositionSnapshots } from '../../src/domain/shogi/replay';
 
 export interface SelfPlayScenario {
   readonly id: string;
@@ -27,6 +30,13 @@ type BookDrop = Readonly<{
   to: readonly [row: number, col: number];
 }>;
 type BookAction = BookMove | BookDrop;
+type HandPieceType = Exclude<PieceType, 'king'>;
+type ScenarioPlacement = readonly [number, number, PieceType, Player];
+
+interface ScenarioHands {
+  readonly sente?: readonly HandPieceType[];
+  readonly gote?: readonly HandPieceType[];
+}
 
 function replayBookLine(id: string, expectedTurn: Player, moves: readonly BookAction[]): BoardState {
   let state = createInitialBoardState();
@@ -51,9 +61,37 @@ function replayBookLine(id: string, expectedTurn: Player, moves: readonly BookAc
   return state;
 }
 
+/**
+ * Builds a deliberately sparse, deterministic research position through the
+ * same normalized BoardState path used by the quiescence benchmark fixtures.
+ * These are composed positions, not claims about a historical game record.
+ */
+function composeResearchPosition(
+  id: string,
+  turn: Player,
+  placements: readonly ScenarioPlacement[],
+  hands: ScenarioHands = {},
+): BoardState {
+  const state = createInitialBoardState();
+  state.recordId = `killer-suite-${id}`;
+
+  for (const row of state.squares) for (const square of row) square.piece = null;
+  for (const [row, col, type, player] of placements) {
+    state.squares[row][col].piece = { id: `${id}-board-${player}-${type}-${row}-${col}`, type, player };
+  }
+
+  const createHand = (player: Player, pieces: readonly HandPieceType[] = []): Piece[] =>
+    pieces.map((type, index) => ({ id: `${id}-hand-${player}-${type}-${index}`, type, player }));
+  state.senteHand = createHand('sente', hands.sente);
+  state.goteHand = createHand('gote', hands.gote);
+  state.turn = turn;
+  state.status = isPlayerInCheck(state, turn) ? 'check' : 'active';
+
+  return normalizePositionSnapshots(normalizePositionHistory(state));
+}
+
 const move = (player: Player, pieceType: PieceType, from: BookMove['from'], to: BookMove['to'],
   promotion: BookMove['promotion'] = 'none'): BookMove => ({ kind: 'move', player, pieceType, from, to, promotion });
-const drop = (player: Player, pieceType: BookDrop['pieceType'], to: BookDrop['to']): BookDrop => ({ kind: 'drop', player, pieceType, to });
 
 /** Fixed, legal, independently-created starts for the research-only suite. */
 export const QUIESCENCE_ORDERING_SELF_PLAY_SCENARIOS: readonly SelfPlayScenario[] = Object.freeze([
@@ -109,26 +147,23 @@ export const QUIESCENCE_ORDERING_SELF_PLAY_SCENARIOS: readonly SelfPlayScenario[
     ]),
   }),
   Object.freeze({
-    id: 'check-evasion-endgame', name: '王手回避を含む終盤',
-    purpose: '持ち駒を伴う局面で王手を受け、合法な回避手を探索する終盤の分岐を含める。',
-    provenance: '既存の王手・金打ち合駒テスト配置を研究用に再構成し、公開合法手APIで合法性を検証した固定局面。実戦棋譜とは主張しない。',
-    phase: 'endgame', sideToMove: 'gote', create: () => replayBookLine('check-evasion-endgame', 'gote', [
-      move('sente', 'pawn', [6, 2], [5, 2]), move('gote', 'pawn', [2, 6], [3, 6]),
-      move('sente', 'bishop', [7, 1], [6, 2]), move('gote', 'bishop', [1, 7], [2, 6]),
-      move('sente', 'bishop', [6, 2], [2, 6], 'promote'),
-    ]),
+    id: 'check-evasion-endgame', name: '構成終盤の王手回避',
+    purpose: '駒数を大幅に減らした後手玉への飛車王手で、王手回避・合駒を含む探索木を比べる。',
+    provenance: '実戦棋譜ではない。quiescence benchmark と同じ正規化済み BoardState 構築パターンで作った、盤上8枚・双方持ち駒ありの決定的な研究用構成局面。',
+    phase: 'endgame', sideToMove: 'gote', create: () => composeResearchPosition('check-evasion-endgame', 'gote', [
+      [8, 4, 'king', 'sente'], [0, 4, 'king', 'gote'], [4, 4, 'rook', 'sente'],
+      [2, 2, 'silver', 'sente'], [6, 6, 'gold', 'sente'], [1, 3, 'gold', 'gote'],
+      [1, 5, 'silver', 'gote'], [3, 7, 'bishop', 'gote'],
+    ], { sente: ['pawn', 'knight'], gote: ['pawn', 'gold'] }),
   }),
   Object.freeze({
-    id: 'hand-drop-endgame', name: '持ち駒の歩打ちを含む終盤',
-    purpose: '駒取りで得た持ち駒があり、駒打ち候補を含む終盤の候補集合を観察する。',
-    provenance: '平手から飛車先の歩交換と持ち駒の歩打ちを公開合法手APIで再生した固定手順。実戦棋譜であるとは主張しない。',
-    phase: 'endgame', sideToMove: 'gote', create: () => replayBookLine('hand-drop-endgame', 'gote', [
-      move('sente', 'pawn', [6, 7], [5, 7]), move('gote', 'pawn', [2, 1], [3, 1]),
-      move('sente', 'pawn', [5, 7], [4, 7]), move('gote', 'pawn', [3, 1], [4, 1]),
-      move('sente', 'pawn', [4, 7], [3, 7]), move('gote', 'pawn', [2, 7], [3, 7]),
-      move('sente', 'rook', [7, 7], [3, 7]), move('gote', 'pawn', [4, 1], [5, 1]),
-      move('sente', 'pawn', [6, 1], [5, 1]), move('gote', 'rook', [1, 1], [5, 1]),
-      drop('sente', 'pawn', [6, 1]),
-    ]),
+    id: 'hand-drop-endgame', name: '構成終盤の持ち駒歩打ち',
+    purpose: '駒数を大幅に減らした後手番で、通常手と合法な持ち駒歩打ちが混ざる探索順を比べる。',
+    provenance: '実戦棋譜ではない。quiescence benchmark と同じ正規化済み BoardState 構築パターンで作った、盤上7枚・双方持ち駒ありの決定的な研究用構成局面。',
+    phase: 'endgame', sideToMove: 'gote', create: () => composeResearchPosition('hand-drop-endgame', 'gote', [
+      [8, 4, 'king', 'sente'], [0, 4, 'king', 'gote'], [5, 2, 'rook', 'sente'],
+      [6, 6, 'gold', 'sente'], [3, 6, 'bishop', 'gote'], [2, 2, 'silver', 'gote'],
+      [4, 5, 'pawn', 'sente'],
+    ], { sente: ['silver', 'knight'], gote: ['pawn', 'gold'] }),
   }),
 ]);

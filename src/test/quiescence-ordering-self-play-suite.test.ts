@@ -1,8 +1,9 @@
 // @vitest-environment node
 import { describe, expect, it, vi } from 'vitest';
 import { createInitialBoardState, type BoardState } from '../types/shogi';
+import { isPlayerInCheck } from '../domain/shogi/checkmate';
 import { createPositionKey } from '../domain/shogi/repetition';
-import { getLegalActions, type LegalAction } from '../domain/shogi/legalActions';
+import { executeLegalAction, getLegalActions, type LegalAction } from '../domain/shogi/legalActions';
 import { runPairedSelfPlayMatch, type PairedSelfPlayMatchResult } from '../domain/shogi/pairedSelfPlayMatch';
 import type { SelfPlaySearchResult } from '../domain/shogi/selfPlayGame';
 import { SELF_PLAY_CONFIG, type SelfPlayBenchmarkDependencies } from '../../scripts/benchmarks/quiescenceOrderingSelfPlay';
@@ -46,7 +47,7 @@ function observedPair(outcome: 'failed' | 'max_plies'): PairedSelfPlayMatchResul
 }
 
 describe('quiescence ordering multi-position self-play suite', () => {
-  it('has seven stable, unique, legal starts with independent replay histories', () => {
+  it('has seven stable, unique, legal starts with independent state instances', () => {
     expect(QUIESCENCE_ORDERING_SELF_PLAY_SCENARIOS.map(scenario => scenario.id)).toEqual([
       'standard-hirate', 'rook-pawn-opening-76-34-26-84', 'rook-pawn-exchange-26-84-25-85',
       'quiet-double-static-rook-middlegame', 'rook-pawn-recapture-middlegame',
@@ -56,7 +57,8 @@ describe('quiescence ordering multi-position self-play suite', () => {
       .toBe(QUIESCENCE_ORDERING_SELF_PLAY_SCENARIOS.length);
     const states = QUIESCENCE_ORDERING_SELF_PLAY_SCENARIOS.map(scenario => scenario.create());
     expect(states.map(state => state.turn)).toEqual(QUIESCENCE_ORDERING_SELF_PLAY_SCENARIOS.map(scenario => scenario.sideToMove));
-    expect(states.map(state => state.history.length)).toEqual([0, 4, 4, 20, 10, 5, 11]);
+    expect(new Set(states.map(state => state.turn))).toEqual(new Set(['sente', 'gote']));
+    expect(states.map(state => state.history.length)).toEqual([0, 4, 4, 20, 10, 0, 0]);
     expect(QUIESCENCE_ORDERING_SELF_PLAY_SCENARIOS.map(scenario => scenario.phase))
       .toEqual(['opening', 'opening', 'opening', 'middlegame', 'middlegame', 'endgame', 'endgame']);
     expect(states.every(state => state.status === 'active' || state.status === 'check')).toBe(true);
@@ -73,6 +75,58 @@ describe('quiescence ordering multi-position self-play suite', () => {
     const second = QUIESCENCE_ORDERING_SELF_PLAY_SCENARIOS[1].create();
     first.squares[5][2].piece = null;
     expect(second.squares[5][2].piece).not.toBeNull();
+  });
+
+  it('fixes each middle- and endgame scenario to its stated board characteristics', () => {
+    const scenario = (id: string) => {
+      const found = QUIESCENCE_ORDERING_SELF_PLAY_SCENARIOS.find(candidate => candidate.id === id);
+      if (!found) throw new Error(`Missing fixture scenario ${id}`);
+      return found;
+    };
+    const boardPieceCount = (state: BoardState) => state.squares.flat().filter(square => square.piece !== null).length;
+
+    const quiet = scenario('quiet-double-static-rook-middlegame').create();
+    expect(quiet.status).toBe('active');
+    expect(quiet.history).toHaveLength(20);
+    expect(quiet.squares[7][5].piece).toMatchObject({ player: 'sente', type: 'king' });
+    expect(quiet.squares[1][3].piece).toMatchObject({ player: 'gote', type: 'king' });
+    expect(quiet.squares[7][6].piece).toMatchObject({ player: 'sente', type: 'silver' });
+    expect(quiet.squares[1][5].piece).toMatchObject({ player: 'gote', type: 'silver' });
+
+    const recapture = scenario('rook-pawn-recapture-middlegame').create();
+    expect(recapture.status).toBe('active');
+    expect(recapture.squares[3][7].piece).toMatchObject({ player: 'sente', type: 'rook' });
+    expect(recapture.squares[5][1].piece).toMatchObject({ player: 'gote', type: 'rook' });
+    expect(recapture.senteHand.filter(piece => piece.type === 'pawn')).toHaveLength(2);
+    expect(recapture.goteHand.filter(piece => piece.type === 'pawn')).toHaveLength(2);
+
+    const check = scenario('check-evasion-endgame').create();
+    expect(check.turn).toBe('gote');
+    expect(check.status).toBe('check');
+    expect(boardPieceCount(check)).toBe(8);
+    expect(check.squares[4][4].piece).toMatchObject({ player: 'sente', type: 'rook' });
+    expect(check.goteHand.map(piece => piece.type)).toEqual(['pawn', 'gold']);
+    const evasions = getLegalActions(check);
+    expect(evasions.length).toBeGreaterThan(0);
+    const evasion = executeLegalAction(check, evasions[0], { proposer: 'local_ai' });
+    expect(evasion.type).toBe('applied');
+    if (evasion.type === 'applied') expect(isPlayerInCheck(evasion.state, 'gote')).toBe(false);
+
+    const handDrop = scenario('hand-drop-endgame').create();
+    expect(handDrop.turn).toBe('gote');
+    expect(handDrop.status).toBe('active');
+    expect(boardPieceCount(handDrop)).toBe(7);
+    expect(handDrop.goteHand.map(piece => piece.type)).toEqual(['pawn', 'gold']);
+    const pawnDrop = getLegalActions(handDrop).find((action): action is Extract<LegalAction, { kind: 'drop' }> =>
+      action.kind === 'drop' && action.player === 'gote' && action.pieceType === 'pawn');
+    expect(pawnDrop).toBeDefined();
+    const appliedPawnDrop = executeLegalAction(handDrop, pawnDrop!, { proposer: 'local_ai' });
+    expect(appliedPawnDrop.type).toBe('applied');
+    if (appliedPawnDrop.type === 'applied') {
+      expect(appliedPawnDrop.state.squares[pawnDrop!.to.row][pawnDrop!.to.col].piece)
+        .toMatchObject({ player: 'gote', type: 'pawn' });
+      expect(isPlayerInCheck(appliedPawnDrop.state, 'gote')).toBe(false);
+    }
   });
 
   it('runs exactly one seat-swapped pair for every scenario in catalog order and preserves null observations', () => {

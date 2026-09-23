@@ -358,7 +358,10 @@ export function formatSuiteComparison(result: SuiteComparisonResult): string {
   ];
   if (result.positions.length === 0) lines.push('  該当なし');
   for (const position of result.positions) {
-    if (!position.ok) { lines.push(`  ${position.scenarioId}: ERROR ${position.error}`); continue; }
+    if (!position.ok) {
+      lines.push(`  ${position.scenarioId}: phase=${position.phase}; sideToMove=${position.sideToMove}; ERROR ${position.error}`);
+      continue;
+    }
     lines.push(`  ${position.scenarioId}: phase=${position.phase}; sideToMove=${position.sideToMove}; 手=${position.baseline!.selectedActionLabel}→${position.candidate!.selectedActionLabel}; 評価=${position.baseline!.selectedEvaluation}→${position.candidate!.selectedEvaluation}; 完了深さ中央値=${position.baseline!.completedDepth}→${position.candidate!.completedDepth}; 深さ分布=${describeDepthDistribution(position.baseline!.completedDepthDistribution)}→${describeDepthDistribution(position.candidate!.completedDepthDistribution)}; 探索局面数=${position.baseline!.searchPositionCount}→${position.candidate!.searchPositionCount}; cutoff=${position.baseline!.cutoffCount}→${position.candidate!.cutoffCount}; skip=${position.baseline!.skippedActionCount}→${position.candidate!.skippedActionCount}; 経過時間ms=${position.baseline!.elapsedMilliseconds}→${position.candidate!.elapsedMilliseconds}; timeout=${position.baseline!.timedOutCount}→${position.candidate!.timedOutCount}`);
   }
   return lines.join('\n');

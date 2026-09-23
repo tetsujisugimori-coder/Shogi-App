@@ -98,11 +98,11 @@ describe('multi-position A/B search suite comparison', () => {
     expect(result.summary).toMatchObject({ targetPositionCount: QUIESCENCE_ORDERING_SELF_PLAY_SCENARIOS.length, completedPositionCount: QUIESCENCE_ORDERING_SELF_PLAY_SCENARIOS.length - 1, errorCount: 1,
       selectedActionChangedPositionCount: QUIESCENCE_ORDERING_SELF_PLAY_SCENARIOS.length - 1 });
     const failed = result.positions[1];
-    expect(failed).toMatchObject({ scenarioId: 'rook-pawn-opening-76-34-26-84', ok: false });
+    expect(failed).toMatchObject({ scenarioId: 'rook-pawn-opening-76-34-26-84', phase: 'opening', sideToMove: 'sente', ok: false });
     expect(failed.trials).toHaveLength(1);
     expect(failed.trials.at(-1)).toMatchObject({ side: 'candidate', ok: false, error: expect.stringContaining('fixture candidate failure') });
     expect(result.positions[2].ok).toBe(true);
-    expect(formatSuiteComparison(result)).toContain('ERROR scenario=rook-pawn-opening-76-34-26-84');
+    expect(formatSuiteComparison(result)).toContain('rook-pawn-opening-76-34-26-84: phase=opening; sideToMove=sente; ERROR scenario=rook-pawn-opening-76-34-26-84');
   });
 
   it('keeps every failed position, null aggregate metrics, and CLI JSON when no position completes', () => {
@@ -120,10 +120,15 @@ describe('multi-position A/B search suite comparison', () => {
     const output: string[] = [];
     expect(runSuiteComparisonCli(['fixed'], dependencies, scenarios, line => output.push(line))).toBe(1);
     expect(output[0]).toContain(`正常完了=0; エラー=${QUIESCENCE_ORDERING_SELF_PLAY_SCENARIOS.length}`);
-    for (const scenario of scenarios) expect(output[0]).toContain(`${scenario.id}: ERROR`);
+    for (const scenario of scenarios) {
+      expect(output[0]).toContain(`${scenario.id}: phase=${scenario.phase}; sideToMove=${scenario.sideToMove}; ERROR`);
+    }
     const serialized = output.at(-1)!.slice('JSON '.length);
-    expect(JSON.parse(serialized).positions.map((position: { scenarioId: string }) => position.scenarioId))
+    const jsonPositions = JSON.parse(serialized).positions as Array<{ scenarioId: string; phase: string; sideToMove: string }>;
+    expect(jsonPositions.map(position => position.scenarioId))
       .toEqual(scenarios.map((scenario) => scenario.id));
+    expect(jsonPositions.map(position => [position.phase, position.sideToMove]))
+      .toEqual(scenarios.map(scenario => [scenario.phase, scenario.sideToMove]));
   });
 
   it('allows an empty scenario list without inventing aggregate values', () => {
