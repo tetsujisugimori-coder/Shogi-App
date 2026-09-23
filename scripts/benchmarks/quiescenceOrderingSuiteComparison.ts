@@ -92,6 +92,8 @@ export interface PositionComparison {
   readonly scenarioId: string;
   readonly scenarioName: string;
   readonly provenance: string;
+  readonly phase: SelfPlayScenario['phase'];
+  readonly sideToMove: SelfPlayScenario['sideToMove'];
   readonly executionOrder: number;
   readonly mode: BenchmarkMode;
   readonly initialPositionKey?: string;
@@ -211,6 +213,7 @@ function emptyDifference(): MetricDifference {
 function failedPosition(scenario: SelfPlayScenario, executionOrder: number, mode: BenchmarkMode,
   trials: SuiteComparisonTrial[], error: string, initialPositionKey?: string): PositionComparison {
   return { scenarioId: scenario.id, scenarioName: scenario.name, provenance: scenario.provenance,
+    phase: scenario.phase, sideToMove: scenario.sideToMove,
     executionOrder, mode, initialPositionKey, trials, ok: false, error,
     evaluation: emptyDifference(), metrics: Object.fromEntries(metricNames.map((metric) => [metric, emptyDifference()])) as Record<MetricName, MetricDifference> };
 }
@@ -259,6 +262,7 @@ function runPositionComparison(scenario: SelfPlayScenario, executionOrder: numbe
     const metrics = Object.fromEntries(metricNames.map((metric) => [metric,
       safeDifference(baseline[metric], candidate[metric])])) as Record<MetricName, MetricDifference>;
     return { scenarioId: scenario.id, scenarioName: scenario.name, provenance: scenario.provenance,
+      phase: scenario.phase, sideToMove: scenario.sideToMove,
       executionOrder, mode: config.mode, initialPositionKey, trials, ok: true, baseline, candidate,
       selectedActionMatches: isDeepStrictEqual(baseline.selectedAction, candidate.selectedAction),
       evaluation: safeDifference(finite(baseline.selectedEvaluation), finite(candidate.selectedEvaluation)), metrics };
@@ -355,7 +359,7 @@ export function formatSuiteComparison(result: SuiteComparisonResult): string {
   if (result.positions.length === 0) lines.push('  該当なし');
   for (const position of result.positions) {
     if (!position.ok) { lines.push(`  ${position.scenarioId}: ERROR ${position.error}`); continue; }
-    lines.push(`  ${position.scenarioId}: 手=${position.baseline!.selectedActionLabel}→${position.candidate!.selectedActionLabel}; 評価=${position.baseline!.selectedEvaluation}→${position.candidate!.selectedEvaluation}; 完了深さ中央値=${position.baseline!.completedDepth}→${position.candidate!.completedDepth}; 深さ分布=${describeDepthDistribution(position.baseline!.completedDepthDistribution)}→${describeDepthDistribution(position.candidate!.completedDepthDistribution)}; 探索局面数=${position.baseline!.searchPositionCount}→${position.candidate!.searchPositionCount}; cutoff=${position.baseline!.cutoffCount}→${position.candidate!.cutoffCount}; skip=${position.baseline!.skippedActionCount}→${position.candidate!.skippedActionCount}; 経過時間ms=${position.baseline!.elapsedMilliseconds}→${position.candidate!.elapsedMilliseconds}; timeout=${position.baseline!.timedOutCount}→${position.candidate!.timedOutCount}`);
+    lines.push(`  ${position.scenarioId}: phase=${position.phase}; sideToMove=${position.sideToMove}; 手=${position.baseline!.selectedActionLabel}→${position.candidate!.selectedActionLabel}; 評価=${position.baseline!.selectedEvaluation}→${position.candidate!.selectedEvaluation}; 完了深さ中央値=${position.baseline!.completedDepth}→${position.candidate!.completedDepth}; 深さ分布=${describeDepthDistribution(position.baseline!.completedDepthDistribution)}→${describeDepthDistribution(position.candidate!.completedDepthDistribution)}; 探索局面数=${position.baseline!.searchPositionCount}→${position.candidate!.searchPositionCount}; cutoff=${position.baseline!.cutoffCount}→${position.candidate!.cutoffCount}; skip=${position.baseline!.skippedActionCount}→${position.candidate!.skippedActionCount}; 経過時間ms=${position.baseline!.elapsedMilliseconds}→${position.candidate!.elapsedMilliseconds}; timeout=${position.baseline!.timedOutCount}→${position.candidate!.timedOutCount}`);
   }
   return lines.join('\n');
 }

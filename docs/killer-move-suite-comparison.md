@@ -1,6 +1,24 @@
 # キラームーブ ON/OFF 複数局面比較
 
-`npm run measure:killer-move-suite-comparison -- [fixed|timed] [--time-limit-ms <正の整数>] [--max-depth <1以上の整数>]` は、PR #138 の比較APIと固定3局面を再利用する研究用CLIです。baseline=`killer-off` とcandidate=`killer-on`の差は`AlphaBetaSearchOptions.killerMoves`だけです。両方とも標準評価、通常`standard`順、静止探索追加1手・`original`順です。
+`npm run measure:killer-move-suite-comparison -- [fixed|timed] [--time-limit-ms <正の整数>] [--max-depth <1以上の整数>]` は、PR #138 の比較APIと固定7局面を再利用する研究用CLIです。baseline=`killer-off` とcandidate=`killer-on`の差は`AlphaBetaSearchOptions.killerMoves`だけです。両方とも標準評価、通常`standard`順、静止探索追加1手・`original`順です。
+
+## 局面スイート
+
+局面は序盤3・中盤2・終盤2の合計7件で、順序と生成結果は決定的です。各 `create()` は平手初期局面から公開 `getLegalActions` で意味的に一意な手を選び、`executeLegalAction` で再生します。開始局面キー、手番、終了状態、合法手の有無、ID・局面キーの重複はテストで検証します。
+
+| ID | 区分 | 手番 | 目的・由来 |
+| --- | --- | --- | --- |
+| `standard-hirate` | opening | sente | 従来パイロットとの連続性を保つ平手初期局面。 |
+| `rook-pawn-opening-76-34-26-84` | opening | sente | 角道と飛車先の定跡分岐。 |
+| `rook-pawn-exchange-26-84-25-85` | opening | sente | 双方の飛車先を進めた別の定跡分岐。 |
+| `quiet-double-static-rook-middlegame` | middlegame | sente | 玉・金銀の整備が進んだ、開始時に王手でない静かな相居飛車の駒組み。 |
+| `rook-pawn-recapture-middlegame` | middlegame | sente | 歩交換、飛車の取り返し、持ち駒を含む戦術的な飛車先。 |
+| `check-evasion-endgame` | endgame | gote | 王手を受け、合法な回避手を持つ局面。 |
+| `hand-drop-endgame` | endgame | gote | 持ち駒の歩打ち候補を含む局面。 |
+
+局面別のJSONには `scenarioId`、`scenarioName`、`phase`、`sideToMove`、`provenance`、`executionOrder` を残し、整形テキストにも区分と手番を表示します。これは局面別データの識別用メタデータであり、区分別の性能集計や勝者判定はしません。
+
+次回は同一環境で5秒・10秒条件をこの7局面へ適用する予定です。今回その長時間測定は実行していません。局面拡張だけから性能改善、棋力・Elo差、統計的有意差、キラームーブの既定ON化、通常対局・UIへの接続を結論しません。
 
 各局面は3回のウォームアップと8回の本測定を行います。本測定のOFF/ON先行は4回ずつで、同じ探索時計やスナップショットは共有しません。fixedは通常深さ3のままで、timedだけが`--time-limit-ms`と`--max-depth`を受け付けます。省略時は従来どおり最大深さ4・呼出しごとに独立した1,000msです。値なし、0、負数、小数、`NaN`、`Infinity`、数字以外、重複、未知オプション、`--max-depth`の1未満、fixedでのtimed専用オプションは、測定を始めず使用例付きで失敗します。深さ1は既存の最低保証であり、timedの予算は厳密な実行上限ではありません。
 

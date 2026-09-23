@@ -96,7 +96,9 @@ export function runSelfPlaySuite(dependencies: SelfPlaySuiteDependencies = {},
     let initialPositionKey = '';
     try {
       const initialState = scenario.create();
-      if (initialState.turn !== 'sente') throw new Error('scenario must start with sente to move.');
+      if (initialState.turn !== scenario.sideToMove) {
+        throw new Error(`scenario turn must be ${scenario.sideToMove}, found ${initialState.turn}.`);
+      }
       initialPositionKey = createPositionKey(initialState);
       hooks.onScenarioStart?.(scenario, index + 1, initialPositionKey);
       const pair = (runner ?? runPairedSelfPlayMatch)({

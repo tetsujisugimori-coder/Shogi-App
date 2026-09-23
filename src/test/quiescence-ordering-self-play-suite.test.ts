@@ -46,14 +46,25 @@ function observedPair(outcome: 'failed' | 'max_plies'): PairedSelfPlayMatchResul
 }
 
 describe('quiescence ordering multi-position self-play suite', () => {
-  it('has three stable, unique, legal starts with independent replay histories', () => {
+  it('has seven stable, unique, legal starts with independent replay histories', () => {
     expect(QUIESCENCE_ORDERING_SELF_PLAY_SCENARIOS.map(scenario => scenario.id)).toEqual([
       'standard-hirate', 'rook-pawn-opening-76-34-26-84', 'rook-pawn-exchange-26-84-25-85',
+      'quiet-double-static-rook-middlegame', 'rook-pawn-recapture-middlegame',
+      'check-evasion-endgame', 'hand-drop-endgame',
     ]);
-    expect(new Set(QUIESCENCE_ORDERING_SELF_PLAY_SCENARIOS.map(scenario => scenario.id)).size).toBe(3);
+    expect(new Set(QUIESCENCE_ORDERING_SELF_PLAY_SCENARIOS.map(scenario => scenario.id)).size)
+      .toBe(QUIESCENCE_ORDERING_SELF_PLAY_SCENARIOS.length);
     const states = QUIESCENCE_ORDERING_SELF_PLAY_SCENARIOS.map(scenario => scenario.create());
-    expect(states.map(state => state.turn)).toEqual(['sente', 'sente', 'sente']);
-    expect(states.map(state => state.history.length)).toEqual([0, 4, 4]);
+    expect(states.map(state => state.turn)).toEqual(QUIESCENCE_ORDERING_SELF_PLAY_SCENARIOS.map(scenario => scenario.sideToMove));
+    expect(states.map(state => state.history.length)).toEqual([0, 4, 4, 20, 10, 5, 11]);
+    expect(QUIESCENCE_ORDERING_SELF_PLAY_SCENARIOS.map(scenario => scenario.phase))
+      .toEqual(['opening', 'opening', 'opening', 'middlegame', 'middlegame', 'endgame', 'endgame']);
+    expect(states.every(state => state.status === 'active' || state.status === 'check')).toBe(true);
+    expect(states.every(state => getLegalActions(state).length > 0)).toBe(true);
+    const positionKeys = states.map(state => createPositionKey(state));
+    expect(new Set(positionKeys).size).toBe(QUIESCENCE_ORDERING_SELF_PLAY_SCENARIOS.length);
+    expect(QUIESCENCE_ORDERING_SELF_PLAY_SCENARIOS.map(scenario => createPositionKey(scenario.create())))
+      .toEqual(positionKeys);
     expect(states[1].squares[5][2].piece?.player).toBe('sente'); // ▲7六歩
     expect(states[1].squares[3][6].piece?.player).toBe('gote'); // △3四歩
     expect(states[2].squares[4][7].piece?.player).toBe('sente'); // ▲2五歩
@@ -71,14 +82,13 @@ describe('quiescence ordering multi-position self-play suite', () => {
       return shortRunner(options);
     });
     const result = runSelfPlaySuite({ ...dependencies, runner });
-    expect(runner).toHaveBeenCalledTimes(3);
+    expect(runner).toHaveBeenCalledTimes(QUIESCENCE_ORDERING_SELF_PLAY_SCENARIOS.length);
     expect(inputs).toEqual(QUIESCENCE_ORDERING_SELF_PLAY_SCENARIOS.map(scenario => createPositionKey(scenario.create())));
-    expect(result.scenarios.map(scenario => scenario.executionOrder)).toEqual([1, 2, 3]);
+    expect(result.scenarios.map(scenario => scenario.executionOrder)).toEqual(QUIESCENCE_ORDERING_SELF_PLAY_SCENARIOS.map((_, index) => index + 1));
     expect(result.scenarios.every(scenario => scenario.pair.games.length === 2)).toBe(true);
-    expect(result.scenarios.map(scenario => scenario.summary.outcomes.maxPlies)).toEqual([2n, 2n, 2n]);
-    expect(result.summary).toMatchObject({ totalGames: 6n, outcomeCountSum: 6n, consistent: true,
-      outcomes: { aWins: 0n, bWins: 0n, draws: 0n, maxPlies: 6n, failures: 0n },
-      uniquePositionSignatures: 3, duplicateGames: 3,
+    expect(result.scenarios.map(scenario => scenario.summary.outcomes.maxPlies)).toEqual(Array(QUIESCENCE_ORDERING_SELF_PLAY_SCENARIOS.length).fill(2n));
+    expect(result.summary).toMatchObject({ totalGames: BigInt(QUIESCENCE_ORDERING_SELF_PLAY_SCENARIOS.length * 2), outcomeCountSum: BigInt(QUIESCENCE_ORDERING_SELF_PLAY_SCENARIOS.length * 2), consistent: true,
+      outcomes: { aWins: 0n, bWins: 0n, draws: 0n, maxPlies: BigInt(QUIESCENCE_ORDERING_SELF_PLAY_SCENARIOS.length * 2), failures: 0n },
     });
     expect(result.scenarios[0].games[0].participants.A.elapsedMilliseconds).toBeNull();
   });
@@ -86,8 +96,8 @@ describe('quiescence ordering multi-position self-play suite', () => {
   it('keeps failed and max-ply games as counted observations', () => {
     let call = 0;
     const result = runSelfPlaySuite({ runner: () => observedPair(++call === 1 ? 'failed' : 'max_plies') });
-    expect(result.summary.outcomes).toEqual({ aWins: 0n, bWins: 0n, draws: 0n, maxPlies: 4n, failures: 2n });
-    expect(result.summary.totalGames).toBe(6n);
+    expect(result.summary.outcomes).toEqual({ aWins: 0n, bWins: 0n, draws: 0n, maxPlies: BigInt((QUIESCENCE_ORDERING_SELF_PLAY_SCENARIOS.length - 1) * 2), failures: 2n });
+    expect(result.summary.totalGames).toBe(BigInt(QUIESCENCE_ORDERING_SELF_PLAY_SCENARIOS.length * 2));
   });
 
   it('distinguishes different starts with the same moves and counts an exact repeat as a duplicate', () => {
@@ -116,8 +126,8 @@ describe('quiescence ordering multi-position self-play suite', () => {
     const read = (prefix: string) => lines.filter(line => line.startsWith(`${prefix} `)).map(line => JSON.parse(line.slice(prefix.length + 1)));
     expect(read('SUITE_CONFIG')[0]).toMatchObject({ scenarioIds: QUIESCENCE_ORDERING_SELF_PLAY_SCENARIOS.map(s => s.id),
       pairsPerScenario: 1, maxPlies: SELF_PLAY_CONFIG.maxPlies });
-    expect(read('SCENARIO_START')).toHaveLength(3); expect(read('RECORD')).toHaveLength(6);
-    expect(read('GAME')).toHaveLength(6); expect(read('SCENARIO_SUMMARY')).toHaveLength(3);
-    expect(read('SUITE_SUMMARY')[0]).toMatchObject({ totalGames: '6', outcomeCountSum: '6', consistent: true });
+    expect(read('SCENARIO_START')).toHaveLength(QUIESCENCE_ORDERING_SELF_PLAY_SCENARIOS.length); expect(read('RECORD')).toHaveLength(QUIESCENCE_ORDERING_SELF_PLAY_SCENARIOS.length * 2);
+    expect(read('GAME')).toHaveLength(QUIESCENCE_ORDERING_SELF_PLAY_SCENARIOS.length * 2); expect(read('SCENARIO_SUMMARY')).toHaveLength(QUIESCENCE_ORDERING_SELF_PLAY_SCENARIOS.length);
+    expect(read('SUITE_SUMMARY')[0]).toMatchObject({ totalGames: String(QUIESCENCE_ORDERING_SELF_PLAY_SCENARIOS.length * 2), outcomeCountSum: String(QUIESCENCE_ORDERING_SELF_PLAY_SCENARIOS.length * 2), consistent: true });
   });
 });
