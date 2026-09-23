@@ -1,6 +1,24 @@
 # キラームーブ ON/OFF 複数局面比較
 
-`npm run measure:killer-move-suite-comparison -- [fixed|timed] [--time-limit-ms <正の整数>] [--max-depth <1以上の整数>]` は、PR #138 の比較APIと固定3局面を再利用する研究用CLIです。baseline=`killer-off` とcandidate=`killer-on`の差は`AlphaBetaSearchOptions.killerMoves`だけです。両方とも標準評価、通常`standard`順、静止探索追加1手・`original`順です。
+`npm run measure:killer-move-suite-comparison -- [fixed|timed] [--time-limit-ms <正の整数>] [--max-depth <1以上の整数>]` は、PR #138 の比較APIと固定7局面を再利用する研究用CLIです。baseline=`killer-off` とcandidate=`killer-on`の差は`AlphaBetaSearchOptions.killerMoves`だけです。両方とも標準評価、通常`standard`順、静止探索追加1手・`original`順です。
+
+## 局面スイート
+
+局面は序盤3・中盤2・終盤2の合計7件で、順序と生成結果は決定的です。序盤・中盤は平手初期局面から公開 `getLegalActions` で意味的に一意な手を選び、`executeLegalAction` で再生します。終盤2局面は実戦棋譜を装わない研究用の構成局面であり、既存の静止探索ベンチマークと同じ `BoardState`・履歴・snapshot の正規化経路で生成します。開始局面キー、手番、状態、合法手の有無、ID・局面キーの重複、再生成の決定性をテストで検証します。
+
+| ID | 区分 | 手番 | 目的・由来 |
+| --- | --- | --- | --- |
+| `standard-hirate` | opening | sente | 従来パイロットとの連続性を保つ平手初期局面。 |
+| `rook-pawn-opening-76-34-26-84` | opening | sente | 角道と飛車先の定跡分岐。 |
+| `rook-pawn-exchange-26-84-25-85` | opening | sente | 双方の飛車先を進めた別の定跡分岐。 |
+| `quiet-double-static-rook-middlegame` | middlegame | sente | 公開APIで20手再生した非王手の相居飛車。双方の玉・金銀・銀が初期位置から展開済みで、静かな駒組みを観察する。実戦棋譜とは主張しない。 |
+| `rook-pawn-recapture-middlegame` | middlegame | sente | 公開APIで歩交換と双方飛車の取り返しまで再生した局面。盤上駒は36枚、双方が歩2枚を持ち駒にしており、具体的な交換後の候補集合を観察する。実戦棋譜とは主張しない。 |
+| `check-evasion-endgame` | endgame | gote | 研究用の構成局面（実戦棋譜ではない）。盤上8枚・双方持ち駒で、先手飛車が後手玉へ王手している。後手の合法な王手回避・合駒を含む。 |
+| `hand-drop-endgame` | endgame | gote | 研究用の構成局面（実戦棋譜ではない）。盤上7枚・双方持ち駒で、後手が歩を持ち、合法な歩打ち候補を実際に持つ。 |
+
+局面別のJSONには `scenarioId`、`scenarioName`、`phase`、`sideToMove`、`provenance`、`executionOrder` を成功・失敗の双方で残します。整形テキストも成功・失敗の双方に `phase` と `sideToMove` を表示します。これは局面別データの識別用メタデータであり、区分別の性能集計や勝者判定はしません。
+
+次回は同一環境で5秒・10秒条件をこの7局面へ適用する予定です。今回その長時間測定は実行していません。局面拡張だけから性能改善、棋力・Elo差、統計的有意差、キラームーブの既定ON化、通常対局・UIへの接続を結論しません。
 
 各局面は3回のウォームアップと8回の本測定を行います。本測定のOFF/ON先行は4回ずつで、同じ探索時計やスナップショットは共有しません。fixedは通常深さ3のままで、timedだけが`--time-limit-ms`と`--max-depth`を受け付けます。省略時は従来どおり最大深さ4・呼出しごとに独立した1,000msです。値なし、0、負数、小数、`NaN`、`Infinity`、数字以外、重複、未知オプション、`--max-depth`の1未満、fixedでのtimed専用オプションは、測定を始めず使用例付きで失敗します。深さ1は既存の最低保証であり、timedの予算は厳密な実行上限ではありません。
 

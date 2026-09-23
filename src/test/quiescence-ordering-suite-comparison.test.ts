@@ -12,14 +12,18 @@ import type { SearchResult } from '../../scripts/benchmarks/quiescenceOrderingSu
 
 function fixtureDependencies(options: { readonly infiniteCandidateEvaluation?: boolean; readonly failScenarioId?: string } = {}): SuiteComparisonDependencies {
   const calls = new Map<string, number>();
+  const legalActions = new Map<string, ReturnType<typeof getLegalActions>>();
+  const scenariosByPosition = new Map(QUIESCENCE_ORDERING_SELF_PLAY_SCENARIOS.map(scenario =>
+    [createPositionKey(scenario.create()), scenario] as const));
   return {
     trialRunner: (input, mode, setting) => {
       const key = `${createPositionKey(input)}/${setting.moveOrdering}`;
       const call = (calls.get(key) ?? 0) + 1;
       calls.set(key, call);
-      const scenario = QUIESCENCE_ORDERING_SELF_PLAY_SCENARIOS.find((item) => createPositionKey(item.create()) === createPositionKey(input));
+      const scenario = scenariosByPosition.get(createPositionKey(input));
       if (setting.moveOrdering === 'material' && scenario?.id === options.failScenarioId) throw new Error('fixture candidate failure');
-      const actions = getLegalActions(input);
+      const actions = legalActions.get(key) ?? getLegalActions(input);
+      legalActions.set(key, actions);
       const candidate = setting.moveOrdering === 'material';
       const measurement = Math.max(1, call - 3);
       const search = {
@@ -55,8 +59,8 @@ describe('multi-position A/B search suite comparison', () => {
       },
     });
 
-    expect(result.positions).toHaveLength(3);
-    expect(seen).toHaveLength(3 * (3 + 8) * 2);
+    expect(result.positions).toHaveLength(QUIESCENCE_ORDERING_SELF_PLAY_SCENARIOS.length);
+    expect(seen).toHaveLength(QUIESCENCE_ORDERING_SELF_PLAY_SCENARIOS.length * (3 + 8) * 2);
     for (const scenario of QUIESCENCE_ORDERING_SELF_PLAY_SCENARIOS) {
       const runs = seen.filter((entry) => entry.position === createPositionKey(scenario.create()));
       expect(runs).toHaveLength(22);
@@ -71,8 +75,8 @@ describe('multi-position A/B search suite comparison', () => {
 
   it('records selected-action differences and medians, sums suite nodes/cutoffs, and keeps zero-based rates unavailable', () => {
     const result = runSuiteComparison(defaultSuiteComparisonConfig('fixed'), fixtureDependencies());
-    expect(result.summary).toMatchObject({ targetPositionCount: 3, completedPositionCount: 3,
-      errorCount: 0, selectedActionChangedPositionCount: 3 });
+    expect(result.summary).toMatchObject({ targetPositionCount: QUIESCENCE_ORDERING_SELF_PLAY_SCENARIOS.length, completedPositionCount: QUIESCENCE_ORDERING_SELF_PLAY_SCENARIOS.length,
+      errorCount: 0, selectedActionChangedPositionCount: QUIESCENCE_ORDERING_SELF_PLAY_SCENARIOS.length });
     const first = result.positions[0];
     expect(first.selectedActionMatches).toBe(false);
     expect(first.evaluation).toMatchObject({ baseline: 0, candidate: 5, difference: 5, percentChange: null });
@@ -81,9 +85,9 @@ describe('multi-position A/B search suite comparison', () => {
     expect(first.metrics.cutoffCount).toEqual({ baseline: 0, candidate: 2, difference: 2, percentChange: null });
     expect(first.metrics.skippedActionCount).toEqual({ baseline: 0, candidate: 3, difference: 3, percentChange: null });
     expect(first.metrics.elapsedMilliseconds).toMatchObject({ baseline: 9, candidate: 18, difference: 9, percentChange: 100 });
-    expect(result.summary.metrics.searchPositionCount).toEqual({ baseline: 0, candidate: 12, difference: 12, percentChange: null });
-    expect(result.summary.metrics.cutoffCount).toEqual({ baseline: 0, candidate: 6, difference: 6, percentChange: null });
-    expect(result.summary.metrics.skippedActionCount).toEqual({ baseline: 0, candidate: 9, difference: 9, percentChange: null });
+    expect(result.summary.metrics.searchPositionCount).toEqual({ baseline: 0, candidate: 4 * QUIESCENCE_ORDERING_SELF_PLAY_SCENARIOS.length, difference: 4 * QUIESCENCE_ORDERING_SELF_PLAY_SCENARIOS.length, percentChange: null });
+    expect(result.summary.metrics.cutoffCount).toEqual({ baseline: 0, candidate: 2 * QUIESCENCE_ORDERING_SELF_PLAY_SCENARIOS.length, difference: 2 * QUIESCENCE_ORDERING_SELF_PLAY_SCENARIOS.length, percentChange: null });
+    expect(result.summary.metrics.skippedActionCount).toEqual({ baseline: 0, candidate: 3 * QUIESCENCE_ORDERING_SELF_PLAY_SCENARIOS.length, difference: 3 * QUIESCENCE_ORDERING_SELF_PLAY_SCENARIOS.length, percentChange: null });
     expect(result.positions.every((position) => position.baseline?.sampleCount === 8 && position.candidate?.sampleCount === 8)).toBe(true);
   });
 
@@ -91,35 +95,40 @@ describe('multi-position A/B search suite comparison', () => {
     const result = runSuiteComparison(defaultSuiteComparisonConfig('fixed'), fixtureDependencies({
       failScenarioId: 'rook-pawn-opening-76-34-26-84',
     }));
-    expect(result.summary).toMatchObject({ targetPositionCount: 3, completedPositionCount: 2, errorCount: 1,
-      selectedActionChangedPositionCount: 2 });
+    expect(result.summary).toMatchObject({ targetPositionCount: QUIESCENCE_ORDERING_SELF_PLAY_SCENARIOS.length, completedPositionCount: QUIESCENCE_ORDERING_SELF_PLAY_SCENARIOS.length - 1, errorCount: 1,
+      selectedActionChangedPositionCount: QUIESCENCE_ORDERING_SELF_PLAY_SCENARIOS.length - 1 });
     const failed = result.positions[1];
-    expect(failed).toMatchObject({ scenarioId: 'rook-pawn-opening-76-34-26-84', ok: false });
+    expect(failed).toMatchObject({ scenarioId: 'rook-pawn-opening-76-34-26-84', phase: 'opening', sideToMove: 'sente', ok: false });
     expect(failed.trials).toHaveLength(1);
     expect(failed.trials.at(-1)).toMatchObject({ side: 'candidate', ok: false, error: expect.stringContaining('fixture candidate failure') });
     expect(result.positions[2].ok).toBe(true);
-    expect(formatSuiteComparison(result)).toContain('ERROR scenario=rook-pawn-opening-76-34-26-84');
+    expect(formatSuiteComparison(result)).toContain('rook-pawn-opening-76-34-26-84: phase=opening; sideToMove=sente; ERROR scenario=rook-pawn-opening-76-34-26-84');
   });
 
   it('keeps every failed position, null aggregate metrics, and CLI JSON when no position completes', () => {
     const scenarios = QUIESCENCE_ORDERING_SELF_PLAY_SCENARIOS;
     const dependencies: SuiteComparisonDependencies = { trialRunner: () => { throw new Error('fixture all failure'); } };
     const result = runSuiteComparison(defaultSuiteComparisonConfig('fixed'), dependencies, scenarios);
-    expect(result.summary).toMatchObject({ targetPositionCount: 3, completedPositionCount: 0, errorCount: 3,
+    expect(result.summary).toMatchObject({ targetPositionCount: QUIESCENCE_ORDERING_SELF_PLAY_SCENARIOS.length, completedPositionCount: 0, errorCount: QUIESCENCE_ORDERING_SELF_PLAY_SCENARIOS.length,
       selectedActionChangedPositionCount: 0 });
     const unavailable = { baseline: null, candidate: null, difference: null, percentChange: null };
     expect(result.summary.metrics).toEqual({ completedDepth: unavailable, searchPositionCount: unavailable,
       cutoffCount: unavailable, skippedActionCount: unavailable, elapsedMilliseconds: unavailable });
-    expect(result.positions).toHaveLength(3);
+    expect(result.positions).toHaveLength(QUIESCENCE_ORDERING_SELF_PLAY_SCENARIOS.length);
     expect(result.positions.every((position) => !position.ok && position.trials.length === 1 &&
       position.trials[0].error?.includes('fixture all failure'))).toBe(true);
     const output: string[] = [];
     expect(runSuiteComparisonCli(['fixed'], dependencies, scenarios, line => output.push(line))).toBe(1);
-    expect(output[0]).toContain('正常完了=0; エラー=3');
-    for (const scenario of scenarios) expect(output[0]).toContain(`${scenario.id}: ERROR`);
+    expect(output[0]).toContain(`正常完了=0; エラー=${QUIESCENCE_ORDERING_SELF_PLAY_SCENARIOS.length}`);
+    for (const scenario of scenarios) {
+      expect(output[0]).toContain(`${scenario.id}: phase=${scenario.phase}; sideToMove=${scenario.sideToMove}; ERROR`);
+    }
     const serialized = output.at(-1)!.slice('JSON '.length);
-    expect(JSON.parse(serialized).positions.map((position: { scenarioId: string }) => position.scenarioId))
+    const jsonPositions = JSON.parse(serialized).positions as Array<{ scenarioId: string; phase: string; sideToMove: string }>;
+    expect(jsonPositions.map(position => position.scenarioId))
       .toEqual(scenarios.map((scenario) => scenario.id));
+    expect(jsonPositions.map(position => [position.phase, position.sideToMove]))
+      .toEqual(scenarios.map(scenario => [scenario.phase, scenario.sideToMove]));
   });
 
   it('allows an empty scenario list without inventing aggregate values', () => {
@@ -155,7 +164,18 @@ describe('multi-position A/B search suite comparison', () => {
     const text = formatSuiteComparison(result);
     expect(text).toMatch(/^A\/B 探索設定スイート比較\nmode=fixed; timeLimitMilliseconds=1000; maxDepth=4/);
     expect(text).toContain('局面別の本測定:');
-    expect(text).toContain('standard-hirate: 手=baseline-action→candidate-action');
+    expect(text).toContain('standard-hirate: phase=opening; sideToMove=sente; 手=baseline-action→candidate-action');
+  });
+
+  it('retains phase and actual side to move in JSON and text, including gote scenarios', () => {
+    const result = runSuiteComparison(defaultSuiteComparisonConfig('fixed'), fixtureDependencies());
+    expect(result.positions.map(position => [position.phase, position.sideToMove]))
+      .toEqual(QUIESCENCE_ORDERING_SELF_PLAY_SCENARIOS.map(scenario => [scenario.phase, scenario.sideToMove]));
+    const gote = result.positions.find(position => position.sideToMove === 'gote');
+    expect(gote).toMatchObject({ ok: true, phase: 'endgame', sideToMove: 'gote' });
+    expect(formatSuiteComparison(result)).toContain('phase=endgame; sideToMove=gote');
+    expect(JSON.parse(serializeSuiteComparison(result)).positions.find((position: { sideToMove: string }) => position.sideToMove === 'gote'))
+      .toMatchObject({ phase: 'endgame', sideToMove: 'gote' });
   });
 
   it('uses the established CLI boundary and rejects invalid modes without an accidental run', () => {

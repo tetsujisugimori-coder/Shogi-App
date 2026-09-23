@@ -1,5 +1,33 @@
 # SHOGI-APP 開発ログ
 
+## [2026-09-23] キラームーブ比較7局面の局面実態補正
+
+### 原因・修正
+
+- PR #144 の初回7局面化では、`check-evasion-endgame` が平手から5手、`hand-drop-endgame` が11手だけの公開合法手再生だったため、`endgame` というメタデータに盤面実態が伴っていなかった。
+- 終盤2局面を、既存 `quiescencePositions.ts` と同じ `BoardState`、`normalizePositionHistory()`、`normalizePositionSnapshots()` の構築経路による決定的な研究用構成局面へ置換した。実戦棋譜とは主張しない。王手回避は後手番・盤上8枚・双方持ち駒・先手飛車の王手、歩打ちは後手番・盤上7枚・双方持ち駒・後手の歩持ち駒を固定する。
+- 中盤は公開API再生を維持し、静かな相居飛車では20手後の玉・金銀・銀の展開、飛車先取り返しでは双方飛車・双方の歩2枚の持ち駒をテストで固定した。終盤のphase文字列だけを根拠にせず、盤上枚数、駒・持ち駒、王手状態、合法手を検証する。
+- `check-evasion-endgame` は後手番の実際の `check` と少なくとも1手の合法回避を検証し、適用後に後手玉が王手でないことを確認する。`hand-drop-endgame` は後手の合法な歩打ちを `getLegalActions()` から取得して適用し、打ち歩詰め・二歩などを規則判定で除外済みの実際の候補であることを確認する。
+- 比較の失敗テキストも `scenarioId: phase=...; sideToMove=...; ERROR ...` に統一し、失敗JSONの `phase` と `sideToMove` を回帰テストで確認した。3回ウォームアップ、8回本測定、OFF/ON交互順、中央値、深さ分布、失敗後の継続、探索本体は変更していない。
+
+### 検証・制限
+
+- 指定の `npx vitest run src/test/quiescence-ordering-self-play-suite.test.ts src/test/quiescence-ordering-suite-comparison.test.ts` は2ファイル22件成功した。`npm run check` はlockfile検証と`tsc --noEmit`の後に全Vitest開始まで到達したが、このWindows実行経路では全件Vitestの終了要約と後続buildを回収できなかった。buildは単独の `npm run build` で成功したため、全体checkの終了確認はこの環境の制約として残す。長時間の5秒・10秒全局面測定は今回実行しない。
+- 性能改善、棋力・Elo差、統計的有意差、キラームーブ既定ON化は結論しない。依存関係、Worker、UI、通常対局、保存形式、評価、SEE、静止探索、αβ本体、CI性能閾値は変更しない。
+
+## [2026-09-23] キラームーブ比較の7局面スイート
+
+### 設計・実装
+
+- 序盤3局面だけでは先手番・初期段階へ偏り、PR #142の5秒・10秒観測を一般化する材料にならないため、型付き`phase`（opening/middlegame/endgame）と期待`sideToMove`を各シナリオへ追加した。既存ID・名称・目的・由来・生成関数は維持し、中盤2・終盤2を加えて7局面にした。
+- 固定手順は公開`getLegalActions()`で意味的にちょうど1手へ照合し、`executeLegalAction()`で適用する。駒打ちも扱える狭い`BookAction` unionへ拡張し、再生後の実手番を期待値と照合する。局面キーの決定性・重複なし、active/check、合法手あり、後手番ありはテストで検証する。
+- 比較結果・JSON・テキストに`phase`と実手番を追加した。比較の3 warmup/8 measurement、交互順、中央値、深さ分布、失敗継続は変更していない。7局面×22呼出しは探索本体ではなくfixture runnerで検証する。
+
+### 範囲・制限
+
+- 中盤は静かな駒組みと飛車先の取り返し、終盤は王手回避と持ち駒の歩打ち候補を分けた。追加局面は決定的な公開API再生の研究用fixtureであり、実戦由来と主張していない。
+- 今回は5秒・10秒の全局面実測を行わない。性能改善、棋力/Elo、統計的有意差、キラームーブ既定ON、通常対局、Worker、UI、評価・SEE・静止探索・αβ本体、保存形式、CI性能閾値、依存関係は変更・結論しない。
+
 ## [2026-09-23] PR #138 失敗記録契約の補正
 
 ### 原因・修正
