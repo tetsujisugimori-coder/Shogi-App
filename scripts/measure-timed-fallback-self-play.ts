@@ -46,12 +46,14 @@ function markdown(summary: ReturnType<typeof summarizeGames>, config: Measuremen
     '| 参加者 | 着手 | fallback | 率 | 実時間超過 | 超過中央値ms | 超過最大ms |',
     '| --- | ---: | ---: | ---: | ---: | ---: | ---: |',
   ];
+  const participantDetails: string[] = [];
   for (const id of ['A', 'B'] as const) {
     const p = summary.participants[id] as ReturnType<typeof summarizeGames>['participants'][string];
     lines.push(`| ${id} | ${p.moves} | ${p.fallbackCount} | ${p.fallbackRate === null ? 'n/a' : (p.fallbackRate * 100).toFixed(1) + '%'} | ${p.actualOverLimit.count}/${p.moves} | ${format(p.actualOverLimit.medianExcessMilliseconds)} | ${format(p.actualOverLimit.maxExcessMilliseconds)} |`);
-    lines.push('', `${id} fallback手数: ${p.fallbackPlies.join(', ') || 'なし'}。深さ分布 ${JSON.stringify(p.completedDepthDistribution)}、手数帯 ${JSON.stringify(p.fallbackByPlyBand)}、超過分布 ${JSON.stringify(p.actualOverLimit.distribution)}。`, '');
+    participantDetails.push(`${id} fallback手数: ${p.fallbackPlies.join(', ') || 'なし'}。深さ分布 ${JSON.stringify(p.completedDepthDistribution)}、手数帯 ${JSON.stringify(p.fallbackByPlyBand)}、超過分布 ${JSON.stringify(p.actualOverLimit.distribution)}。`);
   }
-  lines.push('', `fallbackあり ${summary.byFallback.withFallback.games}局 ${JSON.stringify(summary.byFallback.withFallback.outcomes)}。fallbackなし ${summary.byFallback.withoutFallback.games}局 ${JSON.stringify(summary.byFallback.withoutFallback.outcomes)}。`, '',
+  lines.push('', ...participantDetails.flatMap(detail => [detail, '']),
+    `fallbackあり ${summary.byFallback.withFallback.games}局 ${JSON.stringify(summary.byFallback.withFallback.outcomes)}。fallbackなし ${summary.byFallback.withoutFallback.games}局 ${JSON.stringify(summary.byFallback.withoutFallback.outcomes)}。`, '',
     '| ペア/局 | 先手/後手 | 結果 | 手数 | A fallback/着手 | B fallback/着手 |',
     '| --- | --- | --- | ---: | ---: | ---: |');
   for (const game of summary.perGame) {
