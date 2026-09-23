@@ -5,7 +5,8 @@ import { getLegalActions } from '../domain/shogi/legalActions';
 import { analyzeAlphaBetaSearch } from '../domain/shogi/twoPlyAlphaBetaAi';
 import { QUIESCENCE_ORDERING_SELF_PLAY_SCENARIOS, type SelfPlayScenario } from '../../scripts/benchmarks/quiescenceOrderingSelfPlayScenarios';
 import { defaultSuiteComparisonConfig, formatSuiteComparison, parseSuiteComparisonMode, runSuiteComparison,
-  runSuiteComparisonCli, serializeSuiteComparison, type SuiteComparisonDependencies } from '../../scripts/benchmarks/quiescenceOrderingSuiteComparison';
+  runSuiteComparisonCli, serializeSuiteComparison, defaultKillerMoveSuiteComparisonConfig,
+  type SuiteComparisonDependencies } from '../../scripts/benchmarks/quiescenceOrderingSuiteComparison';
 import type { SearchResult } from '../../scripts/benchmarks/quiescenceOrderingSuite';
 
 function fixtureDependencies(options: { readonly infiniteCandidateEvaluation?: boolean; readonly failScenarioId?: string } = {}): SuiteComparisonDependencies {
@@ -27,6 +28,7 @@ function fixtureDependencies(options: { readonly infiniteCandidateEvaluation?: b
         elapsedMilliseconds: candidate ? measurement * 4 : measurement * 2,
         visitedPositionCount: candidate ? 4 : 0,
         cutoffCount: candidate ? 2 : 0,
+        skippedActionCount: candidate ? 3 : 0,
       } as SearchResult;
       return { setting, search, pv: [candidate ? 'candidate-action' : 'baseline-action'] };
     },
@@ -76,9 +78,11 @@ describe('multi-position A/B search suite comparison', () => {
     expect(first.metrics.completedDepth).toMatchObject({ baseline: 5.5, candidate: 6.5, difference: 1, percentChange: expect.any(Number) });
     expect(first.metrics.searchPositionCount).toEqual({ baseline: 0, candidate: 4, difference: 4, percentChange: null });
     expect(first.metrics.cutoffCount).toEqual({ baseline: 0, candidate: 2, difference: 2, percentChange: null });
+    expect(first.metrics.skippedActionCount).toEqual({ baseline: 0, candidate: 3, difference: 3, percentChange: null });
     expect(first.metrics.elapsedMilliseconds).toMatchObject({ baseline: 9, candidate: 18, difference: 9, percentChange: 100 });
     expect(result.summary.metrics.searchPositionCount).toEqual({ baseline: 0, candidate: 12, difference: 12, percentChange: null });
     expect(result.summary.metrics.cutoffCount).toEqual({ baseline: 0, candidate: 6, difference: 6, percentChange: null });
+    expect(result.summary.metrics.skippedActionCount).toEqual({ baseline: 0, candidate: 9, difference: 9, percentChange: null });
     expect(result.positions.every((position) => position.baseline?.sampleCount === 8 && position.candidate?.sampleCount === 8)).toBe(true);
   });
 
@@ -104,7 +108,7 @@ describe('multi-position A/B search suite comparison', () => {
       selectedActionChangedPositionCount: 0 });
     const unavailable = { baseline: null, candidate: null, difference: null, percentChange: null };
     expect(result.summary.metrics).toEqual({ completedDepth: unavailable, searchPositionCount: unavailable,
-      cutoffCount: unavailable, elapsedMilliseconds: unavailable });
+      cutoffCount: unavailable, skippedActionCount: unavailable, elapsedMilliseconds: unavailable });
     expect(result.positions).toHaveLength(3);
     expect(result.positions.every((position) => !position.ok && position.trials.length === 1 &&
       position.trials[0].error?.includes('fixture all failure'))).toBe(true);
@@ -162,6 +166,14 @@ describe('multi-position A/B search suite comparison', () => {
     expect(parseSuiteComparisonMode([])).toBe('timed');
     expect(parseSuiteComparisonMode(['timed'])).toBe('timed');
     expect(() => parseSuiteComparisonMode(['bad'])).toThrow('measure:quiescence-ordering-suite-comparison');
+  });
+
+  it('builds a balanced killer OFF/ON configuration without changing quiescence or ordinary ordering', () => {
+    const config = defaultKillerMoveSuiteComparisonConfig('timed');
+    expect(config.baseline).toEqual({ id: 'killer-off', setting: { maxTacticalDepth: 1, moveOrdering: 'original', killerMoves: false } });
+    expect(config.candidate).toEqual({ id: 'killer-on', setting: { maxTacticalDepth: 1, moveOrdering: 'original', killerMoves: true } });
+    const result = runSuiteComparison(config, fixtureDependencies(), [QUIESCENCE_ORDERING_SELF_PLAY_SCENARIOS[0]]);
+    expect(result.positions[0].ok).toBe(true);
   });
 
   it('fails fatal duplicate scenario configuration before beginning a suite', () => {

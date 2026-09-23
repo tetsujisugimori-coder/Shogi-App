@@ -11,7 +11,7 @@ import type { BenchmarkMode } from './quiescenceSuite';
 
 export type ComparisonSide = 'baseline' | 'candidate';
 type ComparisonPhase = 'warmup' | 'measurement';
-type MetricName = 'completedDepth' | 'searchPositionCount' | 'cutoffCount' | 'elapsedMilliseconds';
+type MetricName = 'completedDepth' | 'searchPositionCount' | 'cutoffCount' | 'skippedActionCount' | 'elapsedMilliseconds';
 
 export interface NamedSearchSetting {
   readonly id: string;
@@ -25,6 +25,15 @@ export const SUITE_COMPARISON_CONFIG = Object.freeze({
   execution: 'synchronous-serial-alternating-pairs',
   baseline: Object.freeze({ id: 'original', setting: Object.freeze({ maxTacticalDepth: 1, moveOrdering: 'original' }) }),
   candidate: Object.freeze({ id: 'material', setting: Object.freeze({ maxTacticalDepth: 1, moveOrdering: 'material' }) }),
+} as const);
+
+/** Same suite and all other search settings; only killer history differs. */
+export const KILLER_MOVE_SUITE_COMPARISON_CONFIG = Object.freeze({
+  warmupCount: WARMUP_COUNT,
+  measurementCount: MEASUREMENT_COUNT,
+  execution: 'synchronous-serial-alternating-pairs',
+  baseline: Object.freeze({ id: 'killer-off', setting: Object.freeze({ maxTacticalDepth: 1, moveOrdering: 'original', killerMoves: false }) }),
+  candidate: Object.freeze({ id: 'killer-on', setting: Object.freeze({ maxTacticalDepth: 1, moveOrdering: 'original', killerMoves: true }) }),
 } as const);
 
 export interface SuiteComparisonConfig {
@@ -50,6 +59,7 @@ export interface SideMetrics {
   /** Timed mode uses all completed iterations; fixed mode uses its sole pass. */
   readonly searchPositionCount: number | null;
   readonly cutoffCount: number | null;
+  readonly skippedActionCount: number | null;
   readonly elapsedMilliseconds: number | null;
 }
 
@@ -109,7 +119,7 @@ export interface SuiteComparisonDependencies extends RepeatedDependencies {
   readonly trialRunner?: SuiteComparisonTrialRunner;
 }
 
-const metricNames: readonly MetricName[] = ['completedDepth', 'searchPositionCount', 'cutoffCount', 'elapsedMilliseconds'];
+const metricNames: readonly MetricName[] = ['completedDepth', 'searchPositionCount', 'cutoffCount', 'skippedActionCount', 'elapsedMilliseconds'];
 const message = (error: unknown) => error instanceof Error ? error.message : String(error);
 
 function finite(value: unknown): number | null {
@@ -124,6 +134,8 @@ function metricValue(search: SearchResult, metric: MetricName): number | null {
       return finite('iterations' in search ? search.totalVisitedPositionCount : search.visitedPositionCount);
     case 'cutoffCount':
       return finite('iterations' in search ? search.totalCutoffCount : search.cutoffCount);
+    case 'skippedActionCount':
+      return finite('iterations' in search ? search.totalSkippedActionCount : search.skippedActionCount);
   }
 }
 
@@ -168,7 +180,8 @@ function summarizeSide(trials: readonly SuiteComparisonTrial[], side: Comparison
     completedCount: timeoutValues.filter((value) => value === false).length,
     timeoutUnavailableCount: timeoutValues.filter((value) => value === null).length,
     completedDepth: median('completedDepth'), searchPositionCount: median('searchPositionCount'),
-    cutoffCount: median('cutoffCount'), elapsedMilliseconds: median('elapsedMilliseconds'),
+    cutoffCount: median('cutoffCount'), skippedActionCount: median('skippedActionCount'),
+    elapsedMilliseconds: median('elapsedMilliseconds'),
   };
 }
 
@@ -243,7 +256,7 @@ function aggregateMetric(positions: readonly PositionComparison[], metric: Metri
   const baseline = positions.map((position) => position.baseline![metric]);
   const candidate = positions.map((position) => position.candidate![metric]);
   if (!baseline.every((value): value is number => value !== null) || !candidate.every((value): value is number => value !== null)) return emptyDifference();
-  const aggregate = metric === 'searchPositionCount' || metric === 'cutoffCount'
+  const aggregate = metric === 'searchPositionCount' || metric === 'cutoffCount' || metric === 'skippedActionCount'
     ? (values: readonly number[]) => values.reduce((sum, value) => sum + value, 0)
     : (values: readonly number[]) => describeNumbers(values).median;
   return safeDifference(aggregate(baseline), aggregate(candidate));
@@ -259,6 +272,8 @@ function validateConfig(config: SuiteComparisonConfig): void {
       `${side} tactical depth must be 1 or 2.`);
     assert.ok(named.setting.moveOrdering === 'original' || named.setting.moveOrdering === 'material',
       `${side} move ordering must be original or material.`);
+    assert.ok(named.setting.killerMoves === undefined || typeof named.setting.killerMoves === 'boolean',
+      `${side} killerMoves must be boolean when provided.`);
   }
 }
 
@@ -282,6 +297,11 @@ export function defaultSuiteComparisonConfig(mode: BenchmarkMode = 'timed'): Sui
   return { mode, baseline: SUITE_COMPARISON_CONFIG.baseline, candidate: SUITE_COMPARISON_CONFIG.candidate };
 }
 
+export function defaultKillerMoveSuiteComparisonConfig(mode: BenchmarkMode = 'timed'): SuiteComparisonConfig {
+  return { mode, baseline: KILLER_MOVE_SUITE_COMPARISON_CONFIG.baseline,
+    candidate: KILLER_MOVE_SUITE_COMPARISON_CONFIG.candidate };
+}
+
 export function parseSuiteComparisonMode(args: readonly string[]): BenchmarkMode {
   if (args.length === 0) return 'timed';
   if (args.length === 1 && (args[0] === 'fixed' || args[0] === 'timed')) return args[0];
@@ -300,6 +320,7 @@ export function formatSuiteComparison(result: SuiteComparisonResult): string {
     `到達深さ（局面中央値の中央値）: ${value(summary.metrics.completedDepth)}`,
     `探索局面数（局面中央値の合計）: ${value(summary.metrics.searchPositionCount)}`,
     `カットオフ数（局面中央値の合計）: ${value(summary.metrics.cutoffCount)}`,
+    `スキップ手数（局面中央値の合計）: ${value(summary.metrics.skippedActionCount)}`,
     `経過時間ms（局面中央値の中央値）: ${value(summary.metrics.elapsedMilliseconds)}`,
     '局面別の主な差分:',
   ];
@@ -307,7 +328,7 @@ export function formatSuiteComparison(result: SuiteComparisonResult): string {
   if (notable.length === 0) lines.push('  該当なし');
   for (const position of notable) {
     if (!position.ok) { lines.push(`  ${position.scenarioId}: ERROR ${position.error}`); continue; }
-    lines.push(`  ${position.scenarioId}: 手=${position.baseline!.selectedActionLabel}→${position.candidate!.selectedActionLabel}; 一致=${position.selectedActionMatches}; 評価差=${position.evaluation.difference ?? '未算出'}; 深さ差=${position.metrics.completedDepth.difference ?? '未算出'}; 探索局面数差=${position.metrics.searchPositionCount.difference ?? '未算出'}; cutoff差=${position.metrics.cutoffCount.difference ?? '未算出'}; 時間差ms=${position.metrics.elapsedMilliseconds.difference ?? '未算出'}`);
+    lines.push(`  ${position.scenarioId}: 手=${position.baseline!.selectedActionLabel}→${position.candidate!.selectedActionLabel}; 一致=${position.selectedActionMatches}; 評価差=${position.evaluation.difference ?? '未算出'}; 深さ差=${position.metrics.completedDepth.difference ?? '未算出'}; 探索局面数差=${position.metrics.searchPositionCount.difference ?? '未算出'}; cutoff差=${position.metrics.cutoffCount.difference ?? '未算出'}; skip差=${position.metrics.skippedActionCount.difference ?? '未算出'}; 時間差ms=${position.metrics.elapsedMilliseconds.difference ?? '未算出'}; timeout=${position.baseline!.timedOutCount}→${position.candidate!.timedOutCount}`);
   }
   return lines.join('\n');
 }
@@ -316,9 +337,10 @@ export function formatSuiteComparison(result: SuiteComparisonResult): string {
 export const serializeSuiteComparison = (result: SuiteComparisonResult): string => rawJson(result);
 
 export function runSuiteComparisonCli(args: readonly string[], dependencies: SuiteComparisonDependencies = {},
-  scenarios = QUIESCENCE_ORDERING_SELF_PLAY_SCENARIOS, write: (line: string) => void = console.log): 0 | 1 {
+  scenarios = QUIESCENCE_ORDERING_SELF_PLAY_SCENARIOS, write: (line: string) => void = console.log,
+  configForMode: (mode: BenchmarkMode) => SuiteComparisonConfig = defaultSuiteComparisonConfig): 0 | 1 {
   try {
-    const result = runSuiteComparison(defaultSuiteComparisonConfig(parseSuiteComparisonMode(args)), dependencies, scenarios);
+    const result = runSuiteComparison(configForMode(parseSuiteComparisonMode(args)), dependencies, scenarios);
     write(formatSuiteComparison(result));
     write(`JSON ${serializeSuiteComparison(result)}`);
     return result.summary.errorCount === 0 ? 0 : 1;

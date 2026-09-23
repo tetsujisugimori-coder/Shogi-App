@@ -4079,3 +4079,32 @@ PR #1のレビュー指摘を受け、簡易APIの`applyMove`と合法手候補�
 
 - 実探索による長時間の単一局面測定および新規スイート測定は実行していない。今回の変更は測定基盤だけであり、勝率、Elo、棋力差、統計的有意差、性能改善を記録・判定していない。
 - 次段階は、この固定3局面を少数で使うパイロット測定。実施時も100msが深さ1では厳密な上限ではない既存契約、同一局面内の反復を独立標本とみなさない境界、failed/null観測の保持を守る。
+
+## [2026-09-23 JST] αβキラームーブ順序付け（PR #138比較基盤）
+
+### 調査と設計
+
+- 開始時に`origin/main`をfetchし、HEAD/`origin/main`ともPR #138の`1af9f74`、作業ツリー空を確認して`feat/killer-move-ordering`を作成した。親階層・リポジトリ内の`AGENTS.md`は該当なし。README、LOG、探索、既存のSEE/静止探索順序、PR #138の固定3局面比較APIとテストを確認した。
+- `twoPlyAlphaBetaAi.ts`の通常順序は「駒取り+成り→駒取り（`static-exchange`時だけSEE）→成り→その他」、beta cutoffは非root再帰ノードの`alpha >= beta`だった。評価、合法手生成、静止探索、SEE計算は変更していない。
+- `KillerMoveHistory`はrootからのplyをキーに最大2手を探索コンテキスト内だけで保持する。新規を第1、旧第1を第2へ移し、同一手は意味的比較`areLegalActionsEqual`で重複させない。固定探索ごとに新規作成し、反復深化は1回のAPI呼出し内で共有する。別API、比較試行、タイムアウト後に外部状態は残らない。
+- quietは非駒取り・非成り盤上手と駒打ちにした。王手専用の既存分類はないため、この条件の王手は含む。成りは既存の戦術優先を保つため除外する。キラーは既存の3つの戦術tier後、「その他」だけで第1→第2→元の安定順にしたため、捕獲/SEE/成りの優先度を壊さない。
+- `killerMoves?: boolean`を既存の`AlphaBetaSearchOptions`へ追加し、省略/falseはOFF、trueだけON。不正型は探索開始前に拒否する。比較器には`killer-off`/`killer-on`設定、skip統計、timeout表示を追加し、既存の交互実行・凍結局面・集計を再利用した。
+
+### テストと検証
+
+| コマンド | 終了コード | 結果 |
+| --- | ---: | --- |
+| `npm run lint` | 0 | TypeScriptエラー0 |
+| `npm test -- src/test/shogi-killer-moves.test.ts src/test/shogi-move-ordering-modes.test.ts src/test/quiescence-ordering-suite-comparison.test.ts` | 0 | 3ファイル48/48成功 |
+| `npm test` | 0 | 59ファイル1719/1719成功、122.45秒 |
+| `npm run build` | 0 | 1755 modules、4.18秒、buildエラー0 |
+| `git diff --check` | 0 | 空白エラー0 |
+
+- 新規テストはplyごとの最大2手、新手の第1化、旧第1の第2化、重複拒否、ply分離、捕獲拒否、drop受理、存在しないkillerの無害性、OFF順序維持、各API呼出しの新規履歴、固定深さON/OFFの合法root数・最善手・評価一致・入力不変性を確認する。
+- 比較基盤テストは`killer-off`/`killer-on`が同一の静止探索・通常順・評価を保持すること、skip統計の局面別/全体集計を確認する。
+
+### 固定3局面のON/OFF測定
+
+- `npm run measure:killer-move-suite-comparison -- fixed`終了0。3局面×各設定（warmup3 + 本測定8、交互順）。手・評価・深さは全局面で一致、選択手変更0、エラー0。局面中央値の集計は訪問`11468→4840`（-57.80%）、cutoff`1688→385`、skip`48824→14655`、参考時間`7320.12→3158.34ms`（-56.85%）。詳細は`docs/killer-move-suite-comparison.md`。
+- `npm run measure:killer-move-suite-comparison -- timed`終了0。同じ3局面・各呼出し独立1,000msで、全局面で深さ2、手・評価・訪問/cutoff/skipは一致、各設定8/8 timeout、選択手変更0、エラー0。時間中央値は`1000.69→1000.57ms`。この時間予算では深い候補順を活用する段階へ進めず、効果は観測されなかった。
+- fixedの同一機反復で効率低下が観測された一方、timedで改善は再現していない。棋力・一般的な性能改善・既定ONを結論せず、CI性能閾値にも使わない。次候補は追加局面、別時間予算、より深い完了反復での再測定である。

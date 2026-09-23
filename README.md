@@ -192,6 +192,30 @@ PR #136の同じ固定3局面を、名前付きのbaseline=`original`とcandidat
 
 局面ごとの失敗は試行済みデータとエラーを残して後続局面を続行し、失敗局面を全体数値へ混ぜずに終了コード1を返します。重複局面IDや不正な設定は開始前に失敗します。これは勝者・合格/不合格・正解手・棋力・Elo・統計的有意差を自動判定する機能ではありません。**探索局面数の減少だけでは棋力向上を意味しません。** UI、Worker、通常探索の既定値、評価関数、CI性能閾値は変更しません。詳細は[設計資料](docs/quiescence-ordering-suite-comparison.md)を参照してください。
 
+### αβキラームーブ順序付け（既定OFF）
+
+`AlphaBetaSearchOptions.killerMoves` は、同じルート探索内でalpha-beta cutoffを起こした quiet move をrootからのplyごとに最大2手保持し、次に同plyを読む際に優先する実験的な順序付けです。省略時と`false`は従来どおり無効で、評価関数、合法手集合、静止探索、SEEを変更しません。
+
+```ts
+analyzeTimeLimitedIterativeDeepeningAlphaBetaSearch(state, 4, 1000, undefined, undefined, {
+  moveOrdering: 'standard',
+  killerMoves: true,
+  quiescence: { maxTacticalDepth: 1, moveOrdering: 'original' },
+});
+```
+
+登録するquiet moveは非駒取り・非成りの盤上手と駒打ちです。王手を個別判定せず、この条件に合う王手は対象に含めます。一方、成りは既存の独立した戦術優先を保つため登録しません。順序は既存の「駒取り+成り→駒取り（任意SEE）→成り」を変えず、その後のその他の手だけで第1キラー、第2キラー、元の安定順を適用します。合法手一覧にない登録済み手は一致しないため選ばれず、同じ手を重複探索しません。
+
+履歴は各固定深さ検索ごとに作成し、反復深化では同じルート探索の完了反復間で共有します。別のAPI呼出し、比較試行、対局、タイムアウト・中断後に外部状態として残りません。
+
+```sh
+npm run measure:killer-move-suite-comparison          # timed（既定）
+npm run measure:killer-move-suite-comparison -- fixed
+npm run measure:killer-move-suite-comparison -- timed
+```
+
+このCLIは既存の固定3局面・交互実行・ウォームアップ3回・本測定8回・独立凍結スナップショットを再利用し、baseline=`killer-off` と candidate=`killer-on` のみを変えます。通常の順序は`standard`、静止探索は追加1手・`original`、評価は標準のままです。局面別・集計で選択手、評価値、完了深さ、探索局面数、cutoff、skip、経過時間、time out件数をJSONと整形テキストへ残します。fixedでは評価値の不一致を失敗にし、timedでは時間・探索量・深さをCIの性能閾値に使いません。結果は局面依存・実行環境依存の観測であり、これだけで棋力向上や既定有効化を判断しません。
+
 ## 静止探索（Quiescence Search）の純粋関数基盤
 
 `analyzeQuiescenceSearch(state, perspective, maxTacticalDepth, evaluation?, interruptionCheck?)` は、通常の固定深さ探索が駒取り直後などの不安定な局面で静的評価を確定してしまう探索境界の問題を、限定的に読み足して検証するためのドメインAPIです。開始時に指定した`perspective`を固定し、その側の手番で最大化、相手側で最小化します。非王手局面では既存の静的評価をstand-pat候補として先に置き、合法な駒取り（成り付き捕獲を含む）だけを元の合法手順で読みます。同値ならstand-patを維持します。王手中はstand-patを置かず、既存の合法手生成による玉移動・合駒・駒打ちを含む全回避手を読みます。

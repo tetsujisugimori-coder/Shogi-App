@@ -35,6 +35,8 @@ export interface AlphaBetaQuiescenceOptions {
 /** Optional trailing configuration; existing callers keep standard ordering. */
 export interface AlphaBetaSearchOptions {
   readonly moveOrdering?: AlphaBetaMoveOrderingMode;
+  /** Opt-in non-capture cutoff history. Omitted preserves the historical order. */
+  readonly killerMoves?: boolean;
   /** Omit to retain the historical static evaluation at depth-zero leaves. */
   readonly quiescence?: AlphaBetaQuiescenceOptions;
 }
@@ -44,6 +46,13 @@ function resolveMoveOrdering(options: AlphaBetaSearchOptions | undefined): Alpha
   if (mode === undefined) return 'standard';
   if (mode === 'standard' || mode === 'static-exchange') return mode;
   throw new RangeError(`Unsupported alpha-beta move ordering mode: ${String(mode)}`);
+}
+
+function resolveKillerMoves(options: AlphaBetaSearchOptions | undefined): boolean {
+  const enabled = options?.killerMoves;
+  if (enabled === undefined) return false;
+  if (typeof enabled === 'boolean') return enabled;
+  throw new RangeError(`Alpha-beta killerMoves must be a boolean: ${String(enabled)}`);
 }
 
 function resolveQuiescenceOptions(options: AlphaBetaSearchOptions | undefined): AlphaBetaQuiescenceOptions | undefined {
@@ -243,6 +252,38 @@ function cloneLegalAction(action: LegalAction): LegalAction {
   return { ...action, to: { ...action.to } };
 }
 
+/**
+ * Search-local non-capture cutoff history, keyed by ply from the root.
+ *
+ * It is deliberately created by each public search context rather than kept
+ * globally. Iterative passes share one instance; independent calls cannot.
+ */
+export class KillerMoveHistory {
+  private readonly actionsByPly = new Map<number, readonly LegalAction[]>();
+
+  actionsAt(ply: number): readonly LegalAction[] {
+    return this.actionsByPly.get(ply) ?? [];
+  }
+
+  record(state: BoardState, ply: number, action: LegalAction): void {
+    if (!isAlphaBetaQuietAction(state, action)) return;
+    const previous = this.actionsAt(ply).filter((candidate) => !areLegalActionsEqual(candidate, action));
+    this.actionsByPly.set(ply, [cloneLegalAction(action), ...previous].slice(0, 2));
+  }
+}
+
+/**
+ * Ordinary alpha-beta already gives promotions their own tactical tier. A
+ * quiet move is consequently a non-capture, non-promoting board move or a
+ * drop. Checks need no special detection here: checking quiet moves and
+ * checking drops remain eligible just like other moves in that existing tier.
+ */
+export function isAlphaBetaQuietAction(state: BoardState, action: LegalAction): boolean {
+  if (action.kind === 'drop') return true;
+  const target = state.squares[action.to.row][action.to.col].piece;
+  return (target === null || target.player === action.player) && action.promotion !== 'promote';
+}
+
 function clonePrincipalVariation(actions: readonly LegalAction[]): LegalAction[] {
   return actions.map(cloneLegalAction);
 }
@@ -267,9 +308,10 @@ export function orderAlphaBetaNodeActions(
   actions: readonly LegalAction[],
   evaluation: SearchEvaluationConfig = DEFAULT_MATERIAL_VALUE_TABLE,
   interruptionCheck: SearchInterruptionCheck = undefined,
-  options?: AlphaBetaSearchOptions
+  options?: AlphaBetaSearchOptions,
+  killerMoves: readonly LegalAction[] = []
 ): LegalAction[] {
-  return orderAlphaBetaNodeActionsByMode(state, actions, evaluation, interruptionCheck, resolveMoveOrdering(options));
+  return orderAlphaBetaNodeActionsByMode(state, actions, evaluation, interruptionCheck, resolveMoveOrdering(options), killerMoves);
 }
 
 function orderAlphaBetaNodeActionsByMode(
@@ -277,8 +319,14 @@ function orderAlphaBetaNodeActionsByMode(
   actions: readonly LegalAction[],
   evaluation: SearchEvaluationConfig,
   interruptionCheck: SearchInterruptionCheck,
-  moveOrdering: AlphaBetaMoveOrderingMode
+  moveOrdering: AlphaBetaMoveOrderingMode,
+  killerMoves: readonly LegalAction[] = []
 ): LegalAction[] {
+  const killerRank = (action: LegalAction): number => {
+    if (!isAlphaBetaQuietAction(state, action)) return 2;
+    const index = killerMoves.findIndex((candidate) => areLegalActionsEqual(candidate, action));
+    return index === -1 ? 2 : index;
+  };
   if (moveOrdering === 'standard') {
     // Keep the pre-SEE main ordering, including promotion priority and stable
     // indexes. This path never resolves a SEE table or prepares a child state.
@@ -294,8 +342,8 @@ function orderAlphaBetaNodeActionsByMode(
       return 3;
     };
     return actions
-      .map((action, originalIndex) => ({ action, originalIndex, priority: priorityOf(action) }))
-      .sort((left, right) => left.priority - right.priority || left.originalIndex - right.originalIndex)
+      .map((action, originalIndex) => ({ action, originalIndex, priority: priorityOf(action), killer: killerRank(action) }))
+      .sort((left, right) => left.priority - right.priority || left.killer - right.killer || left.originalIndex - right.originalIndex)
       .map(({ action }) => action);
   }
   const classified = actions.map((action, originalIndex) => {
@@ -305,7 +353,7 @@ function orderAlphaBetaNodeActionsByMode(
     const isCapture = action.kind === 'move' && target !== null && target.player !== action.player;
     const isPromotion = action.kind === 'move' && action.promotion === 'promote';
 
-    return { action, originalIndex, priority: isCapture ? 0 : isPromotion ? 1 : 2, exchange: 0 };
+    return { action, originalIndex, priority: isCapture ? 0 : isPromotion ? 1 : 2, exchange: 0, killer: killerRank(action) };
   });
   const captures = classified.filter(({ priority }) => priority === 0);
   // With no competing capture, SEE cannot affect the order. In particular,
@@ -326,7 +374,7 @@ function orderAlphaBetaNodeActionsByMode(
   }
   return classified
     .sort((left, right) => left.priority - right.priority ||
-      right.exchange - left.exchange || left.originalIndex - right.originalIndex)
+      right.exchange - left.exchange || left.killer - right.killer || left.originalIndex - right.originalIndex)
     .map(({ action }) => action);
 }
 
@@ -388,7 +436,9 @@ function searchAlphaBetaNode(
   statistics: SearchStatistics,
   interruptionCheck: SearchInterruptionCheck,
   moveOrdering: AlphaBetaMoveOrderingMode,
-  quiescenceOptions: AlphaBetaQuiescenceOptions | undefined
+  quiescenceOptions: AlphaBetaQuiescenceOptions | undefined,
+  killerMoveHistory: KillerMoveHistory | undefined,
+  ply: number
 ): SearchNodeResult {
   interruptionCheck?.();
   if (state.status === 'ended') {
@@ -419,7 +469,9 @@ function searchAlphaBetaNode(
     };
   }
 
-  const actions = orderAlphaBetaNodeActionsByMode(state, getLegalActions(state), valueTable, interruptionCheck, moveOrdering);
+  const actions = orderAlphaBetaNodeActionsByMode(
+    state, getLegalActions(state), valueTable, interruptionCheck, moveOrdering, killerMoveHistory?.actionsAt(ply)
+  );
   // All reachable no-legal-action positions are marked ended by the existing
   // rules. Treat a malformed in-progress position as a leaf as well, rather
   // than recursing forever or throwing after a valid API result of [].
@@ -451,7 +503,9 @@ function searchAlphaBetaNode(
       statistics,
       interruptionCheck,
       moveOrdering,
-      quiescenceOptions
+      quiescenceOptions,
+      killerMoveHistory,
+      ply + 1
     );
 
     const candidatePrincipalVariation = [
@@ -476,6 +530,7 @@ function searchAlphaBetaNode(
 
     const remainingActionCount = actions.length - actionIndex - 1;
     if (alpha >= beta && remainingActionCount > 0) {
+      killerMoveHistory?.record(state, ply, actions[actionIndex]);
       statistics.cutoffCount += 1;
       statistics.skippedActionCount += remainingActionCount;
       break;
@@ -501,7 +556,8 @@ function searchAlphaBeta(
   previousBestAction: LegalAction | null = null,
   interruptionCheck: SearchInterruptionCheck = undefined,
   moveOrdering: AlphaBetaMoveOrderingMode = 'standard',
-  quiescenceOptions: AlphaBetaQuiescenceOptions | undefined = undefined
+  quiescenceOptions: AlphaBetaQuiescenceOptions | undefined = undefined,
+  killerMoveHistory: KillerMoveHistory | undefined = undefined
 ): UnmeasuredAlphaBetaSearchResult {
   validateSearchDepth(depth);
   const rootPlayer = state.turn;
@@ -572,7 +628,9 @@ function searchAlphaBeta(
       statistics,
       interruptionCheck,
       moveOrdering,
-      quiescenceOptions
+      quiescenceOptions,
+      killerMoveHistory,
+      1
     );
 
     // A root candidate searched after a higher-index PV candidate can be cut
@@ -592,7 +650,9 @@ function searchAlphaBeta(
         statistics,
         interruptionCheck,
         moveOrdering,
-        quiescenceOptions
+        quiescenceOptions,
+        killerMoveHistory,
+        1
       );
     }
 
@@ -643,10 +703,12 @@ export function analyzeAlphaBetaSearch(
   options?: AlphaBetaSearchOptions
 ): AlphaBetaSearchResult {
   const moveOrdering = resolveMoveOrdering(options);
+  const killerMoves = resolveKillerMoves(options);
   const quiescenceOptions = resolveQuiescenceOptions(options);
   const startedAt = clock();
   const searchResult = searchAlphaBeta(
-    state, depth, valueTable, null, undefined, moveOrdering, quiescenceOptions
+    state, depth, valueTable, null, undefined, moveOrdering, quiescenceOptions,
+    killerMoves ? new KillerMoveHistory() : undefined
   );
   return {
     ...searchResult,
@@ -669,16 +731,18 @@ export function analyzeIterativeDeepeningAlphaBetaSearch(
   options?: AlphaBetaSearchOptions
 ): IterativeDeepeningAlphaBetaSearchResult {
   const moveOrdering = resolveMoveOrdering(options);
+  const killerMoves = resolveKillerMoves(options);
   const quiescenceOptions = resolveQuiescenceOptions(options);
   validateIterativeDeepeningMaxDepth(maxDepth);
   const startedAt = clock();
   const iterations: IterativeDeepeningAlphaBetaIterationResult[] = [];
   let previousBestAction: LegalAction | null = null;
+  const killerMoveHistory = killerMoves ? new KillerMoveHistory() : undefined;
 
   for (let depth = 1; depth <= maxDepth; depth += 1) {
     const iterationStartedAt = clock();
     const searchResult = searchAlphaBeta(
-      state, depth, valueTable, previousBestAction, undefined, moveOrdering, quiescenceOptions
+      state, depth, valueTable, previousBestAction, undefined, moveOrdering, quiescenceOptions, killerMoveHistory
     );
     const iteration = {
       ...searchResult,
@@ -732,12 +796,14 @@ export function analyzeTimeLimitedIterativeDeepeningAlphaBetaSearch(
   options?: AlphaBetaSearchOptions
 ): TimeLimitedIterativeDeepeningAlphaBetaSearchResult {
   const moveOrdering = resolveMoveOrdering(options);
+  const killerMoves = resolveKillerMoves(options);
   const quiescenceOptions = resolveQuiescenceOptions(options);
   validateIterativeDeepeningMaxDepth(maxDepth);
   validateSearchTimeLimitMilliseconds(timeLimitMilliseconds);
   const startedAt = clock();
   const iterations: IterativeDeepeningAlphaBetaIterationResult[] = [];
   let previousBestAction: LegalAction | null = null;
+  const killerMoveHistory = killerMoves ? new KillerMoveHistory() : undefined;
   let timedOut = false;
 
   for (let depth = 1; depth <= maxDepth; depth += 1) {
@@ -758,7 +824,8 @@ export function analyzeTimeLimitedIterativeDeepeningAlphaBetaSearch(
           ? () => throwIfSearchTimeLimitReached(clock, startedAt, timeLimitMilliseconds)
           : undefined,
         moveOrdering,
-        quiescenceOptions
+        quiescenceOptions,
+        killerMoveHistory
       );
       const iterationFinishedAt = clock();
       if (depth >= 2) {
@@ -819,7 +886,8 @@ export function selectBestAlphaBetaAction(
   options?: AlphaBetaSearchOptions
 ): LegalAction | null {
   return searchAlphaBeta(
-    state, depth, valueTable, null, undefined, resolveMoveOrdering(options), resolveQuiescenceOptions(options)
+    state, depth, valueTable, null, undefined, resolveMoveOrdering(options), resolveQuiescenceOptions(options),
+    resolveKillerMoves(options) ? new KillerMoveHistory() : undefined
   ).selectedAction;
 }
 
