@@ -165,6 +165,51 @@ export function getLegalActions(state: BoardState, diagnostics?: SearchDiagnosti
   return actions;
 }
 
+/** Detail-only enumeration. The ordinary and root paths above execute unchanged. */
+export function getQuiescenceLegalActionsWithDiagnostics(state: BoardState,
+  diagnostics: SearchDiagnostics): LegalAction[] {
+  if (state.status === 'ended') return [];
+  const actions: LegalAction[] = [];
+  for (let row = 0; row < state.squares.length; row += 1) {
+    for (let col = 0; col < state.squares[row].length; col += 1) {
+      const piece = state.squares[row][col].piece;
+      if (!piece || piece.player !== state.turn) continue;
+      const from = { row, col };
+      diagnostics.qLegalCounts.boardSources++;
+      const destinations = diagnostics.measure('q-board-moves', () =>
+        getLegalMoves(state.squares, from, state.turn, diagnostics)).slice().sort(compareCoordinates);
+      const before = actions.length;
+      for (const destination of destinations) {
+        const promotionStatus = getPromotionStatus(piece, from, destination);
+        const promotions: readonly MovePromotion[] = promotionStatus === 'optional'
+          ? ['decline', 'promote'] : promotionStatus === 'required' ? ['promote'] : ['none'];
+        for (const promotion of promotions) {
+          actions.push({ kind: 'move', player: state.turn, from: copyCoordinate(from),
+            to: copyCoordinate(destination), pieceType: piece.type, promotion });
+        }
+      }
+      diagnostics.qLegalCounts.boardActions += actions.length - before;
+    }
+  }
+  const currentHand = state.turn === 'sente' ? state.senteHand : state.goteHand;
+  for (const pieceType of DROP_PIECE_TYPE_ORDER) {
+    const representativePieceId = currentHand
+      .filter(piece => piece.player === state.turn && piece.type === pieceType && !piece.isPromoted)
+      .map(piece => piece.id).sort(compareIds)[0];
+    if (!representativePieceId) continue;
+    diagnostics.qLegalCounts.dropTypes++;
+    const destinations = diagnostics.measure('q-hand-drops', () =>
+      getLegalDropSquares(state, representativePieceId, undefined, diagnostics)).slice().sort(compareCoordinates);
+    for (const destination of destinations) {
+      actions.push({ kind: 'drop', player: state.turn, pieceId: representativePieceId,
+        pieceType, to: copyCoordinate(destination), promotion: 'none' });
+    }
+    diagnostics.qLegalCounts.dropActions += destinations.length;
+  }
+  diagnostics.qLegalCounts.actions += actions.length;
+  return actions;
+}
+
 /** Executes an enumerated action through the existing validated execution APIs. */
 export function executeLegalAction(
   state: BoardState,

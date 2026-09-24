@@ -1,5 +1,17 @@
 # SHOGI-APP 開発ログ
 
+## [2026-09-24 JST] 静止探索 q-legal 内部の計測・監査
+
+- `git fetch origin main`後、`main`と`origin/main`がPR #164の`f4b9230`で一致し、作業ツリーが空であることを確認。親階層とリポジトリ内に追加の`AGENTS.md`はなし。`test/quiescence-legal-breakdown`を作成。旧JSONLは変更していない。
+- `getLegalActions`の実際の呼出構造に沿い、`q-legal`（包含）→盤上手`q-board-moves`（疑似手、盤面シミュレーション、自玉王手判定）と持駒`q-hand-drops`（打ちの盤面準備、自玉王手判定、歩打ち詰め判定）を診断ONでのみ分解した。各`milliseconds`は排他、`inclusiveMilliseconds`と最大単発は子工程込み。root側の既存`root-piece-moves`/`root-hand-drops`はq呼出で増やさず、注入された探索時計を全工程で共用。診断OFFの合法手生成・着手順・ルール処理は既存経路を維持。
+- 100ms・最大深さ4・標準評価/順序・静止追加1手の保護入力で、PR #164と同じ保存棋譜4局面を各2ウォームアップ後にOFF/ON交互各5本、同期直列で測定。Node v24.20.0、Windows 10.0.26200 x64、Intel Core i7-14650HX、棋譜SHA256=`8b269f95bb3be422ab87fe2e64d1a5dcc342cf53048eb63d3c2424ebfbf1e552`。新JSONLは`docs/benchmarks/q-legal-breakdown-final-20260924.jsonl`、集計は同名`.md`。既存出力を上書きしない`wx`で作成した。
+- 100ms診断OFFは4局面とも5/5が深さ0 fallback、選択手は局面ごとに一致。API中央値は局面順101.26/101.24/102.82/104.66ms。診断ONは処理の進行に伴うroot時間の大きな揺れがあり、`q-legal`呼出数が本測定で局面順`53,1,2,1,1` / `111,3,5,1,4` / `75,2,3,3,2` / `2,2,2,1,2`。期限付き経路の途中で止まるため、これだけで全体の費用を比較しない。
+- 同じ4局面を固定深さ1まで完走する診断ON補助計測を各2ウォームアップ＋5本追加し、局面ごとの全root候補の静止探索内訳を取得した。全5本のq-legal呼出数は局面順314/222/249/289で一致。固定深さ1のq-legal包含中央値は2396.49/639.11/1160.03/515.95ms、排他中央値は28.62/13.12/14.33/6.20ms。葉工程の局面別排他中央値合計では`q-drop-pawn-mate`が1355.78ms、次点`q-board-simulate`が1189.33ms。次の最適化PRで調査する一箇所は歩打ち詰め判定とする。固定深さ1の時間を100ms探索の改善率に換算しない。
+- 新監査は4局面56件の100ms標本と28件の固定深さ1標本について、局面/履歴SHA、件数・順序、非負時間、排他合計、親子包含、`81×持駒種類呼出`、疑似手とシミュレーション・王手判定の回数、合法着手内訳と集計を検査。PR #164レビュー指摘に対応し、新旧双方の監査で記録されたroot候補総数を、保存局面を独立再生して得た`getLegalActions`の件数と照合。固定探索の選択手・評価は診断OFFの独立実行と一致。既存の成り、二歩、歩打ち詰め、持駒、王手時の非捕獲応手を含む診断ON/OFF配列一致テストを追加した。
+- 100ms診断ON/OFF時間を混ぜた改善率は算出できず、固定深さ1診断も期限付き深さ1の100ms完走や棋力改善を保証しない。診断時計、JIT、OS、GC、rootの長時間化、局面間の相関は残る不確実性。専用の取る手生成API、合法手の省略、探索アルゴリズムやルールの変更は行っていない。
+- 再実行: `npm run measure:q-legal-breakdown -- --out docs/benchmarks/別名.jsonl`、`npm run audit:q-legal-breakdown -- docs/benchmarks/別名.jsonl`。計測と`npm run check`は直列に実行する。
+- 最終`npm run check`はlockfile、型検査、63ファイル1746/1746テスト、build（1756 modules）成功。新監査は4局面/100ms 56標本/固定28標本、旧`audit:post-root-depth-one`は4局面56標本、旧`audit:timed-depth-one`は7局面196標本、旧`audit:root-legal-breakdown`は4局面56標本で成功。通常sandboxのVitest/esbuild起動は`spawn EPERM`だったため、許可された実行経路で再実行した。
+
 ## [2026-09-24 JST] root生成後の深さ1未完走診断
 
 - PR #162を含む`main`=`f4afe71`、作業ツリー空から`test/post-root-depth-one-diagnostics`を作成。既存の`SearchDiagnostics`、100ms測定・監査CLI、4局の保存棋譜再生、`LOG.md`を確認した。探索アルゴリズム、ルール、評価、手順、fallback、Worker/UIは変更していない。旧測定JSONLも変更していない。

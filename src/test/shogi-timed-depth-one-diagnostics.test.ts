@@ -31,6 +31,10 @@ describe('timed depth-one diagnostic inputs and invariants', () => {
     expect(probe.phases['root-piece-moves'].calls).toBeGreaterThan(0);
     expect(probe.phases.quiescence.calls).toBeGreaterThan(0);
     expect(probe.phases['q-evaluate'].calls).toBeGreaterThan(0);
+    expect(probe.phases['q-board-moves'].calls).toBeGreaterThan(0);
+    expect(probe.phases['q-board-simulate'].calls).toBe(probe.qLegalCounts.boardPseudo);
+    expect(probe.phases['q-board-own-check'].calls).toBe(probe.qLegalCounts.boardPseudo);
+    expect(probe.qLegalCounts.actions).toBe(probe.qLegalCounts.boardActions + probe.qLegalCounts.dropActions);
     expect(probe.phases.see.calls).toBe(0);
     const phaseSum = Object.values(probe.phases).reduce((total, item) => total + item.milliseconds, 0);
     expect(Math.abs(account.totalMilliseconds - phaseSum - account.apiOtherMilliseconds)).toBeLessThan(1);
@@ -103,7 +107,12 @@ describe('timed depth-one diagnostic inputs and invariants', () => {
     expect(interrupted.rootCandidates).toBe(completed.rootCandidates);
     expect(interrupted.completedCandidates).toBeGreaterThan(0);
     expect(interrupted.completedCandidates).toBeLessThan(interrupted.rootCandidates);
-    expect(interrupted.currentCandidate).not.toBeNull();
+    if (interrupted.currentCandidate === null) {
+      expect(interrupted.interruptedStage).toBe('before-root-candidate');
+    } else {
+      expect(interrupted.currentCandidate).toBeGreaterThan(interrupted.completedCandidates);
+      expect(interrupted.currentCandidate).toBeLessThanOrEqual(interrupted.rootCandidates);
+    }
     expect(interrupted.interruptedStage).not.toBeNull();
     const gap = partial.diagnostic.deadlineObservation!;
     expect(gap.deadlineAt).toBe(1 + limit);

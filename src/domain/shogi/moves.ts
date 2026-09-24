@@ -11,6 +11,7 @@ import {
   isKingInCheck,
 } from './attacks';
 import { isPromotionRequired } from './promotion';
+import type { SearchDiagnostics } from './searchDiagnostics';
 
 /**
  * Checks if a move results in a piece having no legal forward moves ("行き所のない駒").
@@ -115,7 +116,8 @@ export function simulateMoveSquares(
 export function getLegalMoves(
   squares: BoardSquare[][],
   from: Coordinate | null | undefined,
-  currentTurn?: Player
+  currentTurn?: Player,
+  qDiagnostics?: SearchDiagnostics
 ): Coordinate[] {
   if (!from || !isWithinBoard(from.row, from.col)) {
     return [];
@@ -129,6 +131,19 @@ export function getLegalMoves(
   const piece = square.piece;
   if (currentTurn && piece.player !== currentTurn) {
     return [];
+  }
+
+  if (qDiagnostics) {
+    const pseudoMoves = qDiagnostics.measure('q-board-pseudo', () => getPseudoLegalMoves(squares, from, piece));
+    qDiagnostics.qLegalCounts.boardPseudo += pseudoMoves.length;
+    const legalMoves: Coordinate[] = [];
+    for (const dest of pseudoMoves) {
+      const simulatedSquares = qDiagnostics.measure('q-board-simulate', () => simulateMoveSquares(squares, from, dest));
+      if (!qDiagnostics.measure('q-board-own-check', () => isKingInCheck(simulatedSquares, piece.player)))
+        legalMoves.push(dest);
+    }
+    qDiagnostics.qLegalCounts.boardLegal += legalMoves.length;
+    return legalMoves;
   }
 
   const pseudoMoves = getPseudoLegalMoves(squares, from, piece);
