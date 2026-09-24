@@ -1,5 +1,14 @@
 # SHOGI-APP 開発ログ
 
+## [2026-09-24 JST] 歩打ち詰めの直接王手ガード
+
+- PR #166、`dropRules.ts`、歩打ち・合法手・静止探索テスト、測定器と監査を確認。作業開始時はcleanな`main`=`origin/main`=`ee8af4d`で、GitHub APIでもmainのSHAが一致した。`git fetch`はこの環境の`SEC_E_NO_CREDENTIALS`で失敗したため、APIで現在のmainを照合してから`perf/pawn-drop-direct-check`を分岐した。
+- `validateDrop`の二歩・自玉王手放置判定の後に、打った歩の一歩前に相手玉がいるかを既存の先手row−1/後手row＋1の方向で確認。盤外は既存の行き所のない駒判定と明示的な境界判定で扱う。直接王手しない歩打ちでは、相手玉王手判定と盤上応手探索を含む`isPawnDropMateOnSimulatedBoard`を呼ばない。通常の合法手生成と静止探索が使う共通ルール経路だけを変更し、探索・評価・順序・時間制限・Worker/UIには触れていない。
+- 先手・後手それぞれの非王手、王手だが非詰み、打ち歩詰めを確認。非王手の`q-drop-pawn-mate`呼出0、王手かつ非詰みでは1。保存棋譜4局面の合法手配列全体の件数314/222/249/289とSHA-256は変更前後で一致した。SHAと再実行手順は`docs/benchmarks/pawn-drop-mate-comparison-20260924.md`に記載。
+- 公開`validateDrop`へ任意の盤面を渡せるため、相手玉が手番前から金で王手されていて応手もない不正盤面では、離れた歩打ちを旧実装が`pawn_drop_mate`、新実装が合法と返す差を変更前後のテストで再現した。通常の合法遷移では到達不能であり、歩自身が直接王手しない打ちは打ち歩詰めではないというルールを優先。互換性差を回帰テストと比較資料に明示し、不正盤面の旧結果を残すための全盤面王手走査は加えない。
+- 同一環境（Windows 10.0.26200、i7-14650HX、Node v24.20.0）、同じ保存棋譜SHA・設定で、変更前→後の順に各2ウォームアップ＋5本、100ms診断OFF/ON交互、続いて固定深さ1診断ONを直列測定。100ms OFFのAPI中央値は局面順114.05→100.54、100.92→100.13、102.71→100.32、113.54→100.32ms。fallbackは各5/5→5/5、完了深さは全て0→0、選択手は全て一致。固定深さ1 ONの`q-drop-pawn-mate`呼出/回は15,024→285、5,665→1、9,871→226、11,628→260、排他中央値は88.53→46.51、90.57→0.18、638.52→51.64、589.11→40.08ms。生標本と個別集計は新しい`pawn-drop-mate-before/after-20260924.jsonl`/`.md`に保存。診断ON/OFFを混ぜた改善率は算出せず、100msでの完了深さ・手の改善は観測されていない。OS/JIT/GCと変更前後の実行順による変動が残る。
+- 変更前・後の`audit:q-legal-breakdown`は各4局面・100ms 56標本・固定28標本で成功。旧`audit:post-root-depth-one` 56標本、`audit:timed-depth-one` 196標本、`audit:root-legal-breakdown` 56標本も成功。関連3ファイル118テスト成功、最終`npm run check`はlockfile・型検査・63ファイル1749テスト・build成功。測定とテスト/buildは並列に実行していない。
+
 ## [2026-09-24 JST] 静止探索 q-legal 内部の計測・監査
 
 - `git fetch origin main`後、`main`と`origin/main`がPR #164の`f4b9230`で一致し、作業ツリーが空であることを確認。親階層とリポジトリ内に追加の`AGENTS.md`はなし。`test/quiescence-legal-breakdown`を作成。旧JSONLは変更していない。

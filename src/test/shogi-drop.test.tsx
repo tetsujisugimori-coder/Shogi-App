@@ -13,6 +13,7 @@ import {
   simulateDropSquares,
   validateDrop,
 } from '../domain/shogi';
+import { SearchDiagnostics } from '../domain/shogi/searchDiagnostics';
 import {
   BoardState,
   Piece,
@@ -273,13 +274,19 @@ describe('駒打ちドメイン', () => {
     });
   });
 
-  it('玉に逃げられるマスが一つでもあれば歩打ちは合法になる', () => {
-    const { state, pawn, to } = createPawnDropMateState('sente');
-    state.squares[0][3].piece = null;
+  it.each(['sente', 'gote'] as const)('%sの歩打ちが王手でも玉に逃げ道があれば合法になる', (player) => {
+    const { state, pawn, to, respondingPlayer } = createPawnDropMateState(player);
+    const kingRow = player === 'sente' ? 0 : 8;
+    state.squares[kingRow][3].piece = null;
     const simulated = simulateDropSquares(state.squares, pawn, to);
+    const diagnostics = new SearchDiagnostics(false, false);
+    diagnostics.begin(performance.now());
 
-    expect(getLegalMoves(simulated, { row: 0, col: 4 }, 'gote')).toContainEqual({ row: 0, col: 3 });
-    expect(validateDrop(state, pawn.id, to)).toEqual({ isValid: true });
+    expect(isKingInCheck(simulated, respondingPlayer)).toBe(true);
+    expect(getLegalMoves(simulated, { row: kingRow, col: 4 }, respondingPlayer)).toContainEqual({ row: kingRow, col: 3 });
+    expect(validateDrop(state, pawn.id, to, undefined, diagnostics)).toEqual({ isValid: true });
+    diagnostics.finish();
+    expect(diagnostics.phases['q-drop-pawn-mate'].calls).toBe(1);
     expect(getLegalDropSquares(state, pawn.id)).toContainEqual(to);
     expect(executeDrop(state, pawn.id, to).type).toBe('applied');
   });
@@ -302,12 +309,27 @@ describe('駒打ちドメイン', () => {
     expect(validateDrop(state, pawn.id, to)).toEqual({ isValid: true });
   });
 
-  it('歩打ちが王手でなければ相手の盤上合法手の有無にかかわらず打ち歩詰めにしない', () => {
-    const { state, pawn } = createPawnDropMateState('sente');
+  it.each(['sente', 'gote'] as const)('%sの歩打ちが王手でなければ重い歩打ち詰め判定を省く', (player) => {
+    const { state, pawn, respondingPlayer } = createPawnDropMateState(player);
     const to = { row: 4, col: 4 };
     const simulated = simulateDropSquares(state.squares, pawn, to);
+    const diagnostics = new SearchDiagnostics(false, false);
+    diagnostics.begin(performance.now());
 
-    expect(isKingInCheck(simulated, 'gote')).toBe(false);
+    expect(isKingInCheck(simulated, respondingPlayer)).toBe(false);
+    expect(validateDrop(state, pawn.id, to, undefined, diagnostics)).toEqual({ isValid: true });
+    diagnostics.finish();
+    expect(diagnostics.phases['q-drop-pawn-mate'].calls).toBe(0);
+    expect(getLegalDropSquares(state, pawn.id)).toContainEqual(to);
+  });
+
+  it('相手玉が既に王手の不正盤面でも、直接王手しない歩打ちは打ち歩詰めにしない', () => {
+    const { state, pawn } = createPawnDropMateState('sente');
+    state.squares[1][4].piece = { id: 'preexisting-check', type: 'gold', player: 'sente' };
+    const to = { row: 4, col: 4 };
+
+    expect(isKingInCheck(state.squares, 'gote')).toBe(true);
+    expect(isKingInCheck(simulateDropSquares(state.squares, pawn, to), 'gote')).toBe(true);
     expect(validateDrop(state, pawn.id, to)).toEqual({ isValid: true });
   });
 

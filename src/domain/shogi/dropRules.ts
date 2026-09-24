@@ -6,7 +6,7 @@ import {
   Piece,
   Player,
 } from '../../types/shogi';
-import { isKingInCheck } from './attacks';
+import { getForwardDelta, isKingInCheck } from './attacks';
 import { cloneBoardSquares, getOpponent } from './boardStateUtils';
 import { Coordinate, isWithinBoard } from './coordinates';
 import { getLegalMoves } from './moves';
@@ -105,6 +105,14 @@ function isPawnDropMateOnSimulatedBoard(
 
   // A directly checking pawn cannot be answered by interposing a dropped piece.
   return !hasLegalBoardMoveResponseToPawnCheck(squares, respondingPlayer);
+}
+
+/** An unpromoted pawn checks only the square directly ahead of its drop. */
+function droppedPawnDirectlyChecksKing(state: BoardState, to: Coordinate): boolean {
+  const kingRow = to.row + getForwardDelta(state.turn);
+  if (!isWithinBoard(kingRow, to.col)) return false;
+  const pieceInFront = state.squares[kingRow][to.col].piece;
+  return pieceInFront?.type === 'king' && pieceInFront.player === getOpponent(state.turn);
 }
 
 /** Validates one proposed drop in the documented rule order. */
@@ -212,6 +220,7 @@ export function validateDrop(
   if (
     piece.type === 'pawn' &&
     !piece.isPromoted &&
+    droppedPawnDirectlyChecksKing(state, to) &&
     (qDiagnostics
       ? qDiagnostics.measure('q-drop-pawn-mate', () => isPawnDropMateOnSimulatedBoard(simulatedSquares, state.turn))
       : diagnostics
