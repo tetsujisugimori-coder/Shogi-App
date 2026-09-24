@@ -17,6 +17,13 @@ assert.equal(config.sourceSha256, sourceSha256);
 const sha = (value: string) => createHash('sha256').update(value).digest('hex');
 const games = rows.filter(row => row.type === 'game');
 assert.equal(games.length, config.config.pairCount * 2);
+for (const game of games) {
+  assert.ok(game.plies.length <= config.config.maxPlies);
+  if (game.status === 'max_plies') {
+    assert.equal(game.plies.length, config.config.maxPlies);
+    assert.equal(game.detail.reason, 'max_plies');
+  }
+}
 const gamePlies = games.flatMap(game => game.plies.map((ply: { ply: number; positionKey: string }) => ({
   id: `g${game.executionIndex}-p${ply.ply}`, key: sha(ply.positionKey), ply,
 })));
@@ -27,6 +34,7 @@ for (let index = 0; index < fromGames.length; index++) {
   assert.equal(fromGames[index].id, gamePlies[index].id);
   assert.equal(fromGames[index].positionKeySha256, gamePlies[index].key);
   assert.equal(fromGames[index].resultSource, (gamePlies[index].ply as { resultSource: string }).resultSource);
+  assert.deepEqual(fromGames[index].action, (gamePlies[index].ply as { action: unknown }).action);
 }
 const storedPositions = rows.filter(row => row.type === 'position');
 assert.equal(storedPositions.length, 3);
@@ -37,6 +45,14 @@ for (const stored of storedPositions) {
   assert.equal(stored.positionKeySha256, original.positionKeySha256);
 }
 assert.equal(samples.length, gamePlies.length + 3 * 2 * (config.warmups + config.runs));
+const replay = samples.filter(sample => sample.source === 'replay');
+assert.equal(new Set(replay.map(sample => `${sample.id}:${sample.phase}:${sample.run}:${sample.probe}`)).size, replay.length);
+for (const sample of replay) {
+  const original = positions.find(position => position.id === sample.id);
+  assert.ok(original);
+  assert.equal(sample.positionKeySha256, original.positionKeySha256);
+  assert.equal(sample.historyLength, original.historyLength);
+}
 for (const sample of samples) {
   assert.ok(sample.callElapsedMilliseconds >= sample.apiElapsedMilliseconds - 0.5);
   assert.ok(Math.abs(sample.excessMilliseconds - (sample.callElapsedMilliseconds - config.config.timeLimitMilliseconds)) < 1e-6);
