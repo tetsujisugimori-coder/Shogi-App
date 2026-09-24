@@ -1,5 +1,14 @@
 # SHOGI-APP 開発ログ
 
+## [2026-09-24 JST] 王手判定内部の board/drop 別診断
+
+- PR #170 後の clean な `main`=`origin/main`=`a0a7bcc` から `perf/check-internals-diagnostics` を分岐。`git fetch` は `SEC_E_NO_CREDENTIALS` で失敗したため、GitHub API の main SHA とローカル SHA の一致を照合した。盤上手は `getLegalMoves` → 局所盤面シミュレーション → `isKingInCheck`、持駒打ちは `getLegalDropSquares` → `validateDrop` → 打った後の盤面 → `isKingInCheck`。その下は `findKingSquare` → `isSquareAttackedBy` → `countSquareAttackersBy` の81マス走査 → `isPieceAttacking` → `getPieceAttackPattern` / step / ray である。
+- 既存 `SearchDiagnostics` の任意フラグで、静止探索の `q-board-own-check` と `q-drop-own-check` に限り、王手判定・王探索・攻撃元探索・駒攻撃判定・pattern・step・ray の呼出数、包含・排他・最大単発時間、王手確認数、走査数、調査マス数、相手駒数を数値集約する。高頻度の各呼出で記録オブジェクトを作らない。公開攻撃APIと診断OFFの探索経路は従来の攻撃判定を使う。探索、合法手順序、評価、攻撃判定アルゴリズム、時間制御、fallback、Worker/UIは変更しない。
+- 保存棋譜SHA256=`8b269f95bb3be422ab87fe2e64d1a5dcc342cf53048eb63d3c2424ebfbf1e552`。g1-p115/g3-p55/g4-p89/g1-p93、標準評価・標準手順序・静止追加1手・最大深さ4・100ms、Windows 10.0.26200 x64 / i7-14650HX / Node v24.20.0。同一プロセスで同期直列、各2ウォームアップ＋5本。診断OFFの100ms API中央値は順に100.42/100.17/100.26/100.38ms、全局面5/5 fallback・完了深さ0、root候補314/222/249/289。固定深さ1の診断ONを別に完走させた。固定深さ1の完走を100ms以内の完走とは扱わず、異条件のAPI時間から改善率を計算しない。
+- 診断ON固定深さ1の王手確認数はboard側9,818/3,776/2,741/7,112、drop側34,952/6,107/10,529/29,308。各回の攻撃元探索が81マスを走査し、4局面のboard/drop合計で8,451,783マスを調べる。`attackSearch`は王探索より大きい包含段階で、4局面のboard+drop合計中央値は3538.91ms。走査の排他と個々の駒判定の排他は細粒度計時負荷の影響を受けるため、どちらだけが支配的かは断定しない。次PRで調査する一箇所は `countSquareAttackersBy()` の攻撃元探索全体とし、81マス走査と駒判定の費用対効果をさらに確認する。このPRで最適化はしない。
+- 固定深さ1の診断OFF/ON API中央値は順に2227.84/3569.11、998.32/1345.18、1261.79/1723.13、1982.23/3089.26ms。既存探索診断と今回の細粒度時計を含む診断負荷が大きい。包含時間を親子で足さず、細部の時間は概数として扱う。保存先は `docs/benchmarks/check-internals-comparison-final-20260924.jsonl` と同名 `.md`。新計測器は `wx` で既存ファイルを上書きしない。
+- 新監査は4局面、診断OFF 28本・固定深さ1診断ON 28本（ウォームアップを含む）で、棋譜・局面SHA、root候補、81マス×走査、親子時間勘定、診断ON/OFFの合法手配列内容と順序、固定深さ1の選択手・評価一致を確認。既存 `audit:q-legal-breakdown` も4局面・100ms 56標本・固定28標本で成功。`npm run check` は最初の並列Vitest実行で無関係の2テストが5秒の時間制限に達したが、公開攻撃経路を従来形に戻した後の再実行ではlockfile・型検査・63ファイル1751/1751テスト・buildが成功。テストの時間制限やアサーションは変更していない。`git diff --check` 成功。
+
 ## [2026-09-24 JST] 盤上手の王手判定用盤面複製を局所化
 
 - PR #168 後の `main`=`origin/main`=`103ad15`、作業ツリー空から `perf/q-board-local-copy` を作成。GitHub API で main SHA を照合。通常の `git fetch` は `SEC_E_NO_CREDENTIALS` で失敗。`getLegalActions`、静止探索診断の呼出経路、`simulateMoveSquares`、`isKingInCheck` と攻撃判定、PR #159 の持駒打ち盤面準備最適化を確認した。

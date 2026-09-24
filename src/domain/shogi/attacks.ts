@@ -9,6 +9,7 @@
 
 import { BoardSquare, Piece, Player } from '../../types/shogi';
 import { Coordinate, isWithinBoard } from './coordinates';
+import type { CheckInternalsProbe } from './checkInternalsDiagnostics';
 
 /**
  * Standard directional ray vectors [dRow, dCol]
@@ -206,24 +207,60 @@ export function isPieceAttacking(
   targetCoord: Coordinate
 ): boolean {
   const pattern = getPieceAttackPattern(piece);
+  for (const [dr, dc] of pattern.stepOffsets) {
+    if (pieceCoord.row + dr === targetCoord.row && pieceCoord.col + dc === targetCoord.col)
+      return true;
+  }
+  for (const [dr, dc] of pattern.rayDirections) {
+    let currRow = pieceCoord.row + dr;
+    let currCol = pieceCoord.col + dc;
+    while (isWithinBoard(currRow, currCol)) {
+      if (currRow === targetCoord.row && currCol === targetCoord.col) return true;
+      if (squares[currRow][currCol].piece) break;
+      currRow += dr;
+      currCol += dc;
+    }
+  }
+  return false;
+}
+
+/** Mirrors the public attack predicate with opt-in timing at its existing step/ray boundaries. */
+function isPieceAttackingInternal(
+  squares: BoardSquare[][], pieceCoord: Coordinate, piece: Piece,
+  targetCoord: Coordinate, probe?: CheckInternalsProbe
+): boolean {
+  const pieceStart = probe ? performance.now() : 0;
+  const pattern = getPieceAttackPattern(piece);
+  if (probe) probe.record('pattern', performance.now() - pieceStart);
 
   // Check step offsets
+  const stepStart = probe && pattern.stepOffsets.length ? performance.now() : 0;
   for (const [dr, dc] of pattern.stepOffsets) {
     if (
       pieceCoord.row + dr === targetCoord.row &&
       pieceCoord.col + dc === targetCoord.col
     ) {
+      if (probe && pattern.stepOffsets.length) {
+        probe.record('step', performance.now() - stepStart);
+        probe.record('piece', performance.now() - pieceStart);
+      }
       return true;
     }
   }
+  if (probe && pattern.stepOffsets.length) probe.record('step', performance.now() - stepStart);
 
   // Check ray directions
+  const rayStart = probe && pattern.rayDirections.length ? performance.now() : 0;
   for (const [dr, dc] of pattern.rayDirections) {
     let currRow = pieceCoord.row + dr;
     let currCol = pieceCoord.col + dc;
 
     while (isWithinBoard(currRow, currCol)) {
       if (currRow === targetCoord.row && currCol === targetCoord.col) {
+        if (probe && pattern.rayDirections.length) {
+          probe.record('ray', performance.now() - rayStart);
+          probe.record('piece', performance.now() - pieceStart);
+        }
         return true;
       }
 
@@ -237,6 +274,10 @@ export function isPieceAttacking(
     }
   }
 
+  if (probe && pattern.rayDirections.length) {
+    probe.record('ray', performance.now() - rayStart);
+  }
+  if (probe) probe.record('piece', performance.now() - pieceStart);
   return false;
 }
 
@@ -252,23 +293,43 @@ export function countSquareAttackersBy(
   targetCoord: Coordinate,
   attacker: Player
 ): number {
-  if (!isWithinBoard(targetCoord.row, targetCoord.col)) {
-    return 0;
-  }
-
+  if (!isWithinBoard(targetCoord.row, targetCoord.col)) return 0;
   let attackerCount = 0;
   for (let r = 0; r < 9; r++) {
     for (let c = 0; c < 9; c++) {
       const piece = squares[r][c].piece;
-      if (
-        piece?.player === attacker &&
-        isPieceAttacking(squares, { row: r, col: c }, piece, targetCoord)
-      ) {
+      if (piece?.player === attacker &&
+        isPieceAttacking(squares, { row: r, col: c }, piece, targetCoord))
         attackerCount += 1;
+    }
+  }
+  return attackerCount;
+}
+
+/** Same exhaustive scan as the public function, with aggregate counters. */
+function countSquareAttackersByInternal(
+  squares: BoardSquare[][], targetCoord: Coordinate, attacker: Player,
+  probe?: CheckInternalsProbe
+): number {
+  if (!isWithinBoard(targetCoord.row, targetCoord.col)) {
+    return 0;
+  }
+
+  const searchStart = probe ? performance.now() : 0;
+  if (probe) { probe.attackScans++; probe.scannedSquares += 81; }
+  let attackerCount = 0;
+  for (let r = 0; r < 9; r++) {
+    for (let c = 0; c < 9; c++) {
+      const piece = squares[r][c].piece;
+      if (piece?.player === attacker) {
+        if (probe) { probe.opponentPieces++; probe.pieceCalls++; }
+        if (isPieceAttackingInternal(squares, { row: r, col: c }, piece, targetCoord, probe))
+          attackerCount += 1;
       }
     }
   }
 
+  if (probe) probe.record('attackSearch', performance.now() - searchStart);
   return attackerCount;
 }
 
@@ -361,4 +422,22 @@ export function isKingInCheck(
 
   const opponent: Player = player === 'sente' ? 'gote' : 'sente';
   return isSquareAttackedBy(squares, kingCoord, opponent);
+}
+
+/** Internal diagnostic route for quiescence legality; public attack APIs keep their normal path. */
+export function isKingInCheckProfiled(
+  squares: BoardSquare[][], player: Player, probe: CheckInternalsProbe
+): boolean {
+  const checkStart = performance.now();
+  probe.checks++;
+  const kingStart = performance.now();
+  const kingCoord = findKingSquare(squares, player);
+  probe.record('king', performance.now() - kingStart);
+  let checked = false;
+  if (kingCoord) {
+    const opponent: Player = player === 'sente' ? 'gote' : 'sente';
+    checked = countSquareAttackersByInternal(squares, kingCoord, opponent, probe) > 0;
+  }
+  probe.record('check', performance.now() - checkStart);
+  return checked;
 }

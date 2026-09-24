@@ -1,4 +1,5 @@
 import type { PieceType } from '../../types/shogi';
+import { CheckInternalsProbe } from './checkInternalsDiagnostics';
 
 /** Optional, synchronous search probe. Time is exclusive of nested spans. */
 export type SearchDiagnosticPhase =
@@ -58,7 +59,12 @@ export class SearchDiagnostics {
     rook: dropEntry(), bishop: dropEntry(), gold: dropEntry(), silver: dropEntry(),
     knight: dropEntry(), lance: dropEntry(), pawn: dropEntry(),
   };
-  constructor(readonly rootDropStageTiming = false, readonly rootBreakdown = true) {}
+  readonly checkInternals: { board: CheckInternalsProbe; drop: CheckInternalsProbe } | null;
+  constructor(readonly rootDropStageTiming = false, readonly rootBreakdown = true,
+    checkInternals = false) {
+    this.checkInternals = checkInternals
+      ? { board: new CheckInternalsProbe(), drop: new CheckInternalsProbe() } : null;
+  }
 
   recordDropResult(type: DropPieceType, reason?: string): void {
     const entry = this.rootDrops[type];

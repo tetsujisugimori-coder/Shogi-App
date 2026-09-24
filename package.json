@@ -38,6 +38,8 @@
     "audit:post-root-depth-one": "tsx scripts/audit-post-root-depth-one.ts",
     "measure:q-legal-breakdown": "tsx scripts/measure-quiescence-legal-breakdown.ts",
     "audit:q-legal-breakdown": "tsx scripts/audit-quiescence-legal-breakdown.ts",
+    "measure:check-internals": "tsx scripts/measure-check-internals.ts",
+    "audit:check-internals": "tsx scripts/audit-check-internals.ts",
     "audit:timed-fallback-self-play": "tsx scripts/audit-timed-fallback-self-play.ts",
     "check": "npm run verify:lock && npm run lint && npm test && npm run build"
   },
