@@ -40,6 +40,8 @@
     "audit:q-legal-breakdown": "tsx scripts/audit-quiescence-legal-breakdown.ts",
     "measure:check-internals": "tsx scripts/measure-check-internals.ts",
     "audit:check-internals": "tsx scripts/audit-check-internals.ts",
+    "measure:check-shortcircuit-fixed": "tsx scripts/measure-check-shortcircuit-fixed.ts",
+    "audit:check-shortcircuit": "tsx scripts/compare-check-shortcircuit.ts",
     "audit:timed-fallback-self-play": "tsx scripts/audit-timed-fallback-self-play.ts",
     "check": "npm run verify:lock && npm run lint && npm test && npm run build"
   },
