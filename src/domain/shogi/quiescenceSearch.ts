@@ -90,6 +90,7 @@ function searchNode(
   moveOrdering: QuiescenceMoveOrderingMode,
   diagnostics?: SearchDiagnostics
 ): SearchNodeResult {
+  diagnostics?.setStage('quiescence-entry');
   interruptionCheck?.();
   const staticBreakdown = measured(diagnostics, 'q-evaluate', () => evaluateSearchPositionBreakdown(state, perspective, evaluation));
   if (state.status === 'ended' || remainingDepth === 0) {
@@ -131,10 +132,12 @@ function searchNode(
     state, candidates, moveOrdering, resolveSearchMaterialValueTable(evaluation), interruptionCheck
   ));
   for (let actionIndex = 0; actionIndex < candidates.length; actionIndex += 1) {
+    diagnostics?.setStage('before-quiescence-candidate');
     interruptionCheck?.();
     const action = orderedCandidates[actionIndex];
     const child = measured(diagnostics, 'q-execute', () => executeSearchAction(state, action));
     statistics.visitedPositionCount += 1;
+    diagnostics?.setStage('after-quiescence-action');
     interruptionCheck?.();
     const childResult = searchNode(
       child,
