@@ -5,6 +5,7 @@ import {
   getLegalActions,
   type LegalAction,
 } from '../domain/shogi';
+import { SearchDiagnostics } from '../domain/shogi/searchDiagnostics';
 import {
   type BoardState,
   type Piece,
@@ -79,6 +80,24 @@ function createPawnDropMateState(): { state: BoardState; forbidden: { row: numbe
 }
 
 describe('全合法手列挙API', () => {
+  it('root診断でも合法手の内容と順序と入力を保持し、歩打ちの却下理由を記録する', () => {
+    const { state } = createPawnDropMateState();
+    const before = JSON.stringify(state);
+    const plain = getLegalActions(state);
+    const diagnostics = new SearchDiagnostics(true);
+    const measured = getLegalActions(state, diagnostics);
+    expect(measured).toEqual(plain);
+    expect(JSON.stringify(state)).toBe(before);
+    const pawn = diagnostics.rootDrops.pawn;
+    expect(pawn.calls).toBe(1);
+    expect(pawn.candidates).toBe(81);
+    expect(pawn.legal).toBe(dropActions(plain).length);
+    expect(pawn.rejected.pawn_drop_mate).toBeGreaterThan(0);
+    expect(pawn.candidates).toBe(pawn.legal + Object.values(pawn.rejected).reduce((a, b) => a + b, 0));
+    expect(pawn.stages['board-clone'].calls).toBeGreaterThan(0);
+    expect(pawn.stages['pawn-drop-mate'].calls).toBeGreaterThan(0);
+  });
+
   it('初期局面で手番だけの非空候補を、入力を変えず決定的に返す', () => {
     const state = createInitialBoardState();
     const snapshot = JSON.stringify(state);

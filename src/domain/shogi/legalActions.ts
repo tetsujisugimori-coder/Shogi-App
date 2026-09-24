@@ -136,7 +136,18 @@ export function getLegalActions(state: BoardState, diagnostics?: SearchDiagnosti
 
     if (!representativePieceId) continue;
 
-    const destinations = measured(diagnostics, 'root-hand-drops', () => getLegalDropSquares(state, representativePieceId))
+    const destinations = measured(diagnostics, 'root-hand-drops', () => {
+      const began = diagnostics ? diagnostics.now() : 0;
+      const squares = getLegalDropSquares(state, representativePieceId, diagnostics);
+      if (diagnostics) {
+        const duration = Math.max(0, diagnostics.now() - began);
+        const entry = diagnostics.rootDrops[pieceType];
+        entry.calls++;
+        entry.milliseconds += duration;
+        entry.maxMilliseconds = Math.max(entry.maxMilliseconds, duration);
+      }
+      return squares;
+    })
       .slice()
       .sort(compareCoordinates);
     for (const destination of destinations) {

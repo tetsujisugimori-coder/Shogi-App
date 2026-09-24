@@ -18,13 +18,13 @@ export const POSITION_IDS = [
   { game: 1, ply: 115, band: 'late' },
 ] as const;
 
-export function replayPositions(source = SOURCE) {
+export function replayPositions(source = SOURCE, requested: readonly { game: number; ply: number; band: string }[] = POSITION_IDS) {
   const bytes = readFileSync(source);
   const rows = bytes.toString('utf8').trim().split(/\r?\n/).map(line => JSON.parse(line));
   const games = rows.filter(row => row.type === 'game') as MeasurementGame[];
   const positions = [] as Array<{ id: string; band: string; state: BoardState; sourceResult: string;
     sourceActualMilliseconds: number; stateSha256: string; positionKeySha256: string; historyLength: number }>;
-  for (const item of POSITION_IDS) {
+  for (const item of requested) {
     const game = games[item.game - 1];
     assert.equal(game.executionIndex, item.game);
     let state = createInitialBoardState();
@@ -45,7 +45,7 @@ export function replayPositions(source = SOURCE) {
       if (next.type === 'applied') state = next.state;
     }
   }
-  assert.equal(positions.length, POSITION_IDS.length);
+  assert.equal(positions.length, requested.length);
   return { positions, sourceSha256: createHash('sha256').update(bytes).digest('hex') };
 }
 
