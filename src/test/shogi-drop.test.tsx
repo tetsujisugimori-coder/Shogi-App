@@ -145,11 +145,21 @@ describe('駒打ちドメイン', () => {
 
   it('仮想盤面は元盤面と駒を変更せず未成で配置する', () => {
     const piece: Piece = { id: 'sim-pawn', type: 'pawn', player: 'sente' };
-    const state = createDropState([piece]);
+    const state = createDropState([piece], 'sente', [
+      { row: 2, col: 2, piece: { id: 'board-gold', type: 'gold', player: 'gote' } },
+    ]);
+    const before = JSON.stringify(state.squares);
     const simulated = simulateDropSquares(state.squares, piece, { row: 4, col: 4 });
     expect(simulated).not.toBe(state.squares);
     expect(simulated[4][4].piece).toEqual({ ...piece, isPromoted: false });
     expect(state.squares[4][4].piece).toBeNull();
+    simulated[2][2].piece!.id = 'changed';
+    simulated[3][3].coordinateLabel = 'changed';
+    simulated[4][4].piece!.id = 'changed';
+    expect(JSON.stringify(state.squares)).toBe(before);
+    const outside = simulateDropSquares(state.squares, piece, { row: -1, col: 4 });
+    outside[2][2].piece!.id = 'changed-again';
+    expect(JSON.stringify(state.squares)).toBe(before);
   });
 
   it.each([

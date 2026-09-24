@@ -8,7 +8,7 @@ export type SearchDiagnosticPhase =
 
 export interface SearchDiagnosticEntry { calls: number; milliseconds: number; maxMilliseconds?: number }
 
-export type DropStage = 'board-clone' | 'own-check' | 'pawn-drop-mate';
+export type DropStage = 'drop-board-setup' | 'own-check' | 'pawn-drop-mate';
 export type DropPieceType = Exclude<PieceType, 'king'>;
 export interface RootDropEntry {
   calls: number; milliseconds: number; maxMilliseconds: number;
@@ -18,7 +18,7 @@ export interface RootDropEntry {
 
 const dropEntry = (): RootDropEntry => ({ calls: 0, milliseconds: 0, maxMilliseconds: 0,
   candidates: 0, legal: 0, rejected: {},
-  stages: { 'board-clone': { calls: 0, milliseconds: 0 },
+  stages: { 'drop-board-setup': { calls: 0, milliseconds: 0 },
     'own-check': { calls: 0, milliseconds: 0 }, 'pawn-drop-mate': { calls: 0, milliseconds: 0 } } });
 
 export class SearchDiagnostics {

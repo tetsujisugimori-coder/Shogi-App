@@ -12,7 +12,8 @@ assert.ok(path, 'Usage: npm run audit:root-legal-breakdown -- PATH.jsonl');
 const rows = readFileSync(resolve(path), 'utf8').trim().split(/\r?\n/).map(line => JSON.parse(line));
 const config = rows[0];
 assert.equal(config.type, 'config');
-assert.equal(config.schema, 'root-legal-breakdown-v1');
+assert.ok(['root-legal-breakdown-v1', 'root-legal-breakdown-v2'].includes(config.schema));
+const setupStage = config.schema === 'root-legal-breakdown-v1' ? 'board-clone' : 'drop-board-setup';
 assert.equal(rows.at(-1)?.type, 'end');
 const stored = rows.filter(row => row.type === 'position');
 const requested = stored.map(row => {
@@ -67,7 +68,7 @@ for (const row of samples) {
       assert.ok(['occupied_drop_square', 'dead_piece_drop', 'nifu', 'self_check_unresolved', 'pawn_drop_mate'].includes(reason));
     const cloned = entry.candidates - (entry.rejected.occupied_drop_square ?? 0) -
       (entry.rejected.dead_piece_drop ?? 0) - (entry.rejected.nifu ?? 0);
-    assert.equal(entry.stages['board-clone'].calls, cloned);
+    assert.equal(entry.stages[setupStage].calls, cloned);
     assert.equal(entry.stages['own-check'].calls, cloned);
     assert.equal(entry.stages['pawn-drop-mate'].calls,
       type === 'pawn' ? cloned - (entry.rejected.self_check_unresolved ?? 0) : 0);
