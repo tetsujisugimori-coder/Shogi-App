@@ -59,6 +59,22 @@ export function simulateDropSquares(
   return nextSquares;
 }
 
+/** Validation only: readers never mutate shared rows, squares, or pieces. */
+function prepareDropValidationSquares(
+  squares: BoardSquare[][],
+  piece: Piece,
+  to: Coordinate
+): BoardSquare[][] {
+  const nextSquares = squares.slice();
+  const destinationRow = squares[to.row].slice();
+  nextSquares[to.row] = destinationRow;
+  destinationRow[to.col] = {
+    ...squares[to.row][to.col],
+    piece: { ...piece, isPromoted: false },
+  };
+  return nextSquares;
+}
+
 function hasLegalBoardMoveResponseToPawnCheck(
   squares: BoardSquare[][],
   respondingPlayer: Player
@@ -176,8 +192,8 @@ export function validateDrop(
 
   const dropType = piece.type as DropPieceType;
   const simulatedSquares = diagnostics
-    ? diagnostics.measureDropStage(dropType, 'board-clone', () => simulateDropSquares(state.squares, piece, to))
-    : simulateDropSquares(state.squares, piece, to);
+    ? diagnostics.measureDropStage(dropType, 'drop-board-setup', () => prepareDropValidationSquares(state.squares, piece, to))
+    : prepareDropValidationSquares(state.squares, piece, to);
   if (diagnostics
     ? diagnostics.measureDropStage(dropType, 'own-check', () => isKingInCheck(simulatedSquares, state.turn))
     : isKingInCheck(simulatedSquares, state.turn)) {

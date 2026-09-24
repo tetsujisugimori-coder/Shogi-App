@@ -45,7 +45,7 @@ const head = execFileSync('git', ['rev-parse', 'HEAD'], { encoding: 'utf8' }).tr
 const status = execFileSync('git', ['status', '--porcelain=v1', '--untracked-files=all'], { encoding: 'utf8' }).trim();
 const config = { maxDepth: 4, timeLimitMilliseconds: 100, evaluationPreset: 'standard',
   moveOrdering: 'standard', quiescenceMoveOrdering: 'original', maxTacticalDepth: 1 } as const;
-const rows: object[] = [{ type: 'config', schema: 'root-legal-breakdown-v1', startedAt: new Date().toISOString(),
+const rows: object[] = [{ type: 'config', schema: 'root-legal-breakdown-v2', startedAt: new Date().toISOString(),
   head, dirty: status !== '', status, node: process.version, os: `${platform()} ${release()} ${arch()}`,
   cpu: cpus()[0]?.model ?? 'unknown', config, warmups, runs, stageTiming, sourceSha256,
   execution: 'synchronous serial, OFF/ON alternating order per run',
@@ -143,7 +143,7 @@ for (const position of positions) {
       reasons[reason] = (reasons[reason] ?? 0) + count;
     row(`${type}打ち`, calls, sum(entries.map(e => e.milliseconds)), Math.max(...entries.map(e => e.maxMilliseconds)),
       sum(entries.map(e => e.candidates)), sum(entries.map(e => e.legal)), JSON.stringify(reasons));
-    for (const stage of ['board-clone', 'own-check', 'pawn-drop-mate'] as const) {
+    for (const stage of ['drop-board-setup', 'own-check', 'pawn-drop-mate'] as const) {
       const stages = entries.map(e => e.stages[stage]);
       const count = sum(stages.map(e => e.calls));
       if (count) row(`${type}/${stage}`, count, sum(stages.map(e => e.milliseconds)),
@@ -157,8 +157,8 @@ if (positions.length === 4) {
   const total = (numbers: number[]) => numbers.reduce((a, b) => a + b, 0);
   const rootTotal = total(measured.map(r => r.totalMilliseconds));
   const dropTotal = total(measured.map(r => r.dropMilliseconds));
-  const cloneTotal = total(measured.flatMap(r => Object.values(r.byType).map(e => e.stages['board-clone'].milliseconds)));
-  lines.push('', `診断ONの本測定20回ではroot全体${rootTotal.toFixed(2)}ms、持駒打ち${dropTotal.toFixed(2)}ms、盤面複製工程${cloneTotal.toFixed(2)}ms。今回のroot費用では盤面複製が主な候補である。`,
+  const setupTotal = total(measured.flatMap(r => Object.values(r.byType).map(e => e.stages['drop-board-setup'].milliseconds)));
+  lines.push('', `診断ONの本測定20回ではroot全体${rootTotal.toFixed(2)}ms、持駒打ち${dropTotal.toFixed(2)}ms、打ち判定用盤面準備${setupTotal.toFixed(2)}ms。v1の盤面全体の深い複製工程とは処理範囲が異なる。`,
     'PR #158のg1-p93では415.56msの期限確認間隔に複数の持駒打ち生成が含まれ、打ち生成の合計は360.60msだった。今回その長い尾は再現しておらず、当時の工程内部時間やOS・JIT・GC等の寄与は未確定。単一呼出しの最大値だけで415.56msを説明しない。4局の手数上限打切から勝敗・棋力は推定しない。');
 }
 writeFileSync(out.slice(0, -6) + '.md', lines.join('\n') + '\n', { flag: 'wx' });

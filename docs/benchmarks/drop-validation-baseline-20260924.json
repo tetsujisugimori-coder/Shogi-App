@@ -1,0 +1,703 @@
+{
+  "schema": "drop-validation-parity-v1",
+  "rows": [
+    {
+      "id": "g1-p115",
+      "stateSha256": "ad36ced5c3389a3c60b676640477a64c22ba0fb7650d61fa370618e34b66e17b",
+      "actionsSha256": "0d6a3655a7ee0f159f649d1868ab8afa71fab40faffec1992bf67cc29ea029a4",
+      "actionCount": 314,
+      "representativeDropIds": [
+        "gote-gold-4",
+        "gote-silver-3",
+        "gote-knight-8",
+        "gote-lance-9",
+        "gote-pawn-3"
+      ],
+      "drops": [
+        {
+          "pieceId": "gote-gold-6",
+          "resultsSha256": "b592c2dcc9932045f69cecd28100b1134c3369e68acd05b4b130fa195e3ca038",
+          "legalSquaresSha256": "421f2f014739fa91b429d7a0cc51ffa64b0cd0d5170a54278cd0953fbd4e6bab",
+          "legalCount": 61,
+          "reasons": {
+            "occupied_drop_square": 20
+          }
+        },
+        {
+          "pieceId": "gote-pawn-9",
+          "resultsSha256": "5c6e365071860beb8d5729fe36f762803968928a004ef3df3fb142399b1b4bc4",
+          "legalSquaresSha256": "4538f0e3f1eff802b26870a565ee380659fe9b5fd67088644953e619ff9fdf41",
+          "legalCount": 47,
+          "reasons": {
+            "dead_piece_drop": 6,
+            "occupied_drop_square": 20,
+            "nifu": 8
+          }
+        },
+        {
+          "pieceId": "gote-knight-8",
+          "resultsSha256": "b75b9ddf10a2d2ad2dd0401be824036f6e2a8a197f985d66727a671b1485f0d0",
+          "legalSquaresSha256": "3ae03dfeebf2c6756d1b04ce686fc956ca0350c677843dc83a35c794e9038182",
+          "legalCount": 48,
+          "reasons": {
+            "dead_piece_drop": 13,
+            "occupied_drop_square": 20
+          }
+        },
+        {
+          "pieceId": "gote-lance-9",
+          "resultsSha256": "b667a34a61393413269e5d8d9cb1b1e795958e9790fb8da5ae28274808c10954",
+          "legalSquaresSha256": "c1264cb687b55fd85e7b1cde030333a39979bf33eed5daf693f26bc0019f4c1f",
+          "legalCount": 55,
+          "reasons": {
+            "dead_piece_drop": 6,
+            "occupied_drop_square": 20
+          }
+        },
+        {
+          "pieceId": "gote-pawn-8",
+          "resultsSha256": "5c6e365071860beb8d5729fe36f762803968928a004ef3df3fb142399b1b4bc4",
+          "legalSquaresSha256": "4538f0e3f1eff802b26870a565ee380659fe9b5fd67088644953e619ff9fdf41",
+          "legalCount": 47,
+          "reasons": {
+            "dead_piece_drop": 6,
+            "occupied_drop_square": 20,
+            "nifu": 8
+          }
+        },
+        {
+          "pieceId": "gote-silver-7",
+          "resultsSha256": "b592c2dcc9932045f69cecd28100b1134c3369e68acd05b4b130fa195e3ca038",
+          "legalSquaresSha256": "421f2f014739fa91b429d7a0cc51ffa64b0cd0d5170a54278cd0953fbd4e6bab",
+          "legalCount": 61,
+          "reasons": {
+            "occupied_drop_square": 20
+          }
+        },
+        {
+          "pieceId": "gote-pawn-7",
+          "resultsSha256": "5c6e365071860beb8d5729fe36f762803968928a004ef3df3fb142399b1b4bc4",
+          "legalSquaresSha256": "4538f0e3f1eff802b26870a565ee380659fe9b5fd67088644953e619ff9fdf41",
+          "legalCount": 47,
+          "reasons": {
+            "dead_piece_drop": 6,
+            "occupied_drop_square": 20,
+            "nifu": 8
+          }
+        },
+        {
+          "pieceId": "gote-pawn-5",
+          "resultsSha256": "5c6e365071860beb8d5729fe36f762803968928a004ef3df3fb142399b1b4bc4",
+          "legalSquaresSha256": "4538f0e3f1eff802b26870a565ee380659fe9b5fd67088644953e619ff9fdf41",
+          "legalCount": 47,
+          "reasons": {
+            "dead_piece_drop": 6,
+            "occupied_drop_square": 20,
+            "nifu": 8
+          }
+        },
+        {
+          "pieceId": "gote-gold-4",
+          "resultsSha256": "b592c2dcc9932045f69cecd28100b1134c3369e68acd05b4b130fa195e3ca038",
+          "legalSquaresSha256": "421f2f014739fa91b429d7a0cc51ffa64b0cd0d5170a54278cd0953fbd4e6bab",
+          "legalCount": 61,
+          "reasons": {
+            "occupied_drop_square": 20
+          }
+        },
+        {
+          "pieceId": "gote-pawn-4",
+          "resultsSha256": "5c6e365071860beb8d5729fe36f762803968928a004ef3df3fb142399b1b4bc4",
+          "legalSquaresSha256": "4538f0e3f1eff802b26870a565ee380659fe9b5fd67088644953e619ff9fdf41",
+          "legalCount": 47,
+          "reasons": {
+            "dead_piece_drop": 6,
+            "occupied_drop_square": 20,
+            "nifu": 8
+          }
+        },
+        {
+          "pieceId": "gote-silver-3",
+          "resultsSha256": "b592c2dcc9932045f69cecd28100b1134c3369e68acd05b4b130fa195e3ca038",
+          "legalSquaresSha256": "421f2f014739fa91b429d7a0cc51ffa64b0cd0d5170a54278cd0953fbd4e6bab",
+          "legalCount": 61,
+          "reasons": {
+            "occupied_drop_square": 20
+          }
+        },
+        {
+          "pieceId": "gote-pawn-3",
+          "resultsSha256": "5c6e365071860beb8d5729fe36f762803968928a004ef3df3fb142399b1b4bc4",
+          "legalSquaresSha256": "4538f0e3f1eff802b26870a565ee380659fe9b5fd67088644953e619ff9fdf41",
+          "legalCount": 47,
+          "reasons": {
+            "dead_piece_drop": 6,
+            "occupied_drop_square": 20,
+            "nifu": 8
+          }
+        }
+      ]
+    },
+    {
+      "id": "g3-p55",
+      "stateSha256": "5892563555b497f8a0e65c11137eb4e622bff948b0d05c46fb7b01c4a8d9af48",
+      "actionsSha256": "9a537c44590c17074af7299c48ced96b3ea8d72bb6b65edf07b22550d2e47f75",
+      "actionCount": 222,
+      "representativeDropIds": [
+        "gote-rook-8",
+        "gote-gold-6",
+        "gote-silver-7",
+        "gote-pawn-6"
+      ],
+      "drops": [
+        {
+          "pieceId": "gote-pawn-9",
+          "resultsSha256": "b44682d138956195647e36439bc9a2a53d5db733a3c7e11902af502b04e0d019",
+          "legalSquaresSha256": "5200729b2eb56890be20ff258d05f8478983038ac37da1f559efa5118504156f",
+          "legalCount": 25,
+          "reasons": {
+            "dead_piece_drop": 4,
+            "occupied_drop_square": 29,
+            "nifu": 23
+          }
+        },
+        {
+          "pieceId": "gote-pawn-8",
+          "resultsSha256": "b44682d138956195647e36439bc9a2a53d5db733a3c7e11902af502b04e0d019",
+          "legalSquaresSha256": "5200729b2eb56890be20ff258d05f8478983038ac37da1f559efa5118504156f",
+          "legalCount": 25,
+          "reasons": {
+            "dead_piece_drop": 4,
+            "occupied_drop_square": 29,
+            "nifu": 23
+          }
+        },
+        {
+          "pieceId": "gote-rook-8",
+          "resultsSha256": "8b8e2c381dfdebea1672567d80603d29d37e71aa987f701e38c7125d99076bb7",
+          "legalSquaresSha256": "a3fbc2430d64d5248489ce3217b47f38e566c00c809ea1f1a9cd3d866536d8b9",
+          "legalCount": 52,
+          "reasons": {
+            "occupied_drop_square": 29
+          }
+        },
+        {
+          "pieceId": "gote-gold-6",
+          "resultsSha256": "8b8e2c381dfdebea1672567d80603d29d37e71aa987f701e38c7125d99076bb7",
+          "legalSquaresSha256": "a3fbc2430d64d5248489ce3217b47f38e566c00c809ea1f1a9cd3d866536d8b9",
+          "legalCount": 52,
+          "reasons": {
+            "occupied_drop_square": 29
+          }
+        },
+        {
+          "pieceId": "gote-pawn-7",
+          "resultsSha256": "b44682d138956195647e36439bc9a2a53d5db733a3c7e11902af502b04e0d019",
+          "legalSquaresSha256": "5200729b2eb56890be20ff258d05f8478983038ac37da1f559efa5118504156f",
+          "legalCount": 25,
+          "reasons": {
+            "dead_piece_drop": 4,
+            "occupied_drop_square": 29,
+            "nifu": 23
+          }
+        },
+        {
+          "pieceId": "gote-silver-7",
+          "resultsSha256": "8b8e2c381dfdebea1672567d80603d29d37e71aa987f701e38c7125d99076bb7",
+          "legalSquaresSha256": "a3fbc2430d64d5248489ce3217b47f38e566c00c809ea1f1a9cd3d866536d8b9",
+          "legalCount": 52,
+          "reasons": {
+            "occupied_drop_square": 29
+          }
+        },
+        {
+          "pieceId": "gote-pawn-6",
+          "resultsSha256": "b44682d138956195647e36439bc9a2a53d5db733a3c7e11902af502b04e0d019",
+          "legalSquaresSha256": "5200729b2eb56890be20ff258d05f8478983038ac37da1f559efa5118504156f",
+          "legalCount": 25,
+          "reasons": {
+            "dead_piece_drop": 4,
+            "occupied_drop_square": 29,
+            "nifu": 23
+          }
+        }
+      ]
+    },
+    {
+      "id": "g4-p89",
+      "stateSha256": "b9d167a6d76c36ee18babb922ed5e7c8bf88fce80b899cdedf473ae7d4009410",
+      "actionsSha256": "b5ff6242368254e79d46d7a411a21aac8d5c765b11cce3e376606e416cb53daf",
+      "actionCount": 249,
+      "representativeDropIds": [
+        "gote-rook-8",
+        "gote-gold-4",
+        "gote-silver-7",
+        "gote-pawn-4"
+      ],
+      "drops": [
+        {
+          "pieceId": "gote-pawn-9",
+          "resultsSha256": "1c601d09cc4fdd750e9983bfd227d259e4cebefb8e5e82feaa1d0dbba217d987",
+          "legalSquaresSha256": "422bc2b730a1073eef3af21e03a889c5f837e4ca6005470f54abefa0d0e8ff58",
+          "legalCount": 39,
+          "reasons": {
+            "dead_piece_drop": 4,
+            "occupied_drop_square": 25,
+            "nifu": 13
+          }
+        },
+        {
+          "pieceId": "gote-pawn-8",
+          "resultsSha256": "1c601d09cc4fdd750e9983bfd227d259e4cebefb8e5e82feaa1d0dbba217d987",
+          "legalSquaresSha256": "422bc2b730a1073eef3af21e03a889c5f837e4ca6005470f54abefa0d0e8ff58",
+          "legalCount": 39,
+          "reasons": {
+            "dead_piece_drop": 4,
+            "occupied_drop_square": 25,
+            "nifu": 13
+          }
+        },
+        {
+          "pieceId": "gote-rook-8",
+          "resultsSha256": "31e19592798b21e8284e637a13b4e7d8197d9698f3c7021e998cbab43b75257a",
+          "legalSquaresSha256": "ba25f8401ec7567b3f39c33dfc0405da62d8387d1b0ece5ba0c70f947da58d5a",
+          "legalCount": 56,
+          "reasons": {
+            "occupied_drop_square": 25
+          }
+        },
+        {
+          "pieceId": "gote-gold-6",
+          "resultsSha256": "31e19592798b21e8284e637a13b4e7d8197d9698f3c7021e998cbab43b75257a",
+          "legalSquaresSha256": "ba25f8401ec7567b3f39c33dfc0405da62d8387d1b0ece5ba0c70f947da58d5a",
+          "legalCount": 56,
+          "reasons": {
+            "occupied_drop_square": 25
+          }
+        },
+        {
+          "pieceId": "gote-pawn-7",
+          "resultsSha256": "1c601d09cc4fdd750e9983bfd227d259e4cebefb8e5e82feaa1d0dbba217d987",
+          "legalSquaresSha256": "422bc2b730a1073eef3af21e03a889c5f837e4ca6005470f54abefa0d0e8ff58",
+          "legalCount": 39,
+          "reasons": {
+            "dead_piece_drop": 4,
+            "occupied_drop_square": 25,
+            "nifu": 13
+          }
+        },
+        {
+          "pieceId": "gote-silver-7",
+          "resultsSha256": "31e19592798b21e8284e637a13b4e7d8197d9698f3c7021e998cbab43b75257a",
+          "legalSquaresSha256": "ba25f8401ec7567b3f39c33dfc0405da62d8387d1b0ece5ba0c70f947da58d5a",
+          "legalCount": 56,
+          "reasons": {
+            "occupied_drop_square": 25
+          }
+        },
+        {
+          "pieceId": "gote-pawn-6",
+          "resultsSha256": "1c601d09cc4fdd750e9983bfd227d259e4cebefb8e5e82feaa1d0dbba217d987",
+          "legalSquaresSha256": "422bc2b730a1073eef3af21e03a889c5f837e4ca6005470f54abefa0d0e8ff58",
+          "legalCount": 39,
+          "reasons": {
+            "dead_piece_drop": 4,
+            "occupied_drop_square": 25,
+            "nifu": 13
+          }
+        },
+        {
+          "pieceId": "gote-pawn-5",
+          "resultsSha256": "1c601d09cc4fdd750e9983bfd227d259e4cebefb8e5e82feaa1d0dbba217d987",
+          "legalSquaresSha256": "422bc2b730a1073eef3af21e03a889c5f837e4ca6005470f54abefa0d0e8ff58",
+          "legalCount": 39,
+          "reasons": {
+            "dead_piece_drop": 4,
+            "occupied_drop_square": 25,
+            "nifu": 13
+          }
+        },
+        {
+          "pieceId": "gote-pawn-4",
+          "resultsSha256": "1c601d09cc4fdd750e9983bfd227d259e4cebefb8e5e82feaa1d0dbba217d987",
+          "legalSquaresSha256": "422bc2b730a1073eef3af21e03a889c5f837e4ca6005470f54abefa0d0e8ff58",
+          "legalCount": 39,
+          "reasons": {
+            "dead_piece_drop": 4,
+            "occupied_drop_square": 25,
+            "nifu": 13
+          }
+        },
+        {
+          "pieceId": "gote-gold-4",
+          "resultsSha256": "31e19592798b21e8284e637a13b4e7d8197d9698f3c7021e998cbab43b75257a",
+          "legalSquaresSha256": "ba25f8401ec7567b3f39c33dfc0405da62d8387d1b0ece5ba0c70f947da58d5a",
+          "legalCount": 56,
+          "reasons": {
+            "occupied_drop_square": 25
+          }
+        }
+      ]
+    },
+    {
+      "id": "g1-p93",
+      "stateSha256": "cac7611bd07671f27e49a2788adb7c5fc941e95a4f7d476f0c2f329ce41679f0",
+      "actionsSha256": "3d6d58f0274116c5f3aae1db9dd66cff65c6d10187f7c7db2de08f5028e65c02",
+      "actionCount": 289,
+      "representativeDropIds": [
+        "gote-gold-4",
+        "gote-silver-3",
+        "gote-knight-8",
+        "gote-lance-9",
+        "gote-pawn-4"
+      ],
+      "drops": [
+        {
+          "pieceId": "gote-gold-6",
+          "resultsSha256": "3f88fec96a4c8862aa6ef2e29d7c6c9dd02ed2ad962bf79be5591084b00071dc",
+          "legalSquaresSha256": "2d2a329d57e6e4228f10931287de94d49f26e8e2992f80159ee070b1c1c0249b",
+          "legalCount": 59,
+          "reasons": {
+            "occupied_drop_square": 22
+          }
+        },
+        {
+          "pieceId": "gote-pawn-9",
+          "resultsSha256": "e23666d61fd19df9c6da03e9806c96dfe88f61ce92f81cc39809f6d14d6614f2",
+          "legalSquaresSha256": "023ffc5aa03e178e5462a7bd14c4610d36c0908c1c0ab399d78e3479c2f6199c",
+          "legalCount": 33,
+          "reasons": {
+            "dead_piece_drop": 7,
+            "occupied_drop_square": 22,
+            "nifu": 19
+          }
+        },
+        {
+          "pieceId": "gote-knight-8",
+          "resultsSha256": "aa5b8413de91ed7d0c0904477f757d4883b472ac3f96bb4794c446b8dd4eb868",
+          "legalSquaresSha256": "5cd80d58ee85eb18941d678f56865f3df9be73d1107126825acc97556988ae71",
+          "legalCount": 46,
+          "reasons": {
+            "dead_piece_drop": 13,
+            "occupied_drop_square": 22
+          }
+        },
+        {
+          "pieceId": "gote-lance-9",
+          "resultsSha256": "19e62622c30b2a7c176b3a46e9d00b76f7257a1186c97ee7b5b31954de271209",
+          "legalSquaresSha256": "6a48bc5f60e38c7a450f8593531900d425ff09819e24046e81d538ea224cb196",
+          "legalCount": 52,
+          "reasons": {
+            "dead_piece_drop": 7,
+            "occupied_drop_square": 22
+          }
+        },
+        {
+          "pieceId": "gote-pawn-8",
+          "resultsSha256": "e23666d61fd19df9c6da03e9806c96dfe88f61ce92f81cc39809f6d14d6614f2",
+          "legalSquaresSha256": "023ffc5aa03e178e5462a7bd14c4610d36c0908c1c0ab399d78e3479c2f6199c",
+          "legalCount": 33,
+          "reasons": {
+            "dead_piece_drop": 7,
+            "occupied_drop_square": 22,
+            "nifu": 19
+          }
+        },
+        {
+          "pieceId": "gote-silver-7",
+          "resultsSha256": "3f88fec96a4c8862aa6ef2e29d7c6c9dd02ed2ad962bf79be5591084b00071dc",
+          "legalSquaresSha256": "2d2a329d57e6e4228f10931287de94d49f26e8e2992f80159ee070b1c1c0249b",
+          "legalCount": 59,
+          "reasons": {
+            "occupied_drop_square": 22
+          }
+        },
+        {
+          "pieceId": "gote-pawn-7",
+          "resultsSha256": "e23666d61fd19df9c6da03e9806c96dfe88f61ce92f81cc39809f6d14d6614f2",
+          "legalSquaresSha256": "023ffc5aa03e178e5462a7bd14c4610d36c0908c1c0ab399d78e3479c2f6199c",
+          "legalCount": 33,
+          "reasons": {
+            "dead_piece_drop": 7,
+            "occupied_drop_square": 22,
+            "nifu": 19
+          }
+        },
+        {
+          "pieceId": "gote-pawn-5",
+          "resultsSha256": "e23666d61fd19df9c6da03e9806c96dfe88f61ce92f81cc39809f6d14d6614f2",
+          "legalSquaresSha256": "023ffc5aa03e178e5462a7bd14c4610d36c0908c1c0ab399d78e3479c2f6199c",
+          "legalCount": 33,
+          "reasons": {
+            "dead_piece_drop": 7,
+            "occupied_drop_square": 22,
+            "nifu": 19
+          }
+        },
+        {
+          "pieceId": "gote-gold-4",
+          "resultsSha256": "3f88fec96a4c8862aa6ef2e29d7c6c9dd02ed2ad962bf79be5591084b00071dc",
+          "legalSquaresSha256": "2d2a329d57e6e4228f10931287de94d49f26e8e2992f80159ee070b1c1c0249b",
+          "legalCount": 59,
+          "reasons": {
+            "occupied_drop_square": 22
+          }
+        },
+        {
+          "pieceId": "gote-pawn-4",
+          "resultsSha256": "e23666d61fd19df9c6da03e9806c96dfe88f61ce92f81cc39809f6d14d6614f2",
+          "legalSquaresSha256": "023ffc5aa03e178e5462a7bd14c4610d36c0908c1c0ab399d78e3479c2f6199c",
+          "legalCount": 33,
+          "reasons": {
+            "dead_piece_drop": 7,
+            "occupied_drop_square": 22,
+            "nifu": 19
+          }
+        },
+        {
+          "pieceId": "gote-silver-3",
+          "resultsSha256": "3f88fec96a4c8862aa6ef2e29d7c6c9dd02ed2ad962bf79be5591084b00071dc",
+          "legalSquaresSha256": "2d2a329d57e6e4228f10931287de94d49f26e8e2992f80159ee070b1c1c0249b",
+          "legalCount": 59,
+          "reasons": {
+            "occupied_drop_square": 22
+          }
+        }
+      ]
+    },
+    {
+      "id": "g3-p117",
+      "stateSha256": "5339376ca326e8ad2e4706452a833d20fa0b633288681c9b9c50cfcc61fdc10e",
+      "actionsSha256": "69d5b3fe1483fc69dc35a8008454101c47edec0b2582785006d72135c2c8f5cd",
+      "actionCount": 268,
+      "representativeDropIds": [
+        "gote-rook-8",
+        "gote-gold-4",
+        "gote-silver-3",
+        "gote-pawn-3"
+      ],
+      "drops": [
+        {
+          "pieceId": "gote-pawn-9",
+          "resultsSha256": "7cf13a88806d3dbeab149c30cad155fee73ae127cf94c01edb674941ccf922c6",
+          "legalSquaresSha256": "5dba3486deba4eb91309d1e6f37994e37b718b66a50c5f2f57636e795d3f3399",
+          "legalCount": 46,
+          "reasons": {
+            "occupied_drop_square": 21,
+            "dead_piece_drop": 6,
+            "nifu": 8
+          }
+        },
+        {
+          "pieceId": "gote-pawn-8",
+          "resultsSha256": "7cf13a88806d3dbeab149c30cad155fee73ae127cf94c01edb674941ccf922c6",
+          "legalSquaresSha256": "5dba3486deba4eb91309d1e6f37994e37b718b66a50c5f2f57636e795d3f3399",
+          "legalCount": 46,
+          "reasons": {
+            "occupied_drop_square": 21,
+            "dead_piece_drop": 6,
+            "nifu": 8
+          }
+        },
+        {
+          "pieceId": "gote-rook-8",
+          "resultsSha256": "aae2b86e0ca5a307db8117172c4324f3f49c829e05fd166a4c69bcdfee1445c2",
+          "legalSquaresSha256": "2dd05c57d05ac413a1b7307216bb48a02dd90ee97cbc71069825eec00aa64a4c",
+          "legalCount": 60,
+          "reasons": {
+            "occupied_drop_square": 21
+          }
+        },
+        {
+          "pieceId": "gote-gold-6",
+          "resultsSha256": "aae2b86e0ca5a307db8117172c4324f3f49c829e05fd166a4c69bcdfee1445c2",
+          "legalSquaresSha256": "2dd05c57d05ac413a1b7307216bb48a02dd90ee97cbc71069825eec00aa64a4c",
+          "legalCount": 60,
+          "reasons": {
+            "occupied_drop_square": 21
+          }
+        },
+        {
+          "pieceId": "gote-pawn-7",
+          "resultsSha256": "7cf13a88806d3dbeab149c30cad155fee73ae127cf94c01edb674941ccf922c6",
+          "legalSquaresSha256": "5dba3486deba4eb91309d1e6f37994e37b718b66a50c5f2f57636e795d3f3399",
+          "legalCount": 46,
+          "reasons": {
+            "occupied_drop_square": 21,
+            "dead_piece_drop": 6,
+            "nifu": 8
+          }
+        },
+        {
+          "pieceId": "gote-silver-7",
+          "resultsSha256": "aae2b86e0ca5a307db8117172c4324f3f49c829e05fd166a4c69bcdfee1445c2",
+          "legalSquaresSha256": "2dd05c57d05ac413a1b7307216bb48a02dd90ee97cbc71069825eec00aa64a4c",
+          "legalCount": 60,
+          "reasons": {
+            "occupied_drop_square": 21
+          }
+        },
+        {
+          "pieceId": "gote-pawn-6",
+          "resultsSha256": "7cf13a88806d3dbeab149c30cad155fee73ae127cf94c01edb674941ccf922c6",
+          "legalSquaresSha256": "5dba3486deba4eb91309d1e6f37994e37b718b66a50c5f2f57636e795d3f3399",
+          "legalCount": 46,
+          "reasons": {
+            "occupied_drop_square": 21,
+            "dead_piece_drop": 6,
+            "nifu": 8
+          }
+        },
+        {
+          "pieceId": "gote-pawn-5",
+          "resultsSha256": "7cf13a88806d3dbeab149c30cad155fee73ae127cf94c01edb674941ccf922c6",
+          "legalSquaresSha256": "5dba3486deba4eb91309d1e6f37994e37b718b66a50c5f2f57636e795d3f3399",
+          "legalCount": 46,
+          "reasons": {
+            "occupied_drop_square": 21,
+            "dead_piece_drop": 6,
+            "nifu": 8
+          }
+        },
+        {
+          "pieceId": "gote-pawn-4",
+          "resultsSha256": "7cf13a88806d3dbeab149c30cad155fee73ae127cf94c01edb674941ccf922c6",
+          "legalSquaresSha256": "5dba3486deba4eb91309d1e6f37994e37b718b66a50c5f2f57636e795d3f3399",
+          "legalCount": 46,
+          "reasons": {
+            "occupied_drop_square": 21,
+            "dead_piece_drop": 6,
+            "nifu": 8
+          }
+        },
+        {
+          "pieceId": "gote-gold-4",
+          "resultsSha256": "aae2b86e0ca5a307db8117172c4324f3f49c829e05fd166a4c69bcdfee1445c2",
+          "legalSquaresSha256": "2dd05c57d05ac413a1b7307216bb48a02dd90ee97cbc71069825eec00aa64a4c",
+          "legalCount": 60,
+          "reasons": {
+            "occupied_drop_square": 21
+          }
+        },
+        {
+          "pieceId": "gote-pawn-3",
+          "resultsSha256": "7cf13a88806d3dbeab149c30cad155fee73ae127cf94c01edb674941ccf922c6",
+          "legalSquaresSha256": "5dba3486deba4eb91309d1e6f37994e37b718b66a50c5f2f57636e795d3f3399",
+          "legalCount": 46,
+          "reasons": {
+            "occupied_drop_square": 21,
+            "dead_piece_drop": 6,
+            "nifu": 8
+          }
+        },
+        {
+          "pieceId": "gote-silver-3",
+          "resultsSha256": "aae2b86e0ca5a307db8117172c4324f3f49c829e05fd166a4c69bcdfee1445c2",
+          "legalSquaresSha256": "2dd05c57d05ac413a1b7307216bb48a02dd90ee97cbc71069825eec00aa64a4c",
+          "legalCount": 60,
+          "reasons": {
+            "occupied_drop_square": 21
+          }
+        }
+      ]
+    },
+    {
+      "id": "nifu-dead-and-representative",
+      "stateSha256": "dc3800ea93b06c7b16d09b26d362c1f384e91de7e441093a1e78b4cadad4a843",
+      "actionsSha256": "68024104117a6e6b6c701ef28680d651bbb83008a8beedd4012e2ddbe0f0a2fc",
+      "actionCount": 200,
+      "representativeDropIds": [
+        "knight",
+        "lance",
+        "pawn-a"
+      ],
+      "drops": [
+        {
+          "pieceId": "pawn-z",
+          "resultsSha256": "496df8d6e5f1a3b5ae72db9d8d6c34135ca3a52097f245d51719041aab21c2da",
+          "legalSquaresSha256": "57086cc732d93832eaba61992711519a3774941511059a19634aa8673bbc65c1",
+          "legalCount": 63,
+          "reasons": {
+            "dead_piece_drop": 8,
+            "occupied_drop_square": 3,
+            "nifu": 7
+          }
+        },
+        {
+          "pieceId": "pawn-a",
+          "resultsSha256": "496df8d6e5f1a3b5ae72db9d8d6c34135ca3a52097f245d51719041aab21c2da",
+          "legalSquaresSha256": "57086cc732d93832eaba61992711519a3774941511059a19634aa8673bbc65c1",
+          "legalCount": 63,
+          "reasons": {
+            "dead_piece_drop": 8,
+            "occupied_drop_square": 3,
+            "nifu": 7
+          }
+        },
+        {
+          "pieceId": "knight",
+          "resultsSha256": "3bcdc260861d2dbb3eb7437fc2b0d3aa38f8094c7bc4b2f95af3a4c164b68db4",
+          "legalSquaresSha256": "7907e863c8b69d163a0348178a1e1a7db981dc2c3eabba1a6d717c2358ee99f6",
+          "legalCount": 61,
+          "reasons": {
+            "dead_piece_drop": 17,
+            "occupied_drop_square": 3
+          }
+        },
+        {
+          "pieceId": "lance",
+          "resultsSha256": "1d3b3581e1311206cc1531c34b3b8357498f736aefc1fc45db01c652b6e72914",
+          "legalSquaresSha256": "2773a08021591903484b653cc18b7c0d5c61cb2b63d917eede842ba15f0095c2",
+          "legalCount": 70,
+          "reasons": {
+            "dead_piece_drop": 8,
+            "occupied_drop_square": 3
+          }
+        }
+      ]
+    },
+    {
+      "id": "check-response",
+      "stateSha256": "850a20a0f353a3b38afb1189cfc2bed7a57de7f95d0e8e8a6cd888f4b65bbc0b",
+      "actionsSha256": "bad29f2f014ca0d4a8a570ef9e2e83fd4d386e8f4a69e6caf0c43e3aad4e8c96",
+      "actionCount": 11,
+      "representativeDropIds": [
+        "blocking-gold"
+      ],
+      "drops": [
+        {
+          "pieceId": "blocking-gold",
+          "resultsSha256": "159c7cefe7831148b16e5d2ef93bc7d640c4366b4bfdd59c392baf5d3eb0a614",
+          "legalSquaresSha256": "8c23c8c069ef7beb465667b869913c1d3c056f58d897b3d0daa368cb7b65b0c9",
+          "legalCount": 7,
+          "reasons": {
+            "self_check_unresolved": 71,
+            "occupied_drop_square": 3
+          }
+        }
+      ]
+    },
+    {
+      "id": "pawn-drop-mate",
+      "stateSha256": "9dde00025a2e8379e91f9b7cf95b78680679b32478f7fa26ed02862609ff99db",
+      "actionsSha256": "07508e946c685e881522d3cf057bc49e24a1d34d6a413bb46a176bf90cecbc8e",
+      "actionCount": 78,
+      "representativeDropIds": [
+        "mate-pawn"
+      ],
+      "drops": [
+        {
+          "pieceId": "mate-pawn",
+          "resultsSha256": "d8bc6d5725db394538593e171efa6bee919d17099a398c8fc85b6b175db2919d",
+          "legalSquaresSha256": "9b0e81bf0de3d06cf15f7c5a18ac54a78574eea516a2e57bdf3d6174652ac3b4",
+          "legalCount": 67,
+          "reasons": {
+            "dead_piece_drop": 6,
+            "occupied_drop_square": 7,
+            "pawn_drop_mate": 1
+          }
+        }
+      ]
+    }
+  ]
+}

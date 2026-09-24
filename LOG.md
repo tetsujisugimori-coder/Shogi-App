@@ -1,5 +1,14 @@
 # SHOGI-APP 開発ログ
 
+## [2026-09-24 JST] 持駒打ち合法性判定の盤面準備を局所複製に変更
+
+- PR #159を含む`main`=`2117edb`、作業ツリー空から`perf/drop-validation-board-copy`を作成。`dropRules.ts`、`simulateDropSquares`、`cloneBoardSquares`、王手判定と歩打ち詰め応手の盤面読み取り経路を確認。`isKingInCheck`とその攻撃計算、`getLegalMoves`の疑似手生成は共有盤面を読むだけで、応手の`simulateMoveSquares`は別の深い複製を作る。`validateDrop`内の打ち判定だけを外側配列・打ち先の行／マス／駒の複製に変更し、公開`simulateDropSquares`と実着手は従来の深い複製を維持した。元stateの一時変更は行わない。
+- 診断の工程名をv1の`board-clone`からv2の`drop-board-setup`へ変更。前者は盤面全体の深い複製＋配置、後者は局所複製＋配置で処理範囲が異なる。監査CLIはv1/v2双方を受理し、PR #159の保存済み56標本を再監査した。判定順、却下理由、着手順、評価、期限切れ時の返却方式、UIは変更していない。
+- 変更前の独立worktreeと変更後で、保存棋譜5局面＋二歩／行き所／王手応答／打ち歩詰めの3合成局面、全4,698候補の`validateDrop`結果・理由、`getLegalDropSquares`配列、`getLegalActions`配列と代表IDのハッシュ・件数を照合し完全一致。入力盤面の不変性も確認。公開`simulateDropSquares`は盤内・盤外指定の返却盤面で共有されない駒／マスを変更しても元盤面が変わらないテストを追加。
+- 同一Windows 10.0.26200 x64・i7-14650HX・Node v24.20.0で、変更前A→変更後A→変更前B→変更後Bと実行。保護入力、4保存局面、各巡2ウォームアップ＋12本の診断OFF root合法手生成中央値は変更前36.88～52.09ms、変更後10.43～12.89ms。全局面・両巡で変更後の最大値は変更前の最小値より短い。各巡2ウォームアップ＋5本の100ms探索では変更前後の診断OFF計80本がすべて100ms超・fallback・完了深さ0・同じ選択手。呼出最大102.56msで、PR #158の415.56ms級の停止は再現していない。局面測定からfallback頻度や棋力への効果を推定しない。
+- 補助の診断ON本測定20本ずつでは、変更前root合計878.23ms・打ち743.25ms・`board-clone`4545回726.31ms、変更後root233.97ms・打ち104.78ms・`drop-board-setup`4545回22.05ms。工程名と含む処理が違うため、726.31msと22.05msの差を同一工程の短縮量として扱わない。条件、診断OFFの呼出生値、全JSONLへのリンクは`docs/benchmarks/drop-copy-comparison-20260924.md`。rootと探索の生データ10ファイル、判定基準JSON、再実行スクリプトを保存。
+- `npm run check`はlockfile検証、型検査、63ファイル1743テスト、build成功。新旧6データセット各56標本とPR #159のv1主測定56標本の監査成功。通常sandboxの`tsx`/`esbuild`起動は`spawn EPERM`となったため、許可された実行経路で測定・検証した。
+
 ## [2026-09-24 JST] PR #158のroot合法手生成内訳
 
 - 基点はPR #158を含む`main`=`1b6e05daf6d09e6641feff54d13d4bfdeb788dc3`、開始時の作業ツリーは空。`test/root-legal-breakdown`で計測・報告だけを追加した。既存の合法手規則・着手順・評価・時間切れ返却・通常対局の診断OFFの呼出経路は変更しない。保存棋譜再生、`SearchDiagnostics`、長時間測定監査を再利用し、`root-legal-breakdown-v1`と`root-legal-context-v1`を新設、旧`long-tail-v1`は維持した。

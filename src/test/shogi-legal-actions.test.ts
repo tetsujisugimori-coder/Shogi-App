@@ -94,7 +94,7 @@ describe('全合法手列挙API', () => {
     expect(pawn.legal).toBe(dropActions(plain).length);
     expect(pawn.rejected.pawn_drop_mate).toBeGreaterThan(0);
     expect(pawn.candidates).toBe(pawn.legal + Object.values(pawn.rejected).reduce((a, b) => a + b, 0));
-    expect(pawn.stages['board-clone'].calls).toBeGreaterThan(0);
+    expect(pawn.stages['drop-board-setup'].calls).toBeGreaterThan(0);
     expect(pawn.stages['pawn-drop-mate'].calls).toBeGreaterThan(0);
   });
 
