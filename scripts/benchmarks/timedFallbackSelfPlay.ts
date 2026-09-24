@@ -5,6 +5,7 @@ import { runPairedSelfPlayMatch, type PairedSelfPlayOutcome, type PairedSelfPlay
 import type { SelfPlayParticipant, SelfPlayPlyRecord } from '../../src/domain/shogi/selfPlayGame';
 import { resolveSearchEvaluationPreset } from '../../src/domain/shogi/searchEvaluationPresets';
 import { analyzeTimeLimitedIterativeDeepeningAlphaBetaSearch } from '../../src/domain/shogi/twoPlyAlphaBetaAi';
+import { SearchDiagnostics } from '../../src/domain/shogi/searchDiagnostics';
 
 export interface MeasurementConfig {
   pairCount: number;
@@ -52,6 +53,11 @@ export function runMeasurement(config: MeasurementConfig, options: {
   now?: () => number;
   initialState?: BoardState;
   onGame?: (game: MeasurementGame) => void;
+  beforeSearch?: (position: BoardState) => unknown;
+  probe?: boolean;
+  onSearch?: (position: BoardState, result: ReturnType<Search>, timing: {
+    startedAt: number; finishedAt: number; diagnostics: SearchDiagnostics | null; before: unknown;
+  }) => void;
 } = {}): MeasurementGame[] {
   if (!Number.isSafeInteger(config.pairCount) || config.pairCount < 1 ||
     !Number.isSafeInteger(config.maxPlies) || config.maxPlies < 1) {
@@ -63,16 +69,20 @@ export function runMeasurement(config: MeasurementConfig, options: {
   const participant = (): SelfPlayParticipant<MeasurementConfig> => ({
     settings: { ...config },
     search: (position, settings) => {
+      const before = options.beforeSearch?.(position);
+      const diagnostics = options.probe ? new SearchDiagnostics() : undefined;
       const start = now();
       const result = search(position, settings.maxDepth, settings.timeLimitMilliseconds,
         resolveSearchEvaluationPreset(settings.evaluationPreset), undefined,
         { moveOrdering: settings.moveOrdering, quiescence: {
           maxTacticalDepth: settings.maxTacticalDepth, moveOrdering: settings.quiescenceMoveOrdering,
-        } });
-      const actualElapsedMilliseconds = now() - start;
+        } }, diagnostics);
+      const finishedAt = now();
+      const actualElapsedMilliseconds = finishedAt - start;
       if (!Number.isFinite(actualElapsedMilliseconds) || actualElapsedMilliseconds < 0) {
         throw new Error('Invalid monotonic search duration');
       }
+      options.onSearch?.(position, result, { startedAt: start, finishedAt, diagnostics: diagnostics ?? null, before });
       return { ...result, actualElapsedMilliseconds };
     },
   });

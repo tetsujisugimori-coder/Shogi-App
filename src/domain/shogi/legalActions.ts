@@ -19,6 +19,7 @@ import { DropExecutionResult, executeDrop } from './drops';
 import { MoveExecutionResult, executeMove } from './gameState';
 import { getLegalMoves } from './moves';
 import { getPromotionStatus } from './promotion';
+import { measured, type SearchDiagnostics } from './searchDiagnostics';
 
 export interface LegalMoveAction {
   kind: 'move';
@@ -83,7 +84,7 @@ function compareIds(left: string, right: string): number {
  * hand contains identical pieces, the lexicographically smallest ID is the
  * representative action because the destinations are otherwise equivalent.
  */
-export function getLegalActions(state: BoardState): LegalAction[] {
+export function getLegalActions(state: BoardState, diagnostics?: SearchDiagnostics): LegalAction[] {
   if (state.status === 'ended') return [];
 
   const actions: LegalAction[] = [];
@@ -94,7 +95,7 @@ export function getLegalActions(state: BoardState): LegalAction[] {
       if (!piece || piece.player !== state.turn) continue;
 
       const from = { row, col };
-      const destinations = getLegalMoves(state.squares, from, state.turn)
+      const destinations = measured(diagnostics, 'root-piece-moves', () => getLegalMoves(state.squares, from, state.turn))
         .slice()
         .sort(compareCoordinates);
 
@@ -135,7 +136,7 @@ export function getLegalActions(state: BoardState): LegalAction[] {
 
     if (!representativePieceId) continue;
 
-    const destinations = getLegalDropSquares(state, representativePieceId)
+    const destinations = measured(diagnostics, 'root-hand-drops', () => getLegalDropSquares(state, representativePieceId))
       .slice()
       .sort(compareCoordinates);
     for (const destination of destinations) {

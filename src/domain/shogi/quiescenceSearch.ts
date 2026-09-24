@@ -6,6 +6,7 @@
 import type { BoardState, Player } from '../../types/shogi';
 import { isPlayerInCheck } from './checkmate';
 import { executeLegalAction, getLegalActions, type LegalAction } from './legalActions';
+import { measured, type SearchDiagnostics } from './searchDiagnostics';
 import { DEFAULT_MATERIAL_VALUE_TABLE } from './materialEvaluation';
 import { orderQuiescenceCandidates, resolveQuiescenceMoveOrdering, type QuiescenceMoveOrderingMode } from './quiescenceOrdering';
 import {
@@ -86,18 +87,19 @@ function searchNode(
   evaluation: SearchEvaluationConfig,
   statistics: SearchStatistics,
   interruptionCheck: QuiescenceSearchInterruptionCheck,
-  moveOrdering: QuiescenceMoveOrderingMode
+  moveOrdering: QuiescenceMoveOrderingMode,
+  diagnostics?: SearchDiagnostics
 ): SearchNodeResult {
   interruptionCheck?.();
-  const staticBreakdown = evaluateSearchPositionBreakdown(state, perspective, evaluation);
+  const staticBreakdown = measured(diagnostics, 'q-evaluate', () => evaluateSearchPositionBreakdown(state, perspective, evaluation));
   if (state.status === 'ended' || remainingDepth === 0) {
     // A depth-zero checked position is deliberately a static approximation;
     // the caller's safety cap takes precedence over a forced evasion.
     return { evaluation: staticBreakdown.total, evaluationBreakdown: staticBreakdown, principalVariation: [] };
   }
 
-  const isInCheck = isPlayerInCheck(state, state.turn);
-  const actions = getLegalActions(state);
+  const isInCheck = measured(diagnostics, 'q-check', () => isPlayerInCheck(state, state.turn));
+  const actions = measured(diagnostics, 'q-legal', () => getLegalActions(state));
   const candidates = isInCheck ? actions : actions.filter((action) => isCapture(state, action));
 
   // Reachable no-response positions are ended by the existing adjudication
@@ -125,13 +127,13 @@ function searchNode(
     }
   }
 
-  const orderedCandidates = moveOrdering === 'original' ? candidates : orderQuiescenceCandidates(
+  const orderedCandidates = moveOrdering === 'original' ? candidates : measured(diagnostics, 'q-order', () => orderQuiescenceCandidates(
     state, candidates, moveOrdering, resolveSearchMaterialValueTable(evaluation), interruptionCheck
-  );
+  ));
   for (let actionIndex = 0; actionIndex < candidates.length; actionIndex += 1) {
     interruptionCheck?.();
     const action = orderedCandidates[actionIndex];
-    const child = executeSearchAction(state, action);
+    const child = measured(diagnostics, 'q-execute', () => executeSearchAction(state, action));
     statistics.visitedPositionCount += 1;
     interruptionCheck?.();
     const childResult = searchNode(
@@ -143,7 +145,8 @@ function searchNode(
       evaluation,
       statistics,
       interruptionCheck,
-      moveOrdering
+      moveOrdering,
+      diagnostics
     );
 
     const adoptsCandidate = isInCheck && selectedBreakdown === null ||
@@ -208,7 +211,8 @@ export function analyzeQuiescenceSearchWithinBounds(
   interruptionCheck: QuiescenceSearchInterruptionCheck,
   alpha: number,
   beta: number,
-  moveOrdering: QuiescenceMoveOrderingMode = 'original'
+  moveOrdering: QuiescenceMoveOrderingMode = 'original',
+  diagnostics?: SearchDiagnostics
 ): QuiescenceSearchResult {
   validateMaxTacticalDepth(maxTacticalDepth);
   const resolvedOrdering = resolveQuiescenceMoveOrdering(moveOrdering);
@@ -222,7 +226,8 @@ export function analyzeQuiescenceSearchWithinBounds(
     evaluation,
     statistics,
     interruptionCheck,
-    resolvedOrdering
+    resolvedOrdering,
+    diagnostics
   );
   return {
     selectedEvaluation: result.evaluation,
