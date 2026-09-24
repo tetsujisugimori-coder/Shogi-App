@@ -1,0 +1,29 @@
+# Root生成後の深さ1診断
+
+HEAD f4afe71e2bc929248e62ffc82612f0099428a62a、dirty=true、Node v24.20.0、win32 10.0.26200 x64、Intel(R) Core(TM) i7-14650HX。
+保存棋譜SHA256 8b269f95bb3be422ab87fe2e64d1a5dcc342cf53048eb63d3c2424ebfbf1e552。4局面、100ms、最大深さ4、標準評価・並べ替え、静止追加1手。ウォームアップ2、本測定5、OFF/ON交互。
+OFFのAPI内時間・fallback・深さ・手を主結果とする。ONはroot内部の詳細記録を無効にして深さ1の工程と期限確認を記録した補助資料。両者の時間を混ぜて改善率を算出しない。両側とも期限まで動くため、総時間の差から診断負荷は推定できない。
+工程msは入れ子の子工程を除外した排他的時間。静止探索の欄は q-* を除く残余で、q-legal/q-evaluate は別欄。post-rootはroot合法手生成の終了から深さ1完了または中断まで。post-root-otherは同区間から全排他工程を引いた残余。API内時間は探索内開始から返却直前、呼出全体時間は呼出直前から戻り直後。期限間隔は開始+100msから最初の期限確認までの同一時計の差で、内訳はJSONLのdeadline.activities。
+
+| 局面 | OFF API中央値ms | OFF呼出中央値ms | fallback | ON候補総数 | ON完了候補（各回） | ON探索ノード（各回） | ON静止回数（各回） | ON post-root中央値ms | ON着手ms | ON合法手ms | ON評価ms | ON静止残余ms | ON期限確認間隔中央値/最大ms |
+| --- | ---: | ---: | ---: | ---: | --- | --- | --- | ---: | ---: | ---: | ---: | ---: | ---: |
+| g1-p115 | 100.39 | 100.42 | 5/5 | 314 | 53,54,56,50,56 | 54,55,56,51,57 | 53,54,56,51,56 | 87.61 | 26.62 | 54.49 | 1.69 | 0.46 | 0.31/0.57 |
+| g3-p55 | 100.23 | 100.28 | 5/5 | 222 | 109,107,91,87,94 | 110,107,92,87,95 | 109,107,91,87,95 | 89.13 | 41.07 | 42.22 | 2.57 | 0.42 | 0.07/1.21 |
+| g4-p89 | 100.49 | 100.52 | 5/5 | 249 | 80,59,75,70,83 | 81,60,75,70,84 | 80,59,75,70,83 | 88.65 | 33.51 | 50.68 | 2.08 | 0.35 | 0.36/0.65 |
+| g1-p93 | 100.36 | 100.38 | 5/5 | 289 | 64,66,53,63,65 | 64,66,54,63,65 | 64,66,53,63,65 | 88.63 | 28.21 | 56.16 | 1.58 | 0.23 | 0.33/0.76 |
+
+## 各局面の終了段階と期限後の処理
+
+- g1-p115: OFF完了深さ 0,0,0,0,0、OFF選択手 [{"kind":"move","player":"sente","from":{"row":0,"col":5},"to":{"row":0,"col":4},"pieceType":"pawn","promotion":"none"},{"kind":"move","player":"sente","from":{"row":0,"col":5},"to":{"row":0,"col":4},"pieceType":"pawn","promotion":"none"},{"kind":"move","player":"sente","from":{"row":0,"col":5},"to":{"row":0,"col":4},"pieceType":"pawn","promotion":"none"},{"kind":"move","player":"sente","from":{"row":0,"col":5},"to":{"row":0,"col":4},"pieceType":"pawn","promotion":"none"},{"kind":"move","player":"sente","from":{"row":0,"col":5},"to":{"row":0,"col":4},"pieceType":"pawn","promotion":"none"}]。ON処理中候補 54,55,なし,51,57、中断段階 normal-node-entry,normal-node-entry,before-root-candidate,before-quiescence-candidate,normal-node-entry。ON root中央値/最大 12.78/13.10ms。期限超過から確認までの工程合計（5回） {"normal-execute":0.8528000000001157,"normal-other":0.014200000000073487,"q-legal":0.8554999999998927,"quiescence":0.016900000000077853}。q-legal中央値 54.49ms、q-evaluate中央値 1.69ms。
+- g3-p55: OFF完了深さ 0,0,0,0,0、OFF選択手 [{"kind":"move","player":"sente","from":{"row":6,"col":4},"to":{"row":5,"col":4},"pieceType":"pawn","promotion":"none"},{"kind":"move","player":"sente","from":{"row":6,"col":4},"to":{"row":5,"col":4},"pieceType":"pawn","promotion":"none"},{"kind":"move","player":"sente","from":{"row":6,"col":4},"to":{"row":5,"col":4},"pieceType":"pawn","promotion":"none"},{"kind":"move","player":"sente","from":{"row":6,"col":4},"to":{"row":5,"col":4},"pieceType":"pawn","promotion":"none"},{"kind":"move","player":"sente","from":{"row":6,"col":4},"to":{"row":5,"col":4},"pieceType":"pawn","promotion":"none"}]。ON処理中候補 110,なし,92,なし,95、中断段階 normal-node-entry,before-root-candidate,normal-node-entry,before-root-candidate,before-quiescence-candidate。ON root中央値/最大 10.93/12.71ms。期限超過から確認までの工程合計（5回） {"normal-execute":0.29859999999962383,"normal-other":0.012899999999262945,"q-legal":1.2667999999994208,"quiescence":0.01940000000058717}。q-legal中央値 42.22ms、q-evaluate中央値 2.57ms。
+- g4-p89: OFF完了深さ 0,0,0,0,0、OFF選択手 [{"kind":"move","player":"sente","from":{"row":0,"col":3},"to":{"row":0,"col":2},"pieceType":"pawn","promotion":"none"},{"kind":"move","player":"sente","from":{"row":0,"col":3},"to":{"row":0,"col":2},"pieceType":"pawn","promotion":"none"},{"kind":"move","player":"sente","from":{"row":0,"col":3},"to":{"row":0,"col":2},"pieceType":"pawn","promotion":"none"},{"kind":"move","player":"sente","from":{"row":0,"col":3},"to":{"row":0,"col":2},"pieceType":"pawn","promotion":"none"},{"kind":"move","player":"sente","from":{"row":0,"col":3},"to":{"row":0,"col":2},"pieceType":"pawn","promotion":"none"}]。ON処理中候補 81,60,なし,なし,84、中断段階 normal-node-entry,normal-node-entry,before-root-candidate,before-root-candidate,normal-node-entry。ON root中央値/最大 11.44/15.87ms。期限超過から確認までの工程合計（5回） {"normal-execute":0.5091999999995096,"normal-other":0.014700000000630098,"q-legal":1.241899999999987,"quiescence":0.008999999999105057}。q-legal中央値 50.68ms、q-evaluate中央値 2.08ms。
+- g1-p93: OFF完了深さ 0,0,0,0,0、OFF選択手 [{"kind":"move","player":"sente","from":{"row":1,"col":5},"to":{"row":0,"col":5},"pieceType":"pawn","promotion":"promote"},{"kind":"move","player":"sente","from":{"row":1,"col":5},"to":{"row":0,"col":5},"pieceType":"pawn","promotion":"promote"},{"kind":"move","player":"sente","from":{"row":1,"col":5},"to":{"row":0,"col":5},"pieceType":"pawn","promotion":"promote"},{"kind":"move","player":"sente","from":{"row":1,"col":5},"to":{"row":0,"col":5},"pieceType":"pawn","promotion":"promote"},{"kind":"move","player":"sente","from":{"row":1,"col":5},"to":{"row":0,"col":5},"pieceType":"pawn","promotion":"promote"}]。ON処理中候補 なし,なし,54,なし,なし、中断段階 before-root-candidate,before-root-candidate,normal-node-entry,before-root-candidate,before-root-candidate。ON root中央値/最大 12.06/13.97ms。期限超過から確認までの工程合計（5回） {"q-legal":1.6541999999990367,"quiescence":0.020700000000942964,"normal-other":0.005799999998998828,"normal-execute":0.15239999999994325}。q-legal中央値 56.16ms、q-evaluate中央値 1.58ms。
+
+4局面ともONのpost-root工程では静止探索の合法手生成中央値が着手適用・評価より大きい（局面順54.49、42.22、50.68、56.16ms）。次の最適化調査は静止探索の合法手生成1箇所を提案する。これは診断ONでの局所費用であり、OFFの完了深さや棋力の改善量は推定しない。
+各回の候補進捗、工程、期限時刻、確認時刻、区間中の工程と選択手はJSONLに保存した。診断時計の追加読取り、実行順序、OS/JIT/GCで値は変動し得る。GC寄与はこの計測だけでは確定しない。棋力改善は評価していない。
+
+## 再実行
+
+`npm run measure:post-root-depth-one -- --out docs/benchmarks/別名.jsonl`（既存出力は上書きしない）
+`npm run audit:post-root-depth-one -- docs/benchmarks/別名.jsonl`
+`npm run check`、`git diff --check`。測定はほかのテスト・buildと並列に実行しない。

@@ -1,5 +1,14 @@
 # SHOGI-APP 開発ログ
 
+## [2026-09-24 JST] root生成後の深さ1未完走診断
+
+- PR #162を含む`main`=`f4afe71`、作業ツリー空から`test/post-root-depth-one-diagnostics`を作成。既存の`SearchDiagnostics`、100ms測定・監査CLI、4局の保存棋譜再生、`LOG.md`を確認した。探索アルゴリズム、ルール、評価、手順、fallback、Worker/UIは変更していない。旧測定JSONLも変更していない。
+- 任意診断にroot生成終了時刻、深さ1候補総数・完了数・処理中番号、中断段階、探索ノード数、静止探索呼出数、深さ1終了時刻・状態を追加。注入された探索時計を工程・期限観測に共用し、`開始+100ms`の期限時刻から次の確認時刻までの排他的工程を記録する。root内訳診断は既定のまま維持し、新CLIだけそれを無効にしてroot後の計測負荷を抑えた。診断を渡さない通常経路には詳細記録の時計読取りを増やしていない。
+- 時間定義: `postRootMilliseconds`はroot生成終了から深さ1完了または中断まで。`postRootPhases`は入れ子の子工程を差し引いた排他的時間、`postRootOtherMilliseconds`は残余。`quiescence`はq評価・王手・合法手・並べ替え・着手適用を除く残余なので、包含時間と排他時間を重複加算しない。API内時間は探索開始から返却直前の時計値、呼出全体時間はAPI呼出直前から戻り直後。監査は局面・履歴・キーSHA、対の手、候補進捗、終了状態、非負時間、工程包含、期限時刻と区間内工程合計、集計を照合する。注入時計テストで深さ1完走・途中中断と期限をまたぐ工程を検証した。
+- 保存棋譜4局面`g1-p115`、`g3-p55`、`g4-p89`、`g1-p93`、元棋譜SHA256 `8b269f95bb3be422ab87fe2e64d1a5dcc342cf53048eb63d3c2424ebfbf1e552`、100ms、最大深さ4、標準評価・並べ替え、静止追加1手、保護入力。Node v24.20.0、Windows 10.0.26200 x64、i7-14650HXで各2回ウォームアップ後にOFF/ON交互各5回、同期直列で計56標本（本測定40）。診断OFFの20/20本はfallback・完了深さ0、局面ごとに同じ選択手。OFF API中央値は順に100.39、100.23、100.49、100.36ms。ONの候補総数は314、222、249、289。完了候補は順に50～56、87～109、59～83、53～66で、詳細は生データと同名報告に記録した。
+- 4局面のON root中央値は12.78、10.93、11.44、12.06ms。post-root中央値は87.61、89.13、88.65、88.63ms。静止探索の合法手生成は54.49、42.22、50.68、56.16msで、各局面の着手適用26.62、41.07、33.51、28.21msと評価1.69、2.57、2.08、1.58msより大きい。rootが短縮しても全root候補の完走には届かず、次に調査・最適化すべき一箇所は静止探索の合法手生成。実行時変動、JIT、OS、GC、計測負荷の内訳は確定していない。ONとOFFを混ぜた改善率や棋力改善は主張しない。期限超過から次の確認までの間隔中央値/最大は局面順に0.31/0.57、0.07/1.21、0.36/0.65、0.33/0.76msで、区間中の処理はJSONLと報告に記録した。
+- 生データ`docs/benchmarks/post-root-depth-one-main-20260924.jsonl`、集計・定義`docs/benchmarks/post-root-depth-one-main-20260924.md`。再実行: `npm run measure:post-root-depth-one -- --out docs/benchmarks/別名.jsonl`（新規パス）、`npm run audit:post-root-depth-one -- docs/benchmarks/別名.jsonl`、`npm run check`、`git diff --check`。測定とテスト/buildは直列にする。新監査は4局面56標本に成功。旧`audit:timed-depth-one`は7局面196標本、旧`audit:root-legal-breakdown`は4局面56標本を再監査して成功。`npm run check`はlockfile・型検査・全63ファイル1745テスト・build成功。`drop-copy-root-v1`を`root-legal-breakdown`監査へ渡した試行はスキーマ違いで拒否され、測定・旧データの失敗ではない。
+
 ## [2026-09-24 JST] 持駒打ち合法性判定の盤面準備を局所複製に変更
 
 - PR #159を含む`main`=`2117edb`、作業ツリー空から`perf/drop-validation-board-copy`を作成。`dropRules.ts`、`simulateDropSquares`、`cloneBoardSquares`、王手判定と歩打ち詰め応手の盤面読み取り経路を確認。`isKingInCheck`とその攻撃計算、`getLegalMoves`の疑似手生成は共有盤面を読むだけで、応手の`simulateMoveSquares`は別の深い複製を作る。`validateDrop`内の打ち判定だけを外側配列・打ち先の行／マス／駒の複製に変更し、公開`simulateDropSquares`と実着手は従来の深い複製を維持した。元stateの一時変更は行わない。

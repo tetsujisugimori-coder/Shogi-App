@@ -443,9 +443,10 @@ function searchAlphaBetaNode(
   ply: number,
   diagnostics?: SearchDiagnostics
 ): SearchNodeResult {
+  diagnostics?.setStage('normal-node-entry');
   interruptionCheck?.();
   if (state.status === 'ended') {
-    const evaluationBreakdown = evaluateSearchPositionBreakdown(state, rootPlayer, valueTable);
+    const evaluationBreakdown = measured(diagnostics, 'normal-evaluate', () => evaluateSearchPositionBreakdown(state, rootPlayer, valueTable));
     return {
       evaluation: evaluationBreakdown.total,
       principalVariation: [],
@@ -454,10 +455,11 @@ function searchAlphaBetaNode(
   }
   if (remainingDepth === 0) {
     if (quiescenceOptions === undefined) {
-      const evaluationBreakdown = evaluateSearchPositionBreakdown(state, rootPlayer, valueTable);
+      const evaluationBreakdown = measured(diagnostics, 'normal-evaluate', () => evaluateSearchPositionBreakdown(state, rootPlayer, valueTable));
       return { evaluation: evaluationBreakdown.total, principalVariation: [], evaluationBreakdown };
     }
     statistics.quiescenceLeafCount += 1;
+    diagnostics?.quiescenceEntered();
     const quiescence = measured(diagnostics, 'quiescence', () => analyzeQuiescenceSearchWithinBounds(
       state, rootPlayer, quiescenceOptions.maxTacticalDepth, valueTable, interruptionCheck, alpha, beta,
       quiescenceOptions.moveOrdering,
@@ -481,7 +483,7 @@ function searchAlphaBetaNode(
   // rules. Treat a malformed in-progress position as a leaf as well, rather
   // than recursing forever or throwing after a valid API result of [].
   if (actions.length === 0) {
-    const evaluationBreakdown = evaluateSearchPositionBreakdown(state, rootPlayer, valueTable);
+    const evaluationBreakdown = measured(diagnostics, 'normal-evaluate', () => evaluateSearchPositionBreakdown(state, rootPlayer, valueTable));
     return {
       evaluation: evaluationBreakdown.total,
       principalVariation: [],
@@ -497,6 +499,7 @@ function searchAlphaBetaNode(
     interruptionCheck?.();
     const child = measured(diagnostics, 'normal-execute', () => executeSearchAction(state, actions[actionIndex]));
     statistics.visitedPositionCount += 1;
+    diagnostics?.visitedNode();
     const childResult = searchAlphaBetaNode(
       child,
       remainingDepth - 1,
@@ -620,11 +623,16 @@ function searchAlphaBeta(
   let alpha = Number.NEGATIVE_INFINITY;
   const beta = Number.POSITIVE_INFINITY;
 
+  let candidateIndex = 0;
   for (const { action: rootAction, originalIndex } of indexedRootActions) {
+    diagnostics?.setStage('before-root-candidate');
     interruptionCheck?.();
+    diagnostics?.candidateStarted(++candidateIndex);
+    diagnostics?.setStage('root-action-application');
     const alphaBeforeCandidate = alpha;
     const afterRootAction = measured(diagnostics, 'normal-execute', () => executeSearchAction(state, rootAction));
     statistics.visitedPositionCount += 1;
+    diagnostics?.visitedNode();
     let candidateResult = searchAlphaBetaNode(
       afterRootAction,
       depth - 1,
@@ -680,6 +688,7 @@ function searchAlphaBeta(
       bestEvaluationBreakdown = candidateResult.evaluationBreakdown;
     }
     if (bestEvaluation > alpha) alpha = bestEvaluation;
+    diagnostics?.candidateCompleted();
   }
 
   if (bestEvaluationBreakdown === null) {
@@ -818,7 +827,8 @@ export function analyzeTimeLimitedIterativeDeepeningAlphaBetaSearch(
   validateSearchTimeLimitMilliseconds(timeLimitMilliseconds);
   const startedAt = clock();
   diagnostics?.begin(startedAt, timeLimitMilliseconds, clock);
-  const rootActions = measured(diagnostics, 'root-legal', () => getLegalActions(state, diagnostics));
+  const rootActions = measured(diagnostics, 'root-legal', () => getLegalActions(state, diagnostics?.rootBreakdown ? diagnostics : undefined));
+  diagnostics?.rootGenerated(rootActions.length);
   const fallbackAction = rootActions[0] ?? null;
   const iterations: IterativeDeepeningAlphaBetaIterationResult[] = [];
   let previousBestAction: LegalAction | null = null;
@@ -827,6 +837,7 @@ export function analyzeTimeLimitedIterativeDeepeningAlphaBetaSearch(
 
   for (let depth = 1; depth <= maxDepth; depth += 1) {
     try {
+      diagnostics?.setStage('before-depth-one');
       const beforeIteration = clock();
       diagnostics?.checked(beforeIteration);
       throwIfSearchTimeLimitReachedAt(beforeIteration, startedAt, timeLimitMilliseconds);
@@ -855,6 +866,7 @@ export function analyzeTimeLimitedIterativeDeepeningAlphaBetaSearch(
       const iterationFinishedAt = clock();
       diagnostics?.checked(iterationFinishedAt);
       throwIfSearchTimeLimitReachedAt(iterationFinishedAt, startedAt, timeLimitMilliseconds);
+      if (depth === 1) diagnostics?.endDepthOne('completed');
       const iteration = {
         ...searchResult,
         principalVariation: clonePrincipalVariation(searchResult.principalVariation),
@@ -866,6 +878,9 @@ export function analyzeTimeLimitedIterativeDeepeningAlphaBetaSearch(
     } catch (error) {
        if (error instanceof SearchDeadlineExceeded) {
          if (diagnostics?.interruptedPhase === null) diagnostics.interrupted();
+         if (depth === 1) diagnostics?.endDepthOne('interrupted',
+           diagnostics.depthOne?.completedCandidates === rootActions.length && rootActions.length > 0
+             ? 'after-depth-one' : diagnostics.interruptedStage ?? 'before-depth-one');
         timedOut = true;
         break;
       }
