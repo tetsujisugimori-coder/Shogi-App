@@ -221,14 +221,6 @@ function throwIfSearchTimeLimitReachedAt(
   if (observedAt - startedAt >= timeLimitMilliseconds) throw new SearchDeadlineExceeded();
 }
 
-function throwIfSearchTimeLimitReached(
-  clock: SearchClock,
-  startedAt: number,
-  timeLimitMilliseconds: number
-): void {
-  throwIfSearchTimeLimitReachedAt(clock(), startedAt, timeLimitMilliseconds);
-}
-
 function sameCoordinate(
   left: { row: number; col: number },
   right: { row: number; col: number }
@@ -468,7 +460,8 @@ function searchAlphaBetaNode(
     statistics.quiescenceLeafCount += 1;
     const quiescence = measured(diagnostics, 'quiescence', () => analyzeQuiescenceSearchWithinBounds(
       state, rootPlayer, quiescenceOptions.maxTacticalDepth, valueTable, interruptionCheck, alpha, beta,
-      quiescenceOptions.moveOrdering
+      quiescenceOptions.moveOrdering,
+      diagnostics
     ));
     statistics.quiescenceVisitedPositionCount += quiescence.visitedPositionCount;
     statistics.quiescenceCutoffCount += quiescence.cutoffCount;
@@ -599,7 +592,7 @@ function searchAlphaBeta(
     };
   }
 
-  const rootActions = suppliedRootActions ?? measured(diagnostics, 'root-legal', () => getLegalActions(state));
+  const rootActions = suppliedRootActions ?? measured(diagnostics, 'root-legal', () => getLegalActions(state, diagnostics));
   if (rootActions.length === 0) {
     const evaluationBreakdown = evaluateSearchPositionBreakdown(state, rootPlayer, valueTable);
     return {
@@ -724,17 +717,21 @@ export function analyzeAlphaBetaSearch(
   const killerMoves = resolveKillerMoves(options);
   const quiescenceOptions = resolveQuiescenceOptions(options);
   const startedAt = clock();
-  diagnostics?.begin(startedAt);
+  diagnostics?.begin(startedAt, Number.POSITIVE_INFINITY, clock);
   const searchResult = measured(diagnostics, 'normal-other', () => searchAlphaBeta(
     state, depth, valueTable, null, undefined, moveOrdering, quiescenceOptions,
     killerMoves ? new KillerMoveHistory() : undefined, undefined, diagnostics
   ));
-  return {
+  const result: AlphaBetaSearchResult = {
     ...searchResult,
     principalVariation: clonePrincipalVariation(searchResult.principalVariation),
     evaluationBreakdown: cloneSearchEvaluationBreakdown(searchResult.evaluationBreakdown),
-    elapsedMilliseconds: Math.max(0, clock() - startedAt),
+    elapsedMilliseconds: 0,
   };
+  const finishedAt = clock();
+  result.elapsedMilliseconds = Math.max(0, finishedAt - startedAt);
+  diagnostics?.finish(finishedAt);
+  return result;
 }
 
 /**
@@ -820,8 +817,8 @@ export function analyzeTimeLimitedIterativeDeepeningAlphaBetaSearch(
   validateIterativeDeepeningMaxDepth(maxDepth);
   validateSearchTimeLimitMilliseconds(timeLimitMilliseconds);
   const startedAt = clock();
-  diagnostics?.begin(startedAt, timeLimitMilliseconds);
-  const rootActions = measured(diagnostics, 'root-legal', () => getLegalActions(state));
+  diagnostics?.begin(startedAt, timeLimitMilliseconds, clock);
+  const rootActions = measured(diagnostics, 'root-legal', () => getLegalActions(state, diagnostics));
   const fallbackAction = rootActions[0] ?? null;
   const iterations: IterativeDeepeningAlphaBetaIterationResult[] = [];
   let previousBestAction: LegalAction | null = null;
@@ -830,11 +827,17 @@ export function analyzeTimeLimitedIterativeDeepeningAlphaBetaSearch(
 
   for (let depth = 1; depth <= maxDepth; depth += 1) {
     try {
-      throwIfSearchTimeLimitReached(clock, startedAt, timeLimitMilliseconds);
+      const beforeIteration = clock();
+      diagnostics?.checked(beforeIteration);
+      throwIfSearchTimeLimitReachedAt(beforeIteration, startedAt, timeLimitMilliseconds);
 
       const iterationStartedAt = clock();
        const check = () => {
-         try { throwIfSearchTimeLimitReached(clock, startedAt, timeLimitMilliseconds); }
+         try {
+           const observedAt = clock();
+           diagnostics?.checked(observedAt);
+           throwIfSearchTimeLimitReachedAt(observedAt, startedAt, timeLimitMilliseconds);
+         }
          catch (error) { if (error instanceof SearchDeadlineExceeded) diagnostics?.interrupted(); throw error; }
        };
        const searchResult = measured(diagnostics, 'normal-other', () => searchAlphaBeta(
@@ -850,6 +853,7 @@ export function analyzeTimeLimitedIterativeDeepeningAlphaBetaSearch(
          diagnostics
        ));
       const iterationFinishedAt = clock();
+      diagnostics?.checked(iterationFinishedAt);
       throwIfSearchTimeLimitReachedAt(iterationFinishedAt, startedAt, timeLimitMilliseconds);
       const iteration = {
         ...searchResult,
@@ -870,7 +874,7 @@ export function analyzeTimeLimitedIterativeDeepeningAlphaBetaSearch(
   }
 
   const deepestIteration = iterations[iterations.length - 1];
-  return {
+  const result: TimeLimitedIterativeDeepeningAlphaBetaSearchResult = {
     ...(deepestIteration ?? {
       selectedAction: fallbackAction === null ? null : cloneLegalAction(fallbackAction),
       selectedEvaluation: null,
@@ -888,7 +892,7 @@ export function analyzeTimeLimitedIterativeDeepeningAlphaBetaSearch(
     }),
     principalVariation: deepestIteration ? clonePrincipalVariation(deepestIteration.principalVariation) : [],
     evaluationBreakdown: deepestIteration ? cloneSearchEvaluationBreakdown(deepestIteration.evaluationBreakdown) : null,
-    elapsedMilliseconds: Math.max(0, clock() - startedAt),
+    elapsedMilliseconds: 0,
     requestedMaxDepth: maxDepth,
     completedDepth: deepestIteration?.depth ?? 0,
     timedOut,
@@ -912,6 +916,10 @@ export function analyzeTimeLimitedIterativeDeepeningAlphaBetaSearch(
       (total, iteration) => total + iteration.quiescenceSkippedActionCount, 0
     ),
   };
+  const finishedAt = clock();
+  result.elapsedMilliseconds = Math.max(0, finishedAt - startedAt);
+  diagnostics?.finish(finishedAt);
+  return result;
 }
 
 /** Selects only the best action from the requested recursive search depth. */

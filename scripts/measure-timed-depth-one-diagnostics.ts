@@ -40,7 +40,7 @@ try {
     node: process.version, os: `${platform()} ${release()} ${arch()}`, cpu: cpus()[0]?.model ?? 'unknown',
     execution: 'one-process-synchronous-serial-position-mode-probe-run', warmups, measurements,
     settings: { timeLimitMilliseconds: 100, maxDepth: 4, fixedDepth: 1, evaluation: 'standard', ...options },
-    accounting: 'exclusive nested spans; quiescence includes all tactical evaluation/legal/order/execution; apiOther is full API time minus measured spans; normalOther excludes nested spans',
+    accounting: 'v2: exclusive nested spans; apiOther is API start to in-API finish minus measured spans; call time ends immediately after API return; legacy PR #156 files use v1 post-return finish',
   });
   for (const position of positions) emit({ type: 'position', id: position.id, band: position.band,
     game: Number(position.id.match(/^g(\d+)/)![1]), ply: position.historyLength + 1,
@@ -62,7 +62,7 @@ try {
               performance.now.bind(performance), options, diagnostics);
           const actualElapsedMilliseconds = performance.now() - start;
           assert.equal(input.wasMutated(), false);
-          const finished = diagnostics?.finish();
+          const finished = diagnostics?.finished;
           const sample: Sample = { type: 'sample', positionId: position.id, band: position.band, mode, probe,
             phase: index < warmups ? 'warmup' : 'measurement', run: index < warmups ? index + 1 : index - warmups + 1,
             actualElapsedMilliseconds, apiElapsedMilliseconds: result.elapsedMilliseconds,
@@ -90,7 +90,7 @@ try {
   emit({ type: 'end', endedAt: new Date().toISOString() });
   const lines = ['# 深さ1・期限超過の工程診断', '',
     `コードSHA: ${head}。保存棋譜SHA256: ${sourceSha256}。${positions.length}局面、ウォームアップ${warmups}回、本測定${measurements}回。`,
-    '実対局と同じ再帰Proxyで保護した探索入力を、呼び出し時計の外で構築します。時間は入れ子を差し引いた排他的な区分です。quiescenceはその内部の合法手生成、評価、並べ替え、着手適用を含みます。normal-otherは通常探索の残り、api-otherは診断開始からfinishまでの残差です。診断のタイマー読み自体は主に外側の区分に含まれます。',
+    '実対局と同じ再帰Proxyで保護した探索入力を、呼び出し時計の外で構築します。時間は入れ子を差し引いた排他的な区分です。API内実時間は探索内の開始から返却直前まで、呼び出し全体の実時間は呼出直前から戻り直後まで。api-otherはAPI内実時間から排他的工程を差し引いた値です。PR #156の保存値は戻り後のfinishまでを含む旧定義です。',
     'deadlineをまたいだ工程と、次の確認で中断を検知した工程は異なり得ます。', '',
     '| 局面帯 | 条件 | 診断 | 本測定 | 深さ1完走 | fallback | 実時間中央値ms | 最大ms | 105ms超 |',
     '| --- | --- | --- | ---: | ---: | ---: | ---: | ---: | ---: |'];
