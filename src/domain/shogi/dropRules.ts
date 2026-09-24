@@ -6,7 +6,7 @@ import {
   Piece,
   Player,
 } from '../../types/shogi';
-import { getForwardDelta, isKingInCheck } from './attacks';
+import { getForwardDelta, isKingInCheck, isKingInCheckProfiled } from './attacks';
 import { cloneBoardSquares, getOpponent } from './boardStateUtils';
 import { Coordinate, isWithinBoard } from './coordinates';
 import { getLegalMoves } from './moves';
@@ -206,7 +206,9 @@ export function validateDrop(
     ? diagnostics.measureDropStage(dropType, 'drop-board-setup', () => prepareDropValidationSquares(state.squares, piece, to))
     : prepareDropValidationSquares(state.squares, piece, to);
   if (qDiagnostics
-    ? qDiagnostics.measure('q-drop-own-check', () => isKingInCheck(simulatedSquares, state.turn))
+    ? qDiagnostics.measure('q-drop-own-check', () => qDiagnostics.checkInternals
+      ? isKingInCheckProfiled(simulatedSquares, state.turn, qDiagnostics.checkInternals.drop)
+      : isKingInCheck(simulatedSquares, state.turn))
     : diagnostics
     ? diagnostics.measureDropStage(dropType, 'own-check', () => isKingInCheck(simulatedSquares, state.turn))
     : isKingInCheck(simulatedSquares, state.turn)) {

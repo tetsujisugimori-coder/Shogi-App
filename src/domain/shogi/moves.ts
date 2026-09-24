@@ -9,6 +9,7 @@ import { Coordinate, isWithinBoard } from './coordinates';
 import {
   getPieceAttackPattern,
   isKingInCheck,
+  isKingInCheckProfiled,
 } from './attacks';
 import { isPromotionRequired } from './promotion';
 import type { SearchDiagnostics } from './searchDiagnostics';
@@ -155,7 +156,9 @@ export function getLegalMoves(
     const legalMoves: Coordinate[] = [];
     for (const dest of pseudoMoves) {
       const simulatedSquares = qDiagnostics.measure('q-board-simulate', () => simulateMoveSquaresForKingSafety(squares, from, dest));
-      if (!qDiagnostics.measure('q-board-own-check', () => isKingInCheck(simulatedSquares, piece.player)))
+      if (!qDiagnostics.measure('q-board-own-check', () => qDiagnostics.checkInternals
+        ? isKingInCheckProfiled(simulatedSquares, piece.player, qDiagnostics.checkInternals.board)
+        : isKingInCheck(simulatedSquares, piece.player)))
         legalMoves.push(dest);
     }
     qDiagnostics.qLegalCounts.boardLegal += legalMoves.length;

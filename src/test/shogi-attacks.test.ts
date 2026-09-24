@@ -13,6 +13,8 @@ import {
   isKingInCheck,
   isSquareAttackedBy,
 } from '../domain/shogi';
+import { isKingInCheckProfiled } from '../domain/shogi/attacks';
+import { CheckInternalsProbe } from '../domain/shogi/checkInternalsDiagnostics';
 
 function createAttackBoard(
   pieces: Array<{ row: number; col: number; piece: Piece }>
@@ -61,6 +63,30 @@ function expectAttackMapsToMatchRawCounts(squares: BoardSquare[][]): void {
 }
 
 describe('countSquareAttackersBy', () => {
+  it('diagnostic check matches the normal result for step, ray, blocker and missing king', () => {
+    const boards = [createInitialBoardState().squares,
+      createAttackBoard([
+        { row: 8, col: 4, piece: piece('king', 'king', 'sente') },
+        { row: 7, col: 4, piece: piece('pawn', 'pawn', 'gote') },
+      ]),
+      createAttackBoard([
+        { row: 8, col: 4, piece: piece('king', 'king', 'sente') },
+        { row: 0, col: 4, piece: piece('rook', 'rook', 'gote') },
+      ]),
+      createAttackBoard([
+        { row: 8, col: 4, piece: piece('king', 'king', 'sente') },
+        { row: 0, col: 4, piece: piece('rook', 'rook', 'gote') },
+        { row: 4, col: 4, piece: piece('blocker', 'gold', 'sente') },
+      ]), createAttackBoard([])];
+    for (const squares of boards) for (const player of ['sente', 'gote'] as const) {
+      const before = JSON.stringify(squares);
+      const probe = new CheckInternalsProbe();
+      expect(isKingInCheckProfiled(squares, player, probe)).toBe(isKingInCheck(squares, player));
+      expect(probe.checks).toBe(1);
+      expect(probe.scannedSquares).toBe(probe.attackScans * 81);
+      expect(JSON.stringify(squares)).toBe(before);
+    }
+  });
   it('局面ごとの利きマップは代表局面の全81マスで既存の生の利き数と一致し、入力盤面を変更しない', () => {
     const positions = [
       createInitialBoardState().squares,
