@@ -1,5 +1,13 @@
 # SHOGI-APP 開発ログ
 
+## [2026-09-24 JST] 王手判定のboolean専用早期終了
+
+- PR #172の`main`=`2578051`をBeforeとし、`isSquareAttackedBy`のboolean用途だけに最初の攻撃者で終了する経路を追加。正確な攻撃者数を返す`countSquareAttackersBy`、攻撃規則、探索・評価・手順序・時間制御・fallback・Worker/UIは維持。board/drop別の任意診断は実走査マスと早期終了回数を計数する。
+- 既存の代表盤面で81マス×先手/後手のboolean判定と正確なcount>0の一致を確認。段階判定・ray・遮蔽物・成駒・盤面端・玉・入力非破壊を含む。4局面の合法手配列と順序、局面SHA、固定深さ1の選択手・評価はBefore/Afterで一致した。
+- 保存棋譜SHA256=`8b269f95bb3be422ab87fe2e64d1a5dcc342cf53048eb63d3c2424ebfbf1e552`。同一設定の診断ON固定深さ1で、board/drop合計104,343回の王手確認・攻撃元探索は不変。実走査マスは8,451,783→7,996,120（5.39%減）、駒判定は1,536,967→1,433,184（6.75%減）、早期終了8,340回。局面別の値は`docs/benchmarks/check-shortcircuit-comparison-20260924.md`。
+- 診断OFFの100ms通常探索は4局面ともBefore/Afterで完了深さ0、各5/5 fallback。root候補314/222/249/289、fallbackの選択手・評価nullも一致。深さ1到達はない。固定深さ1の診断なし独立測定の中央値は1853.08→1793.29ms、840.64→851.90ms、1047.84→1129.50ms、1641.27→1654.52ms。試行間変動が大きく、再現性のある実時間短縮とは結論しない。
+- 旧計測器が診断ONとOFFの固定深さ1を交互に走らせた系列には大きなJIT段差が出たため、実時間比較から除外。同一スクリプトをPR #172の一時worktreeと変更後に適用し、診断を混ぜない独立JSONLを追加した。`npm run check`、両側の`audit:check-internals`、Before/After比較監査、`git diff --check`の結果をPRに記載する。次PR候補は王手判定以外の高頻度経路の計測であり、今回追加実装しない。
+
 ## [2026-09-24 JST] 王手判定内部の board/drop 別診断
 
 - PR #170 後の clean な `main`=`origin/main`=`a0a7bcc` から `perf/check-internals-diagnostics` を分岐。`git fetch` は `SEC_E_NO_CREDENTIALS` で失敗したため、GitHub API の main SHA とローカル SHA の一致を照合した。盤上手は `getLegalMoves` → 局所盤面シミュレーション → `isKingInCheck`、持駒打ちは `getLegalDropSquares` → `validateDrop` → 打った後の盤面 → `isKingInCheck`。その下は `findKingSquare` → `isSquareAttackedBy` → `countSquareAttackersBy` の81マス走査 → `isPieceAttacking` → `getPieceAttackPattern` / step / ray である。

@@ -306,31 +306,52 @@ export function countSquareAttackersBy(
   return attackerCount;
 }
 
-/** Same exhaustive scan as the public function, with aggregate counters. */
-function countSquareAttackersByInternal(
-  squares: BoardSquare[][], targetCoord: Coordinate, attacker: Player,
-  probe?: CheckInternalsProbe
-): number {
-  if (!isWithinBoard(targetCoord.row, targetCoord.col)) {
-    return 0;
-  }
-
-  const searchStart = probe ? performance.now() : 0;
-  if (probe) { probe.attackScans++; probe.scannedSquares += 81; }
-  let attackerCount = 0;
+/** Stops at the first raw attacker; exact counts remain with countSquareAttackersBy. */
+function hasSquareAttackerBy(
+  squares: BoardSquare[][], targetCoord: Coordinate, attacker: Player
+): boolean {
+  if (!isWithinBoard(targetCoord.row, targetCoord.col)) return false;
   for (let r = 0; r < 9; r++) {
     for (let c = 0; c < 9; c++) {
       const piece = squares[r][c].piece;
+      if (piece?.player === attacker &&
+        isPieceAttacking(squares, { row: r, col: c }, piece, targetCoord))
+        return true;
+    }
+  }
+  return false;
+}
+
+/** The same early exit with opt-in aggregate diagnostics. */
+function hasSquareAttackerByInternal(
+  squares: BoardSquare[][], targetCoord: Coordinate, attacker: Player,
+  probe?: CheckInternalsProbe
+): boolean {
+  if (!isWithinBoard(targetCoord.row, targetCoord.col)) {
+    return false;
+  }
+
+  const searchStart = probe ? performance.now() : 0;
+  if (probe) probe.attackScans++;
+  for (let r = 0; r < 9; r++) {
+    for (let c = 0; c < 9; c++) {
+      if (probe) probe.scannedSquares++;
+      const piece = squares[r][c].piece;
       if (piece?.player === attacker) {
         if (probe) { probe.opponentPieces++; probe.pieceCalls++; }
-        if (isPieceAttackingInternal(squares, { row: r, col: c }, piece, targetCoord, probe))
-          attackerCount += 1;
+        if (isPieceAttackingInternal(squares, { row: r, col: c }, piece, targetCoord, probe)) {
+          if (probe) {
+            probe.earlyExits++;
+            probe.record('attackSearch', performance.now() - searchStart);
+          }
+          return true;
+        }
       }
     }
   }
 
   if (probe) probe.record('attackSearch', performance.now() - searchStart);
-  return attackerCount;
+  return false;
 }
 
 function createEmptyAttackCountMap(): AttackCountMap {
@@ -405,7 +426,7 @@ export function isSquareAttackedBy(
   targetCoord: Coordinate,
   attacker: Player
 ): boolean {
-  return countSquareAttackersBy(squares, targetCoord, attacker) > 0;
+  return hasSquareAttackerBy(squares, targetCoord, attacker);
 }
 
 /**
@@ -436,7 +457,7 @@ export function isKingInCheckProfiled(
   let checked = false;
   if (kingCoord) {
     const opponent: Player = player === 'sente' ? 'gote' : 'sente';
-    checked = countSquareAttackersByInternal(squares, kingCoord, opponent, probe) > 0;
+    checked = hasSquareAttackerByInternal(squares, kingCoord, opponent, probe);
   }
   probe.record('check', performance.now() - checkStart);
   return checked;

@@ -33,7 +33,7 @@ const fd = openSync(out, 'wx');
 const emit = (value: object) => writeSync(fd, JSON.stringify(value) + '\n');
 try {
   const head = execFileSync('git', ['rev-parse', 'HEAD'], { encoding: 'utf8' }).trim();
-  emit({ type: 'config', schema: 'check-internals-v1', head, startedAt: new Date().toISOString(),
+  emit({ type: 'config', schema: 'check-internals-v2', head, startedAt: new Date().toISOString(),
     source: SOURCE, sourceSha256, node: process.version,
     os: `${platform()} ${release()} ${arch()}`, cpu: cpus()[0]?.model ?? 'unknown',
     settings: { maxDepth: 4, timeLimitMilliseconds: 100, evaluation: 'standard',
@@ -46,7 +46,8 @@ try {
     rootCandidates: getLegalActions(position.state).length });
 
   const off: Array<{ positionId: string; phase: string; apiElapsedMilliseconds: number;
-    resultSource: string; completedDepth: number; action: unknown; rootCandidates: number }> = [];
+    resultSource: string; completedDepth: number; action: unknown;
+    evaluation: number | null; rootCandidates: number }> = [];
   for (let index = 0; index < warmups + runs; index++) for (const position of positions) {
     const input = protectSearchInput(position.state);
     const result = analyzeTimeLimitedIterativeDeepeningAlphaBetaSearch(input.snapshot,
@@ -57,6 +58,7 @@ try {
       run: index < warmups ? index + 1 : index - warmups + 1,
       apiElapsedMilliseconds: result.elapsedMilliseconds, resultSource: result.resultSource,
       completedDepth: result.completedDepth, action: result.selectedAction,
+      evaluation: result.selectedEvaluation,
       rootCandidates: getLegalActions(position.state).length };
     off.push(row); emit(row);
   }
@@ -110,7 +112,7 @@ try {
     `環境: ${platform()} ${release()} ${arch()}、${cpus()[0]?.model ?? 'unknown'}、Node ${process.version}。`,
     `条件: ${positions.map(p => p.id).join('、')}、標準評価・標準手順序・静止探索追加1手・最大深さ4・100ms。同期直列、ウォームアップ${warmups}回、本測定${runs}回。`,
     '診断OFFは通常の100ms探索。診断ONは固定深さ1を完走する補助測定であり、100ms以内の完走を意味しない。両者のAPI時間から改善率を算出しない。固定深さ1のONとOFFも交互に対測定し、診断負荷の参考値にする。',
-    '呼出経路: 盤上手は getQuiescenceLegalActionsWithDiagnostics → getLegalMoves → 局所盤面シミュレーション → isKingInCheckProfiled。持駒打ちは同じ列挙から getLegalDropSquares → validateDrop → 打った後の盤面 → isKingInCheckProfiled。どちらも findKingSquare → 81マスの countSquareAttackersBy 相当走査 → isPieceAttacking → getPieceAttackPattern / step / ray の既存判定を使う。公開 isKingInCheck → isSquareAttackedBy → countSquareAttackersBy も維持する。',
+    '呼出経路: 盤上手は getQuiescenceLegalActionsWithDiagnostics → getLegalMoves → 局所盤面シミュレーション → isKingInCheckProfiled。持駒打ちは同じ列挙から getLegalDropSquares → validateDrop → 打った後の盤面 → isKingInCheckProfiled。どちらも findKingSquare → boolean専用攻撃元探索 → isPieceAttackingInternal → getPieceAttackPattern / step / ray を使う。通常の isKingInCheck → isSquareAttackedBy も最初の攻撃者で終了する。正確な countSquareAttackersBy は維持する。',
     '時間は各項目の中央値。排他時間は直接の子の包含時間を差し引く。最大単発は包含時間。親子の包含時間を合算しない。個々の駒に時計を置くため、子計時や集計処理の負荷は親の残余に含まれる。',
     '', '| 局面 | OFF API中央値ms | fallback | 完了深さ | 選択手 | root候補 | 固定深さ1 OFF/ON API中央値ms |',
     '| --- | ---: | ---: | --- | --- | ---: | ---: |'];
@@ -137,7 +139,7 @@ try {
         lines.push(`| ${origin}.${stage} | ${rows.map(x => x.calls).join(',')} | ${f(median(rows.map(x => x.exclusiveMilliseconds)))} | ${f(median(rows.map(x => x.inclusiveMilliseconds)))} | ${f(Math.max(...rows.map(x => x.maxMilliseconds)))} |`);
       }
       const counts = own.map(row => row[origin]);
-      lines.push(`| ${origin} counts | checks ${counts.map(x => x.checks)} | scans ${counts.map(x => x.attackScans)} | squares ${counts.map(x => x.scannedSquares)} | pieces / calls ${counts.map(x => `${x.opponentPieces}/${x.pieceCalls}`)} |`);
+      lines.push(`| ${origin} counts | checks ${counts.map(x => x.checks)} | scans ${counts.map(x => x.attackScans)} | squares ${counts.map(x => x.scannedSquares)} | pieces / calls ${counts.map(x => `${x.opponentPieces}/${x.pieceCalls}`)}; early exits ${counts.map(x => x.earlyExits)} |`);
     }
     lines.push('', '| 既存工程 | 排他中央値ms | 呼出回数（各本） |', '| --- | ---: | --- |');
     for (const phase of parentPhases) lines.push(`| ${phase} | ${f(median(own.map(x => x.diagnostics.phases[phase].milliseconds)))} | ${own.map(x => x.diagnostics.phases[phase].calls).join(',')} |`);
@@ -146,8 +148,8 @@ try {
     (median(fixed.filter(row => row.positionId === position.id && row.phase === 'measurement')
       .map(row => row.board.timing.attackSearch.inclusiveMilliseconds +
         row.drop.timing.attackSearch.inclusiveMilliseconds)) ?? 0), 0);
-  lines.push('', `次PRで調査する一箇所: countSquareAttackersBy() の攻撃元探索全体（4局面のboard+drop別attackSearch包含中央値の合計 ${f(attackSearchTotal)}ms）。王探索より大きい包含段階で、81マス走査と駒攻撃判定を含む。走査排他とpiece排他は計時負荷に敏感で優劣を断定できないため、関数全体を対象に費用対効果を調べる。このPRには最適化を含めない。`,
-    '攻撃元探索は1回につき81マスを走査する。scansとsquaresの比、および相手駒数とpiece呼出数から実態を確認する。',
+  lines.push('', `4局面のboard+drop別attackSearch包含中央値の合計は ${f(attackSearchTotal)}ms。細粒度計時負荷を含む。`,
+    '攻撃元探索は攻撃者発見時に早期終了する。scansと実走査マス、早期終了件数、piece呼出数から実態を確認する。',
     '固定深さ1のON/OFF時間差は大きく、既存の探索診断と今回の高頻度計時の両方を含む。board/dropのprofiled check包含時間とq-own-check包含時間の差は呼出ラッパー、時計・集計負荷を含む。attackSearch排他にも子呼出計時の負荷が残るため、細粒度の値は概数として扱い、81マス走査の件数と併せて判断する。',
     '', `生データ: ${out.replaceAll('\\', '/')}`, '', '再実行: `npm run measure:check-internals -- --out docs/benchmarks/別名.jsonl`。既存ファイルは上書きしない。',
     '`npm run audit:check-internals -- docs/benchmarks/別名.jsonl`、`npm run check`、`git diff --check`。', '');

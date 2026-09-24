@@ -12,7 +12,7 @@ assert.ok(path?.endsWith('.jsonl'), 'Usage: npm run audit:check-internals -- PAT
 const rows = readFileSync(resolve(path), 'utf8').trim().split(/\r?\n/).map(line => JSON.parse(line));
 const config = rows[0];
 assert.equal(config.type, 'config');
-assert.equal(config.schema, 'check-internals-v1');
+assert.ok(config.schema === 'check-internals-v1' || config.schema === 'check-internals-v2');
 assert.equal(config.source, SOURCE);
 assert.deepEqual(config.settings, { maxDepth: 4, timeLimitMilliseconds: 100,
   evaluation: 'standard', moveOrdering: 'standard',
@@ -67,7 +67,15 @@ for (const position of positions) {
       assert.equal(part.timing.check.calls, part.checks);
       assert.equal(part.timing.king.calls, part.checks);
       assert.equal(part.attackScans, part.checks);
-      assert.equal(part.scannedSquares, part.attackScans * 81);
+      if (config.schema === 'check-internals-v1') {
+        assert.equal(part.scannedSquares, part.attackScans * 81);
+      } else {
+        assert.ok(Number.isSafeInteger(part.earlyExits) && part.earlyExits >= 0 &&
+          part.earlyExits <= part.attackScans);
+        assert.ok(Number.isSafeInteger(part.scannedSquares) &&
+          part.scannedSquares >= 81 * (part.attackScans - part.earlyExits) + part.earlyExits &&
+          part.scannedSquares <= part.attackScans * 81);
+      }
       assert.equal(part.opponentPieces, part.pieceCalls);
       assert.equal(part.timing.attackSearch.calls, part.attackScans);
       assert.equal(part.timing.piece.calls, part.pieceCalls);
