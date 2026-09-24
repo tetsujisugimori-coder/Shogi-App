@@ -1,3 +1,5 @@
+import type { PieceType } from '../../types/shogi';
+
 /** Optional, synchronous search probe. Time is exclusive of nested spans. */
 export type SearchDiagnosticPhase =
   | 'root-legal' | 'normal-legal' | 'normal-order' | 'see' | 'normal-execute'
@@ -6,7 +8,45 @@ export type SearchDiagnosticPhase =
 
 export interface SearchDiagnosticEntry { calls: number; milliseconds: number; maxMilliseconds?: number }
 
+export type DropStage = 'board-clone' | 'own-check' | 'pawn-drop-mate';
+export type DropPieceType = Exclude<PieceType, 'king'>;
+export interface RootDropEntry {
+  calls: number; milliseconds: number; maxMilliseconds: number;
+  candidates: number; legal: number; rejected: Record<string, number>;
+  stages: Record<DropStage, SearchDiagnosticEntry>;
+}
+
+const dropEntry = (): RootDropEntry => ({ calls: 0, milliseconds: 0, maxMilliseconds: 0,
+  candidates: 0, legal: 0, rejected: {},
+  stages: { 'board-clone': { calls: 0, milliseconds: 0 },
+    'own-check': { calls: 0, milliseconds: 0 }, 'pawn-drop-mate': { calls: 0, milliseconds: 0 } } });
+
 export class SearchDiagnostics {
+  readonly rootDrops: Record<DropPieceType, RootDropEntry> = {
+    rook: dropEntry(), bishop: dropEntry(), gold: dropEntry(), silver: dropEntry(),
+    knight: dropEntry(), lance: dropEntry(), pawn: dropEntry(),
+  };
+  constructor(readonly rootDropStageTiming = false) {}
+
+  recordDropResult(type: DropPieceType, reason?: string): void {
+    const entry = this.rootDrops[type];
+    entry.candidates++;
+    if (reason) entry.rejected[reason] = (entry.rejected[reason] ?? 0) + 1;
+    else entry.legal++;
+  }
+
+  measureDropStage<T>(type: DropPieceType, stage: DropStage, fn: () => T): T {
+    const entry = this.rootDrops[type].stages[stage];
+    entry.calls++;
+    if (!this.rootDropStageTiming) return fn();
+    const start = this.clock();
+    try { return fn(); }
+    finally {
+      const duration = Math.max(0, this.clock() - start);
+      entry.milliseconds += duration;
+      entry.maxMilliseconds = Math.max(entry.maxMilliseconds ?? 0, duration);
+    }
+  }
   readonly phases: Record<SearchDiagnosticPhase, SearchDiagnosticEntry> = {
     'root-legal': { calls: 0, milliseconds: 0 },
     'normal-legal': { calls: 0, milliseconds: 0 },
@@ -30,6 +70,7 @@ export class SearchDiagnostics {
   private start = 0;
   private limit = Number.POSITIVE_INFINITY;
   private clock: () => number = () => performance.now();
+  now(): number { return this.clock(); }
   private lastCheck = 0;
   private longestSinceCheck = { milliseconds: 0, phase: 'api-other' as SearchDiagnosticPhase | 'api-other' };
   longestCheckInterval = { milliseconds: 0, phase: 'api-other' as SearchDiagnosticPhase | 'api-other' };

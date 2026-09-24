@@ -30,6 +30,10 @@
     "audit:timed-depth-one": "tsx scripts/audit-timed-depth-one-diagnostics.ts",
     "measure:timed-long-tail": "tsx scripts/measure-timed-long-tail.ts",
     "audit:timed-long-tail": "tsx scripts/audit-timed-long-tail.ts",
+    "measure:root-legal-breakdown": "tsx scripts/measure-root-legal-breakdown.ts",
+    "measure:root-legal-context": "tsx scripts/measure-root-legal-context.ts",
+    "audit:root-legal-context": "tsx scripts/audit-root-legal-context.ts",
+    "audit:root-legal-breakdown": "tsx scripts/audit-root-legal-breakdown.ts",
     "audit:timed-fallback-self-play": "tsx scripts/audit-timed-fallback-self-play.ts",
     "check": "npm run verify:lock && npm run lint && npm test && npm run build"
   },
