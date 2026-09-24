@@ -112,7 +112,8 @@ export function validateDrop(
   state: BoardState,
   pieceId: string,
   to: Coordinate,
-  diagnostics?: SearchDiagnostics
+  diagnostics?: SearchDiagnostics,
+  qDiagnostics?: SearchDiagnostics
 ): MoveValidationResult {
   if (state.status === 'ended') {
     return {
@@ -191,10 +192,14 @@ export function validateDrop(
   }
 
   const dropType = piece.type as DropPieceType;
-  const simulatedSquares = diagnostics
+  const simulatedSquares = qDiagnostics
+    ? qDiagnostics.measure('q-drop-board-setup', () => prepareDropValidationSquares(state.squares, piece, to))
+    : diagnostics
     ? diagnostics.measureDropStage(dropType, 'drop-board-setup', () => prepareDropValidationSquares(state.squares, piece, to))
     : prepareDropValidationSquares(state.squares, piece, to);
-  if (diagnostics
+  if (qDiagnostics
+    ? qDiagnostics.measure('q-drop-own-check', () => isKingInCheck(simulatedSquares, state.turn))
+    : diagnostics
     ? diagnostics.measureDropStage(dropType, 'own-check', () => isKingInCheck(simulatedSquares, state.turn))
     : isKingInCheck(simulatedSquares, state.turn)) {
     return {
@@ -207,7 +212,9 @@ export function validateDrop(
   if (
     piece.type === 'pawn' &&
     !piece.isPromoted &&
-    (diagnostics
+    (qDiagnostics
+      ? qDiagnostics.measure('q-drop-pawn-mate', () => isPawnDropMateOnSimulatedBoard(simulatedSquares, state.turn))
+      : diagnostics
       ? diagnostics.measureDropStage(dropType, 'pawn-drop-mate', () => isPawnDropMateOnSimulatedBoard(simulatedSquares, state.turn))
       : isPawnDropMateOnSimulatedBoard(simulatedSquares, state.turn))
   ) {
@@ -222,7 +229,8 @@ export function validateDrop(
 }
 
 /** Returns every legal destination for the selected hand-piece ID. */
-export function getLegalDropSquares(state: BoardState, pieceId: string, diagnostics?: SearchDiagnostics): Coordinate[] {
+export function getLegalDropSquares(state: BoardState, pieceId: string, diagnostics?: SearchDiagnostics,
+  qDiagnostics?: SearchDiagnostics): Coordinate[] {
   if (state.status === 'ended') return [];
   const piece = getHands(state).current.find((candidate) => candidate.id === pieceId);
   if (!piece || piece.player !== state.turn || piece.type === 'king' || piece.isPromoted) {
@@ -233,8 +241,12 @@ export function getLegalDropSquares(state: BoardState, pieceId: string, diagnost
   for (let row = 0; row < 9; row += 1) {
     for (let col = 0; col < 9; col += 1) {
       const to = { row, col };
-      const result = validateDrop(state, pieceId, to, diagnostics);
+      const result = validateDrop(state, pieceId, to, diagnostics, qDiagnostics);
       diagnostics?.recordDropResult(piece.type as DropPieceType, result.isValid ? undefined : result.reason);
+      if (qDiagnostics) {
+        qDiagnostics.qLegalCounts.dropCandidates++;
+        if (result.isValid) qDiagnostics.qLegalCounts.dropLegal++;
+      }
       if (result.isValid) {
         legalSquares.push(to);
       }

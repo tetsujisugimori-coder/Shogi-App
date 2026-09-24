@@ -3,6 +3,7 @@ import {
   analyzeAlphaBetaSearch,
   analyzeIterativeDeepeningAlphaBetaSearch,
   analyzeQuiescenceSearch,
+  analyzeQuiescenceSearchWithinBounds,
   analyzeTimeLimitedIterativeDeepeningAlphaBetaSearch,
   analyzeTwoPlyAlphaBetaSearch,
   cloneBoardSquares,
@@ -19,6 +20,7 @@ import {
   type SearchEvaluationConfig,
 } from '../domain/shogi';
 import * as staticExchangeApi from '../domain/shogi/staticExchangeEvaluation';
+import { SearchDiagnostics } from '../domain/shogi/searchDiagnostics';
 import { createInitialBoardState, type BoardState, type Piece, type PieceType, type Player } from '../types/shogi';
 
 function piece(id: string, type: PieceType, player: Player): Piece {
@@ -150,6 +152,14 @@ describe('静止探索の純粋関数基盤', () => {
     expect(result.visitedPositionCount).toBe(actions.length);
     expect(result.principalVariation).toHaveLength(1);
     expect(actions).toContainEqual(result.principalVariation[0]);
+    const diagnostics = new SearchDiagnostics(false, false);
+    diagnostics.begin(performance.now());
+    const detailed = analyzeQuiescenceSearchWithinBounds(state, 'sente', 1, MATERIAL_ONLY,
+      undefined, Number.NEGATIVE_INFINITY, Number.POSITIVE_INFINITY, 'original', diagnostics);
+    diagnostics.finish();
+    expect(detailed).toEqual(result);
+    expect(detailed.visitedPositionCount).toBe(actions.length);
+    expect(diagnostics.qLegalCounts.dropActions).toBeGreaterThan(0);
   });
 
   it('終局局面は既存の終局評価を返し、追加着手を探索しない', () => {

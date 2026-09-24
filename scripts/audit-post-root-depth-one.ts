@@ -21,7 +21,8 @@ for (const position of positions) {
   for (const key of ['stateSha256', 'positionKeySha256', 'historyLength'])
     assert.equal(stored[key], position[key as keyof typeof position], `${position.id}: ${key}`);
 }
-const fallbackActions = new Map(positions.map(position => [position.id, getLegalActions(position.state)[0] ?? null]));
+const rootActions = new Map(positions.map(position => [position.id, getLegalActions(position.state)]));
+const fallbackActions = new Map(positions.map(position => [position.id, rootActions.get(position.id)![0] ?? null]));
 const samples = rows.filter(row => row.type === 'sample') as PostRootSample[];
 assert.equal(samples.length, positions.length * 2 * (config.warmups + config.runs));
 const near = (a: number, b: number, label: string) => assert.ok(Math.abs(a - b) < 0.5, `${label}: ${a} vs ${b}`);
@@ -49,6 +50,8 @@ for (const sample of samples) {
   const depth = diagnostic.depthOne!;
   assert.ok(depth);
   assert.ok(Number.isSafeInteger(depth.rootCandidates) && depth.rootCandidates > 0);
+  assert.equal(depth.rootCandidates, rootActions.get(sample.positionId)?.length,
+    `${sample.positionId}: independently replayed root legal action count`);
   assert.ok(Number.isSafeInteger(depth.completedCandidates) && depth.completedCandidates >= 0 &&
     depth.completedCandidates <= depth.rootCandidates);
   assert.ok(depth.currentCandidate === null ||

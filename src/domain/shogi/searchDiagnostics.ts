@@ -4,9 +4,16 @@ import type { PieceType } from '../../types/shogi';
 export type SearchDiagnosticPhase =
   | 'root-legal' | 'normal-legal' | 'normal-order' | 'see' | 'normal-execute'
   | 'normal-other' | 'normal-evaluate' | 'quiescence' | 'root-piece-moves' | 'root-hand-drops'
-  | 'q-evaluate' | 'q-check' | 'q-legal' | 'q-order' | 'q-execute';
+  | 'q-evaluate' | 'q-check' | 'q-legal' | 'q-order' | 'q-execute'
+  | 'q-board-moves' | 'q-board-pseudo' | 'q-board-simulate' | 'q-board-own-check'
+  | 'q-hand-drops' | 'q-drop-board-setup' | 'q-drop-own-check' | 'q-drop-pawn-mate';
 
 export interface SearchDiagnosticEntry { calls: number; milliseconds: number; maxMilliseconds?: number; inclusiveMilliseconds?: number }
+export interface QLegalCounts {
+  boardSources: number; boardPseudo: number; boardLegal: number; boardActions: number;
+  dropTypes: number; dropCandidates: number; dropLegal: number; dropActions: number;
+  actions: number;
+}
 export type SearchDiagnosticActivity = SearchDiagnosticPhase | 'api-other';
 export interface DepthOneDiagnostic {
   rootGeneratedAt: number;
@@ -45,6 +52,8 @@ const dropEntry = (): RootDropEntry => ({ calls: 0, milliseconds: 0, maxMillisec
     'own-check': { calls: 0, milliseconds: 0 }, 'pawn-drop-mate': { calls: 0, milliseconds: 0 } } });
 
 export class SearchDiagnostics {
+  readonly qLegalCounts: QLegalCounts = { boardSources: 0, boardPseudo: 0, boardLegal: 0,
+    boardActions: 0, dropTypes: 0, dropCandidates: 0, dropLegal: 0, dropActions: 0, actions: 0 };
   readonly rootDrops: Record<DropPieceType, RootDropEntry> = {
     rook: dropEntry(), bishop: dropEntry(), gold: dropEntry(), silver: dropEntry(),
     knight: dropEntry(), lance: dropEntry(), pawn: dropEntry(),
@@ -86,6 +95,14 @@ export class SearchDiagnostics {
     'q-legal': { calls: 0, milliseconds: 0 },
     'q-order': { calls: 0, milliseconds: 0 },
     'q-execute': { calls: 0, milliseconds: 0 },
+    'q-board-moves': { calls: 0, milliseconds: 0 },
+    'q-board-pseudo': { calls: 0, milliseconds: 0 },
+    'q-board-simulate': { calls: 0, milliseconds: 0 },
+    'q-board-own-check': { calls: 0, milliseconds: 0 },
+    'q-hand-drops': { calls: 0, milliseconds: 0 },
+    'q-drop-board-setup': { calls: 0, milliseconds: 0 },
+    'q-drop-own-check': { calls: 0, milliseconds: 0 },
+    'q-drop-pawn-mate': { calls: 0, milliseconds: 0 },
   };
   interruptedPhase: SearchDiagnosticPhase | 'api-other' | null = null;
   interruptedStage: string | null = null;

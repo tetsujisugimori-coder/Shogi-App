@@ -5,7 +5,7 @@
  */
 import type { BoardState, Player } from '../../types/shogi';
 import { isPlayerInCheck } from './checkmate';
-import { executeLegalAction, getLegalActions, type LegalAction } from './legalActions';
+import { executeLegalAction, getLegalActions, getQuiescenceLegalActionsWithDiagnostics, type LegalAction } from './legalActions';
 import { measured, type SearchDiagnostics } from './searchDiagnostics';
 import { DEFAULT_MATERIAL_VALUE_TABLE } from './materialEvaluation';
 import { orderQuiescenceCandidates, resolveQuiescenceMoveOrdering, type QuiescenceMoveOrderingMode } from './quiescenceOrdering';
@@ -100,7 +100,8 @@ function searchNode(
   }
 
   const isInCheck = measured(diagnostics, 'q-check', () => isPlayerInCheck(state, state.turn));
-  const actions = measured(diagnostics, 'q-legal', () => getLegalActions(state));
+  const actions = measured(diagnostics, 'q-legal', () => diagnostics
+    ? getQuiescenceLegalActionsWithDiagnostics(state, diagnostics) : getLegalActions(state));
   const candidates = isInCheck ? actions : actions.filter((action) => isCapture(state, action));
 
   // Reachable no-response positions are ended by the existing adjudication

@@ -6,6 +6,7 @@ import {
   type LegalAction,
 } from '../domain/shogi';
 import { SearchDiagnostics } from '../domain/shogi/searchDiagnostics';
+import { getQuiescenceLegalActionsWithDiagnostics } from '../domain/shogi/legalActions';
 import {
   type BoardState,
   type Piece,
@@ -80,6 +81,38 @@ function createPawnDropMateState(): { state: BoardState; forbidden: { row: numbe
 }
 
 describe('全合法手列挙API', () => {
+  it('q診断でも成り、二歩、歩打ち詰め、持駒、王手の全応手の内容と順序を保持する', () => {
+    const promotion = createState([
+      { row: 8, col: 4, piece: senteKing }, { row: 0, col: 4, piece: goteKing },
+      { row: 3, col: 3, piece: { id: 'silver', type: 'silver', player: 'sente' } },
+      { row: 2, col: 3, piece: { id: 'target', type: 'pawn', player: 'gote' } },
+    ]);
+    const nifu = createState([
+      { row: 8, col: 4, piece: senteKing }, { row: 0, col: 4, piece: goteKing },
+      { row: 5, col: 3, piece: { id: 'board-pawn', type: 'pawn', player: 'sente' } },
+    ], [{ id: 'hand-pawn', type: 'pawn', player: 'sente' }]);
+    const checked = createState([
+      { row: 8, col: 4, piece: senteKing }, { row: 0, col: 8, piece: goteKing },
+      { row: 4, col: 4, piece: { id: 'checking-rook', type: 'rook', player: 'gote' } },
+    ], [{ id: 'blocking-gold', type: 'gold', player: 'sente' }]);
+    for (const state of [promotion, nifu, createPawnDropMateState().state, checked]) {
+      const before = JSON.stringify(state);
+      const plain = getLegalActions(state);
+      const diagnostics = new SearchDiagnostics(false, false);
+      diagnostics.begin(performance.now());
+      const detailed = diagnostics.measure('q-legal', () => getQuiescenceLegalActionsWithDiagnostics(state, diagnostics));
+      diagnostics.finish();
+      expect(detailed).toEqual(plain);
+      expect(JSON.stringify(state)).toBe(before);
+      expect(diagnostics.qLegalCounts.actions).toBe(plain.length);
+      expect(diagnostics.qLegalCounts.boardActions).toBe(moveActions(plain).length);
+      expect(diagnostics.qLegalCounts.dropActions).toBe(dropActions(plain).length);
+      expect(diagnostics.phases['root-piece-moves'].calls).toBe(0);
+      expect(diagnostics.phases['root-hand-drops'].calls).toBe(0);
+    }
+    expect(getLegalActions(checked).some(action => action.kind === 'move' && action.pieceType === 'king')).toBe(true);
+    expect(getLegalActions(checked).some(action => action.kind === 'drop')).toBe(true);
+  });
   it('root診断でも合法手の内容と順序と入力を保持し、歩打ちの却下理由を記録する', () => {
     const { state } = createPawnDropMateState();
     const before = JSON.stringify(state);
