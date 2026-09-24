@@ -1,5 +1,13 @@
 # SHOGI-APP 開発ログ
 
+## [2026-09-24 JST] 盤上手の王手判定用盤面複製を局所化
+
+- PR #168 後の `main`=`origin/main`=`103ad15`、作業ツリー空から `perf/q-board-local-copy` を作成。GitHub API で main SHA を照合。通常の `git fetch` は `SEC_E_NO_CREDENTIALS` で失敗。`getLegalActions`、静止探索診断の呼出経路、`simulateMoveSquares`、`isKingInCheck` と攻撃判定、PR #159 の持駒打ち盤面準備最適化を確認した。
+- 盤上疑似手の各候補で81マス・駒を深く複製してから2マスに着手を反映していた。王手判定は盤面を読むだけなので、`getLegalMoves` 内だけで外側配列・移動元と移動先の行・2マスを複製する非公開関数を使用。公開 `simulateMoveSquares` の深い複製は維持。元盤面・持駒の一時変更を使わず、例外や早期return時も保全される。探索、評価、手順序、時間制限、Worker/UIは変更していない。
+- PR #168 後の同一保存棋譜4局面、同一 Windows/Node v24.20.0、保護入力、各2ウォームアップ＋5本を変更前→後の順に直列測定。固定深さ1診断ONの `q-board-simulate` 呼出数は9,818/3,776/2,741/7,112回で不変、排他時間中央値msは878.13→27.11 / 273.17→9.53 / 265.32→1.95 / 634.98→17.57。診断OFF 100ms探索は変更前後とも各局面5/5 fallback、完了深さ0、選択手一致。OS/JIT/GCと実行順の揺れを含み、100msでの完走や棋力改善は示していない。
+- 変更前の `getLegalActions` 配列全体を保存し、変更後の4局面全配列314/222/249/289件を `assert.deepEqual` で順序ごと照合。診断ON列挙も一致。先手・後手、同じ行と別の行の着手を凍結盤面で生成するテストを追加。既存テストは王手放置・ピン・成り/不成・捕獲・持駒・二歩・打ち歩詰めを含む。
+- 新旧 `audit:q-legal-breakdown` は各4局面56件の100ms標本と28件の固定深さ1標本で成功。既存 `audit:post-root-depth-one` 4局面56件、`audit:timed-depth-one` 7局面196件、`audit:root-legal-breakdown` 4局面56件で成功。`npm run check` はlockfile、型検査、63ファイル1,750テスト、build成功。`git diff --check` 成功。生標本、配列の変更前JSON、比較・判断・再実行方法は `docs/benchmarks/q-board-local-copy-comparison-20260924.md` に保存。
+
 ## [2026-09-24 JST] 歩打ち詰めの直接王手ガード
 
 - PR #166、`dropRules.ts`、歩打ち・合法手・静止探索テスト、測定器と監査を確認。作業開始時はcleanな`main`=`origin/main`=`ee8af4d`で、GitHub APIでもmainのSHAが一致した。`git fetch`はこの環境の`SEC_E_NO_CREDENTIALS`で失敗したため、APIで現在のmainを照合してから`perf/pawn-drop-direct-check`を分岐した。

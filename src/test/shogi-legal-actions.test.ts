@@ -81,6 +81,37 @@ function createPawnDropMateState(): { state: BoardState; forbidden: { row: numbe
 }
 
 describe('全合法手列挙API', () => {
+  it('盤上手の王手判定は凍結済み盤面を変更せず、同じ行と別の行の着手を列挙する', () => {
+    const states = [
+      createState([
+        { row: 8, col: 4, piece: senteKing }, { row: 0, col: 4, piece: goteKing },
+        { row: 5, col: 3, piece: { id: 's-rook', type: 'rook', player: 'sente' } },
+        { row: 5, col: 6, piece: { id: 'g-pawn', type: 'pawn', player: 'gote' } },
+      ]),
+      createState([
+        { row: 8, col: 4, piece: senteKing }, { row: 0, col: 4, piece: goteKing },
+        { row: 3, col: 5, piece: { id: 'g-rook', type: 'rook', player: 'gote' } },
+        { row: 3, col: 2, piece: { id: 's-pawn', type: 'pawn', player: 'sente' } },
+      ], [], 'gote'),
+    ];
+    for (const state of states) {
+      const expected = getLegalActions(state);
+      const before = JSON.stringify(state);
+      for (const row of state.squares) {
+        for (const square of row) {
+          if (square.piece) Object.freeze(square.piece);
+          Object.freeze(square);
+        }
+        Object.freeze(row);
+      }
+      Object.freeze(state.squares);
+      expect(getLegalActions(state)).toEqual(expected);
+      expect(getQuiescenceLegalActionsWithDiagnostics(state,
+        new SearchDiagnostics(false, false))).toEqual(expected);
+      expect(JSON.stringify(state)).toBe(before);
+    }
+  });
+
   it('q診断でも成り、二歩、歩打ち詰め、持駒、王手の全応手の内容と順序を保持する', () => {
     const promotion = createState([
       { row: 8, col: 4, piece: senteKing }, { row: 0, col: 4, piece: goteKing },

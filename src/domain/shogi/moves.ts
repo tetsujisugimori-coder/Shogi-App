@@ -105,6 +105,22 @@ export function simulateMoveSquares(
   return nextSquares;
 }
 
+/** King-safety readers only need the two changed squares. Never expose this shared copy. */
+function simulateMoveSquaresForKingSafety(
+  squares: BoardSquare[][],
+  from: Coordinate,
+  to: Coordinate
+): BoardSquare[][] {
+  const nextSquares = squares.slice();
+  nextSquares[from.row] = squares[from.row].slice();
+  if (to.row !== from.row) nextSquares[to.row] = squares[to.row].slice();
+  nextSquares[from.row][from.col] = { ...squares[from.row][from.col], piece: null };
+  nextSquares[to.row][to.col] = {
+    ...squares[to.row][to.col], piece: squares[from.row][from.col].piece,
+  };
+  return nextSquares;
+}
+
 /**
  * Computes strictly legal moves for a piece at `from`.
  * Validates:
@@ -138,7 +154,7 @@ export function getLegalMoves(
     qDiagnostics.qLegalCounts.boardPseudo += pseudoMoves.length;
     const legalMoves: Coordinate[] = [];
     for (const dest of pseudoMoves) {
-      const simulatedSquares = qDiagnostics.measure('q-board-simulate', () => simulateMoveSquares(squares, from, dest));
+      const simulatedSquares = qDiagnostics.measure('q-board-simulate', () => simulateMoveSquaresForKingSafety(squares, from, dest));
       if (!qDiagnostics.measure('q-board-own-check', () => isKingInCheck(simulatedSquares, piece.player)))
         legalMoves.push(dest);
     }
@@ -151,7 +167,7 @@ export function getLegalMoves(
 
   for (const dest of pseudoMoves) {
     // Simulate move and check if own king is left in check
-    const simulatedSquares = simulateMoveSquares(squares, from, dest);
+    const simulatedSquares = simulateMoveSquaresForKingSafety(squares, from, dest);
     if (isKingInCheck(simulatedSquares, piece.player)) {
       continue;
     }
