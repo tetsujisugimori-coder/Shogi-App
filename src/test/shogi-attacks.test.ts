@@ -52,6 +52,9 @@ function expectAttackMapsToMatchRawCounts(squares: BoardSquare[][]): void {
         expect(getAttackCount(maps, target, attacker)).toBe(
           countSquareAttackersBy(squares, target, attacker)
         );
+        expect(isSquareAttackedBy(squares, target, attacker)).toBe(
+          countSquareAttackersBy(squares, target, attacker) > 0
+        );
       }
     }
   }
@@ -83,9 +86,29 @@ describe('countSquareAttackersBy', () => {
       const probe = new CheckInternalsProbe();
       expect(isKingInCheckProfiled(squares, player, probe)).toBe(isKingInCheck(squares, player));
       expect(probe.checks).toBe(1);
-      expect(probe.scannedSquares).toBe(probe.attackScans * 81);
+      expect(probe.scannedSquares).toBeLessThanOrEqual(probe.attackScans * 81);
+      expect(probe.earlyExits).toBeLessThanOrEqual(probe.attackScans);
       expect(JSON.stringify(squares)).toBe(before);
     }
+  });
+  it('stops the profiled attack scan at the first attacker and scans all squares when none exists', () => {
+    const attacked = createAttackBoard([
+      { row: 0, col: 0, piece: piece('rook', 'rook', 'gote') },
+      { row: 1, col: 0, piece: piece('king', 'king', 'sente') },
+    ]);
+    const early = new CheckInternalsProbe();
+    expect(isKingInCheckProfiled(attacked, 'sente', early)).toBe(true);
+    expect(early.attackScans).toBe(1);
+    expect(early.scannedSquares).toBe(1);
+    expect(early.pieceCalls).toBe(1);
+    expect(early.earlyExits).toBe(1);
+
+    const quiet = new CheckInternalsProbe();
+    expect(isKingInCheckProfiled(createAttackBoard([
+      { row: 1, col: 0, piece: piece('king', 'king', 'sente') },
+    ]), 'sente', quiet)).toBe(false);
+    expect(quiet.scannedSquares).toBe(81);
+    expect(quiet.earlyExits).toBe(0);
   });
   it('局面ごとの利きマップは代表局面の全81マスで既存の生の利き数と一致し、入力盤面を変更しない', () => {
     const positions = [

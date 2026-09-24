@@ -11,6 +11,7 @@ export class CheckInternalsProbe {
   checks = 0;
   attackScans = 0;
   scannedSquares = 0;
+  earlyExits = 0;
   opponentPieces = 0;
   pieceCalls = 0;
 
@@ -29,6 +30,7 @@ export class CheckInternalsProbe {
     for (const stage of ['king', 'pattern', 'step', 'ray'] as const)
       timing[stage].exclusiveMilliseconds = timing[stage].inclusiveMilliseconds;
     return { timing, checks: this.checks, attackScans: this.attackScans,
-      scannedSquares: this.scannedSquares, opponentPieces: this.opponentPieces, pieceCalls: this.pieceCalls };
+      scannedSquares: this.scannedSquares, earlyExits: this.earlyExits,
+      opponentPieces: this.opponentPieces, pieceCalls: this.pieceCalls };
   }
 }
