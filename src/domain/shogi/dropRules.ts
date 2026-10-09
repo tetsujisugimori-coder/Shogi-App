@@ -211,17 +211,19 @@ export function validateDrop(
     : diagnostics
     ? diagnostics.measureDropStage(dropType, 'drop-board-setup', () => prepareDropValidationSquares(state.squares, piece, to))
     : prepareDropValidationSquares(state.squares, piece, to);
-  if (probe
-    ? probe.measure('own-check', () => qDiagnostics
-      ? qDiagnostics.measure('q-drop-own-check', () => isKingInCheck(simulatedSquares, state.turn))
-      : diagnostics ? diagnostics.measureDropStage(dropType, 'own-check', () => isKingInCheck(simulatedSquares, state.turn)) : isKingInCheck(simulatedSquares, state.turn))
-    : qDiagnostics
-    ? qDiagnostics.measure('q-drop-own-check', () => qDiagnostics.checkInternals
+  let ownCheck: boolean;
+  if (qDiagnostics || diagnostics || probe) {
+    const check = () => qDiagnostics?.checkInternals
       ? isKingInCheckProfiled(simulatedSquares, state.turn, qDiagnostics.checkInternals.drop)
-      : isKingInCheck(simulatedSquares, state.turn))
-    : diagnostics
-    ? diagnostics.measureDropStage(dropType, 'own-check', () => isKingInCheck(simulatedSquares, state.turn))
-    : isKingInCheck(simulatedSquares, state.turn)) {
+      : isKingInCheck(simulatedSquares, state.turn);
+    const checkMeasured = () => qDiagnostics
+      ? qDiagnostics.measure('q-drop-own-check', check)
+      : diagnostics ? diagnostics.measureDropStage(dropType, 'own-check', check) : check();
+    ownCheck = probe ? probe.measure('own-check', checkMeasured) : checkMeasured();
+  } else {
+    ownCheck = isKingInCheck(simulatedSquares, state.turn);
+  }
+  if (ownCheck) {
     return {
       isValid: false,
       reason: 'self_check_unresolved',

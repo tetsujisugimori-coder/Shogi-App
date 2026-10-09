@@ -475,7 +475,8 @@ function searchAlphaBetaNode(
     };
   }
 
-  const legalActions = measured(diagnostics, 'normal-legal', () => getLegalActions(state, diagnostics?.actionValidation ? diagnostics : undefined));
+  const legalActions = measured(diagnostics, 'normal-legal', () =>
+    getLegalActions(state, undefined, diagnostics?.actionValidation ?? undefined));
   const actions = measured(diagnostics, 'normal-order', () => orderAlphaBetaNodeActionsByMode(
     state, legalActions, valueTable, interruptionCheck, moveOrdering, killerMoveHistory?.actionsAt(ply), diagnostics
   ));
@@ -828,7 +829,7 @@ export function analyzeTimeLimitedIterativeDeepeningAlphaBetaSearch(
   const startedAt = clock();
   diagnostics?.begin(startedAt, timeLimitMilliseconds, clock);
   const rootActions = measured(diagnostics, 'root-legal', () => getLegalActions(state,
-    diagnostics?.rootBreakdown || diagnostics?.actionValidation ? diagnostics : undefined));
+    diagnostics?.rootBreakdown ? diagnostics : undefined, diagnostics?.actionValidation ?? undefined));
   diagnostics?.rootGenerated(rootActions.length);
   const fallbackAction = rootActions[0] ?? null;
   const iterations: IterativeDeepeningAlphaBetaIterationResult[] = [];

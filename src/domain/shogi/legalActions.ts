@@ -13,7 +13,7 @@ import {
   Player,
   ProposerType,
 } from '../../types/shogi';
-import type { ActionValidationProbe } from './actionValidationDiagnostics';
+import type { ActionValidationDiagnostics, ActionValidationProbe } from './actionValidationDiagnostics';
 import { Coordinate } from './coordinates';
 import { getLegalDropSquares } from './dropRules';
 import { DropExecutionResult, executeDrop } from './drops';
@@ -85,7 +85,10 @@ function compareIds(left: string, right: string): number {
  * hand contains identical pieces, the lexicographically smallest ID is the
  * representative action because the destinations are otherwise equivalent.
  */
-export function getLegalActions(state: BoardState, diagnostics?: SearchDiagnostics): LegalAction[] {
+// The second argument records root breakdown only. Internal nodes pass just the
+// third argument, keeping generation validation separate from root aggregates.
+export function getLegalActions(state: BoardState, diagnostics?: SearchDiagnostics,
+  actionValidation: ActionValidationDiagnostics | undefined = diagnostics?.actionValidation ?? undefined): LegalAction[] {
   if (state.status === 'ended') return [];
 
   const actions: LegalAction[] = [];
@@ -96,7 +99,7 @@ export function getLegalActions(state: BoardState, diagnostics?: SearchDiagnosti
       if (!piece || piece.player !== state.turn) continue;
 
       const from = { row, col };
-      const destinations = measured(diagnostics, 'root-piece-moves', () => getLegalMoves(state.squares, from, state.turn, undefined, diagnostics?.actionValidation?.generationBoard))
+      const destinations = measured(diagnostics, 'root-piece-moves', () => getLegalMoves(state.squares, from, state.turn, undefined, actionValidation?.generationBoard))
         .slice()
         .sort(compareCoordinates);
 
@@ -139,7 +142,7 @@ export function getLegalActions(state: BoardState, diagnostics?: SearchDiagnosti
 
     const destinations = measured(diagnostics, 'root-hand-drops', () => {
       const began = diagnostics ? diagnostics.now() : 0;
-      const squares = getLegalDropSquares(state, representativePieceId, diagnostics, undefined, diagnostics?.actionValidation?.generationDrop);
+      const squares = getLegalDropSquares(state, representativePieceId, diagnostics, undefined, actionValidation?.generationDrop);
       if (diagnostics) {
         const duration = Math.max(0, diagnostics.now() - began);
         const entry = diagnostics.rootDrops[pieceType];
