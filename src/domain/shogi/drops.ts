@@ -1,4 +1,5 @@
 /** Validated piece-drop execution and notation. */
+import type { ActionValidationProbe } from './actionValidationDiagnostics';
 import {
   BoardState,
   DropFoulRecord,
@@ -103,11 +104,12 @@ export function executeDrop(
   state: BoardState,
   pieceId: string,
   to: Coordinate,
-  options: ExecuteDropOptions = {}
+  options: ExecuteDropOptions = {},
+  probe?: ActionValidationProbe
 ): DropExecutionResult {
   const proposer = options.proposer ?? 'human';
   const mode = options.mode ?? determineDefaultExecutionMode(proposer);
-  const validation = validateDrop(state, pieceId, to);
+  const validation = probe ? probe.measure('validation', () => validateDrop(state, pieceId, to, undefined, undefined, probe)) : validateDrop(state, pieceId, to);
 
   if (validation.isValid) {
     const piece = getHands(state).current.find((candidate) => candidate.id === pieceId);

@@ -11,6 +11,7 @@ import { cloneBoardSquares, getOpponent } from './boardStateUtils';
 import { Coordinate, isWithinBoard } from './coordinates';
 import { getLegalMoves } from './moves';
 import { ILLEGAL_MOVE_MESSAGES } from './validation';
+import type { ActionValidationProbe } from './actionValidationDiagnostics';
 import type { SearchDiagnostics, DropPieceType } from './searchDiagnostics';
 
 function getHands(state: BoardState): { current: Piece[]; opponent: Piece[] } {
@@ -121,7 +122,8 @@ export function validateDrop(
   pieceId: string,
   to: Coordinate,
   diagnostics?: SearchDiagnostics,
-  qDiagnostics?: SearchDiagnostics
+  qDiagnostics?: SearchDiagnostics,
+  probe?: ActionValidationProbe
 ): MoveValidationResult {
   if (state.status === 'ended') {
     return {
@@ -200,12 +202,20 @@ export function validateDrop(
   }
 
   const dropType = piece.type as DropPieceType;
-  const simulatedSquares = qDiagnostics
+  const simulatedSquares = probe
+    ? probe.measure('board-setup', () => qDiagnostics
+      ? qDiagnostics.measure('q-drop-board-setup', () => prepareDropValidationSquares(state.squares, piece, to))
+      : diagnostics ? diagnostics.measureDropStage(dropType, 'drop-board-setup', () => prepareDropValidationSquares(state.squares, piece, to)) : prepareDropValidationSquares(state.squares, piece, to))
+    : qDiagnostics
     ? qDiagnostics.measure('q-drop-board-setup', () => prepareDropValidationSquares(state.squares, piece, to))
     : diagnostics
     ? diagnostics.measureDropStage(dropType, 'drop-board-setup', () => prepareDropValidationSquares(state.squares, piece, to))
     : prepareDropValidationSquares(state.squares, piece, to);
-  if (qDiagnostics
+  if (probe
+    ? probe.measure('own-check', () => qDiagnostics
+      ? qDiagnostics.measure('q-drop-own-check', () => isKingInCheck(simulatedSquares, state.turn))
+      : diagnostics ? diagnostics.measureDropStage(dropType, 'own-check', () => isKingInCheck(simulatedSquares, state.turn)) : isKingInCheck(simulatedSquares, state.turn))
+    : qDiagnostics
     ? qDiagnostics.measure('q-drop-own-check', () => qDiagnostics.checkInternals
       ? isKingInCheckProfiled(simulatedSquares, state.turn, qDiagnostics.checkInternals.drop)
       : isKingInCheck(simulatedSquares, state.turn))
@@ -223,7 +233,11 @@ export function validateDrop(
     piece.type === 'pawn' &&
     !piece.isPromoted &&
     droppedPawnDirectlyChecksKing(state, to) &&
-    (qDiagnostics
+    (probe
+      ? probe.measure('pawn-drop-mate', () => qDiagnostics
+      ? qDiagnostics.measure('q-drop-pawn-mate', () => isPawnDropMateOnSimulatedBoard(simulatedSquares, state.turn))
+      : diagnostics ? diagnostics.measureDropStage(dropType, 'pawn-drop-mate', () => isPawnDropMateOnSimulatedBoard(simulatedSquares, state.turn)) : isPawnDropMateOnSimulatedBoard(simulatedSquares, state.turn))
+      : qDiagnostics
       ? qDiagnostics.measure('q-drop-pawn-mate', () => isPawnDropMateOnSimulatedBoard(simulatedSquares, state.turn))
       : diagnostics
       ? diagnostics.measureDropStage(dropType, 'pawn-drop-mate', () => isPawnDropMateOnSimulatedBoard(simulatedSquares, state.turn))
@@ -241,7 +255,7 @@ export function validateDrop(
 
 /** Returns every legal destination for the selected hand-piece ID. */
 export function getLegalDropSquares(state: BoardState, pieceId: string, diagnostics?: SearchDiagnostics,
-  qDiagnostics?: SearchDiagnostics): Coordinate[] {
+  qDiagnostics?: SearchDiagnostics, probe?: ActionValidationProbe): Coordinate[] {
   if (state.status === 'ended') return [];
   const piece = getHands(state).current.find((candidate) => candidate.id === pieceId);
   if (!piece || piece.player !== state.turn || piece.type === 'king' || piece.isPromoted) {
@@ -252,7 +266,8 @@ export function getLegalDropSquares(state: BoardState, pieceId: string, diagnost
   for (let row = 0; row < 9; row += 1) {
     for (let col = 0; col < 9; col += 1) {
       const to = { row, col };
-      const result = validateDrop(state, pieceId, to, diagnostics, qDiagnostics);
+      const result = probe ? probe.measure('validation', () => validateDrop(state, pieceId, to, diagnostics, qDiagnostics, probe))
+        : validateDrop(state, pieceId, to, diagnostics, qDiagnostics);
       diagnostics?.recordDropResult(piece.type as DropPieceType, result.isValid ? undefined : result.reason);
       if (qDiagnostics) {
         qDiagnostics.qLegalCounts.dropCandidates++;

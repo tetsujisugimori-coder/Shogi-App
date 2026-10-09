@@ -43,7 +43,9 @@
     "measure:check-shortcircuit-fixed": "tsx scripts/measure-check-shortcircuit-fixed.ts",
     "audit:check-shortcircuit": "tsx scripts/compare-check-shortcircuit.ts",
     "audit:timed-fallback-self-play": "tsx scripts/audit-timed-fallback-self-play.ts",
-    "check": "npm run verify:lock && npm run lint && npm test && npm run build"
+    "check": "npm run verify:lock && npm run lint && npm test && npm run build",
+    "measure:action-revalidation": "tsx scripts/measure-action-revalidation.ts",
+    "audit:action-revalidation": "tsx scripts/audit-action-revalidation.ts"
   },
   "dependencies": {
     "@google/genai": "^2.4.0",

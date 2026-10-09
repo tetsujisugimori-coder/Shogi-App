@@ -8,6 +8,7 @@ import {
   IllegalMoveReason,
   MoveValidationResult,
 } from '../../types/shogi';
+import type { ActionValidationProbe } from './actionValidationDiagnostics';
 import { Coordinate, isWithinBoard } from './coordinates';
 import { isKingInCheck } from './attacks';
 import {
@@ -49,7 +50,8 @@ export const ILLEGAL_MOVE_MESSAGES: Record<IllegalMoveReason, string> = {
 export function validateMove(
   state: BoardState,
   from: Coordinate,
-  to: Coordinate
+  to: Coordinate,
+  probe?: ActionValidationProbe
 ): MoveValidationResult {
   // 1. Boundary check
   if (!isWithinBoard(from.row, from.col) || !isWithinBoard(to.row, to.col)) {
@@ -102,7 +104,8 @@ export function validateMove(
   }
 
   // 6. Geometric pseudo-legal move check
-  const pseudoMoves = getPseudoLegalMoves(state.squares, from, piece);
+  const pseudoMoves = probe ? probe.measure('pseudo', () => getPseudoLegalMoves(state.squares, from, piece))
+    : getPseudoLegalMoves(state.squares, from, piece);
   const isPseudoLegal = pseudoMoves.some(
     (c) => c.row === to.row && c.col === to.col
   );
@@ -115,8 +118,10 @@ export function validateMove(
   }
 
   // 7. Self-check / King safety check
-  const simulatedSquares = simulateMoveSquares(state.squares, from, to);
-  if (isKingInCheck(simulatedSquares, piece.player)) {
+  const simulatedSquares = probe ? probe.measure('board-setup', () => simulateMoveSquares(state.squares, from, to))
+    : simulateMoveSquares(state.squares, from, to);
+  if (probe ? probe.measure('own-check', () => isKingInCheck(simulatedSquares, piece.player))
+    : isKingInCheck(simulatedSquares, piece.player)) {
     if (piece.type === 'king') {
       return {
         isValid: false,

@@ -173,11 +173,11 @@ interface SearchStatistics {
   quiescenceSkippedActionCount: number;
 }
 
-function executeSearchAction(state: BoardState, action: LegalAction): BoardState {
+function executeSearchAction(state: BoardState, action: LegalAction, diagnostics?: SearchDiagnostics): BoardState {
   // The public executor validates the action and constructs a new state. Its
   // move/drop paths never mutate the supplied state, so cloning the entire
   // replay history first only duplicates work for every searched successor.
-  const execution = executeLegalAction(state, action);
+  const execution = executeLegalAction(state, action, undefined, diagnostics);
   if (execution.type !== 'applied') {
     throw new Error('A generated legal action could not be executed during alpha-beta search.');
   }
@@ -475,7 +475,7 @@ function searchAlphaBetaNode(
     };
   }
 
-  const legalActions = measured(diagnostics, 'normal-legal', () => getLegalActions(state));
+  const legalActions = measured(diagnostics, 'normal-legal', () => getLegalActions(state, diagnostics?.actionValidation ? diagnostics : undefined));
   const actions = measured(diagnostics, 'normal-order', () => orderAlphaBetaNodeActionsByMode(
     state, legalActions, valueTable, interruptionCheck, moveOrdering, killerMoveHistory?.actionsAt(ply), diagnostics
   ));
@@ -497,7 +497,7 @@ function searchAlphaBetaNode(
   let hasExploredAction = false;
   for (let actionIndex = 0; actionIndex < actions.length; actionIndex += 1) {
     interruptionCheck?.();
-    const child = measured(diagnostics, 'normal-execute', () => executeSearchAction(state, actions[actionIndex]));
+    const child = measured(diagnostics, 'normal-execute', () => executeSearchAction(state, actions[actionIndex], diagnostics));
     statistics.visitedPositionCount += 1;
     diagnostics?.visitedNode();
     const childResult = searchAlphaBetaNode(
@@ -630,7 +630,7 @@ function searchAlphaBeta(
     diagnostics?.candidateStarted(++candidateIndex);
     diagnostics?.setStage('root-action-application');
     const alphaBeforeCandidate = alpha;
-    const afterRootAction = measured(diagnostics, 'normal-execute', () => executeSearchAction(state, rootAction));
+    const afterRootAction = measured(diagnostics, 'normal-execute', () => executeSearchAction(state, rootAction, diagnostics));
     statistics.visitedPositionCount += 1;
     diagnostics?.visitedNode();
     let candidateResult = searchAlphaBetaNode(
@@ -827,7 +827,8 @@ export function analyzeTimeLimitedIterativeDeepeningAlphaBetaSearch(
   validateSearchTimeLimitMilliseconds(timeLimitMilliseconds);
   const startedAt = clock();
   diagnostics?.begin(startedAt, timeLimitMilliseconds, clock);
-  const rootActions = measured(diagnostics, 'root-legal', () => getLegalActions(state, diagnostics?.rootBreakdown ? diagnostics : undefined));
+  const rootActions = measured(diagnostics, 'root-legal', () => getLegalActions(state,
+    diagnostics?.rootBreakdown || diagnostics?.actionValidation ? diagnostics : undefined));
   diagnostics?.rootGenerated(rootActions.length);
   const fallbackAction = rootActions[0] ?? null;
   const iterations: IterativeDeepeningAlphaBetaIterationResult[] = [];
