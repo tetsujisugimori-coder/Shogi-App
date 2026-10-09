@@ -1,5 +1,26 @@
 # SHOGI-APP 開発ログ
 
+## [2026-10-10 JST] PR #176 レビュー指摘の診断整合性修正
+
+- 指定HEAD/PR HEAD=`c77fe6e60339bab516fe34c0e28d9f7e84aff1e0`、fetch後の最新origin/main=`57378c2dfbad1b3d83908cf9dea077824baa4a39`、公開用checkoutはclean。既存ブランチ`diagnose-legal-action-revalidation`を更新し、他checkoutの既存差分は維持。開始時CIはUbuntu/macOS成功。
+- drop own-checkのcallbackを共通化し、qDiagnostics.checkInternalsの詳細王手計測とActionValidationの包含計測を同時維持。無診断時は従来の判定を直接実行し、王手判定・盤面作成の二重実行、ルール/検証順序/早期return/打ち歩詰めの変更なし。boardの既存構造も同時診断テストで確認。
+- getLegalActionsへ末尾の任意ActionValidationDiagnosticsを追加し、既存第二引数からの既定値を維持。通常内部ノードは検証診断だけを渡し、root phases/rootDropsへの混入を防ぐ。timed rootもrootBreakdownの有無と検証診断を分離。q列挙器・公開実行APIの検証は変更なし。
+- 回帰3テスト追加。四診断組合せで合法手順序・全適用state・探索結果/PV/深さ/訪問数・q集計・非破壊が一致。board/drop詳細件数とq own-check件数を照合。深さ1/2およびtimed最大深さ2でroot集計・内部generation増加・execution合計/包含時間/board-drop別件数を確認。修正前にON/ON drop checks=0、深さ2 root盤上2→168回/drop候補81→6,804、rootBreakdown=falseへの混入で失敗することを確認した。
+- 旧5系列JSONLと比較資料は変更なし。fixed-onは詳細王手診断OFF・rootBreakdown ON、深さ1は通常内部生成なしのため旧件数・結論に影響なし。時間は旧実測として保持し再測定値と混同しない。旧監査・比較項目も維持。別日付の説明資料`docs/benchmarks/action-revalidation-review-fixes-20261010.md`へ根拠を記録。
+- 新旧診断2ファイル7件、最終関連5ファイル65件成功。必須4監査（引数付き、別名へ出力）、git diff --check成功。npm run checkのlockfile/型検査成功、通常設定は既存同期大量assertionテストの7.56秒による5秒timeoutで中断。1 fork・標準5秒で全65ファイル/1,759件を実行し1,758件成功、同じ1件だけ7.07秒timeout、終了1。標準timeoutやassertionを弱めず、ローカル全check成功とは報告しない。buildは別途成功。sandboxの既知EPERMにはlocal realpath fallbackとworkspace内TEMP/TMPを使用し、preloadはPR外。更新後CIの通常設定結果はpush後に確認してPRへ報告する。
+- 診断の正確性修正に限定。ルール、公開API安全性、探索/alpha-beta/評価/手順序/静止探索仕様/時間制御/fallback/Worker/UI/棋譜形式の変更、検証省略、専用内部適用経路、高速化、キャッシュ、新規Issue/別PR、自動マージは行わない。
+
+## [2026-10-09 JST] 合法手生成後の実行時再検証診断
+
+- PR #174後の最新main=`57378c2dfbad1b3d83908cf9dea077824baa4a39`から診断専用変更。生成boardは`getLegalMoves`の擬似手・局所盤面・自玉安全判定、実行boardは`executeMove`→`validateMove`の擬似手再生成・全盤面複製・自玉安全判定。生成dropは`getLegalDropSquares`→`validateDrop`、実行dropも`executeDrop`→`validateDrop`を通ることを実コードで確認。公開APIの検証・意味論、ルール、探索/評価/手順序/時間制御/fallback/Worker/UIを維持し、内部適用経路・キャッシュ・高速化は作らない。
+- `SearchDiagnostics`第4引数で任意の粗粒度診断を有効化。generationBoard/generationDrop/executionBoard/executionDropを分離し、executeLegalAction合計・board/drop別、実行API・validation包含、擬似手再生成、盤面準備、自玉王手、条件付き打ち歩詰めを集計。新診断は既存の注入時計だけを使い、OFFで診断オブジェクトやキー生成・JSON化を行わない。王手内部の実走査マス・pawn-mate内応手判定は今回の直接own-check件数に含めない。
+- Windows 10.0.26200 x64 / i7-14650HX / Node v24.20.0、標準評価・標準手順序・静止追加1手（original）。既存4局面g1-p115/g3-p55/g4-p89/g1-p93、棋譜SHA-256=`8b269f95bb3be422ab87fe2e64d1a5dcc342cf53048eb63d3c2424ebfbf1e552`。既存局面復元を再利用し、同期直列・各2ウォームアップ＋5本。mainと変更後の100ms通常探索、両側の固定深さ1 OFF、変更後の固定深さ1 ONを独立5プロセスで測定（140標本）。計測中の未コミット診断差分を生データのdirty=trueと基準HEADで明記し、同一コードを公開用コミットとして保存した。
+- 固定深さ1のboard実行86/71/64/66件、drop実行272/181/207/249件。validateMove/validateDropは各実行につき1回、計1,196回の再検証。生成側のboard候補検証9,858/3,815/2,781/7,150回、validateDrop 51,273/18,306/20,493/47,223回。生成直接own-check合計105,409回に対する実行側1,196回は1.13%。生成側q-own-checkは既存PR #172/#174と一致する。
+- 再検証包含の中央値96.88/74.61/82.56/87.96ms、診断ON API比4.21/7.93/6.83/4.54%。実行dropは全909件で盤面準備・自玉王手確認、打ち歩詰めは各局面1回だけ（生成側286/2/227/261回）。全drop実行はroot、静止探索でのdrop実行0件。A/B・自玉安全確認についてCは成立、Dは未証明。分類は曖昧: 重複は確実だが主要な最適化対象とは断定しない。次PR候補は検証後の状態構築・履歴/反復/終局確認の残余、または静止探索で未実行になるdrop生成量の診断。検証済みLegalAction専用経路は候補に残すが、安全性設計と実装は別PR。
+- 100ms診断OFFは変更前後とも全局面completedDepth=0、各5/5 fallback、timedOut=true、selectedAction・評価null・root候補314/222/249/289一致。固定深さ1の合法手配列/順序、全1,074 root手の適用後state SHA、選択手・評価・PV・深さ・通常/q訪問数をmain/OFF/ONで照合。timestamp/recordIdのみ正規化し、入力は凍結Proxy書込み監視と前後SHAで非破壊確認。時間を通常探索や改善率へ外挿しない。
+- 新規テスト4件、5系列140標本の新比較監査、既存`audit:check-internals`、`audit:q-legal-breakdown`、`audit:check-shortcircuit`成功。`npm run check`もlockfile・型検査・64ファイル1,756テスト・build成功、`git diff --check`成功。Windows sandboxのEPERM回避としてworkspace内TEMP/TMPとnative realpathの標準resolver fallbackをローカルpreloadで使用。標準設定/1 thread workerでは既存同期大量assertionテストが5秒を超え中断し、最終checkはfork 1 worker・runner testTimeout=30秒で成功した。テスト本体・assertion・repo設定は変更せず、標準5秒のローカル全チェック完走は未確認。CI通常設定で確認する。preloadはPRと計測系列には含めない。
+- 生データ5ファイルと比較資料は`docs/benchmarks/action-revalidation-*-20261009.jsonl`、`action-revalidation-comparison-20261009.md`。`measure:action-revalidation` / `audit:action-revalidation`を追加し、既存ファイルはwxで上書きしない。
+
 ## [2026-09-24 JST] 王手判定のboolean専用早期終了
 
 - PR #172の`main`=`2578051`をBeforeとし、`isSquareAttackedBy`のboolean用途だけに最初の攻撃者で終了する経路を追加。正確な攻撃者数を返す`countSquareAttackersBy`、攻撃規則、探索・評価・手順序・時間制御・fallback・Worker/UIは維持。board/drop別の任意診断は実走査マスと早期終了回数を計数する。

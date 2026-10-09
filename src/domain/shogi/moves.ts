@@ -12,6 +12,7 @@ import {
   isKingInCheckProfiled,
 } from './attacks';
 import { isPromotionRequired } from './promotion';
+import type { ActionValidationProbe } from './actionValidationDiagnostics';
 import type { SearchDiagnostics } from './searchDiagnostics';
 
 /**
@@ -134,7 +135,8 @@ export function getLegalMoves(
   squares: BoardSquare[][],
   from: Coordinate | null | undefined,
   currentTurn?: Player,
-  qDiagnostics?: SearchDiagnostics
+  qDiagnostics?: SearchDiagnostics,
+  probe?: ActionValidationProbe
 ): Coordinate[] {
   if (!from || !isWithinBoard(from.row, from.col)) {
     return [];
@@ -150,18 +152,28 @@ export function getLegalMoves(
     return [];
   }
 
-  if (qDiagnostics) {
-    const pseudoMoves = qDiagnostics.measure('q-board-pseudo', () => getPseudoLegalMoves(squares, from, piece));
-    qDiagnostics.qLegalCounts.boardPseudo += pseudoMoves.length;
+  if (qDiagnostics || probe) {
+    const generate = () => getPseudoLegalMoves(squares, from, piece);
+    const generateMeasured = () => qDiagnostics
+      ? qDiagnostics.measure('q-board-pseudo', generate) : generate();
+    const pseudoMoves = probe ? probe.measure('pseudo', generateMeasured) : generateMeasured();
+    if (qDiagnostics) qDiagnostics.qLegalCounts.boardPseudo += pseudoMoves.length;
     const legalMoves: Coordinate[] = [];
     for (const dest of pseudoMoves) {
-      const simulatedSquares = qDiagnostics.measure('q-board-simulate', () => simulateMoveSquaresForKingSafety(squares, from, dest));
-      if (!qDiagnostics.measure('q-board-own-check', () => qDiagnostics.checkInternals
-        ? isKingInCheckProfiled(simulatedSquares, piece.player, qDiagnostics.checkInternals.board)
-        : isKingInCheck(simulatedSquares, piece.player)))
-        legalMoves.push(dest);
+      const validate = () => {
+        const simulate = () => simulateMoveSquaresForKingSafety(squares, from, dest);
+        const simulateMeasured = () => qDiagnostics
+          ? qDiagnostics.measure('q-board-simulate', simulate) : simulate();
+        const simulatedSquares = probe ? probe.measure('board-setup', simulateMeasured) : simulateMeasured();
+        const check = () => qDiagnostics?.checkInternals
+          ? isKingInCheckProfiled(simulatedSquares, piece.player, qDiagnostics.checkInternals.board)
+          : isKingInCheck(simulatedSquares, piece.player);
+        const checkMeasured = () => qDiagnostics ? qDiagnostics.measure('q-board-own-check', check) : check();
+        return !(probe ? probe.measure('own-check', checkMeasured) : checkMeasured());
+      };
+      if (probe ? probe.measure('validation', validate) : validate()) legalMoves.push(dest);
     }
-    qDiagnostics.qLegalCounts.boardLegal += legalMoves.length;
+    if (qDiagnostics) qDiagnostics.qLegalCounts.boardLegal += legalMoves.length;
     return legalMoves;
   }
 

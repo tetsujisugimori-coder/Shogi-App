@@ -4,6 +4,7 @@
  * and dual execution modes (Assist mode for UI / Strict mode for AI & engine experiments).
  */
 
+import type { ActionValidationProbe } from './actionValidationDiagnostics';
 import {
   BoardState,
   ExecutionMode,
@@ -247,7 +248,8 @@ export function executeMove(
   state: BoardState,
   from: Coordinate,
   to: Coordinate,
-  options: ExecuteMoveOptions = {}
+  options: ExecuteMoveOptions = {},
+  probe?: ActionValidationProbe
 ): MoveExecutionResult {
   const proposer = options.proposer ?? 'human';
   const mode = options.mode ?? determineDefaultExecutionMode(proposer);
@@ -262,7 +264,7 @@ export function executeMove(
     };
   }
 
-  let validation: MoveValidationResult = validateMove(state, from, to);
+  let validation: MoveValidationResult = probe ? probe.measure('validation', () => validateMove(state, from, to, probe)) : validateMove(state, from, to);
   let movePromotion: MovePromotion = 'none';
 
   if (validation.isValid) {

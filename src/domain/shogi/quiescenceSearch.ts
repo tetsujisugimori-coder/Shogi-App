@@ -57,9 +57,9 @@ function cloneBreakdown(breakdown: SearchEvaluationBreakdown): SearchEvaluationB
   return { ...breakdown };
 }
 
-function executeSearchAction(state: BoardState, action: LegalAction): BoardState {
+function executeSearchAction(state: BoardState, action: LegalAction, diagnostics?: SearchDiagnostics): BoardState {
   // executeLegalAction already creates a successor without changing state.
-  const execution = executeLegalAction(state, action);
+  const execution = executeLegalAction(state, action, undefined, diagnostics);
   if (execution.type !== 'applied') {
     throw new Error('A generated legal action could not be executed during quiescence search.');
   }
@@ -136,7 +136,7 @@ function searchNode(
     diagnostics?.setStage('before-quiescence-candidate');
     interruptionCheck?.();
     const action = orderedCandidates[actionIndex];
-    const child = measured(diagnostics, 'q-execute', () => executeSearchAction(state, action));
+    const child = measured(diagnostics, 'q-execute', () => executeSearchAction(state, action, diagnostics));
     statistics.visitedPositionCount += 1;
     diagnostics?.setStage('after-quiescence-action');
     interruptionCheck?.();

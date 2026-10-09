@@ -13,6 +13,7 @@ import {
   Player,
   ProposerType,
 } from '../../types/shogi';
+import type { ActionValidationDiagnostics, ActionValidationProbe } from './actionValidationDiagnostics';
 import { Coordinate } from './coordinates';
 import { getLegalDropSquares } from './dropRules';
 import { DropExecutionResult, executeDrop } from './drops';
@@ -84,7 +85,10 @@ function compareIds(left: string, right: string): number {
  * hand contains identical pieces, the lexicographically smallest ID is the
  * representative action because the destinations are otherwise equivalent.
  */
-export function getLegalActions(state: BoardState, diagnostics?: SearchDiagnostics): LegalAction[] {
+// The second argument records root breakdown only. Internal nodes pass just the
+// third argument, keeping generation validation separate from root aggregates.
+export function getLegalActions(state: BoardState, diagnostics?: SearchDiagnostics,
+  actionValidation: ActionValidationDiagnostics | undefined = diagnostics?.actionValidation ?? undefined): LegalAction[] {
   if (state.status === 'ended') return [];
 
   const actions: LegalAction[] = [];
@@ -95,7 +99,7 @@ export function getLegalActions(state: BoardState, diagnostics?: SearchDiagnosti
       if (!piece || piece.player !== state.turn) continue;
 
       const from = { row, col };
-      const destinations = measured(diagnostics, 'root-piece-moves', () => getLegalMoves(state.squares, from, state.turn))
+      const destinations = measured(diagnostics, 'root-piece-moves', () => getLegalMoves(state.squares, from, state.turn, undefined, actionValidation?.generationBoard))
         .slice()
         .sort(compareCoordinates);
 
@@ -138,7 +142,7 @@ export function getLegalActions(state: BoardState, diagnostics?: SearchDiagnosti
 
     const destinations = measured(diagnostics, 'root-hand-drops', () => {
       const began = diagnostics ? diagnostics.now() : 0;
-      const squares = getLegalDropSquares(state, representativePieceId, diagnostics);
+      const squares = getLegalDropSquares(state, representativePieceId, diagnostics, undefined, actionValidation?.generationDrop);
       if (diagnostics) {
         const duration = Math.max(0, diagnostics.now() - began);
         const entry = diagnostics.rootDrops[pieceType];
@@ -177,7 +181,7 @@ export function getQuiescenceLegalActionsWithDiagnostics(state: BoardState,
       const from = { row, col };
       diagnostics.qLegalCounts.boardSources++;
       const destinations = diagnostics.measure('q-board-moves', () =>
-        getLegalMoves(state.squares, from, state.turn, diagnostics)).slice().sort(compareCoordinates);
+        getLegalMoves(state.squares, from, state.turn, diagnostics, diagnostics.actionValidation?.generationBoard)).slice().sort(compareCoordinates);
       const before = actions.length;
       for (const destination of destinations) {
         const promotionStatus = getPromotionStatus(piece, from, destination);
@@ -199,7 +203,7 @@ export function getQuiescenceLegalActionsWithDiagnostics(state: BoardState,
     if (!representativePieceId) continue;
     diagnostics.qLegalCounts.dropTypes++;
     const destinations = diagnostics.measure('q-hand-drops', () =>
-      getLegalDropSquares(state, representativePieceId, undefined, diagnostics)).slice().sort(compareCoordinates);
+      getLegalDropSquares(state, representativePieceId, undefined, diagnostics, diagnostics.actionValidation?.generationDrop)).slice().sort(compareCoordinates);
     for (const destination of destinations) {
       actions.push({ kind: 'drop', player: state.turn, pieceId: representativePieceId,
         pieceType, to: copyCoordinate(destination), promotion: 'none' });
@@ -214,18 +218,28 @@ export function getQuiescenceLegalActionsWithDiagnostics(state: BoardState,
 export function executeLegalAction(
   state: BoardState,
   action: LegalAction,
-  options: ExecuteLegalActionOptions = {}
+  options: ExecuteLegalActionOptions = {},
+  diagnostics?: SearchDiagnostics
 ): LegalActionExecutionResult {
+  const probe = action.kind === 'drop' ? diagnostics?.actionValidation?.executionDrop
+    : diagnostics?.actionValidation?.executionBoard;
+  return probe ? probe.measure('execute-action', () => executeLegalActionValidated(state, action, options, probe))
+    : executeLegalActionValidated(state, action, options);
+}
+
+function executeLegalActionValidated(state: BoardState, action: LegalAction,
+  options: ExecuteLegalActionOptions, probe?: ActionValidationProbe): LegalActionExecutionResult {
   if (action.kind === 'drop') {
-    return executeDrop(state, action.pieceId, action.to, options);
+    return probe ? probe.measure('execute-api', () => executeDrop(state, action.pieceId, action.to, options, probe))
+      : executeDrop(state, action.pieceId, action.to, options);
   }
 
   if (action.promotion === 'none') {
-    return executeMove(state, action.from, action.to, options);
+    return probe ? probe.measure('execute-api', () => executeMove(state, action.from, action.to, options, probe))
+      : executeMove(state, action.from, action.to, options);
   }
 
-  return executeMove(state, action.from, action.to, {
-    ...options,
-    promotion: action.promotion,
-  });
+  const moveOptions = { ...options, promotion: action.promotion };
+  return probe ? probe.measure('execute-api', () => executeMove(state, action.from, action.to, moveOptions, probe))
+    : executeMove(state, action.from, action.to, moveOptions);
 }

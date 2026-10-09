@@ -1,3 +1,4 @@
+import { ActionValidationDiagnostics } from './actionValidationDiagnostics';
 import type { PieceType } from '../../types/shogi';
 import { CheckInternalsProbe } from './checkInternalsDiagnostics';
 
@@ -60,8 +61,10 @@ export class SearchDiagnostics {
     knight: dropEntry(), lance: dropEntry(), pawn: dropEntry(),
   };
   readonly checkInternals: { board: CheckInternalsProbe; drop: CheckInternalsProbe } | null;
+  readonly actionValidation: ActionValidationDiagnostics | null;
   constructor(readonly rootDropStageTiming = false, readonly rootBreakdown = true,
-    checkInternals = false) {
+    checkInternals = false, actionValidation = false) {
+    this.actionValidation = actionValidation ? new ActionValidationDiagnostics(() => this.now()) : null;
     this.checkInternals = checkInternals
       ? { board: new CheckInternalsProbe(), drop: new CheckInternalsProbe() } : null;
   }
