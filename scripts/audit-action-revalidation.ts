@@ -143,6 +143,14 @@ for (const position of positions) {
   }
 }
 lines.push('', 'executeLegalAction総数・包含時間はexecutionBoard.execute-action＋executionDrop.execute-action。同項目を分けて示す上表から総数を再現できる。生成dropのvalidationは早期棄却を含む全候補で、実行側の合法dropだけとは母集団が異なる。pawn-drop-mateはガードを通った実処理回数（歩打ち全件数ではない）。',
+  '', '| 局面 | execute API包含－validation包含の残余ms（中央値） |', '| --- | ---: |');
+for (const position of positions) {
+  const rows = measurement(on, position.id);
+  lines.push(`| ${position.id} | ${f(median(rows.map(row => ['executionBoard', 'executionDrop'].reduce((sum, origin) =>
+    sum + row.diagnostics.actionValidation[origin]['execute-api'].inclusiveMilliseconds -
+      row.diagnostics.actionValidation[origin].validation.inclusiveMilliseconds, 0))))} |`);
+}
+lines.push('', 'この残余には成り検証、状態構築、履歴/反復・終局確認などを含む。今回その内部を分解しておらず、どれが支配的かは断定しない。',
   '', '## 診断OFFの通常100ms探索', '',
   '| 局面 | main→変更後 API中央値ms | main→変更後 completedDepth（各本） | main→変更後 fallback | root候補 |',
   '| --- | ---: | --- | ---: | ---: |');

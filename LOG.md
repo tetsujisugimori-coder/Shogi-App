@@ -1,5 +1,16 @@
 # SHOGI-APP 開発ログ
 
+## [2026-10-09 JST] 合法手生成後の実行時再検証診断
+
+- PR #174後の最新main=`57378c2dfbad1b3d83908cf9dea077824baa4a39`から診断専用変更。生成boardは`getLegalMoves`の擬似手・局所盤面・自玉安全判定、実行boardは`executeMove`→`validateMove`の擬似手再生成・全盤面複製・自玉安全判定。生成dropは`getLegalDropSquares`→`validateDrop`、実行dropも`executeDrop`→`validateDrop`を通ることを実コードで確認。公開APIの検証・意味論、ルール、探索/評価/手順序/時間制御/fallback/Worker/UIを維持し、内部適用経路・キャッシュ・高速化は作らない。
+- `SearchDiagnostics`第4引数で任意の粗粒度診断を有効化。generationBoard/generationDrop/executionBoard/executionDropを分離し、executeLegalAction合計・board/drop別、実行API・validation包含、擬似手再生成、盤面準備、自玉王手、条件付き打ち歩詰めを集計。新診断は既存の注入時計だけを使い、OFFで診断オブジェクトやキー生成・JSON化を行わない。王手内部の実走査マス・pawn-mate内応手判定は今回の直接own-check件数に含めない。
+- Windows 10.0.26200 x64 / i7-14650HX / Node v24.20.0、標準評価・標準手順序・静止追加1手（original）。既存4局面g1-p115/g3-p55/g4-p89/g1-p93、棋譜SHA-256=`8b269f95bb3be422ab87fe2e64d1a5dcc342cf53048eb63d3c2424ebfbf1e552`。既存局面復元を再利用し、同期直列・各2ウォームアップ＋5本。mainと変更後の100ms通常探索、両側の固定深さ1 OFF、変更後の固定深さ1 ONを独立5プロセスで測定（140標本）。計測中の未コミット診断差分を生データのdirty=trueと基準HEADで明記し、同一コードを公開用コミットとして保存した。
+- 固定深さ1のboard実行86/71/64/66件、drop実行272/181/207/249件。validateMove/validateDropは各実行につき1回、計1,196回の再検証。生成側のboard候補検証9,858/3,815/2,781/7,150回、validateDrop 51,273/18,306/20,493/47,223回。生成直接own-check合計105,409回に対する実行側1,196回は1.13%。生成側q-own-checkは既存PR #172/#174と一致する。
+- 再検証包含の中央値96.88/74.61/82.56/87.96ms、診断ON API比4.21/7.93/6.83/4.54%。実行dropは全909件で盤面準備・自玉王手確認、打ち歩詰めは各局面1回だけ（生成側286/2/227/261回）。全drop実行はroot、静止探索でのdrop実行0件。A/B・自玉安全確認についてCは成立、Dは未証明。分類は曖昧: 重複は確実だが主要な最適化対象とは断定しない。次PR候補は検証後の状態構築・履歴/反復/終局確認の残余、または静止探索で未実行になるdrop生成量の診断。検証済みLegalAction専用経路は候補に残すが、安全性設計と実装は別PR。
+- 100ms診断OFFは変更前後とも全局面completedDepth=0、各5/5 fallback、timedOut=true、selectedAction・評価null・root候補314/222/249/289一致。固定深さ1の合法手配列/順序、全1,074 root手の適用後state SHA、選択手・評価・PV・深さ・通常/q訪問数をmain/OFF/ONで照合。timestamp/recordIdのみ正規化し、入力は凍結Proxy書込み監視と前後SHAで非破壊確認。時間を通常探索や改善率へ外挿しない。
+- 新規テスト4件、5系列140標本の新比較監査、既存`audit:check-internals`、`audit:q-legal-breakdown`、`audit:check-shortcircuit`成功。`npm run check`もlockfile・型検査・64ファイル1,756テスト・build成功、`git diff --check`成功。Windows sandboxのEPERM回避としてworkspace内TEMP/TMPとnative realpathの標準resolver fallbackをローカルpreloadで使用。標準設定/1 thread workerでは既存同期大量assertionテストが5秒を超え中断し、最終checkはfork 1 worker・runner testTimeout=30秒で成功した。テスト本体・assertion・repo設定は変更せず、標準5秒のローカル全チェック完走は未確認。CI通常設定で確認する。preloadはPRと計測系列には含めない。
+- 生データ5ファイルと比較資料は`docs/benchmarks/action-revalidation-*-20261009.jsonl`、`action-revalidation-comparison-20261009.md`。`measure:action-revalidation` / `audit:action-revalidation`を追加し、既存ファイルはwxで上書きしない。
+
 ## [2026-09-24 JST] 王手判定のboolean専用早期終了
 
 - PR #172の`main`=`2578051`をBeforeとし、`isSquareAttackedBy`のboolean用途だけに最初の攻撃者で終了する経路を追加。正確な攻撃者数を返す`countSquareAttackersBy`、攻撃規則、探索・評価・手順序・時間制御・fallback・Worker/UIは維持。board/drop別の任意診断は実走査マスと早期終了回数を計数する。
