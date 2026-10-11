@@ -1,5 +1,15 @@
 # SHOGI-APP
 
+## SEE内部の協調的中断（2026-10-12）
+
+明示的な `moveOrdering: 'static-exchange'` が使うSEEへ、探索の既存の中断確認を渡します。準備の合法手生成、基準駒得評価、交換再帰のノード進入・合法な取り返し生成・候補適用・再帰復帰・結果返却の境界で確認します。SEE内に時計や別deadlineは作りません。中断例外をそのまま探索へ伝播し、部分的なSEE値・手順序・反復結果は採用しません。最後の完了反復、または未完了時の既存の合法手fallback（評価null・空PV・完了統計0）を返します。
+
+公開 `evaluateStaticExchange(state, action, table?)` と中断確認なしの準備呼出しは互換です。既定standard、静止探索のoriginal/materialはSEEを開始しません。深さ1のrootは従来の合法手順を保持するためSEEを実行せず、SEEは深さ2以降のroot再順序付け・内部通常ノードで実行されます。
+
+単一の同期処理（合法手生成、着手適用内の検証・履歴・終局判定、複製など）は引き続き強制中断できません。100ms以内の厳密復帰や棋力改善を保証する変更ではありません。[比較記録](docs/benchmarks/see-deadline-comparison-20261012.md)に決定的な回帰、修正前後の100/1,000ms測定と制約を記載しています。報告局面は取得できず、別の構成局面では15秒超を再現していません。
+
+隔離測定を再実行する場合は `node --import tsx scripts/measure-see-deadline.ts after docs/benchmarks/see-deadline-local.jsonl` を使います。出力は新規作成のみで、各同期測定を親プロセスの20秒打切りで保護します。この打切りは検証専用で、アプリのWorkerへは導入していません。
+
 ## 深さ1と100ms超過の工程診断（2026-09-24）
 
 PR #154の[保存済み100ms棋譜](docs/benchmarks/timed-fallback-100ms-20260924.jsonl)から7局面を合法手で再生します。`g1-p5`、`g1-p30`が序盤、`g2-p54`、`g3-p55`が中盤、`g4-p89`、`g2-p92`、`g1-p115`が後半です。`g1-p5`・`g2-p54`・`g2-p92`は元の棋譜で深さ1以上を完走し、ほかはfallbackでした。`g1-p115`は元の最大実時間333.57msの手です。局面IDの`g`は保存棋譜のexecutionIndex、`p`は次の着手番号です。初期局面から直前まで全手を`executeLegalAction`で再生し、`history`、`positionHistory`、`positionSnapshots`を含む状態を保持します。各着手前のpositionKeyと、元棋譜の合法手を照合します。

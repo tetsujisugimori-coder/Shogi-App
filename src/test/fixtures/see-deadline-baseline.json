@@ -1,0 +1,1417 @@
+{
+  "base": "5d1f83ed9db821c445f295eb15e365491740acea",
+  "captures": [
+    {
+      "action": {
+        "kind": "move",
+        "player": "sente",
+        "from": {
+          "row": 2,
+          "col": 2
+        },
+        "to": {
+          "row": 4,
+          "col": 0
+        },
+        "pieceType": "bishop",
+        "promotion": "decline"
+      },
+      "value": 2000
+    },
+    {
+      "action": {
+        "kind": "move",
+        "player": "sente",
+        "from": {
+          "row": 2,
+          "col": 2
+        },
+        "to": {
+          "row": 4,
+          "col": 0
+        },
+        "pieceType": "bishop",
+        "promotion": "promote"
+      },
+      "value": 2200
+    },
+    {
+      "action": {
+        "kind": "move",
+        "player": "sente",
+        "from": {
+          "row": 2,
+          "col": 2
+        },
+        "to": {
+          "row": 4,
+          "col": 4
+        },
+        "pieceType": "bishop",
+        "promotion": "decline"
+      },
+      "value": -400
+    },
+    {
+      "action": {
+        "kind": "move",
+        "player": "sente",
+        "from": {
+          "row": 2,
+          "col": 2
+        },
+        "to": {
+          "row": 4,
+          "col": 4
+        },
+        "pieceType": "bishop",
+        "promotion": "promote"
+      },
+      "value": -400
+    },
+    {
+      "action": {
+        "kind": "move",
+        "player": "sente",
+        "from": {
+          "row": 5,
+          "col": 4
+        },
+        "to": {
+          "row": 4,
+          "col": 4
+        },
+        "pieceType": "rook",
+        "promotion": "none"
+      },
+      "value": -600
+    },
+    {
+      "action": {
+        "kind": "move",
+        "player": "sente",
+        "from": {
+          "row": 5,
+          "col": 5
+        },
+        "to": {
+          "row": 4,
+          "col": 4
+        },
+        "pieceType": "silver",
+        "promotion": "none"
+      },
+      "value": 200
+    }
+  ],
+  "standard": {
+    "ordered": [
+      {
+        "kind": "move",
+        "player": "sente",
+        "from": {
+          "row": 2,
+          "col": 2
+        },
+        "to": {
+          "row": 4,
+          "col": 0
+        },
+        "pieceType": "bishop",
+        "promotion": "promote"
+      },
+      {
+        "kind": "move",
+        "player": "sente",
+        "from": {
+          "row": 2,
+          "col": 2
+        },
+        "to": {
+          "row": 4,
+          "col": 4
+        },
+        "pieceType": "bishop",
+        "promotion": "promote"
+      },
+      {
+        "kind": "move",
+        "player": "sente",
+        "from": {
+          "row": 2,
+          "col": 2
+        },
+        "to": {
+          "row": 4,
+          "col": 0
+        },
+        "pieceType": "bishop",
+        "promotion": "decline"
+      },
+      {
+        "kind": "move",
+        "player": "sente",
+        "from": {
+          "row": 2,
+          "col": 2
+        },
+        "to": {
+          "row": 4,
+          "col": 4
+        },
+        "pieceType": "bishop",
+        "promotion": "decline"
+      },
+      {
+        "kind": "move",
+        "player": "sente",
+        "from": {
+          "row": 5,
+          "col": 4
+        },
+        "to": {
+          "row": 4,
+          "col": 4
+        },
+        "pieceType": "rook",
+        "promotion": "none"
+      },
+      {
+        "kind": "move",
+        "player": "sente",
+        "from": {
+          "row": 5,
+          "col": 5
+        },
+        "to": {
+          "row": 4,
+          "col": 4
+        },
+        "pieceType": "silver",
+        "promotion": "none"
+      },
+      {
+        "kind": "move",
+        "player": "sente",
+        "from": {
+          "row": 2,
+          "col": 2
+        },
+        "to": {
+          "row": 0,
+          "col": 0
+        },
+        "pieceType": "bishop",
+        "promotion": "promote"
+      },
+      {
+        "kind": "move",
+        "player": "sente",
+        "from": {
+          "row": 2,
+          "col": 2
+        },
+        "to": {
+          "row": 0,
+          "col": 4
+        },
+        "pieceType": "bishop",
+        "promotion": "promote"
+      },
+      {
+        "kind": "move",
+        "player": "sente",
+        "from": {
+          "row": 2,
+          "col": 2
+        },
+        "to": {
+          "row": 1,
+          "col": 1
+        },
+        "pieceType": "bishop",
+        "promotion": "promote"
+      },
+      {
+        "kind": "move",
+        "player": "sente",
+        "from": {
+          "row": 2,
+          "col": 2
+        },
+        "to": {
+          "row": 1,
+          "col": 3
+        },
+        "pieceType": "bishop",
+        "promotion": "promote"
+      },
+      {
+        "kind": "move",
+        "player": "sente",
+        "from": {
+          "row": 2,
+          "col": 2
+        },
+        "to": {
+          "row": 3,
+          "col": 1
+        },
+        "pieceType": "bishop",
+        "promotion": "promote"
+      },
+      {
+        "kind": "move",
+        "player": "sente",
+        "from": {
+          "row": 2,
+          "col": 2
+        },
+        "to": {
+          "row": 3,
+          "col": 3
+        },
+        "pieceType": "bishop",
+        "promotion": "promote"
+      },
+      {
+        "kind": "move",
+        "player": "sente",
+        "from": {
+          "row": 2,
+          "col": 2
+        },
+        "to": {
+          "row": 0,
+          "col": 0
+        },
+        "pieceType": "bishop",
+        "promotion": "decline"
+      },
+      {
+        "kind": "move",
+        "player": "sente",
+        "from": {
+          "row": 2,
+          "col": 2
+        },
+        "to": {
+          "row": 0,
+          "col": 4
+        },
+        "pieceType": "bishop",
+        "promotion": "decline"
+      },
+      {
+        "kind": "move",
+        "player": "sente",
+        "from": {
+          "row": 2,
+          "col": 2
+        },
+        "to": {
+          "row": 1,
+          "col": 1
+        },
+        "pieceType": "bishop",
+        "promotion": "decline"
+      },
+      {
+        "kind": "move",
+        "player": "sente",
+        "from": {
+          "row": 2,
+          "col": 2
+        },
+        "to": {
+          "row": 1,
+          "col": 3
+        },
+        "pieceType": "bishop",
+        "promotion": "decline"
+      },
+      {
+        "kind": "move",
+        "player": "sente",
+        "from": {
+          "row": 2,
+          "col": 2
+        },
+        "to": {
+          "row": 3,
+          "col": 1
+        },
+        "pieceType": "bishop",
+        "promotion": "decline"
+      },
+      {
+        "kind": "move",
+        "player": "sente",
+        "from": {
+          "row": 2,
+          "col": 2
+        },
+        "to": {
+          "row": 3,
+          "col": 3
+        },
+        "pieceType": "bishop",
+        "promotion": "decline"
+      },
+      {
+        "kind": "move",
+        "player": "sente",
+        "from": {
+          "row": 5,
+          "col": 4
+        },
+        "to": {
+          "row": 5,
+          "col": 0
+        },
+        "pieceType": "rook",
+        "promotion": "none"
+      },
+      {
+        "kind": "move",
+        "player": "sente",
+        "from": {
+          "row": 5,
+          "col": 4
+        },
+        "to": {
+          "row": 5,
+          "col": 1
+        },
+        "pieceType": "rook",
+        "promotion": "none"
+      },
+      {
+        "kind": "move",
+        "player": "sente",
+        "from": {
+          "row": 5,
+          "col": 4
+        },
+        "to": {
+          "row": 5,
+          "col": 2
+        },
+        "pieceType": "rook",
+        "promotion": "none"
+      },
+      {
+        "kind": "move",
+        "player": "sente",
+        "from": {
+          "row": 5,
+          "col": 4
+        },
+        "to": {
+          "row": 5,
+          "col": 3
+        },
+        "pieceType": "rook",
+        "promotion": "none"
+      },
+      {
+        "kind": "move",
+        "player": "sente",
+        "from": {
+          "row": 5,
+          "col": 5
+        },
+        "to": {
+          "row": 4,
+          "col": 5
+        },
+        "pieceType": "silver",
+        "promotion": "none"
+      },
+      {
+        "kind": "move",
+        "player": "sente",
+        "from": {
+          "row": 5,
+          "col": 5
+        },
+        "to": {
+          "row": 4,
+          "col": 6
+        },
+        "pieceType": "silver",
+        "promotion": "none"
+      },
+      {
+        "kind": "move",
+        "player": "sente",
+        "from": {
+          "row": 5,
+          "col": 5
+        },
+        "to": {
+          "row": 6,
+          "col": 6
+        },
+        "pieceType": "silver",
+        "promotion": "none"
+      },
+      {
+        "kind": "move",
+        "player": "sente",
+        "from": {
+          "row": 8,
+          "col": 8
+        },
+        "to": {
+          "row": 7,
+          "col": 7
+        },
+        "pieceType": "king",
+        "promotion": "none"
+      },
+      {
+        "kind": "move",
+        "player": "sente",
+        "from": {
+          "row": 8,
+          "col": 8
+        },
+        "to": {
+          "row": 7,
+          "col": 8
+        },
+        "pieceType": "king",
+        "promotion": "none"
+      },
+      {
+        "kind": "move",
+        "player": "sente",
+        "from": {
+          "row": 8,
+          "col": 8
+        },
+        "to": {
+          "row": 8,
+          "col": 7
+        },
+        "pieceType": "king",
+        "promotion": "none"
+      }
+    ],
+    "fixed": {
+      "selectedAction": {
+        "kind": "move",
+        "player": "sente",
+        "from": {
+          "row": 2,
+          "col": 2
+        },
+        "to": {
+          "row": 4,
+          "col": 0
+        },
+        "pieceType": "bishop",
+        "promotion": "promote"
+      },
+      "selectedEvaluation": 1110,
+      "principalVariation": [
+        {
+          "kind": "move",
+          "player": "sente",
+          "from": {
+            "row": 2,
+            "col": 2
+          },
+          "to": {
+            "row": 4,
+            "col": 0
+          },
+          "pieceType": "bishop",
+          "promotion": "promote"
+        },
+        {
+          "kind": "move",
+          "player": "gote",
+          "from": {
+            "row": 4,
+            "col": 4
+          },
+          "to": {
+            "row": 5,
+            "col": 4
+          },
+          "pieceType": "pawn",
+          "promotion": "none"
+        }
+      ],
+      "evaluationBreakdown": {
+        "total": 1110,
+        "material": 1100,
+        "pieceSquare": 0,
+        "kingSafety": 0,
+        "undefendedPieceSafety": 10,
+        "terminal": null
+      },
+      "rootLegalActionCount": 28,
+      "depth": 2,
+      "visitedPositionCount": 182,
+      "cutoffCount": 21,
+      "skippedActionCount": 450,
+      "quiescenceLeafCount": 0,
+      "quiescenceVisitedPositionCount": 0,
+      "quiescenceCutoffCount": 0,
+      "quiescenceSkippedActionCount": 0,
+      "elapsedMilliseconds": 0
+    },
+    "timed": {
+      "selectedAction": {
+        "kind": "move",
+        "player": "sente",
+        "from": {
+          "row": 2,
+          "col": 2
+        },
+        "to": {
+          "row": 4,
+          "col": 0
+        },
+        "pieceType": "bishop",
+        "promotion": "promote"
+      },
+      "selectedEvaluation": 1110,
+      "principalVariation": [
+        {
+          "kind": "move",
+          "player": "sente",
+          "from": {
+            "row": 2,
+            "col": 2
+          },
+          "to": {
+            "row": 4,
+            "col": 0
+          },
+          "pieceType": "bishop",
+          "promotion": "promote"
+        },
+        {
+          "kind": "move",
+          "player": "gote",
+          "from": {
+            "row": 4,
+            "col": 4
+          },
+          "to": {
+            "row": 5,
+            "col": 4
+          },
+          "pieceType": "pawn",
+          "promotion": "none"
+        }
+      ],
+      "evaluationBreakdown": {
+        "total": 1110,
+        "material": 1100,
+        "pieceSquare": 0,
+        "kingSafety": 0,
+        "undefendedPieceSafety": 10,
+        "terminal": null
+      },
+      "rootLegalActionCount": 28,
+      "depth": 2,
+      "visitedPositionCount": 64,
+      "cutoffCount": 27,
+      "skippedActionCount": 568,
+      "quiescenceLeafCount": 0,
+      "quiescenceVisitedPositionCount": 0,
+      "quiescenceCutoffCount": 0,
+      "quiescenceSkippedActionCount": 0,
+      "elapsedMilliseconds": 0,
+      "requestedMaxDepth": 2,
+      "completedDepth": 2,
+      "timedOut": false,
+      "resultSource": "completed-iteration",
+      "iterations": [
+        {
+          "selectedAction": {
+            "kind": "move",
+            "player": "sente",
+            "from": {
+              "row": 2,
+              "col": 2
+            },
+            "to": {
+              "row": 4,
+              "col": 0
+            },
+            "pieceType": "bishop",
+            "promotion": "promote"
+          },
+          "selectedEvaluation": 3103,
+          "principalVariation": [
+            {
+              "kind": "move",
+              "player": "sente",
+              "from": {
+                "row": 2,
+                "col": 2
+              },
+              "to": {
+                "row": 4,
+                "col": 0
+              },
+              "pieceType": "bishop",
+              "promotion": "promote"
+            }
+          ],
+          "evaluationBreakdown": {
+            "total": 3103,
+            "material": 3100,
+            "pieceSquare": 3,
+            "kingSafety": 0,
+            "undefendedPieceSafety": 0,
+            "terminal": null
+          },
+          "rootLegalActionCount": 28,
+          "depth": 1,
+          "visitedPositionCount": 28,
+          "cutoffCount": 0,
+          "skippedActionCount": 0,
+          "quiescenceLeafCount": 0,
+          "quiescenceVisitedPositionCount": 0,
+          "quiescenceCutoffCount": 0,
+          "quiescenceSkippedActionCount": 0,
+          "elapsedMilliseconds": 0
+        },
+        {
+          "selectedAction": {
+            "kind": "move",
+            "player": "sente",
+            "from": {
+              "row": 2,
+              "col": 2
+            },
+            "to": {
+              "row": 4,
+              "col": 0
+            },
+            "pieceType": "bishop",
+            "promotion": "promote"
+          },
+          "selectedEvaluation": 1110,
+          "principalVariation": [
+            {
+              "kind": "move",
+              "player": "sente",
+              "from": {
+                "row": 2,
+                "col": 2
+              },
+              "to": {
+                "row": 4,
+                "col": 0
+              },
+              "pieceType": "bishop",
+              "promotion": "promote"
+            },
+            {
+              "kind": "move",
+              "player": "gote",
+              "from": {
+                "row": 4,
+                "col": 4
+              },
+              "to": {
+                "row": 5,
+                "col": 4
+              },
+              "pieceType": "pawn",
+              "promotion": "none"
+            }
+          ],
+          "evaluationBreakdown": {
+            "total": 1110,
+            "material": 1100,
+            "pieceSquare": 0,
+            "kingSafety": 0,
+            "undefendedPieceSafety": 10,
+            "terminal": null
+          },
+          "rootLegalActionCount": 28,
+          "depth": 2,
+          "visitedPositionCount": 64,
+          "cutoffCount": 27,
+          "skippedActionCount": 568,
+          "quiescenceLeafCount": 0,
+          "quiescenceVisitedPositionCount": 0,
+          "quiescenceCutoffCount": 0,
+          "quiescenceSkippedActionCount": 0,
+          "elapsedMilliseconds": 0
+        }
+      ],
+      "totalVisitedPositionCount": 92,
+      "totalCutoffCount": 27,
+      "totalSkippedActionCount": 568,
+      "totalQuiescenceLeafCount": 0,
+      "totalQuiescenceVisitedPositionCount": 0,
+      "totalQuiescenceCutoffCount": 0,
+      "totalQuiescenceSkippedActionCount": 0
+    }
+  },
+  "static-exchange": {
+    "ordered": [
+      {
+        "kind": "move",
+        "player": "sente",
+        "from": {
+          "row": 2,
+          "col": 2
+        },
+        "to": {
+          "row": 4,
+          "col": 0
+        },
+        "pieceType": "bishop",
+        "promotion": "promote"
+      },
+      {
+        "kind": "move",
+        "player": "sente",
+        "from": {
+          "row": 2,
+          "col": 2
+        },
+        "to": {
+          "row": 4,
+          "col": 0
+        },
+        "pieceType": "bishop",
+        "promotion": "decline"
+      },
+      {
+        "kind": "move",
+        "player": "sente",
+        "from": {
+          "row": 5,
+          "col": 5
+        },
+        "to": {
+          "row": 4,
+          "col": 4
+        },
+        "pieceType": "silver",
+        "promotion": "none"
+      },
+      {
+        "kind": "move",
+        "player": "sente",
+        "from": {
+          "row": 2,
+          "col": 2
+        },
+        "to": {
+          "row": 4,
+          "col": 4
+        },
+        "pieceType": "bishop",
+        "promotion": "decline"
+      },
+      {
+        "kind": "move",
+        "player": "sente",
+        "from": {
+          "row": 2,
+          "col": 2
+        },
+        "to": {
+          "row": 4,
+          "col": 4
+        },
+        "pieceType": "bishop",
+        "promotion": "promote"
+      },
+      {
+        "kind": "move",
+        "player": "sente",
+        "from": {
+          "row": 5,
+          "col": 4
+        },
+        "to": {
+          "row": 4,
+          "col": 4
+        },
+        "pieceType": "rook",
+        "promotion": "none"
+      },
+      {
+        "kind": "move",
+        "player": "sente",
+        "from": {
+          "row": 2,
+          "col": 2
+        },
+        "to": {
+          "row": 0,
+          "col": 0
+        },
+        "pieceType": "bishop",
+        "promotion": "promote"
+      },
+      {
+        "kind": "move",
+        "player": "sente",
+        "from": {
+          "row": 2,
+          "col": 2
+        },
+        "to": {
+          "row": 0,
+          "col": 4
+        },
+        "pieceType": "bishop",
+        "promotion": "promote"
+      },
+      {
+        "kind": "move",
+        "player": "sente",
+        "from": {
+          "row": 2,
+          "col": 2
+        },
+        "to": {
+          "row": 1,
+          "col": 1
+        },
+        "pieceType": "bishop",
+        "promotion": "promote"
+      },
+      {
+        "kind": "move",
+        "player": "sente",
+        "from": {
+          "row": 2,
+          "col": 2
+        },
+        "to": {
+          "row": 1,
+          "col": 3
+        },
+        "pieceType": "bishop",
+        "promotion": "promote"
+      },
+      {
+        "kind": "move",
+        "player": "sente",
+        "from": {
+          "row": 2,
+          "col": 2
+        },
+        "to": {
+          "row": 3,
+          "col": 1
+        },
+        "pieceType": "bishop",
+        "promotion": "promote"
+      },
+      {
+        "kind": "move",
+        "player": "sente",
+        "from": {
+          "row": 2,
+          "col": 2
+        },
+        "to": {
+          "row": 3,
+          "col": 3
+        },
+        "pieceType": "bishop",
+        "promotion": "promote"
+      },
+      {
+        "kind": "move",
+        "player": "sente",
+        "from": {
+          "row": 2,
+          "col": 2
+        },
+        "to": {
+          "row": 0,
+          "col": 0
+        },
+        "pieceType": "bishop",
+        "promotion": "decline"
+      },
+      {
+        "kind": "move",
+        "player": "sente",
+        "from": {
+          "row": 2,
+          "col": 2
+        },
+        "to": {
+          "row": 0,
+          "col": 4
+        },
+        "pieceType": "bishop",
+        "promotion": "decline"
+      },
+      {
+        "kind": "move",
+        "player": "sente",
+        "from": {
+          "row": 2,
+          "col": 2
+        },
+        "to": {
+          "row": 1,
+          "col": 1
+        },
+        "pieceType": "bishop",
+        "promotion": "decline"
+      },
+      {
+        "kind": "move",
+        "player": "sente",
+        "from": {
+          "row": 2,
+          "col": 2
+        },
+        "to": {
+          "row": 1,
+          "col": 3
+        },
+        "pieceType": "bishop",
+        "promotion": "decline"
+      },
+      {
+        "kind": "move",
+        "player": "sente",
+        "from": {
+          "row": 2,
+          "col": 2
+        },
+        "to": {
+          "row": 3,
+          "col": 1
+        },
+        "pieceType": "bishop",
+        "promotion": "decline"
+      },
+      {
+        "kind": "move",
+        "player": "sente",
+        "from": {
+          "row": 2,
+          "col": 2
+        },
+        "to": {
+          "row": 3,
+          "col": 3
+        },
+        "pieceType": "bishop",
+        "promotion": "decline"
+      },
+      {
+        "kind": "move",
+        "player": "sente",
+        "from": {
+          "row": 5,
+          "col": 4
+        },
+        "to": {
+          "row": 5,
+          "col": 0
+        },
+        "pieceType": "rook",
+        "promotion": "none"
+      },
+      {
+        "kind": "move",
+        "player": "sente",
+        "from": {
+          "row": 5,
+          "col": 4
+        },
+        "to": {
+          "row": 5,
+          "col": 1
+        },
+        "pieceType": "rook",
+        "promotion": "none"
+      },
+      {
+        "kind": "move",
+        "player": "sente",
+        "from": {
+          "row": 5,
+          "col": 4
+        },
+        "to": {
+          "row": 5,
+          "col": 2
+        },
+        "pieceType": "rook",
+        "promotion": "none"
+      },
+      {
+        "kind": "move",
+        "player": "sente",
+        "from": {
+          "row": 5,
+          "col": 4
+        },
+        "to": {
+          "row": 5,
+          "col": 3
+        },
+        "pieceType": "rook",
+        "promotion": "none"
+      },
+      {
+        "kind": "move",
+        "player": "sente",
+        "from": {
+          "row": 5,
+          "col": 5
+        },
+        "to": {
+          "row": 4,
+          "col": 5
+        },
+        "pieceType": "silver",
+        "promotion": "none"
+      },
+      {
+        "kind": "move",
+        "player": "sente",
+        "from": {
+          "row": 5,
+          "col": 5
+        },
+        "to": {
+          "row": 4,
+          "col": 6
+        },
+        "pieceType": "silver",
+        "promotion": "none"
+      },
+      {
+        "kind": "move",
+        "player": "sente",
+        "from": {
+          "row": 5,
+          "col": 5
+        },
+        "to": {
+          "row": 6,
+          "col": 6
+        },
+        "pieceType": "silver",
+        "promotion": "none"
+      },
+      {
+        "kind": "move",
+        "player": "sente",
+        "from": {
+          "row": 8,
+          "col": 8
+        },
+        "to": {
+          "row": 7,
+          "col": 7
+        },
+        "pieceType": "king",
+        "promotion": "none"
+      },
+      {
+        "kind": "move",
+        "player": "sente",
+        "from": {
+          "row": 8,
+          "col": 8
+        },
+        "to": {
+          "row": 7,
+          "col": 8
+        },
+        "pieceType": "king",
+        "promotion": "none"
+      },
+      {
+        "kind": "move",
+        "player": "sente",
+        "from": {
+          "row": 8,
+          "col": 8
+        },
+        "to": {
+          "row": 8,
+          "col": 7
+        },
+        "pieceType": "king",
+        "promotion": "none"
+      }
+    ],
+    "fixed": {
+      "selectedAction": {
+        "kind": "move",
+        "player": "sente",
+        "from": {
+          "row": 2,
+          "col": 2
+        },
+        "to": {
+          "row": 4,
+          "col": 0
+        },
+        "pieceType": "bishop",
+        "promotion": "promote"
+      },
+      "selectedEvaluation": 1110,
+      "principalVariation": [
+        {
+          "kind": "move",
+          "player": "sente",
+          "from": {
+            "row": 2,
+            "col": 2
+          },
+          "to": {
+            "row": 4,
+            "col": 0
+          },
+          "pieceType": "bishop",
+          "promotion": "promote"
+        },
+        {
+          "kind": "move",
+          "player": "gote",
+          "from": {
+            "row": 4,
+            "col": 4
+          },
+          "to": {
+            "row": 5,
+            "col": 4
+          },
+          "pieceType": "pawn",
+          "promotion": "none"
+        }
+      ],
+      "evaluationBreakdown": {
+        "total": 1110,
+        "material": 1100,
+        "pieceSquare": 0,
+        "kingSafety": 0,
+        "undefendedPieceSafety": 10,
+        "terminal": null
+      },
+      "rootLegalActionCount": 28,
+      "depth": 2,
+      "visitedPositionCount": 182,
+      "cutoffCount": 21,
+      "skippedActionCount": 450,
+      "quiescenceLeafCount": 0,
+      "quiescenceVisitedPositionCount": 0,
+      "quiescenceCutoffCount": 0,
+      "quiescenceSkippedActionCount": 0,
+      "elapsedMilliseconds": 0
+    },
+    "timed": {
+      "selectedAction": {
+        "kind": "move",
+        "player": "sente",
+        "from": {
+          "row": 2,
+          "col": 2
+        },
+        "to": {
+          "row": 4,
+          "col": 0
+        },
+        "pieceType": "bishop",
+        "promotion": "promote"
+      },
+      "selectedEvaluation": 1110,
+      "principalVariation": [
+        {
+          "kind": "move",
+          "player": "sente",
+          "from": {
+            "row": 2,
+            "col": 2
+          },
+          "to": {
+            "row": 4,
+            "col": 0
+          },
+          "pieceType": "bishop",
+          "promotion": "promote"
+        },
+        {
+          "kind": "move",
+          "player": "gote",
+          "from": {
+            "row": 4,
+            "col": 4
+          },
+          "to": {
+            "row": 5,
+            "col": 4
+          },
+          "pieceType": "pawn",
+          "promotion": "none"
+        }
+      ],
+      "evaluationBreakdown": {
+        "total": 1110,
+        "material": 1100,
+        "pieceSquare": 0,
+        "kingSafety": 0,
+        "undefendedPieceSafety": 10,
+        "terminal": null
+      },
+      "rootLegalActionCount": 28,
+      "depth": 2,
+      "visitedPositionCount": 64,
+      "cutoffCount": 27,
+      "skippedActionCount": 568,
+      "quiescenceLeafCount": 0,
+      "quiescenceVisitedPositionCount": 0,
+      "quiescenceCutoffCount": 0,
+      "quiescenceSkippedActionCount": 0,
+      "elapsedMilliseconds": 0,
+      "requestedMaxDepth": 2,
+      "completedDepth": 2,
+      "timedOut": false,
+      "resultSource": "completed-iteration",
+      "iterations": [
+        {
+          "selectedAction": {
+            "kind": "move",
+            "player": "sente",
+            "from": {
+              "row": 2,
+              "col": 2
+            },
+            "to": {
+              "row": 4,
+              "col": 0
+            },
+            "pieceType": "bishop",
+            "promotion": "promote"
+          },
+          "selectedEvaluation": 3103,
+          "principalVariation": [
+            {
+              "kind": "move",
+              "player": "sente",
+              "from": {
+                "row": 2,
+                "col": 2
+              },
+              "to": {
+                "row": 4,
+                "col": 0
+              },
+              "pieceType": "bishop",
+              "promotion": "promote"
+            }
+          ],
+          "evaluationBreakdown": {
+            "total": 3103,
+            "material": 3100,
+            "pieceSquare": 3,
+            "kingSafety": 0,
+            "undefendedPieceSafety": 0,
+            "terminal": null
+          },
+          "rootLegalActionCount": 28,
+          "depth": 1,
+          "visitedPositionCount": 28,
+          "cutoffCount": 0,
+          "skippedActionCount": 0,
+          "quiescenceLeafCount": 0,
+          "quiescenceVisitedPositionCount": 0,
+          "quiescenceCutoffCount": 0,
+          "quiescenceSkippedActionCount": 0,
+          "elapsedMilliseconds": 0
+        },
+        {
+          "selectedAction": {
+            "kind": "move",
+            "player": "sente",
+            "from": {
+              "row": 2,
+              "col": 2
+            },
+            "to": {
+              "row": 4,
+              "col": 0
+            },
+            "pieceType": "bishop",
+            "promotion": "promote"
+          },
+          "selectedEvaluation": 1110,
+          "principalVariation": [
+            {
+              "kind": "move",
+              "player": "sente",
+              "from": {
+                "row": 2,
+                "col": 2
+              },
+              "to": {
+                "row": 4,
+                "col": 0
+              },
+              "pieceType": "bishop",
+              "promotion": "promote"
+            },
+            {
+              "kind": "move",
+              "player": "gote",
+              "from": {
+                "row": 4,
+                "col": 4
+              },
+              "to": {
+                "row": 5,
+                "col": 4
+              },
+              "pieceType": "pawn",
+              "promotion": "none"
+            }
+          ],
+          "evaluationBreakdown": {
+            "total": 1110,
+            "material": 1100,
+            "pieceSquare": 0,
+            "kingSafety": 0,
+            "undefendedPieceSafety": 10,
+            "terminal": null
+          },
+          "rootLegalActionCount": 28,
+          "depth": 2,
+          "visitedPositionCount": 64,
+          "cutoffCount": 27,
+          "skippedActionCount": 568,
+          "quiescenceLeafCount": 0,
+          "quiescenceVisitedPositionCount": 0,
+          "quiescenceCutoffCount": 0,
+          "quiescenceSkippedActionCount": 0,
+          "elapsedMilliseconds": 0
+        }
+      ],
+      "totalVisitedPositionCount": 92,
+      "totalCutoffCount": 27,
+      "totalSkippedActionCount": 568,
+      "totalQuiescenceLeafCount": 0,
+      "totalQuiescenceVisitedPositionCount": 0,
+      "totalQuiescenceCutoffCount": 0,
+      "totalQuiescenceSkippedActionCount": 0
+    }
+  }
+}

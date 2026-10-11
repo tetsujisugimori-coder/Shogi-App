@@ -65,8 +65,8 @@ function observePreparedSee() {
     prepared: (action: LegalAction) => number | null
   ) => prepared(action));
   const preparation = vi.spyOn(see, 'prepareStaticExchangeEvaluation')
-    .mockImplementation((state, table = DEFAULT_MATERIAL_VALUE_TABLE) => {
-      const prepared = originalPrepare(state, table);
+    .mockImplementation((state, table = DEFAULT_MATERIAL_VALUE_TABLE, check) => {
+      const prepared = originalPrepare(state, table, check);
       return (action) => evaluate(state, action, table, prepared);
     });
   return Object.assign(evaluate, { preparation });
@@ -265,7 +265,9 @@ describe('SEE capture ordering', () => {
 
   it.each(['before', 'after'] as const)('checks interruption %s a capture evaluation', (when) => {
     const state = position();
-    const spy = observePreparedSee();
+    // Isolate the outer ordering checks from the evaluator's own checks.
+    const spy = vi.fn(() => 200);
+    const preparation = vi.spyOn(see, 'prepareStaticExchangeEvaluation').mockReturnValue(spy);
     const error = new Error('interrupted');
     let checks = 0;
     expect(() => orderAlphaBetaNodeActions(state, getLegalActions(state), undefined, () => {
@@ -273,16 +275,17 @@ describe('SEE capture ordering', () => {
       if (checks === (when === 'before' ? 1 : 2)) throw error;
     }, SEE_OPTIONS)).toThrow(error);
     expect(spy).toHaveBeenCalledTimes(when === 'before' ? 0 : 1);
-    expect(spy.preparation).toHaveBeenCalledTimes(when === 'before' ? 0 : 1);
+    expect(preparation).toHaveBeenCalledTimes(when === 'before' ? 0 : 1);
   });
 
   it('checks interruption before and after every capture, including subsequent shared evaluations', () => {
     const state = position();
     const { captures } = categories(state);
     const events: string[] = [];
-    observePreparedSee().mockImplementation((_state, action, _table, evaluate) => {
+    // The internal boundaries are covered by shogi-see-deadline.test.ts.
+    vi.spyOn(see, 'prepareStaticExchangeEvaluation').mockReturnValue(() => {
       events.push('evaluate');
-      return evaluate(action);
+      return 200;
     });
     orderAlphaBetaNodeActions(state, captures, undefined, () => { events.push('check'); }, SEE_OPTIONS);
     expect(events).toEqual(captures.flatMap(() => ['check', 'evaluate', 'check']));
