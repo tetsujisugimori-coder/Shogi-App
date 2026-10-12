@@ -1,5 +1,18 @@
 # SHOGI-APP 開発ログ
 
+## [2026-10-12 JST] SEE内部の探索deadlineへの協調的中断
+
+- 最新origin/mainをfetchし、基準full SHA `5d1f83ed9db821c445f295eb15e365491740acea`（#176マージ）から別worktree・`fix-see-cooperative-deadline`を作成。元checkoutはclean、追加AGENTS.mdなし。#152/#176と既存探索・静止探索・SEE・時間制限/反復深化テスト・README/LOG/関連比較資料を確認した。
+- `prepareStaticExchangeEvaluation`の末尾に任意callbackを追加し、手順序付けが使う既存の中断確認を伝播。準備開始/合法手生成後・評価開始/baseline後・交換再帰進入/駒得後/合法手生成後・候補適用前/再帰復帰後/最終返却前へ確認を配置。再帰進入は適用直後の境界も兼ねる。SEE内の時計・別deadline・catch・近似・枝打切り・深さ制限・キャッシュは追加しない。
+- 既存deadline例外が探索の反復catchへ届き、未完了SEE・局所順序・反復を破棄する。最後の完了反復、または合法fallback（評価/内訳null、空PV、iterations空、完了統計0）の契約を維持。公開SEE/確認なし準備API、standardのSEE未開始、入力非破壊、通常エラーの伝播を維持する。
+- 深さ1は前回最善手なしのroot元順＋remainingDepth=0でSEEを呼ばない。要求Cは深さ1期限/fallback/SEE未開始として確認し、実際のSEE内部期限は深さ2で確認した。深さ1にSEEを新設する変更は行わない。
+- 修正前の新規テスト初版14件は12失敗/2成功。再帰・準備/候補境界は例外なし、深さ2は内部中断=false、callback回数0を検出。修正後の新規17件、既存のprepared-with-check意味論34件を含む最終関連9ファイル325件成功。基準mainから採取したSEE値・全順序・固定深さ2・反復深化2の選択手/評価/PV/内訳/統計snapshotは完全一致。強制取り返し・任意停止・複数分岐・成り・同点元順も既存3経路で検証した。
+- 八兵衛の旧main `57378c2...`の具体的な報告局面は取得できず、既存SEEテスト由来9駒の構成局面で測定。報告局面とは区別し、15秒超は再現しなかった。明示SEE・standard、100/1,000ms、深さ4、静止探索無効、各2warmup+5本、前→後・独立child・直列、親20秒検証用打切り。56標本全て正常、打切り/エラー0。前後20本測定ペアの選択手/評価/PV/深さ/timeout/resultSource一致、初期state完全一致を監査。
+- SEE100ms本の前→後 min/median/max は100.065/100.083/100.423→100.082/100.096/100.129ms、全て深さ2・timeout。SEE1,000msは622.840/637.696/644.205→631.975/656.586/671.241ms、全て深さ4完了。standard100msは深さ3、1,000msは深さ4。一般的速度改善や報告事例解消の証明とは扱わない。全環境・full SHA・測定時ソースhash・設定・結果は新JSONL/比較資料へ保存、旧ファイル非上書き。
+- 最終 `npm run check` は通常2 worker/標準5秒で終了0、lockfile・型検査・66ファイル1,810件・build1,758 modules成功。PR #176の既存Windows timeoutは再現なし。補助単独1 fork/標準5秒でもquiescence-ordering-repeated 37件成功、通常checkと区別。native realpath EPERM対策とworkspace TEMP/TMPは検証プロセスだけのPR外preload、測定には不使用。アサーション/timeout/製品設定を緩めない。既存jsdom navigation通知は失敗0と区別。`git diff --check`成功。
+- README、[比較記録](docs/benchmarks/see-deadline-comparison-20261012.md)、前後JSONL、基準snapshot、隔離測定CLIを追加/更新。単一の同期合法手生成・公開着手適用/再検証/履歴/終局・複製/駒得評価は強制中断不能。100ms厳密復帰・棋力向上は保証しない。UI/Worker/評価/ルール/fallback方式/合法性検証を変更しない。
+- commit→push→main向けPR作成、最終HEAD CI確認の順に公開する。マージしない。CI確定結果はPR本文/完了報告へ記録し、その記録だけでHEADを再変更しない。
+
 ## [2026-10-10 JST] PR #176 レビュー指摘の診断整合性修正
 
 - 指定HEAD/PR HEAD=`c77fe6e60339bab516fe34c0e28d9f7e84aff1e0`、fetch後の最新origin/main=`57378c2dfbad1b3d83908cf9dea077824baa4a39`、公開用checkoutはclean。既存ブランチ`diagnose-legal-action-revalidation`を更新し、他checkoutの既存差分は維持。開始時CIはUbuntu/macOS成功。

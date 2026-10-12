@@ -364,7 +364,7 @@ function orderAlphaBetaNodeActionsByMode(
     let evaluateCapture: ReturnType<typeof prepareStaticExchangeEvaluation> | undefined;
     for (const candidate of captures) {
       interruptionCheck?.();
-      evaluateCapture ??= measured(diagnostics, 'see', () => prepareStaticExchangeEvaluation(state, materialValueTable));
+      evaluateCapture ??= measured(diagnostics, 'see', () => prepareStaticExchangeEvaluation(state, materialValueTable, interruptionCheck));
       const score = measured(diagnostics, 'see', () => evaluateCapture!(candidate.action));
       if (score === null) {
         throw new Error('Alpha-beta capture ordering contract violated: legal capture returned null SEE.');

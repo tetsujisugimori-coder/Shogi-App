@@ -33,15 +33,20 @@ function evaluateExchangeContinuation(
   target: Coordinate,
   perspective: Player,
   baseline: number,
-  valueTable: MaterialValueTable
+  valueTable: MaterialValueTable,
+  interruptionCheck?: () => void
 ): number {
+  // Node entry is also the check immediately after the caller's application.
+  interruptionCheck?.();
   const current = evaluateMaterial(state, perspective, valueTable) - baseline;
   if (!Number.isFinite(current)) {
     throw new RangeError('Static exchange requires a finite material difference.');
   }
+  interruptionCheck?.();
   if (state.status === 'ended') return current;
 
   const actions = getLegalActions(state);
+  interruptionCheck?.();
   if (actions.length === 0) return current;
   const occupant = state.squares[target.row][target.col].piece;
   const recaptures = actions.filter((candidate) =>
@@ -54,14 +59,17 @@ function evaluateExchangeContinuation(
   // that action is not played. If every legal action is a recapture, it is forced.
   let best = recaptures.length < actions.length ? current : null;
   for (const recapture of recaptures) {
+    interruptionCheck?.();
     // Each continuation removes one board piece, so no depth limit is needed.
     const score = evaluateExchangeContinuation(
-      applyLegalAction(state, recapture), target, perspective, baseline, valueTable
+      applyLegalAction(state, recapture), target, perspective, baseline, valueTable, interruptionCheck
     );
+    interruptionCheck?.();
     best = best === null ? score : state.turn === perspective
       ? Math.max(best, score)
       : Math.min(best, score);
   }
+  interruptionCheck?.();
   return best ?? current;
 }
 
@@ -87,14 +95,20 @@ export function evaluateStaticExchange(
  * the evaluator, and discard it before moving to another position. Legal actions
  * all belong to the starting side. Each exchange still gets its own cloned state
  * and generates legal recaptures at every continuation; no position cache is used.
+ * The optional caller-owned cooperative check propagates exceptions unchanged.
+ * Discard the evaluator on interruption; no partial exchange score is returned.
  */
 export function prepareStaticExchangeEvaluation(
   state: BoardState,
-  valueTable: MaterialValueTable = DEFAULT_MATERIAL_VALUE_TABLE
+  valueTable: MaterialValueTable = DEFAULT_MATERIAL_VALUE_TABLE,
+  interruptionCheck?: () => void
 ): (action: LegalAction) => number | null {
+  interruptionCheck?.();
   const legalActions = getLegalActions(state);
+  interruptionCheck?.();
   let baseline: number | undefined;
   return (action) => {
+    interruptionCheck?.();
     const legalAction = legalActions.find((candidate) => sameAction(candidate, action));
     if (!legalAction) {
       throw new Error('Static exchange requires an action legal in the starting position.');
@@ -103,8 +117,9 @@ export function prepareStaticExchangeEvaluation(
       return null;
     }
     baseline ??= evaluateMaterial(state, legalAction.player, valueTable);
+    interruptionCheck?.();
     return evaluateExchangeContinuation(
-      applyLegalAction(state, legalAction), legalAction.to, legalAction.player, baseline, valueTable
+      applyLegalAction(state, legalAction), legalAction.to, legalAction.player, baseline, valueTable, interruptionCheck
     );
   };
 }

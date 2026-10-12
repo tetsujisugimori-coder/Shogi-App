@@ -115,10 +115,12 @@ describe('共有する開始局面の準備', () => {
   });
 });
 
-describe.each(['public', 'prepared'] as const)('合法手ベースの静的交換評価 (%s)', (mode) => {
+describe.each(['public', 'prepared', 'prepared-with-check'] as const)('合法手ベースの静的交換評価 (%s)', (mode) => {
   const evaluateStaticExchange: typeof evaluateStaticExchangePublic = mode === 'public'
     ? evaluateStaticExchangePublic
-    : (state, action, table) => prepareStaticExchangeEvaluation(state, table)(action);
+    : (state, action, table) => prepareStaticExchangeEvaluation(
+      state, table, mode === 'prepared-with-check' ? () => {} : undefined
+    )(action);
   it('無防備な歩の一回の捕獲は盤上喪失と持ち駒獲得の駒得差分になる', () => {
     const state = basic();
     const action = move(state, [5, 4]);
