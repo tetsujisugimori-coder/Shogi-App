@@ -98,6 +98,10 @@ export function simulateMoveSquares(
     }))
   );
 
+  if (!isWithinBoard(from.row, from.col) || !isWithinBoard(to.row, to.col)) {
+    return nextSquares;
+  }
+
   const movingPiece = nextSquares[from.row][from.col].piece;
   if (!movingPiece) return nextSquares;
 

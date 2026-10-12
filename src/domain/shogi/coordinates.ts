@@ -17,10 +17,11 @@ export interface Coordinate {
 }
 
 /**
- * Checks if a coordinate is strictly within the 9x9 board boundaries.
+ * Checks if both components are integer square indices within the 9x9 board.
  */
 export function isWithinBoard(row: number, col: number): boolean {
-  return row >= 0 && row < 9 && col >= 0 && col < 9;
+  return Number.isInteger(row) && Number.isInteger(col) &&
+    row >= 0 && row < 9 && col >= 0 && col < 9;
 }
 
 /**

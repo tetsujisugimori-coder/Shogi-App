@@ -1,4 +1,19 @@
-# SHOGI-APP 開発ログ
+### [2026-10-12 JST] 公開着手APIの数値座標の安全化
+
+- 最新origin/mainをfetchし、main full SHA `9f42b648966418225e5d21d3b8007eed5f38d7b1`（PR #178のmerge commit）を基準に専用worktree・`fix-numeric-board-coordinates`を作成。元mainの未コミット変更なし、既存worktreeは維持。リポジトリ/親階層に追加AGENTS.mdなし。coordinates/dropRules/drops/validation/gameState/legalActions/executionPolicy、候補生成・攻撃走査・仮想盤面、座標境界・assist/strict・終局・成り・二歩・自玉王手・打ち歩詰めの既存テストを調査。
+- 合法な再現局面は平手から `(6,0)→(5,0), (2,0)→(3,0), (5,0)→(4,0), (3,0)→(4,0), (8,0)→(4,0), (2,1)→(3,1)` をexecuteMoveで順に適用した先手手番・持ち歩ありの局面。row/colは0始まり。既存のレビュー報告を現在の再現結果として転記せず、この基準mainで実測した。
+- 修正前: 自分の持ち歩を `{row:0.5,col:4}` / `{row:4,col:0.5}` へ渡すとvalidateDropとexecuteDrop assist/strictがTypeError。発生箇所は基準main dropRules.ts:180の `state.squares[to.row][to.col].piece`（row小数はundefined行、col小数はundefinedマス）。simulateDropSquaresも同:56の書き込みでTypeError。盤上移動はfrom小数がno_piece_at_source、to小数がinvalid_piece_moveで、assistはrejected、strictはfoul_loss、例外なし。
+- 原因は共通isWithinBoardが範囲だけを確認し、盤内の小数を許可したこと。各成分をNumber.isIntegerかつ0以上9未満に限定。丸め/切捨て/補正はせず、NaN/±Infinityも拒否。不正な数値座標を既存out_of_boundsへ統一し、新理由コード・型・分類は追加しない。
+- 共通チェックの利用範囲はvalidateDrop/validateMove、simulateDropSquares、合法移動元、step/ray候補、攻撃走査/対象マス、玉周辺評価、歩打ち直接王手。内部生成の整数座標は引き続き受理。executeMoveの反則駒種取得の重複チェックも共通関数へ揃え、小数fromで配列を参照しない。
+- 公開simulateDropSquaresは既存盤外時と同じく未変更の独立複製を返す。公開simulateMoveSquaresは従来盤外ガードがなく不正数値で例外だったため、複製後・アクセス前にfrom/toの境界ガードを追加し、未変更の独立複製を返す。正常入力の適用と行/マス/駒の複製独立性を維持。内部king-safety用共有コピーは公開せず、合法候補のみで使用する既存方式を維持。
+- assistはout_of_boundsと元state参照を返す。strictは従来盤外入力の契約どおり反則負け（status/result/foulHistory/既存moveLimitJishogi解除）を返すが、元stateを変更せず、盤面/持駒/手番/手数/通常履歴/lastMove/局面履歴を進めない。human/省略のassist、local_ai/shogi_engineのstrict、明示mode優先を維持。終局後executeMove/executeDrop/executeLegalActionとvalidateDropのgame_already_ended優先、validateMove単体の境界優先も維持。
+- 新規回帰テスト65件は0/8、0.5/4.5/8.5/-1/-0.5/9/10/NaN/±Infinityをrow/col・移動from/toへ割り当て、理由、assist/strict、proposer既定/override、入力不変性、strict非進行、終局優先、公開仮想盤面の独立複製を確認。修正前35失敗/30成功、修正後65成功。既存正常移動/駒打ち・成り・二歩・自玉王手・打ち歩詰めを含む関連5ファイル314件成功。新規テストのunion型/validation判別の型エラーは修正後lint成功。
+- 基準mainの3変更ファイルを一時復元して採取した全合法手配列と、修正後配列をJSON完全比較。平手30手、保存対局50手136手/98手290手、seed=1合法対局150手90手、飛車先取り返し10手49手、王手回避構成局面11手の内容と順序すべて一致。局面は既存TIME_LIMIT_STRESS_POSITIONSから生成し、元state/手順を変更していない。各配列SHA-256は順に `928bfaf3d45303b8c9ef8a5d9fc5bf801ca0f13132d66eaf405aaa10f8cb1edb`, `c5bf386bb052f85a812c3db1afb2f64115557802e0f0ae6dfdff4c84f716a25e`, `37a5c3a31488af9a06364dd70772d1ca68c670e661edf22d738c2bf49df5f62f`, `9edebf3163293c73263873f2a2551101f709687e8b414b3939c5329193597ae6`, `e0f78b3d3cc8eec4be405ba54523fd5bfb861e7200df365bff10b96c5c199646`, `3f27fa2f7c061273c450419925c2354fac37aa667fa389b0a9a80d31784d8c53`。
+- 初回npm run checkはlockfile/lint成功、67ファイル中66成功・1,874成功/1失敗。既存quiescence-ordering-repeatedの終了局面528複製テストが通常5秒timeout（7.55秒）。このテストは終了局面のgetLegalActions早期returnを使い、変更した座標チェック/仮想適用へ進まない。基準mainと修正後を同じ通常設定で単独実行すると両方37/37成功（ファイル2.52/2.41秒、テスト合計1.55/1.48秒）。製品やテストのtimeout/2 worker/アサーションを変えずfull checkを再実行したが、同じ1件が6.79秒でtimeout（他1,874件成功）。追加で基準mainの全体checkを同環境・通常設定で比較し、66ファイル1,810件・buildが成功した（終了0）。単独では修正前後とも成功し、この終了局面テストは変更箇所を実行しないが、修正後local全体checkは成功と扱わず、残る環境/負荷依存のtimeoutとして明示する。
+- Windows sandboxではnative realpathがEPERM、既定TEMPのrenameもEPERMになったため、検証プロセス限定でrepo外のJS realpath preloadとworkspace TEMP/TMPを使用。製品・依存・通常テスト設定は変更なし。通常環境の最終HEAD Ubuntu/macOS CI結果はPR本文/最終報告で確定する。
+- 修正後npm run checkは上記既存1件のtimeoutで終了1、verify:lock/lintとその他1,874件は成功。後続のnpm run build（1,758 modules）とgit diff --checkは個別に成功。任意の壊れたBoardState/null/文字列の汎用入力検証と性能測定は対象外。探索/評価/手順序/時間制御/fallback/Worker/UI/終局規則/保存形式/性能最適化の実装は変更しない。commit→push→PR作成と最終HEAD CI確認まで行い、マージしない。
+
+ SHOGI-APP 開発ログ
 
 ## [2026-10-12 JST] SEE内部の探索deadlineへの協調的中断
 
