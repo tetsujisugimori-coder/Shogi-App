@@ -47,7 +47,7 @@ PR #180 HEAD `243ed8bef934438809770d05c25ef9f908a0fbe3` を含む最新origin/ma
 | Worker | 成功応答の中に手なしfallback | 成功応答の中にno-legal-actions、loss |
 | 単独WorkerのUI受信 | 手なしを探索エラー表示 | 自身の合法手照会で確認して終局表示 |
 
-探索の非終局rootで合法手0を確認した後だけ終局内訳を作る。全評価葉に新しい合法手生成を追加しない。通常の評価APIはadjudication済みstateのstatus/resultを評価する従来仕様を保つ。深さ0の静的評価も従来仕様を維持する。玉欠落の既存人工局面には新たな勝者を作らない。時間制限探索で終局済み入力を正の予算で読む既存の完了反復形式は維持し、0msの終局済み入力は手なしを時間切れと区別する。
+探索の非終局rootで合法手0を確認した後だけ終局内訳を作る。全評価葉に新しい合法手生成を追加しない。通常の評価APIはadjudication済みstateのstatus/resultを評価する従来仕様を保つ。深さ0の静的評価も従来仕様を維持する。玉欠落の既存人工局面には新たな勝者を作らない。時間制限探索の終局済み入力は、予算によらずended-positionとして元の結果を保持し、反復せず時間切れとも区別する（独立レビュー追従を参照）。
 
 キャンセルは従来のAbortError、探索例外はWorker failureとして維持。合法手がある0ms入力は従来どおり合法なfallbackとtimedOut:true。確認された手なしに架空の着手・fallbackを作らない。自対局実行器も手なしを自身で確認して決着とし、架空のplyを履歴に追加しない。
 
@@ -69,4 +69,12 @@ Windowsローカル検証はPR #180と同じnative realpathのEPERMがテスト�
 
 実ブラウザはin-app browserのセッション不一致、Edgeのlocalhost接続timeoutで未完了。React DOM操作テストによる表示と操作停止の確認は実ブラウザ確認の代替達成とは記載しない。最終ローカル実行結果はLOG、最終HEADのCI結果はPR本文に追記する。
 
-探索高速化、評価重み・手順序・SEE・deadline・fallback品質・汎用入力検証は変更対象にしていない。
+PR #182の独立レビュー追従では応手の存在確認だけを短絡化した。合法手の列挙順序、評価重み・手順序・SEE・deadline・fallback品質・汎用入力検証は変更していない。
+
+## 独立レビュー追従
+
+応手の存在確認は最初の合法な移動／駒打ちで終了し、同じ種類・所有者・成否の持ち駒の検証を1照会内だけで共有する。盤面・手番をまたぐキャッシュは使わない。盤上移動と駒打ちの全列挙APIは維持し、全464着手の順序・着手後stateおよび固定深さ探索結果の一致を検証した。測定条件、生データ、100msでの深さのばらつきは[性能検証](benchmarks/no-legal-review/README.md)参照。
+
+時間制限探索の終局済み入力は0ms・正の予算とも `ended-position` とし、`terminalResult` に元のGameResultを複写する。completedDepth:0、selectedAction:null、timedOut:false、iterations:[]。千日手・投了等を合法手なしへ置換しない。activeの合法手0は `no-legal-actions`、合法手ありの時間切れは従来の完了反復／fallbackと区別する。玉欠落のactive人工fixtureは従来の中立な有限評価を維持する。Workerの結果型・比較検証・ベンチマーク検証・画面の理由表示を追従し、自対局の開始時終局処理は既存経路を維持した。
+
+2手ミニマックスAIと時間制限AIは手nullだけで勝敗を決めず、adjudicateNoLegalActionsで開始局面の合法手なしを独立に再確認する。確認できた場合だけ終局表示・操作停止へ進み、着手履歴を追加しない。合法手があるnull結果は終局にしない。先後対称のDOM操作テストで双方の経路を検証した。保存型・JSON/KIF・履歴復元仕様は今回変更していない。

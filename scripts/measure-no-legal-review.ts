@@ -53,9 +53,10 @@ if (mode === 'generate') {
   console.log('Complete legal-action order and every applied child audited');
 } else if (mode === 'measure') {
   const json=gunzipSync(fs.readFileSync(fixturePath)).toString('utf8');
-  const cases=JSON.parse(json) as {id:string;state:BoardState;provenance:string}[];
+  const cases=(JSON.parse(json) as {id:string;state:BoardState;provenance:string}[])
+    .filter(c=>!process.env.REVIEW_CASE || c.id===process.env.REVIEW_CASE);
   const rows: unknown[]=[];
-  const warmups=2, repetitions=5, batch=100;
+  const warmups=Number(process.env.REVIEW_WARMUPS??2), repetitions=Number(process.env.REVIEW_REPETITIONS??5), batch=100;
   const metadata={label,head:execFileSync('git',['rev-parse','HEAD'],{encoding:'utf8'}).trim(),sourceTree:execFileSync('git',['rev-parse','HEAD:src'],{encoding:'utf8'}).trim(),node:process.version,platform:process.platform,arch:process.arch,cpu:os.cpus()[0].model,cpuCount:os.cpus().length,fixtureSha256:hash(json),warmups,repetitions,microBatch:batch,depth:2,maxDepth:4,options:{moveOrdering:'standard',quiescence:'disabled',killerMoves:false},startedAt:new Date().toISOString()};
   for (const c of cases) {
     const frozen=JSON.stringify(c.state);
