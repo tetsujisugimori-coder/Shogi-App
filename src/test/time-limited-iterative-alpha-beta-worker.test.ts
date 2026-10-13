@@ -299,7 +299,8 @@ describe('時間制限付き反復深化αβ探索Workerの純粋処理', () => 
         undefendedPieceSafety: 0,
         terminal: testCase.terminal,
       });
-      expect(response.result.iterations[0].evaluationBreakdown).toEqual(response.result.evaluationBreakdown);
+      expect(response.result.iterations).toEqual([]);
+      expect(response.result).toMatchObject({resultSource:'ended-position',terminalResult:testCase.state.result,completedDepth:0,timedOut:false});
       expect(structuredClone(response)).toEqual(response);
     }
   });

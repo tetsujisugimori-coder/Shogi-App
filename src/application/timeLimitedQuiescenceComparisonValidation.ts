@@ -8,6 +8,7 @@ import { getDisplayEvaluationBreakdown } from './searchEvaluationBreakdownValida
 import { validateAndFormatPrincipalVariation } from './searchPrincipalVariation';
 import { quiescenceComparisonProtocolError } from './quiescenceComparisonValidation';
 import { evaluateNoLegalActionsPositionBreakdown } from '../domain/shogi/twoPlyMinimaxAi';
+import { evaluateSearchPositionBreakdown } from '../domain/shogi/twoPlyMinimaxAi';
 
 const statistics = [
   ['visitedPositionCount', 'totalVisitedPositionCount'],
@@ -52,8 +53,21 @@ export function validateTimeLimitedQuiescenceComparison(
     if (typeof entry !== 'object' || entry === null) return invalid();
     const result = entry as TimeLimitedQuiescenceComparisonResult;
     const extension = TIME_LIMITED_QUIESCENCE_COMPARISON_SETTINGS[index];
-    if (result.resultSource === 'no-legal-actions') {
-      const expected = legalCount === 0 ? evaluateNoLegalActionsPositionBreakdown(state, state.turn) : null;
+    if (state.status === 'ended' && result.resultSource !== 'ended-position') return invalid();
+    if (state.status !== 'ended' && result.terminalResult !== undefined) return invalid();
+    if (legalCount === 0 && result.resultSource !== 'no-legal-actions' && result.resultSource !== 'ended-position') return invalid();
+    if (result.resultSource === 'no-legal-actions' || result.resultSource === 'ended-position') {
+      const ended = result.resultSource === 'ended-position';
+      if (ended !== (state.status === 'ended')) return invalid();
+      if (ended) {
+        const saved = result.terminalResult as unknown as Record<string, unknown> | undefined;
+        if (!state.result || !saved || typeof saved !== 'object' || Array.isArray(saved) ||
+          Object.keys(saved).length !== Object.keys(state.result).length ||
+          Object.entries(state.result).some(([key,value])=>saved[key]!==value)) return invalid();
+      } else if (result.terminalResult !== undefined) return invalid();
+      const expected = legalCount === 0 ? ended
+        ? evaluateSearchPositionBreakdown(state, state.turn)
+        : evaluateNoLegalActionsPositionBreakdown(state, state.turn) : null;
       if (!expected || result.quiescenceMaxTacticalDepth !== extension || result.requestedMaxDepth !== maxDepth ||
         result.depth !== 0 || result.completedDepth !== 0 || result.timedOut !== false || result.selectedAction !== null ||
         result.rootLegalActionCount !== 0 || result.selectedEvaluation !== expected.total ||

@@ -197,9 +197,22 @@ export function getLegalMoves(
   return legalMoves;
 }
 
-/**
- * Alias for backward-compatibility with UI components.
+/** Exact existence query using the same candidates and king-safety simulation.
+ * No legal destination list is materialized and validation stops at the first.
  */
+export function hasLegalMove(
+  squares: BoardSquare[][],
+  from: Coordinate,
+  currentTurn?: Player
+): boolean {
+  if (!isWithinBoard(from.row, from.col)) return false;
+  const piece = squares[from.row]?.[from.col]?.piece;
+  if (!piece || (currentTurn && piece.player !== currentTurn)) return false;
+  return getPseudoLegalMoves(squares, from, piece).some(to =>
+    !isKingInCheck(simulateMoveSquaresForKingSafety(squares, from, to), piece.player));
+}
+
+/** Alias for backward-compatibility with UI components. */
 export function getMoveCandidates(
   squares: BoardSquare[][],
   from: Coordinate | null | undefined,

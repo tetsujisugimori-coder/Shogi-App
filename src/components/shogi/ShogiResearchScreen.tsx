@@ -1032,7 +1032,15 @@ export const ShogiResearchScreen: React.FC<ShogiResearchScreenProps> = ({
       ...analyzeTwoPlyMinimaxSearch(boardState, resolveSearchEvaluationPreset(evaluationPresetId)),
       evaluationPresetId,
     };
-    if (!result.selectedAction) return;
+    if (!result.selectedAction) {
+      const ended = adjudicateNoLegalActions(boardState);
+      if (ended !== null) {
+        setBoardState(ended);
+        setSelection({ kind: 'none' });
+        setPendingPromotion(null);
+      }
+      return;
+    }
 
     const selectedNotation = formatLegalActionNotation(boardState, result.selectedAction);
     const candidateNotations = result.topCandidates.map((candidate) =>

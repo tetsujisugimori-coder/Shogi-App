@@ -1,8 +1,8 @@
 /** Pure check and checkmate queries for an arbitrary player. */
 import { BoardState, Player } from '../../types/shogi';
 import { isKingInCheck } from './attacks';
-import { getLegalDropSquares } from './dropRules';
-import { getLegalMoves } from './moves';
+import { hasLegalDropSquare } from './dropRules';
+import { hasLegalMove } from './moves';
 
 /** Returns whether the specified player is currently in check. */
 export function isPlayerInCheck(state: BoardState, player: Player): boolean {
@@ -16,7 +16,7 @@ export function hasLegalBoardMove(state: BoardState, player: Player): boolean {
       const piece = state.squares[row][col].piece;
       if (
         piece?.player === player &&
-        getLegalMoves(state.squares, { row, col }, player).length > 0
+        hasLegalMove(state.squares, { row, col }, player)
       ) {
         return true;
       }
@@ -38,9 +38,19 @@ export function hasLegalDrop(state: BoardState, player: Player): boolean {
     result: null,
   };
 
-  return hand.some(
-    (piece) => getLegalDropSquares(analysisState, piece.id).length > 0
-  );
+  // validateDrop resolves IDs to the first matching hand entry. Deduplicate the
+  // resolved rule-relevant attributes, so even duplicate-ID artificial fixtures
+  // keep that existing lookup contract. This set lives only for this query.
+  const byId = new Map<string, (typeof hand)[number]>();
+  for (const piece of hand) if (!byId.has(piece.id)) byId.set(piece.id, piece);
+  const seen = new Set<string>();
+  return hand.some(piece => {
+    const resolved = byId.get(piece.id)!;
+    const key = `${resolved.type}:${resolved.player}:${Boolean(resolved.isPromoted)}`;
+    if (seen.has(key)) return false;
+    seen.add(key);
+    return hasLegalDropSquare(analysisState, piece.id);
+  });
 }
 
 /** Returns whether the player has any legal response, on board or from hand. */

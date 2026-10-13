@@ -2,7 +2,7 @@
  * A depth-configurable alpha-beta search built exclusively from the public
  * legal-action, execution, cloning, and material-evaluation domain APIs.
  */
-import type { BoardState, Player } from '../../types/shogi';
+import type { BoardState, Player, GameResult } from '../../types/shogi';
 import { executeLegalAction, getLegalActions, type LegalAction } from './legalActions';
 import {
   DEFAULT_MATERIAL_VALUE_TABLE,
@@ -141,7 +141,9 @@ export interface TimeLimitedIterativeDeepeningAlphaBetaSearchResult
   completedDepth: number;
   /** True when the deadline interrupted or prevented a requested iteration. */
   timedOut: boolean;
-  resultSource: 'completed-iteration' | 'fallback' | 'no-legal-actions';
+  resultSource: 'completed-iteration' | 'fallback' | 'no-legal-actions' | 'ended-position';
+  /** Only ended-position roots carry their original adjudicated reason. */
+  terminalResult?: GameResult;
 }
 
 /** Backward-compatible measurements for the established two-ply API. */
@@ -827,10 +829,27 @@ export function analyzeTimeLimitedIterativeDeepeningAlphaBetaSearch(
   validateSearchTimeLimitMilliseconds(timeLimitMilliseconds);
   const startedAt = clock();
   diagnostics?.begin(startedAt, timeLimitMilliseconds, clock);
+  if (state.status === 'ended') {
+    // Evaluate the recorded result before legal enumeration or deadline checks.
+    // Ended roots are already known: they need no iteration and cannot timeout.
+    const evaluated = searchAlphaBeta(state, 0, valueTable);
+    diagnostics?.rootGenerated(0);
+    const finishedAt = clock();
+    diagnostics?.finish(finishedAt);
+    return {
+      ...evaluated, elapsedMilliseconds: Math.max(0, finishedAt - startedAt),
+      requestedMaxDepth: maxDepth, completedDepth: 0, timedOut: false,
+      resultSource: 'ended-position', terminalResult: { ...state.result! }, iterations: [],
+      totalVisitedPositionCount: 0, totalCutoffCount: 0, totalSkippedActionCount: 0,
+      totalQuiescenceLeafCount: 0, totalQuiescenceVisitedPositionCount: 0,
+      totalQuiescenceCutoffCount: 0, totalQuiescenceSkippedActionCount: 0,
+    };
+  }
   const rootActions = measured(diagnostics, 'root-legal', () => getLegalActions(state,
     diagnostics?.rootBreakdown ? diagnostics : undefined, diagnostics?.actionValidation ?? undefined));
   diagnostics?.rootGenerated(rootActions.length);
-  const noLegalActions = rootActions.length === 0 && (state.status !== 'ended' || timeLimitMilliseconds === 0);
+  const noLegalActions = rootActions.length === 0;
+  const noActionBreakdown = noLegalActions ? evaluateNoLegalActionsPositionBreakdown(state, state.turn, valueTable) : null;
   const fallbackAction = rootActions[0] ?? null;
   const iterations: IterativeDeepeningAlphaBetaIterationResult[] = [];
   let previousBestAction: LegalAction | null = null;
@@ -910,7 +929,7 @@ export function analyzeTimeLimitedIterativeDeepeningAlphaBetaSearch(
     }),
     principalVariation: deepestIteration ? clonePrincipalVariation(deepestIteration.principalVariation) : [],
     evaluationBreakdown: noLegalActions
-      ? evaluateNoLegalActionsPositionBreakdown(state, state.turn, valueTable)
+      ? noActionBreakdown
       : deepestIteration ? cloneSearchEvaluationBreakdown(deepestIteration.evaluationBreakdown) : null,
     elapsedMilliseconds: 0,
     requestedMaxDepth: maxDepth,
@@ -918,7 +937,7 @@ export function analyzeTimeLimitedIterativeDeepeningAlphaBetaSearch(
     timedOut,
     resultSource: noLegalActions ? 'no-legal-actions' : deepestIteration ? 'completed-iteration' : 'fallback',
     selectedEvaluation: noLegalActions
-      ? evaluateNoLegalActionsPositionBreakdown(state, state.turn, valueTable).total
+      ? noActionBreakdown!.total
       : deepestIteration?.selectedEvaluation ?? null,
     iterations,
     totalVisitedPositionCount: iterations.reduce(

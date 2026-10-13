@@ -30,9 +30,11 @@ export function adjudicateAfterLegalMove(
   const gaveCheck = isPlayerInCheck(state, respondingPlayer);
   const recordedState = recordPositionAfterLegalMove(state, movingPlayer, gaveCheck);
 
-  const bothKingsExist = (['sente', 'gote'] as const).every(player =>
-    recordedState.squares.some(row => row.some(square => square.piece?.type === 'king' && square.piece.player === player)));
-  if ((gaveCheck || bothKingsExist) && !hasLegalResponse(recordedState, respondingPlayer)) {
+  // Both predicates are pure. Defer the artificial-position king guard until
+  // the exact response query is empty; normal positions avoid two board scans.
+  if (!hasLegalResponse(recordedState, respondingPlayer) && (gaveCheck ||
+      (['sente', 'gote'] as const).every(player => recordedState.squares.some(row =>
+        row.some(square => square.piece?.type === 'king' && square.piece.player === player))))) {
     return {
       ...recordedState,
       status: 'ended',
