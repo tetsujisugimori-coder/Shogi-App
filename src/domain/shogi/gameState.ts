@@ -18,7 +18,7 @@ import {
   ProposerType,
   PromotionChoice,
 } from '../../types/shogi';
-import { Coordinate, toCoordinateLabel } from './coordinates';
+import { Coordinate, isWithinBoard, toCoordinateLabel } from './coordinates';
 import { getPromotionStatus } from './promotion';
 import { validateMove } from './validation';
 import { ILLEGAL_MOVE_MESSAGES } from './validation';
@@ -322,14 +322,7 @@ export function executeMove(
 
   // If move is illegal:
   // Accurately record source piece if one exists on the board; do not fabricate a pieceType (e.g. pawn)
-  const isFromInBounds =
-    from &&
-    typeof from.row === 'number' &&
-    typeof from.col === 'number' &&
-    from.row >= 0 &&
-    from.row < 9 &&
-    from.col >= 0 &&
-    from.col < 9;
+  const isFromInBounds = from && isWithinBoard(from.row, from.col);
 
   const originSquare = isFromInBounds ? state.squares[from.row]?.[from.col] : undefined;
   const pieceType = originSquare?.piece?.type ?? null;
