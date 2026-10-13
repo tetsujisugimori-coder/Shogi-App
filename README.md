@@ -464,7 +464,8 @@ const total = Object.values(repeated.summary).reduce((sum, count) => sum + count
     - `isPlayerInCheck` / `hasLegalBoardMove` / `hasLegalDrop` / `hasLegalResponse` / `isCheckmate` による純粋な局面照会
     - 玉の退避、王手駒の捕獲、盤上移動・駒打ちによる合駒、成り・不成を含む全合法応手の探索
     - 通常移動・成り・突き歩・歩以外の駒打ちによる詰みを `checkmate` として終局し、勝者・敗者・最終着手を記録
-    - 応手がある王手は `status: 'check'`、王手でない局面は `status: 'active'` として共通更新
+    - 応手がある王手は `status: 'check'`、王手でない局面で合法手があれば `status: 'active'` として共通更新
+    - 両玉があり王手でないのに盤上移動・駒打ちの合法手が0なら、アプリ仕様として手番側の負け・`no_legal_actions` で終局。通常の詰み・反則・引き分けとは区別し、詰みと同じく千日手・500手規定より優先する。探索・Workerも手なしと時間切れを区別する。[規則の調査、採用理由、構成局面、保存互換性と検証制約](docs/no-legal-actions.md)を参照。
     - 王手中の手番と、詰みによる勝者をステータスバッジで文字表示し、終局後の盤・駒台・成り選択を無効化
   - **千日手・連続王手の千日手**:
     - 盤上の全駒の位置・所有者・駒種・成り状態、先後別・駒種別の持ち駒枚数、次の手番がすべて一致する局面を同一局面と定義

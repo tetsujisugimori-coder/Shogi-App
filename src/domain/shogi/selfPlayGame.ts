@@ -1,6 +1,7 @@
 import type { BoardState, GameResult, Player } from '../../types/shogi';
 import { executeLegalAction, getLegalActions, type LegalAction } from './legalActions';
 import { cloneBoardState } from './replay';
+import { adjudicateNoLegalActions } from './adjudication';
 import { createPositionKey } from './repetition';
 import { areLegalActionsEqual, type TimeLimitedIterativeDeepeningAlphaBetaSearchResult } from './twoPlyAlphaBetaAi';
 
@@ -203,7 +204,13 @@ export function runSelfPlayGame<SenteSettings, GoteSettings>(options: {
     let record: SelfPlayPlyRecord;
     try {
       if (!result || typeof result !== 'object') return fail('result', 'invalid_result', 'Search must return an observation object.');
-      if (result.selectedAction === null) return fail('result', 'missing_action', 'Non-ended position requires a selected action.');
+      if (result.selectedAction === null) {
+        const ended = adjudicateNoLegalActions(state);
+        if (ended?.result) {
+          return { status: 'ended', gameResult: { ...ended.result }, finalState: cloneBoardState(ended), plies };
+        }
+        return fail('result', 'missing_action', 'Non-ended position requires a selected action.');
+      }
       if (!isAction(result.selectedAction)) return fail('result', 'invalid_result', 'Malformed selected action.');
       if (result.selectedAction.player !== state.turn) return fail('result', 'wrong_player', 'Selected action does not match the current turn.');
       const legal = getLegalActions(state).find((candidate) => areLegalActionsEqual(candidate, result.selectedAction!));

@@ -18,6 +18,7 @@ import type {
 } from '../../workers/timeLimitedIterativeDeepeningAlphaBetaWorkerProtocol';
 import { SEARCH_EVALUATION_PRESET_DISPLAY } from './searchEvaluationPresetDisplay';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { adjudicateNoLegalActions } from '../../domain/shogi/adjudication';
 import { createInitialBoardState, BoardState, BoardSquare, Piece, PieceType } from '../../types/shogi';
 import {
   executeDrop,
@@ -1101,10 +1102,16 @@ export const ShogiResearchScreen: React.FC<ShogiResearchScreenProps> = ({
           return;
         }
 
-        // The screen cannot start this search from an ended position. Therefore a
-        // missing action is not a normal no-move outcome at this UI boundary.
         if (!result.selectedAction) {
           activeWorkerSearchRef.current = null;
+          if (result.resultSource === 'no-legal-actions' && result.rootLegalActionCount === 0 && !result.timedOut) {
+            const ended = adjudicateNoLegalActions(searchState);
+            if (ended !== null) {
+              setBoardState(ended);
+              setWorkerSearchState({ kind: 'idle' });
+              return;
+            }
+          }
           setWorkerSearchState({
             kind: 'error',
             message: 'AIの指し手を受け取れませんでした。',

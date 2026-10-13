@@ -91,6 +91,15 @@ export function getGameResultDisplay(result: GameResult): GameResultDisplay {
         tone: 'rose',
       };
     }
+    case 'no_legal_actions': {
+      const winner = getPlayerName(result.winner);
+      const loser = getPlayerName(result.loser);
+      return {
+        panelText: `${winner}勝ち（${loser}の合法手なし）`,
+        statusText: `${winner}勝ち（${loser}の合法手なし）`,
+        tone: 'rose',
+      };
+    }
     case 'checkmate': {
       const winner = getPlayerName(result.winner);
       return {

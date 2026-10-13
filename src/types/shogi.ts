@@ -147,6 +147,7 @@ export type GameEndReason =
   | 'foul_loss'
   | 'resignation'
   | 'checkmate'
+  | 'no_legal_actions'
   | 'repetition'
   | 'five_hundred_move_jishogi'
   | 'agreed_jishogi_draw'
@@ -168,6 +169,10 @@ export interface FoulLossGameResult extends DecisiveGameResultBase {
 
 export interface CheckmateGameResult extends DecisiveGameResultBase {
   endReason: 'checkmate';
+}
+
+export interface NoLegalActionsGameResult extends DecisiveGameResultBase {
+  endReason: 'no_legal_actions';
 }
 
 export interface ResignationGameResult extends DecisiveGameResultBase {
@@ -225,6 +230,7 @@ export interface EnteringKingDeclarationFailureGameResult
 export type GameResult =
   | FoulLossGameResult
   | CheckmateGameResult
+  | NoLegalActionsGameResult
   | ResignationGameResult
   | RepetitionGameResult
   | FiveHundredMoveJishogiGameResult

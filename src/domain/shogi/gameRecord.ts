@@ -153,7 +153,7 @@ export type SavedGameResultV1 =
       endReason: 'foul_loss';
       foulReason: SavedFoulReasonV1;
     })
-  | (SavedDecisiveGameResultBaseV1 & { endReason: 'checkmate' | 'resignation' })
+  | (SavedDecisiveGameResultBaseV1 & { endReason: 'checkmate' | 'resignation' | 'no_legal_actions' })
   | {
       winner: null;
       loser: null;
@@ -476,11 +476,12 @@ function cloneGameResult(result: GameResult | null | undefined): SavedGameResult
         foulReason: toSavedFoulReasonV1(result.foulReason),
         ...(result.details === undefined ? {} : { details: result.details }),
       };
+    case 'no_legal_actions':
     case 'checkmate':
       return {
         winner: toSavedPlayerV1(result.winner),
         loser: toSavedPlayerV1(result.loser),
-        endReason: 'checkmate',
+        endReason: result.endReason,
         ...(result.details === undefined ? {} : { details: result.details }),
       };
     case 'resignation':

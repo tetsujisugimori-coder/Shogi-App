@@ -1,5 +1,5 @@
 import { BoardState, Player } from '../../types/shogi';
-import { isPlayerInCheck, isCheckmate } from './checkmate';
+import { isPlayerInCheck, hasLegalResponse } from './checkmate';
 import {
   classifyRepetition,
   createPositionKey,
@@ -7,7 +7,21 @@ import {
 } from './repetition';
 import { classifyMoveLimitJishogi } from './moveLimitJishogi';
 
-/** Applies the common check/checkmate status after one already-legal move or drop. */
+/** Pure adjudication for a custom active/check position without a new move. */
+export function adjudicateNoLegalActions(state: BoardState): BoardState | null {
+  const bothKingsExist = (['sente', 'gote'] as const).every(player =>
+    state.squares.some(row => row.some(square => square.piece?.type === 'king' && square.piece.player === player)));
+  if (!bothKingsExist || (state.status !== 'active' && state.status !== 'check') || hasLegalResponse(state, state.turn)) return null;
+  return {
+    ...state, status: 'ended', moveLimitJishogi: null,
+    result: {
+      winner: state.turn === 'sente' ? 'gote' : 'sente', loser: state.turn,
+      endReason: isPlayerInCheck(state, state.turn) ? 'checkmate' : 'no_legal_actions',
+    },
+  };
+}
+
+/** Applies terminal/check status after one already-legal move or drop. */
 export function adjudicateAfterLegalMove(
   state: BoardState,
   movingPlayer: Player
@@ -16,14 +30,16 @@ export function adjudicateAfterLegalMove(
   const gaveCheck = isPlayerInCheck(state, respondingPlayer);
   const recordedState = recordPositionAfterLegalMove(state, movingPlayer, gaveCheck);
 
-  if (isCheckmate(recordedState, respondingPlayer)) {
+  const bothKingsExist = (['sente', 'gote'] as const).every(player =>
+    recordedState.squares.some(row => row.some(square => square.piece?.type === 'king' && square.piece.player === player)));
+  if ((gaveCheck || bothKingsExist) && !hasLegalResponse(recordedState, respondingPlayer)) {
     return {
       ...recordedState,
       status: 'ended',
       result: {
         winner: movingPlayer,
         loser: respondingPlayer,
-        endReason: 'checkmate',
+        endReason: gaveCheck ? 'checkmate' : 'no_legal_actions',
       },
       moveLimitJishogi: null,
     };

@@ -29,7 +29,7 @@ export type MeasurementPly = SelfPlayPlyRecord & {
   participant: PairedSelfPlayParticipantId;
   timeLimitMilliseconds: number;
   actualElapsedMilliseconds: number;
-  resultSource: 'fallback' | 'completed-iteration';
+  resultSource: 'fallback' | 'completed-iteration' | 'no-legal-actions';
 };
 
 export interface MeasurementGame {

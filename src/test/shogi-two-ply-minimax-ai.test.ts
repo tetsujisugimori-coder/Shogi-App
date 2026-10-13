@@ -900,7 +900,7 @@ describe('時間制限付き反復深化αβ探索', () => {
     expect(result.iterations).toEqual([]);
   });
 
-  it('終局の0ミリ秒は手なしfallbackを返し、凍結入力を変えない', () => {
+  it('終局の0ミリ秒は合法手なしを返し、凍結入力を変えない', () => {
     const state = recaptureTrapState();
     const ended = { ...state, status: 'ended' as const,
       result: { winner: null, loser: null, endReason: 'repetition' as const } };
@@ -919,7 +919,7 @@ describe('時間制限付き反復深化αβ探索', () => {
     expect(second.selectedAction).toEqual(first.selectedAction);
     expect(JSON.stringify(state)).toBe(snapshot);
     expect(analyzeTimeLimitedIterativeDeepeningAlphaBetaSearch(ended, 2, 0, undefined, () => 0))
-      .toMatchObject({ selectedAction: null, completedDepth: 0, resultSource: 'fallback' });
+      .toMatchObject({ selectedAction: null, completedDepth: 0, resultSource: 'no-legal-actions', timedOut: false });
   });
 
   it('最大深さ1も期限切れならfallbackを返す', () => {

@@ -44,6 +44,7 @@ import {
 } from './gameRecord';
 import { createShogiGameRecordId } from './recordIdentity';
 import { executeResignation } from './resignation';
+import { adjudicateNoLegalActions } from './adjudication';
 
 /**
  * 500手規模では再生スナップショットが大半を占めるため、余裕を持って32 MiBとする。
@@ -489,13 +490,12 @@ function readResult(value: unknown, path: string): SavedGameResultV1 | null {
         : readIllegalMoveReason(object.foulReason, `${path}.foulReason`);
       return attachDetails({ ...players, endReason: 'foul_loss', foulReason }, detailsProbe);
     }
+    case 'no_legal_actions':
     case 'checkmate':
     case 'resignation': {
       const object = exactKeys(value, ['winner', 'loser', 'endReason'], ['details'], path);
       const players = decisive(object.winner, object.loser);
-      return endReason === 'checkmate'
-        ? attachDetails({ ...players, endReason: 'checkmate' }, detailsProbe)
-        : attachDetails({ ...players, endReason: 'resignation' }, detailsProbe);
+      return attachDetails({ ...players, endReason }, detailsProbe);
     }
     case 'repetition':
     case 'five_hundred_move_jishogi':
@@ -768,8 +768,9 @@ function toResult(result: SavedGameResultV1 | null): GameResult | null {
   switch (result.endReason) {
     case 'foul_loss':
       return { winner: result.winner, loser: result.loser, endReason: 'foul_loss', foulReason: result.foulReason, ...(result.details === undefined ? {} : { details: result.details }) };
+    case 'no_legal_actions':
     case 'checkmate':
-      return { winner: result.winner, loser: result.loser, endReason: 'checkmate', ...(result.details === undefined ? {} : { details: result.details }) };
+      return { winner: result.winner, loser: result.loser, endReason: result.endReason, ...(result.details === undefined ? {} : { details: result.details }) };
     case 'resignation':
       return { winner: result.winner, loser: result.loser, endReason: 'resignation', ...(result.details === undefined ? {} : { details: result.details }) };
     case 'repetition':
@@ -943,6 +944,13 @@ function validateNonMoveResult(
     const execution = executeEnteringKingDeclaration(replayed, { mode: 'strict', proposer: 'shogi_engine' });
     if (execution.type === 'rejected' || !same(createShogiGameRecordV1(execution.state, new Date(0)).result, saved)) {
       fail('inconsistent_record', '入玉宣言結果と局面が不整合です。');
+    }
+    return;
+  }
+  if (saved.endReason === 'no_legal_actions') {
+    const ended = adjudicateNoLegalActions(replayed);
+    if (!ended || !same(createShogiGameRecordV1(ended, new Date(0)).result, saved)) {
+      fail('inconsistent_record', '合法手なしの結果と局面が不整合です。');
     }
     return;
   }

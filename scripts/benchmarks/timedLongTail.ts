@@ -4,7 +4,7 @@ export interface LongTailSample {
   type: 'sample'; source: 'game' | 'replay'; id: string; gameId: string | null;
   ply: number; positionKeySha256: string; historyLength: number;
   probe: boolean; phase: 'warmup' | 'measurement'; run: number;
-  resultSource: 'fallback' | 'completed-iteration'; completedDepth: number; timedOut: boolean;
+  resultSource: 'fallback' | 'completed-iteration' | 'no-legal-actions'; completedDepth: number; timedOut: boolean;
   apiElapsedMilliseconds: number; callElapsedMilliseconds: number; excessMilliseconds: number;
   action: unknown; diagnostics: null | {
     phases: SearchDiagnostics['phases']; apiOtherMilliseconds: number; totalMilliseconds: number;

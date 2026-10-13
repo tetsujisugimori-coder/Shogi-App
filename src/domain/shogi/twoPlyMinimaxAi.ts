@@ -3,6 +3,7 @@
  * legal-action, execution, cloning, and material-evaluation domain APIs.
  */
 import type { BoardState, Player } from '../../types/shogi';
+import { isPlayerInCheck } from './checkmate';
 import { executeLegalAction, getLegalActions, type LegalAction } from './legalActions';
 import {
   DEFAULT_MATERIAL_VALUE_TABLE,
@@ -198,10 +199,29 @@ export function evaluateSearchPositionBreakdown(
   };
 }
 
-/**
- * Returns the total from the canonical search evaluation breakdown. The
- * historical numeric API remains unchanged for every caller and config form.
+/** Evaluate a root whose public legal-action enumeration has already returned [].
+ * Custom positions need not have passed post-move adjudication. Do not fabricate
+ * a decisive result for king-missing analysis fixtures.
  */
+export function evaluateNoLegalActionsPositionBreakdown(
+  state: BoardState,
+  perspective: Player,
+  evaluation: SearchEvaluationConfig = DEFAULT_MATERIAL_VALUE_TABLE
+): SearchEvaluationBreakdown {
+  const kings = state.squares.flat().filter(s => s.piece?.type === 'king');
+  if (state.status === 'ended' ||
+      !kings.some(s => s.piece?.player === 'sente') ||
+      !kings.some(s => s.piece?.player === 'gote')) {
+    return evaluateSearchPositionBreakdown(state, perspective, evaluation);
+  }
+  return evaluateSearchPositionBreakdown({
+    ...state, status: 'ended',
+    result: { winner: opponentOf(state.turn), loser: state.turn,
+      endReason: isPlayerInCheck(state, state.turn) ? 'checkmate' : 'no_legal_actions' },
+  }, perspective, evaluation);
+}
+
+/** Returns the total from the canonical evaluation of an adjudicated state. */
 export function evaluateSearchPosition(
   state: BoardState,
   perspective: Player,
@@ -238,6 +258,16 @@ function searchTwoPlyMinimax(
 ): UnmeasuredTwoPlyMinimaxSearchResult {
   const rootPlayer = state.turn;
   const rootActions = getLegalActions(state);
+  if (rootActions.length === 0 && state.status !== 'ended') {
+    const breakdown = evaluateNoLegalActionsPositionBreakdown(state, rootPlayer, evaluation);
+    if (breakdown.terminal !== null) {
+      return {
+        selectedAction: null, selectedEvaluation: breakdown.total, evaluationBreakdown: breakdown,
+        rootLegalActionCount: 0, visitedPositionCount: 0,
+        depth: TWO_PLY_MINIMAX_SEARCH_DEPTH, topCandidates: [],
+      };
+    }
+  }
   let bestAction: LegalAction | null = null;
   let bestEvaluation = Number.NEGATIVE_INFINITY;
   let bestBreakdown: SearchEvaluationBreakdown | null = null;
