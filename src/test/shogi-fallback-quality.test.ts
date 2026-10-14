@@ -8,7 +8,8 @@ import { protectSearchInput } from '../domain/shogi/selfPlayGame';
 import { noLegalActionsCase } from './no-legal-actions.cases';
 import { replayPositions, SOURCE } from '../../scripts/benchmarks/timedDepthOneDiagnostics';
 import { apply, classify, encodeScore, finiteLoss, movingSide, reference, options, evaluation, summarize,
-  verifyAction, sha256, type TimedSample, type ReferenceRow } from '../../scripts/benchmarks/fallbackQuality';
+  verifyAction, sha256, tacticalEvidence, type TimedSample, type ReferenceRow } from '../../scripts/benchmarks/fallbackQuality';
+import { evaluateMaterial } from '../domain/shogi/materialEvaluation';
 
 function kings(turn: Player = 'sente'): BoardState {
   const state = createInitialBoardState();
@@ -65,6 +66,18 @@ describe('fallback quality diagnostics', () => {
     const input = protectSearchInput(state); const before = JSON.stringify(state);
     analyzeAlphaBetaSearch(input.snapshot, 0, evaluation);
     expect(input.wasMutated()).toBe(false); expect(JSON.stringify(state)).toBe(before);
+  });
+  it('saves a legally replayable material witness and an alternative, without claiming a free capture', () => {
+    const state = replayPositions(SOURCE, [{ game: 4, ply: 89, band: 'late' }]).positions[0].state;
+    const ref = reference(state); const before = JSON.stringify(state);
+    const evidence = tacticalEvidence(state, ref.result.selectedAction!);
+    const child = apply(state, evidence.fallback.action);
+    const after = apply(child, evidence.fallback.witness!);
+    expect(evaluateMaterial(after, state.turn) - evaluateMaterial(child, state.turn)).toBe(-600);
+    expect(evidence.alternative.worstDeltaFromRoot).toBe(0);
+    expect(evidence.betterOneReplyMaterialHorizon).toBe(true);
+    expect(evidence.missedMateInOne).toBe(false); expect(evidence.allowsMateInOne).toBe(false);
+    expect(JSON.stringify(state)).toBe(before);
   });
   it('keeps terminal scores lossless and excludes missing/incomplete reference scores', () => {
     expect(JSON.parse(JSON.stringify([encodeScore(Infinity), encodeScore(-Infinity), encodeScore(null)])))
