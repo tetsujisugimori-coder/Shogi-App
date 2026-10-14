@@ -1,3 +1,5 @@
+import { analyzeTimeLimitedIterativeDeepeningAlphaBetaSearch as partialTimed } from '../domain/shogi/twoPlyAlphaBetaAi';
+import { createInitialBoardState } from '../types/shogi';
 import { comparisonCaptureTrap, comparisonExtendedPv } from './fixtures/quiescenceComparisonPositions';
 import recorded from './fixtures/time-limited-quiescence-comparison-results.json';
 import { validateTimeLimitedQuiescenceComparison } from '../application/timeLimitedQuiescenceComparisonValidation';
@@ -171,4 +173,19 @@ describe('比較Workerのアトミックな通信と終了', () => {
     expect(response).toEqual({ type: 'time-limited-quiescence-comparison-failed', requestId: 'x', errorName: 'Error', errorMessage: 'third search failed' });
     expect(response).not.toHaveProperty('results');
   });
+});
+
+
+it('validates three partial-root comparison candidates with depth zero and actual PVs', () => {
+  const position = createInitialBoardState();
+  const candidates = ([null,1,2] as const).map(extension => {
+    // Static leaves isolate the transport contract; real quiescence exactness is tested separately.
+    let reads = 0;
+    return { ...partialTimed(position,4,1000,undefined,()=> ++reads >= 7 ? 1000 : 0),
+      quiescenceMaxTacticalDepth: extension };
+  });
+  expect(candidates.every(r=>r.resultSource==='partial-root')).toBe(true);
+  expect(()=>validateTimeLimitedQuiescenceComparison(position,4,1000,structuredClone(candidates))).not.toThrow();
+  candidates[0].selectedEvaluation = null;
+  expect(()=>validateTimeLimitedQuiescenceComparison(position,4,1000,candidates)).toThrow();
 });

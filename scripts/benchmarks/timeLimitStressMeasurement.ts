@@ -1,3 +1,4 @@
+import { validatePartialRoot } from '../../src/application/partialRootValidation';
 import type { BoardState } from '../../src/types/shogi';
 import { getLegalActions } from '../../src/domain/shogi/legalActions';
 import {
@@ -57,7 +58,8 @@ export function measureStressSample(args: {
     result.selectedAction === null || !legal.some((action) => areLegalActionsEqual(action, result.selectedAction!)) ||
     result.iterations.length !== result.completedDepth ||
     (result.completedDepth > 0 && result.iterations[0]?.depth !== 1) ||
-    (result.completedDepth === 0 && (result.resultSource !== 'fallback' || !result.timedOut ||
+    (result.resultSource === 'partial-root' && !validatePartialRoot(args.state, result, args.mode === 'quiescence-1' ? 1 : 0)) ||
+    (result.completedDepth === 0 && result.resultSource !== 'partial-root' && (result.resultSource !== 'fallback' || !result.timedOut ||
       result.selectedEvaluation !== null || result.evaluationBreakdown !== null || result.principalVariation.length !== 0)) ||
     (result.completedDepth > 0 && result.resultSource !== 'completed-iteration')) {
     throw new Error(`${args.position.id}: search result or root position is invalid`);

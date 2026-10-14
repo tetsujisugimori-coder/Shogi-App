@@ -25,6 +25,7 @@ type ObservationKey = StatisticKey | 'selectedEvaluation' | 'completedDepth' |
 export type SelfPlaySearchResult = Pick<TimeLimitedIterativeDeepeningAlphaBetaSearchResult, 'selectedAction'> & {
   [K in ObservationKey]: TimeLimitedIterativeDeepeningAlphaBetaSearchResult[K] | null;
 } & { resultSource?: TimeLimitedIterativeDeepeningAlphaBetaSearchResult['resultSource'];
+  partialRoot?: TimeLimitedIterativeDeepeningAlphaBetaSearchResult['partialRoot'];
   /** Measured by the caller around the entire search API invocation. */
   actualElapsedMilliseconds?: number };
 
@@ -114,11 +115,14 @@ function isAction(value: unknown): value is LegalAction {
 function validateObservations(state: BoardState, result: SelfPlaySearchResult): void {
   const invalid = (field: string): never => { throw new TypeError(`Invalid self-play search result: ${field}.`); };
   if (result.resultSource !== undefined && result.resultSource !== 'fallback' &&
-    result.resultSource !== 'completed-iteration') invalid('resultSource');
+    result.resultSource !== 'completed-iteration' && result.resultSource !== 'partial-root') invalid('resultSource');
   if (result.resultSource === 'fallback' && (result.completedDepth !== 0 || !result.timedOut ||
     result.selectedEvaluation !== null || result.evaluationBreakdown !== null ||
     result.principalVariation?.length !== 0 || statisticPairs.some(([key, total]) =>
       result[key] !== 0 || result[total] !== 0))) invalid('fallback');
+  if (result.resultSource === 'partial-root' && (result.completedDepth !== 0 || !result.timedOut ||
+    result.selectedEvaluation === null || result.evaluationBreakdown === null || !result.principalVariation?.length ||
+    statisticPairs.some(([key, total]) => result[key] !== 0 || result[total] !== 0))) invalid('partial-root');
   if (result.selectedEvaluation !== null && !score(result.selectedEvaluation)) invalid('selectedEvaluation');
   if (result.completedDepth !== null && !count(result.completedDepth)) invalid('completedDepth');
   if (result.elapsedMilliseconds !== null &&
@@ -225,6 +229,8 @@ export function runSelfPlayGame<SenteSettings, GoteSettings>(options: {
         principalVariation: result.principalVariation?.map(cloneAction) ?? null,
         evaluationBreakdown: result.evaluationBreakdown === null ? null : { ...result.evaluationBreakdown },
         ...(result.resultSource === undefined ? {} : { resultSource: result.resultSource }),
+        ...(result.partialRoot === undefined ? {} : { partialRoot: { ...result.partialRoot,
+          attemptedStatistics: { ...result.partialRoot.attemptedStatistics } } }),
         ...(result.actualElapsedMilliseconds === undefined ? {} : { actualElapsedMilliseconds: result.actualElapsedMilliseconds }),
       };
     } catch (error) {

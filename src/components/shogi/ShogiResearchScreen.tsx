@@ -1,3 +1,4 @@
+import { validatePartialRoot } from '../../application/partialRootValidation';
 import { TIME_LIMITED_QUIESCENCE_COMPARISON_MAX_DEPTH, TIME_LIMITED_QUIESCENCE_COMPARISON_MILLISECONDS } from '../../domain/shogi/timeLimitedQuiescenceComparison';
 import { runTimeLimitedQuiescenceComparisonInWorker } from '../../application/timeLimitedQuiescenceComparisonWorkerClient';
 import { validateTimeLimitedQuiescenceComparison } from '../../application/timeLimitedQuiescenceComparisonValidation';
@@ -1009,7 +1010,7 @@ export const ShogiResearchScreen: React.FC<ShogiResearchScreenProps> = ({
         principalVariationNotations: result.resultSource === 'fallback'
           ? result.selectedAction ? [formatLegalActionNotation(snapshot, result.selectedAction)] : []
           : result.selectedAction
-            ? validateAndFormatPrincipalVariation(snapshot, result, result.depth + (result.quiescenceMaxTacticalDepth ?? 0))! : [],
+            ? validateAndFormatPrincipalVariation(snapshot, result, (result.resultSource === 'partial-root' ? 1 : result.depth) + (result.quiescenceMaxTacticalDepth ?? 0))! : [],
       }));
       activeWorkerSearchRef.current = null;
       setTimeLimitedQuiescenceComparisonDisplay({ perspective: snapshot.turn, entries });
@@ -1151,7 +1152,9 @@ export const ShogiResearchScreen: React.FC<ShogiResearchScreenProps> = ({
           rootActions[0] !== undefined && areLegalActionsEqual(rootActions[0], result.selectedAction);
         const principalVariationNotations = result.resultSource === 'fallback'
           ? fallbackValid ? [] : null
-          : validateAndFormatPrincipalVariation(searchState, result, result.completedDepth);
+          : result.resultSource === 'partial-root'
+            ? validatePartialRoot(searchState, result, result.quiescenceMaxTacticalDepth ?? 0)
+            : validateAndFormatPrincipalVariation(searchState, result, result.completedDepth + (result.quiescenceMaxTacticalDepth ?? 0));
         if (!principalVariationNotations) {
           activeWorkerSearchRef.current = null;
           setWorkerSearchState({

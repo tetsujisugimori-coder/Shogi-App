@@ -33,10 +33,10 @@ export function AiJudgmentPanel({ search, thinking }: AiJudgmentPanelProps) {
             <dt>評価値</dt><dd>{search.kind === 'time-limited-worker' && search.result.resultSource === 'fallback'
               ? '未評価（合法手を選択）' : `先手 ${formatSenteEvaluation(search.result.selectedEvaluation, search.perspective)}`}</dd>
           </dl>
-          {search.kind === 'time-limited-worker' && search.result.resultSource === 'completed-iteration' && (
+          {search.kind === 'time-limited-worker' && (search.result.resultSource === 'completed-iteration' || search.result.resultSource === 'partial-root') && (
             <div>
               <h3 className="font-medium">AIの読み筋</h3>
-              <p className="mt-1 text-stone-400">完了深さ {search.result.completedDepth} ply 中 {search.principalVariationNotations.length} 手順</p>
+              <p className="mt-1 text-stone-400">{search.result.resultSource === 'partial-root' ? '部分探索・深さ1未完了：選択候補の評価・PV' : `完了深さ ${search.result.completedDepth} ply 中 ${search.principalVariationNotations.length} 手順`}</p>
               <ol className="mt-1 list-decimal space-y-1 pl-5">
                 {search.principalVariationNotations.map((notation, index) => <li key={index}>{notation}</li>)}
               </ol>

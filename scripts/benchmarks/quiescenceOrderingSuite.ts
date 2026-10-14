@@ -1,3 +1,4 @@
+import { validatePartialRoot } from '../../src/application/partialRootValidation';
 import assert from 'node:assert/strict';
 import type { BoardState } from '../../src/types/shogi';
 import { createComparisonSnapshot } from '../../src/domain/shogi/evaluationPresetComparison';
@@ -121,6 +122,9 @@ export function validateOrderingResult(state: BoardState, result: SearchResult, 
   assert.ok(Number.isSafeInteger(result.completedDepth) && result.completedDepth >= 0 && result.completedDepth <= timedOptions.maxDepth);
   assert.equal(result.timedOut, result.completedDepth < timedOptions.maxDepth);
   assert.equal(result.iterations.length, result.completedDepth);
+  if (result.resultSource === 'partial-root') {
+    const pv = validatePartialRoot(state, result, extension); assert.ok(pv); return pv;
+  }
   if (result.completedDepth === 0) {
     const legal = getLegalActions(state);
     assert.equal(result.resultSource, 'fallback');

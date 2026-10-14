@@ -45,12 +45,16 @@ export function apply(state: BoardState, action: LegalAction) {
 }
 export function classify(result: TimedResult) {
   const source = result.resultSource;
-  assert.ok(['fallback', 'completed-iteration', 'no-legal-actions', 'ended-position'].includes(source));
+  assert.ok(['fallback', 'partial-root', 'completed-iteration', 'no-legal-actions', 'ended-position'].includes(source));
   if (source === 'fallback') {
     assert.equal(result.completedDepth, 0); assert.equal(result.iterations.length, 0);
     assert.ok(result.selectedAction); assert.equal(result.selectedEvaluation, null);
     assert.equal(result.evaluationBreakdown, null); assert.deepEqual(result.principalVariation, []);
     assert.equal(result.timedOut, true); assert.ok(result.rootLegalActionCount > 0);
+  } else if (source === 'partial-root') {
+    assert.equal(result.completedDepth, 0); assert.equal(result.iterations.length, 0);
+    assert.ok(result.selectedAction && result.selectedEvaluation !== null && result.evaluationBreakdown);
+    assert.equal(result.timedOut, true); assert.ok(result.partialRoot);
   } else if (source === 'completed-iteration') {
     assert.ok(result.completedDepth >= 1); assert.equal(result.iterations.at(-1)?.depth, result.completedDepth);
   } else {

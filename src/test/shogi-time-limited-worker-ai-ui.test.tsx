@@ -1,3 +1,6 @@
+import { createTimeLimitedIterativeDeepeningAlphaBetaSearchWorkerClient, type TimeLimitedIterativeDeepeningAlphaBetaSearchWorkerLike } from '../application/timeLimitedIterativeDeepeningAlphaBetaWorkerClient';
+import type { TimeLimitedIterativeDeepeningAlphaBetaSearchWorkerRequest } from '../workers/timeLimitedIterativeDeepeningAlphaBetaWorkerProtocol';
+import { handleTimeLimitedIterativeDeepeningAlphaBetaSearchWorkerRequest } from '../workers/timeLimitedIterativeDeepeningAlphaBetaWorkerHandler';
 import type { PresetTimeLimitedSearchResult } from '../workers/timeLimitedIterativeDeepeningAlphaBetaWorkerProtocol';
 import { DEFAULT_SEARCH_EVALUATION_PRESET_ID } from '../domain/shogi/searchEvaluationPresets';
 import React from 'react';
@@ -125,6 +128,55 @@ function createFourMoveState() {
 }
 
 describe('時間制限Worker AIの盤面UI接続', () => {
+  it('Worker handlerのpartial-rootをcloneして表示し、合法な1手だけを適用する', async () => {
+    const state = createInitialBoardState();
+    const response = handleTimeLimitedIterativeDeepeningAlphaBetaSearchWorkerRequest({
+      type: 'run-time-limited-iterative-deepening-alpha-beta-search', requestId: 'partial',
+      state, maxDepth: 4, timeLimitMilliseconds: 100,
+    }, (input, depth, limit, evaluation) => {
+      let reads = 0;
+      return analyzeTimeLimitedIterativeDeepeningAlphaBetaSearch(input, depth, limit, evaluation,
+        () => ++reads >= 7 ? 100 : 0);
+    });
+    expect(response.type).toBe('time-limited-iterative-deepening-alpha-beta-search-succeeded');
+    if (response.type !== 'time-limited-iterative-deepening-alpha-beta-search-succeeded') throw new Error('fixture');
+    const result = structuredClone(response.result);
+    expect(result.resultSource).toBe('partial-root');
+    const user = userEvent.setup();
+    const events = new EventTarget();
+    const transport = {
+      addEventListener(type: string, listener: EventListener) { events.addEventListener(type, listener); },
+      postMessage(request: TimeLimitedIterativeDeepeningAlphaBetaSearchWorkerRequest) {
+        events.dispatchEvent(new MessageEvent('message', { data: structuredClone({ ...response, requestId: request.requestId }) }));
+      },
+      terminate: vi.fn(),
+    } as unknown as TimeLimitedIterativeDeepeningAlphaBetaSearchWorkerLike;
+    const client = createTimeLimitedIterativeDeepeningAlphaBetaSearchWorkerClient({ workerFactory: () => transport });
+    render(<ShogiResearchScreen workerSearchRunner={(...args) => client.run(...args)} />);
+    await user.click(workerButton());
+    expect(transport.terminate).toHaveBeenCalledTimes(1);
+    expect(document.getElementById('shogi-research-screen')).toHaveAttribute('data-history-count', '1');
+    expect(document.getElementById('shogi-research-screen')).toHaveAttribute('data-ai-search-depth', '0');
+    expect(screen.getByText('部分探索・深さ1未完了')).toBeVisible();
+    await user.click(screen.getByText('AIの判断'));
+    expect(screen.getByText('AIの読み筋')).toBeVisible();
+    expect(screen.getByText('部分探索・深さ1未完了：選択候補の評価・PV')).toBeVisible();
+  });
+
+  it('中止後に到着したpartial-rootを着手に適用しない', async () => {
+    const pending = deferred<PresetTimeLimitedSearchResult>();
+    const user = userEvent.setup();
+    render(<ShogiResearchScreen workerSearchRunner={() => pending.promise} />);
+    await user.click(workerButton());
+    await user.click(screen.getByRole('button', { name: '思考を中止' }));
+    let reads = 0;
+    const result = analyzeTimeLimitedIterativeDeepeningAlphaBetaSearch(createInitialBoardState(), 4, 100,
+      undefined, () => ++reads >= 7 ? 100 : 0);
+    await act(async () => pending.resolve({ ...result, evaluationPresetId: DEFAULT_SEARCH_EVALUATION_PRESET_ID,
+      quiescenceMaxTacticalDepth: null }));
+    expect(document.getElementById('shogi-research-screen')).toHaveAttribute('data-history-count', '0');
+  });
+
   it('深さ1未完了のfallback手を着手し、評価値とPVを捏造して表示しない', async () => {
     const fallback = analyzeTimeLimitedIterativeDeepeningAlphaBetaSearch(
       createInitialBoardState(), 4, 0, undefined, () => 0
@@ -183,7 +235,7 @@ describe('時間制限Worker AIの盤面UI接続', () => {
     expect(screen.getByText('静止探索の量（通常探索とは別）')).toBeVisible();
     expect(screen.getByText('最深完了反復の静止探索葉数')).toBeVisible();
     expect(screen.getByText('最深完了反復の静止探索調査局面数').nextElementSibling).toHaveTextContent('5');
-    expect(screen.getByText('全反復合計の静止探索葉数').nextElementSibling).toHaveTextContent('7');
+    expect(screen.getByText('全完了反復合計の静止探索葉数').nextElementSibling).toHaveTextContent('7');
     expect(select).toBeEnabled();
   });
 
@@ -363,7 +415,7 @@ describe('時間制限Worker AIの盤面UI接続', () => {
     expect(within(panel).getByText('指定最大深さ')).toBeInTheDocument();
     expect(within(panel).getByText('API全体の経過時間')).toBeInTheDocument();
     expect(within(panel).getByText('最深完了反復の調査局面数')).toBeInTheDocument();
-    expect(within(panel).getByText('全反復合計の調査局面数')).toBeInTheDocument();
+    expect(within(panel).getByText('全完了反復合計の調査局面数')).toBeInTheDocument();
   });
 
   it('検証済みPVを局面ごとの棋譜表記でAIの読み筋として順番に表示し、盤面へは先頭手だけ適用する', async () => {
