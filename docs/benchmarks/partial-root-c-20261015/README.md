@@ -57,7 +57,7 @@ npm run check
 
 mainはprotected=false、required_status_checks APIは「Branch not protected」404。今回の確認対象はリポジトリ標準CIのVerify on ubuntu-latest / macos-latest（lock、型、全テスト、build、macOS固有check）。公開後に最終head SHAと照合する。
 
-前回診断zip SHA256: a3360e433ece30e2d361e8541011d9cc2d12da1ba87cbcd589a22148240d2e3c0。zip内report.txtは展開原本とバイト一致（SHA256 8dbb021576b81b768d29fe039fdc41e63b5b1033306abaf5afdd4463b3dfbbd7）。
+前回診断zip SHA256: a3360e433ece30e2d361e8541011d9cc2d12da1ba87bcd589a22148240d2e3c0。zip内report.txtは展開原本とバイト一致（SHA256 8dbb021576b81b768d29fe039fdc41e63b5b1033306abaf5afdd4463b3dfbbd7）。
 
 製品最終コードのローカル全体検証（並列1）は71ファイル/1,932テスト中1,931成功・1既存timeout（反復測定、6.880秒）。新規/変更対象の22追加テストを含め、assertion失敗は0。lock検証・型検査成功、別実行のbuild成功（18.31秒）。標準全体checkの失敗を個別成功で置き換えたものではない。timeoutを緩めていない。GitHub標準2OS CIを確認するまでは必須チェック成功とは主張しない。
 
