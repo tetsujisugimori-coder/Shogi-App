@@ -1,0 +1,575 @@
+{
+  "schema": "fallback-quality-summary-v1",
+  "inputByteSha256": {
+    "timed.jsonl": "decd531aad8e43363ad5cb26725233ac3c69dc88a1d91f73f3b10c25d7e4f397",
+    "reference.jsonl": "a936223ffabdfc03355da3b443b46984542399de59eec2898420addff611e196",
+    "tactics.jsonl": "25c535e481b65be518767766da6334597f8de87af41d7d7e8d28f903b2fb214a",
+    "positions.json.gz": "f7e092021ec24bcbfa8ef65436918b76e11ffee92c402f9b306443e848d18e16"
+  },
+  "uniquePositions": 10,
+  "measurementCalls": 100,
+  "rows": [
+    {
+      "positionId": "g1-p5",
+      "budget": 100,
+      "samples": 5,
+      "fallback": 0,
+      "depthDistribution": {
+        "2": 5
+      },
+      "sources": {
+        "completed-iteration": 5
+      },
+      "callMedianMs": 100.0890000000004,
+      "callMinMs": 100.0827999999999,
+      "callMaxMs": 100.44529999999986,
+      "apiMedianMs": 100.07279999999992,
+      "overrunMedianMs": 0.08900000000039654,
+      "overrunMaxMs": 0.44529999999986103,
+      "overBudget": 5,
+      "referenceStatus": "complete",
+      "actionMatches": false,
+      "finiteComparable": true,
+      "finiteLoss": 202,
+      "terminalComparison": null
+    },
+    {
+      "positionId": "g1-p5",
+      "budget": 1000,
+      "samples": 5,
+      "fallback": 0,
+      "depthDistribution": {
+        "2": 5
+      },
+      "sources": {
+        "completed-iteration": 5
+      },
+      "callMedianMs": 1000.5824999999995,
+      "callMinMs": 1000.2984999999999,
+      "callMaxMs": 1000.6950999999999,
+      "apiMedianMs": 1000.5389000000005,
+      "overrunMedianMs": 0.5824999999995271,
+      "overrunMaxMs": 0.6950999999999112,
+      "overBudget": 5,
+      "referenceStatus": "complete",
+      "actionMatches": false,
+      "finiteComparable": true,
+      "finiteLoss": 202,
+      "terminalComparison": null
+    },
+    {
+      "positionId": "g1-p30",
+      "budget": 100,
+      "samples": 5,
+      "fallback": 5,
+      "depthDistribution": {
+        "0": 5
+      },
+      "sources": {
+        "fallback": 5
+      },
+      "callMedianMs": 100.70870000000104,
+      "callMinMs": 100.6232,
+      "callMaxMs": 101.59089999999924,
+      "apiMedianMs": 100.65999999999985,
+      "overrunMedianMs": 0.7087000000010448,
+      "overrunMaxMs": 1.5908999999992375,
+      "overBudget": 5,
+      "referenceStatus": "complete",
+      "actionMatches": false,
+      "finiteComparable": true,
+      "finiteLoss": 588,
+      "terminalComparison": null
+    },
+    {
+      "positionId": "g1-p30",
+      "budget": 1000,
+      "samples": 5,
+      "fallback": 0,
+      "depthDistribution": {
+        "1": 5
+      },
+      "sources": {
+        "completed-iteration": 5
+      },
+      "callMedianMs": 1000.7474999999995,
+      "callMinMs": 1000.3287,
+      "callMaxMs": 1001.2855999999992,
+      "apiMedianMs": 1000.6787999999997,
+      "overrunMedianMs": 0.7474999999994907,
+      "overrunMaxMs": 1.2855999999992491,
+      "overBudget": 5,
+      "referenceStatus": "complete",
+      "actionMatches": false,
+      "finiteComparable": true,
+      "finiteLoss": 588,
+      "terminalComparison": null
+    },
+    {
+      "positionId": "g2-p54",
+      "budget": 100,
+      "samples": 5,
+      "fallback": 0,
+      "depthDistribution": {
+        "1": 5
+      },
+      "sources": {
+        "completed-iteration": 5
+      },
+      "callMedianMs": 100.4974000000002,
+      "callMinMs": 100.4877000000015,
+      "callMaxMs": 101.04899999999907,
+      "apiMedianMs": 100.44959999999992,
+      "overrunMedianMs": 0.4974000000001979,
+      "overrunMaxMs": 1.0489999999990687,
+      "overBudget": 5,
+      "referenceStatus": "complete",
+      "actionMatches": true,
+      "finiteComparable": true,
+      "finiteLoss": 0,
+      "terminalComparison": null
+    },
+    {
+      "positionId": "g2-p54",
+      "budget": 1000,
+      "samples": 5,
+      "fallback": 0,
+      "depthDistribution": {
+        "2": 5
+      },
+      "sources": {
+        "completed-iteration": 5
+      },
+      "callMedianMs": 1002.0492999999988,
+      "callMinMs": 1000.5246999999981,
+      "callMaxMs": 1005.1190000000024,
+      "apiMedianMs": 1002.0164000000004,
+      "overrunMedianMs": 2.049299999998766,
+      "overrunMaxMs": 5.119000000002416,
+      "overBudget": 5,
+      "referenceStatus": "complete",
+      "actionMatches": true,
+      "finiteComparable": true,
+      "finiteLoss": 0,
+      "terminalComparison": null
+    },
+    {
+      "positionId": "g3-p55",
+      "budget": 100,
+      "samples": 5,
+      "fallback": 5,
+      "depthDistribution": {
+        "0": 5
+      },
+      "sources": {
+        "fallback": 5
+      },
+      "callMedianMs": 101.40829999999914,
+      "callMinMs": 100.41270000000077,
+      "callMaxMs": 102.5811999999969,
+      "apiMedianMs": 101.36969999999928,
+      "overrunMedianMs": 1.4082999999991443,
+      "overrunMaxMs": 2.5811999999968975,
+      "overBudget": 5,
+      "referenceStatus": "complete",
+      "actionMatches": false,
+      "finiteComparable": true,
+      "finiteLoss": 13,
+      "terminalComparison": null
+    },
+    {
+      "positionId": "g3-p55",
+      "budget": 1000,
+      "samples": 5,
+      "fallback": 0,
+      "depthDistribution": {
+        "1": 5
+      },
+      "sources": {
+        "completed-iteration": 5
+      },
+      "callMedianMs": 1003.2976000000017,
+      "callMinMs": 1000.6558999999979,
+      "callMaxMs": 1004.0117000000027,
+      "apiMedianMs": 1003.2527000000009,
+      "overrunMedianMs": 3.297600000001694,
+      "overrunMaxMs": 4.011700000002747,
+      "overBudget": 5,
+      "referenceStatus": "complete",
+      "actionMatches": false,
+      "finiteComparable": true,
+      "finiteLoss": 13,
+      "terminalComparison": null
+    },
+    {
+      "positionId": "g4-p89",
+      "budget": 100,
+      "samples": 5,
+      "fallback": 5,
+      "depthDistribution": {
+        "0": 5
+      },
+      "sources": {
+        "fallback": 5
+      },
+      "callMedianMs": 102.17990000000282,
+      "callMinMs": 100.42609999999695,
+      "callMaxMs": 103.31519999999728,
+      "apiMedianMs": 102.13769999999931,
+      "overrunMedianMs": 2.1799000000028173,
+      "overrunMaxMs": 3.315199999997276,
+      "overBudget": 5,
+      "referenceStatus": "complete",
+      "actionMatches": false,
+      "finiteComparable": true,
+      "finiteLoss": 614,
+      "terminalComparison": null
+    },
+    {
+      "positionId": "g4-p89",
+      "budget": 1000,
+      "samples": 5,
+      "fallback": 5,
+      "depthDistribution": {
+        "0": 5
+      },
+      "sources": {
+        "fallback": 5
+      },
+      "callMedianMs": 1000.9883000000045,
+      "callMinMs": 1000.4623000000065,
+      "callMaxMs": 1002.9811999999947,
+      "apiMedianMs": 1000.9415000000008,
+      "overrunMedianMs": 0.9883000000045286,
+      "overrunMaxMs": 2.9811999999947147,
+      "overBudget": 5,
+      "referenceStatus": "complete",
+      "actionMatches": false,
+      "finiteComparable": true,
+      "finiteLoss": 614,
+      "terminalComparison": null
+    },
+    {
+      "positionId": "g2-p92",
+      "budget": 100,
+      "samples": 5,
+      "fallback": 0,
+      "depthDistribution": {
+        "1": 5
+      },
+      "sources": {
+        "completed-iteration": 5
+      },
+      "callMedianMs": 101.12329999999929,
+      "callMinMs": 100.51929999999993,
+      "callMaxMs": 105.42020000000048,
+      "apiMedianMs": 101.08120000000054,
+      "overrunMedianMs": 1.1232999999992899,
+      "overrunMaxMs": 5.420200000000477,
+      "overBudget": 5,
+      "referenceStatus": "complete",
+      "actionMatches": true,
+      "finiteComparable": true,
+      "finiteLoss": 0,
+      "terminalComparison": null
+    },
+    {
+      "positionId": "g2-p92",
+      "budget": 1000,
+      "samples": 5,
+      "fallback": 0,
+      "depthDistribution": {
+        "2": 5
+      },
+      "sources": {
+        "completed-iteration": 5
+      },
+      "callMedianMs": 1000.9401999999973,
+      "callMinMs": 1000.7560999999987,
+      "callMaxMs": 1004.6063999999969,
+      "apiMedianMs": 1000.8979999999938,
+      "overrunMedianMs": 0.9401999999972759,
+      "overrunMaxMs": 4.606399999996938,
+      "overBudget": 5,
+      "referenceStatus": "complete",
+      "actionMatches": true,
+      "finiteComparable": true,
+      "finiteLoss": 0,
+      "terminalComparison": null
+    },
+    {
+      "positionId": "g1-p115",
+      "budget": 100,
+      "samples": 5,
+      "fallback": 5,
+      "depthDistribution": {
+        "0": 5
+      },
+      "sources": {
+        "fallback": 5
+      },
+      "callMedianMs": 100.96800000000076,
+      "callMinMs": 100.3775999999998,
+      "callMaxMs": 102.7381000000023,
+      "apiMedianMs": 100.92959999999584,
+      "overrunMedianMs": 0.9680000000007567,
+      "overrunMaxMs": 2.738100000002305,
+      "overBudget": 5,
+      "referenceStatus": "complete",
+      "actionMatches": false,
+      "finiteComparable": true,
+      "finiteLoss": 3295,
+      "terminalComparison": null
+    },
+    {
+      "positionId": "g1-p115",
+      "budget": 1000,
+      "samples": 5,
+      "fallback": 5,
+      "depthDistribution": {
+        "0": 5
+      },
+      "sources": {
+        "fallback": 5
+      },
+      "callMedianMs": 1001.4980999999971,
+      "callMinMs": 1000.9569999999949,
+      "callMaxMs": 1002.7652000000016,
+      "apiMedianMs": 1001.4496999999974,
+      "overrunMedianMs": 1.4980999999970663,
+      "overrunMaxMs": 2.7652000000016415,
+      "overBudget": 5,
+      "referenceStatus": "complete",
+      "actionMatches": false,
+      "finiteComparable": true,
+      "finiteLoss": 3295,
+      "terminalComparison": null
+    },
+    {
+      "positionId": "g1-p44",
+      "budget": 100,
+      "samples": 5,
+      "fallback": 0,
+      "depthDistribution": {
+        "1": 5
+      },
+      "sources": {
+        "completed-iteration": 5
+      },
+      "callMedianMs": 100.77219999999943,
+      "callMinMs": 100.40359999999782,
+      "callMaxMs": 101.14069999999629,
+      "apiMedianMs": 100.73409999999421,
+      "overrunMedianMs": 0.7721999999994296,
+      "overrunMaxMs": 1.1406999999962864,
+      "overBudget": 5,
+      "referenceStatus": "complete",
+      "actionMatches": false,
+      "finiteComparable": true,
+      "finiteLoss": 7,
+      "terminalComparison": null
+    },
+    {
+      "positionId": "g1-p44",
+      "budget": 1000,
+      "samples": 5,
+      "fallback": 0,
+      "depthDistribution": {
+        "2": 5
+      },
+      "sources": {
+        "completed-iteration": 5
+      },
+      "callMedianMs": 1001.944399999993,
+      "callMinMs": 1000.4262000000017,
+      "callMaxMs": 1005.0228000000061,
+      "apiMedianMs": 1001.9040000000095,
+      "overrunMedianMs": 1.9443999999930384,
+      "overrunMaxMs": 5.0228000000061,
+      "overBudget": 5,
+      "referenceStatus": "complete",
+      "actionMatches": false,
+      "finiteComparable": true,
+      "finiteLoss": 7,
+      "terminalComparison": null
+    },
+    {
+      "positionId": "g1-p93",
+      "budget": 100,
+      "samples": 5,
+      "fallback": 5,
+      "depthDistribution": {
+        "0": 5
+      },
+      "sources": {
+        "fallback": 5
+      },
+      "callMedianMs": 101.67519999999786,
+      "callMinMs": 100.33879999999772,
+      "callMaxMs": 103.28129999998782,
+      "apiMedianMs": 101.62489999999525,
+      "overrunMedianMs": 1.675199999997858,
+      "overrunMaxMs": 3.281299999987823,
+      "overBudget": 5,
+      "referenceStatus": "complete",
+      "actionMatches": false,
+      "finiteComparable": true,
+      "finiteLoss": 3698,
+      "terminalComparison": null
+    },
+    {
+      "positionId": "g1-p93",
+      "budget": 1000,
+      "samples": 5,
+      "fallback": 5,
+      "depthDistribution": {
+        "0": 5
+      },
+      "sources": {
+        "fallback": 5
+      },
+      "callMedianMs": 1002.1247999999905,
+      "callMinMs": 1000.4135999999999,
+      "callMaxMs": 1002.2516000000032,
+      "apiMedianMs": 1002.0750000000116,
+      "overrunMedianMs": 2.1247999999905005,
+      "overrunMaxMs": 2.2516000000032363,
+      "overBudget": 5,
+      "referenceStatus": "complete",
+      "actionMatches": false,
+      "finiteComparable": true,
+      "finiteLoss": 3698,
+      "terminalComparison": null
+    },
+    {
+      "positionId": "g3-p117",
+      "budget": 100,
+      "samples": 5,
+      "fallback": 5,
+      "depthDistribution": {
+        "0": 5
+      },
+      "sources": {
+        "fallback": 5
+      },
+      "callMedianMs": 101.14010000000417,
+      "callMinMs": 100.86460000000079,
+      "callMaxMs": 101.38439999999537,
+      "apiMedianMs": 101.09320000000298,
+      "overrunMedianMs": 1.1401000000041677,
+      "overrunMaxMs": 1.3843999999953667,
+      "overBudget": 5,
+      "referenceStatus": "complete",
+      "actionMatches": false,
+      "finiteComparable": true,
+      "finiteLoss": 3631,
+      "terminalComparison": null
+    },
+    {
+      "positionId": "g3-p117",
+      "budget": 1000,
+      "samples": 5,
+      "fallback": 5,
+      "depthDistribution": {
+        "0": 5
+      },
+      "sources": {
+        "fallback": 5
+      },
+      "callMedianMs": 1001.9098000000085,
+      "callMinMs": 1000.429999999993,
+      "callMaxMs": 1002.2182999999932,
+      "apiMedianMs": 1001.8660999999993,
+      "overrunMedianMs": 1.9098000000085449,
+      "overrunMaxMs": 2.218299999993178,
+      "overBudget": 5,
+      "referenceStatus": "complete",
+      "actionMatches": false,
+      "finiteComparable": true,
+      "finiteLoss": 3631,
+      "terminalComparison": null
+    }
+  ],
+  "tactics": [
+    {
+      "positionId": "g1-p5",
+      "status": "complete",
+      "missedMateInOne": false,
+      "allowsMateInOne": false,
+      "alternativeAvoidsMateInOne": false,
+      "betterOneReplyMaterialHorizon": true
+    },
+    {
+      "positionId": "g1-p30",
+      "status": "complete",
+      "missedMateInOne": false,
+      "allowsMateInOne": false,
+      "alternativeAvoidsMateInOne": false,
+      "betterOneReplyMaterialHorizon": true
+    },
+    {
+      "positionId": "g2-p54",
+      "status": "complete",
+      "missedMateInOne": false,
+      "allowsMateInOne": false,
+      "alternativeAvoidsMateInOne": false,
+      "betterOneReplyMaterialHorizon": false
+    },
+    {
+      "positionId": "g3-p55",
+      "status": "complete",
+      "missedMateInOne": false,
+      "allowsMateInOne": false,
+      "alternativeAvoidsMateInOne": false,
+      "betterOneReplyMaterialHorizon": false
+    },
+    {
+      "positionId": "g4-p89",
+      "status": "complete",
+      "missedMateInOne": false,
+      "allowsMateInOne": false,
+      "alternativeAvoidsMateInOne": false,
+      "betterOneReplyMaterialHorizon": true
+    },
+    {
+      "positionId": "g2-p92",
+      "status": "complete",
+      "missedMateInOne": false,
+      "allowsMateInOne": false,
+      "alternativeAvoidsMateInOne": false,
+      "betterOneReplyMaterialHorizon": false
+    },
+    {
+      "positionId": "g1-p115",
+      "status": "complete",
+      "missedMateInOne": false,
+      "allowsMateInOne": false,
+      "alternativeAvoidsMateInOne": false,
+      "betterOneReplyMaterialHorizon": true
+    },
+    {
+      "positionId": "g1-p44",
+      "status": "complete",
+      "missedMateInOne": false,
+      "allowsMateInOne": false,
+      "alternativeAvoidsMateInOne": false,
+      "betterOneReplyMaterialHorizon": false
+    },
+    {
+      "positionId": "g1-p93",
+      "status": "complete",
+      "missedMateInOne": false,
+      "allowsMateInOne": false,
+      "alternativeAvoidsMateInOne": false,
+      "betterOneReplyMaterialHorizon": true
+    },
+    {
+      "positionId": "g3-p117",
+      "status": "complete",
+      "missedMateInOne": false,
+      "allowsMateInOne": false,
+      "alternativeAvoidsMateInOne": false,
+      "betterOneReplyMaterialHorizon": true
+    }
+  ]
+}
