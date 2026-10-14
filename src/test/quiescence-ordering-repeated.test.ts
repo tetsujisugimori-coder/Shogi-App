@@ -40,6 +40,14 @@ function pass(state: BoardState, depth: number, variant: 'first' | 'last' | 'cap
     quiescenceLeafCount: 0, quiescenceVisitedPositionCount: 0, quiescenceCutoffCount: 0, quiescenceSkippedActionCount: 0 };
 }
 function timed(state: BoardState, depth: number, variant: 'first' | 'last' = 'first'): TimeLimitedIterativeDeepeningAlphaBetaSearchResult {
+  if (state.status === 'ended') {
+    const root=pass(state,0);
+    return { ...root, selectedEvaluation:root.evaluationBreakdown.total,
+      terminalResult:{...state.result!},resultSource:'ended-position',iterations:[],
+      requestedMaxDepth:4,completedDepth:0,timedOut:false,
+      ...Object.fromEntries(statisticKeys.map(([,sum])=>[sum,0])) as Record<typeof statisticKeys[number][1], number>,
+    };
+  }
   const iterations = Array.from({ length: depth }, (_, i) => pass(state, i + 1, variant));
   return { ...iterations.at(-1)!, iterations, requestedMaxDepth: 4, completedDepth: depth, timedOut: depth < 4,
     resultSource: 'completed-iteration',
@@ -110,9 +118,10 @@ describe('repeated ordering schedule and isolation', () => {
     for (const trial of entry.trials) {
       const result = trial.search as TimeLimitedIterativeDeepeningAlphaBetaSearchResult;
       // Fake-clock consequence, never an expectation on real runtime/depth.
-      expect(result.completedDepth).toBe(0); expect(result.timedOut).toBe(true);
-      expect(result.resultSource).toBe('fallback');
-      expect(result.elapsedMilliseconds).toBe(2400);
+      expect(result.completedDepth).toBe(0); expect(result.timedOut).toBe(false);
+      expect(result.resultSource).toBe('ended-position');
+      expect(result.terminalResult).toEqual(ended.create().result);
+      expect(result.elapsedMilliseconds).toBe(600);
       expect(result.iterations).toHaveLength(0);
     }
   });

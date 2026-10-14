@@ -255,6 +255,19 @@ export function validateDrop(
   return { isValid: true };
 }
 
+/** Exact existence query; shares validateDrop, including pawn-drop mate rules. */
+export function hasLegalDropSquare(state: BoardState, pieceId: string): boolean {
+  if (state.status === 'ended') return false;
+  const piece = getHands(state).current.find(candidate => candidate.id === pieceId);
+  if (!piece || piece.player !== state.turn || piece.type === 'king' || piece.isPromoted) return false;
+  for (let row = 0; row < 9; row += 1) {
+    for (let col = 0; col < 9; col += 1) {
+      if (validateDrop(state, pieceId, { row, col }).isValid) return true;
+    }
+  }
+  return false;
+}
+
 /** Returns every legal destination for the selected hand-piece ID. */
 export function getLegalDropSquares(state: BoardState, pieceId: string, diagnostics?: SearchDiagnostics,
   qDiagnostics?: SearchDiagnostics, probe?: ActionValidationProbe): Coordinate[] {

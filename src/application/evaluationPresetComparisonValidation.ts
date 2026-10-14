@@ -5,6 +5,7 @@ import { getLegalActions } from '../domain/shogi/legalActions';
 import { cloneBoardState } from '../domain/shogi/replay';
 import { getDisplayEvaluationBreakdown } from './searchEvaluationBreakdownValidation';
 import { validateAndFormatPrincipalVariation } from './searchPrincipalVariation';
+import { evaluateNoLegalActionsPositionBreakdown } from '../domain/shogi/twoPlyMinimaxAi';
 
 /** BoardState consists solely of cloneable record data; normalize optional fields. */
 export function isSameComparisonPosition(left: BoardState, right: BoardState): boolean {
@@ -15,7 +16,7 @@ export function isSameComparisonPosition(left: BoardState, right: BoardState): b
   }
 }
 
-/** Fail the entire job before publishing anything. No evaluation runs here. */
+/** Fail before publishing; only no-action roots need a terminal consistency query. */
 export function validateEvaluationPresetComparison(
   state: BoardState, depth: number, value: unknown,
 ): asserts value is readonly EvaluationPresetComparisonResult[] {
@@ -31,12 +32,14 @@ export function validateEvaluationPresetComparison(
         (key) => Number.isSafeInteger(result[key]) && result[key] >= 0) ||
       result.rootLegalActionCount !== legalCount ||
       !Number.isFinite(result.elapsedMilliseconds) || result.elapsedMilliseconds < 0) return invalid();
-    // Fixed-depth search keeps selectedEvaluation null when there are no root moves.
+    // An unadjudicated no-action root can carry a decisive terminal evaluation.
     const noAction = result.selectedAction === null && legalCount === 0;
     if (!getDisplayEvaluationBreakdown(result.evaluationBreakdown,
       noAction ? result.evaluationBreakdown?.total : result.selectedEvaluation)) return invalid();
     if (noAction) {
-      if (result.selectedEvaluation !== null || result.principalVariation.length !== 0 ||
+      const expected = evaluateNoLegalActionsPositionBreakdown(state, state.turn);
+      const selected = state.status === 'ended' || expected.terminal === null ? null : expected.total;
+      if (result.selectedEvaluation !== selected || result.evaluationBreakdown.terminal !== expected.terminal || result.principalVariation.length !== 0 ||
         result.visitedPositionCount !== 0 || result.cutoffCount !== 0 || result.skippedActionCount !== 0) return invalid();
     } else if (!validateAndFormatPrincipalVariation(state, result, depth, true)) return invalid();
   }

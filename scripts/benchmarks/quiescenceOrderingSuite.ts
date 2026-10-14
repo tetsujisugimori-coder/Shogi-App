@@ -3,7 +3,7 @@ import type { BoardState } from '../../src/types/shogi';
 import { createComparisonSnapshot } from '../../src/domain/shogi/evaluationPresetComparison';
 import { executeLegalAction, getLegalActions } from '../../src/domain/shogi/legalActions';
 import { cloneBoardState } from '../../src/domain/shogi/replay';
-import { evaluateSearchPositionBreakdown } from '../../src/domain/shogi/twoPlyMinimaxAi';
+import { evaluateSearchPositionBreakdown, evaluateNoLegalActionsPositionBreakdown } from '../../src/domain/shogi/twoPlyMinimaxAi';
 import { analyzeAlphaBetaSearch, analyzeTimeLimitedIterativeDeepeningAlphaBetaSearch,
   type AlphaBetaSearchResult, type TimeLimitedIterativeDeepeningAlphaBetaSearchResult } from '../../src/domain/shogi/twoPlyAlphaBetaAi';
 import { formatLegalActionNotation, validateAndFormatPrincipalVariation } from '../../src/application/searchPrincipalVariation';
@@ -80,6 +80,44 @@ export function validateOrderingResult(state: BoardState, result: SearchResult, 
   }
   assert.ok('iterations' in result, '完了反復なし');
   assert.equal(result.requestedMaxDepth, timedOptions.maxDepth);
+  if (state.status === 'ended') assert.equal(result.resultSource,'ended-position','終局root分類');
+  if (result.resultSource === 'ended-position') {
+    assert.equal(state.status, 'ended');
+    assert.deepStrictEqual(result.terminalResult, state.result, '元の終局理由');
+    assert.equal(result.depth, 0);
+    assert.equal(result.completedDepth, 0);
+    assert.equal(result.timedOut, false);
+    assert.equal(result.rootLegalActionCount, 0);
+    assert.equal(result.selectedAction, null);
+    assert.deepStrictEqual(result.iterations, []);
+    assert.deepStrictEqual(result.principalVariation, []);
+    assert.deepStrictEqual(result.evaluationBreakdown, evaluateSearchPositionBreakdown(state,state.turn));
+    assert.equal(result.selectedEvaluation, result.evaluationBreakdown.total);
+    assert.ok(Number.isFinite(result.elapsedMilliseconds) && result.elapsedMilliseconds>=0);
+    for (const [key,total] of statisticKeys) {
+      assert.equal(result[key],0,`終局root:${key}`);
+      assert.equal(result[total],0,`完了反復合計:${total}`);
+    }
+    return [];
+  }
+  if (result.resultSource === 'no-legal-actions') {
+    assert.notEqual(state.status,'ended');
+    assert.equal(getLegalActions(state).length,0);
+    assert.equal(result.terminalResult,undefined);
+    assert.equal(result.depth,0);
+    assert.equal(result.completedDepth,0);
+    assert.equal(result.timedOut,false);
+    assert.equal(result.selectedAction,null);
+    assert.equal(result.rootLegalActionCount,0);
+    assert.deepStrictEqual(result.iterations,[]);
+    assert.deepStrictEqual(result.principalVariation,[]);
+    const expected = evaluateNoLegalActionsPositionBreakdown(state,state.turn);
+    assert.deepStrictEqual(result.evaluationBreakdown,expected);
+    assert.equal(result.selectedEvaluation,expected.total);
+    assert.ok(Number.isFinite(result.elapsedMilliseconds) && result.elapsedMilliseconds>=0);
+    assert.ok(statisticKeys.every(([key,total])=>result[key]===0 && result[total]===0));
+    return [];
+  }
   assert.ok(Number.isSafeInteger(result.completedDepth) && result.completedDepth >= 0 && result.completedDepth <= timedOptions.maxDepth);
   assert.equal(result.timedOut, result.completedDepth < timedOptions.maxDepth);
   assert.equal(result.iterations.length, result.completedDepth);

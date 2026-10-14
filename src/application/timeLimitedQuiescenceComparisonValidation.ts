@@ -7,6 +7,8 @@ import { areLegalActionsEqual } from '../domain/shogi/twoPlyAlphaBetaAi';
 import { getDisplayEvaluationBreakdown } from './searchEvaluationBreakdownValidation';
 import { validateAndFormatPrincipalVariation } from './searchPrincipalVariation';
 import { quiescenceComparisonProtocolError } from './quiescenceComparisonValidation';
+import { evaluateNoLegalActionsPositionBreakdown } from '../domain/shogi/twoPlyMinimaxAi';
+import { evaluateSearchPositionBreakdown } from '../domain/shogi/twoPlyMinimaxAi';
 
 const statistics = [
   ['visitedPositionCount', 'totalVisitedPositionCount'],
@@ -40,10 +42,10 @@ export function validateTimeLimitedQuiescenceComparison(
     if (!getDisplayEvaluationBreakdown(pass.evaluationBreakdown,
       noAction ? pass.evaluationBreakdown?.total : pass.selectedEvaluation)) return invalid();
     if (noAction) {
-      const terminal = state.status !== 'ended' ? null : state.result?.winner === null
-        ? 'draw' : state.result?.winner === state.turn ? 'win' : 'loss';
-      if (pass.selectedEvaluation !== null || pass.principalVariation.length !== 0 ||
-        statistics.some(([key]) => pass[key] !== 0) || pass.evaluationBreakdown.terminal !== terminal) return invalid();
+      const expected = evaluateNoLegalActionsPositionBreakdown(state, state.turn);
+      const selected = state.status === 'ended' || expected.terminal === null ? null : expected.total;
+      if (pass.selectedEvaluation !== selected || pass.principalVariation.length !== 0 ||
+        statistics.some(([key]) => pass[key] !== 0) || pass.evaluationBreakdown.terminal !== expected.terminal) return invalid();
     } else if (!validateAndFormatPrincipalVariation(state, pass, Math.max(depth, pass.principalVariation.length), true)) return invalid();
   };
   for (const [index, entry] of (value as unknown[]).entries()) {
@@ -51,6 +53,32 @@ export function validateTimeLimitedQuiescenceComparison(
     if (typeof entry !== 'object' || entry === null) return invalid();
     const result = entry as TimeLimitedQuiescenceComparisonResult;
     const extension = TIME_LIMITED_QUIESCENCE_COMPARISON_SETTINGS[index];
+    if (state.status === 'ended' && result.resultSource !== 'ended-position') return invalid();
+    if (state.status !== 'ended' && result.terminalResult !== undefined) return invalid();
+    if (legalCount === 0 && result.resultSource !== 'no-legal-actions' && result.resultSource !== 'ended-position') return invalid();
+    if (result.resultSource === 'no-legal-actions' || result.resultSource === 'ended-position') {
+      const ended = result.resultSource === 'ended-position';
+      if (ended !== (state.status === 'ended')) return invalid();
+      if (ended) {
+        const saved = result.terminalResult as unknown as Record<string, unknown> | undefined;
+        if (!state.result || !saved || typeof saved !== 'object' || Array.isArray(saved) ||
+          Object.keys(saved).length !== Object.keys(state.result).length ||
+          Object.entries(state.result).some(([key,value])=>saved[key]!==value)) return invalid();
+      } else if (result.terminalResult !== undefined) return invalid();
+      const expected = legalCount === 0 ? ended
+        ? evaluateSearchPositionBreakdown(state, state.turn)
+        : evaluateNoLegalActionsPositionBreakdown(state, state.turn) : null;
+      if (!expected || result.quiescenceMaxTacticalDepth !== extension || result.requestedMaxDepth !== maxDepth ||
+        result.depth !== 0 || result.completedDepth !== 0 || result.timedOut !== false || result.selectedAction !== null ||
+        result.rootLegalActionCount !== 0 || result.selectedEvaluation !== expected.total ||
+        !getDisplayEvaluationBreakdown(result.evaluationBreakdown, result.selectedEvaluation) ||
+        result.evaluationBreakdown?.terminal !== expected.terminal ||
+        !Array.isArray(result.principalVariation) || result.principalVariation.length !== 0 ||
+        !Array.isArray(result.iterations) || result.iterations.length !== 0 ||
+        !Number.isFinite(result.elapsedMilliseconds) || result.elapsedMilliseconds < 0 ||
+        statistics.some(([key,total])=>result[key]!==0 || result[total]!==0)) return invalid();
+      continue;
+    }
     if (result.quiescenceMaxTacticalDepth !== extension || result.requestedMaxDepth !== maxDepth ||
       !Number.isSafeInteger(result.completedDepth) || result.completedDepth < 0 || result.completedDepth > maxDepth ||
       typeof result.timedOut !== 'boolean' || result.timedOut !== (result.completedDepth < maxDepth) ||

@@ -3,6 +3,7 @@ import { QUIESCENCE_COMPARISON_SETTINGS, type QuiescenceComparisonResult } from 
 import { getLegalActions } from '../domain/shogi/legalActions';
 import { getDisplayEvaluationBreakdown } from './searchEvaluationBreakdownValidation';
 import { validateAndFormatPrincipalVariation } from './searchPrincipalVariation';
+import { evaluateNoLegalActionsPositionBreakdown } from '../domain/shogi/twoPlyMinimaxAi';
 
 export function quiescenceComparisonProtocolError(message: string, comparisonSetting?: string): Error {
   const error = Object.assign(new Error(message), { comparisonSetting });
@@ -10,7 +11,7 @@ export function quiescenceComparisonProtocolError(message: string, comparisonSet
   return error;
 }
 
-/** Validate all three passes before publishing any result. Never re-evaluate. */
+/** Validate all passes; query terminal consistency only for no-action roots. */
 export function validateQuiescenceComparison(
   state: BoardState, depth: number, value: unknown,
 ): asserts value is readonly QuiescenceComparisonResult[] {
@@ -38,11 +39,11 @@ export function validateQuiescenceComparison(
     if (!getDisplayEvaluationBreakdown(result.evaluationBreakdown,
       noAction ? result.evaluationBreakdown?.total : result.selectedEvaluation)) return invalid();
     if (noAction) {
-      if (result.selectedEvaluation !== null || result.principalVariation.length !== 0 ||
+      const expected = evaluateNoLegalActionsPositionBreakdown(state, state.turn);
+      const selected = state.status === 'ended' || expected.terminal === null ? null : expected.total;
+      if (result.selectedEvaluation !== selected || result.principalVariation.length !== 0 ||
         [...normalKeys, ...tacticalKeys].some((key) => result[key] !== 0)) return invalid();
-      const terminal = state.status !== 'ended' ? null : state.result?.winner === null
-        ? 'draw' : state.result?.winner === state.turn ? 'win' : 'loss';
-      if (result.evaluationBreakdown.terminal !== terminal) return invalid();
+      if (result.evaluationBreakdown.terminal !== expected.terminal) return invalid();
     } else if (!validateAndFormatPrincipalVariation(state, result,
       Math.max(depth, result.principalVariation.length), true)) return invalid();
   }

@@ -1,3 +1,29 @@
+### [2026-10-14 JST] PR #182 独立レビュー3件への追従
+
+- fetch時の既存PRはopen、対象branch `fix-no-legal-actions`、HEAD `14b72771b4c4e367d41271e6073c33eff8174617`。base main `5035a64c702b470b914d49d7eb65519ae5df4bfa` との関係を確認し、同じbranchを継続。既存変更・他worktreeを保護し、比較用main/変更前を隔離したdetached worktreeに用意した。新しいPRは作らず、マージしない。
+- P2性能: 王手なしでも着手後に必要な厳密応手確認は維持。盤上移動・駒打ちを全列挙してから有無を調べていたため、既存候補と安全性検証を共有する存在確認を追加し、最初の合法手で終了。同種持ち駒は照会内だけで重複検証を避ける。盤面・手番間キャッシュなし。両玉guardは応手がない場合にだけ確認。全合法手生成の順序・SEE・deadline・評価・fallback品質は変更しない。
+- P2分類: 終局済み入力が0msではno-legal-actions、正の予算で時計切れするとfallbackとなり得た。探索より前に元の終局結果を読む `ended-position` と `terminalResult` を追加。0/100/1000ms・期限切れ時計でも反復なし・深さ0・手null・timedOut:false。元の理由に従う±Infinity/0と評価内訳を返す。Worker、比較受信・ベンチマーク検証、表示を追従。開始時終局を先に処理する自対局は既存経路を維持し、着手のあるplyに終局sourceを許可しない。
+- P3画面: 2手ミニマックスAIの手null分岐が状態更新せず戻っていた。共通adjudicateNoLegalActionsを呼び、独立に確認できた場合だけ終局・選択解除へ進む。時間制限AIの既存再確認と整合。架空の履歴を追加せず、合法手ありnullは終局にしない。Workerエラー・中止経路とJSON/KIF/復元形式は変更しない。
+- 変更前HEADへ初期10回帰を適用して5失敗/5成功。先後の終局済み分類、比較受信、先後の2手AI表示の失敗を検出した。最終新規15件は全成功。全7終局理由×先後×0/100/1000ms、実Worker handlerとstructuredClone、active手なし、玉欠落、timeout/fallback、正常完了、両AIのDOM表示・操作停止・履歴非追加、偽手なし応答拒否、確認回数と次照会での無効化を検証する。既存の通常詰み・駒打ち・千日手・保存・自対局・SEE中断のテストも全体検証に含む。
+- 性能比較はmain/変更前/修正後の5局面、2巡×warmup2+本測定5、micro100呼出し、固定深さ2と100/1000msを分離。実測修正後SHA `de3ec93b034ba02043811a60b4577d6b5ebe539e`。全464合法手・着手後state、固定深さ50標本の手・評価・PV・訪問数が変更前と一致。中盤の揺れには追加warmup10+測定10を実施し、固定深さ50.5→37.7ms、100msは両条件深さ2が10/10。少応手・王手の応手確認中央値0.0097→0.0037ms / 0.0094→0.0038ms。持ち駒多数100msのfallback8/10→5/10だが、少応手では修正後2本が深さ2。測定ノイズを一律改善と断定しない。最大超過は修正後100msで1.460ms、1000msで2.537ms。環境・全実測・再現手順・制約は[性能検証](docs/benchmarks/no-legal-review/README.md)参照。
+- 途中のcheckは69ファイル1,899成功/1失敗、既存528複製テストが7.520秒でtimeout。標準worker数・timeout・アサーションを変更せず、検証プロセスだけ既存realpath preload/TEMP補助を使用した。途中の古い終局分類fixtureとエラー文字列境界のテストは修正済み。最終ローカル結果とCIは追記する。
+- 実ブラウザは既存のセッション不一致・localhost接続timeoutにより未確認。DOM操作テスト成功を実ブラウザ確認とは記載しない。構成局面の平手到達性、非王手手なし終局の通常対局発生例、新理由の平手完全棋譜読込は引き続き未確認。
+- 最終ローカル通常 `npm run check` は失敗: lock/lint成功、69ファイル1,900成功/2失敗（1,902件）。既存528複製テスト7.311秒と既存プリセット比較UI最初のテスト5.341秒でtimeout。過去のWindows実行にも同じテストのtimeout記録があるが、今回の実行を成功とは扱わない。個別production build成功（1,758 modules、65秒）、git diff --check成功。測定後のコミットでは文書・ハーネス・生データのみを追加し、測定した製品コードは不変。最終HEADのCI結果・SHAは既存PR本文に記録する。
+
+### [2026-10-14 JST] 王手でない合法手なしの終局
+
+- 最新origin/main `5035a64c702b470b914d49d7eb65519ae5df4bfa` をfetchし、PR #180 HEAD `243ed8bef934438809770d05c25ef9f908a0fbe3` の祖先関係を確認。既存mainはclean、既存worktreeは変更せず、専用worktreeと `fix-no-legal-actions` を作成。リポジトリと適用親階層に追加AGENTS.mdなし。ユーザーの「回答末尾に日時」を適用。新旧adjudication/checkmate、合法手、探索、Worker、UI、結果型、JSON/KIF、再生・自対局と既存テストを調査した。
+- 一次資料の連盟対局規則・王手と詰み説明、FESA公開規則を確認。非王手の合法手なしを即負けとする直接規定は確認できず、一般規定からの解釈と区別した。既存仕様でも未確定のため、先後対称の実行再現と具体的な選択肢を提示し、ユーザーが「手番側の負け（専用理由『合法手なし』）」を選択。公式規則の断定ではなくアプリ仕様として `no_legal_actions` を採用。出典URL・根拠・残る制約は [仕様記録](docs/no-legal-actions.md) を参照。
+- 両玉各1・40枚・ID重複なし・9×9を保った構成局面で先後を検証。後手金9六→9七（先後交換版は先手金1四→1三）をexecuteMoveで合法に適用した後、次の手番は王手false、盤上移動0・駒打ち0・全合法手0。作成済み局面の照会だけでなく、公開合法着手から自動終局まで検証した。平手からの到達可能性は未証明であり、通常対局の発生例とは主張しない。双方の入力stateは不変。
+- 変更前はactive/result:null、αβの手・評価null／有限・非終局の内訳、0ms探索は手null/timedOut:true/fallback。Workerも成功応答の中に手なしfallback、UIは手なしを探索エラー扱い。変更後は着手側勝ち・次の手番側負けでended/no_legal_actions。非終局照会用コピーの探索は手null、評価-Infinity・loss、0msでもtimedOut:false/no-legal-actions。Worker/UI・比較受信・自対局も確認済みの手なしを決着として扱い、架空の着手やplyを作らない。キャンセル・探索失敗は従来のエラー経路を維持。
+- `isCheckmate` の王手条件と通常詰みは維持。合法移動と合法な持ち駒の打ち先を共通のhasLegalResponseで検証。詰み／合法手なしを千日手（連続王手を含む）と500手規定より優先。競合履歴のテストは人工履歴で、実対局の同時発生例ではない。玉欠落の既存fixtureに新しい勝者を生成しない。探索・評価・手順序・SEE・deadline・fallback品質の強化は行っていない。
+- JSON v1の結果型、保存・構文検証・復元と表示を追従。旧理由の棋譜と既存JSON/KIFテストを維持。新理由のKIFは対応終局語未確定のため、誤変換せずJSON保存を案内する明示エラー。任意局面読込は追加しない。構成局面のJSONは新理由を保存・型検証したうえで、従来の平手再実行条件によりinconsistent_recordで拒否。新理由を含む平手からの完全棋譜の読込成功は未確認。既存履歴index復元で終局前はactive/result:null、最後は終局結果を保持。
+- 新規回帰12件を基準mainへ同じfixture・同じアサーションで追加: 10失敗/2成功。先後の非終局継続、手なしをtimeout/fallback扱い、千日手・500手優先、専用理由の保存検証、比較／自対局／Worker/UIの扱いを検出。合法な駒打ちありと通常詰み・合駒回避は変更前から成功。途中のテストfixture・型の修正や既存人工局面互換性の失敗は解消済み。最終関連6ファイル234件成功（最後の連続王手優先1件追加前）。
+- Windows native realpathのEPERMがテスト開始前に発生し、明示filesystem権でも変わらなかったため、PR #180と同じrepo外JS realpath補助とworkspace TEMP/TMPを検証プロセスだけに使用。通常2 worker・既定5秒timeout・アサーションを維持し、依存・製品設定を変更していない。
+- ローカル全体check（連続王手優先1件追加前）: verify:lock/lint成功、68ファイル1,885成功/1失敗。`shogi-evaluation-preset-comparison-ui` の最初の既存UIテストが5.843秒でtimeout。PR #180の既存timeoutと同じとは主張しない。基準main全体checkは67ファイル1,874成功/1失敗、`quiescence-ordering-repeated` の528複製テストが7.669秒でtimeout（PR #180記録と同じテスト）。いずれもcheck成功とは扱わない。buildは個別に1,758 modulesで成功。git diff --check成功。
+- 実ブラウザはin-app browserのセッション不一致とEdgeのlocalhost接続timeoutで未完了。React DOM操作テストは着手後の新理由表示・盤の操作停止・Worker手なし応答の終局表示を確認したが、実ブラウザ確認済みとは記載しない。React品質確認はvercel:react-best-practices、流れの検証はvercel:verificationを使用。最終HEAD・CIの結果はPR本文に記録し、マージしない。
+- 最後の連続王手優先テストを含む最終通常 `npm run check` は成功: verify:lock、lint、68ファイル1,887/1,887件、production build。新規12件も全成功。途中と基準mainのtimeoutを上書きして成功扱いにせず、この最終実行と区別して記録した。git diff --check成功。
+
 ### [2026-10-12 JST] 公開着手APIの数値座標の安全化
 
 - 最新origin/mainをfetchし、main full SHA `9f42b648966418225e5d21d3b8007eed5f38d7b1`（PR #178のmerge commit）を基準に専用worktree・`fix-numeric-board-coordinates`を作成。元mainの未コミット変更なし、既存worktreeは維持。リポジトリ/親階層に追加AGENTS.mdなし。coordinates/dropRules/drops/validation/gameState/legalActions/executionPolicy、候補生成・攻撃走査・仮想盤面、座標境界・assist/strict・終局・成り・二歩・自玉王手・打ち歩詰めの既存テストを調査。

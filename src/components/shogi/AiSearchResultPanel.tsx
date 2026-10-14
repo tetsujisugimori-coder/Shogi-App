@@ -6,6 +6,7 @@ import type {
 
 import type { Player } from '../../types/shogi';
 import { formatSenteEvaluation } from './searchEvaluationDisplay';
+import { getGameResultDisplay } from './gameResultDisplay';
 
 export type AiSearchDisplay =
   | {
@@ -46,7 +47,11 @@ export function AiSearchResultPanel({ search }: AiSearchResultPanelProps) {
           <dt className="text-stone-400">完了深さ</dt>
           <dd className="text-sky-100">{result.completedDepth}</dd>
           <dt className="text-stone-400">着手の出所</dt>
-          <dd className="text-sky-100">{result.resultSource === 'fallback' ? '合法手 fallback' : '完了した探索'}</dd>
+          <dd className="text-sky-100">{result.resultSource === 'ended-position' ? '終局済み' : result.resultSource === 'no-legal-actions' ? '合法手なし' : result.resultSource === 'fallback' ? '合法手 fallback' : '完了した探索'}</dd>
+          {result.resultSource === 'ended-position' && result.terminalResult && <>
+            <dt className="text-stone-400">終局結果</dt>
+            <dd className="text-sky-100">{getGameResultDisplay(result.terminalResult).panelText}</dd>
+          </>}
           <dt className="text-stone-400">指定最大深さ</dt>
           <dd className="text-sky-100">{result.requestedMaxDepth}</dd>
           <dt className="text-stone-400">API全体の経過時間</dt>

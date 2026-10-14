@@ -222,6 +222,8 @@ function formatResultLines(state: BoardState): string[] {
       return [terminalPrefix + '投了', formatWinnerSummary(result, completedMoveCount)];
     case 'checkmate':
       return [terminalPrefix + '詰み', formatWinnerSummary(result, completedMoveCount)];
+    case 'no_legal_actions':
+      throw new TypeError('合法手なしの終局はKIFでは未対応です。JSON対局記録で保存してください。');
     case 'foul_loss':
       return [
         terminalPrefix + (result.foulReason === 'perpetual_check_repetition' ? '反則勝ち' : '反則負け'),

@@ -2,7 +2,7 @@
  * A depth-configurable alpha-beta search built exclusively from the public
  * legal-action, execution, cloning, and material-evaluation domain APIs.
  */
-import type { BoardState, Player } from '../../types/shogi';
+import type { BoardState, Player, GameResult } from '../../types/shogi';
 import { executeLegalAction, getLegalActions, type LegalAction } from './legalActions';
 import {
   DEFAULT_MATERIAL_VALUE_TABLE,
@@ -13,6 +13,7 @@ import { prepareStaticExchangeEvaluation } from './staticExchangeEvaluation';
 import { measured, type SearchDiagnostics } from './searchDiagnostics';
 import {
   evaluateSearchPositionBreakdown,
+  evaluateNoLegalActionsPositionBreakdown,
   resolveSearchMaterialValueTable,
   type SearchClock,
   type SearchEvaluationConfig,
@@ -133,14 +134,16 @@ export interface IterativeDeepeningAlphaBetaSearchResult extends AlphaBetaSearch
  */
 export interface TimeLimitedIterativeDeepeningAlphaBetaSearchResult
   extends Omit<IterativeDeepeningAlphaBetaSearchResult, 'evaluationBreakdown'> {
-  /** Null only when no iteration completed; no leaf was evaluated for the fallback. */
+  /** Null for fallback; a no-action root has its terminal/static breakdown. */
   evaluationBreakdown: SearchEvaluationBreakdown | null;
   requestedMaxDepth: number;
   /** Zero means no iteration completed. */
   completedDepth: number;
   /** True when the deadline interrupted or prevented a requested iteration. */
   timedOut: boolean;
-  resultSource: 'completed-iteration' | 'fallback';
+  resultSource: 'completed-iteration' | 'fallback' | 'no-legal-actions' | 'ended-position';
+  /** Only ended-position roots carry their original adjudicated reason. */
+  terminalResult?: GameResult;
 }
 
 /** Backward-compatible measurements for the established two-ply API. */
@@ -480,11 +483,9 @@ function searchAlphaBetaNode(
   const actions = measured(diagnostics, 'normal-order', () => orderAlphaBetaNodeActionsByMode(
     state, legalActions, valueTable, interruptionCheck, moveOrdering, killerMoveHistory?.actionsAt(ply), diagnostics
   ));
-  // All reachable no-legal-action positions are marked ended by the existing
-  // rules. Treat a malformed in-progress position as a leaf as well, rather
-  // than recursing forever or throwing after a valid API result of [].
+  // Custom roots can lack the post-move adjudication performed on child states.
   if (actions.length === 0) {
-    const evaluationBreakdown = measured(diagnostics, 'normal-evaluate', () => evaluateSearchPositionBreakdown(state, rootPlayer, valueTable));
+    const evaluationBreakdown = measured(diagnostics, 'normal-evaluate', () => evaluateNoLegalActionsPositionBreakdown(state, rootPlayer, valueTable));
     return {
       evaluation: evaluationBreakdown.total,
       principalVariation: [],
@@ -598,10 +599,10 @@ function searchAlphaBeta(
 
   const rootActions = suppliedRootActions ?? measured(diagnostics, 'root-legal', () => getLegalActions(state, diagnostics));
   if (rootActions.length === 0) {
-    const evaluationBreakdown = evaluateSearchPositionBreakdown(state, rootPlayer, valueTable);
+    const evaluationBreakdown = evaluateNoLegalActionsPositionBreakdown(state, rootPlayer, valueTable);
     return {
       selectedAction: null,
-      selectedEvaluation: null,
+      selectedEvaluation: state.status === 'ended' || evaluationBreakdown.terminal === null ? null : evaluationBreakdown.total,
       principalVariation: [],
       evaluationBreakdown,
       rootLegalActionCount: 0,
@@ -828,9 +829,27 @@ export function analyzeTimeLimitedIterativeDeepeningAlphaBetaSearch(
   validateSearchTimeLimitMilliseconds(timeLimitMilliseconds);
   const startedAt = clock();
   diagnostics?.begin(startedAt, timeLimitMilliseconds, clock);
+  if (state.status === 'ended') {
+    // Evaluate the recorded result before legal enumeration or deadline checks.
+    // Ended roots are already known: they need no iteration and cannot timeout.
+    const evaluated = searchAlphaBeta(state, 0, valueTable);
+    diagnostics?.rootGenerated(0);
+    const finishedAt = clock();
+    diagnostics?.finish(finishedAt);
+    return {
+      ...evaluated, elapsedMilliseconds: Math.max(0, finishedAt - startedAt),
+      requestedMaxDepth: maxDepth, completedDepth: 0, timedOut: false,
+      resultSource: 'ended-position', terminalResult: { ...state.result! }, iterations: [],
+      totalVisitedPositionCount: 0, totalCutoffCount: 0, totalSkippedActionCount: 0,
+      totalQuiescenceLeafCount: 0, totalQuiescenceVisitedPositionCount: 0,
+      totalQuiescenceCutoffCount: 0, totalQuiescenceSkippedActionCount: 0,
+    };
+  }
   const rootActions = measured(diagnostics, 'root-legal', () => getLegalActions(state,
     diagnostics?.rootBreakdown ? diagnostics : undefined, diagnostics?.actionValidation ?? undefined));
   diagnostics?.rootGenerated(rootActions.length);
+  const noLegalActions = rootActions.length === 0;
+  const noActionBreakdown = noLegalActions ? evaluateNoLegalActionsPositionBreakdown(state, state.turn, valueTable) : null;
   const fallbackAction = rootActions[0] ?? null;
   const iterations: IterativeDeepeningAlphaBetaIterationResult[] = [];
   let previousBestAction: LegalAction | null = null;
@@ -838,6 +857,7 @@ export function analyzeTimeLimitedIterativeDeepeningAlphaBetaSearch(
   let timedOut = false;
 
   for (let depth = 1; depth <= maxDepth; depth += 1) {
+    if (noLegalActions) break;
     try {
       diagnostics?.setStage('before-depth-one');
       const beforeIteration = clock();
@@ -908,12 +928,17 @@ export function analyzeTimeLimitedIterativeDeepeningAlphaBetaSearch(
       quiescenceSkippedActionCount: 0,
     }),
     principalVariation: deepestIteration ? clonePrincipalVariation(deepestIteration.principalVariation) : [],
-    evaluationBreakdown: deepestIteration ? cloneSearchEvaluationBreakdown(deepestIteration.evaluationBreakdown) : null,
+    evaluationBreakdown: noLegalActions
+      ? noActionBreakdown
+      : deepestIteration ? cloneSearchEvaluationBreakdown(deepestIteration.evaluationBreakdown) : null,
     elapsedMilliseconds: 0,
     requestedMaxDepth: maxDepth,
     completedDepth: deepestIteration?.depth ?? 0,
     timedOut,
-    resultSource: deepestIteration ? 'completed-iteration' : 'fallback',
+    resultSource: noLegalActions ? 'no-legal-actions' : deepestIteration ? 'completed-iteration' : 'fallback',
+    selectedEvaluation: noLegalActions
+      ? noActionBreakdown!.total
+      : deepestIteration?.selectedEvaluation ?? null,
     iterations,
     totalVisitedPositionCount: iterations.reduce(
       (total, iteration) => total + iteration.visitedPositionCount,
