@@ -10,9 +10,9 @@ import type { BoardState } from '../src/types/shogi';
 import type { LegalAction } from '../src/domain/shogi/legalActions';
 import { getLegalActions } from '../src/domain/shogi/legalActions';
 import { protectSearchInput } from '../src/domain/shogi/selfPlayGame';
-import { analyzeTimeLimitedIterativeDeepeningAlphaBetaSearch } from '../src/domain/shogi/twoPlyAlphaBetaAi';
+import { analyzeTimeLimitedIterativeDeepeningAlphaBetaSearch, areLegalActionsEqual } from '../src/domain/shogi/twoPlyAlphaBetaAi';
 import { options, evaluation, sha256, loadPositions, positionMetadata, verifyAction, reference,
-  tacticalEvidence, summarize, type TimedSample, type ReferenceRow } from './benchmarks/fallbackQuality';
+  tacticalEvidence, summarize, finiteLoss, type TimedSample, type ReferenceRow } from './benchmarks/fallbackQuality';
 import { SOURCE } from './benchmarks/timedDepthOneDiagnostics';
 import { SearchDiagnostics } from '../src/domain/shogi/searchDiagnostics';
 
@@ -81,6 +81,17 @@ if (args[0] === '--worker') {
       const references = refs.filter(r => r.type === 'reference') as ReferenceRow[];
       assert.equal(references.length, positions.length);
       assert.deepEqual(references.map(r => r.positionId).sort(), positions.map(p => p.id).sort());
+      for (const ref of refs.filter(r => r.type === 'reference' && r.status === 'complete')) {
+        const p = positions.find(p => p.id === ref.positionId)!;
+        assert.equal(ref.result.depth, 1); assert.ok(ref.result.selectedAction);
+        assert.equal(ref.bestScore, ref.result.selectedEvaluation);
+        assert.equal(ref.fallbackScore, ref.fallbackEvaluation);
+        assert.equal(ref.finiteLoss, finiteLoss(ref.bestScore, ref.fallbackScore));
+        assert.equal(ref.actionMatches, areLegalActionsEqual(ref.fallback, ref.result.selectedAction));
+        const legal = getLegalActions(p.state);
+        assert.ok(areLegalActionsEqual(legal[0], ref.fallback));
+        assert.ok(legal.some(a => areLegalActionsEqual(a, ref.result.selectedAction)));
+      }
       const tacticalRows = tactics.filter(r => r.type === 'tactics');
       assert.deepEqual(tacticalRows.map(r => r.positionId).sort(), positions.map(p => p.id).sort());
       const summary = { schema: 'fallback-quality-summary-v1',

@@ -79,6 +79,17 @@ describe('fallback quality diagnostics', () => {
     expect(evidence.missedMateInOne).toBe(false); expect(evidence.allowsMateInOne).toBe(false);
     expect(JSON.stringify(state)).toBe(before);
   });
+  it('detects a verified missed mate and preserves its terminal reference score', () => {
+    const state = kings();
+    state.squares[2][0].piece = state.squares[8][8].piece; state.squares[8][8].piece = null;
+    state.squares[2][1].piece = { id: 'gold', player: 'sente', type: 'gold' };
+    const ref = reference(state);
+    expect(ref.bestScore).toBe('+Infinity'); expect(ref.finiteLoss).toBeNull();
+    const evidence = tacticalEvidence(state, ref.result.selectedAction!);
+    expect(evidence.missedMateInOne).toBe(true);
+    expect(evidence.mateInOneActions.length).toBeGreaterThan(0);
+    for (const action of evidence.mateInOneActions) expect(apply(state, action).result?.endReason).toBe('checkmate');
+  });
   it('keeps terminal scores lossless and excludes missing/incomplete reference scores', () => {
     expect(JSON.parse(JSON.stringify([encodeScore(Infinity), encodeScore(-Infinity), encodeScore(null)])))
       .toEqual(['+Infinity', '-Infinity', null]);

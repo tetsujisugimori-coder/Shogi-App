@@ -1,0 +1,8 @@
+
+ RUN  v4.1.11 C:/Users/tetsu/Documents/Codex/2026-10-14/tetsujisugimori-coder-shogi-app-1-commit/work/repo
+
+
+ Test Files  1 passed (1)
+      Tests  37 passed (37)
+   Start at  17:37:36
+   Duration  2.38s (transform 415ms, setup 174ms, import 467ms, tests 1.56s, environment 0ms)

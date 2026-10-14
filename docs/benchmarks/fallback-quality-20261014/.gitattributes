@@ -1,0 +1,3 @@
+# Preserve raw byte hashes on Windows and Unix checkouts.
+*.jsonl -text
+*.gz -text
