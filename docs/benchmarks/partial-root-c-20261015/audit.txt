@@ -1,0 +1,1 @@
+PASS: 280 calls (200 measured), 10 distinct positions, exact candidate quality and 10 fixed comparisons; raw/summary consistent

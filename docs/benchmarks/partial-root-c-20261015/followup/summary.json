@@ -1,0 +1,16 @@
+[
+  {
+    "position": "g1-p5",
+    "baselineMedian": 22.142100000000028,
+    "productMedian": 22.47059999999999,
+    "identicalCompletedResults": true,
+    "identicalClockReadCount": 116
+  },
+  {
+    "position": "g4-p89",
+    "baselineMedian": 191.58329999999978,
+    "productMedian": 167.3822,
+    "identicalCompletedResults": true,
+    "identicalClockReadCount": 818
+  }
+]

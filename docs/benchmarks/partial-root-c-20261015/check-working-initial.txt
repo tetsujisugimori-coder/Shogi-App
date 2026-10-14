@@ -1,0 +1,556 @@
+
+> shogi-app@0.0.0 check
+> npm run verify:lock && npm run lint && npm test && npm run build
+
+
+> shogi-app@0.0.0 verify:lock
+> node scripts/verify-lockfile.mjs
+
+--- Lockfile Verification Summary ---
+Lockfile Name:           shogi-app
+Lockfile Version:        3
+Total Package Entries:   399
+Inspected Registry Pkgs: 398
+Valid Exceptions:        0
+Missing "version":       0
+Missing "resolved":      0
+Missing "integrity":     0
+
+[verify:lock] SUCCESS: package-lock.json is valid and complete.
+
+
+> shogi-app@0.0.0 lint
+> tsc --noEmit
+
+
+> shogi-app@0.0.0 test
+> vitest run
+
+
+ RUN  v4.1.11 C:/Users/tetsu/Documents/Codex/2026-10-15/tetsujisugimori-coder-shogi-app-1-c/work/repo
+
+ ❯ src/test/quiescence-ordering-repeated.test.ts (37 tests | 1 failed) 9790ms
+     × runs 3+8 per setting on six unchanged positions, both modes, with independent frozen snapshots 6586ms
+Not implemented: navigation to another Document
+ ❯ src/test/shogi-partial-root.test.ts (15 tests | 1 failed) 65ms
+     × records partial self-play and round trips the applied action in the unchanged v1 game format 27ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 2 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/test/quiescence-ordering-repeated.test.ts > repeated ordering schedule and isolation > runs 3+8 per setting on six unchanged positions, both modes, with independent frozen snapshots
+Error: Test timed out in 5000ms.
+If this is a long-running test, pass a timeout value as the last argument or configure it globally with "testTimeout".
+ ❯ src/test/quiescence-ordering-repeated.test.ts:65:3
+     63|
+     64| describe('repeated ordering schedule and isolation', () => {
+     65|   it('runs 3+8 per setting on six unchanged positions, both modes, wit…
+       |   ^
+     66|     const snapshots: BoardState[] = [];
+     67|     const fixedSearch: NonNullable<RepeatedDependencies['fixedSearch']…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/2]⎯
+
+ FAIL  src/test/shogi-partial-root.test.ts > partial-root deadline and exact selection > records partial self-play and round trips the applied action in the unchanged v1 game format
+AssertionError: expected [ [ …(9) ], [ …(9) ], [ …(9) ], …(6) ] to deeply equal [ [ …(9) ], [ …(9) ], [ …(9) ], …(6) ]
+
+- Expected
++ Received
+
+@@ -5,10 +5,11 @@
+        "coordinateLabel": "9一",
+        "file": 9,
+        "hasBottomRightStarMarker": false,
+        "piece": {
+          "id": "gote-lance-9",
++         "isPromoted": false,
+          "player": "gote",
+          "type": "lance",
+        },
+        "rank": 1,
+        "rankKanji": "一",
+@@ -19,10 +20,11 @@
+        "coordinateLabel": "8一",
+        "file": 8,
+        "hasBottomRightStarMarker": false,
+        "piece": {
+          "id": "gote-knight-8",
++         "isPromoted": false,
+          "player": "gote",
+          "type": "knight",
+        },
+        "rank": 1,
+        "rankKanji": "一",
+@@ -33,10 +35,11 @@
+        "coordinateLabel": "7一",
+        "file": 7,
+        "hasBottomRightStarMarker": false,
+        "piece": {
+          "id": "gote-silver-7",
++         "isPromoted": false,
+          "player": "gote",
+          "type": "silver",
+        },
+        "rank": 1,
+        "rankKanji": "一",
+@@ -47,10 +50,11 @@
+        "coordinateLabel": "6一",
+        "file": 6,
+        "hasBottomRightStarMarker": false,
+        "piece": {
+          "id": "gote-gold-6",
++         "isPromoted": false,
+          "player": "gote",
+          "type": "gold",
+        },
+        "rank": 1,
+        "rankKanji": "一",
+@@ -61,10 +65,11 @@
+        "coordinateLabel": "5一",
+        "file": 5,
+        "hasBottomRightStarMarker": false,
+        "piece": {
+          "id": "gote-king-5",
++         "isPromoted": false,
+          "player": "gote",
+          "type": "king",
+        },
+        "rank": 1,
+        "rankKanji": "一",
+@@ -75,10 +80,11 @@
+        "coordinateLabel": "4一",
+        "file": 4,
+        "hasBottomRightStarMarker": false,
+        "piece": {
+          "id": "gote-gold-4",
++         "isPromoted": false,
+          "player": "gote",
+          "type": "gold",
+        },
+        "rank": 1,
+        "rankKanji": "一",
+@@ -89,10 +95,11 @@
+        "coordinateLabel": "3一",
+        "file": 3,
+        "hasBottomRightStarMarker": false,
+        "piece": {
+          "id": "gote-silver-3",
++         "isPromoted": false,
+          "player": "gote",
+          "type": "silver",
+        },
+        "rank": 1,
+        "rankKanji": "一",
+@@ -103,10 +110,11 @@
+        "coordinateLabel": "2一",
+        "file": 2,
+        "hasBottomRightStarMarker": false,
+        "piece": {
+          "id": "gote-knight-2",
++         "isPromoted": false,
+          "player": "gote",
+          "type": "knight",
+        },
+        "rank": 1,
+        "rankKanji": "一",
+@@ -117,10 +125,11 @@
+        "coordinateLabel": "1一",
+        "file": 1,
+        "hasBottomRightStarMarker": false,
+        "piece": {
+          "id": "gote-lance-1",
++         "isPromoted": false,
+          "player": "gote",
+          "type": "lance",
+        },
+        "rank": 1,
+        "rankKanji": "一",
+@@ -143,10 +152,11 @@
+        "coordinateLabel": "8二",
+        "file": 8,
+        "hasBottomRightStarMarker": false,
+        "piece": {
+          "id": "gote-rook-8",
++         "isPromoted": false,
+          "player": "gote",
+          "type": "rook",
+        },
+        "rank": 2,
+        "rankKanji": "二",
+@@ -207,10 +217,11 @@
+        "coordinateLabel": "2二",
+        "file": 2,
+        "hasBottomRightStarMarker": false,
+        "piece": {
+          "id": "gote-bishop-2",
++         "isPromoted": false,
+          "player": "gote",
+          "type": "bishop",
+        },
+        "rank": 2,
+        "rankKanji": "二",
+@@ -233,10 +244,11 @@
+        "coordinateLabel": "9三",
+        "file": 9,
+        "hasBottomRightStarMarker": false,
+        "piece": {
+          "id": "gote-pawn-9",
++         "isPromoted": false,
+          "player": "gote",
+          "type": "pawn",
+        },
+        "rank": 3,
+        "rankKanji": "三",
+@@ -247,10 +259,11 @@
+        "coordinateLabel": "8三",
+        "file": 8,
+        "hasBottomRightStarMarker": false,
+        "piece": {
+          "id": "gote-pawn-8",
++         "isPromoted": false,
+          "player": "gote",
+          "type": "pawn",
+        },
+        "rank": 3,
+        "rankKanji": "三",
+@@ -261,10 +274,11 @@
+        "coordinateLabel": "7三",
+        "file": 7,
+        "hasBottomRightStarMarker": true,
+        "piece": {
+          "id": "gote-pawn-7",
++         "isPromoted": false,
+          "player": "gote",
+          "type": "pawn",
+        },
+        "rank": 3,
+        "rankKanji": "三",
+@@ -275,10 +289,11 @@
+        "coordinateLabel": "6三",
+        "file": 6,
+        "hasBottomRightStarMarker": false,
+        "piece": {
+          "id": "gote-pawn-6",
++         "isPromoted": false,
+          "player": "gote",
+          "type": "pawn",
+        },
+        "rank": 3,
+        "rankKanji": "三",
+@@ -289,10 +304,11 @@
+        "coordinateLabel": "5三",
+        "file": 5,
+        "hasBottomRightStarMarker": false,
+        "piece": {
+          "id": "gote-pawn-5",
++         "isPromoted": false,
+          "player": "gote",
+          "type": "pawn",
+        },
+        "rank": 3,
+        "rankKanji": "三",
+@@ -303,10 +319,11 @@
+        "coordinateLabel": "4三",
+        "file": 4,
+        "hasBottomRightStarMarker": true,
+        "piece": {
+          "id": "gote-pawn-4",
++         "isPromoted": false,
+          "player": "gote",
+          "type": "pawn",
+        },
+        "rank": 3,
+        "rankKanji": "三",
+@@ -317,10 +334,11 @@
+        "coordinateLabel": "3三",
+        "file": 3,
+        "hasBottomRightStarMarker": false,
+        "piece": {
+          "id": "gote-pawn-3",
++         "isPromoted": false,
+          "player": "gote",
+          "type": "pawn",
+        },
+        "rank": 3,
+        "rankKanji": "三",
+@@ -331,10 +349,11 @@
+        "coordinateLabel": "2三",
+        "file": 2,
+        "hasBottomRightStarMarker": false,
+        "piece": {
+          "id": "gote-pawn-2",
++         "isPromoted": false,
+          "player": "gote",
+          "type": "pawn",
+        },
+        "rank": 3,
+        "rankKanji": "三",
+@@ -345,10 +364,11 @@
+        "coordinateLabel": "1三",
+        "file": 1,
+        "hasBottomRightStarMarker": false,
+        "piece": {
+          "id": "gote-pawn-1",
++         "isPromoted": false,
+          "player": "gote",
+          "type": "pawn",
+        },
+        "rank": 3,
+        "rankKanji": "三",
+@@ -545,11 +565,11 @@
+        "coordinateLabel": "9六",
+        "file": 9,
+        "hasBottomRightStarMarker": false,
+        "piece": {
+          "id": "sente-pawn-9",
+-         "isPromoted": undefined,
++         "isPromoted": false,
+          "player": "sente",
+          "type": "pawn",
+        },
+        "rank": 6,
+        "rankKanji": "六",
+@@ -652,10 +672,11 @@
+        "coordinateLabel": "8七",
+        "file": 8,
+        "hasBottomRightStarMarker": false,
+        "piece": {
+          "id": "sente-pawn-8",
++         "isPromoted": false,
+          "player": "sente",
+          "type": "pawn",
+        },
+        "rank": 7,
+        "rankKanji": "七",
+@@ -666,10 +687,11 @@
+        "coordinateLabel": "7七",
+        "file": 7,
+        "hasBottomRightStarMarker": false,
+        "piece": {
+          "id": "sente-pawn-7",
++         "isPromoted": false,
+          "player": "sente",
+          "type": "pawn",
+        },
+        "rank": 7,
+        "rankKanji": "七",
+@@ -680,10 +702,11 @@
+        "coordinateLabel": "6七",
+        "file": 6,
+        "hasBottomRightStarMarker": false,
+        "piece": {
+          "id": "sente-pawn-6",
++         "isPromoted": false,
+          "player": "sente",
+          "type": "pawn",
+        },
+        "rank": 7,
+        "rankKanji": "七",
+@@ -694,10 +717,11 @@
+        "coordinateLabel": "5七",
+        "file": 5,
+        "hasBottomRightStarMarker": false,
+        "piece": {
+          "id": "sente-pawn-5",
++         "isPromoted": false,
+          "player": "sente",
+          "type": "pawn",
+        },
+        "rank": 7,
+        "rankKanji": "七",
+@@ -708,10 +732,11 @@
+        "coordinateLabel": "4七",
+        "file": 4,
+        "hasBottomRightStarMarker": false,
+        "piece": {
+          "id": "sente-pawn-4",
++         "isPromoted": false,
+          "player": "sente",
+          "type": "pawn",
+        },
+        "rank": 7,
+        "rankKanji": "七",
+@@ -722,10 +747,11 @@
+        "coordinateLabel": "3七",
+        "file": 3,
+        "hasBottomRightStarMarker": false,
+        "piece": {
+          "id": "sente-pawn-3",
++         "isPromoted": false,
+          "player": "sente",
+          "type": "pawn",
+        },
+        "rank": 7,
+        "rankKanji": "七",
+@@ -736,10 +762,11 @@
+        "coordinateLabel": "2七",
+        "file": 2,
+        "hasBottomRightStarMarker": false,
+        "piece": {
+          "id": "sente-pawn-2",
++         "isPromoted": false,
+          "player": "sente",
+          "type": "pawn",
+        },
+        "rank": 7,
+        "rankKanji": "七",
+@@ -750,10 +777,11 @@
+        "coordinateLabel": "1七",
+        "file": 1,
+        "hasBottomRightStarMarker": false,
+        "piece": {
+          "id": "sente-pawn-1",
++         "isPromoted": false,
+          "player": "sente",
+          "type": "pawn",
+        },
+        "rank": 7,
+        "rankKanji": "七",
+@@ -776,10 +804,11 @@
+        "coordinateLabel": "8八",
+        "file": 8,
+        "hasBottomRightStarMarker": false,
+        "piece": {
+          "id": "sente-bishop-8",
++         "isPromoted": false,
+          "player": "sente",
+          "type": "bishop",
+        },
+        "rank": 8,
+        "rankKanji": "八",
+@@ -840,10 +869,11 @@
+        "coordinateLabel": "2八",
+        "file": 2,
+        "hasBottomRightStarMarker": false,
+        "piece": {
+          "id": "sente-rook-2",
++         "isPromoted": false,
+          "player": "sente",
+          "type": "rook",
+        },
+        "rank": 8,
+        "rankKanji": "八",
+@@ -866,10 +896,11 @@
+        "coordinateLabel": "9九",
+        "file": 9,
+        "hasBottomRightStarMarker": false,
+        "piece": {
+          "id": "sente-lance-9",
++         "isPromoted": false,
+          "player": "sente",
+          "type": "lance",
+        },
+        "rank": 9,
+        "rankKanji": "九",
+@@ -880,10 +911,11 @@
+        "coordinateLabel": "8九",
+        "file": 8,
+        "hasBottomRightStarMarker": false,
+        "piece": {
+          "id": "sente-knight-8",
++         "isPromoted": false,
+          "player": "sente",
+          "type": "knight",
+        },
+        "rank": 9,
+        "rankKanji": "九",
+@@ -894,10 +926,11 @@
+        "coordinateLabel": "7九",
+        "file": 7,
+        "hasBottomRightStarMarker": false,
+        "piece": {
+          "id": "sente-silver-7",
++         "isPromoted": false,
+          "player": "sente",
+          "type": "silver",
+        },
+        "rank": 9,
+        "rankKanji": "九",
+@@ -908,10 +941,11 @@
+        "coordinateLabel": "6九",
+        "file": 6,
+        "hasBottomRightStarMarker": false,
+        "piece": {
+          "id": "sente-gold-6",
++         "isPromoted": false,
+          "player": "sente",
+          "type": "gold",
+        },
+        "rank": 9,
+        "rankKanji": "九",
+@@ -922,10 +956,11 @@
+        "coordinateLabel": "5九",
+        "file": 5,
+        "hasBottomRightStarMarker": false,
+        "piece": {
+          "id": "sente-king-5",
++         "isPromoted": false,
+          "player": "sente",
+          "type": "king",
+        },
+        "rank": 9,
+        "rankKanji": "九",
+@@ -936,10 +971,11 @@
+        "coordinateLabel": "4九",
+        "file": 4,
+        "hasBottomRightStarMarker": false,
+        "piece": {
+          "id": "sente-gold-4",
++         "isPromoted": false,
+          "player": "sente",
+          "type": "gold",
+        },
+        "rank": 9,
+        "rankKanji": "九",
+@@ -950,10 +986,11 @@
+        "coordinateLabel": "3九",
+        "file": 3,
+        "hasBottomRightStarMarker": false,
+        "piece": {
+          "id": "sente-silver-3",
++         "isPromoted": false,
+          "player": "sente",
+          "type": "silver",
+        },
+        "rank": 9,
+        "rankKanji": "九",
+@@ -964,10 +1001,11 @@
+        "coordinateLabel": "2九",
+        "file": 2,
+        "hasBottomRightStarMarker": false,
+        "piece": {
+          "id": "sente-knight-2",
++         "isPromoted": false,
+          "player": "sente",
+          "type": "knight",
+        },
+        "rank": 9,
+        "rankKanji": "九",
+@@ -978,10 +1016,11 @@
+        "coordinateLabel": "1九",
+        "file": 1,
+        "hasBottomRightStarMarker": false,
+        "piece": {
+          "id": "sente-lance-1",
++         "isPromoted": false,
+          "player": "sente",
+          "type": "lance",
+        },
+        "rank": 9,
+        "rankKanji": "九",
+
+ ❯ src/test/shogi-partial-root.test.ts:120:36
+    118|     expect(restored.state.history).toHaveLength(1);
+    119|     expect(restored.state.turn).toBe(game.finalState.turn);
+    120|     expect(restored.state.squares).toEqual(game.finalState.squares);
+       |                                    ^
+    121|     expect(JSON.stringify(restored.state)).not.toContain('partial-root…
+    122|   });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/2]⎯
+
+
+ Test Files  2 failed | 69 passed (71)
+      Tests  2 failed | 1925 passed (1927)
+   Start at  04:02:07
+   Duration  181.97s (transform 9.32s, setup 11.36s, import 17.76s, tests 256.79s, environment 60.21s)
+
