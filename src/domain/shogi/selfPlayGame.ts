@@ -112,7 +112,7 @@ function isAction(value: unknown): value is LegalAction {
       : action.kind === 'drop' && typeof action.pieceId === 'string' && action.promotion === 'none');
 }
 
-function validateObservations(state: BoardState, result: SelfPlaySearchResult): void {
+function validateObservations(state: BoardState, result: SelfPlaySearchResult, rootActions: readonly LegalAction[]): void {
   const invalid = (field: string): never => { throw new TypeError(`Invalid self-play search result: ${field}.`); };
   if (result.resultSource !== undefined && result.resultSource !== 'fallback' &&
     result.resultSource !== 'completed-iteration' && result.resultSource !== 'partial-root') invalid('resultSource');
@@ -120,9 +120,24 @@ function validateObservations(state: BoardState, result: SelfPlaySearchResult): 
     result.selectedEvaluation !== null || result.evaluationBreakdown !== null ||
     result.principalVariation?.length !== 0 || statisticPairs.some(([key, total]) =>
       result[key] !== 0 || result[total] !== 0))) invalid('fallback');
-  if (result.resultSource === 'partial-root' && (result.completedDepth !== 0 || !result.timedOut ||
-    result.selectedEvaluation === null || result.evaluationBreakdown === null || !result.principalVariation?.length ||
-    statisticPairs.some(([key, total]) => result[key] !== 0 || result[total] !== 0))) invalid('partial-root');
+  if (result.resultSource === 'partial-root') {
+    const meta = result.partialRoot;
+    // Mirror the candidate metadata contract at this boundary without casting
+    // the nullable self-play observations to the stricter Worker result type.
+    if (result.completedDepth !== 0 || result.timedOut !== true ||
+      result.selectedEvaluation === null || result.evaluationBreakdown === null || !result.principalVariation?.length ||
+      statisticPairs.some(([key, total]) => result[key] !== 0 || result[total] !== 0) ||
+      !meta || typeof meta !== 'object' || Array.isArray(meta) || meta.candidateDepth !== 1 ||
+      !count(meta.completedRootCandidateCount) || meta.completedRootCandidateCount < 1 ||
+      !count(meta.exactRootCandidateCount) || meta.exactRootCandidateCount < 1 ||
+      meta.exactRootCandidateCount > meta.completedRootCandidateCount ||
+      meta.completedRootCandidateCount > rootActions.length ||
+      !count(meta.selectedRootOriginalIndex) || meta.selectedRootOriginalIndex >= meta.completedRootCandidateCount ||
+      !areLegalActionsEqual(rootActions[meta.selectedRootOriginalIndex], result.selectedAction!) ||
+      !meta.attemptedStatistics || typeof meta.attemptedStatistics !== 'object' || Array.isArray(meta.attemptedStatistics) ||
+      statisticPairs.some(([key]) => !count(meta.attemptedStatistics[key])) ||
+      meta.attemptedStatistics.visitedPositionCount < meta.completedRootCandidateCount) invalid('partial-root');
+  }
   if (result.selectedEvaluation !== null && !score(result.selectedEvaluation)) invalid('selectedEvaluation');
   if (result.completedDepth !== null && !count(result.completedDepth)) invalid('completedDepth');
   if (result.elapsedMilliseconds !== null &&
@@ -217,10 +232,11 @@ export function runSelfPlayGame<SenteSettings, GoteSettings>(options: {
       }
       if (!isAction(result.selectedAction)) return fail('result', 'invalid_result', 'Malformed selected action.');
       if (result.selectedAction.player !== state.turn) return fail('result', 'wrong_player', 'Selected action does not match the current turn.');
-      const legal = getLegalActions(state).find((candidate) => areLegalActionsEqual(candidate, result.selectedAction!));
+      const rootActions = getLegalActions(state);
+      const legal = rootActions.find((candidate) => areLegalActionsEqual(candidate, result.selectedAction!));
       if (!legal) return fail('result', 'illegal_action', 'Selected action is not a legal candidate.');
       action = cloneAction(legal);
-      validateObservations(state, result);
+      validateObservations(state, result, rootActions);
       const statistics = Object.fromEntries(statisticPairs.flatMap((pair) => pair.map((key) => [key, result[key]]))) as Pick<SelfPlaySearchResult, StatisticKey>;
       record = {
         ply: plies.length + 1, player: state.turn, positionKey: createPositionKey(state), action: cloneAction(action),

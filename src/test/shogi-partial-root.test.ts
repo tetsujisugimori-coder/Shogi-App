@@ -1,3 +1,4 @@
+import { cloneBoardState } from '../domain/shogi/replay';
 import { runSelfPlayGame } from '../domain/shogi/selfPlayGame';
 import { serializeShogiGameRecordV1 } from '../domain/shogi/gameRecord';
 import { importShogiGameRecord } from '../domain/shogi/gameRecordImport';
@@ -122,8 +123,12 @@ describe('partial-root deadline and exact selection', () => {
     expect(game.status).toBe('max_plies');
     expect(game.plies[0]).toMatchObject({ resultSource: 'partial-root', completedDepth: 0,
       selectedEvaluation: result.selectedEvaluation, principalVariation: result.principalVariation });
+    expect(game.plies[0].partialRoot).toEqual(result.partialRoot);
+    expect(game.plies[0].partialRoot).not.toBe(result.partialRoot);
+    expect(game.plies[0].partialRoot?.attemptedStatistics).not.toBe(result.partialRoot?.attemptedStatistics);
     const recorded = JSON.parse(selfPlayJson(game));
     expect(recorded.plies[0].resultSource).toBe('partial-root');
+    expect(recorded.plies[0].partialRoot).toEqual(result.partialRoot);
     expect(JSON.parse(selfPlayJson({ value: Infinity, missing: null }))).toEqual({ value: 'Infinity', missing: null });
     const restored = importShogiGameRecord(serializeShogiGameRecordV1(game.finalState, new Date('2026-10-15T00:00:00+09:00')));
     expect(restored.ok).toBe(true);
@@ -133,6 +138,52 @@ describe('partial-root deadline and exact selection', () => {
     expect(serializeShogiGameRecordV1(restored.state, new Date('2026-10-15T00:00:00+09:00')))
       .toBe(serializeShogiGameRecordV1(game.finalState, new Date('2026-10-15T00:00:00+09:00')));
     expect(JSON.stringify(restored.state)).not.toContain('partial-root');
+  });
+
+  const invalidMetadata: [string, (result: ReturnType<typeof run>['result']) => void][] = [
+    ['missing metadata', r => { delete r.partialRoot; }],
+    ['null metadata', r => { Reflect.set(r, 'partialRoot', null); }],
+    ['non-object metadata', r => { Reflect.set(r, 'partialRoot', 1); }],
+    ['array metadata', r => { Reflect.set(r, 'partialRoot', []); }],
+    ['candidate depth', r => { Reflect.set(r.partialRoot!, 'candidateDepth', 2); }],
+    ['no completed candidates', r => { r.partialRoot!.completedRootCandidateCount = 0; }],
+    ['non-integer candidate count', r => { r.partialRoot!.completedRootCandidateCount = 1.5; }],
+    ['no exact candidates', r => { r.partialRoot!.exactRootCandidateCount = 0; }],
+    ['invalid exact count', r => { r.partialRoot!.exactRootCandidateCount = NaN; }],
+    ['too many exact candidates', r => { r.partialRoot!.exactRootCandidateCount = 2; }],
+    ['more candidates than legal actions', r => { r.partialRoot!.completedRootCandidateCount = r.rootLegalActionCount + 1; }],
+    ['negative selected index', r => { r.partialRoot!.selectedRootOriginalIndex = -1; }],
+    ['unsafe selected index', r => { r.partialRoot!.selectedRootOriginalIndex = Number.MAX_SAFE_INTEGER + 1; }],
+    ['selected index outside completed subset', r => { r.partialRoot!.selectedRootOriginalIndex = 1; }],
+    ['selected index points to another legal action', r => {
+      r.partialRoot!.completedRootCandidateCount = 2; r.partialRoot!.selectedRootOriginalIndex = 1;
+    }],
+    ['missing attempted statistics', r => { Reflect.deleteProperty(r.partialRoot!, 'attemptedStatistics'); }],
+    ['non-object attempted statistics', r => { Reflect.set(r.partialRoot!, 'attemptedStatistics', 1); }],
+    ['array attempted statistics', r => { Reflect.set(r.partialRoot!, 'attemptedStatistics', []); }],
+    ['inconsistent visited count', r => { r.partialRoot!.attemptedStatistics.visitedPositionCount = 0; }],
+    ['non-boolean timeout', r => { Reflect.set(r, 'timedOut', 1); }],
+  ];
+  it.each(invalidMetadata)('rejects partial self-play with %s before recording a move', (_name, mutate) => {
+    const { result, state } = run(7);
+    mutate(result);
+    const participant = { settings: undefined, search: () => result };
+    const game = runSelfPlayGame({ initialState: state, maxPlies: 1, sente: participant, gote: participant });
+    expect(game).toMatchObject({ status: 'failed', failure: { stage: 'result', code: 'invalid_result' }, plies: [] });
+    expect(game.finalState).toEqual(cloneBoardState(state));
+  });
+  it('rejects every invalid attempted statistic using the existing statistic keys', () => {
+    const original = run(7).result.partialRoot!.attemptedStatistics;
+    for (const key of Object.keys(original)) {
+      for (const value of [undefined, -1, 0.5, NaN, Infinity, Number.MAX_SAFE_INTEGER + 1]) {
+        const { result, state } = run(7);
+        Reflect.set(result.partialRoot!.attemptedStatistics, key, value);
+        const participant = { settings: undefined, search: () => result };
+        const game = runSelfPlayGame({ initialState: state, maxPlies: 1, sente: participant, gote: participant });
+        expect(game).toMatchObject({ status: 'failed', failure: { stage: 'result', code: 'invalid_result' }, plies: [] });
+        expect(game.finalState).toEqual(cloneBoardState(state));
+      }
+    }
   });
 
 });
