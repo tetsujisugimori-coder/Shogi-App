@@ -1,0 +1,10 @@
+
+ RUN  v4.1.11 C:/Users/tetsu/Documents/Codex/2026-10-16/shogi-app-c-partial-root-pr/work/repo
+
+
+ Test Files  4 passed (4)
+      Tests  102 passed (102)
+   Start at  22:43:31
+   Duration  3.54s (transform 910ms, setup 773ms, import 1.22s, tests 402ms, environment 3.87s)
+
+EXIT_CODE=0
