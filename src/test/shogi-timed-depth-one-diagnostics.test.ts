@@ -101,7 +101,8 @@ describe('timed depth-one diagnostic inputs and invariants', () => {
     const limit = Math.floor((completed.rootGeneratedAt + completed.finishedAt!) / 2);
     const partial = run(limit);
     const interrupted = partial.diagnostic.depthOne!;
-    expect(partial.result.resultSource).toBe('fallback');
+    expect(partial.result.resultSource).toBe('partial-root');
+    expect(partial.result.partialRoot!.exactRootCandidateCount).toBeGreaterThan(0);
     expect(partial.result.completedDepth).toBe(0);
     expect(interrupted.status).toBe('interrupted');
     expect(interrupted.rootCandidates).toBe(completed.rootCandidates);

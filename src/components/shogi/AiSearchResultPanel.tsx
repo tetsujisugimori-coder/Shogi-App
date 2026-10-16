@@ -43,14 +43,21 @@ export function AiSearchResultPanel({ search }: AiSearchResultPanelProps) {
           AI思考結果
         </h2>
         <p className="mt-1 text-xs text-stone-300">時間制限付き反復深化αβ探索</p>
+        {result.resultSource === 'partial-root' && <p className="mt-1 text-xs text-stone-300">選択候補の評価・PVです。全合法手の比較は未完了です。</p>}
         <dl className="mt-2 grid grid-cols-[minmax(0,2fr)_minmax(0,1fr)] gap-x-3 gap-y-1 text-xs">
           <dt className="text-stone-400">完了深さ</dt>
           <dd className="text-sky-100">{result.completedDepth}</dd>
           <dt className="text-stone-400">着手の出所</dt>
-          <dd className="text-sky-100">{result.resultSource === 'ended-position' ? '終局済み' : result.resultSource === 'no-legal-actions' ? '合法手なし' : result.resultSource === 'fallback' ? '合法手 fallback' : '完了した探索'}</dd>
+          <dd className="text-sky-100">{result.resultSource === 'ended-position' ? '終局済み' : result.resultSource === 'no-legal-actions' ? '合法手なし' : result.resultSource === 'fallback' ? '合法手 fallback' : result.resultSource === 'partial-root' ? '部分探索・深さ1未完了' : '完了した探索'}</dd>
           {result.resultSource === 'ended-position' && result.terminalResult && <>
             <dt className="text-stone-400">終局結果</dt>
             <dd className="text-sky-100">{getGameResultDisplay(result.terminalResult).panelText}</dd>
+          </>}
+          {result.resultSource === 'partial-root' && result.partialRoot && <>
+            <dt className="text-stone-400">期限内確定候補／合法手数</dt>
+            <dd className="text-sky-100">{result.partialRoot.completedRootCandidateCount} / {result.rootLegalActionCount}</dd>
+            <dt className="text-stone-400">exact候補数</dt>
+            <dd className="text-sky-100">{result.partialRoot.exactRootCandidateCount}</dd>
           </>}
           <dt className="text-stone-400">指定最大深さ</dt>
           <dd className="text-sky-100">{result.requestedMaxDepth}</dd>
@@ -64,11 +71,11 @@ export function AiSearchResultPanel({ search }: AiSearchResultPanelProps) {
           <dd className="text-sky-100">{result.cutoffCount}</dd>
           <dt className="text-stone-400">最深完了反復の未調査候補手数</dt>
           <dd className="text-sky-100">{result.skippedActionCount}</dd>
-          <dt className="text-stone-400">全反復合計の調査局面数</dt>
+          <dt className="text-stone-400">全完了反復合計の調査局面数</dt>
           <dd className="text-sky-100">{result.totalVisitedPositionCount}</dd>
-          <dt className="text-stone-400">全反復合計の枝刈り回数</dt>
+          <dt className="text-stone-400">全完了反復合計の枝刈り回数</dt>
           <dd className="text-sky-100">{result.totalCutoffCount}</dd>
-          <dt className="text-stone-400">全反復合計の未調査候補手数</dt>
+          <dt className="text-stone-400">全完了反復合計の未調査候補手数</dt>
           <dd className="text-sky-100">{result.totalSkippedActionCount}</dd>
         </dl>
         <div className="mt-3 border-t border-sky-900/80 pt-2">
@@ -82,13 +89,13 @@ export function AiSearchResultPanel({ search }: AiSearchResultPanelProps) {
             <dd className="text-sky-100">{result.quiescenceCutoffCount}</dd>
             <dt className="text-stone-400">最深完了反復の静止探索未調査候補手数</dt>
             <dd className="text-sky-100">{result.quiescenceSkippedActionCount}</dd>
-            <dt className="text-stone-400">全反復合計の静止探索葉数</dt>
+            <dt className="text-stone-400">全完了反復合計の静止探索葉数</dt>
             <dd className="text-sky-100">{result.totalQuiescenceLeafCount}</dd>
-            <dt className="text-stone-400">全反復合計の静止探索調査局面数</dt>
+            <dt className="text-stone-400">全完了反復合計の静止探索調査局面数</dt>
             <dd className="text-sky-100">{result.totalQuiescenceVisitedPositionCount}</dd>
-            <dt className="text-stone-400">全反復合計の静止探索枝刈り回数</dt>
+            <dt className="text-stone-400">全完了反復合計の静止探索枝刈り回数</dt>
             <dd className="text-sky-100">{result.totalQuiescenceCutoffCount}</dd>
-            <dt className="text-stone-400">全反復合計の静止探索未調査候補手数</dt>
+            <dt className="text-stone-400">全完了反復合計の静止探索未調査候補手数</dt>
             <dd className="text-sky-100">{result.totalQuiescenceSkippedActionCount}</dd>
           </dl>
         </div>

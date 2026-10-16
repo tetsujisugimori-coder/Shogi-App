@@ -44,6 +44,7 @@ export function TimeLimitedQuiescenceComparisonPanel({ display, state }: {
           const name = quiescenceComparisonName(result.quiescenceMaxTacticalDepth);
           return <article key={name} aria-label={name} className="min-w-0 space-y-3 rounded border border-sky-900 p-3">
             <h3 className="text-sm font-semibold">{name}</h3>
+            {result.resultSource === 'partial-root' && <p>部分探索・深さ1未完了：選択候補の評価・PV（全合法手の比較は未完了）</p>}
             <dl className="grid grid-cols-2 gap-2">
               <dt>推奨手</dt><dd>{principalVariationNotations[0] ?? '指せる手はありません'}</dd>
               <dt>評価値</dt><dd>{result.resultSource === 'fallback' ? '未評価' : `先手 ${formatSenteEvaluation(result.selectedEvaluation ?? result.evaluationBreakdown?.total ?? null, display.perspective)}`}</dd>

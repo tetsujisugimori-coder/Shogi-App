@@ -1,3 +1,4 @@
+import { validatePartialRoot } from './partialRootValidation';
 import { createSearchWorker, createSearchWorkerRequestId, runSearchWorkerJob, TimeLimitedIterativeDeepeningAlphaBetaSearchWorkerError, type SearchWorkerLike } from './searchWorkerJob';
 import { DEFAULT_SEARCH_EVALUATION_PRESET_ID, resolveSearchEvaluationPreset, type SearchEvaluationPresetId } from '../domain/shogi/searchEvaluationPresets';
 import type {
@@ -66,6 +67,11 @@ export function createTimeLimitedIterativeDeepeningAlphaBetaSearchWorkerClient(
           if (response.result.quiescenceMaxTacticalDepth !== (quiescenceMaxTacticalDepth ?? null)) {
             throw new TimeLimitedIterativeDeepeningAlphaBetaSearchWorkerError(
               'Worker response quiescence setting did not match the submitted request.', 'WorkerProtocolError');
+          }
+          if (response.result.resultSource === 'partial-root' &&
+            !validatePartialRoot(state, response.result, quiescenceMaxTacticalDepth ?? 0)) {
+            throw new TimeLimitedIterativeDeepeningAlphaBetaSearchWorkerError(
+              'Worker returned an invalid partial-root candidate.', 'WorkerProtocolError');
           }
           return response.result;
         }

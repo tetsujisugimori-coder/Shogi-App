@@ -29,7 +29,7 @@ export type MeasurementPly = SelfPlayPlyRecord & {
   participant: PairedSelfPlayParticipantId;
   timeLimitMilliseconds: number;
   actualElapsedMilliseconds: number;
-  resultSource: 'fallback' | 'completed-iteration' | 'no-legal-actions' | 'ended-position';
+  resultSource: 'fallback' | 'partial-root' | 'completed-iteration' | 'no-legal-actions' | 'ended-position';
 };
 
 export interface MeasurementGame {
@@ -142,7 +142,7 @@ export function summarizePlies(plies: readonly MeasurementPly[]) {
   const positive = excess.filter(n => n > 0).sort((a, b) => a - b);
   const excessBins = { withinLimit: 0, over0to5: 0, over5to20: 0, over20to100: 0, over100: 0 };
   for (const ply of plies) {
-    if (ply.resultSource !== 'fallback' && ply.resultSource !== 'completed-iteration') throw new Error('Missing resultSource');
+    if (ply.resultSource !== 'fallback' && ply.resultSource !== 'completed-iteration' && ply.resultSource !== 'partial-root') throw new Error('Missing resultSource');
     if (ply.actualElapsedMilliseconds === undefined || ply.elapsedMilliseconds === null ||
       ply.completedDepth === null || ply.timedOut === null) throw new Error('Missing timed observation');
     const depth = String(ply.completedDepth);

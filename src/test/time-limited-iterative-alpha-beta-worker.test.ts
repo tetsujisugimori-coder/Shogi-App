@@ -596,3 +596,28 @@ describe('時間制限付き反復深化αβ探索Workerクライアント', () 
     }
   });
 });
+
+
+describe('partial-root worker round trip', () => {
+  it('receives the real handler candidate through the client and rejects missing candidate metadata', async () => {
+    const state = createInitialBoardState();
+    const fake = createFakeWorker();
+    const client = createTimeLimitedIterativeDeepeningAlphaBetaSearchWorkerClient({ workerFactory: () => fake.worker,
+      requestIdFactory: () => 'partial-client' });
+    const response = handleTimeLimitedIterativeDeepeningAlphaBetaSearchWorkerRequest({
+      type: 'run-time-limited-iterative-deepening-alpha-beta-search', requestId: 'partial-client',
+      state, maxDepth: 4, timeLimitMilliseconds: 100,
+    }, (input, depth, limit, evaluation) => {
+      let reads = 0;
+      return analyzeTimeLimitedIterativeDeepeningAlphaBetaSearch(input, depth, limit, evaluation,
+        () => ++reads >= 7 ? 100 : 0);
+    });
+    if (response.type !== 'time-limited-iterative-deepening-alpha-beta-search-succeeded') throw new Error('fixture');
+    const pending = client.run(state, 4, 100);
+    fake.emitMessage(structuredClone(response));
+    await expect(pending).resolves.toMatchObject({ resultSource: 'partial-root', completedDepth: 0 });
+    const malformed = client.run(state,4,100);
+    fake.emitMessage({ ...response, result: { ...response.result, partialRoot: undefined } });
+    await expect(malformed).rejects.toMatchObject({ name: 'WorkerProtocolError' });
+  });
+});

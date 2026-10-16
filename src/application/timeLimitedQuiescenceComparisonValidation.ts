@@ -1,3 +1,4 @@
+import { validatePartialRoot } from './partialRootValidation';
 import type { BoardState } from '../types/shogi';
 import { TIME_LIMITED_QUIESCENCE_COMPARISON_MAX_DEPTH, TIME_LIMITED_QUIESCENCE_COMPARISON_MILLISECONDS,
   TIME_LIMITED_QUIESCENCE_COMPARISON_SETTINGS, type TimeLimitedQuiescenceComparisonResult } from '../domain/shogi/timeLimitedQuiescenceComparison';
@@ -83,6 +84,10 @@ export function validateTimeLimitedQuiescenceComparison(
       !Number.isSafeInteger(result.completedDepth) || result.completedDepth < 0 || result.completedDepth > maxDepth ||
       typeof result.timedOut !== 'boolean' || result.timedOut !== (result.completedDepth < maxDepth) ||
       !Array.isArray(result.iterations) || result.iterations.length !== result.completedDepth) return invalid();
+    if (result.resultSource === 'partial-root') {
+      if (!validatePartialRoot(state, result, extension ?? 0)) return invalid();
+      continue;
+    }
     if (result.completedDepth === 0) {
       const fallback = legalCount === 0 ? null : getLegalActions(state)[0];
       if (result.resultSource !== 'fallback' || result.depth !== 0 ||

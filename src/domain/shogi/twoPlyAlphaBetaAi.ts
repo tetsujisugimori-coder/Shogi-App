@@ -129,7 +129,8 @@ export interface IterativeDeepeningAlphaBetaSearchResult extends AlphaBetaSearch
 
 /**
  * A time-limited iterative-deepening result. `completedDepth` and the
- * inherited fixed-depth fields always describe the last fully completed pass.
+ * inherited statistics describe the last fully completed pass. partial-root
+ * carries a selected candidate evaluation/PV with depth zero, never a completed pass.
  * The top-level elapsed time includes work discarded from an interrupted pass.
  */
 export interface TimeLimitedIterativeDeepeningAlphaBetaSearchResult
@@ -141,7 +142,17 @@ export interface TimeLimitedIterativeDeepeningAlphaBetaSearchResult
   completedDepth: number;
   /** True when the deadline interrupted or prevented a requested iteration. */
   timedOut: boolean;
-  resultSource: 'completed-iteration' | 'fallback' | 'no-legal-actions' | 'ended-position';
+  resultSource: 'completed-iteration' | 'partial-root' | 'fallback' | 'no-legal-actions' | 'ended-position';
+  /** Present only for partial-root; ordinary/total statistics still count completed passes only. */
+  partialRoot?: {
+    candidateDepth: 1;
+    selectedRootOriginalIndex: number;
+    completedRootCandidateCount: number;
+    exactRootCandidateCount: number;
+    /** Started ordinary nodes/leaves and fully returned quiescence calls.
+     * Includes rejected candidates; in-flight quiescence internal work is unavailable. */
+    attemptedStatistics: SearchStatistics;
+  };
   /** Only ended-position roots carry their original adjudicated reason. */
   terminalResult?: GameResult;
 }
@@ -166,7 +177,7 @@ export interface TwoPlyAlphaBetaSearchResult {
   quiescenceSkippedActionCount: number;
 }
 
-interface SearchStatistics {
+export interface SearchStatistics {
   visitedPositionCount: number;
   cutoffCount: number;
   skippedActionCount: number;
@@ -553,6 +564,33 @@ function searchAlphaBetaNode(
   return { evaluation: value, principalVariation, evaluationBreakdown };
 }
 
+interface PartialRootCandidate {
+  action: LegalAction;
+  originalIndex: number;
+  result: SearchNodeResult;
+}
+
+/** Local to one timed call. Pending candidates are committed by the NEXT existing deadline check. */
+interface PartialRootProgress {
+  best?: PartialRootCandidate;
+  pending?: PartialRootCandidate;
+  pendingExact: boolean;
+  pendingCompleted: boolean;
+  completedCount: number;
+  exactCount: number;
+  statistics?: SearchStatistics;
+}
+
+function commitPartialRootCandidate(progress: PartialRootProgress): void {
+  if (!progress.pendingCompleted) return;
+  progress.completedCount += 1;
+  if (progress.pendingExact) progress.exactCount += 1;
+  if (progress.pending) progress.best = progress.pending;
+  progress.pending = undefined;
+  progress.pendingCompleted = false;
+  progress.pendingExact = false;
+}
+
 type UnmeasuredAlphaBetaSearchResult = Omit<AlphaBetaSearchResult, 'elapsedMilliseconds'>;
 
 /**
@@ -570,7 +608,8 @@ function searchAlphaBeta(
   quiescenceOptions: AlphaBetaQuiescenceOptions | undefined = undefined,
   killerMoveHistory: KillerMoveHistory | undefined = undefined,
   suppliedRootActions: readonly LegalAction[] | undefined = undefined,
-  diagnostics?: SearchDiagnostics
+  diagnostics?: SearchDiagnostics,
+  partialRoot?: PartialRootProgress
 ): UnmeasuredAlphaBetaSearchResult {
   validateSearchDepth(depth);
   const rootPlayer = state.turn;
@@ -583,6 +622,8 @@ function searchAlphaBeta(
     quiescenceCutoffCount: 0,
     quiescenceSkippedActionCount: 0,
   };
+
+  if (partialRoot) partialRoot.statistics = statistics;
 
   if (depth === 0) {
     const evaluationBreakdown = evaluateSearchPositionBreakdown(state, rootPlayer, valueTable);
@@ -674,6 +715,28 @@ function searchAlphaBeta(
           1,
           diagnostics
       );
+    }
+
+    if (partialRoot) {
+      // Depth one: static/terminal leaves are unpruned. With quiescence and
+      // beta=+Infinity, fail-low/equality at finite alpha is only an upper bound.
+      // Absolute extrema are exact even at a window endpoint. NaN is never usable.
+      const value = candidateResult.evaluation;
+      const exact = typeof value === 'number' && !Number.isNaN(value) && value === candidateResult.evaluationBreakdown.total &&
+        (afterRootAction.status === 'ended' || quiescenceOptions === undefined ||
+          alphaBeforeCandidate === -Infinity || value > alphaBeforeCandidate || Math.abs(value) === Infinity);
+      partialRoot.pendingCompleted = true;
+      partialRoot.pendingExact = exact;
+      const best = partialRoot.best;
+      if (exact && (!best || value > best.result.evaluation ||
+        (value === best.result.evaluation && originalIndex < best.originalIndex))) {
+        partialRoot.pending = {
+          action: cloneLegalAction(rootAction), originalIndex,
+          result: { evaluation: value,
+            principalVariation: clonePrincipalVariation(candidateResult.principalVariation),
+            evaluationBreakdown: cloneSearchEvaluationBreakdown(candidateResult.evaluationBreakdown) },
+        };
+      }
     }
 
     // The first legal action establishes the baseline even at -Infinity.
@@ -855,6 +918,9 @@ export function analyzeTimeLimitedIterativeDeepeningAlphaBetaSearch(
   let previousBestAction: LegalAction | null = null;
   const killerMoveHistory = killerMoves ? new KillerMoveHistory() : undefined;
   let timedOut = false;
+  const partialRoot: PartialRootProgress = {
+    pendingExact: false, pendingCompleted: false, completedCount: 0, exactCount: 0,
+  };
 
   for (let depth = 1; depth <= maxDepth; depth += 1) {
     if (noLegalActions) break;
@@ -865,30 +931,39 @@ export function analyzeTimeLimitedIterativeDeepeningAlphaBetaSearch(
       throwIfSearchTimeLimitReachedAt(beforeIteration, startedAt, timeLimitMilliseconds);
 
       const iterationStartedAt = clock();
-       const check = () => {
-         try {
-           const observedAt = clock();
-           diagnostics?.checked(observedAt);
-           throwIfSearchTimeLimitReachedAt(observedAt, startedAt, timeLimitMilliseconds);
-         }
-         catch (error) { if (error instanceof SearchDeadlineExceeded) diagnostics?.interrupted(); throw error; }
-       };
-       const searchResult = measured(diagnostics, 'normal-other', () => searchAlphaBeta(
+      const check = () => {
+        try {
+          const observedAt = clock();
+          diagnostics?.checked(observedAt);
+          throwIfSearchTimeLimitReachedAt(observedAt, startedAt, timeLimitMilliseconds);
+          // Pending is set only after a root candidate returned. Reuse this
+          // existing check instead of reading the clock again for C selection.
+          if (depth === 1) commitPartialRootCandidate(partialRoot);
+        } catch (error) {
+          if (error instanceof SearchDeadlineExceeded) diagnostics?.interrupted();
+          throw error;
+        }
+      };
+      const searchResult = measured(diagnostics, 'normal-other', () => searchAlphaBeta(
         state,
         depth,
         valueTable,
         previousBestAction,
-         check,
+        check,
         moveOrdering,
         quiescenceOptions,
         killerMoveHistory,
-         rootActions,
-         diagnostics
-       ));
+        rootActions,
+        diagnostics,
+        depth === 1 ? partialRoot : undefined
+      ));
       const iterationFinishedAt = clock();
       diagnostics?.checked(iterationFinishedAt);
       throwIfSearchTimeLimitReachedAt(iterationFinishedAt, startedAt, timeLimitMilliseconds);
-      if (depth === 1) diagnostics?.endDepthOne('completed');
+      if (depth === 1) {
+        commitPartialRootCandidate(partialRoot);
+        diagnostics?.endDepthOne('completed');
+      }
       const iteration = {
         ...searchResult,
         principalVariation: clonePrincipalVariation(searchResult.principalVariation),
@@ -958,6 +1033,20 @@ export function analyzeTimeLimitedIterativeDeepeningAlphaBetaSearch(
       (total, iteration) => total + iteration.quiescenceSkippedActionCount, 0
     ),
   };
+  if (!deepestIteration && partialRoot.best) {
+    const { action, originalIndex, result: candidate } = partialRoot.best;
+    result.resultSource = 'partial-root';
+    result.selectedAction = action;
+    result.selectedEvaluation = candidate.evaluation;
+    result.evaluationBreakdown = candidate.evaluationBreakdown;
+    result.principalVariation = [action, ...candidate.principalVariation];
+    result.partialRoot = {
+      candidateDepth: 1, selectedRootOriginalIndex: originalIndex,
+      completedRootCandidateCount: partialRoot.completedCount,
+      exactRootCandidateCount: partialRoot.exactCount,
+      attemptedStatistics: { ...partialRoot.statistics! },
+    };
+  }
   const finishedAt = clock();
   result.elapsedMilliseconds = Math.max(0, finishedAt - startedAt);
   diagnostics?.finish(finishedAt);

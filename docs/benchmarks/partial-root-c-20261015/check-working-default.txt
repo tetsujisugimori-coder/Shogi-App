@@ -1,0 +1,55 @@
+
+> shogi-app@0.0.0 check
+> npm run verify:lock && npm run lint && npm test && npm run build
+
+
+> shogi-app@0.0.0 verify:lock
+> node scripts/verify-lockfile.mjs
+
+--- Lockfile Verification Summary ---
+Lockfile Name:           shogi-app
+Lockfile Version:        3
+Total Package Entries:   399
+Inspected Registry Pkgs: 398
+Valid Exceptions:        0
+Missing "version":       0
+Missing "resolved":      0
+Missing "integrity":     0
+
+[verify:lock] SUCCESS: package-lock.json is valid and complete.
+
+
+> shogi-app@0.0.0 lint
+> tsc --noEmit
+
+
+> shogi-app@0.0.0 test
+> vitest run
+
+
+ RUN  v4.1.11 C:/Users/tetsu/Documents/Codex/2026-10-15/tetsujisugimori-coder-shogi-app-1-c/work/repo
+
+ ❯ src/test/shogi-evaluation-preset-comparison-ui.test.tsx (24 tests | 1 failed) 45886ms
+     × 不変局面と深さ3で開始し、競合AIを止め、全結果を固定順で表示する 5614ms
+Not implemented: navigation to another Document
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/test/shogi-evaluation-preset-comparison-ui.test.tsx > 解析専用の3プリセット比較UI > 不変局面と深さ3で開始し、競合AIを止め、全結果を固定順で表示する
+Error: Test timed out in 5000ms.
+If this is a long-running test, pass a timeout value as the last argument or configure it globally with "testTimeout".
+ ❯ src/test/shogi-evaluation-preset-comparison-ui.test.tsx:43:3
+     41|
+     42| describe('解析専用の3プリセット比較UI', () => {
+     43|   it('不変局面と深さ3で開始し、競合AIを止め、全結果を固定順で表示する', async () => {
+       |   ^
+     44|     const user = userEvent.setup(); const pending = deferred();
+     45|     const runner = vi.fn((_state: BoardState, _depth: number, _signal?…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed | 70 passed (71)
+      Tests  1 failed | 1928 passed (1929)
+   Start at  04:05:50
+   Duration  175.42s (transform 8.65s, setup 11.31s, import 16.69s, tests 247.43s, environment 59.87s)

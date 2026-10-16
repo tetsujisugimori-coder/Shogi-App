@@ -1,0 +1,13 @@
+timed g1-p5
+timed g1-p30
+timed g2-p54
+timed g3-p55
+timed g4-p89
+timed g2-p92
+timed g1-p115
+timed g1-p44
+timed g1-p93
+timed g3-p117
+[{"budget":100,"baseline":{"calls":50,"sources":{"completed-iteration":20,"fallback":30},"depths":{"0":30,"1":16,"2":4},"apiP50":100.77700000000186,"callP50":100.82770000000164,"callP95":104.24869999999646,"maxOverrun":8.998200000001816,"overrunCount":50},"product":{"calls":50,"sources":{"completed-iteration":19,"partial-root":31},"depths":{"0":31,"1":15,"2":4},"apiP50":101.13620000000083,"callP50":101.18889999999737,"callP95":103.30520000000251,"maxOverrun":10.686100000020815,"overrunCount":50},"quality":{"calls":31,"improved":31,"equal":0,"worsened":0}},{"budget":1000,"baseline":{"calls":50,"sources":{"completed-iteration":31,"fallback":19},"depths":{"0":19,"1":11,"2":20},"apiP50":1001.3148000000074,"callP50":1001.3608999999997,"callP95":1006.7266000000091,"maxOverrun":8.993100000006962,"overrunCount":50},"product":{"calls":50,"sources":{"completed-iteration":30,"partial-root":20},"depths":{"0":20,"1":10,"2":20},"apiP50":1001.0005999999994,"callP50":1001.0380000000005,"callP95":1005.0334000000003,"maxOverrun":6.095400000005611,"overrunCount":50},"quality":{"calls":20,"improved":20,"equal":0,"worsened":0}}]
+(node:36028) [DEP0190] DeprecationWarning: Passing args to a child process with shell option true can lead to security vulnerabilities, as the arguments are not escaped, only concatenated.
+(Use `node --trace-deprecation ...` to show where the warning was created)
