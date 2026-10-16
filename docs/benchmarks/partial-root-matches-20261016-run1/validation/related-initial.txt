@@ -1,0 +1,37 @@
+
+ RUN  v4.1.11 C:/Users/tetsu/Documents/Codex/2026-10-16/shogi-app-c-partial-root-pr/work/repo
+
+ ❯ src/test/shogi-partial-root-matches.test.ts (7 tests | 1 failed) 89ms
+     × replays all four saved games at the predeclared twentieth ply with full history 52ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/test/shogi-partial-root-matches.test.ts > fixed partial-root match diagnostic > replays all four saved games at the predeclared twentieth ply with full history
+AssertionError: Expected values to be strictly equal:
+
+3 !== 5
+
+
+- Expected
++ Received
+
+- 5
++ 3
+
+ ❯ positionsFromGames scripts/benchmarks/partialRootMatches.ts:41:10
+     39|     positions.push({ id: `g${i + 1}-after20`, state, actions, stateHas…
+     40|   });
+     41|   assert.equal(new Set(positions.map(p => createPositionKey(p.state)))…
+       |          ^
+     42|   return positions;
+     43| }
+ ❯ src/test/shogi-partial-root-matches.test.ts:26:23
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed | 3 passed (4)
+      Tests  1 failed | 100 passed (101)
+   Start at  22:34:30
+   Duration  8.95s (transform 4.02s, setup 3.38s, import 4.84s, tests 1.46s, environment 7.02s)
+

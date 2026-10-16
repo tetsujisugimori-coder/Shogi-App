@@ -1,0 +1,23 @@
+game-01 100ms ended 92 plies
+game-02 100ms ended 173 plies
+game-03 1000ms ended 51 plies
+game-04 1000ms ended 44 plies
+game-05 1000ms ended 68 plies
+game-06 1000ms ended 53 plies
+game-07 100ms ended 77 plies
+game-08 100ms ended 74 plies
+game-09 100ms ended 37 plies
+game-10 100ms ended 141 plies
+game-11 1000ms ended 21 plies
+game-12 1000ms ended 21 plies
+game-13 1000ms ended 63 plies
+game-14 1000ms ended 33 plies
+game-15 100ms ended 112 plies
+game-16 100ms ended 74 plies
+game-17 100ms ended 88 plies
+game-18 100ms ended 122 plies
+game-19 1000ms ended 3 plies
+game-20 1000ms ended 3 plies
+(node:10984) [DEP0190] DeprecationWarning: Passing args to a child process with shell option true can lead to security vulnerabilities, as the arguments are not escaped, only concatenated.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+EXIT_CODE=0
