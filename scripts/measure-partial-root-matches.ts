@@ -126,7 +126,9 @@ if (mode === 'prepare') {
         if (a.error || !a.result) throw Error(a.error ?? 'Missing search result');
         return { ...a.result, actualElapsedMilliseconds: a.callMs };
       });
-      assert.equal(index, own.length); assert.deepEqual(replayed, saved);
+      // JSON omits optional undefined object properties (e.g. branchFrom and
+      // isPromoted). Compare the entire replay in that same persisted format.
+      assert.equal(index, own.length); assert.deepEqual(parse(json(replayed)), saved);
       games.push(saved);
     }
     assert.equal(attempts.length, games.reduce((n, g) => n + g.result.plies.length + (g.result.status === 'failed' ? 1 : 0), 0));

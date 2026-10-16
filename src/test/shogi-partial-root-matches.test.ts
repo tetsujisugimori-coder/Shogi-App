@@ -104,6 +104,9 @@ describe('fixed partial-root match diagnostic', () => {
     let i = 0;
     const replay = runGame(p, state, () => parse(json(results[i++])), 3);
     expect(i).toBe(3); expect(replay).toEqual(game);
+    // cloneBoardState adds optional undefined properties; JSON omits them.
+    expect(replay.result.finalState).toHaveProperty('branchFrom', undefined);
+    expect(parse(json(replay))).toStrictEqual(parse(json(game)));
     expect(summarize([parse(json(game))], [])).toEqual(summarize([replay], []));
   });
 });
