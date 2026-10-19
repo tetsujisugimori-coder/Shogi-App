@@ -44,6 +44,7 @@ callMsは入力保護後、API呼出し直前から直後の単調時計。apiMs
 ## 失敗記録
 
 - 初版の型検査は候補配列のimplicit anyとError.codeの型で失敗。明示型を追加して修正。
+- 初回runは測定前のplan照合で停止（environment/rawは未生成）。合法再生APIが作るoptionalな`isPromoted: undefined`/`branchFrom: undefined`がJSONでは省略され、オブジェクトdeepEqualが不一致となった。局面/条件/参照は変更せず、照合を既存のcanonical JSON hashへ修正。null/Infinityと未取得の区別は維持し、往復hashの回帰を追加した。
 - sandbox内の新規テスト起動はWindows Temp内rename EPERMで0件実行のまま失敗。製品/timeoutを変えずsandbox外の通常実行で検証する。
 - 参照局面作成時、既存q fixtureの同一筋の歩2枚を発見。診断の合法性条件を満たさないため金に置換してから測定局面を固定。最初の既存詰みfixtureだけでは3ply勝ちを確認できず、エンジン結果を見る前に独立した両玉＋金局面を作成・検証した。負け局面の最初の案も4ply内必敗を確認できず不採用。これらは期待成立性の事前確認であり、測定結果による局面選別ではない。
 

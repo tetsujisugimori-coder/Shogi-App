@@ -69,7 +69,9 @@ if (mode === 'child') {
   } else {
     const plan=read('plan.json'); const positions=plan.positions as TacticalPosition[];
     assert.deepEqual(plan.conditions,CONDITIONS); assert.equal(plan.positionHash,hash(positions));
-    assert.deepEqual(positions,tacticalPositions());
+    // JSON intentionally omits optional undefined properties; compare canonical
+    // serialized content, retaining null and non-finite score distinctions.
+    assert.equal(hash(positions),hash(tacticalPositions()));
     for (const p of positions) assert.deepEqual(validatePosition(p),plan.validation[p.id]);
     const refs=read('references.json') as Record<string,Reference>;
     for (const p of positions) verifyReference(p,refs[p.id]);

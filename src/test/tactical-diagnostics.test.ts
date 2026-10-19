@@ -10,6 +10,7 @@ const result = (id:string) => analyzeAlphaBetaSearch(get(id).state,1,resolveSear
 describe('tactical diagnostics (bounded, offline)',()=>{
   it('has ten distinct deterministic validated identities; preserves input and replay',()=>{
     expect(tacticalPositions()).toEqual(positions);
+    expect(hash(parse(json(positions)))).toBe(hash(tacticalPositions()));
     expect(new Set(positions.map(p=>p.id)).size).toBe(10);
     const before=hash(positions);
     for(const p of positions) expect(validatePosition(p).consistency).toBe('verified');
