@@ -1,5 +1,7 @@
 # SHOGI-APP
 
+戦術・詰み距離の診断CLIと固定局面、独立参照、実測・監査手順は[診断記録](docs/benchmarks/tactical-mate-20261019/README.md)を参照してください。製品の評価・探索仕様は変更しません。
+
 PR #182の独立レビュー追従では、終局済み入力を予算によらず `ended-position` として分類し、`terminalResult` に元の終局理由を保持します。2手ミニマックスAIも合法手なしを独立に再確認して終局表示へ進みます。応手確認の短絡化は合法手の列挙順序を維持します。詳細は[仕様](docs/no-legal-actions.md)、実測と再現手順は[レビュー性能検証](docs/benchmarks/no-legal-review/README.md)を参照してください。
 
 ## SEE内部の協調的中断（2026-10-12）
