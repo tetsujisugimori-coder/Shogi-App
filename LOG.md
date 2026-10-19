@@ -1,3 +1,13 @@
+### [2026-10-19 JST] 戦術評価・mate-distanceの診断基盤
+
+- 最新origin/main `21c6677`を取得、#187/#189マージを確認。元checkoutのclean/既存worktree/関連Issue/README/LOG/合法手・終局・評価・通常/q探索・棋譜監査を確認し、専用`codex/tactical-mate-diagnostics`と`.worktrees/tactical`で実装。他作業は変更しない。
+- 10固定局面、公開合法手だけのAND/OR限定参照と全防御応手証明書、固定d1/q0/1/2・d4/q1・100/1000ms最大d4/q1のCLI、raw監査・集計・終局理由監査、10テストを追加。standard評価/順序、killer=false、q original。製品の評価/探索/順序/ルール/Worker/UI/partial契約を変更しない。
+- 測定前に局面/条件/参照をcommitで固定。測定SHA `6c5c0a6b4ac562a01ad770e6c731414363fc9ecb`、clean、2026-10-19 20:05:59〜20:06:31 JST、直列60条件全成功、warmup6件別保存、欠測/打切り0。JSONの±Infinity/null/未取得を区別。固定40件は局所期待一致30/不一致2/判断不能8、timed20件は16/0/4。raw→summary再生成一致、全PV/内訳一致、終局応手をendedゲートを外したコピーでも再列挙して監査。
+- 1/3ply強制勝ちは同じ+Infinity。現行は元合法手indexで1plyを選ぶが、別計算した候補配列の逆順first-maximumは3plyを選び距離がスコアへ反映されないことを確認。これは製品内部順序全体の反転実験ではない。3ply局面のd1/q0/1/2は正解初手でも評価504、d4/timedは+Infinityであり、正解初手と詰み発見を分離した。
+- 必敗局面のcheckmate-only参照は4/2plyだが、4ply側にも2plyのno_legal_actions終局がある。最適な実際の敗北距離は双方2plyで、真の異距離延命の検証にはならない。結果を見て局面を追加せず未検証として記録。取り返しのq0見落としは先後ともq1で回避。通常/q境界の終局見落としは今回未再現。evasion/平手再生対照の安全性は参照未確定。timedは全件completed-iteration、partial/fallback0でpartial固有の品質は判断不能。
+- 初版型エラー、Windows sandbox Temp rename EPERM、測定前のundefined/JSON厳密照合不一致と修正を失敗記録へ保存。初回通常checkは73ファイル/1,970件・型/lock/build成功。最終追加監査を含む通常check原本は診断ディレクトリのvalidation/final-check.txt。timeout/worker/アサーションを緩めず、長時間診断をCIへ追加しない。
+- [診断記録](docs/benchmarks/tactical-mate-20261019/README.md)に完全state、証明書、計画、環境/SHA、raw、集計、再現、制約、次の製品設計を保存。次は終局理由を区別したroot-ply距離比較、真の必敗延命参照、通常探索到達率、partial距離/PV整合の順。今回mate-distance製品変更は実装しない。commit→push→main向けPR、最終HEAD CIを確認しマージしない。
+
 ### [2026-10-14 JST] PR #182 独立レビュー3件への追従
 
 - fetch時の既存PRはopen、対象branch `fix-no-legal-actions`、HEAD `14b72771b4c4e367d41271e6073c33eff8174617`。base main `5035a64c702b470b914d49d7eb65519ae5df4bfa` との関係を確認し、同じbranchを継続。既存変更・他worktreeを保護し、比較用main/変更前を隔離したdetached worktreeに用意した。新しいPRは作らず、マージしない。

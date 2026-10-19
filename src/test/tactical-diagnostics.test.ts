@@ -4,6 +4,7 @@ import { CONDITIONS, validatePosition, reference, verifyReference, validateResul
 import { analyzeAlphaBetaSearch } from '../domain/shogi/twoPlyAlphaBetaAi';
 import { evaluateSearchPositionBreakdown } from '../domain/shogi/twoPlyMinimaxAi';
 import { resolveSearchEvaluationPreset } from '../domain/shogi/searchEvaluationPresets';
+import {auditProofAdjudications,verifyAdjudication} from '../../scripts/benchmarks/tacticalObservations';
 const positions = tacticalPositions();
 const get = (id:string) => positions.find(p=>p.id===id)!;
 const result = (id:string) => analyzeAlphaBetaSearch(get(id).state,1,resolveSearchEvaluationPreset('standard'),undefined,options(1));
@@ -38,13 +39,19 @@ describe('tactical diagnostics (bounded, offline)',()=>{
     const loss=reference(get('resistance'));
     expect(loss.candidates.map(c=>c.distance)).toEqual([4,2]);
     expect(loss.candidates.every(c=>c.status==='forced')).toBe(true);
-    for(const id of ['mate-three','mixed-distance','resistance']) verifyReference(get(id),reference(get(id)));
+    for(const id of ['mate-three','mixed-distance','resistance']) auditProofAdjudications(get(id),reference(get(id)));
     const broken=structuredClone(loss);broken.candidates[0].distance=2;
     expect(()=>verifyReference(get('resistance'),broken)).toThrow();
     const p=get('resistance');const truncated=structuredClone(loss);
     const proof=truncated.candidates[0].proof!;
     if('replies' in proof) proof.replies=[];
     expect(()=>verifyReference(p,truncated)).toThrow();
+  });
+  it('does not use ended-state empty legal lists as the only terminal proof',()=>{
+    const s=structuredClone(get('capture').state);s.status='ended';s.result={winner:'gote',loser:'sente',endReason:'checkmate'};
+    expect(()=>verifyAdjudication(s)).toThrow();
+    s.result={winner:'gote',loser:'sente',endReason:'no_legal_actions'};
+    expect(()=>verifyAdjudication(s)).toThrow();
   });
   it('limits reference work and never labels horizon or interrupted work safe',()=>{
     const p=get('mate-three');const r=reference(p,1);
