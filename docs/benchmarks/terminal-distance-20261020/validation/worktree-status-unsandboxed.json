@@ -1,0 +1,204 @@
+[
+  {
+    "path": "C:/Users/tetsu/Documents/Codex/Shogi-App",
+    "status": [
+      " M LOG.md",
+      " M README.md",
+      " M src/domain/shogi/quiescenceSearch.ts",
+      " M src/domain/shogi/twoPlyAlphaBetaAi.ts",
+      " M src/domain/shogi/twoPlyMinimaxAi.ts",
+      " M src/test/shogi-partial-root.test.ts",
+      "?? docs/benchmarks/terminal-distance-20261020/",
+      "?? scripts/audit-terminal-distance.ts",
+      "?? scripts/benchmarks/terminalDistanceReference.ts",
+      "?? scripts/find-terminal-resistance.ts",
+      "?? scripts/measure-terminal-distance.ts",
+      "?? src/domain/shogi/searchValue.ts",
+      "?? src/test/shogi-terminal-distance.test.ts"
+    ],
+    "exitCode": 0
+  },
+  {
+    "path": "C:/Users/tetsu/.codex/visualizations/2026/10/20/01a1593d-450a-7823-b341-3dbd4d1c7bb7/terminal-baseline",
+    "status": [
+      "?? baseline-check.txt"
+    ],
+    "exitCode": 0
+  },
+  {
+    "path": "C:/Users/tetsu/.codex/visualizations/2026/10/20/01a1593d-450a-7823-b341-3dbd4d1c7bb7/terminal-candidate",
+    "status": [
+      " M src/domain/shogi/quiescenceSearch.ts",
+      " M src/domain/shogi/twoPlyAlphaBetaAi.ts",
+      " M src/domain/shogi/twoPlyMinimaxAi.ts",
+      " M src/test/shogi-partial-root.test.ts",
+      "?? candidate-check.txt",
+      "?? final-check.txt",
+      "?? focused-initial.txt",
+      "?? scripts/audit-terminal-distance.ts",
+      "?? scripts/benchmarks/terminalDistanceReference.ts",
+      "?? scripts/find-terminal-resistance.ts",
+      "?? scripts/measure-terminal-distance.ts",
+      "?? src/domain/shogi/searchValue.ts",
+      "?? src/test/shogi-terminal-distance.test.ts"
+    ],
+    "exitCode": 0
+  },
+  {
+    "path": "C:/Users/tetsu/Documents/Codex/2026-10-09/tetsujisugimori-coder-shogi-app-pr-174/work/baseline",
+    "status": [
+      "?? scripts/measure-action-revalidation.ts"
+    ],
+    "exitCode": 0
+  },
+  {
+    "path": "C:/Users/tetsu/Documents/Codex/2026-10-09/tetsujisugimori-coder-shogi-app-pr-174/work/repo",
+    "status": [
+      " M LOG.md",
+      " M package.json",
+      " M src/domain/shogi/dropRules.ts",
+      " M src/domain/shogi/drops.ts",
+      " M src/domain/shogi/gameState.ts",
+      " M src/domain/shogi/legalActions.ts",
+      " M src/domain/shogi/moves.ts",
+      " M src/domain/shogi/quiescenceSearch.ts",
+      " M src/domain/shogi/searchDiagnostics.ts",
+      " M src/domain/shogi/twoPlyAlphaBetaAi.ts",
+      " M src/domain/shogi/validation.ts",
+      "?? docs/benchmarks/action-revalidation-comparison-20261009.md",
+      "?? docs/benchmarks/action-revalidation-fixed-off-20261009.jsonl",
+      "?? docs/benchmarks/action-revalidation-fixed-on-20261009.jsonl",
+      "?? docs/benchmarks/action-revalidation-main-fixed-20261009.jsonl",
+      "?? docs/benchmarks/action-revalidation-main-timed-20261009.jsonl",
+      "?? docs/benchmarks/action-revalidation-timed-20261009.jsonl",
+      "?? scripts/audit-action-revalidation.ts",
+      "?? scripts/measure-action-revalidation.ts",
+      "?? src/domain/shogi/actionValidationDiagnostics.ts",
+      "?? src/test/shogi-action-revalidation.test.ts"
+    ],
+    "exitCode": 0
+  },
+  {
+    "path": "C:/Users/tetsu/Documents/Codex/2026-10-12/shogi-app-1pr-see-commit-push/work/repo",
+    "status": [],
+    "exitCode": 0
+  },
+  {
+    "path": "C:/Users/tetsu/Documents/Codex/2026-10-12/shogi-app-api-commit-push-pr/work/repo",
+    "status": [],
+    "exitCode": 0
+  },
+  {
+    "path": "C:/Users/tetsu/Documents/Codex/2026-10-14/shogi-app-repository-tetsujisugimori-coder-shogi/work/baseline",
+    "status": [
+      "?? scripts/reproduce-no-legal-actions.ts",
+      "?? src/test/no-legal-actions.cases.ts",
+      "?? src/test/shogi-no-legal-actions.test.tsx"
+    ],
+    "exitCode": 0
+  },
+  {
+    "path": "C:/Users/tetsu/Documents/Codex/2026-10-14/shogi-app-repository-tetsujisugimori-coder-shogi/work/repo",
+    "status": [],
+    "exitCode": 0
+  },
+  {
+    "path": "C:/Users/tetsu/Documents/Codex/2026-10-14/shogi-app-repository-tetsujisugimori-coder-shogi/work/review-before",
+    "status": [
+      "?? docs/benchmarks/no-legal-review/",
+      "?? scripts/measure-no-legal-review.ts",
+      "?? src/test/shogi-no-legal-review.test.tsx"
+    ],
+    "exitCode": 0
+  },
+  {
+    "path": "C:/Users/tetsu/Documents/Codex/2026-10-14/shogi-app-repository-tetsujisugimori-coder-shogi/work/review-main",
+    "status": [
+      "?? docs/benchmarks/no-legal-review/",
+      "?? scripts/measure-no-legal-review.ts"
+    ],
+    "exitCode": 0
+  },
+  {
+    "path": "C:/Users/tetsu/Documents/Codex/2026-10-14/tetsujisugimori-coder-shogi-app-1-commit/work/baseline",
+    "status": [],
+    "exitCode": 0
+  },
+  {
+    "path": "C:/Users/tetsu/Documents/Codex/2026-10-14/tetsujisugimori-coder-shogi-app-1-commit/work/repo",
+    "status": [],
+    "exitCode": 0
+  },
+  {
+    "path": "C:/Users/tetsu/Documents/Codex/2026-10-15/tetsujisugimori-coder-shogi-app-1-c/work/baseline",
+    "status": [],
+    "exitCode": 0
+  },
+  {
+    "path": "C:/Users/tetsu/Documents/Codex/2026-10-15/tetsujisugimori-coder-shogi-app-1-c/work/repo",
+    "status": [],
+    "exitCode": 0
+  },
+  {
+    "path": "C:/Users/tetsu/Documents/Codex/2026-10-16/shogi-app-c-partial-root-pr/work/baseline",
+    "status": [],
+    "exitCode": 0
+  },
+  {
+    "path": "C:/Users/tetsu/Documents/Codex/2026-10-16/shogi-app-c-partial-root-pr/work/c-engine",
+    "status": [],
+    "exitCode": 0
+  },
+  {
+    "path": "C:/Users/tetsu/Documents/Codex/2026-10-16/shogi-app-c-partial-root-pr/work/repo",
+    "status": [],
+    "exitCode": 0
+  },
+  {
+    "path": "C:/Users/tetsu/Documents/Codex/Shogi-App/.worktrees/tactical",
+    "status": [],
+    "exitCode": 0
+  },
+  {
+    "path": "C:/Users/tetsu/Documents/Codex/Shogi-App-before-check-shortcircuit",
+    "status": [
+      "?? scripts/snapshot-check-shortcircuit-legal.ts"
+    ],
+    "exitCode": 0
+  },
+  {
+    "path": "C:/Users/tetsu/Documents/Codex/Shogi-App-depth-clean",
+    "status": [],
+    "exitCode": 0
+  },
+  {
+    "path": "C:/Users/tetsu/Documents/Codex/shogi-pr123-windows-main-20260920",
+    "status": [],
+    "exitCode": 0
+  },
+  {
+    "path": "C:/Users/tetsu/Documents/Codex/shogi-quiescence-ordering-baseline",
+    "status": [],
+    "exitCode": 0
+  },
+  {
+    "path": "C:/Users/tetsu/Documents/Codex/shogi-see-reference-main",
+    "status": [],
+    "exitCode": 0
+  },
+  {
+    "path": "C:/Users/tetsu/Documents/Codex/shogi-see-reference-parent414",
+    "status": [],
+    "exitCode": 0
+  },
+  {
+    "path": "C:/Users/tetsu/Documents/Codex/shogi-see-reference-parent740",
+    "status": [],
+    "exitCode": 0
+  },
+  {
+    "path": "C:/Users/tetsu/Documents/Codex/shogi-see-reference-pr106",
+    "status": [],
+    "exitCode": 0
+  }
+]

@@ -1,0 +1,8 @@
+
+ RUN  v4.1.11 C:/Users/tetsu/.codex/visualizations/2026/10/20/01a1593d-450a-7823-b341-3dbd4d1c7bb7/terminal-candidate
+
+
+ Test Files  2 passed (2)
+      Tests  57 passed (57)
+   Start at  21:23:43
+   Duration  1.29s (transform 477ms, setup 177ms, import 537ms, tests 469ms, environment 1.10s)

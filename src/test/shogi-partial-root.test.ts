@@ -1,3 +1,4 @@
+import { searchValue } from '../domain/shogi/searchValue';
 import { cloneBoardState } from '../domain/shogi/replay';
 import { runSelfPlayGame } from '../domain/shogi/selfPlayGame';
 import { serializeShogiGameRecordV1 } from '../domain/shogi/gameRecord';
@@ -20,15 +21,17 @@ function run(expireAt: number, quiescence = false, turn: 'sente' | 'gote' = 'sen
   expect(state).toEqual(before);
   return { result, state, reads };
 }
-function mockScores(values: number[]) {
+function mockScores(values: number[], distances: number[] = []) {
   let index = 0;
-  return vi.spyOn(q, 'analyzeQuiescenceSearchWithinBounds').mockImplementation(() => {
+  return vi.spyOn(q, 'analyzeQuiescenceSearchWithInternalBounds').mockImplementation(() => {
     const value = values[index++] ?? -1000;
-    return { selectedEvaluation: value, principalVariation: [], evaluationBreakdown: {
+    const evaluationBreakdown = {
       total: value, material: Number.isFinite(value) ? value : 0, pieceSquare: 0,
       kingSafety: 0, undefendedPieceSafety: 0,
-      terminal: value === Infinity ? 'win' : value === -Infinity ? 'loss' : null,
-    }, visitedPositionCount: 0, cutoffCount: 0, skippedActionCount: 0, maxTacticalDepth: 1 };
+      terminal: value === Infinity ? 'win' as const : value === -Infinity ? 'loss' as const : null,
+    };
+    return { selectedEvaluation: value, searchValue: searchValue(evaluationBreakdown, distances[index - 1] ?? 1),
+      principalVariation: [], evaluationBreakdown, visitedPositionCount: 0, cutoffCount: 0, skippedActionCount: 0, maxTacticalDepth: 1 };
   });
 }
 afterEach(() => vi.restoreAllMocks());
@@ -69,30 +72,43 @@ describe('partial-root deadline and exact selection', () => {
     expect(result.selectedEvaluation).toBe(evaluateSearchPositionBreakdown(child.state, turn).total);
   });
   it('does not adopt missing runtime values', () => {
-    vi.spyOn(q, 'analyzeQuiescenceSearchWithinBounds').mockReturnValue({ selectedEvaluation: undefined,
+    vi.spyOn(q, 'analyzeQuiescenceSearchWithInternalBounds').mockReturnValue({ selectedEvaluation: undefined, searchValue: { category: 'non-terminal', evaluation: undefined },
       principalVariation: [], evaluationBreakdown: { total: undefined, material: 0, pieceSquare: 0,
         kingSafety: 0, undefendedPieceSafety: 0, terminal: null },
-      visitedPositionCount: 0, cutoffCount: 0, skippedActionCount: 0, maxTacticalDepth: 1 } as unknown as q.QuiescenceSearchResult);
+      visitedPositionCount: 0, cutoffCount: 0, skippedActionCount: 0, maxTacticalDepth: 1 } as unknown as ReturnType<typeof q.analyzeQuiescenceSearchWithInternalBounds>);
     expect(run(7, true).result.resultSource).toBe('fallback');
   });
-  it('does not adopt fail-low bounds or indeterminate values', () => {
-    mockScores([20, 15, NaN]);
+  it('does not adopt fail-low bounds', () => {
+    mockScores([20, 15, 10]);
     const { result } = run(11, true);
     expect(result.selectedEvaluation).toBe(20);
     expect(result.partialRoot).toMatchObject({ completedRootCandidateCount: 3, exactRootCandidateCount: 1 });
   });
-  it('falls back when the only returned value is indeterminate', () => {
+  it('propagates NaN instead of falling back', () => {
     mockScores([NaN]);
-    expect(run(7, true).result.resultSource).toBe('fallback');
+    expect(() => run(7, true)).toThrow(/NaN/);
   });
-  it.each([Infinity, -Infinity])('preserves exact absolute endpoint %s and its actual PV', value => {
+  it('propagates NaN after valid q candidates instead of returning partial-root', () => {
+    mockScores([20, 15, NaN]);
+    expect(() => run(11, true)).toThrow(/NaN/);
+  });
+  it.each([Infinity, -Infinity])('rejects equal terminal-distance window bounds %s while retaining the first exact PV', value => {
     mockScores([value, value]);
     const { result, state } = run(9, true);
     expect(result.selectedEvaluation).toBe(value);
-    expect(result.partialRoot?.exactRootCandidateCount).toBe(2);
+    expect(result.partialRoot?.exactRootCandidateCount).toBe(1);
     expect(result.principalVariation).toEqual([getLegalActions(state)[0]]);
     expect(structuredClone(result).selectedEvaluation).toBe(value);
   });
+  it.each([[Infinity, [3, 1]], [-Infinity, [2, 4]]] as const)(
+    'uses terminal distance between exact partial candidates with public score %s', (score, distances) => {
+      mockScores([score, score], [...distances]);
+      const { result, state } = run(9, true);
+      expect(result.selectedAction).toEqual(getLegalActions(state)[1]);
+      expect(result.selectedEvaluation).toBe(score);
+      expect(result.evaluationBreakdown?.total).toBe(score);
+      expect(result.partialRoot).toMatchObject({ completedRootCandidateCount: 2, exactRootCandidateCount: 2 });
+    });
   it('rejects the last candidate on the final existing deadline check', () => {
     const { result } = run(64);
     expect(result).toMatchObject({ resultSource: 'partial-root', completedDepth: 0, iterations: [],
@@ -108,7 +124,7 @@ describe('partial-root deadline and exact selection', () => {
       'visitedPositionCount','cutoffCount','skippedActionCount'] as const) expect(result[key]).toEqual(fixed[key]);
   });
   it('propagates exceptions rather than returning a saved candidate', () => {
-    vi.spyOn(q, 'analyzeQuiescenceSearchWithinBounds').mockImplementation(() => { throw new Error('evaluation failed'); });
+    vi.spyOn(q, 'analyzeQuiescenceSearchWithInternalBounds').mockImplementation(() => { throw new Error('evaluation failed'); });
     expect(() => run(100, true)).toThrow('evaluation failed');
   });
   it('rejects missing evaluation and malformed candidate metadata at the UI boundary', () => {

@@ -1,3 +1,4 @@
+import { searchValue, compareSearchValues, SEARCH_BOTTOM, type SearchValue } from './searchValue';
 /**
  * A fixed-depth, two-ply material search built exclusively from the public
  * legal-action, execution, cloning, and material-evaluation domain APIs.
@@ -240,14 +241,6 @@ function executeSearchAction(state: BoardState, action: LegalAction): BoardState
 
 type UnmeasuredTwoPlyMinimaxSearchResult = Omit<TwoPlyMinimaxSearchResult, 'elapsedMilliseconds'>;
 
-function compareCandidatesByEvaluation(
-  left: TwoPlyMinimaxCandidate,
-  right: TwoPlyMinimaxCandidate
-): number {
-  if (left.evaluation === right.evaluation) return 0;
-  return right.evaluation > left.evaluation ? 1 : -1;
-}
-
 /**
  * Runs the fixed-depth search once without taking a clock reading. Keeping the
  * clock outside this function makes the minimax computation deterministic.
@@ -260,6 +253,7 @@ function searchTwoPlyMinimax(
   const rootActions = getLegalActions(state);
   if (rootActions.length === 0 && state.status !== 'ended') {
     const breakdown = evaluateNoLegalActionsPositionBreakdown(state, rootPlayer, evaluation);
+    searchValue(breakdown, 0);
     if (breakdown.terminal !== null) {
       return {
         selectedAction: null, selectedEvaluation: breakdown.total, evaluationBreakdown: breakdown,
@@ -270,14 +264,16 @@ function searchTwoPlyMinimax(
   }
   let bestAction: LegalAction | null = null;
   let bestEvaluation = Number.NEGATIVE_INFINITY;
+  let bestValue = SEARCH_BOTTOM;
   let bestBreakdown: SearchEvaluationBreakdown | null = null;
   let visitedPositionCount = 0;
-  const candidates: TwoPlyMinimaxCandidate[] = [];
+  const candidates: (TwoPlyMinimaxCandidate & { value: SearchValue })[] = [];
 
   for (const rootAction of rootActions) {
     const afterRootAction = executeSearchAction(state, rootAction);
     visitedPositionCount += 1;
     let candidateBreakdown: SearchEvaluationBreakdown;
+    let candidatePly = 1;
 
     if (afterRootAction.status === 'ended') {
       candidateBreakdown = evaluateSearchPositionBreakdown(afterRootAction, rootPlayer, evaluation);
@@ -287,12 +283,13 @@ function searchTwoPlyMinimax(
         throw new Error('A non-ended search position has no legal opponent response.');
       }
 
+      candidatePly = 2;
       let worstReplyBreakdown: SearchEvaluationBreakdown | null = null;
       for (const reply of replies) {
         const afterReply = executeSearchAction(afterRootAction, reply);
         visitedPositionCount += 1;
         const replyBreakdown = evaluateSearchPositionBreakdown(afterReply, rootPlayer, evaluation);
-        if (worstReplyBreakdown === null || replyBreakdown.total < worstReplyBreakdown.total) {
+        if (worstReplyBreakdown === null || compareSearchValues(searchValue(replyBreakdown, 2), searchValue(worstReplyBreakdown, 2)) < 0) {
           worstReplyBreakdown = replyBreakdown;
         }
       }
@@ -301,12 +298,14 @@ function searchTwoPlyMinimax(
     }
 
     const candidateEvaluation = candidateBreakdown.total;
-    candidates.push({ action: rootAction, evaluation: candidateEvaluation });
+    const value = searchValue(candidateBreakdown, candidatePly);
+    candidates.push({ action: rootAction, evaluation: candidateEvaluation, value });
     // The first legal action establishes the stable comparison baseline. Later
     // equal scores retain that action because this remains a strict comparison.
-    if (bestAction === null || candidateEvaluation > bestEvaluation) {
+    if (bestAction === null || compareSearchValues(value, bestValue) > 0) {
       bestAction = rootAction;
       bestEvaluation = candidateEvaluation;
+      bestValue = value;
       bestBreakdown = candidateBreakdown;
     }
   }
@@ -318,7 +317,8 @@ function searchTwoPlyMinimax(
     rootLegalActionCount: rootActions.length,
     visitedPositionCount,
     depth: TWO_PLY_MINIMAX_SEARCH_DEPTH,
-    topCandidates: candidates.slice().sort(compareCandidatesByEvaluation).slice(0, 3),
+    topCandidates: candidates.slice().sort((left, right) => compareSearchValues(right.value, left.value)).slice(0, 3)
+      .map(({ action, evaluation }) => ({ action, evaluation })),
   };
 }
 

@@ -1,0 +1,8 @@
+
+ RUN  v4.1.11 C:/Users/tetsu/.codex/visualizations/2026/10/20/01a1593d-450a-7823-b341-3dbd4d1c7bb7/nan-review-20261021/after
+
+
+ Test Files  3 passed (3)
+      Tests  95 passed (95)
+   Start at  01:20:05
+   Duration  1.98s (transform 484ms, setup 275ms, import 563ms, tests 487ms, environment 1.54s)

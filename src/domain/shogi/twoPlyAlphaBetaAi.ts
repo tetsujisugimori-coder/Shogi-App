@@ -1,3 +1,4 @@
+import { searchValue, compareSearchValues as compare, SEARCH_BOTTOM, SEARCH_TOP, type SearchValue } from './searchValue';
 /**
  * A depth-configurable alpha-beta search built exclusively from the public
  * legal-action, execution, cloning, and material-evaluation domain APIs.
@@ -7,7 +8,7 @@ import { executeLegalAction, getLegalActions, type LegalAction } from './legalAc
 import {
   DEFAULT_MATERIAL_VALUE_TABLE,
 } from './materialEvaluation';
-import { analyzeQuiescenceSearchWithinBounds } from './quiescenceSearch';
+import { analyzeQuiescenceSearchWithInternalBounds } from './quiescenceSearch';
 import { resolveQuiescenceMoveOrdering, type QuiescenceMoveOrderingMode } from './quiescenceOrdering';
 import { prepareStaticExchangeEvaluation } from './staticExchangeEvaluation';
 import { measured, type SearchDiagnostics } from './searchDiagnostics';
@@ -77,7 +78,7 @@ function resolveQuiescenceOptions(options: AlphaBetaSearchOptions | undefined): 
  * Every evaluation is from the root AI player's perspective: larger values are
  * better for that player. `visitedPositionCount` counts successor states made
  * by applying explored actions; the supplied root state is excluded.
- * `cutoffCount` counts loops actually stopped by `alpha >= beta`, and
+ * `cutoffCount` counts loops actually stopped by `compare(alpha, beta) >= 0`, and
  * `skippedActionCount` counts the unexecuted actions left in those loops.
  * Those established fields describe ordinary alpha-beta only. The
  * `quiescence*` fields separately describe opt-in tactical leaf work.
@@ -436,7 +437,7 @@ function orderIterativeDeepeningRootActionsByMode(
  * ply before this function is first called.
  */
 interface SearchNodeResult {
-  evaluation: number;
+  evaluation: SearchValue;
   principalVariation: LegalAction[];
   evaluationBreakdown: SearchEvaluationBreakdown;
 }
@@ -446,8 +447,8 @@ function searchAlphaBetaNode(
   remainingDepth: number,
   rootPlayer: Player,
   isMaximizing: boolean,
-  alpha: number,
-  beta: number,
+  alpha: SearchValue,
+  beta: SearchValue,
   valueTable: SearchEvaluationConfig,
   statistics: SearchStatistics,
   interruptionCheck: SearchInterruptionCheck,
@@ -462,7 +463,7 @@ function searchAlphaBetaNode(
   if (state.status === 'ended') {
     const evaluationBreakdown = measured(diagnostics, 'normal-evaluate', () => evaluateSearchPositionBreakdown(state, rootPlayer, valueTable));
     return {
-      evaluation: evaluationBreakdown.total,
+      evaluation: searchValue(evaluationBreakdown, ply),
       principalVariation: [],
       evaluationBreakdown,
     };
@@ -470,20 +471,20 @@ function searchAlphaBetaNode(
   if (remainingDepth === 0) {
     if (quiescenceOptions === undefined) {
       const evaluationBreakdown = measured(diagnostics, 'normal-evaluate', () => evaluateSearchPositionBreakdown(state, rootPlayer, valueTable));
-      return { evaluation: evaluationBreakdown.total, principalVariation: [], evaluationBreakdown };
+      return { evaluation: searchValue(evaluationBreakdown, ply), principalVariation: [], evaluationBreakdown };
     }
     statistics.quiescenceLeafCount += 1;
     diagnostics?.quiescenceEntered();
-    const quiescence = measured(diagnostics, 'quiescence', () => analyzeQuiescenceSearchWithinBounds(
+    const quiescence = measured(diagnostics, 'quiescence', () => analyzeQuiescenceSearchWithInternalBounds(
       state, rootPlayer, quiescenceOptions.maxTacticalDepth, valueTable, interruptionCheck, alpha, beta,
       quiescenceOptions.moveOrdering,
-      diagnostics
+      diagnostics, ply
     ));
     statistics.quiescenceVisitedPositionCount += quiescence.visitedPositionCount;
     statistics.quiescenceCutoffCount += quiescence.cutoffCount;
     statistics.quiescenceSkippedActionCount += quiescence.skippedActionCount;
     return {
-      evaluation: quiescence.selectedEvaluation,
+      evaluation: quiescence.searchValue,
       principalVariation: clonePrincipalVariation(quiescence.principalVariation),
       evaluationBreakdown: cloneSearchEvaluationBreakdown(quiescence.evaluationBreakdown),
     };
@@ -498,13 +499,13 @@ function searchAlphaBetaNode(
   if (actions.length === 0) {
     const evaluationBreakdown = measured(diagnostics, 'normal-evaluate', () => evaluateNoLegalActionsPositionBreakdown(state, rootPlayer, valueTable));
     return {
-      evaluation: evaluationBreakdown.total,
+      evaluation: searchValue(evaluationBreakdown, ply),
       principalVariation: [],
       evaluationBreakdown,
     };
   }
 
-  let value = isMaximizing ? Number.NEGATIVE_INFINITY : Number.POSITIVE_INFINITY;
+  let value = isMaximizing ? SEARCH_BOTTOM : SEARCH_TOP;
   let principalVariation: LegalAction[] = [];
   let evaluationBreakdown: SearchEvaluationBreakdown | null = null;
   let hasExploredAction = false;
@@ -535,8 +536,8 @@ function searchAlphaBetaNode(
       ...clonePrincipalVariation(childResult.principalVariation),
     ];
     const adoptsCandidate = !hasExploredAction || (isMaximizing
-      ? childResult.evaluation > value
-      : childResult.evaluation < value);
+      ? compare(childResult.evaluation, value) > 0
+      : compare(childResult.evaluation, value) < 0);
     if (adoptsCandidate) {
       value = childResult.evaluation;
       principalVariation = candidatePrincipalVariation;
@@ -545,13 +546,13 @@ function searchAlphaBetaNode(
     hasExploredAction = true;
 
     if (isMaximizing) {
-      if (value > alpha) alpha = value;
+      if (compare(value, alpha) > 0) alpha = value;
     } else {
-      if (value < beta) beta = value;
+      if (compare(value, beta) < 0) beta = value;
     }
 
     const remainingActionCount = actions.length - actionIndex - 1;
-    if (alpha >= beta && remainingActionCount > 0) {
+    if (compare(alpha, beta) >= 0 && remainingActionCount > 0) {
       killerMoveHistory?.record(state, ply, actions[actionIndex]);
       statistics.cutoffCount += 1;
       statistics.skippedActionCount += remainingActionCount;
@@ -627,6 +628,7 @@ function searchAlphaBeta(
 
   if (depth === 0) {
     const evaluationBreakdown = evaluateSearchPositionBreakdown(state, rootPlayer, valueTable);
+    searchValue(evaluationBreakdown, 0);
     return {
       selectedAction: null,
       selectedEvaluation: evaluationBreakdown.total,
@@ -641,6 +643,7 @@ function searchAlphaBeta(
   const rootActions = suppliedRootActions ?? measured(diagnostics, 'root-legal', () => getLegalActions(state, diagnostics));
   if (rootActions.length === 0) {
     const evaluationBreakdown = evaluateNoLegalActionsPositionBreakdown(state, rootPlayer, valueTable);
+    searchValue(evaluationBreakdown, 0);
     return {
       selectedAction: null,
       selectedEvaluation: state.status === 'ended' || evaluationBreakdown.terminal === null ? null : evaluationBreakdown.total,
@@ -660,11 +663,11 @@ function searchAlphaBeta(
   }));
   let bestAction: LegalAction | null = null;
   let bestOriginalIndex = Number.POSITIVE_INFINITY;
-  let bestEvaluation = Number.NEGATIVE_INFINITY;
+  let bestEvaluation = SEARCH_BOTTOM;
   let bestPrincipalVariation: LegalAction[] = [];
   let bestEvaluationBreakdown: SearchEvaluationBreakdown | null = null;
-  let alpha = Number.NEGATIVE_INFINITY;
-  const beta = Number.POSITIVE_INFINITY;
+  let alpha = SEARCH_BOTTOM;
+  const beta = SEARCH_TOP;
 
   let candidateIndex = 0;
   for (const { action: rootAction, originalIndex } of indexedRootActions) {
@@ -698,14 +701,14 @@ function searchAlphaBeta(
     // exact tie which belongs to an earlier legal action. This separates the
     // search order from the established root tie-breaking order.
     if (bestAction !== null && originalIndex < bestOriginalIndex &&
-      candidateResult.evaluation === bestEvaluation && candidateResult.evaluation === alphaBeforeCandidate) {
+      compare(candidateResult.evaluation, bestEvaluation) === 0 && compare(candidateResult.evaluation, alphaBeforeCandidate) === 0) {
       candidateResult = searchAlphaBetaNode(
         afterRootAction,
         depth - 1,
         rootPlayer,
         false,
-        Number.NEGATIVE_INFINITY,
-        Number.POSITIVE_INFINITY,
+        SEARCH_BOTTOM,
+        SEARCH_TOP,
         valueTable,
         statistics,
         interruptionCheck,
@@ -718,18 +721,19 @@ function searchAlphaBeta(
     }
 
     if (partialRoot) {
-      // Depth one: static/terminal leaves are unpruned. With quiescence and
-      // beta=+Infinity, fail-low/equality at finite alpha is only an upper bound.
-      // Absolute extrema are exact even at a window endpoint. NaN is never usable.
+      // A terminal numeric Infinity is no longer an absolute window extreme:
+      // another terminal with the same outcome may have a better distance.
+      // At depth one static/adjudicated leaves are exact. A q fail-low is not.
       const value = candidateResult.evaluation;
-      const exact = typeof value === 'number' && !Number.isNaN(value) && value === candidateResult.evaluationBreakdown.total &&
+      const exact = typeof candidateResult.evaluationBreakdown.total === 'number' &&
+        !Number.isNaN(candidateResult.evaluationBreakdown.total) &&
         (afterRootAction.status === 'ended' || quiescenceOptions === undefined ||
-          alphaBeforeCandidate === -Infinity || value > alphaBeforeCandidate || Math.abs(value) === Infinity);
+          alphaBeforeCandidate === SEARCH_BOTTOM || compare(value, alphaBeforeCandidate) > 0);
       partialRoot.pendingCompleted = true;
       partialRoot.pendingExact = exact;
       const best = partialRoot.best;
-      if (exact && (!best || value > best.result.evaluation ||
-        (value === best.result.evaluation && originalIndex < best.originalIndex))) {
+      if (exact && (!best || compare(value, best.result.evaluation) > 0 ||
+        (compare(value, best.result.evaluation) === 0 && originalIndex < best.originalIndex))) {
         partialRoot.pending = {
           action: cloneLegalAction(rootAction), originalIndex,
           result: { evaluation: value,
@@ -741,8 +745,8 @@ function searchAlphaBeta(
 
     // The first legal action establishes the baseline even at -Infinity.
     // For iterative root reordering, compare original indexes on exact ties.
-    if (bestAction === null || candidateResult.evaluation > bestEvaluation ||
-      (candidateResult.evaluation === bestEvaluation && originalIndex < bestOriginalIndex)) {
+    if (bestAction === null || compare(candidateResult.evaluation, bestEvaluation) > 0 ||
+      (compare(candidateResult.evaluation, bestEvaluation) === 0 && originalIndex < bestOriginalIndex)) {
       bestAction = rootAction;
       bestOriginalIndex = originalIndex;
       bestEvaluation = candidateResult.evaluation;
@@ -752,7 +756,7 @@ function searchAlphaBeta(
       ];
       bestEvaluationBreakdown = candidateResult.evaluationBreakdown;
     }
-    if (bestEvaluation > alpha) alpha = bestEvaluation;
+    if (compare(bestEvaluation, alpha) > 0) alpha = bestEvaluation;
     diagnostics?.candidateCompleted();
   }
 
@@ -762,7 +766,7 @@ function searchAlphaBeta(
 
   return {
     selectedAction: bestAction,
-    selectedEvaluation: bestAction === null ? null : bestEvaluation,
+    selectedEvaluation: bestAction === null ? null : bestEvaluationBreakdown.total,
     principalVariation: clonePrincipalVariation(bestPrincipalVariation),
     evaluationBreakdown: cloneSearchEvaluationBreakdown(bestEvaluationBreakdown),
     rootLegalActionCount: rootActions.length,
@@ -913,6 +917,7 @@ export function analyzeTimeLimitedIterativeDeepeningAlphaBetaSearch(
   diagnostics?.rootGenerated(rootActions.length);
   const noLegalActions = rootActions.length === 0;
   const noActionBreakdown = noLegalActions ? evaluateNoLegalActionsPositionBreakdown(state, state.turn, valueTable) : null;
+  if (noActionBreakdown) searchValue(noActionBreakdown, 0);
   const fallbackAction = rootActions[0] ?? null;
   const iterations: IterativeDeepeningAlphaBetaIterationResult[] = [];
   let previousBestAction: LegalAction | null = null;
@@ -1037,7 +1042,7 @@ export function analyzeTimeLimitedIterativeDeepeningAlphaBetaSearch(
     const { action, originalIndex, result: candidate } = partialRoot.best;
     result.resultSource = 'partial-root';
     result.selectedAction = action;
-    result.selectedEvaluation = candidate.evaluation;
+    result.selectedEvaluation = candidate.evaluationBreakdown.total;
     result.evaluationBreakdown = candidate.evaluationBreakdown;
     result.principalVariation = [action, ...candidate.principalVariation];
     result.partialRoot = {

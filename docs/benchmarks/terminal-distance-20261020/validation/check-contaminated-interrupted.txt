@@ -1,0 +1,47 @@
+
+> shogi-app@0.0.0 check
+> npm run verify:lock && npm run lint && npm test && npm run build
+
+
+> shogi-app@0.0.0 verify:lock
+> node scripts/verify-lockfile.mjs
+
+--- Lockfile Verification Summary ---
+Lockfile Name:           shogi-app
+Lockfile Version:        3
+Total Package Entries:   399
+Inspected Registry Pkgs: 398
+Valid Exceptions:        0
+Missing "version":       0
+Missing "resolved":      0
+Missing "integrity":     0
+
+[verify:lock] SUCCESS: package-lock.json is valid and complete.
+
+
+> shogi-app@0.0.0 lint
+> tsc --noEmit
+
+
+> shogi-app@0.0.0 test
+> vitest run
+
+
+ RUN  v4.1.11 C:/Users/tetsu/Documents/Codex/Shogi-App
+
+ ❯ src/test/shogi-evaluation-preset-comparison-ui.test.tsx (24 tests | 1 failed) 48842ms
+     × 不変局面と深さ3で開始し、競合AIを止め、全結果を固定順で表示する 5701ms
+ ❯ .worktrees/terminal-baseline/src/test/time-limited-iterative-alpha-beta-worker.test.ts (0 test)
+ ❯ .worktrees/terminal-baseline/src/test/shogi-agreed-jishogi.test.tsx (0 test)
+ ❯ .worktrees/terminal-baseline/src/test/shogi-game-record.test.tsx (0 test)
+ ❯ .worktrees/terminal-baseline/src/test/shogi-branch-replay.test.ts (0 test)
+ ❯ .worktrees/terminal-baseline/src/test/shogi-static-exchange-evaluation.test.ts (0 test)
+ ❯ .worktrees/terminal-baseline/src/test/shogi-checkmate.test.tsx (0 test)
+ ❯ .worktrees/terminal-baseline/src/test/quiescence-ordering-repeated.test.ts (0 test)
+ ❯ .worktrees/terminal-baseline/src/test/shogi-entering-king.test.tsx (0 test)
+ ❯ .worktrees/terminal-baseline/src/test/shogi-repetition.test.tsx (0 test)
+ ❯ .worktrees/terminal-baseline/src/test/shogi-quiescence-comparison-ui.test.tsx (0 test)
+ ❯ .worktrees/terminal-baseline/src/test/quiescence-ordering-suite-comparison.test.ts (0 test)
+ ❯ .worktrees/terminal-baseline/src/test/shogi-self-play-game.test.ts (0 test)
+ ❯ .worktrees/terminal-baseline/src/test/shogi-see-move-ordering.test.ts (0 test)
+ ❯ .worktrees/terminal-baseline/src/test/shogi-kif-import.test.ts (0 test)
