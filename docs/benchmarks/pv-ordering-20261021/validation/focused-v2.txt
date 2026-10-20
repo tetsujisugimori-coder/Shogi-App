@@ -1,0 +1,8 @@
+
+ RUN  v4.1.11 C:/Users/tetsu/.codex/visualizations/2026/10/20/01a15b5d-069b-73c2-b2e6-a33e1b7f3d4a/pv-ordering
+
+
+ Test Files  1 passed (1)
+      Tests  13 passed (13)
+   Start at  07:14:04
+   Duration  1.44s (transform 196ms, setup 83ms, import 212ms, tests 515ms, environment 511ms)

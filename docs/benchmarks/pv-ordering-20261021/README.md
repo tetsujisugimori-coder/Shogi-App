@@ -1,0 +1,130 @@
+# 反復深化の前回PV優先（2026-10-21 JST）
+
+## 基準・保全
+
+origin/mainをfetchし、基準SHAは`34d3689e96200b9ecc4a417e15a0ed0012cb2cd3`。PR #192は2026-10-20 21:56:54 UTCに同SHAへマージ済み、#190は`6cd961b699a9985a0ff73ca6a93bb7bbdaa2b2ef`へマージ済み。本文原文はvalidation/pr192.json、pr190.json。README/LOG、探索・SearchValue・q、terminal-distance-20261020、terminal-distance-nan-20261021、tactical-mate-20261019の原本を確認した。#190の詰み限定参照を全終局の抵抗距離の証明へ流用しない。
+
+開始mainはclean。既存worktreeには未コミットの診断・修正があり、読取り確認だけを行い維持した（validation/worktree-statuses.txt）。追加AGENTS.mdなし、ユーザーの回答末尾日時指示を適用。専用`codex/pv-ordering`と独立worktreeで作業し、基準main検証用にも独立checkoutを作成。既存の診断原本は変更しない。アプリのworktree作成後に許可済み領域へgit worktree moveしたため再attachは「managed worktreeでない」と返したが、Gitのworktree・専用ブランチとして使用できている。
+
+## 実装
+
+`AlphaBetaSearchOptions.usePreviousIterationPv: true`を明示した反復深化APIだけで内部PV優先を有効化する。未指定/falseは従来のルート最善手優先を保つ。単発固定深さAPIには前回反復がないため効果はない。Worker/UIの設定・保存形式は増やさず、製品の既定動作はOFFのまま。boolean以外の明示値はRangeError。
+
+採用済み完了反復のPV配列を次の反復へ共有し、既存plyで次の手を参照する。通常ノードでは全合法手を生成し、既存standard/SEE/killer順序を完成させてから、`areLegalActionsEqual`で一致する合法PV手だけを先頭へ安定移動する。他の手の相対順と集合を保ち、不在/空ヒントではそのまま返す。盤面照合・棋譜再生・配列のsuffix複製はしない。
+
+親でPV手と実探索手が一致した子だけへ同じ配列を渡す。分岐した子にはundefinedを渡し、同じplyへ戻ってもヒントを再開しない。ルートは従来の前回最善手順序を使い、その手とPV[0]の一致で内部ヒントを開始する。root同点の元合法手indexと必要な無限窓再探索は維持。再探索へも同じ経路条件で渡す。
+
+通常深さ0より先は既存q入口へ入り、q内部へヒントは渡さない。前回PVのq由来suffixが次の深さで通常ノードになれば、そこでは通常の合法手として優先できる。qの探索順序・深さ・評価・stand-patは変更しない。SearchValue、終局規則、NaN拒否、deadline確認位置、partial-rootのexact/bound・期限承認順は変更しない。時間切れ反復のPVは採用せず、前回の完了反復を返す。
+
+## 正当性の監査
+
+PR #192の`terminalDistanceReference.ts`を原本のまま再利用。比較・全幅minimax・q条件は製品のSearchValue/枝刈り/順序付けから独立だが、合法手・適用・数値評価のAPIは共有するため、ルールそのものの外部証明ではない。
+
+`reference-final.jsonl`は12局面×深さ1〜4の48件で実際の基準mainとOFFを照合する。経過時間以外の全結果・各反復・全統計を完全比較。さらに全12局面でd1/q0,1,2およびd2/q1、mixed-distanceと必敗の先後2局面ではd4/qなし・d4/q1・d3/q1を全幅/逆順全幅と比較し、ON/OFFのカテゴリ・距離・公開評価・内訳・元合法手indexのroot同点を検証する。各候補の参照値とPVも保存する。計162行＝main/OFF48件＋独立参照ON/OFF114件、全成功。初回reference.jsonlも保存し、最終版では±InfinityをJSON変換で失わない比較ヘルパーを使って再実行した。
+
+`deep-reference.jsonl`は指定6局面のd4/q1を追加の全幅参照と比較し、全12件（6局面×OFF/ON）成功。測定の監査は全完了反復の合法PV再生・末端内訳一致、同じ完了深さの固定/時間制限結果一致、統計の反復和、partial候補の独立q exact値を検証する。PV差があれば分岐点の両候補を全幅で独立評価し、同値かどうかを保存する。単に公開InfinityやPV長が一致しただけでは合格にしない。
+
+## 凍結した測定条件
+
+standard評価/standard通常順序/killer=false/q original/maxTacticalDepth=1、最大通常深さ4。PR #192の12局面を同じ順で用いる。固定深さ4は単発探索でなくd1〜4の反復深化を無期限に完了させ、最深反復と全反復合計を分ける（単発APIではPV優先の効果を測れない）。固定は各条件3本、100ms/1,000msは各条件5本。各局面・予算・OFF/ONにつき先行1本をwarmupとして分離する。各ペアで先行順を交互にし、局面・予算をまたいでも順序を継続する。全呼出しは同期直列、テスト/build/参照監査と並走させない。
+
+run1/plan.jsonに完全入力・入力hash、設定、実装/CLI/参照hash、dirty差分、基準SHA、環境を保存。測定時HEADが基準SHAであるだけで変更済み実装を識別せず、ソースhashとdiffを使う。raw.jsonlは順序・warmup・全API結果・各深さ・通常/qノード・cutoff/skipped・手・評価・PV・終局理由/距離・実呼出し時間・API内時間・超過を逐次保存し、既存ファイルは上書きしない。入力は既存protectSearchInputで保護し、その準備とPV監査は計時外。
+
+公開統計のtotalは完了反復の和で、時間切れ途中の通常/q全作業量ではない。partialは既存attemptedStatisticsを保存し、未完了q内部のノードを作らない。実時間には中断反復も含む。p50/p95はnearest-rank、超過はmax(0,実時間−予算)。局面ごとの完了深さ列と全体分布を併記する。OS負荷/JIT/GC/電源/CPU affinityは固定せず、少数標本から統計的に確定した速度向上・一般棋力を主張しない。
+
+## 再現
+
+```powershell
+npm run check
+node --import tsx scripts/audit-pv-ordering.ts reference <new-reference.jsonl> <clean-baseline-root>
+node --import tsx scripts/audit-pv-ordering.ts deep-reference <new-deep-reference.jsonl>
+node --import tsx scripts/measure-pv-ordering.ts <new-run-directory>
+node --import tsx scripts/audit-pv-ordering.ts measurements <run-directory>
+node --import tsx scripts/measure-pv-ordering.ts <new-cpu-run-directory> --fixed-only
+node --import tsx scripts/audit-pv-ordering.ts cpu-measurements <cpu-run-directory> <run-directory>
+node --import tsx scripts/audit-pv-ordering.ts manifest docs/benchmarks/pv-ordering-20261021
+```
+
+集計が既にある場合、監査CLIは再計算との完全一致を要求する。元の測定値を更新しない。長時間測定・全幅診断は通常CIへ追加しない。
+
+## run1の測定結果
+
+2026-10-21 07:18:42〜07:26:19 JST、Windows 10.0.26300 x64、Intel Core i7-14650HX、Node v24.20.0、npm 11.17.0。全384呼出し（warmup72、本測定312＝固定72＋時間制限240）成功、欠測・例外0。測定中にテスト/build/独立参照は並走させていない。run1の時点のCLIをmeasurement-source.ts.txtにbyte保存し、planのCLI SHA-256と一致確認した。後続のCPU計測追加版と区別する。
+
+全完了反復について、PV合法再生・末端内訳・selectedEvaluation・入力非破壊・同一深さの無期限/時間制限の全結果/統計一致を監査。partial-root 10件（OFF/ON各5、hirate-exchangeの100ms）の採用候補は独立全幅q1のカテゴリ/距離/数値と一致し、既存検証器を通過。実時間でfallbackは0件であり、fallbackと期限切れ候補棄却は制御時計の回帰で検証する。
+
+時限OFF/ONで完了深さやpartial候補が異なる場合の手・評価・PVも生データに残す。同じ完了深さの結果は無期限反復と完全一致し、深さの違いによる結果差を同値PV差の説明へ混ぜない。
+
+全局面の各深さと完全結果は[summary.json](run1/summary.json)、読みやすい集計は[summary.md](run1/summary.md)、全標本は[raw.jsonl](run1/raw.jsonl)。最深d4の通常ノード合計は26,539→26,981（+1.67%）、qは9,529→10,300（+8.09%）。反復d1〜4合計でも通常38,832→39,258（+1.10%）、q10,895→11,667（+7.09%）。合計は固定局面セット1巡の決定的ノード数で、3標本を水増しして加算していない。
+
+| 局面 | d4通常 OFF→ON | d4 q OFF→ON | 固定の呼出しp50 ms OFF→ON |
+|---|---:|---:|---:|
+| terminal-resistance | 416→377 | 61→48 | 309.866→259.301 |
+| terminal-resistance-gote | 282→250 | 38→35 | 231.883→222.071 |
+| evasion | 693→725 | 110→145 | 577.891→608.074 |
+| hirate-exchange | 7,913→8,428 | 5,181→5,935 | 24,584.281→25,246.888 |
+
+mate-sente/gote、mate-three、mixed-distance、旧resistanceは通常/qノード不変。特に1ply勝ちのPVには内部ヒントがないため、当初の終局距離比較コストを減らせていない。recaptureは最深通常1,825→1,817だが全反復通常2,495→2,496、q306→307で、最深ノードだけを改善と報告しない。captureは通常715→711、recapture-goteは1,328→1,306。旧PR #192の単発固定d4と今回の反復d4はroot順序が異なるため、過去の数値との速度比較には使わない。
+
+| 予算 | PV | 呼出しp50/p95 ms | 最大超過ms | completed/partial/fallback | 完了深さ0/1/2/3/4 |
+|---|---|---:|---:|---|---|
+| 100ms | OFF | 100.548 / 102.218 | 2.798 | 55 / 5 / 0 | 5 / 20 / 20 / 15 / 0 |
+| 100ms | ON | 100.487 / 102.461 | 3.262 | 55 / 5 / 0 | 5 / 23 / 17 / 15 / 0 |
+| 1,000ms | OFF | 603.997 / 1000.885 | 2.468 | 60 / 0 / 0 | 0 / 0 / 15 / 10 / 35 |
+| 1,000ms | ON | 675.068 / 1000.864 | 2.011 | 60 / 0 / 0 | 0 / 0 / 15 / 9 / 36 |
+
+各行n=60。100msのcaptureはOFF全5本が深さ2、ONは2本が深さ2/3本が深さ1。1,000msのrecapture-goteはOFF全5本が深さ3、ONは4本が深さ3/1本が深さ4。mate-sente/goteの1,000ms深さ2、mate-threeの100ms深さ2は両条件とも変わらず、以前報告された完了深さ低下を今回のヒントで解消した証拠はない。100msのp95と最大超過は悪化し、1,000msの最大超過は減少した。片方だけを採ってdeadline性能改善とは結論しない。
+
+固定mate-senteの本測定はOFF4,041〜7,924ms、ON3,754〜9,661msと幅があり、ノード数は同じである。ノード不変のmixed-distanceの1,000ms呼出しp50も89.215→159.876msとなる。OS/JIT/GC等の影響を分離できておらず、時間差をPV照合コストだけの因果効果とみなせない。過去の別環境・別時刻のPR測定と絶対時間を比べない。
+
+## PV差の調査
+
+各完了深さのroot選択手と勝敗カテゴリ/距離/数値は両条件で一致。内部PVが異なるのは深さ4の2局面だけで、分岐直後の双方の候補を残り通常深さ＋q1の独立全幅で評価した（summary.jsonのpvDifferences）。
+
+- capture：rootの後の後手玉が(0,8)→(0,7)と(0,8)→(1,8)で分岐し、双方の独立値が非終局1304。内部の先に探索した同点候補を維持する既存仕様による差。
+- terminal-resistance-gote：rootの後の後手金が異なり、OFFはno_legal_actions、ONはcheckmateで終わる。双方の独立値がroot側loss・終局距離4で一致。終局理由に追加の優先順位は既存仕様になく、同値の4ply応手差である。末端の合法応手ゼロと王手有無もそれぞれ再確認した。理由の差を隠したり、単に公開−Infinityが同じという理由で許容したりしていない。
+
+## 採用判断
+
+**B：条件付き採用候補。既定ONは推奨しない。** 最長抵抗の2局面ではノード減と複数の時間条件で低い中央値を観測した一方、非終局のevasion/hirate-exchangeには決定的なノード退行があり、全12局面の合計探索量は増加した。100msで一部完了深さとtail超過も悪化し、1,000msの深さ4増は1標本だけ。小標本の時間改善を統計的に確定した効果とは表現しない。
+
+レビュー用の明示OFF/ON切替は残し、既定化は別判断とする。次は非終局でPV順序が余計な探索を生む分岐の調査と、より大きな直列・交互順の再現測定を優先する。新たな枝刈り、評価調整、TT等を混ぜた改善へ今回の結果を読み替えない。
+
+## テストと失敗記録
+
+- 変更前の新規12件は2失敗/10成功（red-executed.txt）。内部PV優先が未実装であることと、未検証の新flagを検出した。
+- 最初のsandbox実行（red.txt）はTemp配下のrename EPERMでテスト開始前に失敗し、回帰結果とは扱わない。権限付き実行で通常の設定のまま再検証した。
+- baseline-check.txtは新APIを要求する回帰を追加済み・製品未変更のworktreeでの型検査失敗であり、clean mainの回帰失敗ではない。cleanな独立mainのbaseline-clean-check.txtは76ファイル/2,033件、lockfile・型検査・buildすべて成功。
+- 実装後の最初の重点4ファイルは106成功/1失敗。新トレース検査の二重走査が5.317秒となりtimeout（focused.txt）。同じ経路/同点検査をMapで索引化し、アサーション・timeoutを維持したまま13件成功（focused-v2.txt）。
+- 途中の通常candidate-check.txtは77ファイル/2,054件・lockfile・型検査・build成功。追加の明示ON NaN回帰と最終監査CLIを含むfinal-check.txtは **77ファイル/2,055件、lockfile・型検査・production build（1,760 modules）すべて成功**。新規22件も全成功。基準main・変更後とも既存テストのtimeoutはなく、途中の新規検査timeoutと区別する。
+
+新規回帰は経路一致の内部優先、分岐後の通常順序、合法でない/空ヒント、他の合法手の安定順、未指定/false一致、単発深さ不変、先後の勝敗距離、非終局、root同点、SEE/killer併用、空PVの各引分、後続反復の時間切れ、partial/fallbackの制御時計、NaN拒否、実Worker handlerの結果/structuredClone、入力非破壊を対象にする。既存の探索/q/partial/Worker/UI/保存の全テストも通常checkに含む。5秒timeout・2 workerと既存アサーションは変更していない。既存のjsdom navigation通知は失敗と区別する。
+
+最終commit・PR headRefOid・CI run headShaの一致とUbuntu/macOSの結果はPR本文へ確定記録する。自己参照するcommit SHAを作るために測定原本を書き換えない。manifestは自身を除く証拠と変更ソースのSHA-256を保持し、測定した製品bytesと最終製品bytesの一致・旧診断ディレクトリ差分0も再確認する。表示用テキストログの末尾空白/空行を整える場合は元bytesを同名.txt.gzに保全する。
+
+ソースhashは改行も含むbyte hashで、測定checkoutのcore.autocrlfはtrue。製品4ファイルの測定時bytesをrun1/sources/*.ts.gzに、主測定/CPU補足のCLIを各measurement-source.ts.txtに保存した。Gitの改行変換が入る新checkoutで厳密なbyte照合を再現するときは、保存したbytesを使用する。新しい診断ディレクトリの.gitattributesは証拠の自動改行変換を無効にし、旧原本の属性は変更しない。
+
+## CPU時間の補足測定
+
+run1は実時間の測定であり、後からCPU時間が記録済みだったことにはしない。追加のcpu-runは2026-10-21 07:35:37〜07:42:31 JST、同じ環境・製品bytes・完全入力・設定・固定深さ・交互順で96呼出し（warmup24＋本測定72）。各条件3本を維持し、主測定と分けて全標本を保存した。テスト/build/参照と並走なし。cpu-measurements監査は件数・一意性・順序・raw hash・製品hash・入力/設定一致、および全結果/全反復/全統計のrun1との一致を確認して成功した。
+
+`process.cpuUsage`のuser/system差分を計測し、読取りは呼出しwall-clockの外で行う。探索内部の時計やdeadlineは変えない。process全体のGC/補助thread等も含み、GCが標本境界をまたぐ可能性はある。観測CPU値は約15〜16ms刻みが多く、短い呼出しの小差を精密な費用として解釈しない。下表はuser＋system合計の中央値で、個別標本とuser/system別中央値は[cpu-run/summary.json](cpu-run/summary.json)、全API結果は[raw.jsonl](cpu-run/raw.jsonl)。別々の中央値の和は合計CPU中央値とは限らない。
+
+| 局面 | CPU p50 ms OFF→ON | 実時間p50 ms OFF→ON |
+|---|---:|---:|
+| mate-sente | 10,125→10,203 | 10,742.770→11,089.261 |
+| mate-gote | 10,468→10,453 | 11,432.942→11,290.510 |
+| mate-three | 188→203 | 209.599→203.292 |
+| mixed-distance | 297→280 | 298.383→305.894 |
+| resistance | 188→188 | 207.220→215.290 |
+| evasion | 531→610 | 596.587→666.082 |
+| recapture | 1,781→1,766 | 1,905.698→1,870.251 |
+| capture | 829→766 | 849.082→871.642 |
+| recapture-gote | 1,609→1,578 | 1,682.999→1,655.208 |
+| hirate-exchange | 22,313→23,781 | 24,235.397→25,681.353 |
+| terminal-resistance | 250→250 | 286.700→275.210 |
+| terminal-resistance-gote | 219→188 | 235.785→204.170 |
+
+evasion/hirate-exchangeはCPUでも退行を観測した。ノードが減ったterminal-resistanceはCPU中央値が同じで、実時間だけを見て処理費用の低下を確定しない。ヒントのない1ply詰みのCPU差は小さいが、これだけで全局面のPV照合費用に上限を付けられない。追加処理の費用と枝刈りの変化を合算した実探索比較であり、PV照合だけの費用を単独で同定した測定ではない。主測定を入れ替えたり、CPU側で良い標本だけを採ったりせず、B・既定OFFの判断を維持する。
+
+最初のstaged diff --checkは、新規診断READMEのCRLFを末尾空白として検出した。staged-diff-check-initial.txtと修正前manifestをvalidationへ保存し、READMEだけをLFへ整えた。測定原本・製品・テストを変更せず、最終manifestとstaged checkを再確認する。

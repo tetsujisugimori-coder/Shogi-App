@@ -1,0 +1,26 @@
+
+ RUN  v4.1.11 C:/Users/tetsu/.codex/visualizations/2026/10/20/01a15b5d-069b-73c2-b2e6-a33e1b7f3d4a/pv-ordering
+
+ ❯ src/test/shogi-previous-pv.test.ts (12 tests | 1 failed) 7452ms
+     × uses the PV next move only along the matching prefix, including deeper ordinary nodes 5317ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/test/shogi-previous-pv.test.ts > previous completed iteration PV > uses the PV next move only along the matching prefix, including deeper ordinary nodes
+Error: Test timed out in 5000ms.
+If this is a long-running test, pass a timeout value as the last argument or configure it globally with "testTimeout".
+ ❯ src/test/shogi-previous-pv.test.ts:17:3
+     15|   });
+     16|
+     17|   it('uses the PV next move only along the matching prefix, including …
+       |   ^
+     18|     const s = position('recapture');
+     19|     const original = legal.executeLegalAction;
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed | 3 passed (4)
+      Tests  1 failed | 106 passed (107)
+   Start at  07:12:50
+   Duration  8.42s (transform 582ms, setup 359ms, import 727ms, tests 7.98s, environment 2.11s)

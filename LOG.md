@@ -1,3 +1,18 @@
+### [2026-10-21 JST] 前回完了PVによる通常探索の順序付け（既定OFF）
+
+- origin/mainをfetchし、PR #192が `34d3689e96200b9ecc4a417e15a0ed0012cb2cd3` にマージ済みと確認。同SHAを基準に専用 `codex/pv-ordering` と独立worktreeを作成。README/LOG、PR #190/#192の本文と診断原本、既存の未コミットworktreeを読取り確認して保護した。既存はrootの前回最善手だけを優先していた。
+- `usePreviousIterationPv: true` で直前の完了反復のPVを次反復の通常再帰へ渡す。生成済み合法手の既存standard/SEE/killer順序を作ってから合法なPV手だけを安定して先頭へ移動。親で着手が一致する子にだけ同じ配列を渡し、分岐後はヒントを破棄。既存ply参照で盤面照合・棋譜再生・suffix複製をしない。q内部へは渡さず、前回qのsuffixが次の反復で通常ノードになればそこで合法手として優先する。以前の評価は使わない。
+- 未指定/falseは従来結果・全統計を維持。単発固定深さには前回反復がないため効果なし。既定ON、Worker/UI設定、保存形式、評価係数、深さ、合法手集合、終局規則は変更しない。rootの元合法手index同点・必要な再探索、SearchValue/NaN拒否、deadline確認位置、期限内exact partialとfallbackを維持。
+- 変更前回帰は12件中2失敗/10成功で内部PV未利用と未検証のflagを検出。最初はsandboxのTemp rename権限でテスト開始前に失敗。権限付き通常実行で分離した。初回green試行は新規トレース検査の二重走査で5.317秒timeoutとなり、同じ検査をMap参照に直した。timeout/worker/アサーションは緩和しない。基準mainの通常checkは76ファイル/2,033件、途中candidateは77ファイル/2,054件・lock/型/build成功。原本は新診断のvalidationへ保存。
+- 実mainとOFFの12局面×d1〜4の48件が経過時間以外完全一致。全12局面の限定深さ・q境界と、mixed-distance/新必敗の先後の通常d4等、独立全幅/逆順全幅をOFF/ONの114件で照合。さらに指定6局面すべてのd4/q1を全幅参照と比較した12件も成功。最終版は非有限値を保持する比較を使う。root同点の元合法手index、公開評価/内訳、勝敗カテゴリ/終局距離、合法PV、入力非破壊を確認。
+- 主測定はWindows 10.0.26300 x64 / i7-14650HX / Node v24.20.0 / npm 11.17.0、2026-10-21 07:18:42〜07:26:19 JST。standard評価/順序、killer=false、q original+1、最大d4。無期限反復d1〜4は各3回、100/1,000msは各5回。warmup72＋本測定312の全384呼出し成功、欠測0、同期直列・テスト/build/参照との並走なし。各反復と合計を分け、全PV/末端内訳/同じ完了深さの固定・時限全結果を監査した。partial10件の期限承認exact候補も独立qで一致。fallbackの実測は0で、制御時計回帰と区別する。
+- 最深d4の通常ノード合計26,539→26,981（+1.67%）、q9,529→10,300（+8.09%）。反復合計は通常38,832→39,258、q10,895→11,667。terminal-resistanceの通常416→377、先後反転282→250は減少し、固定呼出しp50は309.866→259.301ms、231.883→222.071ms。一方evasion693→725、hirate-exchange7,913→8,428と退行。mate-sente/gote等の通常/qノードは不変で、元の深さ低下を解消した証拠はない。
+- 100msの実時間p50/p95は100.548/102.218→100.487/102.461ms、最大超過2.798→3.262ms。両条件completed55/partial5/fallback0、captureは深さ2全5本→2本深さ2/3本深さ1。1,000msは603.997/1000.885→675.068/1000.864ms、最大超過2.468→2.011ms、両条件completed60。深さ4は35→36件で、recapture-goteの1本だけ深さ3→4。OS/JIT/GC等による揺れが大きく、統計的に確定した速度/深さ改善とはしない。
+- 内部PV差はd4の2局面。captureの異なる玉応手は独立全幅で双方非終局1304。terminal-resistance-goteの異なる金応手はno_legal_actions/checkmateと理由も異なるが双方loss・4plyで一致。分岐した候補を独立評価し、同値の内部先行候補差と確認した。単なる公開Infinity一致やPV長だけで許容していない。
+- CPU補足は07:35:37〜07:42:31 JST、同じ製品bytes/完全入力/設定/交互順の固定96呼出し（warmup24＋本測定72）、全成功。user/system CPU差分は探索時計の外で取得し、全結果/統計が主測定と一致。CPU中央値はevasion531→610ms、hirate-exchange22,313→23,781msと増加。terminal-resistanceは250→250ms、先後反転219→188ms。主測定と別保存し、粗い観測刻み・GC跨境界・少数標本を明記。速度向上や照合処理単独の費用を確定した扱いにしない。
+- 最終通常 `npm run check` は77ファイル/2,055件（新規22件含む）・lockfile・型検査・build（1,760 modules）すべて成功。基準mainと最終candidateの既存テストtimeoutは0。全計測・監査の終了後に直列で実行し、途中の期待red・権限エラー・新検査timeoutを別ログとして保全した。
+- 判断は **B：条件付き採用候補、既定ON非推奨**。一部の最長抵抗に効果がある一方、全局面合計と非終局に退行があり、100msのtailと深さも悪化した。詳細・全標本・CPU補足・失敗ログ・再現・SHA-256 manifestは[PV比較記録](docs/benchmarks/pv-ordering-20261021/README.md)。最終commit/CI対象HEADとUbuntu/macOS結果はPR本文へ確定記録し、マージしない。
+
 ### [2026-10-21 JST] PR #192 P2: 探索内部のNaN拒否
 
 - origin/mainとPR最新HEADをfetchし、PR OPEN・HEAD=`96803e3db338855ae5ea7d1ac82d8add275fc3df`・対象との差分0を確認。GitHub reviews/comments/行コメントは取得時に空で、今回のユーザー指示のP2を根拠とする。cleanな既存ブランチを継続し、既存worktreeと測定原本を保護した。

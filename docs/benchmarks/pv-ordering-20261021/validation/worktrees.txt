@@ -1,0 +1,123 @@
+worktree C:/Users/tetsu/Documents/Codex/Shogi-App
+HEAD 34d3689e96200b9ecc4a417e15a0ed0012cb2cd3
+branch refs/heads/main
+
+worktree C:/Users/tetsu/.codex/visualizations/2026/10/20/01a1593d-450a-7823-b341-3dbd4d1c7bb7/nan-review-20261021/after
+HEAD 96803e3db338855ae5ea7d1ac82d8add275fc3df
+detached
+
+worktree C:/Users/tetsu/.codex/visualizations/2026/10/20/01a1593d-450a-7823-b341-3dbd4d1c7bb7/nan-review-20261021/before
+HEAD 96803e3db338855ae5ea7d1ac82d8add275fc3df
+detached
+
+worktree C:/Users/tetsu/.codex/visualizations/2026/10/20/01a1593d-450a-7823-b341-3dbd4d1c7bb7/terminal-baseline
+HEAD 6cd961b699a9985a0ff73ca6a93bb7bbdaa2b2ef
+detached
+
+worktree C:/Users/tetsu/.codex/visualizations/2026/10/20/01a1593d-450a-7823-b341-3dbd4d1c7bb7/terminal-candidate
+HEAD 6cd961b699a9985a0ff73ca6a93bb7bbdaa2b2ef
+detached
+
+worktree C:/Users/tetsu/.codex/visualizations/2026/10/20/01a15b5d-069b-73c2-b2e6-a33e1b7f3d4a/pv-baseline
+HEAD 34d3689e96200b9ecc4a417e15a0ed0012cb2cd3
+detached
+
+worktree C:/Users/tetsu/.codex/visualizations/2026/10/20/01a15b5d-069b-73c2-b2e6-a33e1b7f3d4a/pv-ordering
+HEAD 34d3689e96200b9ecc4a417e15a0ed0012cb2cd3
+branch refs/heads/codex/pv-ordering
+
+worktree C:/Users/tetsu/Documents/Codex/2026-10-09/tetsujisugimori-coder-shogi-app-pr-174/work/baseline
+HEAD 57378c2dfbad1b3d83908cf9dea077824baa4a39
+detached
+
+worktree C:/Users/tetsu/Documents/Codex/2026-10-09/tetsujisugimori-coder-shogi-app-pr-174/work/repo
+HEAD 57378c2dfbad1b3d83908cf9dea077824baa4a39
+branch refs/heads/diagnose-legal-action-revalidation
+
+worktree C:/Users/tetsu/Documents/Codex/2026-10-12/shogi-app-1pr-see-commit-push/work/repo
+HEAD 3d62f7790aacbe3e09fc9d23a7adbdad030d7f97
+branch refs/heads/fix-see-cooperative-deadline
+
+worktree C:/Users/tetsu/Documents/Codex/2026-10-12/shogi-app-api-commit-push-pr/work/repo
+HEAD 243ed8bef934438809770d05c25ef9f908a0fbe3
+branch refs/heads/fix-numeric-board-coordinates
+
+worktree C:/Users/tetsu/Documents/Codex/2026-10-14/shogi-app-repository-tetsujisugimori-coder-shogi/work/baseline
+HEAD 5035a64c702b470b914d49d7eb65519ae5df4bfa
+detached
+
+worktree C:/Users/tetsu/Documents/Codex/2026-10-14/shogi-app-repository-tetsujisugimori-coder-shogi/work/repo
+HEAD ab1532102cdd1484161652ee400a47fd728417e5
+branch refs/heads/fix-no-legal-actions
+
+worktree C:/Users/tetsu/Documents/Codex/2026-10-14/shogi-app-repository-tetsujisugimori-coder-shogi/work/review-before
+HEAD 14b72771b4c4e367d41271e6073c33eff8174617
+detached
+
+worktree C:/Users/tetsu/Documents/Codex/2026-10-14/shogi-app-repository-tetsujisugimori-coder-shogi/work/review-main
+HEAD 5035a64c702b470b914d49d7eb65519ae5df4bfa
+detached
+
+worktree C:/Users/tetsu/Documents/Codex/2026-10-14/tetsujisugimori-coder-shogi-app-1-commit/work/baseline
+HEAD 42e8919f73d483e8b9a7dd8d7ca3bc7d5851777e
+detached
+
+worktree C:/Users/tetsu/Documents/Codex/2026-10-14/tetsujisugimori-coder-shogi-app-1-commit/work/repo
+HEAD 7b68ad4a46bfa0e8131d7d9dde6af4ac18bb86fb
+branch refs/heads/diagnose-fallback-quality
+
+worktree C:/Users/tetsu/Documents/Codex/2026-10-15/tetsujisugimori-coder-shogi-app-1-c/work/baseline
+HEAD cc37291a121a9bf72cef222ff472e5d2f1e90f45
+detached
+
+worktree C:/Users/tetsu/Documents/Codex/2026-10-15/tetsujisugimori-coder-shogi-app-1-c/work/repo
+HEAD 7291246ad12960d4218f59331fe5235db65dd657
+branch refs/heads/feat/partial-root-c
+
+worktree C:/Users/tetsu/Documents/Codex/2026-10-16/shogi-app-c-partial-root-pr/work/baseline
+HEAD cc37291a121a9bf72cef222ff472e5d2f1e90f45
+detached
+
+worktree C:/Users/tetsu/Documents/Codex/2026-10-16/shogi-app-c-partial-root-pr/work/c-engine
+HEAD 70a9a0f753abf76dd24d605caa361e06f17f1266
+detached
+
+worktree C:/Users/tetsu/Documents/Codex/2026-10-16/shogi-app-c-partial-root-pr/work/repo
+HEAD 978fec4812dfc32880808cc10ff2a005cbd4668f
+branch refs/heads/diagnose/partial-root-matches
+
+worktree C:/Users/tetsu/Documents/Codex/Shogi-App/.worktrees/tactical
+HEAD 25716f23b8ebb5331d1d7c111834f804e1ed38ed
+branch refs/heads/codex/tactical-mate-diagnostics
+
+worktree C:/Users/tetsu/Documents/Codex/Shogi-App-before-check-shortcircuit
+HEAD 2578051d11ab4be2fc9e986a9cd27795b6f6b1ab
+detached
+
+worktree C:/Users/tetsu/Documents/Codex/Shogi-App-depth-clean
+HEAD f7ae3d2ffe4c460aa3ef1f2dc09deb12d4301caa
+detached
+
+worktree C:/Users/tetsu/Documents/Codex/shogi-pr123-windows-main-20260920
+HEAD 032622f4f23f90198681d745ff71c2ea5ca0261e
+detached
+
+worktree C:/Users/tetsu/Documents/Codex/shogi-quiescence-ordering-baseline
+HEAD 032622f4f23f90198681d745ff71c2ea5ca0261e
+detached
+
+worktree C:/Users/tetsu/Documents/Codex/shogi-see-reference-main
+HEAD a964fd6cffb536b20133e3bc68cf5b13427eaafb
+detached
+
+worktree C:/Users/tetsu/Documents/Codex/shogi-see-reference-parent414
+HEAD 414e7a13e7e0957cf7e3dc8e68cf6a1e25999825
+detached
+
+worktree C:/Users/tetsu/Documents/Codex/shogi-see-reference-parent740
+HEAD 7401423bb0aa8c8a748f0553ae404a31b65d921b
+detached
+
+worktree C:/Users/tetsu/Documents/Codex/shogi-see-reference-pr106
+HEAD 2507fdbf7067fe21c35e3c1cea3fd69c39acb616
+detached
