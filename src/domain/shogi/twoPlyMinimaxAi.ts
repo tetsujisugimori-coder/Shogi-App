@@ -253,6 +253,7 @@ function searchTwoPlyMinimax(
   const rootActions = getLegalActions(state);
   if (rootActions.length === 0 && state.status !== 'ended') {
     const breakdown = evaluateNoLegalActionsPositionBreakdown(state, rootPlayer, evaluation);
+    searchValue(breakdown, 0);
     if (breakdown.terminal !== null) {
       return {
         selectedAction: null, selectedEvaluation: breakdown.total, evaluationBreakdown: breakdown,

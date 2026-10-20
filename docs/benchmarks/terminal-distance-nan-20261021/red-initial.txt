@@ -1,0 +1,164 @@
+
+ RUN  v4.1.11 C:/Users/tetsu/.codex/visualizations/2026/10/20/01a1593d-450a-7823-b341-3dbd4d1c7bb7/nan-review-20261021/before
+
+ ❯ src/test/shogi-search-value-nan.test.ts (25 tests | 22 failed) 176ms
+     × rejects NaN non-decisive evaluation (null) 3ms
+     × rejects NaN non-decisive evaluation (draw) 0ms
+     × rejects a NaN numerical window bound even before q evaluation 0ms
+     × rejects directly constructed NaN values on either side before category ranking 0ms
+     × rejects a directly supplied NaN win distance 0ms
+     × rejects a directly supplied NaN loss distance 0ms
+     × direct NaN table: alpha-beta throws 5ms
+     × direct NaN table: quiescence throws 1ms
+     × direct NaN table: minimax throws 83ms
+     × direct NaN table: iterative throws 3ms
+     × direct NaN table: timed throws 2ms
+     × finite table overflow (Infinity minus Infinity): alpha-beta throws 2ms
+     × finite table overflow (Infinity minus Infinity): quiescence throws 0ms
+     × finite table overflow (Infinity minus Infinity): minimax throws 52ms
+     × finite table overflow (Infinity minus Infinity): iterative throws 2ms
+     × finite table overflow (Infinity minus Infinity): timed throws 2ms
+     × finite coefficient overflow (opposite infinite terms): alpha-beta throws 1ms
+     × finite coefficient overflow (opposite infinite terms): quiescence throws 0ms
+     × finite coefficient overflow (opposite infinite terms): minimax throws 6ms
+     × finite coefficient overflow (opposite infinite terms): iterative throws 1ms
+     × finite coefficient overflow (opposite infinite terms): timed throws 1ms
+     × propagates NaN after a valid candidate instead of returning saved partial-root 2ms
+
+⎯⎯⎯⎯⎯⎯ Failed Tests 22 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/test/shogi-search-value-nan.test.ts > search value NaN rejection and valid ordering > rejects NaN non-decisive evaluation (null)
+ FAIL  src/test/shogi-search-value-nan.test.ts > search value NaN rejection and valid ordering > rejects NaN non-decisive evaluation (draw)
+AssertionError: expected [Function] to throw an error
+
+- Expected:
+null
+
++ Received:
+undefined
+
+ ❯ src/test/shogi-search-value-nan.test.ts:31:56
+     29|   });
+     30|   it.each([null,'draw'] as const)('rejects NaN non-decisive evaluation…
+     31|     expect(()=>searchValue(breakdown(NaN,terminal),0)).toThrow(/NaN/);
+       |                                                        ^
+     32|   });
+     33|   it('rejects a NaN numerical window bound even before q evaluation', …
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/22]⎯
+
+ FAIL  src/test/shogi-search-value-nan.test.ts > search value NaN rejection and valid ordering > rejects a NaN numerical window bound even before q evaluation
+AssertionError: expected [Function] to throw an error
+
+- Expected:
+null
+
++ Received:
+undefined
+
+ ❯ src/test/shogi-search-value-nan.test.ts:34:43
+     32|   });
+     33|   it('rejects a NaN numerical window bound even before q evaluation', …
+     34|     expect(()=>numericalSearchBound(NaN)).toThrow(/NaN/);
+       |                                           ^
+     35|     for (const [a,b] of [[NaN,Infinity],[-Infinity,NaN]])
+     36|       expect(()=>boundedQ(createInitialBoardState(),'sente',0,TABLE,un…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/22]⎯
+
+ FAIL  src/test/shogi-search-value-nan.test.ts > search value NaN rejection and valid ordering > rejects directly constructed NaN values on either side before category ranking
+AssertionError: expected [Function] to throw an error
+
+- Expected:
+null
+
++ Received:
+undefined
+
+ ❯ src/test/shogi-search-value-nan.test.ts:42:39
+     40|       {category:'win',terminalDistancePly:NaN},{category:'loss',termin…
+     41|       for (const good of [...values,bad]) {
+     42|         expect(()=>compare(bad,good)).toThrow(/NaN/);
+       |                                       ^
+     43|         expect(()=>compare(good,bad)).toThrow(/NaN/);
+     44|       }
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/22]⎯
+
+ FAIL  src/test/shogi-search-value-nan.test.ts > search value NaN rejection and valid ordering > rejects a directly supplied NaN win distance
+ FAIL  src/test/shogi-search-value-nan.test.ts > search value NaN rejection and valid ordering > rejects a directly supplied NaN loss distance
+AssertionError: expected [Function] to throw an error
+
+- Expected:
+null
+
++ Received:
+undefined
+
+ ❯ src/test/shogi-search-value-nan.test.ts:48:90
+     46|   });
+     47|   it.each(['win','loss'] as const)('rejects a directly supplied NaN %s…
+     48|     expect(()=>searchValue(breakdown(terminal==='win'?Infinity:-Infini…
+       |                                                                                          ^
+     49|   });
+     50| });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/22]⎯
+
+ FAIL  src/test/shogi-search-value-nan.test.ts > anomalous evaluation propagates as an error, never a deadline result > direct NaN table: alpha-beta throws
+ FAIL  src/test/shogi-search-value-nan.test.ts > anomalous evaluation propagates as an error, never a deadline result > direct NaN table: quiescence throws
+ FAIL  src/test/shogi-search-value-nan.test.ts > anomalous evaluation propagates as an error, never a deadline result > direct NaN table: minimax throws
+ FAIL  src/test/shogi-search-value-nan.test.ts > anomalous evaluation propagates as an error, never a deadline result > direct NaN table: iterative throws
+ FAIL  src/test/shogi-search-value-nan.test.ts > anomalous evaluation propagates as an error, never a deadline result > direct NaN table: timed throws
+ FAIL  src/test/shogi-search-value-nan.test.ts > anomalous evaluation propagates as an error, never a deadline result > finite table overflow (Infinity minus Infinity): alpha-beta throws
+ FAIL  src/test/shogi-search-value-nan.test.ts > anomalous evaluation propagates as an error, never a deadline result > finite table overflow (Infinity minus Infinity): quiescence throws
+ FAIL  src/test/shogi-search-value-nan.test.ts > anomalous evaluation propagates as an error, never a deadline result > finite table overflow (Infinity minus Infinity): minimax throws
+ FAIL  src/test/shogi-search-value-nan.test.ts > anomalous evaluation propagates as an error, never a deadline result > finite table overflow (Infinity minus Infinity): iterative throws
+ FAIL  src/test/shogi-search-value-nan.test.ts > anomalous evaluation propagates as an error, never a deadline result > finite table overflow (Infinity minus Infinity): timed throws
+ FAIL  src/test/shogi-search-value-nan.test.ts > anomalous evaluation propagates as an error, never a deadline result > finite coefficient overflow (opposite infinite terms): alpha-beta throws
+ FAIL  src/test/shogi-search-value-nan.test.ts > anomalous evaluation propagates as an error, never a deadline result > finite coefficient overflow (opposite infinite terms): quiescence throws
+ FAIL  src/test/shogi-search-value-nan.test.ts > anomalous evaluation propagates as an error, never a deadline result > finite coefficient overflow (opposite infinite terms): minimax throws
+ FAIL  src/test/shogi-search-value-nan.test.ts > anomalous evaluation propagates as an error, never a deadline result > finite coefficient overflow (opposite infinite terms): iterative throws
+ FAIL  src/test/shogi-search-value-nan.test.ts > anomalous evaluation propagates as an error, never a deadline result > finite coefficient overflow (opposite infinite terms): timed throws
+AssertionError: expected [Function run] to throw an error
+
+- Expected:
+null
+
++ Received:
+undefined
+
+ ❯ src/test/shogi-search-value-nan.test.ts:78:19
+     76|         : mode==='iterative'?iterative(state,1,config,()=>0)
+     77|         : timed(state,1,100,config,()=>0);
+     78|       expect(run).toThrow(/NaN/);
+       |                   ^
+     79|       expect(state).toEqual(before);
+     80|     });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[5/22]⎯
+
+ FAIL  src/test/shogi-search-value-nan.test.ts > anomalous evaluation propagates as an error, never a deadline result > propagates NaN after a valid candidate instead of returning saved partial-root
+AssertionError: expected [Function] to throw an error
+
+- Expected:
+null
+
++ Received:
+undefined
+
+ ❯ src/test/shogi-search-value-nan.test.ts:87:68
+     85|     vi.spyOn(evaluation,'evaluateSearchPositionBreakdown').mockImpleme…
+     86|       ++leaves===1?actual(...args):breakdown(NaN));
+     87|     expect(()=>timed(createInitialBoardState(),1,100,TABLE,()=>0)).toT…
+       |                                                                    ^
+     88|     expect(leaves).toBe(2);
+     89|   });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[6/22]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  22 failed | 3 passed (25)
+   Start at  01:13:16
+   Duration  1.85s (transform 203ms, setup 210ms, import 222ms, tests 176ms, environment 1.07s)

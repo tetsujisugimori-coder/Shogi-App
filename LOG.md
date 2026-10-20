@@ -1,3 +1,12 @@
+### [2026-10-21 JST] PR #192 P2: 探索内部のNaN拒否
+
+- origin/mainとPR最新HEADをfetchし、PR OPEN・HEAD=`96803e3db338855ae5ea7d1ac82d8add275fc3df`・対象との差分0を確認。GitHub reviews/comments/行コメントは取得時に空で、今回のユーザー指示のP2を根拠とする。cleanな既存ブランチを継続し、既存worktreeと測定原本を保護した。
+- NaNでは等値・大小比較がいずれもfalseとなり、比較の反対称性を破る。カスタムNaN表、有限極端値の駒得Infinity−Infinity、有限極端係数の正負Infinity合算を再現。既定値・正常駒数の問題と区別した。
+- searchValue生成・numericalSearchBound生成・compareSearchValues両入力をRangeErrorで検証し、直接渡されたNaN距離も拒否。比較を通らないroot直接返却も同じ検証へ通した。数値置換・新catch・評価式/既定係数/時計位置/ルール/公開結果形式の変更なし。正常な有限値・±Infinity・引分・距離・窓端順位を維持する。
+- 修正前回帰は初版22失敗/3成功、最終30件は27失敗/3成功。修正後の関連3ファイル95件成功。旧NaN fallback期待をthrow必須へ強化し、fail-lowと未評価の時間切れfallback検証は維持。初回全体checkは新rootテストのモック不備で1失敗/2,032成功となり、実際の合法手なし解析fixtureへ直して通常checkを再実行する。失敗原本を保持する。
+- 正常12局面×7条件＋制御時計3条件の87件は、経過時間以外の選択手/公開評価/内訳/PV/終局距離/深さ/反復/source/partial metadata/全統計が完全一致。入力非破壊とPV合法再生も確認。旧時間性能測定は再実行・変更しない。
+- 最終通常checkは76ファイル/2,033件・lockfile/型検査/build（1,760 modules）すべて成功。原本・ソースhash・再現手順は[修正記録](docs/benchmarks/terminal-distance-nan-20261021/README.md)へ保存。CI確定結果は既存PR本文へ記録する。commit/pushは同じPR #192へ反映し、新PR作成・mainへのマージは行わない。
+
 ### [2026-10-20 JST] 終局距離による探索内部の辞書順比較
 
 - origin/mainをfetchし、PR #190のマージSHA `6cd961b699a9985a0ff73ca6a93bb7bbdaa2b2ef`を確認。本文・レビュー・固定診断・partial-root関連資料、README/LOG、探索・終局・合法手・Worker/UI/保存テストを参照。元checkoutはclean。専用`codex/terminal-distance`を作成し、既存worktreeと保存済み診断原本を保護した。

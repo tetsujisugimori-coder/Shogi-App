@@ -1,0 +1,61 @@
+
+> shogi-app@0.0.0 check
+> npm run verify:lock && npm run lint && npm test && npm run build
+
+
+> shogi-app@0.0.0 verify:lock
+> node scripts/verify-lockfile.mjs
+
+--- Lockfile Verification Summary ---
+Lockfile Name:           shogi-app
+Lockfile Version:        3
+Total Package Entries:   399
+Inspected Registry Pkgs: 398
+Valid Exceptions:        0
+Missing "version":       0
+Missing "resolved":      0
+Missing "integrity":     0
+
+[verify:lock] SUCCESS: package-lock.json is valid and complete.
+
+
+> shogi-app@0.0.0 lint
+> tsc --noEmit
+
+
+> shogi-app@0.0.0 test
+> vitest run
+
+
+ RUN  v4.1.11 C:/Users/tetsu/.codex/visualizations/2026/10/20/01a1593d-450a-7823-b341-3dbd4d1c7bb7/nan-review-20261021/after
+
+ ❯ src/test/shogi-search-value-nan.test.ts (30 tests | 1 failed) 37ms
+     × rejects an anomalous no-action root evaluation in every root return path 3ms
+Not implemented: navigation to another Document
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/test/shogi-search-value-nan.test.ts > anomalous evaluation propagates as an error, never a deadline result > rejects an anomalous no-action root evaluation in every root return path
+AssertionError: expected [Function] to throw an error
+
+- Expected:
+null
+
++ Received:
+undefined
+
+ ❯ src/test/shogi-search-value-nan.test.ts:98:19
+     96|     const s=createInitialBoardState();
+     97|     for (const run of [()=>alpha(s,1),()=>evaluation.analyzeTwoPlyMini…
+     98|       expect(run).toThrow(/NaN/);
+       |                   ^
+     99|   });
+    100|   it('still returns the existing fallback when the deadline prevents a…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed | 75 passed (76)
+      Tests  1 failed | 2032 passed (2033)
+   Start at  01:16:57
+   Duration  141.05s (transform 6.92s, setup 6.02s, import 13.02s, tests 213.66s, environment 35.90s)

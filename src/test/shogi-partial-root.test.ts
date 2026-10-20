@@ -78,15 +78,19 @@ describe('partial-root deadline and exact selection', () => {
       visitedPositionCount: 0, cutoffCount: 0, skippedActionCount: 0, maxTacticalDepth: 1 } as unknown as ReturnType<typeof q.analyzeQuiescenceSearchWithInternalBounds>);
     expect(run(7, true).result.resultSource).toBe('fallback');
   });
-  it('does not adopt fail-low bounds or indeterminate values', () => {
-    mockScores([20, 15, NaN]);
+  it('does not adopt fail-low bounds', () => {
+    mockScores([20, 15, 10]);
     const { result } = run(11, true);
     expect(result.selectedEvaluation).toBe(20);
     expect(result.partialRoot).toMatchObject({ completedRootCandidateCount: 3, exactRootCandidateCount: 1 });
   });
-  it('falls back when the only returned value is indeterminate', () => {
+  it('propagates NaN instead of falling back', () => {
     mockScores([NaN]);
-    expect(run(7, true).result.resultSource).toBe('fallback');
+    expect(() => run(7, true)).toThrow(/NaN/);
+  });
+  it('propagates NaN after valid q candidates instead of returning partial-root', () => {
+    mockScores([20, 15, NaN]);
+    expect(() => run(11, true)).toThrow(/NaN/);
   });
   it.each([Infinity, -Infinity])('rejects equal terminal-distance window bounds %s while retaining the first exact PV', value => {
     mockScores([value, value]);

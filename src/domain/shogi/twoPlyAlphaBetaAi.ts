@@ -628,6 +628,7 @@ function searchAlphaBeta(
 
   if (depth === 0) {
     const evaluationBreakdown = evaluateSearchPositionBreakdown(state, rootPlayer, valueTable);
+    searchValue(evaluationBreakdown, 0);
     return {
       selectedAction: null,
       selectedEvaluation: evaluationBreakdown.total,
@@ -642,6 +643,7 @@ function searchAlphaBeta(
   const rootActions = suppliedRootActions ?? measured(diagnostics, 'root-legal', () => getLegalActions(state, diagnostics));
   if (rootActions.length === 0) {
     const evaluationBreakdown = evaluateNoLegalActionsPositionBreakdown(state, rootPlayer, valueTable);
+    searchValue(evaluationBreakdown, 0);
     return {
       selectedAction: null,
       selectedEvaluation: state.status === 'ended' || evaluationBreakdown.terminal === null ? null : evaluationBreakdown.total,
@@ -915,6 +917,7 @@ export function analyzeTimeLimitedIterativeDeepeningAlphaBetaSearch(
   diagnostics?.rootGenerated(rootActions.length);
   const noLegalActions = rootActions.length === 0;
   const noActionBreakdown = noLegalActions ? evaluateNoLegalActionsPositionBreakdown(state, state.turn, valueTable) : null;
+  if (noActionBreakdown) searchValue(noActionBreakdown, 0);
   const fallbackAction = rootActions[0] ?? null;
   const iterations: IterativeDeepeningAlphaBetaIterationResult[] = [];
   let previousBestAction: LegalAction | null = null;
