@@ -75,8 +75,9 @@ export type MateProof = { terminal: true } | { turn: Player; quantifier: 'exists
 export interface CandidateProof { action: LegalAction; status: 'forced' | 'no-force-within-bound' | 'unverified'; distance: number | null; checkedThrough: number; proof?:MateProof }
 export interface Reference { winner: Player; maxPly: number; nodes: number; elapsedMs: number; stopped: boolean; candidates: CandidateProof[] }
 
-/** Independent Boolean AND/OR solver: no engine score, ordering, qsearch, alpha-beta,
- * or engine PV. Iterative bounds give exact shortest-win/longest-defence ply.
+/** Independent CHECKMATE-ONLY Boolean AND/OR solver: no engine score, ordering,
+ * qsearch, alpha-beta, or engine PV. Distances optimize the checkmate objective,
+ * not the distance to any decisive ending (e.g. no_legal_actions is excluded).
  * All defending replies must succeed; existential attacker nodes may stop at a
  * witness. No transposition cache: repetition histories stay distinct. */
 export function reference(p: TacticalPosition, maxNodes = 60000, maxMs = 8000): Reference {
@@ -174,15 +175,30 @@ export function classify(p: TacticalPosition, ref: Reference, r: Result | null) 
   }
   const forced = ref.candidates.filter(x=>x.status==='forced');
   if (p.expectation === 'shortest-win') {
-    if (!forced.length) return { verdict:'indeterminate',reason:'no-proven-win' };
-    const shortest = Math.min(...forced.map(x=>x.distance!));
-    if (chosen.status !== 'forced') return { verdict: chosen.status==='unverified'?'indeterminate':'mismatch',reason:'selected-win-unproved',shortest };
-    return { verdict:chosen.distance===shortest?'match':'mismatch',reason:r.selectedEvaluation===Infinity?'discovered-win-distance-choice':'finite-despite-reference-win',shortest,selectedDistance:chosen.distance };
+    // A negative bounded checkmate result does not refute other winning endings.
+    // Neither an Infinity score nor a single PV supplies an all-terminal proof.
+    const scope = 'checkmate-only' as const;
+    if (!forced.length) return { verdict:'indeterminate',reason:'no-proven-checkmate',scope };
+    const shortestMatePly = Math.min(...forced.map(x=>x.distance!));
+    if (chosen.status !== 'forced') return {
+      verdict:'indeterminate', scope, shortestMatePly, selectedMatePly:null,
+      reason:chosen.status==='unverified'?'selected-checkmate-unverified':'selected-win-outside-checkmate-proof',
+    };
+    return { verdict:chosen.distance===shortestMatePly?'match':'mismatch', scope,
+      reason:chosen.distance===shortestMatePly?'shortest-proven-checkmate-selected':'longer-proven-checkmate-selected',
+      shortestMatePly,selectedMatePly:chosen.distance };
   }
   if (p.expectation === 'longest-resistance') {
-    if (forced.length!==ref.candidates.length) return { verdict:'indeterminate',reason:'unavoidable-loss-unproved' };
-    const longest = Math.max(...forced.map(x=>x.distance!));
-    return { verdict:chosen.distance===longest?'match':'mismatch',reason:r.selectedEvaluation===-Infinity?'discovered-loss-distance-choice':'finite-despite-reference-loss',longest,selectedDistance:chosen.distance };
+    // Even complete checkmate-only certificates cannot prove actual prolongation:
+    // the winning side may choose a different, earlier decisive ending.
+    const checkmateOnly = forced.length!==ref.candidates.length
+      ? { scope:'checkmate-only' as const,verdict:'indeterminate',reason:'checkmate-loss-unproved',longestMatePly:null,selectedMatePly:null }
+      : { scope:'checkmate-only' as const,
+        verdict:chosen.distance===Math.max(...forced.map(x=>x.distance!))?'match':'mismatch',
+        reason:'checkmate-only-distance-comparison',
+        longestMatePly:Math.max(...forced.map(x=>x.distance!)),selectedMatePly:chosen.distance };
+    return { verdict:'indeterminate',reason:'all-terminal-resistance-distance-unproved',
+      scope:'all-terminal-distance' as const,checkmateOnly };
   }
   // A finite horizon cannot establish that mate is avoided forever.
   return { verdict: chosen.status==='forced'?'mismatch':'indeterminate',reason:chosen.status==='forced'?'selected-proven-losing-move':'no-force-within-bound-is-not-safety' };

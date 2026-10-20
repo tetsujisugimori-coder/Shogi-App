@@ -1,0 +1,5 @@
+Initial git diff --cached --check exited 2 before commit/push:
+docs/benchmarks/tactical-mate-20261019/review-20261020/unit-tests.txt:9: new blank line at EOF.
+Removed only redundant trailing blank lines from this newly created test log.
+No test assertion, timeout, worker setting, code or original measurement was changed.
+The failure is retained here; final staged diff check is run again before commit.

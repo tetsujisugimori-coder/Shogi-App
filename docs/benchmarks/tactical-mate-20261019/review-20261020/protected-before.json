@@ -1,0 +1,14 @@
+{
+  "reviewedSha": "2aab5c61296a2f88a80c92af31eabc6929ec2f0a",
+  "sha256": {
+    "docs/benchmarks/tactical-mate-20261019/run1/candidate-probe-mixed-distance.json": "73d188da2a3caf1f363a4e7b530b8a181704b37a3011a1f82a14c95724d13fd2",
+    "docs/benchmarks/tactical-mate-20261019/run1/candidate-probe-resistance.json": "f5932aa96c2cee95ee4356d8185b6d7d87992b854d2376cb03372ad65ffb11ef",
+    "docs/benchmarks/tactical-mate-20261019/run1/completed.json": "2c5049569cdce6a47842d2fd9cfbe35573ccdafd51c0a8c3e6e2f4eee91aff61",
+    "docs/benchmarks/tactical-mate-20261019/run1/environment.json": "f1cac901aeb68aec824c87f6ae91e2e5111527ddeb068ed50ca906d10228ebc0",
+    "docs/benchmarks/tactical-mate-20261019/run1/observations.json": "67ac41bd4109302cc1519031efadacdbada88da833b011332bb4952430074647",
+    "docs/benchmarks/tactical-mate-20261019/run1/plan.json": "73bfd4697e6bae3b21101ec70233ba864869655fad33fdda5971e5b579374266",
+    "docs/benchmarks/tactical-mate-20261019/run1/raw.jsonl": "de6c30427779cba6343c8bfb8241f595c064a2a6246fce0468f031d2e0c315e9",
+    "docs/benchmarks/tactical-mate-20261019/run1/references.json": "48f30a0d632f227946a87a4a2a2bd2ad4b17f818021b2da4d596bb90ab13c237",
+    "docs/benchmarks/tactical-mate-20261019/run1/warmup.jsonl": "5b27564d6957d32ec0704d304c8bad21a90bc6d788699a2d51e9918f3a147f75"
+  }
+}

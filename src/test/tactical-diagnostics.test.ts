@@ -28,7 +28,7 @@ describe('tactical diagnostics (bounded, offline)',()=>{
       (p:typeof positions[number])=>{p.state.squares[5][0].piece={id:'p1',type:'pawn',player:'sente'};p.state.squares[6][0].piece={id:'p2',type:'pawn',player:'sente'};},
     ]) {const p=structuredClone(get('mate-sente'));mutate(p);expect(()=>validatePosition(p)).toThrow();}
   });
-  it('proves one/three-ply wins and two/four-ply unavoidable losses independently',()=>{
+  it('proves one/three-ply checkmates and two/four-ply checkmate-only losses independently',()=>{
     const three=reference(get('mate-three'));
     expect(three.stopped).toBe(false);
     const wins=three.candidates.filter(c=>c.status==='forced');
@@ -88,7 +88,10 @@ describe('tactical diagnostics (bounded, offline)',()=>{
     const long=mr.candidates.find(c=>c.distance===3)!;
     expect(classify(mixed,mr,{...short,selectedAction:long.action}).verdict).toBe('mismatch');
     const lp=get('resistance'),lr=reference(lp),loss=result('resistance');
-    expect(classify(lp,lr,{...loss,selectedEvaluation:-Infinity,selectedAction:lr.candidates[1].action}).verdict).toBe('mismatch');
+    expect(classify(lp,lr,{...loss,selectedEvaluation:-Infinity,selectedAction:lr.candidates[1].action})).toMatchObject({
+      verdict:'indeterminate',scope:'all-terminal-distance',
+      checkmateOnly:{verdict:'mismatch',longestMatePly:4,selectedMatePly:2},
+    });
   });
   it('reaggregates raw deterministically, rejects missing/duplicate/unknown cells',()=>{
     const p=get('capture'),refs={[p.id]:reference(p)};

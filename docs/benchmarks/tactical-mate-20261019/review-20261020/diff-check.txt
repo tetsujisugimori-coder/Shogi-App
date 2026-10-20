@@ -1,0 +1,4 @@
+warning: in the working copy of 'docs/benchmarks/tactical-mate-20261019/README.md', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'docs/benchmarks/tactical-mate-20261019/run1/summary.json', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'scripts/benchmarks/tacticalDiagnostics.ts', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/test/tactical-diagnostics.test.ts', LF will be replaced by CRLF the next time Git touches it

@@ -1,3 +1,14 @@
+### [2026-10-20 JST] PR #190 独立レビューP2×2の分類修正
+
+- origin/main `21c6677`とPR最新HEAD `2aab5c61296a2f88a80c92af31eabc6929ec2f0a`をfetchし、PR本文/レビュー5571142871の2コメント/診断/テスト/保存データを確認。既存branch `codex/tactical-mate-diagnostics`とworktreeのcleanを確認して継続し、他worktreeを保護。新しいPRは作らず、マージしない。
+- P2即時勝利: shortest-winで選択手のcheckmate-only証明がない場合、no-force-within-boundも未完了もindeterminateとした。mixed-distanceの玉(2,1)→(1,2)による1ply no_legal_actions勝ちをmismatchにしない。+Infinityは強制勝利の証明にしない。正の詰み証明による比較だけscope=checkmate-onlyとshortestMatePly/selectedMatePlyを明示。
+- P2延命: longest-resistanceの全終局距離は未証明なので局面IDによらずindeterminate。checkmateOnlyへ詰み限定の比較を分離し、longestMatePly=4を実際の延命と混同しない。両候補の保存PVは2plyで別理由の敗北となるため、どちらを選んでも一般の延命成功/失敗を断定しない。
+- 追加測定なしで保存rawからsummaryを再生成。固定40件は一致/不一致/判定不能=30/2/8→26/2/12、timed20件は16/0/4→14/0/6、全60件は46/2/12→40/2/18。resistanceの6件だけverdictがmatch→indeterminate。即時勝利の手は元60件で選ばれず件数変化なし。24行のshortest-win範囲/理由/距離名も明確化し、分類情報差分は計30行。
+- 旧summaryをreview-20261020/summary-before.jsonへ正確に保存し、旧SHA・旧summary byte hash・新旧件数/理由/全行をsummary-diff.jsonへ記録。新CLIはrawからのみ再集計し、旧原本か新計算との一致を確認して移行し、不明な既存編集を拒否する。
+- 保全監査でrun1のsummary以外全9ファイルのbyte SHA-256と修正前Git blob、旧summaryのblob一致を確認。凍結10局面/6条件・参照証明書・raw・warmup・environment・測定SHA/日時・probe/observations・製品探索/評価/ルール/順序/Worker/UI/partial契約は変更しない。全終局ソルバーへ拡張しない。
+- 保存結果だけを使うP2回帰6件と既存診断10件は16件成功。通常npm run checkも74ファイル/1,977件・lockfile・型検査・build成功。raw再集計/差分再実行・summary整合・observations・原本保全・git diff --checkは全て終了0。原本は[レビュー修正記録](docs/benchmarks/tactical-mate-20261019/README.md)のreview-20261020へ保存。timeout/worker/アサーションを緩めず、既存jsdom通知は失敗0と区別。以下の2026-10-19の旧集計は修正前の履歴で、現行値は本項の新集計。
+- 同じPRへcommit→push→本文更新し、最終HEADとCI run headShaの一致・Ubuntu/macOSの確定結果をPR本文に記録する。全終局延命/参照範囲外の勝利/partial固有品質は判定不能のまま残す。
+
 ### [2026-10-19 JST] 戦術評価・mate-distanceの診断基盤
 
 - 最新origin/main `21c6677`を取得、#187/#189マージを確認。元checkoutのclean/既存worktree/関連Issue/README/LOG/合法手・終局・評価・通常/q探索・棋譜監査を確認し、専用`codex/tactical-mate-diagnostics`と`.worktrees/tactical`で実装。他作業は変更しない。

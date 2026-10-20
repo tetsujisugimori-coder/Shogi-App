@@ -10,7 +10,7 @@
 
 各条件1回の別プロセスwarmupを単純な両玉局面で実行し、raw本測定とは別保存。さらに各本測定子プロセス自身でも計時前に両玉のd1/q(当該条件)を1回実行し、processWarmupへ分離記録する。独立プロセス間でJIT状態は引き継がず、局面や深い分岐が十分温まった保証はない。速度比較の精密統計ではなく、1本の観測を報告する。テスト/build/他の性能測定とは並走しない。OS負荷・GC・電源・CPU affinityは固定していない。
 
-独立AND/OR参照は評価関数・エンジン探索・q・枝刈り・順序付けを使わない。勝つ側は全合法手の存在量化、守る側は全合法手の全称量化。各root候補で1plyから順に強制勝ちの成立を確認し、最初の成立plyを距離とする。勝つ側は最短、守る側は最長抵抗になる。全称ノードの全応手を証明木へ保存する。終端は合法手0・王手・敗者の一致を再確認する。参照は合法手/適用/王手APIを共有するためルール実装から独立した外部エンジンによる証明ではない。`no-force-within-bound`は上限内の強制詰みなしであり、永久の安全・不詰証明ではない。
+独立AND/OR参照は評価関数・エンジン探索・q・枝刈り・順序付けを使わない。対象はcheckmateだけで、no_legal_actionsなど他の決着は含まない。勝つ側は全合法手の存在量化、守る側は全合法手の全称量化。各root候補で1plyから順に強制詰みの成立を確認し、最初の成立plyを距離とする。詰みという目的に限り最短攻撃・最長防御の距離であり、全終局を考えた最短勝ち・最長抵抗とは限らない。全称ノードの全応手を証明木へ保存する。終端は合法手0・王手・敗者の一致を再確認する。参照は合法手/適用/王手APIを共有するためルール実装から独立した外部エンジンによる証明ではない。`no-force-within-bound`は上限内の強制詰みなしであり、永久の安全・不詰・他の勝利の不存在の証明ではない。
 
 追加の候補別診断はmixed-distance/resistanceの2局面だけに事前固定。全root候補を適用し、子を固定d3/q1で独立検索して子root視点の符号を反転（終局は元root視点で評価）。この候補スコア配列を元順/逆順のfirst-maximumで比較する。これは独立した同点処理の比較モデルで、製品の手順序を変更した実験ではない。内部PVの同点処理も完全に反転した探索とは解釈しない。
 
@@ -18,7 +18,7 @@
 
 完全state、由来、目的、期待分類、探索条件は`run1/plan.json`。構成局面は盤上・持駒のID/数/所属、両玉、二歩・行き所なし・前手番の自玉王手・手番の王手状態・履歴キー整合を確認する。省略駒は問題外であり持駒に追加しない。平手からの到達可能性は主張しない。hirate-exchangeのみ平手から公開合法手で6ply再生し履歴・持駒を維持。
 
-mate-sente/goteは既存checkmate fixtureの先後反転。mate-threeは後手玉(0,0)、先手玉(2,1)、先手金(3,0)、金(2,0)→玉の全応手→金の詰みの3ply。初手が王手の連続王手詰将棋ではなく、相手の全合法応手に対する強制勝ち。mixed-distanceは同じ後手玉/先手玉、金(2,0)/(3,2)で1ply/3plyの勝ち。resistanceは後手玉(0,1)、先手玉(2,1)、金(2,3)/(3,0)、後手番。玉(0,0)なら4ply、(0,2)なら2ply。全手順は参照証明木で機械監査する。
+mate-sente/goteは既存checkmate fixtureの先後反転。mate-threeは後手玉(0,0)、先手玉(2,1)、先手金(3,0)、金(2,0)→玉の全応手→金の詰みの3ply。初手が王手の連続王手詰将棋ではなく、相手の全合法応手に対する強制詰み。mixed-distanceは同じ後手玉/先手玉、金(2,0)/(3,2)で1ply/3plyの詰み。resistanceは後手玉(0,1)、先手玉(2,1)、金(2,3)/(3,0)、後手番。玉(0,0)なら詰み限定で4ply、(0,2)なら詰み限定で2ply。全手順は参照証明木で機械監査する。この距離を一般の延命距離へ流用しない。
 
 recaptureは既存q fixtureを基に、二歩になる2枚目の後手歩を金へ変更した。飛(5,4)×歩(4,4)を金(3,4)が取り返せるためその駒取りを避けるのが局所期待。captureは取り返す金なし、駒取りを期待。recapture-goteは180度回転・先後交換。これらの局所期待は大局的な最善手・強制詰みの証明ではない。evasionは王手回避の全合法手、hirate-exchangeは実戦形式の入力を確認する対照群。参照未確定なら判定不能とする。
 
@@ -54,7 +54,7 @@ callMsは入力保護後、API呼出し直前から直後の単調時計。apiMs
 | mate-gote | +∞ / +∞ / +∞ | +∞ | 先後反転でもroot勝ちを正方向に評価 |
 | mate-three | 504 / 504 / 504 | +∞ | 全て正解初手だが浅い3条件は終局スコア未発見 |
 | mixed-distance | +∞ / +∞ / +∞ | +∞ | 全て1plyを選ぶ。候補別では1/3ply同点 |
-| resistance | -1001 / -1001 / -1001 | -∞ | 参照の4ply詰み側を選択。ただし非詰みの早期終局あり |
+| resistance | -1001 / -1001 / -1001 | -∞ | 全条件で延命品質は判定不能。詰み限定比較は別指標 |
 | evasion | -1005 / -1005 / -1005 | -1205 | 合法回避。永続的な詰み回避は判定不能 |
 | recapture | 552 / 399 / 399 | 599 | q0だけ取り返される歩を取り局所期待不一致 |
 | capture | 1103 / 1103 / 1103 | 1304 | 全て保護されない歩を取る |
@@ -74,7 +74,7 @@ callMsは入力保護後、API呼出し直前から直後の単調時計。apiMs
 | recapture-gote | 502 / 2 | 599 / 4 |
 | hirate-exchange | 798 / 2 | 597 / 3 |
 
-固定40件：局所期待/参照目的と一致30、不一致2、判定不能8。時間制限20件：一致16、不一致0、判定不能4。resistanceの一致はcheckmate-only参照に対する一致で、実際の延命の証拠ではない。mate-threeの浅い初手一致と詰み発見も別分類。棋力勝率・独立標本の統計とは解釈しない。
+レビュー修正後の固定40件：一致26、不一致2、判定不能12。時間制限20件：一致14、不一致0、判定不能6。resistanceの6件は一般の延命品質を証明できないため全て判定不能。shortest-winの一致/不一致は明記したcheckmate-only範囲での比較であり、全終局の最短勝ちの判定ではない。mate-threeの浅い初手一致と詰み発見も別分類。棋力勝率・独立標本の統計とは解釈しない。旧集計（固定30/2/8、timed16/0/4）は`review-20261020/summary-before.json`へ原本保存し、30行の分類情報差分と6行のverdict変更を`summary-diff.json`に保存した。
 
 時間制限は全20件completed-iteration。timedOutは100msで7件、1000msで1件。実呼出し超過最大は各0.5319/0.5323ms。partial-root/fallbackは0件。今回大幅超過がなかっただけで厳密時間保証ではない。partial-rootの実例はなく候補スコア/PV不整合の有無は実測から判断不能。結果を受けて追加測定はしていない。
 
@@ -88,6 +88,36 @@ callMsは入力保護後、API呼出し直前から直後の単調時計。apiMs
 - **参照未確定**：evasion/hirate-exchangeは上限内に強制詰みを証明できず安全の証明もない。合法王手回避は確認できるが、詰み回避に成功したかは判断不能。
 
 `observations.json`は全60PVの終局理由、候補probeの終局理由と参照mate距離を併記。audit本体はraw→summary一致、追加auditはraw/probe/証明木→observations一致を再生成する。両方とも既存ファイルがあれば一致をassertし書換えない。
+
+## 独立レビューP2×2の修正（2026-10-20）
+
+レビュー`5571142871`、修正前SHA `2aab5c61296a2f88a80c92af31eabc6929ec2f0a`。origin/main/PR HEADを再fetchし同じbranch/worktreeのcleanを確認して継続。新PR・追加測定・新局面・全終局ソルバーは追加していない。
+
+1. **即時勝利の偽陰性**：mixed-distanceの先手玉(2,1)→(1,2)は1plyのno_legal_actions勝ち。しかし詰み限定参照ではno-force-within-boundとなる。従来のmismatchをindeterminate / selected-win-outside-checkmate-proofへ修正した。未完了参照もindeterminate。+Infinityだけで勝ちを証明した扱いにはしない。正の詰み証明がある選択手のみ、scope=checkmate-onlyの範囲で比較する。元の60件では当該手を選んでおらず、この偽陰性修正によるverdict件数変化は0件。
+2. **延命の誤判定**：longest-resistanceは局面IDによらず、全終局距離が未証明なので常にindeterminate / all-terminal-resistance-distance-unproved / scope=all-terminal-distanceとする。詰み限定の比較はcheckmateOnlyへ分離。longestMatePly / selectedMatePlyは詰み目的の距離であり、最適な実際の終局距離を表す値ではない。resistanceの両候補ともtop-levelは判定不能、別指標のみmatch/mismatch。保存60件の6件がmatchから判定不能へ変わる。
+
+shortest-winのgenericなshortest/selectedDistanceはshortestMatePly/selectedMatePlyへ改名しscopeを併記。longest-resistanceではgenericなlongest/selectedDistanceを廃止してcheckmateOnlyに詰み距離を格納。discoveryのterminal-score-returnedはAPIがそのスコアを返したという観測だけで、強制勝利や全終局距離の証明ではない。
+
+| 条件 | 旧 match / mismatch / indeterminate | 新 match / mismatch / indeterminate |
+|---|---|---|
+| 固定40件 | 30 / 2 / 8 | 26 / 2 / 12 |
+| timed20件 | 16 / 0 / 4 | 14 / 0 / 6 |
+| 全60件 | 46 / 2 / 12 | 40 / 2 / 18 |
+
+再集計と移行差分の再現（探索は実行しない）：
+
+```powershell
+node --import tsx scripts/reaggregate-tactical-summary.ts docs/benchmarks/tactical-mate-20261019/run1 docs/benchmarks/tactical-mate-20261019/review-20261020/summary-before.json docs/benchmarks/tactical-mate-20261019/review-20261020/summary-diff.json
+npm run diagnose:tactical -- audit docs/benchmarks/tactical-mate-20261019/run1
+node --import tsx scripts/audit-tactical-observations.ts docs/benchmarks/tactical-mate-20261019/run1
+node docs/benchmarks/tactical-mate-20261019/review-20261020/audit-preservation.mjs
+```
+
+移行CLIは既存summaryが旧原本か現行再計算と一致する場合だけ更新を許す。差分原本があれば一致をassertし、旧原本やrawは書き換えない。summary-beforeのbyte hash、旧SHA、変更前後の各行と件数・理由を差分に保持する。保全監査は残るrun1全9ファイルの変更前後byte SHA-256と修正前Git blob一致、旧summary原本のblob一致、製品・凍結局面コード・測定CLI非変更を確認する。plan・参照証明書・raw・warmup・environment・測定SHA・測定日時・probe・observationsは一切変更していない。
+
+初回staged diff --checkは新規unit-tests.txt末尾の余分な空行で終了2となりcommit前に停止。新規ログの末尾空行だけを整形して再確認した。失敗はstaged-diff-check-failure.txtへ保存し、テスト・アサーション・timeout・workerや測定原本は変更していない。
+
+保存probe/rawを使う6回帰（即時勝ち、Infinity非証明、詰み限定正比較、延命両候補、未確定参照、再集計/不変性）を追加。既存診断10件と合わせた16件成功は`review-20261020/unit-tests.txt`。通常全checkも74ファイル/1,977テスト・lockfile・型検査・build 1,759 modulesが成功し、原本は`review-20261020/check.txt`。標準timeout/worker/アサーションを維持。既存jsdom navigation通知は失敗0と区別。再集計再実行・summary監査・observations監査・原本保全・diff --checkは全て終了0で、各原本は同reviewディレクトリに保存した。P2×2を回帰で解消確認済み。追加測定はせず、判定不能の全終局延命・参照範囲外の勝利・partial-root固有の品質は未解決のまま明示する。最終HEADの公開CI確定結果はPR本文へ記録し、そのための追加commitは行わない。
 
 次の優先順位は、(1)終局理由を区別した内部距離比較の設計と1/3ply局面の回帰、(2)no_legal_actionsも考慮した真の異距離必敗局面の参照整備、(3)静かな手を含む通常深さ到達率と時間制限下の戦術品質、(4)partial-root発生局面での距離/PV整合。評価係数やq仕様の変更が必要とは結論づけない。
 
