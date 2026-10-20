@@ -1,0 +1,9 @@
+
+ RUN  v4.1.11 C:/Users/tetsu/Documents/Codex/Shogi-App/.worktrees/tactical
+
+
+ Test Files  1 passed (1)
+      Tests  9 passed (9)
+   Start at  20:05:46
+   Duration  1.36s (transform 324ms, setup 90ms, import 370ms, tests 240ms, environment 546ms)
+

@@ -1,0 +1,1 @@
+Replayed all saved PVs and positive certificates; independently verified terminal legal-response absence.

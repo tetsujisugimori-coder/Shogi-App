@@ -1,0 +1,7 @@
+First run at frozen harness ff96032: exit 1 before environment.json or any measurement.
+AssertionError [ERR_ASSERTION]: Expected values to be strictly deep-equal
+scripts/measure-tactical-diagnostics.ts:72 (positions vs tacticalPositions())
+JSON-parsed plan omitted optional branchFrom: undefined and nested isPromoted: undefined
+from public legal replay. Reference states/settings were unchanged. Fixed comparison
+to canonical JSON hash; added JSON round-trip regression. This was not an engine
+measurement, and there are no discarded timing samples.
