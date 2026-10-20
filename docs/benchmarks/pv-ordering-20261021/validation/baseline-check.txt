@@ -1,0 +1,29 @@
+
+> shogi-app@0.0.0 check
+> npm run verify:lock && npm run lint && npm test && npm run build
+
+
+> shogi-app@0.0.0 verify:lock
+> node scripts/verify-lockfile.mjs
+
+--- Lockfile Verification Summary ---
+Lockfile Name:           shogi-app
+Lockfile Version:        3
+Total Package Entries:   399
+Inspected Registry Pkgs: 398
+Valid Exceptions:        0
+Missing "version":       0
+Missing "resolved":      0
+Missing "integrity":     0
+
+[verify:lock] SUCCESS: package-lock.json is valid and complete.
+
+
+> shogi-app@0.0.0 lint
+> tsc --noEmit
+
+src/test/shogi-previous-pv.test.ts(58,107): error TS2353: Object literal may only specify known properties, and 'usePreviousIterationPv' does not exist in type 'AlphaBetaSearchOptions'.
+src/test/shogi-previous-pv.test.ts(69,166): error TS2353: Object literal may only specify known properties, and 'usePreviousIterationPv' does not exist in type 'AlphaBetaSearchOptions'.
+src/test/shogi-previous-pv.test.ts(70,151): error TS2345: Argument of type '{ usePreviousIterationPv: boolean; } | undefined' is not assignable to parameter of type 'AlphaBetaSearchOptions | undefined'.
+  Object literal may only specify known properties, and 'usePreviousIterationPv' does not exist in type 'AlphaBetaSearchOptions'.
+src/test/shogi-previous-pv.test.ts(76,57): error TS2353: Object literal may only specify known properties, and 'usePreviousIterationPv' does not exist in type 'AlphaBetaSearchOptions'.

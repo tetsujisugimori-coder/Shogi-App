@@ -39,6 +39,8 @@ export interface AlphaBetaSearchOptions {
   readonly moveOrdering?: AlphaBetaMoveOrderingMode;
   /** Opt-in non-capture cutoff history. Omitted preserves the historical order. */
   readonly killerMoves?: boolean;
+  /** Opt-in ordering hint from the last completed pass, on matching ordinary paths only. */
+  readonly usePreviousIterationPv?: boolean;
   /** Omit to retain the historical static evaluation at depth-zero leaves. */
   readonly quiescence?: AlphaBetaQuiescenceOptions;
 }
@@ -55,6 +57,21 @@ function resolveKillerMoves(options: AlphaBetaSearchOptions | undefined): boolea
   if (enabled === undefined) return false;
   if (typeof enabled === 'boolean') return enabled;
   throw new RangeError(`Alpha-beta killerMoves must be a boolean: ${String(enabled)}`);
+}
+
+function resolvePreviousIterationPv(options: AlphaBetaSearchOptions | undefined): boolean {
+  const enabled = options?.usePreviousIterationPv;
+  if (enabled === undefined) return false;
+  if (typeof enabled === 'boolean') return enabled;
+  throw new RangeError(`Alpha-beta usePreviousIterationPv must be a boolean: ${String(enabled)}`);
+}
+
+/** Stable promotion of a hint only when it is present in the generated legal set. */
+export function prioritizeLegalPvAction(actions: LegalAction[], hint: LegalAction | undefined): LegalAction[] {
+  if (hint === undefined) return actions;
+  const index = actions.findIndex(action => areLegalActionsEqual(action, hint));
+  if (index > 0) actions.unshift(...actions.splice(index, 1));
+  return actions;
 }
 
 function resolveQuiescenceOptions(options: AlphaBetaSearchOptions | undefined): AlphaBetaQuiescenceOptions | undefined {
@@ -456,7 +473,8 @@ function searchAlphaBetaNode(
   quiescenceOptions: AlphaBetaQuiescenceOptions | undefined,
   killerMoveHistory: KillerMoveHistory | undefined,
   ply: number,
-  diagnostics?: SearchDiagnostics
+  diagnostics?: SearchDiagnostics,
+  previousPv?: readonly LegalAction[]
 ): SearchNodeResult {
   diagnostics?.setStage('normal-node-entry');
   interruptionCheck?.();
@@ -492,9 +510,11 @@ function searchAlphaBetaNode(
 
   const legalActions = measured(diagnostics, 'normal-legal', () =>
     getLegalActions(state, undefined, diagnostics?.actionValidation ?? undefined));
-  const actions = measured(diagnostics, 'normal-order', () => orderAlphaBetaNodeActionsByMode(
+  // Only ordinary nodes reach this ordering step. A previous tactical suffix
+  // may become ordinary at a deeper iteration; q itself never receives hints.
+  const actions = measured(diagnostics, 'normal-order', () => prioritizeLegalPvAction(orderAlphaBetaNodeActionsByMode(
     state, legalActions, valueTable, interruptionCheck, moveOrdering, killerMoveHistory?.actionsAt(ply), diagnostics
-  ));
+  ), previousPv?.[ply]));
   // Custom roots can lack the post-move adjudication performed on child states.
   if (actions.length === 0) {
     const evaluationBreakdown = measured(diagnostics, 'normal-evaluate', () => evaluateNoLegalActionsPositionBreakdown(state, rootPlayer, valueTable));
@@ -528,7 +548,8 @@ function searchAlphaBetaNode(
       quiescenceOptions,
       killerMoveHistory,
       ply + 1,
-      diagnostics
+      diagnostics,
+      previousPv?.[ply] && areLegalActionsEqual(actions[actionIndex], previousPv[ply]) ? previousPv : undefined
     );
 
     const candidatePrincipalVariation = [
@@ -610,7 +631,8 @@ function searchAlphaBeta(
   killerMoveHistory: KillerMoveHistory | undefined = undefined,
   suppliedRootActions: readonly LegalAction[] | undefined = undefined,
   diagnostics?: SearchDiagnostics,
-  partialRoot?: PartialRootProgress
+  partialRoot?: PartialRootProgress,
+  previousPv?: readonly LegalAction[]
 ): UnmeasuredAlphaBetaSearchResult {
   validateSearchDepth(depth);
   const rootPlayer = state.turn;
@@ -693,7 +715,8 @@ function searchAlphaBeta(
       quiescenceOptions,
       killerMoveHistory,
       1,
-      diagnostics
+      diagnostics,
+      previousPv?.[0] && areLegalActionsEqual(rootAction, previousPv[0]) ? previousPv : undefined
     );
 
     // A root candidate searched after a higher-index PV candidate can be cut
@@ -715,8 +738,9 @@ function searchAlphaBeta(
         moveOrdering,
         quiescenceOptions,
         killerMoveHistory,
-          1,
-          diagnostics
+        1,
+        diagnostics,
+        previousPv?.[0] && areLegalActionsEqual(rootAction, previousPv[0]) ? previousPv : undefined
       );
     }
 
@@ -793,6 +817,7 @@ export function analyzeAlphaBetaSearch(
 ): AlphaBetaSearchResult {
   const moveOrdering = resolveMoveOrdering(options);
   const killerMoves = resolveKillerMoves(options);
+  resolvePreviousIterationPv(options);
   const quiescenceOptions = resolveQuiescenceOptions(options);
   const startedAt = clock();
   diagnostics?.begin(startedAt, Number.POSITIVE_INFINITY, clock);
@@ -826,17 +851,20 @@ export function analyzeIterativeDeepeningAlphaBetaSearch(
 ): IterativeDeepeningAlphaBetaSearchResult {
   const moveOrdering = resolveMoveOrdering(options);
   const killerMoves = resolveKillerMoves(options);
+  const usePreviousIterationPv = resolvePreviousIterationPv(options);
   const quiescenceOptions = resolveQuiescenceOptions(options);
   validateIterativeDeepeningMaxDepth(maxDepth);
   const startedAt = clock();
   const iterations: IterativeDeepeningAlphaBetaIterationResult[] = [];
   let previousBestAction: LegalAction | null = null;
+  let previousPv: readonly LegalAction[] | undefined;
   const killerMoveHistory = killerMoves ? new KillerMoveHistory() : undefined;
 
   for (let depth = 1; depth <= maxDepth; depth += 1) {
     const iterationStartedAt = clock();
     const searchResult = searchAlphaBeta(
-      state, depth, valueTable, previousBestAction, undefined, moveOrdering, quiescenceOptions, killerMoveHistory
+      state, depth, valueTable, previousBestAction, undefined, moveOrdering, quiescenceOptions, killerMoveHistory,
+      undefined, undefined, undefined, previousPv
     );
     const iteration = {
       ...searchResult,
@@ -846,6 +874,7 @@ export function analyzeIterativeDeepeningAlphaBetaSearch(
     };
     iterations.push(iteration);
     previousBestAction = iteration.selectedAction;
+    if (usePreviousIterationPv) previousPv = iteration.principalVariation;
   }
 
   const deepestIteration = iterations[iterations.length - 1];
@@ -891,6 +920,7 @@ export function analyzeTimeLimitedIterativeDeepeningAlphaBetaSearch(
 ): TimeLimitedIterativeDeepeningAlphaBetaSearchResult {
   const moveOrdering = resolveMoveOrdering(options);
   const killerMoves = resolveKillerMoves(options);
+  const usePreviousIterationPv = resolvePreviousIterationPv(options);
   const quiescenceOptions = resolveQuiescenceOptions(options);
   validateIterativeDeepeningMaxDepth(maxDepth);
   validateSearchTimeLimitMilliseconds(timeLimitMilliseconds);
@@ -921,6 +951,7 @@ export function analyzeTimeLimitedIterativeDeepeningAlphaBetaSearch(
   const fallbackAction = rootActions[0] ?? null;
   const iterations: IterativeDeepeningAlphaBetaIterationResult[] = [];
   let previousBestAction: LegalAction | null = null;
+  let previousPv: readonly LegalAction[] | undefined;
   const killerMoveHistory = killerMoves ? new KillerMoveHistory() : undefined;
   let timedOut = false;
   const partialRoot: PartialRootProgress = {
@@ -960,7 +991,8 @@ export function analyzeTimeLimitedIterativeDeepeningAlphaBetaSearch(
         killerMoveHistory,
         rootActions,
         diagnostics,
-        depth === 1 ? partialRoot : undefined
+        depth === 1 ? partialRoot : undefined,
+        previousPv
       ));
       const iterationFinishedAt = clock();
       diagnostics?.checked(iterationFinishedAt);
@@ -977,6 +1009,7 @@ export function analyzeTimeLimitedIterativeDeepeningAlphaBetaSearch(
       };
       iterations.push(iteration);
       previousBestAction = iteration.selectedAction;
+      if (usePreviousIterationPv) previousPv = iteration.principalVariation;
     } catch (error) {
        if (error instanceof SearchDeadlineExceeded) {
          if (diagnostics?.interruptedPhase === null) diagnostics.interrupted();
@@ -1065,6 +1098,7 @@ export function selectBestAlphaBetaAction(
   valueTable: SearchEvaluationConfig = DEFAULT_MATERIAL_VALUE_TABLE,
   options?: AlphaBetaSearchOptions
 ): LegalAction | null {
+  resolvePreviousIterationPv(options);
   return searchAlphaBeta(
     state, depth, valueTable, null, undefined, resolveMoveOrdering(options), resolveQuiescenceOptions(options),
     resolveKillerMoves(options) ? new KillerMoveHistory() : undefined

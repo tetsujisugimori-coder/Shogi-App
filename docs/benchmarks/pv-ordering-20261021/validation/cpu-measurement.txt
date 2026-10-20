@@ -1,0 +1,12 @@
+mate-sente
+mate-gote
+mate-three
+mixed-distance
+resistance
+evasion
+recapture
+capture
+recapture-gote
+hirate-exchange
+terminal-resistance
+terminal-resistance-gote

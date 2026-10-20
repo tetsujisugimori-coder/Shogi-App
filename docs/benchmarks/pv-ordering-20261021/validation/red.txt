@@ -1,0 +1,16 @@
+
+ RUN  v4.1.11 C:/Users/tetsu/.codex/visualizations/2026/10/20/01a15b5d-069b-73c2-b2e6-a33e1b7f3d4a/pv-ordering
+
+ ❯ src/test/shogi-previous-pv.test.ts (0 test)
+
+⎯⎯⎯⎯⎯⎯ Failed Suites 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/test/shogi-previous-pv.test.ts [ src/test/shogi-previous-pv.test.ts ]
+Error: EPERM: operation not permitted, rename 'C:\Users\tetsu\AppData\Local\Packages\sandbox.{ded43cfa-1354-4bba-ba1c-d478a3d3f66c}\AC\Temp\2si6gPnlt-ko11vXE-olt\client\.tmp-1792534301955-iuayoyi8pf' -> 'C:\Users\tetsu\AppData\Local\Packages\sandbox.{ded43cfa-1354-4bba-ba1c-d478a3d3f66c}\AC\Temp\2si6gPnlt-ko11vXE-olt\client\9c3cccfac81cd5c7ae61477e07a0db0d2096a949'
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  no tests
+   Start at  07:11:40
+   Duration  1.42s (transform 0ms, setup 0ms, import 0ms, tests 0ms, environment 1.20s)

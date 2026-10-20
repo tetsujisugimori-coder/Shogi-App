@@ -1,0 +1,62 @@
+
+ RUN  v4.1.11 C:/Users/tetsu/.codex/visualizations/2026/10/20/01a15b5d-069b-73c2-b2e6-a33e1b7f3d4a/pv-ordering
+
+ ❯ src/test/shogi-previous-pv.test.ts (12 tests | 2 failed) 533ms
+     × rejects invalid runtime opt-in values 12ms
+     × uses the PV next move only along the matching prefix, including deeper ordinary nodes 203ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 2 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/test/shogi-previous-pv.test.ts > previous completed iteration PV > rejects invalid runtime opt-in values
+AssertionError: expected function to throw an error, but it didn't
+ ❯ src/test/shogi-previous-pv.test.ts:14:83
+     12|   it('rejects invalid runtime opt-in values', () => {
+     13|     expect(() => ai.analyzeIterativeDeepeningAlphaBetaSearch(position(…
+     14|       { usePreviousIterationPv: 'yes' } as unknown as ai.AlphaBetaSear…
+       |                                                                                   ^
+     15|   });
+     16|
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/2]⎯
+
+ FAIL  src/test/shogi-previous-pv.test.ts > previous completed iteration PV > uses the PV next move only along the matching prefix, including deeper ordinary nodes
+AssertionError: expected { kind: 'move', player: 'gote', …(4) } to deeply equal { kind: 'move', player: 'gote', …(4) }
+
+- Expected
++ Received
+
+  {
+    "from": {
+-     "col": 4,
+-     "row": 3,
++     "col": 8,
++     "row": 0,
+    },
+    "kind": "move",
+-   "pieceType": "gold",
++   "pieceType": "king",
+    "player": "gote",
+    "promotion": "none",
+    "to": {
+-     "col": 3,
+-     "row": 3,
++     "col": 7,
++     "row": 0,
+    },
+  }
+
+ ❯ src/test/shogi-previous-pv.test.ts:38:31
+     36|       for (let ply = 1; ply < Math.min(depth, pv.length); ply++) {
+     37|         const first = trace.find(t => t.iteration === depth && JSON.st…
+     38|         expect(first?.action).toEqual(pv[ply]);
+       |                               ^
+     39|         internalHints++;
+     40|       }
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/2]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  2 failed | 10 passed (12)
+   Start at  07:12:05
+   Duration  1.60s (transform 204ms, setup 208ms, import 222ms, tests 533ms, environment 520ms)

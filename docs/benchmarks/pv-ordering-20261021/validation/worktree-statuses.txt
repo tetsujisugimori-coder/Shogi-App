@@ -1,0 +1,96 @@
+C:/Users/tetsu/Documents/Codex/Shogi-App
+C:/Users/tetsu/.codex/visualizations/2026/10/20/01a1593d-450a-7823-b341-3dbd4d1c7bb7/nan-review-20261021/after
+ M src/domain/shogi/searchValue.ts
+ M src/domain/shogi/twoPlyAlphaBetaAi.ts
+ M src/domain/shogi/twoPlyMinimaxAi.ts
+ M src/test/shogi-partial-root.test.ts
+?? check.txt
+?? final-check.txt
+?? focused-final.txt
+?? focused-green.txt
+?? lint.txt
+?? scripts/compare-search-value-nan.ts
+?? src/test/shogi-search-value-nan.test.ts
+C:/Users/tetsu/.codex/visualizations/2026/10/20/01a1593d-450a-7823-b341-3dbd4d1c7bb7/nan-review-20261021/before
+?? nan-red-final.txt
+?? nan-red-real-fixture.txt
+?? nan-red.txt
+?? src/test/shogi-search-value-nan.test.ts
+C:/Users/tetsu/.codex/visualizations/2026/10/20/01a1593d-450a-7823-b341-3dbd4d1c7bb7/terminal-baseline
+?? baseline-check.txt
+C:/Users/tetsu/.codex/visualizations/2026/10/20/01a1593d-450a-7823-b341-3dbd4d1c7bb7/terminal-candidate
+ M src/domain/shogi/quiescenceSearch.ts
+ M src/domain/shogi/twoPlyAlphaBetaAi.ts
+ M src/domain/shogi/twoPlyMinimaxAi.ts
+ M src/test/shogi-partial-root.test.ts
+?? candidate-check.txt
+?? final-check.txt
+?? focused-initial.txt
+?? scripts/audit-terminal-distance.ts
+?? scripts/benchmarks/terminalDistanceReference.ts
+?? scripts/find-terminal-resistance.ts
+?? scripts/measure-terminal-distance.ts
+?? src/domain/shogi/searchValue.ts
+?? src/test/shogi-terminal-distance.test.ts
+C:/Users/tetsu/.codex/visualizations/2026/10/20/01a15b5d-069b-73c2-b2e6-a33e1b7f3d4a/pv-baseline
+C:/Users/tetsu/.codex/visualizations/2026/10/20/01a15b5d-069b-73c2-b2e6-a33e1b7f3d4a/pv-ordering
+ M src/domain/shogi/twoPlyAlphaBetaAi.ts
+?? docs/benchmarks/pv-ordering-20261021/
+?? scripts/audit-pv-ordering.ts
+?? scripts/measure-pv-ordering.ts
+?? src/test/shogi-previous-pv.test.ts
+C:/Users/tetsu/Documents/Codex/2026-10-09/tetsujisugimori-coder-shogi-app-pr-174/work/baseline
+?? scripts/measure-action-revalidation.ts
+C:/Users/tetsu/Documents/Codex/2026-10-09/tetsujisugimori-coder-shogi-app-pr-174/work/repo
+ M LOG.md
+ M package.json
+ M src/domain/shogi/dropRules.ts
+ M src/domain/shogi/drops.ts
+ M src/domain/shogi/gameState.ts
+ M src/domain/shogi/legalActions.ts
+ M src/domain/shogi/moves.ts
+ M src/domain/shogi/quiescenceSearch.ts
+ M src/domain/shogi/searchDiagnostics.ts
+ M src/domain/shogi/twoPlyAlphaBetaAi.ts
+ M src/domain/shogi/validation.ts
+?? docs/benchmarks/action-revalidation-comparison-20261009.md
+?? docs/benchmarks/action-revalidation-fixed-off-20261009.jsonl
+?? docs/benchmarks/action-revalidation-fixed-on-20261009.jsonl
+?? docs/benchmarks/action-revalidation-main-fixed-20261009.jsonl
+?? docs/benchmarks/action-revalidation-main-timed-20261009.jsonl
+?? docs/benchmarks/action-revalidation-timed-20261009.jsonl
+?? scripts/audit-action-revalidation.ts
+?? scripts/measure-action-revalidation.ts
+?? src/domain/shogi/actionValidationDiagnostics.ts
+?? src/test/shogi-action-revalidation.test.ts
+C:/Users/tetsu/Documents/Codex/2026-10-12/shogi-app-1pr-see-commit-push/work/repo
+C:/Users/tetsu/Documents/Codex/2026-10-12/shogi-app-api-commit-push-pr/work/repo
+C:/Users/tetsu/Documents/Codex/2026-10-14/shogi-app-repository-tetsujisugimori-coder-shogi/work/baseline
+?? scripts/reproduce-no-legal-actions.ts
+?? src/test/no-legal-actions.cases.ts
+?? src/test/shogi-no-legal-actions.test.tsx
+C:/Users/tetsu/Documents/Codex/2026-10-14/shogi-app-repository-tetsujisugimori-coder-shogi/work/repo
+C:/Users/tetsu/Documents/Codex/2026-10-14/shogi-app-repository-tetsujisugimori-coder-shogi/work/review-before
+?? docs/benchmarks/no-legal-review/
+?? scripts/measure-no-legal-review.ts
+?? src/test/shogi-no-legal-review.test.tsx
+C:/Users/tetsu/Documents/Codex/2026-10-14/shogi-app-repository-tetsujisugimori-coder-shogi/work/review-main
+?? docs/benchmarks/no-legal-review/
+?? scripts/measure-no-legal-review.ts
+C:/Users/tetsu/Documents/Codex/2026-10-14/tetsujisugimori-coder-shogi-app-1-commit/work/baseline
+C:/Users/tetsu/Documents/Codex/2026-10-14/tetsujisugimori-coder-shogi-app-1-commit/work/repo
+C:/Users/tetsu/Documents/Codex/2026-10-15/tetsujisugimori-coder-shogi-app-1-c/work/baseline
+C:/Users/tetsu/Documents/Codex/2026-10-15/tetsujisugimori-coder-shogi-app-1-c/work/repo
+C:/Users/tetsu/Documents/Codex/2026-10-16/shogi-app-c-partial-root-pr/work/baseline
+C:/Users/tetsu/Documents/Codex/2026-10-16/shogi-app-c-partial-root-pr/work/c-engine
+C:/Users/tetsu/Documents/Codex/2026-10-16/shogi-app-c-partial-root-pr/work/repo
+C:/Users/tetsu/Documents/Codex/Shogi-App/.worktrees/tactical
+C:/Users/tetsu/Documents/Codex/Shogi-App-before-check-shortcircuit
+?? scripts/snapshot-check-shortcircuit-legal.ts
+C:/Users/tetsu/Documents/Codex/Shogi-App-depth-clean
+C:/Users/tetsu/Documents/Codex/shogi-pr123-windows-main-20260920
+C:/Users/tetsu/Documents/Codex/shogi-quiescence-ordering-baseline
+C:/Users/tetsu/Documents/Codex/shogi-see-reference-main
+C:/Users/tetsu/Documents/Codex/shogi-see-reference-parent414
+C:/Users/tetsu/Documents/Codex/shogi-see-reference-parent740
+C:/Users/tetsu/Documents/Codex/shogi-see-reference-pr106

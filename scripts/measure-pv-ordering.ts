@@ -1,0 +1,63 @@
+import assert from 'node:assert/strict';
+import { mkdirSync, writeFileSync, appendFileSync, readFileSync } from 'node:fs';
+import { cpus, platform, release, arch } from 'node:os';
+import { resolve, join } from 'node:path';
+import { execFileSync } from 'node:child_process';
+import { analyzeIterativeDeepeningAlphaBetaSearch as fixed, analyzeTimeLimitedIterativeDeepeningAlphaBetaSearch as timed } from '../src/domain/shogi/twoPlyAlphaBetaAi';
+import { distancePositions, observePv } from './benchmarks/terminalDistanceReference';
+import { protectSearchInput } from '../src/domain/shogi/selfPlayGame';
+import { json, hash, byteHash } from './benchmarks/partialRootMatches';
+
+const output = resolve(process.argv[2]);
+const fixedOnly = process.argv[3] === '--fixed-only';
+const budgets = fixedOnly ? [null] : [null, 100, 1000];
+mkdirSync(output); // fail if a run already exists
+const positions = distancePositions();
+const settings = { moveOrdering: 'standard' as const, killerMoves: false,
+  quiescence: { maxTacticalDepth: 1, moveOrdering: 'original' as const } };
+const plan = { startedAt: new Date().toISOString(), sha: execFileSync('git', ['rev-parse', 'HEAD'], { encoding: 'utf8' }).trim(),
+  base: execFileSync('git', ['rev-parse', 'origin/main'], { encoding: 'utf8' }).trim(),
+  diff: execFileSync('git', ['diff', '--binary'], { encoding: 'utf8' }),
+  status: execFileSync('git', ['status', '--short'], { encoding: 'utf8' }),
+  node: process.version, platform: platform(), release: release(), arch: arch(), cpu: cpus()[0].model,
+  settings, maxDepth: 4, budgets, repeats: { fixed: 3, timed: 5 }, warmupPerCondition: 1,
+  cpuMeasurement: 'process.cpuUsage user/system delta; reads outside wall-clock interval; includes process GC and helper threads',
+  order: 'position, budget, warmup pair, measured repeats; OFF/ON alternates each pair (including across positions/budgets)',
+  sources: Object.fromEntries(['src/domain/shogi/twoPlyAlphaBetaAi.ts', 'src/domain/shogi/quiescenceSearch.ts',
+    'src/domain/shogi/searchValue.ts', 'scripts/measure-pv-ordering.ts', 'scripts/benchmarks/terminalDistanceReference.ts'].map(f => [f, byteHash(readFileSync(f))])),
+  positions: positions.map(p => ({ ...p, hash: hash(p.state) })),
+  limits: 'Serial synchronous calls, no concurrent tests/build. OS/JIT/GC/power/affinity uncontrolled; n=5 timed pairs per position is exploratory.' };
+writeFileSync(join(output, 'plan.json'), json(plan) + '\n', { flag: 'wx' });
+writeFileSync(join(output, 'raw.jsonl'), '', { flag: 'wx' });
+let pair = 0, sequence = 0;
+for (const p of positions) {
+  for (const budget of budgets) {
+    for (let repeat = -1; repeat < (budget === null ? 3 : 5); repeat++) {
+      const order = pair++ % 2 ? [true, false] : [false, true];
+      for (const enabled of order) {
+        const input = protectSearchInput(p.state), before = hash(p.state);
+        const cpuBefore = process.cpuUsage();
+        const start = performance.now();
+        const options = { ...settings, usePreviousIterationPv: enabled };
+        const result = budget === null ? fixed(input.snapshot, 4, undefined, undefined, options)
+          : timed(input.snapshot, 4, budget, undefined, undefined, options);
+        const callMs = performance.now() - start;
+        const cpu = process.cpuUsage(cpuBefore);
+        assert.equal(input.wasMutated(), false); assert.equal(hash(p.state), before);
+        const pv = observePv(p.state, result.principalVariation);
+        if ('resultSource' in result && result.resultSource === 'fallback') {
+          assert.equal(result.selectedEvaluation, null); assert.equal(result.evaluationBreakdown, null);
+          assert.equal(result.principalVariation.length, 0);
+        } else { assert.deepEqual(result.evaluationBreakdown, pv.breakdown); assert.equal(result.selectedEvaluation, pv.breakdown.total); }
+        appendFileSync(join(output, 'raw.jsonl'), json({ sequence: sequence++, position: p.id,
+          phase: repeat < 0 ? 'warmup' : 'measurement', repeat, enabled, budget, callMs,
+          cpuUserMs: cpu.user / 1000, cpuSystemMs: cpu.system / 1000, cpuTotalMs: (cpu.user + cpu.system) / 1000,
+          overrunMs: budget === null ? null : Math.max(0, callMs - budget), result,
+          reason: pv.reason, terminalDistancePly: pv.terminalDistancePly }) + '\n');
+      }
+    }
+  }
+  console.log(p.id);
+}
+writeFileSync(join(output, 'completed.json'), json({ finishedAt: new Date().toISOString(), rows: sequence,
+  rawSha256: byteHash(readFileSync(join(output, 'raw.jsonl'))) }) + '\n', { flag: 'wx' });

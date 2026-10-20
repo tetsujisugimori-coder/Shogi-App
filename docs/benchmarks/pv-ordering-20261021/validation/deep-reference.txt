@@ -1,0 +1,6 @@
+mate-sente
+mate-gote
+mate-three
+mixed-distance
+terminal-resistance
+terminal-resistance-gote

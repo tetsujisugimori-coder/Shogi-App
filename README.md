@@ -1,5 +1,9 @@
 # SHOGI-APP
 
+反復深化APIは `usePreviousIterationPv: true` を明示すると、直前の完了反復PVを通常探索内部の手順序ヒントとして利用します。合法手を全列挙し、PV経路が一致する局面だけで合法な次の手を先頭へ移動します。分岐後はヒントを破棄し、他の手の相対順、元合法手indexによるroot同点、終局距離・partial-root・deadline・静止探索の仕様を維持します。未指定/falseは従来動作、既定OFFです。Worker/UIの設定と保存形式は追加しません。
+
+12固定局面の比較では最長抵抗の2局面でノード減を確認しましたが、深さ4の通常ノード合計は26,539→26,981、静止探索は9,529→10,300へ増加。100msでは一部完了深さと最大超過が悪化し、1,000msの深さ改善は1標本だけでした。判断は **B：条件付き採用候補、既定ONは推奨しない** です。[正当性・固定/時間制限・CPU比較・再現手順](docs/benchmarks/pv-ordering-20261021/README.md)に生データと制約を保存しています。
+
 探索内部はroot視点の勝敗カテゴリ・終局距離・通常数値評価を分離して比較します。同じ勝ちなら短い終局、同じ負けなら長い抵抗を優先し、引分と非終局の数値評価は従来どおりです。checkmate以外の既存勝敗終局も対象です。距離は採用した探索葉までのrootからのplyで、探索外の強制勝利証明ではありません。
 
 公開selectedEvaluationとevaluationBreakdown.totalの±Infinity、PV、反復深化・partial-root・fallback、Worker/UI/保存形式は維持します。距離は内部専用です。partial-rootのq結果は同じ±Infinityでも距離が窓端一致ならboundとして除外し、期限内のexact候補だけを採用します。deadline確認位置は変更しません。[設計・独立参照・今回の比較記録](docs/benchmarks/terminal-distance-20261020/README.md)を参照してください。
