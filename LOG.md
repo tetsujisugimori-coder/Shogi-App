@@ -1,3 +1,14 @@
+### [2026-10-20 JST] 終局距離による探索内部の辞書順比較
+
+- origin/mainをfetchし、PR #190のマージSHA `6cd961b699a9985a0ff73ca6a93bb7bbdaa2b2ef`を確認。本文・レビュー・固定診断・partial-root関連資料、README/LOG、探索・終局・合法手・Worker/UI/保存テストを参照。元checkoutはclean。専用`codex/terminal-distance`を作成し、既存worktreeと保存済み診断原本を保護した。
+- win/loss/non-terminal、root基準terminalDistancePly、従来数値評価を分離するSearchValueを導入。勝ち最短・負け最長をroot/通常再帰/alpha-beta更新と枝刈り/同点再探索/q/minimaxで共通比較。窓端bottom/topを勝敗値から独立させ、巨大有限Mを使わない。qへ通常plyを継承し着手ごとに加算。係数・q深さ・最大深さ既定値・順序・ルール・反則処理は変更しない。
+- 公開数値と内訳の±Infinity/PV/結果形式を維持し、距離は公開しない。partial-rootのq窓端±Infinityを距離exactとみなす旧例外を除去。期限確認位置・完了反復優先・depth=0 partialとfallback契約を維持。窓端回帰をbound棄却へ強化し、異距離exact候補の採用を追加検証した。
+- PR #190のcheckmate-only 4/2plyを全終局延命証明へ流用しない。新しい後手玉(0,1)/先手玉(2,0)/先手金(1,5),(2,1)局面を全終局の独立全幅参照で2/4ply必敗と確認し、先後反転も検証する。原本は新しいterminal-distance-20261020配下へ分離する。
+- 変更前mainの通常checkは74ファイル/1,977件、変更後は75ファイル/1,997件・lockfile/型/build成功。既存worktreeを内包しない独立checkoutで同一依存・通常設定を使用。root checkout初回checkは途中作成worktreeを誤検出して中止し、5秒UI timeoutと誤検出のログを保存。timeout/worker/アサーションの緩和なし。
+- 引分全理由と実際のq終局距離を追加した最終通常checkは75ファイル/2,002件・lockfile/型/build成功。独立参照3局面×5条件の15件、実測partial-root15候補の全幅q再評価、非終局対照5局面の完全一致、旧PR #190の60件監査/PV/終局理由監査、原本差分0を確認。
+- 新規測定は12局面・固定d4/q1各1本、100/1,000ms各5本、warmup72本分離、計336呼出しすべて成功。100msは両実装ともcompleted45/partial15/fallback0、1,000msは両実装ともcompleted60。実時間p50/p95は100msで100.746/102.162→100.494/102.073ms、1,000msで588.984/1000.705→602.353/1001.234ms。最大超過は4.237→3.087ms、3.871→1.815ms。終局局面のノード増・完了深さ低下も明記し、速度や一般棋力の改善と断定しない。
+- 新必敗のmain選択手は最適応手なら2ply敗北だが保存PVは4plyであり、PV長を最長抵抗の証明と混同しない。変更後は最適終局距離4ply側を選ぶ。先後反転でも4plyを維持。結果/全ソースhash/完全PV/参照値/環境/測定順序は[比較記録](docs/benchmarks/terminal-distance-20261020/README.md)へ保存。旧PR測定を新規実測として扱わない。最終HEAD/CI確定結果はPR本文へ記録し、mainへマージしない。
+
 ### [2026-10-20 JST] PR #190 独立レビューP2×2の分類修正
 
 - origin/main `21c6677`とPR最新HEAD `2aab5c61296a2f88a80c92af31eabc6929ec2f0a`をfetchし、PR本文/レビュー5571142871の2コメント/診断/テスト/保存データを確認。既存branch `codex/tactical-mate-diagnostics`とworktreeのcleanを確認して継続し、他worktreeを保護。新しいPRは作らず、マージしない。

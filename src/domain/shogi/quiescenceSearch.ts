@@ -1,3 +1,4 @@
+import { searchValue, compareSearchValues as compare, numericalSearchBound, SEARCH_BOTTOM, SEARCH_TOP, type SearchValue } from './searchValue';
 /**
  * A bounded tactical extension for a fixed evaluation perspective. This is a
  * standalone domain API: callers opt in explicitly and existing alpha-beta,
@@ -42,7 +43,7 @@ interface SearchStatistics {
 }
 
 interface SearchNodeResult {
-  evaluation: number;
+  evaluation: SearchValue;
   evaluationBreakdown: SearchEvaluationBreakdown;
   principalVariation: LegalAction[];
 }
@@ -82,13 +83,14 @@ function searchNode(
   state: BoardState,
   remainingDepth: number,
   perspective: Player,
-  alpha: number,
-  beta: number,
+  alpha: SearchValue,
+  beta: SearchValue,
   evaluation: SearchEvaluationConfig,
   statistics: SearchStatistics,
   interruptionCheck: QuiescenceSearchInterruptionCheck,
   moveOrdering: QuiescenceMoveOrderingMode,
-  diagnostics?: SearchDiagnostics
+  diagnostics: SearchDiagnostics | undefined,
+  ply: number
 ): SearchNodeResult {
   diagnostics?.setStage('quiescence-entry');
   interruptionCheck?.();
@@ -96,7 +98,7 @@ function searchNode(
   if (state.status === 'ended' || remainingDepth === 0) {
     // A depth-zero checked position is deliberately a static approximation;
     // the caller's safety cap takes precedence over a forced evasion.
-    return { evaluation: staticBreakdown.total, evaluationBreakdown: staticBreakdown, principalVariation: [] };
+    return { evaluation: searchValue(staticBreakdown, ply), evaluationBreakdown: staticBreakdown, principalVariation: [] };
   }
 
   const isInCheck = measured(diagnostics, 'q-check', () => isPlayerInCheck(state, state.turn));
@@ -107,22 +109,22 @@ function searchNode(
   // Reachable no-response positions are ended by the existing adjudication
   // path. Keep malformed in-progress positions finite and deterministic too.
   if (candidates.length === 0) {
-    return { evaluation: staticBreakdown.total, evaluationBreakdown: staticBreakdown, principalVariation: [] };
+    return { evaluation: searchValue(staticBreakdown, ply), evaluationBreakdown: staticBreakdown, principalVariation: [] };
   }
 
   const isMaximizing = state.turn === perspective;
   let selectedEvaluation = isInCheck
-    ? (isMaximizing ? Number.NEGATIVE_INFINITY : Number.POSITIVE_INFINITY)
-    : staticBreakdown.total;
+    ? (isMaximizing ? SEARCH_BOTTOM : SEARCH_TOP)
+    : searchValue(staticBreakdown, ply);
   let selectedBreakdown: SearchEvaluationBreakdown | null = isInCheck ? null : staticBreakdown;
   let principalVariation: LegalAction[] = [];
 
   // In a non-check position, stand-pat is the first candidate and wins all
   // ties. Its bound may therefore make every tactical child unnecessary.
   if (!isInCheck) {
-    if (isMaximizing) alpha = Math.max(alpha, selectedEvaluation);
-    else beta = Math.min(beta, selectedEvaluation);
-    if (alpha >= beta) {
+    if (isMaximizing) { if (compare(selectedEvaluation, alpha) > 0) alpha = selectedEvaluation; }
+    else { if (compare(selectedEvaluation, beta) < 0) beta = selectedEvaluation; }
+    if (compare(alpha, beta) >= 0) {
       statistics.cutoffCount += 1;
       statistics.skippedActionCount += candidates.length;
       return { evaluation: selectedEvaluation, evaluationBreakdown: selectedBreakdown!, principalVariation };
@@ -150,21 +152,21 @@ function searchNode(
       statistics,
       interruptionCheck,
       moveOrdering,
-      diagnostics
+      diagnostics, ply + 1
     );
 
     const adoptsCandidate = isInCheck && selectedBreakdown === null ||
-      (isMaximizing ? childResult.evaluation > selectedEvaluation : childResult.evaluation < selectedEvaluation);
+      (isMaximizing ? compare(childResult.evaluation, selectedEvaluation) > 0 : compare(childResult.evaluation, selectedEvaluation) < 0);
     if (adoptsCandidate) {
       selectedEvaluation = childResult.evaluation;
       selectedBreakdown = childResult.evaluationBreakdown;
       principalVariation = [cloneLegalAction(action), ...childResult.principalVariation.map(cloneLegalAction)];
     }
 
-    if (isMaximizing) alpha = Math.max(alpha, selectedEvaluation);
-    else beta = Math.min(beta, selectedEvaluation);
+    if (isMaximizing) { if (compare(selectedEvaluation, alpha) > 0) alpha = selectedEvaluation; }
+    else { if (compare(selectedEvaluation, beta) < 0) beta = selectedEvaluation; }
     const remainingActionCount = candidates.length - actionIndex - 1;
-    if (alpha >= beta && remainingActionCount > 0) {
+    if (compare(alpha, beta) >= 0 && remainingActionCount > 0) {
       statistics.cutoffCount += 1;
       statistics.skippedActionCount += remainingActionCount;
       break;
@@ -207,17 +209,18 @@ export function analyzeQuiescenceSearch(
  * API's unbounded behavior while allowing a fixed-depth caller to preserve
  * its current alpha/beta window at a tactical leaf.
  */
-export function analyzeQuiescenceSearchWithinBounds(
+export function analyzeQuiescenceSearchWithInternalBounds(
   state: BoardState,
   perspective: Player,
   maxTacticalDepth: number,
   evaluation: SearchEvaluationConfig,
   interruptionCheck: QuiescenceSearchInterruptionCheck,
-  alpha: number,
-  beta: number,
+  alpha: SearchValue,
+  beta: SearchValue,
   moveOrdering: QuiescenceMoveOrderingMode = 'original',
-  diagnostics?: SearchDiagnostics
-): QuiescenceSearchResult {
+  diagnostics?: SearchDiagnostics,
+  rootPly = 0
+): QuiescenceSearchResult & { searchValue: SearchValue } {
   validateMaxTacticalDepth(maxTacticalDepth);
   const resolvedOrdering = resolveQuiescenceMoveOrdering(moveOrdering);
   const statistics: SearchStatistics = { visitedPositionCount: 0, cutoffCount: 0, skippedActionCount: 0 };
@@ -231,13 +234,28 @@ export function analyzeQuiescenceSearchWithinBounds(
     statistics,
     interruptionCheck,
     resolvedOrdering,
-    diagnostics
+    diagnostics, rootPly
   );
   return {
-    selectedEvaluation: result.evaluation,
+    selectedEvaluation: result.evaluationBreakdown.total,
+    searchValue: result.evaluation,
     evaluationBreakdown: cloneBreakdown(result.evaluationBreakdown),
     principalVariation: result.principalVariation.map(cloneLegalAction),
     maxTacticalDepth,
     ...statistics,
   };
+}
+
+/** Preserve the established numerical-window API; internal callers carry distance. */
+export function analyzeQuiescenceSearchWithinBounds(
+  state: BoardState, perspective: Player, maxTacticalDepth: number,
+  evaluation: SearchEvaluationConfig, interruptionCheck: QuiescenceSearchInterruptionCheck,
+  alpha: number, beta: number, moveOrdering: QuiescenceMoveOrderingMode = 'original',
+  diagnostics?: SearchDiagnostics
+): QuiescenceSearchResult {
+  const { searchValue: _internal, ...result } = analyzeQuiescenceSearchWithInternalBounds(
+    state, perspective, maxTacticalDepth, evaluation, interruptionCheck,
+    numericalSearchBound(alpha), numericalSearchBound(beta), moveOrdering, diagnostics
+  );
+  return result;
 }

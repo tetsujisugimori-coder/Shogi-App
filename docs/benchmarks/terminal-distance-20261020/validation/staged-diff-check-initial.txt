@@ -1,0 +1,2 @@
+docs/benchmarks/terminal-distance-20261020/validation/final-root-lint.txt:4: new blank line at EOF.
+docs/benchmarks/terminal-distance-20261020/validation/focused-initial.txt:9: new blank line at EOF.

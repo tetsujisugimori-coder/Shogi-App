@@ -1,5 +1,9 @@
 # SHOGI-APP
 
+探索内部はroot視点の勝敗カテゴリ・終局距離・通常数値評価を分離して比較します。同じ勝ちなら短い終局、同じ負けなら長い抵抗を優先し、引分と非終局の数値評価は従来どおりです。checkmate以外の既存勝敗終局も対象です。距離は採用した探索葉までのrootからのplyで、探索外の強制勝利証明ではありません。
+
+公開selectedEvaluationとevaluationBreakdown.totalの±Infinity、PV、反復深化・partial-root・fallback、Worker/UI/保存形式は維持します。距離は内部専用です。partial-rootのq結果は同じ±Infinityでも距離が窓端一致ならboundとして除外し、期限内のexact候補だけを採用します。deadline確認位置は変更しません。[設計・独立参照・今回の比較記録](docs/benchmarks/terminal-distance-20261020/README.md)を参照してください。
+
 戦術・詰み距離の診断CLIと固定局面、独立参照、実測・監査手順は[診断記録](docs/benchmarks/tactical-mate-20261019/README.md)を参照してください。製品の評価・探索仕様は変更しません。
 
 PR #182の独立レビュー追従では、終局済み入力を予算によらず `ended-position` として分類し、`terminalResult` に元の終局理由を保持します。2手ミニマックスAIも合法手なしを独立に再確認して終局表示へ進みます。応手確認の短絡化は合法手の列挙順序を維持します。詳細は[仕様](docs/no-legal-actions.md)、実測と再現手順は[レビュー性能検証](docs/benchmarks/no-legal-review/README.md)を参照してください。

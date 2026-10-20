@@ -1,0 +1,1 @@
+{"placements":[[0,1,"king","gote"],[2,0,"king","sente"],[1,5,"gold","sente"],[2,1,"gold","sente"]],"actions":[{"kind":"move","player":"gote","from":{"row":0,"col":1},"to":{"row":0,"col":0},"pieceType":"king","promotion":"none"},{"kind":"move","player":"gote","from":{"row":0,"col":1},"to":{"row":0,"col":2},"pieceType":"king","promotion":"none"}],"values":[2,4],"tested":75}
