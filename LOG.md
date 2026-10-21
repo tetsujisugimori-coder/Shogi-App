@@ -1,3 +1,16 @@
+### [2026-10-21 JST] TT 2段階照合（既定OFF継続）
+
+- 最新main `f5fdb17c777f34e4db34d903135f6a5dc88e93c9` とPR #196 MERGEDを確認し、専用branch/worktreeを作成。既存診断原本を保護した。
+- 実装前にhas→probeと遅延callbackを比較し、1回のMap.get後に候補がある場合だけ生成する方式を記録。miss後はexact保存だけで生成し、照合済みidentityを再利用する。完全identity、exact証明、中断確認、killer迂回、FIFO/容量、既定OFFを維持。新規カウンターで生成/照合/拒否理由を分離する。
+- 関連25件と型検査、旧main OFF/旧ON対新ON、独立全幅/逆順全幅、PV/killer、制御時計の計103条件は成功。初回はsandbox Temp rename EPERMでテスト開始前に失敗し、通常設定の再実行で成功。期待値/timeout/worker設定を緩和しない。
+- 設計、原本、環境、検証・独立レビュー、測定と再現手順は[専用診断](docs/benchmarks/tt-two-stage-20261021/README.md)へ保存する。
+- 測定ソース `ce4aead9e29ab0c7295005751deb0f33910b4f42` を固定し、19:42:14〜20:01:49 JSTに同期直列でABC比較。基本12局面の固定d4/反復d1〜4/100/1000ms、120手合法棋譜の同4条件、小規模3局面d5、各warmup1＋本測定3、ABC/BCA/CABローテーション。660呼出し（warmup165＋本測定495）は失敗/欠測0。過去の時間値を流用せず、完全state・環境・順序・source gzip/hash・rawを保存した。
+- raw監査で旧新の決定的全結果/既存TT統計116組、時限完了反復288件、独立qのpartial候補24件が一致。全PV/評価内訳/終局距離/入力非破壊・保持上限も確認。基本12局面fixedのidentity92,766→46,464（49.91%減）、fixed＋反復208,962→109,977（47.37%減）。exact再利用と通常/qノードはB/C不変。
+- 同12局面fixed＋反復の合計実時間259,851.510→257,289.589ms（0.99%短縮）、fixedは1.98%悪化、反復3.47%短縮。fixedのp50は7/12改善・5/12悪化。100ms最大超過2.689→2.778ms、1000ms1.791→1.391ms。100ms完了深さは一部改善、1000ms分布同じ。工程別wrapper診断は別実行とし通常性能へ混ぜない。全identity/clone/純粋な比較・容量判定の独立時間は未分離。
+- 全追加条件込みの新TT本測定lookup261,447、miss223,972、粗hit37,475、identity生成145,404、一致/再利用37,190、不一致285、非exact拒否115,953、サイズ拒否303、store107,911、eviction65,160、最大512件/2,357,618文字。RSSは共有processの呼出し前後観測値で、単独variant保持量とはしない。
+- 独立レビューは製品・計測・集計に阻害指摘なし。RSSをOS high-waterと呼ばないこと、時限の時間差も仕事量差を含むことを反映。判断 **B：安全性維持、改善は限定的**。n=3とOS/JIT/GC等の揺れに対して時間差が小さく、一般的高速化を確証したとはしない。既定OFF、次はfixed悪化局面の多標本測定と低擾乱の工程分離。自動マージしない。
+- 最終通常checkは78ファイル/2,080件、lockfile・型・production build（1,761 modules）成功。測定後、offline監査CLIのmanifestを絶対パスからrepo相対キーへ修正。独立レビューP2でCRLF/LF混在による別cloneのbyte照合失敗を指摘され、測定原本byte hashを維持しつつ現行ソース/manifestのテキストのみLF正規化で照合するよう修正した。計時経路の製品/測定CLI/helper/テスト内容は不変で、auditの測定時原本と最終版は別hashで識別する。rawはgzip展開のbyte一致を確認して保存し、summary/report再生成一致・旧PR原本diff=0を再確認する。
+
 ### [2026-10-21 JST] exact限定Transposition Table（既定OFF）
 
 - 最新origin/main `519a332c36ad97dacdaae8c09a20a8e08bf511be` を取得し、PR #190/#192/#194のMERGEDを確認。元mainはclean、既存worktree/旧診断原本を保護し、専用 `codex/transposition-table` / 独立worktreeで作業。README/LOGと既存の探索値、q、千日手、500手、合法手、partial-root/PV/監査を確認した。

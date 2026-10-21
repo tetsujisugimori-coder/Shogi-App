@@ -12,11 +12,18 @@ export interface TranspositionTableStatistics {
   evictions: number;
   maxEntries: number;
   maxPayloadCharacters: number;
+  identityGenerations: number;
+  identityMatches: number;
+  identityMismatches: number;
+  nonExactStoreRejects: number;
+  sizeStoreRejects: number;
 }
 
 export function createTranspositionTableStatistics(): TranspositionTableStatistics {
   return { lookups: 0, hits: 0, exactReuses: 0, misses: 0, safetyRejects: 0,
-    stores: 0, evictions: 0, maxEntries: 0, maxPayloadCharacters: 0 };
+    stores: 0, evictions: 0, maxEntries: 0, maxPayloadCharacters: 0,
+    identityGenerations: 0, identityMatches: 0, identityMismatches: 0,
+    nonExactStoreRejects: 0, sizeStoreRejects: 0 };
 }
 
 export const TRANSPOSITION_TABLE_CAPACITY = 512;
@@ -57,19 +64,23 @@ export class ExactTranspositionTable<T> {
   key(state: BoardState, depth: number, ply: number): string {
     return JSON.stringify([createPositionKey(state), depth, ply]);
   }
-  probe(key: string, identity: string): T | undefined {
+  probe(key: string, identity: string | (() => string)): T | undefined {
     const s = this.statistics;
     s.lookups++;
     const entry = this.entries.get(key);
     if (!entry) { s.misses++; return undefined; }
     s.hits++;
-    if (entry.identity !== identity) { s.safetyRejects++; return undefined; }
+    const expected = typeof identity === 'function' ? identity() : identity;
+    if (entry.identity !== expected) { s.safetyRejects++; s.identityMismatches++; return undefined; }
+    s.identityMatches++;
     s.exactReuses++;
     return entry.result;
   }
   store(key: string, identity: string, result: T): void {
     const characters = key.length + identity.length + JSON.stringify(result).length;
-    if (characters > MAX_ENTRY_CHARACTERS) { this.statistics.safetyRejects++; return; }
+    if (characters > MAX_ENTRY_CHARACTERS) {
+      this.statistics.safetyRejects++; this.statistics.sizeStoreRejects++; return;
+    }
     const existing = this.entries.get(key);
     if (existing) { this.characters -= existing.characters; this.entries.delete(key); }
     if (this.entries.size === TRANSPOSITION_TABLE_CAPACITY) {

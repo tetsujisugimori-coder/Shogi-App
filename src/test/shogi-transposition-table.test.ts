@@ -19,6 +19,75 @@ function stripTime(value: unknown): unknown {
 }
 
 describe('bounded exact transposition table', () => {
+  it('only evaluates a lazy identity for a candidate, including mismatches and falsey results', () => {
+    const table = new ExactTranspositionTable<number>();
+    const identity = vi.fn(() => 'safe');
+    expect(table.probe('missing', identity)).toBeUndefined();
+    expect(identity).not.toHaveBeenCalled();
+    table.store('present', 'safe', 0);
+    expect(table.probe('present', identity)).toBe(0);
+    expect(identity).toHaveBeenCalledTimes(1);
+    expect(table.probe('present', () => 'different')).toBeUndefined();
+    expect(table.statistics).toMatchObject({ lookups: 3, misses: 1, hits: 2,
+      identityMatches: 1, identityMismatches: 1, exactReuses: 1, safetyRejects: 1 });
+  });
+
+  it('generates identity once for candidate checks or exact stores, skipping nonexact misses', () => {
+    const s = constructed('tt-lazy', [[8,8,'king','sente'], [0,0,'king','gote']]);
+    const stats = createTranspositionTableStatistics();
+    const probe = ExactTranspositionTable.prototype.probe;
+    const store = ExactTranspositionTable.prototype.store;
+    const generated = new Set<string>();
+    let calls = 0;
+    vi.spyOn(ExactTranspositionTable.prototype, 'probe').mockImplementation(function(this: ExactTranspositionTable<unknown>, key, identity) {
+      expect(typeof identity).toBe('function');
+      return probe.call(this, key, () => {
+        generated.add(key); calls++;
+        return (identity as () => string)();
+      });
+    });
+    vi.spyOn(ExactTranspositionTable.prototype, 'store').mockImplementation(function(this: ExactTranspositionTable<unknown>, key, identity, result) {
+      expect(identity.length).toBeGreaterThan(0);
+      return store.call(this, key, identity, result);
+    });
+    ai.analyzeAlphaBetaSearch(s, 4, undefined, () => 0,
+      { useTranspositionTable: true, transpositionTableStatistics: stats });
+    expect(stats.identityGenerations).toBe(stats.hits + stats.stores);
+    expect(calls).toBe(stats.hits);
+    expect(generated.size).toBeGreaterThan(0);
+    expect(stats.nonExactStoreRejects).toBeGreaterThan(0);
+    expect(stats.identityGenerations).toBeLessThan(stats.lookups);
+    expect(stats.identityMatches).toBe(stats.exactReuses);
+    expect(stats.sizeStoreRejects).toBe(0);
+    expect(stats.safetyRejects).toBe(stats.identityMismatches + stats.nonExactStoreRejects);
+  });
+
+  it('reuses an identity rejected by a candidate check when saving the completed exact result', () => {
+    const s = position('mixed-distance');
+    const probe = ExactTranspositionTable.prototype.probe;
+    const store = ExactTranspositionTable.prototype.store;
+    const identities = new Map<string,string>();
+    const stats = createTranspositionTableStatistics();
+    vi.spyOn(ExactTranspositionTable.prototype, 'probe').mockImplementation(function(this: ExactTranspositionTable<unknown>, key, identity) {
+      // Force a coarse-key collision. The mismatched value must never escape.
+      store.call(this,key,'incompatible',{ poison: true });
+      return probe.call(this,key,() => {
+        const value = (identity as () => string)(); identities.set(key,value); return value;
+      });
+    });
+    const saved = vi.spyOn(ExactTranspositionTable.prototype, 'store').mockImplementation(function(this: ExactTranspositionTable<unknown>,key,identity,result) {
+      expect(identity).toBe(identities.get(key)); return store.call(this,key,identity,result);
+    });
+    const on = ai.analyzeAlphaBetaSearch(s,2,undefined,() => 0,
+      { useTranspositionTable:true, transpositionTableStatistics:stats });
+    const off = ai.analyzeAlphaBetaSearch(s,2,undefined,() => 0);
+    expect(on).toEqual(off);
+    expect(saved).toHaveBeenCalled();
+    expect(stats.identityGenerations).toBe(stats.lookups);
+    expect(stats.identityMismatches).toBe(stats.lookups);
+    expect(stats.exactReuses).toBe(0);
+  });
+
   it('is FIFO with bounded entry count and payload, and distinguishes hit from reuse', () => {
     const table = new ExactTranspositionTable<number>();
     for (let i = 0; i <= TRANSPOSITION_TABLE_CAPACITY; i++) table.store(String(i), 'safe', i);
@@ -27,7 +96,8 @@ describe('bounded exact transposition table', () => {
     expect(table.probe('1', 'safe')).toBe(1);
     table.store('huge', 'x'.repeat(16385), 0);
     expect(table.statistics).toMatchObject({ maxEntries: 512, evictions: 1,
-      lookups: 3, misses: 1, hits: 2, exactReuses: 1, safetyRejects: 2, stores: 513 });
+      lookups: 3, misses: 1, hits: 2, exactReuses: 1, safetyRejects: 2, stores: 513,
+      sizeStoreRejects: 1, identityMismatches: 1, identityMatches: 1 });
     expect(table.statistics.maxPayloadCharacters).toBeLessThanOrEqual(512 * 16384);
   });
 
