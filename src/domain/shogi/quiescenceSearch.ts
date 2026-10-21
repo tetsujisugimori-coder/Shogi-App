@@ -1,8 +1,7 @@
 import { searchValue, compareSearchValues as compare, numericalSearchBound, SEARCH_BOTTOM, SEARCH_TOP, type SearchValue } from './searchValue';
 /**
  * A bounded tactical extension for a fixed evaluation perspective. This is a
- * standalone domain API: callers opt in explicitly and existing alpha-beta,
- * Worker, and UI paths do not invoke it.
+ * domain API: alpha-beta callers opt in explicitly; Worker/UI defaults stay unchanged.
  */
 import type { BoardState, Player } from '../../types/shogi';
 import { isPlayerInCheck } from './checkmate';
@@ -12,6 +11,7 @@ import { DEFAULT_MATERIAL_VALUE_TABLE } from './materialEvaluation';
 import { orderQuiescenceCandidates, resolveQuiescenceMoveOrdering, type QuiescenceMoveOrderingMode } from './quiescenceOrdering';
 import {
   evaluateSearchPositionBreakdown,
+  evaluateNoLegalActionsPositionBreakdown,
   resolveSearchMaterialValueTable,
   type SearchEvaluationBreakdown,
   type SearchEvaluationConfig,
@@ -19,6 +19,23 @@ import {
 
 /** A cooperative check run at node entry and around every candidate execution. */
 export type QuiescenceSearchInterruptionCheck = (() => void) | undefined;
+
+/** Attempted work, including interrupted calls. Independent of completed-pass counters. */
+export interface CheckEvasionStatistics {
+  visitedPositionCount: number;
+  maxExtensionDepth: number;
+  limitReachedCount: number;
+}
+
+export function createCheckEvasionStatistics(): CheckEvasionStatistics {
+  return { visitedPositionCount: 0, maxExtensionDepth: 0, limitReachedCount: 0 };
+}
+
+export function validateMaxCheckEvasionExtensions(value: number): void {
+  if (!Number.isInteger(value) || value < 0 || value > 2) {
+    throw new RangeError('Maximum check evasion extensions must be an integer from 0 to 2 ply.');
+  }
+}
 
 /**
  * Result of one bounded quiescence search. `visitedPositionCount` excludes the
@@ -40,6 +57,7 @@ interface SearchStatistics {
   visitedPositionCount: number;
   cutoffCount: number;
   skippedActionCount: number;
+  checkEvasionLimitReached: boolean;
 }
 
 interface SearchNodeResult {
@@ -90,25 +108,42 @@ function searchNode(
   interruptionCheck: QuiescenceSearchInterruptionCheck,
   moveOrdering: QuiescenceMoveOrderingMode,
   diagnostics: SearchDiagnostics | undefined,
-  ply: number
+  ply: number,
+  remainingCheckEvasions: number,
+  extensionPly: number,
+  checkEvasionStatistics?: CheckEvasionStatistics
 ): SearchNodeResult {
   diagnostics?.setStage('quiescence-entry');
   interruptionCheck?.();
   const staticBreakdown = measured(diagnostics, 'q-evaluate', () => evaluateSearchPositionBreakdown(state, perspective, evaluation));
-  if (state.status === 'ended' || remainingDepth === 0) {
-    // A depth-zero checked position is deliberately a static approximation;
-    // the caller's safety cap takes precedence over a forced evasion.
+  if (state.status === 'ended' || remainingDepth === 0 && remainingCheckEvasions === 0 && extensionPly === 0) {
+    // Preserve the historical zero-option path, including interruption checks.
     return { evaluation: searchValue(staticBreakdown, ply), evaluationBreakdown: staticBreakdown, principalVariation: [] };
   }
 
   const isInCheck = measured(diagnostics, 'q-check', () => isPlayerInCheck(state, state.turn));
+  const extending = remainingDepth === 0 && isInCheck && remainingCheckEvasions > 0;
+  if (remainingDepth === 0 && !extending) {
+    if (isInCheck) {
+      statistics.checkEvasionLimitReached = true;
+      if (checkEvasionStatistics) checkEvasionStatistics.limitReachedCount++;
+    }
+    return { evaluation: searchValue(staticBreakdown, ply), evaluationBreakdown: staticBreakdown, principalVariation: [] };
+  }
+  if (extensionPly > 0 || extending) interruptionCheck?.();
   const actions = measured(diagnostics, 'q-legal', () => diagnostics
     ? getQuiescenceLegalActionsWithDiagnostics(state, diagnostics) : getLegalActions(state));
+  if (extensionPly > 0 || extending) interruptionCheck?.();
   const candidates = isInCheck ? actions : actions.filter((action) => isCapture(state, action));
 
-  // Reachable no-response positions are ended by the existing adjudication
-  // path. Keep malformed in-progress positions finite and deterministic too.
+  // Child execution normally adjudicates no-response positions. In the new
+  // extension path, also resolve custom checked roots through the shared evaluator.
+  // The historical path preserves its static approximation for custom inputs.
   if (candidates.length === 0) {
+    if (extending) {
+      const breakdown = evaluateNoLegalActionsPositionBreakdown(state, perspective, evaluation);
+      return { evaluation: searchValue(breakdown, ply), evaluationBreakdown: breakdown, principalVariation: [] };
+    }
     return { evaluation: searchValue(staticBreakdown, ply), evaluationBreakdown: staticBreakdown, principalVariation: [] };
   }
 
@@ -140,11 +175,15 @@ function searchNode(
     const action = orderedCandidates[actionIndex];
     const child = measured(diagnostics, 'q-execute', () => executeSearchAction(state, action, diagnostics));
     statistics.visitedPositionCount += 1;
+    if (extending && checkEvasionStatistics) {
+      checkEvasionStatistics.visitedPositionCount++;
+      checkEvasionStatistics.maxExtensionDepth = Math.max(checkEvasionStatistics.maxExtensionDepth, extensionPly + 1);
+    }
     diagnostics?.setStage('after-quiescence-action');
     interruptionCheck?.();
     const childResult = searchNode(
       child,
-      remainingDepth - 1,
+      Math.max(0, remainingDepth - 1),
       perspective,
       alpha,
       beta,
@@ -152,8 +191,11 @@ function searchNode(
       statistics,
       interruptionCheck,
       moveOrdering,
-      diagnostics, ply + 1
+      diagnostics, ply + 1,
+      remainingCheckEvasions - (extending ? 1 : 0),
+      extensionPly + (extending ? 1 : 0), checkEvasionStatistics
     );
+    if (extensionPly > 0 || extending) interruptionCheck?.();
 
     const adoptsCandidate = isInCheck && selectedBreakdown === null ||
       (isMaximizing ? compare(childResult.evaluation, selectedEvaluation) > 0 : compare(childResult.evaluation, selectedEvaluation) < 0);
@@ -190,7 +232,9 @@ export function analyzeQuiescenceSearch(
   maxTacticalDepth: number,
   evaluation: SearchEvaluationConfig = DEFAULT_MATERIAL_VALUE_TABLE,
   interruptionCheck: QuiescenceSearchInterruptionCheck = undefined,
-  moveOrdering: QuiescenceMoveOrderingMode = 'original'
+  moveOrdering: QuiescenceMoveOrderingMode = 'original',
+  maxCheckEvasionExtensions = 0,
+  checkEvasionStatistics?: CheckEvasionStatistics
 ): QuiescenceSearchResult {
   return analyzeQuiescenceSearchWithinBounds(
     state,
@@ -200,7 +244,7 @@ export function analyzeQuiescenceSearch(
     interruptionCheck,
     Number.NEGATIVE_INFINITY,
     Number.POSITIVE_INFINITY,
-    moveOrdering
+    moveOrdering, undefined, maxCheckEvasionExtensions, checkEvasionStatistics
   );
 }
 
@@ -219,11 +263,14 @@ export function analyzeQuiescenceSearchWithInternalBounds(
   beta: SearchValue,
   moveOrdering: QuiescenceMoveOrderingMode = 'original',
   diagnostics?: SearchDiagnostics,
-  rootPly = 0
-): QuiescenceSearchResult & { searchValue: SearchValue } {
+  rootPly = 0,
+  maxCheckEvasionExtensions = 0,
+  checkEvasionStatistics?: CheckEvasionStatistics
+): QuiescenceSearchResult & { searchValue: SearchValue; checkEvasionLimitReached?: boolean } {
   validateMaxTacticalDepth(maxTacticalDepth);
+  validateMaxCheckEvasionExtensions(maxCheckEvasionExtensions);
   const resolvedOrdering = resolveQuiescenceMoveOrdering(moveOrdering);
-  const statistics: SearchStatistics = { visitedPositionCount: 0, cutoffCount: 0, skippedActionCount: 0 };
+  const statistics: SearchStatistics = { visitedPositionCount: 0, cutoffCount: 0, skippedActionCount: 0, checkEvasionLimitReached: false };
   const result = searchNode(
     state,
     maxTacticalDepth,
@@ -234,7 +281,7 @@ export function analyzeQuiescenceSearchWithInternalBounds(
     statistics,
     interruptionCheck,
     resolvedOrdering,
-    diagnostics, rootPly
+    diagnostics, rootPly, maxCheckEvasionExtensions, 0, checkEvasionStatistics
   );
   return {
     selectedEvaluation: result.evaluationBreakdown.total,
@@ -251,11 +298,14 @@ export function analyzeQuiescenceSearchWithinBounds(
   state: BoardState, perspective: Player, maxTacticalDepth: number,
   evaluation: SearchEvaluationConfig, interruptionCheck: QuiescenceSearchInterruptionCheck,
   alpha: number, beta: number, moveOrdering: QuiescenceMoveOrderingMode = 'original',
-  diagnostics?: SearchDiagnostics
+  diagnostics?: SearchDiagnostics,
+  maxCheckEvasionExtensions = 0,
+  checkEvasionStatistics?: CheckEvasionStatistics
 ): QuiescenceSearchResult {
-  const { searchValue: _internal, ...result } = analyzeQuiescenceSearchWithInternalBounds(
+  const { searchValue: _internal, checkEvasionLimitReached: _limit, ...result } = analyzeQuiescenceSearchWithInternalBounds(
     state, perspective, maxTacticalDepth, evaluation, interruptionCheck,
-    numericalSearchBound(alpha), numericalSearchBound(beta), moveOrdering, diagnostics
+    numericalSearchBound(alpha), numericalSearchBound(beta), moveOrdering, diagnostics, 0,
+    maxCheckEvasionExtensions, checkEvasionStatistics
   );
   return result;
 }

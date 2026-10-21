@@ -1,0 +1,13 @@
+
+> shogi-app@0.0.0 test
+> vitest run src/test/shogi-check-evasion.test.ts src/test/shogi-quiescence-search.test.ts src/test/shogi-partial-root.test.ts
+
+
+ RUN  v4.1.11 C:/Users/tetsu/Documents/Codex/Shogi-App/.worktrees/check-evasion
+
+
+ Test Files  3 passed (3)
+      Tests  114 passed (114)
+   Start at  23:33:08
+   Duration  3.52s (transform 843ms, setup 566ms, import 1.06s, tests 448ms, environment 2.91s)
+

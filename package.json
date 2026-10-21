@@ -10,6 +10,7 @@
   },
   "scripts": {
     "diagnose:tactical": "tsx scripts/measure-tactical-diagnostics.ts",
+    "diagnose:check-evasion": "tsx scripts/measure-check-evasion.ts",
     "dev": "vite --port=3000 --host=0.0.0.0",
     "build": "vite build",
     "preview": "vite preview",

@@ -9,7 +9,8 @@ import { executeLegalAction, getLegalActions, type LegalAction } from './legalAc
 import {
   DEFAULT_MATERIAL_VALUE_TABLE,
 } from './materialEvaluation';
-import { analyzeQuiescenceSearchWithInternalBounds } from './quiescenceSearch';
+import { analyzeQuiescenceSearchWithInternalBounds, validateMaxCheckEvasionExtensions,
+  createCheckEvasionStatistics, type CheckEvasionStatistics } from './quiescenceSearch';
 import { resolveQuiescenceMoveOrdering, type QuiescenceMoveOrderingMode } from './quiescenceOrdering';
 import { prepareStaticExchangeEvaluation } from './staticExchangeEvaluation';
 import { measured, type SearchDiagnostics } from './searchDiagnostics';
@@ -31,12 +32,16 @@ export type AlphaBetaMoveOrderingMode = 'standard' | 'static-exchange';
 /** Explicit opt-in tactical extension at ordinary alpha-beta leaves. */
 export interface AlphaBetaQuiescenceOptions {
   readonly maxTacticalDepth: number;
+  /** Additional check-only ply after tactical depth is exhausted. Default 0; maximum 2. */
+  readonly maxCheckEvasionExtensions?: number;
   /** Omitted retains legal generation order. Independent of ordinary moveOrdering. */
   readonly moveOrdering?: QuiescenceMoveOrderingMode;
 }
 
 /** Optional trailing configuration; existing callers keep standard ordering. */
 export interface AlphaBetaSearchOptions {
+  /** Reset at public entry; counts attempted extra work, including interrupted iterations. */
+  readonly checkEvasionStatistics?: CheckEvasionStatistics;
   /** Exact-only cache, scoped to this public call. Default OFF. */
   readonly useTranspositionTable?: boolean;
   /** Optional caller-owned observations; reset at public call entry, never serialized. */
@@ -88,19 +93,28 @@ export function prioritizeLegalPvAction(actions: LegalAction[], hint: LegalActio
   return actions;
 }
 
-function resolveQuiescenceOptions(options: AlphaBetaSearchOptions | undefined): AlphaBetaQuiescenceOptions | undefined {
+interface ResolvedQuiescenceOptions extends AlphaBetaQuiescenceOptions {
+  statistics?: CheckEvasionStatistics;
+}
+
+function resolveQuiescenceOptions(options: AlphaBetaSearchOptions | undefined): ResolvedQuiescenceOptions | undefined {
+  if (options?.checkEvasionStatistics) Object.assign(options.checkEvasionStatistics, createCheckEvasionStatistics());
   const quiescence = options?.quiescence;
   if (quiescence === undefined) return undefined;
   if (quiescence === null || typeof quiescence !== 'object' || Array.isArray(quiescence) ||
-    Reflect.ownKeys(quiescence).some((key) => key !== 'maxTacticalDepth' && key !== 'moveOrdering')) {
-    throw new RangeError('Alpha-beta quiescence options must contain only maxTacticalDepth and optional moveOrdering.');
+    Reflect.ownKeys(quiescence).some((key) => key !== 'maxTacticalDepth' && key !== 'moveOrdering' && key !== 'maxCheckEvasionExtensions')) {
+    throw new RangeError('Alpha-beta quiescence options must contain only maxTacticalDepth, moveOrdering and maxCheckEvasionExtensions.');
   }
   const maxTacticalDepth = (quiescence as AlphaBetaQuiescenceOptions).maxTacticalDepth;
   if (typeof maxTacticalDepth !== 'number' || !Number.isFinite(maxTacticalDepth) ||
     !Number.isInteger(maxTacticalDepth) || maxTacticalDepth < 0) {
     throw new RangeError('Alpha-beta quiescence maximum tactical depth must be a finite non-negative integer measured in ply.');
   }
-  return { maxTacticalDepth, moveOrdering: resolveQuiescenceMoveOrdering(quiescence.moveOrdering) };
+  const extensions = quiescence.maxCheckEvasionExtensions === undefined ? 0 : quiescence.maxCheckEvasionExtensions;
+  // null is an invalid explicit value, not omission.
+  validateMaxCheckEvasionExtensions(extensions);
+  return { maxTacticalDepth, moveOrdering: resolveQuiescenceMoveOrdering(quiescence.moveOrdering),
+    maxCheckEvasionExtensions: extensions, statistics: options?.checkEvasionStatistics };
 }
 
 /**
@@ -468,6 +482,7 @@ function orderIterativeDeepeningRootActionsByMode(
  * ply before this function is first called.
  */
 interface SearchNodeResult {
+  checkEvasionLimitReached?: boolean;
   /** All descendants were completed without any ordinary/q cutoff. */
   ttExact?: boolean;
   evaluation: SearchValue;
@@ -486,7 +501,7 @@ function searchAlphaBetaNode(
   statistics: SearchStatistics,
   interruptionCheck: SearchInterruptionCheck,
   moveOrdering: AlphaBetaMoveOrderingMode,
-  quiescenceOptions: AlphaBetaQuiescenceOptions | undefined,
+  quiescenceOptions: ResolvedQuiescenceOptions | undefined,
   killerMoveHistory: KillerMoveHistory | undefined,
   ply: number,
   diagnostics?: SearchDiagnostics,
@@ -498,9 +513,10 @@ function searchAlphaBetaNode(
   let key: string | undefined;
   let identity: string | undefined;
   let getIdentity: (() => string) | undefined;
-  // Replaying a cached subtree would omit killer-history side effects. Keep
-  // that opt-in combination correct by declining reuse throughout the call.
-  if (transpositions && killerMoveHistory) transpositions.statistics.safetyRejects++;
+  // Replaying a cached subtree would omit killer-history side effects. The
+  // check extension also has a longer history horizon and approximate caps.
+  // Conservatively bypass TT throughout that opt-in call (including ancestors).
+  if (transpositions && (killerMoveHistory || (quiescenceOptions?.maxCheckEvasionExtensions ?? 0) > 0)) transpositions.statistics.safetyRejects++;
   else if (transpositions) {
     getIdentity = () => {
       if (identity === undefined) {
@@ -528,7 +544,7 @@ function searchAlphaBetaNode(
 }
 
 function cloneSearchNodeResult(result: SearchNodeResult): SearchNodeResult {
-  return { ttExact: result.ttExact, evaluation: { ...result.evaluation },
+  return { checkEvasionLimitReached: result.checkEvasionLimitReached, ttExact: result.ttExact, evaluation: { ...result.evaluation },
     principalVariation: clonePrincipalVariation(result.principalVariation),
     evaluationBreakdown: cloneSearchEvaluationBreakdown(result.evaluationBreakdown) };
 }
@@ -544,7 +560,7 @@ function searchAlphaBetaNodeUncached(
   statistics: SearchStatistics,
   interruptionCheck: SearchInterruptionCheck,
   moveOrdering: AlphaBetaMoveOrderingMode,
-  quiescenceOptions: AlphaBetaQuiescenceOptions | undefined,
+  quiescenceOptions: ResolvedQuiescenceOptions | undefined,
   killerMoveHistory: KillerMoveHistory | undefined,
   ply: number,
   diagnostics?: SearchDiagnostics,
@@ -569,13 +585,14 @@ function searchAlphaBetaNodeUncached(
     const quiescence = measured(diagnostics, 'quiescence', () => analyzeQuiescenceSearchWithInternalBounds(
       state, rootPlayer, quiescenceOptions.maxTacticalDepth, valueTable, interruptionCheck, alpha, beta,
       quiescenceOptions.moveOrdering,
-      diagnostics, ply
+      diagnostics, ply, quiescenceOptions.maxCheckEvasionExtensions, quiescenceOptions.statistics
     ));
     statistics.quiescenceVisitedPositionCount += quiescence.visitedPositionCount;
     statistics.quiescenceCutoffCount += quiescence.cutoffCount;
     statistics.quiescenceSkippedActionCount += quiescence.skippedActionCount;
     return {
-      ttExact: quiescence.cutoffCount === 0, evaluation: quiescence.searchValue,
+      checkEvasionLimitReached: quiescence.checkEvasionLimitReached,
+      ttExact: quiescence.cutoffCount === 0 && !quiescence.checkEvasionLimitReached, evaluation: quiescence.searchValue,
       principalVariation: clonePrincipalVariation(quiescence.principalVariation),
       evaluationBreakdown: cloneSearchEvaluationBreakdown(quiescence.evaluationBreakdown),
     };
@@ -603,6 +620,7 @@ function searchAlphaBetaNodeUncached(
   let evaluationBreakdown: SearchEvaluationBreakdown | null = null;
   let hasExploredAction = false;
   let ttExact = true;
+  let checkEvasionLimitReached = false;
   for (let actionIndex = 0; actionIndex < actions.length; actionIndex += 1) {
     interruptionCheck?.();
     const child = measured(diagnostics, 'normal-execute', () => executeSearchAction(state, actions[actionIndex], diagnostics));
@@ -628,6 +646,7 @@ function searchAlphaBetaNodeUncached(
     );
 
     ttExact = ttExact && childResult.ttExact === true;
+    checkEvasionLimitReached ||= childResult.checkEvasionLimitReached === true;
     const candidatePrincipalVariation = [
       cloneLegalAction(actions[actionIndex]),
       ...clonePrincipalVariation(childResult.principalVariation),
@@ -660,7 +679,7 @@ function searchAlphaBetaNodeUncached(
   if (evaluationBreakdown === null) {
     throw new Error('Alpha-beta search explored no actions at a non-leaf node.');
   }
-  return { ttExact, evaluation: value, principalVariation, evaluationBreakdown };
+  return { checkEvasionLimitReached, ttExact, evaluation: value, principalVariation, evaluationBreakdown };
 }
 
 interface PartialRootCandidate {
@@ -704,7 +723,7 @@ function searchAlphaBeta(
   previousBestAction: LegalAction | null = null,
   interruptionCheck: SearchInterruptionCheck = undefined,
   moveOrdering: AlphaBetaMoveOrderingMode = 'standard',
-  quiescenceOptions: AlphaBetaQuiescenceOptions | undefined = undefined,
+  quiescenceOptions: ResolvedQuiescenceOptions | undefined = undefined,
   killerMoveHistory: KillerMoveHistory | undefined = undefined,
   suppliedRootActions: readonly LegalAction[] | undefined = undefined,
   diagnostics?: SearchDiagnostics,
@@ -829,7 +848,7 @@ function searchAlphaBeta(
       // another terminal with the same outcome may have a better distance.
       // At depth one static/adjudicated leaves are exact. A q fail-low is not.
       const value = candidateResult.evaluation;
-      const exact = typeof candidateResult.evaluationBreakdown.total === 'number' &&
+      const exact = !candidateResult.checkEvasionLimitReached && typeof candidateResult.evaluationBreakdown.total === 'number' &&
         !Number.isNaN(candidateResult.evaluationBreakdown.total) &&
         (afterRootAction.status === 'ended' || quiescenceOptions === undefined ||
           alphaBeforeCandidate === SEARCH_BOTTOM || compare(value, alphaBeforeCandidate) > 0);

@@ -1,5 +1,7 @@
 # SHOGI-APP
 
+静止探索は `quiescence: { maxTacticalDepth: 1, maxCheckEvasionExtensions: 1 }` を明示すると、q深さ0の王手局面だけ合法応手を追加探索します。追加上限は整数0〜2ply、既定0（従来動作）。通常のq予算とは独立し、上限の静的近似をpartial-rootのexact候補へ採用しません。拡張有効時のTTは安全のため迂回します。Worker/UIの既定は変更しません。`npm run diagnose:check-evasion -- prepare NEW_DIR` / `run DIR` / `audit DIR` で比較できます。[設計・固定局面・検証・実測](docs/benchmarks/check-evasion-20261021/README.md)を参照してください。
+
 TTボトルネック診断を追加しました。固定SHA・独立processのABC比較で優先7局面×4条件、各warmup1＋本測定7を実施。固定＋反復の旧TT→新TTはidentity生成41.75%減に対し、合計実時間は観測上0.53%短縮（固定0.26%悪化、反復1.40%短縮）でした。通常ノード削減はOFF比0.35%に留まり、着手適用はTT照合前に残ります。複数倍の時間変動もあり安定した高速化は未確立です。判断は **B：安全だが効果は限定的**。製品コード変更・既定ON化は行わず、再実行可能な診断・監査回帰・工程別/CPU証拠を保存しました。[原因・全分布・再現手順](docs/benchmarks/tt-bottleneck-20261021/README.md)を参照してください。以下は過去PRの測定です。
 
 TT検索を2段階照合に変更し、粗いキーに候補がある場合、またはexact保存が必要な場合だけ詳細identityを生成します。安全条件と既存統計の意味は維持し、生成・一致/不一致・非exact拒否・サイズ拒否のカウンターを追加しました。今回のABC比較660呼出しは全監査成功。基本12局面の固定＋反復でidentity生成47.37%削減、合計実時間は観測上0.99%短縮ですが、固定d4単独は1.98%悪化しました。判断は **B：安全性維持、改善は限定的、既定OFF継続**。一般的な高速化は未確立です。[今回の設計・比較診断](docs/benchmarks/tt-two-stage-20261021/README.md)と[局面別表](docs/benchmarks/tt-two-stage-20261021/results.md)を参照してください。以下の数値はPR #196の導入時測定です。
