@@ -2,7 +2,12 @@
 
 - 基準main f9a78e255e7e0bfa53b3eed9a95b7fa3a143c1b4、PR #202 MERGED確認。専用worktree/branchを作成し原本保護。
 - 既存14局面＋評価を使わない合法棋譜続き2局面を事前固定。全幅/逆順3ply・6000ノード参照、厳格な4分類、PV/終局/内訳監査、ABC測定、hash付き生データ保存と再集計CLIを実装。製品探索・UI・既定設定は不変。
-- 検証/実測/レビューの詳細は [今回の記録](docs/benchmarks/tactical-quality-20261022/README.md)。最終結果は追記する。
+- 本測定SHA `23497fbf753a92a9cb2f6ebab18ecd1e5ced57ce`、2026-10-22 06:54:48〜06:58:39 JST、Windows/i7-14650HX/Node24.20.0/npm11.17.0。standard/standard、killer/PV/TT=false、q original+1、追加0/1/2、d1/100/1000ms全16局面、d4は費用基準5秒以下の11局面。固定2回/時限3回、warmup177＋本450＝627呼出し、直列ABC回転。主測定失敗/欠測0。予備は342保存呼出し後、追加局面d4で60秒hard-stop。失敗/42未保存cellを隠さず保持。
+- 各追加量150件でProvenError0/QualityGap5/Inconclusive60/NoObservedDifference85（合計0/15/180/255）。暫定差はmate-three/100msとevasion/d1の2局面で、追加による改善なし。300比較の選択手差4件は全て時限の判定不能例。合法平手再生3局面は全て参照上限で品質未判定。実戦棋譜からの抽出ではない。
+- 固定d4の通常16,702/q1,638は全追加量同じ。1000msのq3,027→3,171（+4.76%）、追加試行204/201、完了深さ合計150は同じ。100ms最大超過2.876→3.170/3.900ms、1000msは1.101→2.510/3.968ms。少数/混合局面/JIT等の変動を一般的性能改善・悪化の因果証明としない。判断 **C：品質改善未確認・ノード負荷増加、既定OFF継続**。
+- 450件の合法PV/内訳/終局理由・距離/partial-root/入力非破壊/全cell/hashを監査。全幅/逆順参照を再計算し、生データから2回再集計して全出力一致。新規17・関連175件成功。最終checkは2141成功/既存UI1timeout、単独再実行は1.32秒成功。lock/型/個別build成功。timeout・既存assertion緩和なし。
+- 別観点自己レビューで履歴全合法再生、fallback内訳null、局面hash、phase/有限時間/非負ノード、原本改行保護、cell/由来別分布を強化。第三者レビューの独立性はなく、独立探索もルール/評価を共有する。v1/測定時ソースを保持してv2へ再監査。最終HEAD/Ubuntu・macOS CIはPR本文に照合記録。マージ/自動マージしない。
+- 詳細・制約・次の候補は [今回の記録](docs/benchmarks/tactical-quality-20261022/README.md)と[結果](docs/benchmarks/tactical-quality-20261022/results-report.md)。
 
 ### [2026-10-21 JST] q深さ境界の王手回避拡張（既定OFF・判断B）
 

@@ -88,7 +88,7 @@ if(mode==='select-cost') {
     const refs:Record<string,Reference>={};
     for(const p of positions) { refs[p.id]=reference(p); console.log('reference',p.id,refs[p.id].stopped); }
     write('references.json',refs);
-    write('quality-references.json',Object.fromEntries(positions.map(p=>[p.id,qualityReference(p)]))); 
+    write('quality-references.json',Object.fromEntries(positions.map(p=>[p.id,qualityReference(p)])));
   } else {
     const plan=parse(readFileSync(file('plan.json'),'utf8'));
     loadPositions(plan.positions,plan.positionHash);

@@ -1,8 +1,8 @@
-# 戦術品質診断
+# SHOGI-APP
 
 `npm run diagnose:tactical-quality -- prepare NEW_DIR` / `run DIR` / `audit DIR` で、固定16局面・王手回避追加0/1/2を比較します。全幅/逆順の有限参照と詰み限定証明を分離し、ProvenError / QualityGap / Inconclusive / NoObservedDifferenceを記録します。製品探索と既定設定は変更しません。[設計・実測・再現手順](docs/benchmarks/tactical-quality-20261022/README.md)。
 
-# SHOGI-APP
+16局面の本測定450件はProvenError 0 / QualityGap 15（2局面）/ Inconclusive 180 / NoObservedDifference 255。追加0/1/2の分類件数は同じで、1,000msのqノードは追加1/2で4.76%増。判断は **C：改善未確認・負荷増加、既定OFF継続**。原本からの2回の再集計は一致。予備の60秒打切りと深さ4の費用選定、参照不足を含め[今回の結果](docs/benchmarks/tactical-quality-20261022/results-report.md)へ記録しています。
 
 静止探索は `quiescence: { maxTacticalDepth: 1, maxCheckEvasionExtensions: 1 }` を明示すると、q深さ0の王手局面だけ合法応手を追加探索します。追加上限は整数0〜2ply、既定0（従来動作）。通常のq予算とは独立し、上限の静的近似をpartial-rootのexact候補へ採用しません。拡張有効時のTTは安全のため迂回します。Worker/UIの既定は変更しません。`npm run diagnose:check-evasion -- prepare NEW_DIR` / `run DIR` / `audit DIR` で比較できます。[設計・固定局面・検証・実測](docs/benchmarks/check-evasion-20261021/README.md)を参照してください。
 
