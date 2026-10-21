@@ -1,3 +1,14 @@
+### [2026-10-21 JST] q深さ境界の王手回避拡張（既定OFF・判断B）
+
+- #190/#192/#194/#196/#198/#200のMERGEDを確認し、fetchしたmain `8248857d5c2fd4dea0a23e1b0de8f013c1ddc0f2` を基準に専用worktree `.worktrees/check-evasion` / `codex/check-evasion-extensions` を作成。元mainはclean、既存作業/測定原本を保護。関連Issue #201。
+- `quiescence.maxCheckEvasionExtensions` は整数0〜2、既定0。通常q予算とは別に王手の合法応手だけを追加探索する。上限の静的近似をpartial-root exactから除外し、期限例外は既存反復処理へ伝播。拡張有効時のTTは祖先ごと安全に迂回。入力・評価/内訳/PV・カテゴリ/終局距離・既存統計定義・Worker/UI/保存形式/既定設定を維持。追加試行統計は別観測で中断作業も含む。
+- 製品変更前の14局面q0/1/2、元main moduleからd1/d2の28探索を保存し、省略/0との完全一致を回帰化。新規40テスト。既存戦術10局面＋1手回避/王手返しの先後4局面を結果前に固定。独立AND/OR参照と、枝刈りなし/逆順参照の境界84条件、PV合法再生・末端内訳・入力hashを照合。別観点の安全性レビューでTT履歴horizonとcap/partialの拒否条件も再確認した。
+- 測定コードSHA `fcebfd8159e6f5809da0fe44fee7a7f91686e7e9`、2026-10-21 23:41:16〜23:43:22 JST、Windows 10.0.26300 x64/i7-14650HX/Node24.20.0/npm11.17.0。standard評価/順序、killer=false、PV=false、TT=false、q1/original、固定d1/d4・100/1000ms最大d4。A追加0/B1/C2、各cell warmup1、固定1本/時限3本、ABC/BCA/CAB直列。504呼出し＝warmup168＋本336、例外/欠測/打切り/監査失敗0。完全入力・SHA/元bytes/hash・環境・原本/再集計/位置別表を保存。
+- 全112本ずつで参照一致56/不一致0/判定不能56。224対で選択手/参照判定の変化0、王手開始40本ずつ全合法回避。スコア/PVが変わる10対を棋力改善に数えない。実際の誤選択の独立証明はこの固定集合では得ていない。固定d4通常32,295→32,387、q11,662→12,552、B/C追加1,926。実時間合計7,428.668→7,644.371/7,689.473ms（+2.90%/+3.51%）。100msのd4完了15→14、1標本低下。1000msのd3=9/d4=33は同じ。主測定追加最大1/cap0で、追加2の付加価値は未確認。
+- 初回TEMP rename EPERMはworkspace TEMP/TMPで解消。初期回帰2失敗はαβからqへ新引数を渡す接続漏れを検出、修正後114件、最終関連7ファイル209件成功。型の後方互換mock問題と事前の測定順rotationも修正。失敗原本/経緯を保持し、timeout/worker/既存assertionを緩和しない。
+- 通常 `npm run check` は2回とも80ファイル2,124成功/1失敗。既存 `quiescence-ordering-repeated` の528snapshot mock harnessが6.659/5.901秒で5秒timeout。同テストを含む関連209件は成功。lockfile/型検査成功、個別build1,761 modules成功。全体check成功とは扱わず、最終HEADのUbuntu/macOS CIはPR本文に記録する。
+- 採用判断 **B：安全だが戦術改善効果は未確認、既定OFF継続**。有限参照の不詰/最善を断定せず、CPU/OS/JIT/GC揺れ・少数標本・中断統計の母集団差・同期処理の強制停止不能を明記。次は誤選択を独立に証明できる境界局面を事前固定し、深い外部参照・反復/実戦で品質検証する。詳細と再現は [専用記録](docs/benchmarks/check-evasion-20261021/README.md)。commit/push/PR/CI対象SHA確認まで実施し、マージ/自動マージしない。
+
 ### [2026-10-21 JST] TTボトルネック診断（製品変更なし・判断B）
 
 - origin/main再fetch後HEAD `b031decd02ed32a036e43d88829a217cc385b70d`、#196/#198 MERGEDと指定merge SHAを確認。元checkout clean、既存branch/worktree/診断原本を保護し、専用 `codex/tt-bottleneck` と独立旧/新checkoutを作成。
