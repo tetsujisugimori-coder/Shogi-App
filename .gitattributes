@@ -1,3 +1,4 @@
 # Keep diagnostic byte hashes stable on Windows and Unix checkouts.
 docs/benchmarks/partial-root-matches-20261016-run1/*.json -text
 docs/benchmarks/partial-root-matches-20261016-run1/*.jsonl -text
+docs/benchmarks/check-evasion-20261021/** -text

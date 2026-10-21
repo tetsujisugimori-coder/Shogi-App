@@ -1,0 +1,56 @@
+
+> shogi-app@0.0.0 check
+> npm run verify:lock && npm run lint && npm test && npm run build
+
+
+> shogi-app@0.0.0 verify:lock
+> node scripts/verify-lockfile.mjs
+
+--- Lockfile Verification Summary ---
+Lockfile Name:           shogi-app
+Lockfile Version:        3
+Total Package Entries:   399
+Inspected Registry Pkgs: 398
+Valid Exceptions:        0
+Missing "version":       0
+Missing "resolved":      0
+Missing "integrity":     0
+
+[verify:lock] SUCCESS: package-lock.json is valid and complete.
+
+
+> shogi-app@0.0.0 lint
+> tsc --noEmit
+
+
+> shogi-app@0.0.0 test
+> vitest run
+
+
+ RUN  v4.1.11 C:/Users/tetsu/Documents/Codex/Shogi-App/.worktrees/check-evasion
+
+ ❯ src/test/quiescence-ordering-repeated.test.ts (37 tests | 1 failed) 9122ms
+     × runs 3+8 per setting on six unchanged positions, both modes, with independent frozen snapshots 5901ms
+Not implemented: navigation to another Document
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/test/quiescence-ordering-repeated.test.ts > repeated ordering schedule and isolation > runs 3+8 per setting on six unchanged positions, both modes, with independent frozen snapshots
+Error: Test timed out in 5000ms.
+If this is a long-running test, pass a timeout value as the last argument or configure it globally with "testTimeout".
+ ❯ src/test/quiescence-ordering-repeated.test.ts:65:3
+     63|
+     64| describe('repeated ordering schedule and isolation', () => {
+     65|   it('runs 3+8 per setting on six unchanged positions, both modes, wit…
+       |   ^
+     66|     const snapshots: BoardState[] = [];
+     67|     const fixedSearch: NonNullable<RepeatedDependencies['fixedSearch']…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed | 79 passed (80)
+      Tests  1 failed | 2124 passed (2125)
+   Start at  23:44:40
+   Duration  201.41s (transform 10.27s, setup 13.66s, import 18.91s, tests 282.29s, environment 69.53s)
+
