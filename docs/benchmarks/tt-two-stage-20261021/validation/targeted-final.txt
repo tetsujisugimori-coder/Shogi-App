@@ -1,9 +1,0 @@
-
- RUN  v4.1.11 C:/Users/tetsu/Documents/Codex/Shogi-App/.worktrees/tt-two-stage
-
-
- Test Files  1 passed (1)
-      Tests  25 passed (25)
-   Start at  19:41:01
-   Duration  1.76s (transform 239ms, setup 144ms, import 250ms, tests 476ms, environment 767ms)
-

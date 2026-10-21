@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import { readFileSync, writeFileSync, readdirSync, existsSync } from 'node:fs';
-import { join, resolve } from 'node:path';
+import { join, resolve, relative } from 'node:path';
 import { pathToFileURL } from 'node:url';
 import { gzipSync, gunzipSync } from 'node:zlib';
 import { execFileSync } from 'node:child_process';
@@ -11,6 +11,7 @@ import { json, parse, byteHash } from './benchmarks/partialRootMatches';
 
 const [mode, output, baselineRoot] = process.argv.slice(2);
 const baseSha = 'f5fdb17c777f34e4db34d903135f6a5dc88e93c9';
+const textHash = (bytes: Buffer) => byteHash(Buffer.from(bytes.toString('utf8').replaceAll('\r\n','\n')));
 const settings = { moveOrdering: 'standard' as const, killerMoves: false, usePreviousIterationPv: false,
   quiescence: { maxTacticalDepth: 1, moveOrdering: 'original' as const } };
 function stripTime(value: any): any {
@@ -78,11 +79,17 @@ if (mode === 'reference') {
   const raw = existsSync(join(directory,'raw.jsonl')) ? readFileSync(join(directory,'raw.jsonl')) : gunzipSync(readFileSync(join(directory,'raw.jsonl.gz')));
   assert.equal(byteHash(raw), completion.rawSha256);
   for (const [name, hash] of Object.entries(plan.sources)) {
-    assert.equal(byteHash(gunzipSync(readFileSync(join(directory,'sources',name+'.gz')))), hash);
+    const measured = gunzipSync(readFileSync(join(directory,'sources',name+'.gz')));
+    assert.equal(byteHash(measured), hash);
     if (name.startsWith('candidate__')) {
       const file = name.slice('candidate__'.length).replaceAll('__','/');
       // Historical probe snapshots may precede improvements to the audit CLI.
-      if (plan.mode === 'run') assert.equal(byteHash(readFileSync(file)),hash,`measured candidate changed: ${file}`);
+      // The offline auditor may receive post-measurement portability fixes;
+      // its measured snapshot remains verified above. Timed code and helpers
+      // must still match the measured text (allow checkout EOL conversion).
+      if (plan.mode === 'run' && file !== 'scripts/audit-tt-two-stage.ts') {
+        assert.equal(textHash(readFileSync(file)),textHash(measured),`measured candidate changed: ${file}`);
+      }
     }
   }
   const rows = raw.toString().trim().split('\n').map(parse);
@@ -159,6 +166,8 @@ if (mode === 'reference') {
   const collect=(dir:string):string[]=>readdirSync(dir,{withFileTypes:true}).flatMap(e=>e.isDirectory()?collect(join(dir,e.name)):join(dir,e.name)===target?[]:[join(dir,e.name)]);
   const files=[...collect(root),'src/domain/shogi/twoPlyAlphaBetaAi.ts','src/domain/shogi/transpositionTable.ts',
     'src/test/shogi-transposition-table.test.ts','scripts/measure-tt-two-stage.ts','scripts/audit-tt-two-stage.ts','README.md','LOG.md'].sort();
-  saveOrVerify(target,{ base:baseSha,files:Object.fromEntries(files.map(f=>[f.replaceAll('\\','/'),byteHash(readFileSync(f))])) });
+  saveOrVerify(target,{ base:baseSha, textHash: 'SHA-256 of UTF-8 text normalized CRLF to LF; .gz uses original bytes',
+    files:Object.fromEntries(files.map(f=>[relative(process.cwd(),resolve(f)).replaceAll('\\','/'),
+      f.endsWith('.gz') ? byteHash(readFileSync(f)) : textHash(readFileSync(f))])) });
   console.log(`Verified ${files.length} hashes.`);
 } else throw Error('Use reference OUTPUT.gz BASELINE_ROOT, summary RUN_DIRECTORY, or manifest EVIDENCE_DIRECTORY');
