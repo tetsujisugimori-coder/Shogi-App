@@ -1,3 +1,10 @@
+### [2026-10-21 JST] TT 2段階照合（既定OFF継続）
+
+- 最新main `f5fdb17c777f34e4db34d903135f6a5dc88e93c9` とPR #196 MERGEDを確認し、専用branch/worktreeを作成。既存診断原本を保護した。
+- 実装前にhas→probeと遅延callbackを比較し、1回のMap.get後に候補がある場合だけ生成する方式を記録。miss後はexact保存だけで生成し、照合済みidentityを再利用する。完全identity、exact証明、中断確認、killer迂回、FIFO/容量、既定OFFを維持。新規カウンターで生成/照合/拒否理由を分離する。
+- 関連25件と型検査、旧main OFF/旧ON対新ON、独立全幅/逆順全幅、PV/killer、制御時計の計103条件は成功。初回はsandbox Temp rename EPERMでテスト開始前に失敗し、通常設定の再実行で成功。期待値/timeout/worker設定を緩和しない。
+- 設計、原本、環境、検証・独立レビュー、測定と再現手順は[専用診断](docs/benchmarks/tt-two-stage-20261021/README.md)へ保存する。
+
 ### [2026-10-21 JST] exact限定Transposition Table（既定OFF）
 
 - 最新origin/main `519a332c36ad97dacdaae8c09a20a8e08bf511be` を取得し、PR #190/#192/#194のMERGEDを確認。元mainはclean、既存worktree/旧診断原本を保護し、専用 `codex/transposition-table` / 独立worktreeで作業。README/LOGと既存の探索値、q、千日手、500手、合法手、partial-root/PV/監査を確認した。
