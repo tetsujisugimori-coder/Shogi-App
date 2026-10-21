@@ -1,0 +1,8 @@
+f5fdb17 feat(shogi): add opt-in exact transposition table and audited benchmarks (#196)
+519a332 feat(shogi): prioritize previous PV during iterative search (#194)
+34d3689 勝敗カテゴリと終局距離を探索全体で一貫比較する (#192)
+6cd961b 固定10局面で戦術品質と詰み距離・終局理由を診断 (#190)
+21c6677 固定SHA・同一時間の20局でpartial-root導入前後を診断 (#189)
+70a9a0f 深さ1未完走時に期限内exact候補を採用しWorker・UIへ接続 (#187)
+cc37291 深さ1未完走フォールバックの品質を診断し改善判断の証拠を保存 (#184)
+42e8919 王手でない合法手なしを専用理由の負けとして終局 (#182)

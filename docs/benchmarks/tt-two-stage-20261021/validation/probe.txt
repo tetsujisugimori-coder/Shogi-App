@@ -1,0 +1,5 @@
+mixed-distance fixed d5
+terminal-resistance fixed d5
+long-legal-history fixed d5
+(node:35476) [DEP0190] DeprecationWarning: Passing args to a child process with shell option true can lead to security vulnerabilities, as the arguments are not escaped, only concatenated.
+(Use `node --trace-deprecation ...` to show where the warning was created)

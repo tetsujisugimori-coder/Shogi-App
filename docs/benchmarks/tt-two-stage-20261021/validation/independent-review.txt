@@ -1,0 +1,17 @@
+2026-10-21 JST / independent_review agent / static review, no heavy concurrent work
+
+Product changes: no blocking findings. Single Map.get, callback only on coarse
+candidate, unchanged complete identity, interruption position, killer bypass,
+exact proof, result copy, FIFO/capacity and legacy counter increments verified.
+
+Measurement/audit: no blocking findings. Three measured rotations balance ABC,
+BCA, CAB. Warmups excluded. Fixed B/C full results and legacy statistics checked;
+A selected action/evaluation/PV checked. Timed completed iterations compared to
+the same variant unlimited prefix. Missing/duplicate rows, raw/source hashes,
+and preservation of PR196 evidence checked. Mismatch-to-exact-store memoization
+test reviewed.
+
+Limitations to disclose: n=3 per-cell p95 is maximum; ALL pools heterogeneous
+positions. hitIdentityMs measures only candidate-hit identities in C, excluding
+miss-to-store generation and all eager B generation. Do not describe it as the
+total identity-generation cost.

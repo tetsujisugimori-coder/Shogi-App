@@ -497,22 +497,32 @@ function searchAlphaBetaNode(
   interruptionCheck?.();
   let key: string | undefined;
   let identity: string | undefined;
+  let getIdentity: (() => string) | undefined;
   // Replaying a cached subtree would omit killer-history side effects. Keep
   // that opt-in combination correct by declining reuse throughout the call.
   if (transpositions && killerMoveHistory) transpositions.statistics.safetyRejects++;
   else if (transpositions) {
+    getIdentity = () => {
+      if (identity === undefined) {
+        transpositions!.statistics.identityGenerations++;
+        identity = JSON.stringify([rootPlayer, isMaximizing, quiescenceOptions, moveOrdering,
+          previousPv?.slice(ply), transpositionIdentity(state, remainingDepth + (quiescenceOptions?.maxTacticalDepth ?? 0))]);
+      }
+      return identity;
+    };
     key = transpositions.key(state, remainingDepth, ply);
-    identity = JSON.stringify([rootPlayer, isMaximizing, quiescenceOptions, moveOrdering,
-      previousPv?.slice(ply), transpositionIdentity(state, remainingDepth + (quiescenceOptions?.maxTacticalDepth ?? 0))]);
-    const cached = transpositions.probe(key, identity);
+    const cached = transpositions.probe(key, getIdentity);
     if (cached) return cloneSearchNodeResult(cached);
   }
   const result = searchAlphaBetaNodeUncached(state, remainingDepth, rootPlayer, isMaximizing,
     alpha, beta, valueTable, statistics, interruptionCheck, moveOrdering, quiescenceOptions,
     killerMoveHistory, ply, diagnostics, previousPv, transpositions);
-  if (key !== undefined && identity !== undefined) {
-    if (result.ttExact) transpositions!.store(key, identity, cloneSearchNodeResult(result));
-    else transpositions!.statistics.safetyRejects++;
+  if (key !== undefined) {
+    if (result.ttExact) transpositions!.store(key, getIdentity!(), cloneSearchNodeResult(result));
+    else {
+      transpositions!.statistics.safetyRejects++;
+      transpositions!.statistics.nonExactStoreRejects++;
+    }
   }
   return result;
 }
