@@ -1,0 +1,330 @@
+
+> shogi-app@0.0.0 check
+> npm run verify:lock && npm run lint && npm test && npm run build
+
+
+> shogi-app@0.0.0 verify:lock
+> node scripts/verify-lockfile.mjs
+
+--- Lockfile Verification Summary ---
+Lockfile Name:           shogi-app
+Lockfile Version:        3
+Total Package Entries:   399
+Inspected Registry Pkgs: 398
+Valid Exceptions:        0
+Missing "version":       0
+Missing "resolved":      0
+Missing "integrity":     0
+
+[verify:lock] SUCCESS: package-lock.json is valid and complete.
+
+
+> shogi-app@0.0.0 lint
+> tsc --noEmit
+
+
+> shogi-app@0.0.0 test
+> vitest run
+
+
+ RUN  v4.1.11 C:/Users/tetsu/Documents/Codex/Shogi-App/.worktrees/tactical-quality
+
+ ❯ src/test/shogi-two-ply-minimax-ai.test.ts (72 tests | 1 failed) 16249ms
+     × 深さ3の途中で詰みへ到達した枝は、それ以上の子局面を生成せず既存の終局評価を返す 5238ms
+ ❯ src/test/quiescence-ordering-repeated.test.ts (37 tests | 1 failed) 10586ms
+     × runs 3+8 per setting on six unchanged positions, both modes, with independent frozen snapshots 7362ms
+Not implemented: navigation to another Document
+ ❯ src/test/tactical-quality.test.ts (16 tests | 1 failed) 161ms
+     × loads frozen 16 positions and two legal-history continuations without mutation 93ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 3 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/test/quiescence-ordering-repeated.test.ts > repeated ordering schedule and isolation > runs 3+8 per setting on six unchanged positions, both modes, with independent frozen snapshots
+Error: Test timed out in 5000ms.
+If this is a long-running test, pass a timeout value as the last argument or configure it globally with "testTimeout".
+ ❯ src/test/quiescence-ordering-repeated.test.ts:65:3
+     63|
+     64| describe('repeated ordering schedule and isolation', () => {
+     65|   it('runs 3+8 per setting on six unchanged positions, both modes, wit…
+       |   ^
+     66|     const snapshots: BoardState[] = [];
+     67|     const fixedSearch: NonNullable<RepeatedDependencies['fixedSearch']…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/3]⎯
+
+ FAIL  src/test/shogi-two-ply-minimax-ai.test.ts > 再帰型αβ枝刈り探索 > 深さ3の途中で詰みへ到達した枝は、それ以上の子局面を生成せず既存の終局評価を返す
+Error: Test timed out in 5000ms.
+If this is a long-running test, pass a timeout value as the last argument or configure it globally with "testTimeout".
+ ❯ src/test/shogi-two-ply-minimax-ai.test.ts:1611:3
+    1609|   });
+    1610|
+    1611|   it('深さ3の途中で詰みへ到達した枝は、それ以上の子局面を生成せず既存の終局評価を返す', () => {
+       |   ^
+    1612|     const state = createState([
+    1613|       { row: 8, col: 4, piece: piece('sente-king', 'king', 'sente') },
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/3]⎯
+
+ FAIL  src/test/tactical-quality.test.ts > tactical quality diagnostic evidence > loads frozen 16 positions and two legal-history continuations without mutation
+AssertionError: history/hand/snapshots must match full legal replay
++ actual - expected
+... Skipped lines
+
+  {
++   branchFrom: undefined,
+    foulHistory: [],
+    goteHand: [
+      {
+        id: 'sente-pawn-9',
+        isPromoted: false,
+...
+                id: 'sente-pawn-9',
++               isPromoted: undefined,
+                player: 'sente',
+                type: 'pawn'
+              },
+              rank: 6,
+              rankKanji: '六',
+...
+                id: 'gote-pawn-9',
++               isPromoted: undefined,
+                player: 'gote',
+                type: 'pawn'
+              },
+              rank: 4,
+              rankKanji: '四',
+...
+                id: 'sente-pawn-9',
++               isPromoted: undefined,
+                player: 'sente',
+                type: 'pawn'
+              },
+              rank: 6,
+              rankKanji: '六',
+...
+                id: 'gote-pawn-9',
++               isPromoted: undefined,
+                player: 'gote',
+                type: 'pawn'
+              },
+              rank: 4,
+              rankKanji: '四',
+...
+                id: 'sente-pawn-9',
++               isPromoted: undefined,
+                player: 'sente',
+                type: 'pawn'
+              },
+              rank: 5,
+              rankKanji: '五',
+...
+                id: 'gote-pawn-9',
++               isPromoted: undefined,
+                player: 'gote',
+                type: 'pawn'
+              },
+              rank: 5,
+              rankKanji: '五',
+...
+                id: 'sente-lance-9',
++               isPromoted: undefined,
+                player: 'sente',
+                type: 'lance'
+              },
+              rank: 5,
+              rankKanji: '五',
+...
+                id: 'gote-pawn-8',
++               isPromoted: undefined,
+                player: 'gote',
+                type: 'pawn'
+              },
+              rank: 4,
+              rankKanji: '四',
+...
+                id: 'sente-lance-9',
++               isPromoted: undefined,
+                player: 'sente',
+                type: 'lance'
+              },
+              rank: 5,
+              rankKanji: '五',
+...
+            id: 'gote-pawn-8',
++           isPromoted: undefined,
+            player: 'gote',
+            type: 'pawn'
+          },
+          rank: 4,
+          rankKanji: '四',
+...
+            id: 'sente-lance-9',
++           isPromoted: undefined,
+            player: 'sente',
+            type: 'lance'
+          },
+          rank: 5,
+          rankKanji: '五',
+
+
+- Expected
++ Received
+
+@@ -1,6 +1,7 @@
+  {
++   "branchFrom": undefined,
+    "foulHistory": [],
+    "goteHand": [
+      {
+        "id": "sente-pawn-9",
+        "isPromoted": false,
+@@ -1748,10 +1749,11 @@
+              "coordinateLabel": "9六",
+              "file": 9,
+              "hasBottomRightStarMarker": false,
+              "piece": {
+                "id": "sente-pawn-9",
++               "isPromoted": undefined,
+                "player": "sente",
+                "type": "pawn",
+              },
+              "rank": 6,
+              "rankKanji": "六",
+@@ -2577,10 +2579,11 @@
+              "coordinateLabel": "9四",
+              "file": 9,
+              "hasBottomRightStarMarker": false,
+              "piece": {
+                "id": "gote-pawn-9",
++               "isPromoted": undefined,
+                "player": "gote",
+                "type": "pawn",
+              },
+              "rank": 4,
+              "rankKanji": "四",
+@@ -2765,10 +2768,11 @@
+              "coordinateLabel": "9六",
+              "file": 9,
+              "hasBottomRightStarMarker": false,
+              "piece": {
+                "id": "sente-pawn-9",
++               "isPromoted": undefined,
+                "player": "sente",
+                "type": "pawn",
+              },
+              "rank": 6,
+              "rankKanji": "六",
+@@ -3594,10 +3598,11 @@
+              "coordinateLabel": "9四",
+              "file": 9,
+              "hasBottomRightStarMarker": false,
+              "piece": {
+                "id": "gote-pawn-9",
++               "isPromoted": undefined,
+                "player": "gote",
+                "type": "pawn",
+              },
+              "rank": 4,
+              "rankKanji": "四",
+@@ -3690,10 +3695,11 @@
+              "coordinateLabel": "9五",
+              "file": 9,
+              "hasBottomRightStarMarker": false,
+              "piece": {
+                "id": "sente-pawn-9",
++               "isPromoted": undefined,
+                "player": "sente",
+                "type": "pawn",
+              },
+              "rank": 5,
+              "rankKanji": "五",
+@@ -4710,10 +4716,11 @@
+              "coordinateLabel": "9五",
+              "file": 9,
+              "hasBottomRightStarMarker": false,
+              "piece": {
+                "id": "gote-pawn-9",
++               "isPromoted": undefined,
+                "player": "gote",
+                "type": "pawn",
+              },
+              "rank": 5,
+              "rankKanji": "五",
+@@ -5737,10 +5744,11 @@
+              "coordinateLabel": "9五",
+              "file": 9,
+              "hasBottomRightStarMarker": false,
+              "piece": {
+                "id": "sente-lance-9",
++               "isPromoted": undefined,
+                "player": "sente",
+                "type": "lance",
+              },
+              "rank": 5,
+              "rankKanji": "五",
+@@ -6674,10 +6682,11 @@
+              "coordinateLabel": "8四",
+              "file": 8,
+              "hasBottomRightStarMarker": false,
+              "piece": {
+                "id": "gote-pawn-8",
++               "isPromoted": undefined,
+                "player": "gote",
+                "type": "pawn",
+              },
+              "rank": 4,
+              "rankKanji": "四",
+@@ -6760,10 +6769,11 @@
+              "coordinateLabel": "9五",
+              "file": 9,
+              "hasBottomRightStarMarker": false,
+              "piece": {
+                "id": "sente-lance-9",
++               "isPromoted": undefined,
+                "player": "sente",
+                "type": "lance",
+              },
+              "rank": 5,
+              "rankKanji": "五",
+@@ -7670,10 +7680,11 @@
+          "coordinateLabel": "8四",
+          "file": 8,
+          "hasBottomRightStarMarker": false,
+          "piece": {
+            "id": "gote-pawn-8",
++           "isPromoted": undefined,
+            "player": "gote",
+            "type": "pawn",
+          },
+          "rank": 4,
+          "rankKanji": "四",
+@@ -7756,10 +7767,11 @@
+          "coordinateLabel": "9五",
+          "file": 9,
+          "hasBottomRightStarMarker": false,
+          "piece": {
+            "id": "sente-lance-9",
++           "isPromoted": undefined,
+            "player": "sente",
+            "type": "lance",
+          },
+          "rank": 5,
+          "rankKanji": "五",
+
+ ❯ loadPositions scripts/benchmarks/tacticalQuality.ts:25:14
+     23|         assert.ok(action,'history must replay legally from hirate'); r…
+     24|       }
+     25|       assert.deepEqual(replay,p.state,'history/hand/snapshots must mat…
+       |              ^
+     26|     }
+     27|   }
+ ❯ src/test/tactical-quality.test.ts:12:35
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/3]⎯
+
+
+ Test Files  3 failed | 78 passed (81)
+      Tests  3 failed | 2138 passed (2141)
+   Start at  06:38:45
+   Duration  209.21s (transform 12.85s, setup 13.46s, import 22.39s, tests 291.34s, environment 71.02s)
+

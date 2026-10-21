@@ -9,3 +9,5 @@ coverage/
 
 # Live diagnostic journal; the byte-identical gzip is the committed raw artifact.
 /docs/benchmarks/partial-root-matches-20261016-run1/attempts.jsonl
+
+/.diagnostic-temp/

@@ -1,0 +1,28 @@
+
+ RUN  v4.1.11 C:/Users/tetsu/Documents/Codex/Shogi-App/.worktrees/tactical-quality
+
+ ❯ src/test/tactical-quality.test.ts (16 tests | 2 failed) 120ms
+     × records actual 100ms result with completed depth/source and legal PV 2ms
+     × records actual 1000ms result with completed depth/source and legal PV 0ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 2 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/test/tactical-quality.test.ts > tactical quality diagnostic evidence > records actual 100ms result with completed depth/source and legal PV
+ FAIL  src/test/tactical-quality.test.ts > tactical quality diagnostic evidence > records actual 1000ms result with completed depth/source and legal PV
+AssertionError: expected [ 'completed', 'partial-root', …(1) ] to include 'completed-iteration'
+ ❯ src/test/tactical-quality.test.ts:66:104
+     64|   it.each([100,1000])('records actual %ims result with completed depth…
+     65|     const pos=ps.find(p=>p.id==='single-evasion')!,r=timed(pos.state,1…
+     66|     expect(r.completedDepth).toBeGreaterThanOrEqual(0);expect(['comple…
+       |                                                                                                        ^
+     67|     auditQualityResult(pos,r,0);
+     68|   });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/2]⎯
+
+
+ Test Files  1 failed | 3 passed (4)
+      Tests  2 failed | 70 passed (72)
+   Start at  06:36:55
+   Duration  3.82s (transform 931ms, setup 920ms, import 1.23s, tests 699ms, environment 3.80s)
+

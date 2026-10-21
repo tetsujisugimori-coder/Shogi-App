@@ -1,3 +1,9 @@
+### [2026-10-22 JST] 戦術品質診断基盤
+
+- 基準main f9a78e255e7e0bfa53b3eed9a95b7fa3a143c1b4、PR #202 MERGED確認。専用worktree/branchを作成し原本保護。
+- 既存14局面＋評価を使わない合法棋譜続き2局面を事前固定。全幅/逆順3ply・6000ノード参照、厳格な4分類、PV/終局/内訳監査、ABC測定、hash付き生データ保存と再集計CLIを実装。製品探索・UI・既定設定は不変。
+- 検証/実測/レビューの詳細は [今回の記録](docs/benchmarks/tactical-quality-20261022/README.md)。最終結果は追記する。
+
 ### [2026-10-21 JST] q深さ境界の王手回避拡張（既定OFF・判断B）
 
 - #190/#192/#194/#196/#198/#200のMERGEDを確認し、fetchしたmain `8248857d5c2fd4dea0a23e1b0de8f013c1ddc0f2` を基準に専用worktree `.worktrees/check-evasion` / `codex/check-evasion-extensions` を作成。元mainはclean、既存作業/測定原本を保護。関連Issue #201。
