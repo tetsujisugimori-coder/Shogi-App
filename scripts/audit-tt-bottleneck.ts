@@ -4,7 +4,7 @@ import { join, resolve } from 'node:path';
 import { gunzipSync } from 'node:zlib';
 import { pathToFileURL } from 'node:url';
 import { json, parse, byteHash } from './benchmarks/partialRootMatches';
-import { observePv } from './benchmarks/terminalDistanceReference';
+import { observePv, exhaustive, apply } from './benchmarks/terminalDistanceReference';
 import { getLegalActions } from '../src/domain/shogi/legalActions';
 
 export function percentile(values: number[], q: number): number {
@@ -12,6 +12,11 @@ export function percentile(values: number[], q: number): number {
   return [...values].sort((a,b)=>a-b)[Math.ceil(q*values.length)-1];
 }
 const signature = (r: any) => json([r.selectedAction,r.selectedEvaluation,r.principalVariation,r.evaluationBreakdown]);
+function stripTime(v:any):any {
+  if(Array.isArray(v)) return v.map(stripTime);
+  if(v!==null&&typeof v==='object') return Object.fromEntries(Object.entries(v).filter(([k])=>k!=='elapsedMilliseconds').map(([k,x])=>[k,stripTime(x)]));
+  return v;
+}
 const histogram = (values: any[]) => Object.fromEntries([...new Set(values)].map(v=>[String(v),values.filter(x=>x===v).length]));
 export function summarize(plan: any, rows: any[]) {
   assert.equal(rows.length,plan.cells.length*(plan.repeats+1)*plan.variants.length);
@@ -41,10 +46,42 @@ export function summarize(plan: any, rows: any[]) {
       assert.equal(s.safetyRejects,s.identityMismatches+s.nonExactStoreRejects+s.sizeStoreRejects);
       assert.ok(s.identityGenerations<=s.hits+s.stores+s.sizeStoreRejects);
     }
-    if(r.variant==='A') continue;
-    const a=rows.find(o=>o.position===r.position&&o.kind===r.kind&&o.repeat===r.repeat&&o.variant==='A');
+    if(r.variant==='P') {
+      const expected={ 'A-coarse-key':s.lookups, 'B-map-get':s.lookups, 'E-probe-inclusive':s.lookups,
+        'C-core-identity':s.identityGenerations, 'C-full-identity':s.identityGenerations,
+        'D-identity-equality':s.hits, 'F-exact-store-check':s.lookups-s.exactReuses,
+        'H-clone-result':s.exactReuses+s.stores+s.sizeStoreRejects,
+        'G-store-inclusive':s.stores+s.sizeStoreRejects, 'I-fifo-capacity-map':s.stores };
+      for(const [key,count] of Object.entries(expected)) {
+        assert.equal(r.diagnostic[key]?.calls??0,count,key);
+        if(count) assert.ok(Number.isFinite(r.diagnostic[key].ms)&&r.diagnostic[key].ms>=0);
+      }
+    }
+    if(['100ms','1000ms'].includes(r.kind)) {
+      if(r.result.resultSource==='completed-iteration'&&Array.isArray(r.result.iterations)) {
+        const unlimited=rows.find(o=>o.position===r.position&&o.kind==='iterative'&&o.variant===r.variant);
+        assert.ok(unlimited);
+        assert.deepEqual(stripTime(r.result.iterations),stripTime(unlimited.result.iterations.slice(0,r.result.completedDepth)));
+        assert.equal(signature(r.result),signature(r.result.iterations.at(-1)));
+      } else if(r.result.resultSource==='partial-root') {
+        const reference=exhaustive(apply(state,r.result.selectedAction),0,1,state.turn,1);
+        assert.equal(r.result.selectedEvaluation,reference.breakdown.total);
+        assert.equal(leaf.breakdown.terminal,reference.breakdown.terminal);
+        assert.equal(leaf.terminalDistancePly,reference.terminalDistancePly);
+      }
+    }
+    const referenceVariant=plan.variants.includes('A')?'A':'C';
+    if(r.variant===referenceVariant) continue;
+    const a=rows.find(o=>o.position===r.position&&o.kind===r.kind&&o.repeat===r.repeat&&o.variant===referenceVariant);
     if(['fixed','iterative'].includes(r.kind)) {
       assert.equal(signature(r.result),signature(a.result)); fixedMatches++;
+      const b=rows.find(o=>o.position===r.position&&o.kind===r.kind&&o.repeat===r.repeat&&o.variant==='B');
+      const c=rows.find(o=>o.position===r.position&&o.kind===r.kind&&o.repeat===r.repeat&&o.variant==='C');
+      if(b&&c) {
+        assert.deepEqual(stripTime(b.result),stripTime(c.result));
+        for(const key of ['lookups','hits','exactReuses','misses','safetyRejects','stores','evictions','maxEntries','maxPayloadCharacters']) assert.equal(b.statistics[key],c.statistics[key]);
+      }
+      if(r.variant==='P') { assert.deepEqual(stripTime(r.result),stripTime(c.result)); assert.deepEqual(r.statistics,c.statistics); }
     } else {
       const sameDepth=(r.result.completedDepth===a.result.completedDepth);
       const sameResult=signature(r.result)===signature(a.result);
@@ -79,7 +116,10 @@ if(process.argv[1]&&import.meta.url===pathToFileURL(resolve(process.argv[1])).hr
   const raw=existsSync(join(dir,'raw.jsonl'))?readFileSync(join(dir,'raw.jsonl')):gunzipSync(readFileSync(join(dir,'raw.jsonl.gz')));
   assert.equal(byteHash(raw),completion.rawSha256);
   assert.equal(byteHash(Buffer.from(json(plan.positions))),plan.inputHash);
-  for(const [name,hash] of Object.entries(plan.sourceHashes)) assert.equal(byteHash(gunzipSync(readFileSync(join(dir,'sources',name+'.gz')))),hash);
+  const sourceBundle=existsSync(join(dir,'sources.json.gz'))?JSON.parse(gunzipSync(readFileSync(join(dir,'sources.json.gz'))).toString()):null;
+  if(sourceBundle) assert.deepEqual(Object.keys(sourceBundle).sort(),Object.keys(plan.sourceHashes).sort());
+  for(const [name,hash] of Object.entries(plan.sourceHashes)) assert.equal(byteHash(sourceBundle?
+    Buffer.from(sourceBundle[name],'base64'):gunzipSync(readFileSync(join(dir,'sources',name+'.gz')))),hash);
   const rows=raw.toString().trim().split('\n').map(parse);
   assert.equal(rows.length,completion.rows); assert.equal(completion.failures,0);
   const summary=summarize(plan,rows);

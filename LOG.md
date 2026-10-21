@@ -1,3 +1,14 @@
+### [2026-10-21 JST] TTボトルネック診断（製品変更なし・判断B）
+
+- origin/main再fetch後HEAD `b031decd02ed32a036e43d88829a217cc385b70d`、#196/#198 MERGEDと指定merge SHAを確認。元checkout clean、既存branch/worktree/診断原本を保護し、専用 `codex/tt-bottleneck` と独立旧/新checkoutを作成。
+- runnerソース `a144e6ad6d0749922576fc966ac0313855d52eef` を固定。独立processのA現行OFF/B旧ON/C新ON、優先7局面×fixed d4/反復d1〜4/100/1000ms、standard評価/順序・killer=false・PV=false・q original+1。全条件warmup1＋本測定7、ABC/BCA/CAB直列。672呼出し、例外/欠測0。通常計測に工程clock/log/cpu-profを追加しない。
+- 別コピーPの工程診断56呼出し、CPU-profなしC/P負荷対照4局面各7回64呼出し、予備168呼出しを分離保存、総960。予備は起動時helper混在を独立レビューで修正する前なので費用参考だけにし、性能効果へ流用しない。工程時間は入れ子inclusiveで非加算、samplingはwhole process、空wrapper較正も別実行。
+- fixed＋反復のidentity生成192,752→112,280（41.75%減）、実時間157,650.121→156,807.397ms（0.53%減）、CPU151,422→148,783ms。fixedは0.26%悪化、反復1.40%短縮。CはOFFの152,628.374msより2.74%遅い。mate-sente反復に約1.5〜11秒の多峰性を残し、微小差を安定した高速化と断定しない。
+- fixed＋反復の通常ノードOFF193,424→ON192,738（0.35%減）、q51,688→43,330。C miss165,550/lookup192,752、再利用27,118、保存85,162、非exact拒否80,472、eviction54,306。保存identity再生成/nonexact時cloneは既に回避。親の着手適用がprobe前に済むため、再利用数は重い探索削減数ではない。clone/FIFOの小さな費用やサイズ拒否0に対して安全契約を変える根拠はない。
+- 固定/反復結果・PV・内訳224比較、旧新全結果（時刻除外）/共通TT統計、P/C全結果/全TT統計/工程呼出し会計、完了反復prefix/partial候補の独立q/全入力非破壊・合法手・容量・原本hashを監査。100msのcaptureだけ3比較で完了深さ差、同深さ結果差0。1000ms全variant深さ分布同じ。raw/summary/source全src gzip/hash/入力/CPU profile/再生成CLIを[証拠](docs/benchmarks/tt-bottleneck-20261021/README.md)へ保存。
+- 独立レビューのbootstrap混在、旧counter推定名、較正、選択手/PV監査を修正。回帰5件追加、既存テストの緩和なし。通常checkとbundle保存形式変更後の最終checkはいずれも79ファイル/2,085件、lockfile・型・1,761-module build成功。最終独立レビュー/bundle追加レビューともblocking指摘なし。validation/reviewへ保存し、最終HEAD/CIはPRへ確定記録する。
+- 判断 **B：安全だが効果は限定的**。製品コード変更は採用せずD比較なし。TT既定OFF・exact限定・履歴/500手/ply/ID/PV/期限/partial/fallback/NaN/FIFO契約を維持。TT追加最適化はいったん区切り、次は戦術評価・指し手品質の独立参照付き改善を推奨。commit/push/PR作成後レビュー待ちで停止し、自動マージしない。
+
 ### [2026-10-21 JST] TT 2段階照合（既定OFF継続）
 
 - 最新main `f5fdb17c777f34e4db34d903135f6a5dc88e93c9` とPR #196 MERGEDを確認し、専用branch/worktreeを作成。既存診断原本を保護した。

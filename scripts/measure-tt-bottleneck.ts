@@ -44,7 +44,7 @@ if (mode === 'worker') {
   }
 } else {
   const { distancePositions, observePv } = await import('./benchmarks/terminalDistanceReference');
-  assert.ok(['pilot', 'run', 'diagnostic'].includes(mode));
+  assert.ok(['pilot', 'run', 'diagnostic', 'overhead'].includes(mode));
   assert.ok(destination && oldArg && currentArg);
   const out = resolve(destination), old = resolve(oldArg), current = resolve(currentArg);
   assert.equal(sha(old), 'f5fdb17c777f34e4db34d903135f6a5dc88e93c9');
@@ -53,28 +53,31 @@ if (mode === 'worker') {
     execFileSync('git',['-C',root,'diff','--exit-code','HEAD','--','src','package.json','package-lock.json']);
     assert.equal(execFileSync('git',['-C',root,'ls-files','--others','--exclude-standard','src'],{encoding:'utf8'}).trim(),'');
   }
-  mkdirSync(out); mkdirSync(join(out, 'sources'));
+  mkdirSync(out);
   const ids = (selection ?? 'mate-sente,resistance,evasion,capture,terminal-resistance-gote,recapture,mixed-distance').split(',');
   const positions = ids.map(id => { const p = distancePositions().find(p => p.id === id); assert.ok(p, id); return p; });
-  const variants = ['A','B','C'];
+  const variants = mode==='overhead'?['C']:['A','B','C'];
   const roots: Record<string,string> = { A: current, B: old, C: current };
-  if (mode === 'diagnostic') { variants.push('P'); roots.P = resolve(current, '../tt-profile'); }
+  if (mode === 'diagnostic'||mode==='overhead') { variants.push('P'); roots.P = resolve(current, '../tt-profile'); }
   const collect = (dir: string): string[] => readdirSync(join(current,dir),{withFileTypes:true})
     .flatMap(e=>e.isDirectory()?collect(dir+'/'+e.name):[dir+'/'+e.name]);
   const files = [...collect('src'), 'package.json','package-lock.json',
     'scripts/benchmarks/terminalDistanceReference.ts','scripts/benchmarks/tacticalPositions.ts',
     'scripts/benchmarks/partialRootMatches.ts','scripts/measure-tt-bottleneck.ts','scripts/prepare-tt-profile.ts'];
   const sources: Record<string,string> = {};
+  const sourceBundle: Record<string,string> = {};
   for (const v of variants) for (const file of files) {
-    const bytes = readFileSync(join(file.startsWith('scripts/') || file==='package-lock.json' ? process.cwd() : roots[v], file));
+    const bytes = readFileSync(join(file.startsWith('scripts/') || v==='P'&&file==='package-lock.json' ? process.cwd() : roots[v], file));
     const name = v + '__' + file.replaceAll('/','__'); sources[name] = byteHash(bytes);
-    writeFileSync(join(out, 'sources', name+'.gz'), gzipSync(bytes), { flag: 'wx' });
+    sourceBundle[name]=bytes.toString('base64');
   }
-  const repeats = mode === 'run' ? 7 : 1;
-  const cells = positions.flatMap(p => (mode === 'diagnostic' ? ['fixed'] : ['fixed','iterative','100ms','1000ms'])
+  writeFileSync(join(out,'sources.json.gz'),gzipSync(JSON.stringify(sourceBundle)),{flag:'wx'});
+  const repeats = mode === 'run'||mode==='overhead' ? 7 : 1;
+  const cells = positions.flatMap(p => (mode === 'diagnostic'||mode==='overhead' ? ['fixed'] : ['fixed','iterative','100ms','1000ms'])
     .map(kind => ({ position: p.id, kind, budget: kind === '100ms' ? 100 : kind === '1000ms' ? 1000 : null })));
   writeFileSync(join(out,'plan.json'), json({ mode, startedAt: new Date().toISOString(), main: sha(current), old: sha(old),
-    runnerHead: sha(process.cwd()), roots, settings, node: process.version, os: release(), cpu: cpus()[0].model,
+    runnerHead: sha(process.cwd()), runnerStatus: execFileSync('git',['status','--porcelain'],{encoding:'utf8'}),
+    runnerDiff: execFileSync('git',['diff','--binary'],{encoding:'utf8'}), roots, settings, node: process.version, os: release(), cpu: cpus()[0].model,
     sourceHashes: sources, inputHash: byteHash(Buffer.from(json(positions))), positions, variants, cells, repeats,
     warmups: 1, order: 'serial; rotate variants every repeat including warmup; independent persistent process per variant',
     limitations: 'OS scheduling, affinity, power, JIT and GC uncontrolled; n=7 p95 is maximum; no build/tests during timing' })+'\n');
