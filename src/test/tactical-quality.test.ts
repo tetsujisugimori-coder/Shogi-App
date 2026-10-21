@@ -71,13 +71,22 @@ describe('tactical quality diagnostic evidence',()=>{
     const r=result();
     expect(auditQualityResult(p,{...r,resultSource:'fallback',selectedEvaluation:null,evaluationBreakdown:null,principalVariation:[]} as never,0)).toBeNull();
     expect(()=>auditQualityResult(p,{...r,resultSource:'completed',selectedEvaluation:null} as never,0)).toThrow();
+    expect(()=>auditQualityResult(p,{...r,resultSource:'fallback',selectedEvaluation:null,principalVariation:[]} as never,0)).toThrow();
     const part={...r,resultSource:'partial-root',depth:0,completedDepth:0};expect(auditQualityResult(p,part as never,0)).not.toBeNull();
   });
   it('regenerates aggregates, preserves equivalent actions and reports depth differences',()=>{
     const r=result(),row={position:p.id,condition:'100ms',rep:0,quality:'NoObservedDifference' as const,callMs:101,overrunMs:1,result:r};
     const rows=[{...row,extra:0},{...row,extra:1},{...row,extra:2,result:{...r,depth:0,selectedAction:getLegalActions(p.state).find(a=>json(a)!==json(r.selectedAction))!}}];
     const a=aggregateQuality([p],rows);expect(aggregateQuality([p],parse(json(rows)))).toEqual(a);
+    expect(aggregateQuality([p],rows.slice(1)).unpaired).toHaveLength(2);
     expect(a.differences).toHaveLength(1);expect(a.firstDifference).toMatchObject({baselineDepth:1,depth:0});
+  });
+  it('audits real cooperative fallback and partial-root with a controlled clock',()=>{
+    for(const boundary of [4,7]) {
+      let reads=0;
+      const r=timed(p.state,1,100,undefined,()=>++reads>=boundary?100:0,{...opts,quiescence:{...opts.quiescence,maxTacticalDepth:0}});
+      expect(r.resultSource).toBe(boundary===4?'fallback':'partial-root');auditQualityResult(p,r,0);
+    }
   });
   it('repeats fixed search deterministically without mutating input',()=>{
     const before=hash(p),a=result(),b=result();expect({...a,elapsedMilliseconds:0}).toEqual({...b,elapsedMilliseconds:0});expect(hash(p)).toBe(before);

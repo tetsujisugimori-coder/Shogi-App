@@ -26,7 +26,12 @@ PR #190/#202の14局面をすべて維持し、既存の合法な平手棋譜の
 Node 24 / npm 11。依存がなければnpm ci。Windowsのsandbox TEMP rename EPERM時はworkspace内のTEMP/TMPを指定する。既存テストのtimeoutやassertionは緩和しない。
 
 ```
+npm run diagnose:tactical-quality -- prepare PILOT_DIR pilot
+npm run diagnose:tactical-quality -- run PILOT_DIR
+# 失敗時は audit-partial、完了時は audit
+npm run diagnose:tactical-quality -- audit-partial PILOT_DIR
 npm run diagnose:tactical-quality -- prepare NEW_DIR
+npm run diagnose:tactical-quality -- select-cost NEW_DIR PILOT_DIR
 # plan・参照を固定し、実装をcommitしてから
 npm run diagnose:tactical-quality -- run NEW_DIR
 npm run diagnose:tactical-quality -- audit NEW_DIR
@@ -34,7 +39,7 @@ npm run diagnose:tactical-quality -- audit NEW_DIR
 ```
 
 既存check-evasion runnerのprocess分離・ローテーション・保存/監査構造を踏襲し、既存局面/参照/合法PV再生/partial-root検証を再利用。既存CLI・生データの意味は変更しない。
-standard評価/standard順序、killer=false/PV=false/TT=false、q original+1、追加だけ0/1/2。固定d1/d4と100/1000ms（最大d4）。予備は同じ入力で各条件1回、本測定は固定各2回・時限各3回。各cellに別warmup1回。ABC/BCA/CABを回転して同一環境で直列に実行。参照、build、テストは計測中に並走しない。深さ5以上は実施しない。
+standard評価/standard順序、killer=false/PV=false/TT=false、q original+1、追加だけ0/1/2。固定d1/d4と100/1000ms（最大d4）。予備は同じ入力で各条件1回、予備の深さ4最大費用5,000ms以下かつ6標本完備の11局面だけを本測定の深さ4へ採用。他の3条件は16局面すべてを保持。本測定は固定各2回・時限各3回。各cellに別warmup1回。ABC/BCA/CABを回転して同一環境で直列に実行。参照、build、テストは計測中に並走しない。深さ5以上は実施しない。
 
 sources.jsonに製品srcと診断ソースを保存しenvironment.jsonへ測定commit/元bytes SHA256/環境/入力・参照hashを保存。時限の通常/qノードは完了反復分、拡張統計は中断作業も含む。callMsは探索呼出しのみで、入力保護・PV監査・集計は時計の外。timeoutは親60秒hard-stop、例外/途中終了はfailure.jsonにcell情報を保存して停止。同期内部の合法手生成は協調的中断でありms期限の強制保証はない。
 
@@ -45,3 +50,12 @@ summary.jsonには入力/履歴識別・手番・由来・設定・合法性・�
 初回関連テストはsandbox TEMP rename EPERMで起動失敗。workspace TEMPで実行後、追加テスト2件の期待値が正式API `completed-iteration` ではなく `completed` だったため失敗。テスト側の名称を訂正し、関連4ファイル72件成功。製品コード・既存assertion・timeoutは変更していない。初回全体check/最終検証はvalidationへ記録する。
 
 実測結果と最終レビューはresults-report.md / review.mdを参照。
+
+
+## 予備測定からの費用選定
+
+予備測定は34a7d89a313d3747ad73a4a0546c9e8ca9b559a6。342呼出しを保存（warmup171・測定171）。hirate-followup-1 / d4 / extra0 / warmupで親60秒hard-stopが発生し、完了していない。failure.json・interrupted-audit.json・missing.jsonに失敗と42欠測cellを保存する（失敗cellを含む）。audit-partialは既知のcellの重複・不正値を拒否しつつ、未完了を明示して保存済み結果だけを再集計する。auditで完了扱いにはできない。
+
+品質分類を集計する前に、費用のみで深さ4を11局面へ限定した。候補16局面は削除せず、深さ1/100ms/1000msは全局面を本測定する。select-costはraw/warmupのhash・最大費用・選定日時・旧planを保存し、測定開始後の変更を拒否する。最初から長い深さ5以上を試さず、最大費用9〜11秒の詰み2局面、約20秒の平手局面、60秒打切り/未実行の追加局面の深さ4を本測定しない。
+
+予備後の診断コード修正は、途中監査、費用選定CLI、fallback内訳nullの検証、実際の制御時計partial/fallback回帰。製品・候補・参照・品質判定基準は変更しない。測定SHAは各environment.json。監査実行時の診断コードと測定原本のソースは区別し、sources.jsonを保持する。

@@ -17,7 +17,7 @@ import { isPlayerInCheck } from '../src/domain/shogi/checkmate';
 import { apply } from './benchmarks/terminalDistanceReference';
 import { validatePartialRoot } from '../src/application/partialRootValidation';
 
-const [mode, dirArg] = process.argv.slice(2);
+const [mode, dirArg, pilotArg] = process.argv.slice(2);
 const conditions = [ {id:'d1',depth:1,budget:null,repeats:2}, {id:'d4',depth:4,budget:null,repeats:2},
   {id:'100ms',depth:4,budget:100,repeats:3}, {id:'1000ms',depth:4,budget:1000,repeats:3} ];
 const sources=[...execFileSync('git',['ls-files','src'],{encoding:'utf8'}).trim().split(/\r?\n/).filter(f=>!f.startsWith('src/test/')), 'scripts/benchmarks/partialRootMatches.ts','scripts/benchmarks/tacticalQuality.ts','src/domain/shogi/quiescenceSearch.ts','src/domain/shogi/twoPlyAlphaBetaAi.ts',
@@ -30,7 +30,28 @@ const git=(...args:string[])=>execFileSync('git',args,{encoding:'utf8'}).trim();
 const opts=(extra:number,stats=createCheckEvasionStatistics())=>({moveOrdering:'standard' as const,killerMoves:false,
   usePreviousIterationPv:false,useTranspositionTable:false,checkEvasionStatistics:stats,
   quiescence:{maxTacticalDepth:1,moveOrdering:'original' as const,maxCheckEvasionExtensions:extra}});
-if(mode==='child') {
+if(mode==='select-cost') {
+  assert.ok(dirArg && pilotArg,'select-cost PREPARED_MAIN_DIR PILOT_DIR');
+  const dir=path.resolve(dirArg),pilot=path.resolve(pilotArg),target=path.join(dir,'plan.json');
+  assert.ok(!existsSync(path.join(dir,'environment.json')),'schedule must be fixed before measurement');
+  const plan=parse(readFileSync(target,'utf8')),pilotPlan=parse(readFileSync(path.join(pilot,'plan.json'),'utf8'));
+  assert.equal(plan.positionHash,pilotPlan.positionHash); assert.ok(!plan.costSelection,'cost schedule already frozen');
+  const contents=['raw.jsonl','warmup.jsonl'].map(f=>readFileSync(path.join(pilot,f),'utf8'));
+  const rows=contents.flatMap(s=>s.trim().split(/\r?\n/).map(parse));
+  const positions=plan.positions.map((p:{id:string})=>{
+    const rs=rows.filter(r=>r.position===p.id&&r.condition==='d4');
+    const keys=rs.map(r=>`${r.extra}/${r.phase}/${r.rep}`).sort();
+    const expected=[0,1,2].flatMap(extra=>[`${extra}/warmup/-1`,`${extra}/measurement/0`]).sort();
+    const maxFixedD4Ms=rs.length?Math.max(...rs.map(r=>r.callMs)):null;
+    return {position:p.id,samples:rs.length,maxFixedD4Ms,eligible:json(keys)===json(expected)&&maxFixedD4Ms!==null&&maxFixedD4Ms<=5000};
+  });
+  writeFileSync(path.join(dir,'plan-before-cost-selection.json'),readFileSync(target),{flag:'wx'});
+  plan.fixedD4PositionIds=positions.filter((p:{eligible:boolean})=>p.eligible).map((p:{position:string})=>p.position);
+  assert.ok(plan.fixedD4PositionIds.length>0);
+  plan.costSelection={rule:'all six pilot d4 calls present and max callMs <= 5000; timing only; other conditions retain all inputs',
+    pilotRawHash:hash(contents[0]),pilotWarmupHash:hash(contents[1]),selectedAt:new Date().toISOString(),positions};
+  writeFileSync(target,json(plan)+'\n'); console.log('fixed d4 positions',plan.fixedD4PositionIds);
+} else if(mode==='child') {
   const lines=createInterface({input:process.stdin});
   for await (const line of lines) {
     const {p,c,extra}=parse(line);
@@ -52,14 +73,15 @@ if(mode==='child') {
       overrunMs:c.budget===null?null:Math.max(0,callMs-c.budget)})+'\n');
   }
 } else {
-  assert.ok(dirArg && ['prepare','run','audit'].includes(mode),'prepare NEW_DIR | run DIR | audit DIR');
+  assert.ok(dirArg && ['prepare','run','audit','audit-partial'].includes(mode),'prepare NEW_DIR | run DIR | audit DIR');
   const dir=path.resolve(dirArg), file=(s:string)=>path.join(dir,s);
   const write=(name:string,v:unknown)=>writeFileSync(file(name),json(v)+'\n',{flag:'wx'});
   if(mode==='prepare') {
     mkdirSync(dir); const positions=qualityPositions();
+    const preparedConditions=pilotArg==='pilot'?conditions.map(c=>({...c,repeats:1})):conditions;
     const validation=Object.fromEntries(positions.map(p=>[p.id,validatePosition(p)]));
     write('plan.json',{baseSha:git('rev-parse','origin/main'),positions,positionHash:hash(positions),validation,
-      selectionRule:'all prior 14 plus two deterministic capture-first legal plies; no outcome filtering',referenceQuality:{depth:3,maxNodes:6000,reverse:true},conditions,extensions:[0,1,2],settings:opts(0),referenceLimits:{nodes:60000,milliseconds:8000},
+      selectionRule:'all prior 14 plus two deterministic capture-first legal plies; no outcome filtering',referenceQuality:{depth:3,maxNodes:6000,reverse:true},conditions:preparedConditions,stage:pilotArg==='pilot'?'pilot':'main',extensions:[0,1,2],settings:opts(0),referenceLimits:{nodes:60000,milliseconds:8000},
       order:'serial position, condition, repetition; ABC/BCA/CAB rotates including warmup; one warmup per cell excluded',
       hardStopMs:60000, limitations:'timed ordinary/q counters cover completed passes; extra stats include interrupted calls. CPU affinity, power, OS/JIT/GC uncontrolled.',
       createdAt:new Date().toISOString()});
@@ -73,9 +95,14 @@ if(mode==='child') {
     const qualityRefs=parse(readFileSync(file('quality-references.json'),'utf8'));
     assert.equal(hash(qualityPositions()),plan.positionHash); assert.deepEqual(plan.conditions.map(({repeats,...c}:typeof conditions[number])=>c),conditions.map(({repeats,...c})=>c));
     const runConditions=plan.conditions as typeof conditions;
+    const measuredPositions=plan.measurementPositionIds ? plan.positions.filter((p:{id:string})=>plan.measurementPositionIds.includes(p.id)) : plan.positions;
+    assert.ok(measuredPositions.length>0);
+    if(plan.measurementPositionIds) assert.deepEqual(measuredPositions.map((p:{id:string})=>p.id),plan.measurementPositionIds);
+    const tasks:{p:Parameters<typeof qualityReference>[0];c:typeof conditions[number]}[]=measuredPositions.flatMap((p:Parameters<typeof qualityReference>[0])=>runConditions.filter(c=>c.id!=='d4'||!plan.fixedD4PositionIds||plan.fixedD4PositionIds.includes(p.id)).map(c=>({p,c})));
+    if(plan.fixedD4PositionIds) assert.deepEqual(measuredPositions.filter((p:{id:string})=>plan.fixedD4PositionIds.includes(p.id)).map((p:{id:string})=>p.id),plan.fixedD4PositionIds);
     assert.ok(runConditions.every(c=>Number.isInteger(c.repeats)&&c.repeats>=1&&c.repeats<=3));
     const refs=parse(readFileSync(file('references.json'),'utf8')) as Record<string,Reference>;
-    for(const p of plan.positions) { verifyReference(p,refs[p.id]); if(mode==='audit') assert.deepEqual(qualityReference(p),qualityRefs[p.id]); }
+    for(const p of plan.positions) { verifyReference(p,refs[p.id]); if(mode.startsWith('audit')) assert.deepEqual(qualityReference(p),qualityRefs[p.id]); }
     if(mode==='run') {
       assert.equal(git('diff','--name-only'),''); assert.equal(git('diff','--cached','--name-only'),'');
       assert.ok(!existsSync(file('environment.json')),'refuse overwriting measurements');
@@ -89,7 +116,7 @@ if(mode==='child') {
       });
       let sequence=0; let active:unknown=null;
       try {
-        for(const p of plan.positions) for(const c of runConditions) for(let rep=-1;rep<c.repeats;rep++) {
+        for(const {p,c} of tasks) for(let rep=-1;rep<c.repeats;rep++) {
           const rotation=(sequence/3)%3;
           for(const extra of [rotation,(rotation+1)%3,(rotation+2)%3]) {
             const {child,lines}=workers[extra]; const phase=rep<0?'warmup':'measurement';
@@ -108,7 +135,14 @@ if(mode==='child') {
       } catch(e) { write('failure.json',{error:String(e),sequence,active,at:new Date().toISOString()}); throw e; }
       finally { for(const w of workers) w.child.kill(); }
     } else {
-      const env=parse(readFileSync(file('environment.json'),'utf8')), done=parse(readFileSync(file('completed.json'),'utf8'));
+      const env=parse(readFileSync(file('environment.json'),'utf8'));
+      const interrupted=mode==='audit-partial';
+      assert.ok(!interrupted || existsSync(file('failure.json')),'partial audit requires an explicit failure record');
+      const partial={status:'incomplete',failureHash:interrupted?hash(readFileSync(file('failure.json'),'utf8')):null,
+        rawHash:hash(readFileSync(file('raw.jsonl'),'utf8')),warmupHash:hash(readFileSync(file('warmup.jsonl'),'utf8')),
+        samples:[...readFileSync(file('raw.jsonl'),'utf8').trim().split(/\r?\n/),...readFileSync(file('warmup.jsonl'),'utf8').trim().split(/\r?\n/)].length};
+      if(interrupted) { if(existsSync(file('interrupted-audit.json'))) assert.deepEqual(parse(readFileSync(file('interrupted-audit.json'),'utf8')),partial); else write('interrupted-audit.json',partial); }
+      const done=interrupted?partial:parse(readFileSync(file('completed.json'),'utf8'));
       assert.equal(env.planHash,hash(plan)); assert.equal(env.refsHash,hash(refs)); assert.equal(env.qualityRefsHash,hash(qualityRefs));
       const snapshot=parse(readFileSync(file('sources.json'),'utf8'));
       for(const [name,content] of Object.entries(snapshot)) assert.equal(env.sourceHashes[name],byteHash(content as string));
@@ -116,10 +150,12 @@ if(mode==='child') {
       assert.equal(done.warmupHash,hash(readFileSync(file('warmup.jsonl'),'utf8')));
       const rows=readFileSync(file('raw.jsonl'),'utf8').trim().split(/\r?\n/).map(parse);
       const warmups=readFileSync(file('warmup.jsonl'),'utf8').trim().split(/\r?\n/).map(parse);
-      assert.equal(warmups.length,plan.positions.length*runConditions.length*3);
+      if(!interrupted) assert.equal(warmups.length,tasks.length*3);
       assert.equal(done.samples,rows.length+warmups.length);
-      const expectedWarmups=plan.positions.flatMap((p:{id:string})=>runConditions.flatMap(c=>[0,1,2].map(extra=>`${p.id}/${c.id}/${extra}/-1`))).sort();
-      assert.deepEqual(warmups.map(r=>`${r.position}/${r.condition}/${r.extra}/${r.rep}`).sort(),expectedWarmups);
+      const expectedWarmups=tasks.flatMap(({p,c})=>[0,1,2].map(extra=>`${p.id}/${c.id}/${extra}/-1`)).sort();
+      const warmupKeys=warmups.map(r=>`${r.position}/${r.condition}/${r.extra}/${r.rep}`).sort();
+      assert.equal(new Set(warmupKeys).size,warmupKeys.length);
+      assert.deepEqual(warmupKeys,interrupted?expectedWarmups.filter((k:string)=>warmupKeys.includes(k)):expectedWarmups);
       const all=[...rows,...warmups].sort((a,b)=>a.sequence-b.sequence);
       assert.deepEqual(all.map(r=>r.sequence),Array.from({length:done.samples},(_,i)=>i));
       for(const row of all) {
@@ -133,8 +169,14 @@ if(mode==='child') {
         if(row.result.resultSource==='partial-root') assert.ok(validatePartialRoot(p.state,row.result,1+row.extra));
         if(row.result.selectedEvaluation!==null) assert.deepEqual(observePv(p.state,row.result.principalVariation).breakdown,row.result.evaluationBreakdown);
       }
-      const expected=plan.positions.flatMap((p:{id:string})=>runConditions.flatMap(c=>[0,1,2].flatMap(extra=>Array.from({length:c.repeats},(_,rep)=>`${p.id}/${c.id}/${extra}/${rep}`)))).sort();
-      assert.deepEqual(rows.map(r=>`${r.position}/${r.condition}/${r.extra}/${r.rep}`).sort(),expected);
+      const expected=tasks.flatMap(({p,c})=>[0,1,2].flatMap(extra=>Array.from({length:c.repeats},(_,rep)=>`${p.id}/${c.id}/${extra}/${rep}`))).sort();
+      const rowKeys=rows.map(r=>`${r.position}/${r.condition}/${r.extra}/${r.rep}`).sort();
+      assert.equal(new Set(rowKeys).size,rowKeys.length);
+      assert.deepEqual(rowKeys,interrupted?expected.filter((k:string)=>rowKeys.includes(k)):expected);
+      if(interrupted) {
+        const missing={status:'incomplete',missingMeasurementCells:expected.filter((k:string)=>!rowKeys.includes(k)),missingWarmupCells:expectedWarmups.filter((k:string)=>!warmupKeys.includes(k))};
+        if(existsSync(file('missing.json'))) assert.deepEqual(parse(readFileSync(file('missing.json'),'utf8')),missing);else write('missing.json',missing);
+      }
       const summary=rows.map(row=>{
         const p=plan.positions.find((p:{id:string})=>p.id===row.position), r=row.result as Result;
         if(r.selectedEvaluation!==null) assert.deepEqual(observePv(p.state,r.principalVariation).breakdown,r.evaluationBreakdown);
@@ -160,13 +202,13 @@ if(mode==='child') {
       }
       const content=table.join('\n')+'\n';
       if(existsSync(file('results.md'))) assert.equal(readFileSync(file('results.md'),'utf8'),content);else writeFileSync(file('results.md'),content,{flag:'wx'});
-      for(const c of runConditions.filter(c=>c.budget===null)) for(const p of plan.positions) for(const extra of [0,1,2]) {
+      for(const c of runConditions.filter(c=>c.budget===null)) for(const p of measuredPositions) for(const extra of [0,1,2]) {
         const rs=rows.filter(r=>r.position===p.id&&r.condition===c.id&&r.extra===extra);
         for(const r of rs.slice(1)) assert.deepEqual({...r.result,elapsedMilliseconds:0},{...rs[0].result,elapsedMilliseconds:0});
       }
       const quality=aggregateQuality(plan.positions,summary);
       if(existsSync(file('quality-summary.json'))) assert.deepEqual(parse(readFileSync(file('quality-summary.json'),'utf8')),quality); else write('quality-summary.json',quality);
-      console.log(`Audited ${rows.length} measured samples, all PV and evaluations; summary regenerated.`);
+      console.log(`${interrupted?'INCOMPLETE partial audit: ':'Complete audit: '}Audited ${rows.length} measured samples, all PV and evaluations; summary regenerated.`);
     }
   }
 }

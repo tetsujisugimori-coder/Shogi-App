@@ -93,7 +93,7 @@ export function qualityClassify(p: TacticalPosition, ref: QualityReference, r: R
 }
 export function auditQualityResult(p:TacticalPosition,r:Result,extra:number) {
   assert.ok(getLegalActions(p.state).some(a=>json(a)===json(r.selectedAction)));
-  if(r.selectedEvaluation===null) { assert.equal('resultSource' in r?r.resultSource:null,'fallback'); assert.deepEqual(r.principalVariation,[]); return null; }
+  if(r.selectedEvaluation===null) { assert.equal('resultSource' in r?r.resultSource:null,'fallback'); assert.deepEqual(r.principalVariation,[]); assert.equal(r.evaluationBreakdown,null); return null; }
   assert.deepEqual(r.selectedAction,r.principalVariation[0]);
   assert.ok(r.principalVariation.length<=Math.max(1,r.depth)+1+extra);
   const observed=observePv(p.state,r.principalVariation);
@@ -112,11 +112,11 @@ export function aggregateQuality(positions:TacticalPosition[], rows:{position:st
       p50:times[Math.ceil(times.length*.5)-1],p95:times[Math.ceil(times.length*.95)-1],max:times.at(-1),maxOverrun:Math.max(...rs.map(r=>r.overrunMs??0))}];
   }));
   const differences=rows.filter(r=>r.extra!==0).flatMap(r=>{
-    const baseline=rows.find(b=>b.position===r.position&&b.condition===r.condition&&b.rep===r.rep&&b.extra===0); assert.ok(baseline);
+    const baseline=rows.find(b=>b.position===r.position&&b.condition===r.condition&&b.rep===r.rep&&b.extra===0); if(!baseline) return [];
     return json(baseline.result.selectedAction)===json(r.result.selectedAction)?[]:[{position:r.position,condition:r.condition,rep:r.rep,extra:r.extra,
       baselineDepth:baseline.result.depth,depth:r.result.depth,quality:r.quality}];
   });
-  return {stats,differences,firstDifference:differences[0]??null};
+  return {stats,differences,firstDifference:differences[0]??null,unpaired:rows.filter(r=>r.extra!==0&&!rows.some(b=>b.position===r.position&&b.condition===r.condition&&b.rep===r.rep&&b.extra===0)).map(r=>({position:r.position,condition:r.condition,rep:r.rep,extra:r.extra}))};
 }
 
 /** Predeclared collection: two successive legal plies after the existing hirate replay.
