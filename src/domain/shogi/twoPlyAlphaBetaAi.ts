@@ -1,3 +1,4 @@
+import { ExactTranspositionTable, transpositionIdentity, createTranspositionTableStatistics, type TranspositionTableStatistics } from './transpositionTable';
 import { searchValue, compareSearchValues as compare, SEARCH_BOTTOM, SEARCH_TOP, type SearchValue } from './searchValue';
 /**
  * A depth-configurable alpha-beta search built exclusively from the public
@@ -36,6 +37,10 @@ export interface AlphaBetaQuiescenceOptions {
 
 /** Optional trailing configuration; existing callers keep standard ordering. */
 export interface AlphaBetaSearchOptions {
+  /** Exact-only cache, scoped to this public call. Default OFF. */
+  readonly useTranspositionTable?: boolean;
+  /** Optional caller-owned observations; reset at public call entry, never serialized. */
+  readonly transpositionTableStatistics?: TranspositionTableStatistics;
   readonly moveOrdering?: AlphaBetaMoveOrderingMode;
   /** Opt-in non-capture cutoff history. Omitted preserves the historical order. */
   readonly killerMoves?: boolean;
@@ -43,6 +48,15 @@ export interface AlphaBetaSearchOptions {
   readonly usePreviousIterationPv?: boolean;
   /** Omit to retain the historical static evaluation at depth-zero leaves. */
   readonly quiescence?: AlphaBetaQuiescenceOptions;
+}
+
+function resolveTranspositionTable(options?: AlphaBetaSearchOptions): ExactTranspositionTable<SearchNodeResult> | undefined {
+  const enabled = options?.useTranspositionTable;
+  if (enabled !== undefined && typeof enabled !== 'boolean') {
+    throw new RangeError('Alpha-beta useTranspositionTable must be a boolean.');
+  }
+  if (options?.transpositionTableStatistics) Object.assign(options.transpositionTableStatistics, createTranspositionTableStatistics());
+  return enabled ? new ExactTranspositionTable(options?.transpositionTableStatistics) : undefined;
 }
 
 function resolveMoveOrdering(options: AlphaBetaSearchOptions | undefined): AlphaBetaMoveOrderingMode {
@@ -454,6 +468,8 @@ function orderIterativeDeepeningRootActionsByMode(
  * ply before this function is first called.
  */
 interface SearchNodeResult {
+  /** All descendants were completed without any ordinary/q cutoff. */
+  ttExact?: boolean;
   evaluation: SearchValue;
   principalVariation: LegalAction[];
   evaluationBreakdown: SearchEvaluationBreakdown;
@@ -474,14 +490,61 @@ function searchAlphaBetaNode(
   killerMoveHistory: KillerMoveHistory | undefined,
   ply: number,
   diagnostics?: SearchDiagnostics,
-  previousPv?: readonly LegalAction[]
+  previousPv?: readonly LegalAction[],
+  transpositions?: ExactTranspositionTable<SearchNodeResult>
 ): SearchNodeResult {
   diagnostics?.setStage('normal-node-entry');
   interruptionCheck?.();
+  let key: string | undefined;
+  let identity: string | undefined;
+  // Replaying a cached subtree would omit killer-history side effects. Keep
+  // that opt-in combination correct by declining reuse throughout the call.
+  if (transpositions && killerMoveHistory) transpositions.statistics.safetyRejects++;
+  else if (transpositions) {
+    key = transpositions.key(state, remainingDepth, ply);
+    identity = JSON.stringify([rootPlayer, isMaximizing, quiescenceOptions, moveOrdering,
+      previousPv?.slice(ply), transpositionIdentity(state, remainingDepth + (quiescenceOptions?.maxTacticalDepth ?? 0))]);
+    const cached = transpositions.probe(key, identity);
+    if (cached) return cloneSearchNodeResult(cached);
+  }
+  const result = searchAlphaBetaNodeUncached(state, remainingDepth, rootPlayer, isMaximizing,
+    alpha, beta, valueTable, statistics, interruptionCheck, moveOrdering, quiescenceOptions,
+    killerMoveHistory, ply, diagnostics, previousPv, transpositions);
+  if (key !== undefined && identity !== undefined) {
+    if (result.ttExact) transpositions!.store(key, identity, cloneSearchNodeResult(result));
+    else transpositions!.statistics.safetyRejects++;
+  }
+  return result;
+}
+
+function cloneSearchNodeResult(result: SearchNodeResult): SearchNodeResult {
+  return { ttExact: result.ttExact, evaluation: { ...result.evaluation },
+    principalVariation: clonePrincipalVariation(result.principalVariation),
+    evaluationBreakdown: cloneSearchEvaluationBreakdown(result.evaluationBreakdown) };
+}
+
+function searchAlphaBetaNodeUncached(
+  state: BoardState,
+  remainingDepth: number,
+  rootPlayer: Player,
+  isMaximizing: boolean,
+  alpha: SearchValue,
+  beta: SearchValue,
+  valueTable: SearchEvaluationConfig,
+  statistics: SearchStatistics,
+  interruptionCheck: SearchInterruptionCheck,
+  moveOrdering: AlphaBetaMoveOrderingMode,
+  quiescenceOptions: AlphaBetaQuiescenceOptions | undefined,
+  killerMoveHistory: KillerMoveHistory | undefined,
+  ply: number,
+  diagnostics?: SearchDiagnostics,
+  previousPv?: readonly LegalAction[],
+  transpositions?: ExactTranspositionTable<SearchNodeResult>
+): SearchNodeResult {
   if (state.status === 'ended') {
     const evaluationBreakdown = measured(diagnostics, 'normal-evaluate', () => evaluateSearchPositionBreakdown(state, rootPlayer, valueTable));
     return {
-      evaluation: searchValue(evaluationBreakdown, ply),
+      ttExact: true, evaluation: searchValue(evaluationBreakdown, ply),
       principalVariation: [],
       evaluationBreakdown,
     };
@@ -489,7 +552,7 @@ function searchAlphaBetaNode(
   if (remainingDepth === 0) {
     if (quiescenceOptions === undefined) {
       const evaluationBreakdown = measured(diagnostics, 'normal-evaluate', () => evaluateSearchPositionBreakdown(state, rootPlayer, valueTable));
-      return { evaluation: searchValue(evaluationBreakdown, ply), principalVariation: [], evaluationBreakdown };
+      return { ttExact: true, evaluation: searchValue(evaluationBreakdown, ply), principalVariation: [], evaluationBreakdown };
     }
     statistics.quiescenceLeafCount += 1;
     diagnostics?.quiescenceEntered();
@@ -502,7 +565,7 @@ function searchAlphaBetaNode(
     statistics.quiescenceCutoffCount += quiescence.cutoffCount;
     statistics.quiescenceSkippedActionCount += quiescence.skippedActionCount;
     return {
-      evaluation: quiescence.searchValue,
+      ttExact: quiescence.cutoffCount === 0, evaluation: quiescence.searchValue,
       principalVariation: clonePrincipalVariation(quiescence.principalVariation),
       evaluationBreakdown: cloneSearchEvaluationBreakdown(quiescence.evaluationBreakdown),
     };
@@ -519,7 +582,7 @@ function searchAlphaBetaNode(
   if (actions.length === 0) {
     const evaluationBreakdown = measured(diagnostics, 'normal-evaluate', () => evaluateNoLegalActionsPositionBreakdown(state, rootPlayer, valueTable));
     return {
-      evaluation: searchValue(evaluationBreakdown, ply),
+      ttExact: true, evaluation: searchValue(evaluationBreakdown, ply),
       principalVariation: [],
       evaluationBreakdown,
     };
@@ -529,6 +592,7 @@ function searchAlphaBetaNode(
   let principalVariation: LegalAction[] = [];
   let evaluationBreakdown: SearchEvaluationBreakdown | null = null;
   let hasExploredAction = false;
+  let ttExact = true;
   for (let actionIndex = 0; actionIndex < actions.length; actionIndex += 1) {
     interruptionCheck?.();
     const child = measured(diagnostics, 'normal-execute', () => executeSearchAction(state, actions[actionIndex], diagnostics));
@@ -549,9 +613,11 @@ function searchAlphaBetaNode(
       killerMoveHistory,
       ply + 1,
       diagnostics,
-      previousPv?.[ply] && areLegalActionsEqual(actions[actionIndex], previousPv[ply]) ? previousPv : undefined
+      previousPv?.[ply] && areLegalActionsEqual(actions[actionIndex], previousPv[ply]) ? previousPv : undefined,
+      transpositions
     );
 
+    ttExact = ttExact && childResult.ttExact === true;
     const candidatePrincipalVariation = [
       cloneLegalAction(actions[actionIndex]),
       ...clonePrincipalVariation(childResult.principalVariation),
@@ -574,6 +640,7 @@ function searchAlphaBetaNode(
 
     const remainingActionCount = actions.length - actionIndex - 1;
     if (compare(alpha, beta) >= 0 && remainingActionCount > 0) {
+      ttExact = false;
       killerMoveHistory?.record(state, ply, actions[actionIndex]);
       statistics.cutoffCount += 1;
       statistics.skippedActionCount += remainingActionCount;
@@ -583,7 +650,7 @@ function searchAlphaBetaNode(
   if (evaluationBreakdown === null) {
     throw new Error('Alpha-beta search explored no actions at a non-leaf node.');
   }
-  return { evaluation: value, principalVariation, evaluationBreakdown };
+  return { ttExact, evaluation: value, principalVariation, evaluationBreakdown };
 }
 
 interface PartialRootCandidate {
@@ -632,7 +699,8 @@ function searchAlphaBeta(
   suppliedRootActions: readonly LegalAction[] | undefined = undefined,
   diagnostics?: SearchDiagnostics,
   partialRoot?: PartialRootProgress,
-  previousPv?: readonly LegalAction[]
+  previousPv?: readonly LegalAction[],
+  transpositions?: ExactTranspositionTable<SearchNodeResult>
 ): UnmeasuredAlphaBetaSearchResult {
   validateSearchDepth(depth);
   const rootPlayer = state.turn;
@@ -716,7 +784,8 @@ function searchAlphaBeta(
       killerMoveHistory,
       1,
       diagnostics,
-      previousPv?.[0] && areLegalActionsEqual(rootAction, previousPv[0]) ? previousPv : undefined
+      previousPv?.[0] && areLegalActionsEqual(rootAction, previousPv[0]) ? previousPv : undefined,
+      transpositions
     );
 
     // A root candidate searched after a higher-index PV candidate can be cut
@@ -740,7 +809,8 @@ function searchAlphaBeta(
         killerMoveHistory,
         1,
         diagnostics,
-        previousPv?.[0] && areLegalActionsEqual(rootAction, previousPv[0]) ? previousPv : undefined
+        previousPv?.[0] && areLegalActionsEqual(rootAction, previousPv[0]) ? previousPv : undefined,
+        transpositions
       );
     }
 
@@ -815,6 +885,7 @@ export function analyzeAlphaBetaSearch(
   options?: AlphaBetaSearchOptions,
   diagnostics?: SearchDiagnostics
 ): AlphaBetaSearchResult {
+  const transpositions = resolveTranspositionTable(options);
   const moveOrdering = resolveMoveOrdering(options);
   const killerMoves = resolveKillerMoves(options);
   resolvePreviousIterationPv(options);
@@ -823,7 +894,7 @@ export function analyzeAlphaBetaSearch(
   diagnostics?.begin(startedAt, Number.POSITIVE_INFINITY, clock);
   const searchResult = measured(diagnostics, 'normal-other', () => searchAlphaBeta(
     state, depth, valueTable, null, undefined, moveOrdering, quiescenceOptions,
-    killerMoves ? new KillerMoveHistory() : undefined, undefined, diagnostics
+    killerMoves ? new KillerMoveHistory() : undefined, undefined, diagnostics, undefined, undefined, transpositions
   ));
   const result: AlphaBetaSearchResult = {
     ...searchResult,
@@ -849,6 +920,7 @@ export function analyzeIterativeDeepeningAlphaBetaSearch(
   clock: SearchClock = defaultSearchClock,
   options?: AlphaBetaSearchOptions
 ): IterativeDeepeningAlphaBetaSearchResult {
+  const transpositions = resolveTranspositionTable(options);
   const moveOrdering = resolveMoveOrdering(options);
   const killerMoves = resolveKillerMoves(options);
   const usePreviousIterationPv = resolvePreviousIterationPv(options);
@@ -864,7 +936,7 @@ export function analyzeIterativeDeepeningAlphaBetaSearch(
     const iterationStartedAt = clock();
     const searchResult = searchAlphaBeta(
       state, depth, valueTable, previousBestAction, undefined, moveOrdering, quiescenceOptions, killerMoveHistory,
-      undefined, undefined, undefined, previousPv
+      undefined, undefined, undefined, previousPv, transpositions
     );
     const iteration = {
       ...searchResult,
@@ -918,6 +990,7 @@ export function analyzeTimeLimitedIterativeDeepeningAlphaBetaSearch(
   options?: AlphaBetaSearchOptions,
   diagnostics?: SearchDiagnostics
 ): TimeLimitedIterativeDeepeningAlphaBetaSearchResult {
+  const transpositions = resolveTranspositionTable(options);
   const moveOrdering = resolveMoveOrdering(options);
   const killerMoves = resolveKillerMoves(options);
   const usePreviousIterationPv = resolvePreviousIterationPv(options);
@@ -992,7 +1065,7 @@ export function analyzeTimeLimitedIterativeDeepeningAlphaBetaSearch(
         rootActions,
         diagnostics,
         depth === 1 ? partialRoot : undefined,
-        previousPv
+        previousPv, transpositions
       ));
       const iterationFinishedAt = clock();
       diagnostics?.checked(iterationFinishedAt);
@@ -1098,10 +1171,12 @@ export function selectBestAlphaBetaAction(
   valueTable: SearchEvaluationConfig = DEFAULT_MATERIAL_VALUE_TABLE,
   options?: AlphaBetaSearchOptions
 ): LegalAction | null {
+  const transpositions = resolveTranspositionTable(options);
   resolvePreviousIterationPv(options);
   return searchAlphaBeta(
     state, depth, valueTable, null, undefined, resolveMoveOrdering(options), resolveQuiescenceOptions(options),
-    resolveKillerMoves(options) ? new KillerMoveHistory() : undefined
+    resolveKillerMoves(options) ? new KillerMoveHistory() : undefined,
+    undefined, undefined, undefined, undefined, transpositions
   ).selectedAction;
 }
 

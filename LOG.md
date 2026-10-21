@@ -1,3 +1,16 @@
+### [2026-10-21 JST] exact限定Transposition Table（既定OFF）
+
+- 最新origin/main `519a332c36ad97dacdaae8c09a20a8e08bf511be` を取得し、PR #190/#192/#194のMERGEDを確認。元mainはclean、既存worktree/旧診断原本を保護し、専用 `codex/transposition-table` / 独立worktreeで作業。README/LOGと既存の探索値、q、千日手、500手、合法手、partial-root/PV/監査を確認した。
+- `useTranspositionTable: true` のみ有効。公開呼出し内でFIFO最大512件、1件16,384文字まで。反復内で共有するが別公開呼出しへ残さない。depth/ply・盤面ID/持ち駒順・moveNumber/保留状態/終局理由・root視点/q/PVを区別。過去最大出現数＋通常/q残り上限<4を証明できる範囲だけ履歴差を許容し、それ以外は全positionHistoryを比較する。killerMoves有効時は値再利用・保存を迂回する。
+- static/終局は直接exact、qは子孫cutoff0、通常は全子exactかつ全候補を探索済みだけ保存する。窓端の数値からexactへ昇格させない。値/PV/内訳を一体複製し、既存のnode-entry中断確認をprobe前に維持する。partial exactとは別条件。時計読取り、root元index、完了反復優先、期限承認partial/fallback、NaN/RangeError伝播、公開統計定義を維持し、Worker/UI/保存形式は変更しない。
+- 基準checkは既存1件の5秒timeout後、設定を変えず77ファイル/2,055件とlock/型/build成功。初回junction試行の出力停止、未接続診断スクリプトの基準型検査混入、千日手新fixtureが先に詰む2失敗も原本と原因を保存し修正。通常candidate checkは78ファイル/2,075件成功。その後の±Infinityの実再利用/別呼出し分離強化を含む最終新規22件も成功。最終通常checkは78ファイル/2,077件とlockfile/型/buildすべて成功し、診断validationに保存。timeout/worker数/アサーションは緩和していない。
+- 実main対OFFの12局面×d1〜4=48件は全結果/既存統計が一致。独立全幅・逆順全幅の44条件、小規模d4の最短勝ち/最長抵抗、実hitを伴う合法経路の合流、全保存部分木の独立評価、履歴/連続王手/500手/ply/ID/PV/killer/中断/partial/fallback/NaNを検査した。
+- 今回の測定は08:49:19〜09:02:43 JST、Windows 10.0.26300 x64 / i7-14650HX / Node v24.20.0 / npm 11.17.0。12局面・standard評価/順序・killer=false・PV=false・q original+1・d4。固定単発/無期限反復/100/1,000msを各1組warmup後3組、OFF/ON交互順、同期直列。warmup96＋本測定288=384呼出し、例外/失敗/欠測0。旧PR #194の時間値は流用しない。完全入力・dirty測定ソース原本/hash・環境・全PV/内訳/統計・raw/summary/manifestを保存。
+- 本測定lookup236,371、粗いhit30,978、exact再利用30,732、miss205,393、拒否107,244（保存拒否含む）、保存98,565、eviction60,628。最大保持512件、payload表現2,357,618文字。固定d4の12局面各1回換算で通常30,978→30,922（−0.18%）、q11,562→9,425（−18.48%）。反復合計は通常38,832→38,726、q10,895→9,032。固定単発p50は10/12で悪化、反復p50は7/12で短縮。値再利用と着手ノード削減を分けて報告する。
+- 100msはp50/p95=100.446/102.999→100.566/102.722ms、最大超過3.776→3.144ms。両方completed27/partial9/fallback0、d3完了10→9本。1,000msは591.816/1001.502→566.585/1001.373ms、最大超過1.800→2.084ms、両方completed36、深さ分布d2=9/d3=6/d4=21で不変。完了ノード数は中断作業を含まない既存定義である。
+- 全384件の合法PV/末端内訳と固定/反復ON/OFFの選択手・評価・終局距離を監査しPV差0件。時限完了反復は無期限同設定と全統計一致。warmup含むpartial24件を独立qで照合。fallback実測0は制御時計回帰と区別した。
+- 判断は **B：安全だが効果は限定的・条件付き、既定OFF継続**。通常ノード削減は小さく、照合費用で退行する局面が多い。3組の探索的測定で速度・一般棋力を断定しない。詳細/制約/改善候補は[TT診断記録](docs/benchmarks/transposition-table-20261021/README.md)。最終commitとUbuntu/macOS CIはPR本文に確定記録し、mainへマージしない。
+
 ### [2026-10-21 JST] 前回完了PVによる通常探索の順序付け（既定OFF）
 
 - origin/mainをfetchし、PR #192が `34d3689e96200b9ecc4a417e15a0ed0012cb2cd3` にマージ済みと確認。同SHAを基準に専用 `codex/pv-ordering` と独立worktreeを作成。README/LOG、PR #190/#192の本文と診断原本、既存の未コミットworktreeを読取り確認して保護した。既存はrootの前回最善手だけを優先していた。

@@ -1,0 +1,32 @@
+{
+  "baseSha": "519a332c36ad97dacdaae8c09a20a8e08bf511be",
+  "originalBranch": "main",
+  "originalHead": "519a332c36ad97dacdaae8c09a20a8e08bf511be",
+  "originalUncommittedChanges": [],
+  "branch": "codex/transposition-table",
+  "mergeChecks": [
+    {
+      "state": "MERGED",
+      "pr": 190,
+      "mergedAt": "2026-10-20T11:27:25Z",
+      "sha": "6cd961b699a9985a0ff73ca6a93bb7bbdaa2b2ef"
+    },
+    {
+      "state": "MERGED",
+      "pr": 192,
+      "mergedAt": "2026-10-20T21:56:54Z",
+      "sha": "34d3689e96200b9ecc4a417e15a0ed0012cb2cd3"
+    },
+    {
+      "state": "MERGED",
+      "pr": 194,
+      "mergedAt": "2026-10-20T23:20:40Z",
+      "sha": "519a332c36ad97dacdaae8c09a20a8e08bf511be"
+    }
+  ],
+  "existingWorktreesPreserved": true,
+  "sourceInstructions": "User: append date/time at end of answers; pasted TT implementation request",
+  "baselineCheck": "validation/baseline-clean-retry.txt.gz",
+  "comparison": "validation/reference.txt.gz / reference.json",
+  "worktree": "C:\\Users\\tetsu\\.codex\\visualizations\\2026\\10\\20\\01a15ba8-0ae7-7410-8842-0d0b1a704b02\\tt-work"
+}
