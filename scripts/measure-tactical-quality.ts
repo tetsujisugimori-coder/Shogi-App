@@ -91,7 +91,7 @@ if(mode==='select-cost') {
     write('quality-references.json',Object.fromEntries(positions.map(p=>[p.id,qualityReference(p)]))); 
   } else {
     const plan=parse(readFileSync(file('plan.json'),'utf8'));
-    loadPositions(plan.positions);
+    loadPositions(plan.positions,plan.positionHash);
     const qualityRefs=parse(readFileSync(file('quality-references.json'),'utf8'));
     assert.equal(hash(qualityPositions()),plan.positionHash); assert.deepEqual(plan.conditions.map(({repeats,...c}:typeof conditions[number])=>c),conditions.map(({repeats,...c})=>c));
     const runConditions=plan.conditions as typeof conditions;
@@ -150,6 +150,7 @@ if(mode==='select-cost') {
       assert.equal(done.warmupHash,hash(readFileSync(file('warmup.jsonl'),'utf8')));
       const rows=readFileSync(file('raw.jsonl'),'utf8').trim().split(/\r?\n/).map(parse);
       const warmups=readFileSync(file('warmup.jsonl'),'utf8').trim().split(/\r?\n/).map(parse);
+      assert.ok(rows.every(r=>r.phase==='measurement') && warmups.every(r=>r.phase==='warmup'),'raw/warmup phase mismatch');
       if(!interrupted) assert.equal(warmups.length,tasks.length*3);
       assert.equal(done.samples,rows.length+warmups.length);
       const expectedWarmups=tasks.flatMap(({p,c})=>[0,1,2].map(extra=>`${p.id}/${c.id}/${extra}/-1`)).sort();
@@ -160,7 +161,7 @@ if(mode==='select-cost') {
       assert.deepEqual(all.map(r=>r.sequence),Array.from({length:done.samples},(_,i)=>i));
       for(const row of all) {
         const c=runConditions.find(c=>c.id===row.condition)!;
-        assert.equal(row.status,'ok'); assert.ok(row.callMs>=0 && row.apiMs>=0);
+        assert.equal(row.status,'ok'); assert.ok(Number.isFinite(row.callMs) && row.callMs>=0 && Number.isFinite(row.apiMs) && row.apiMs>=0);
         assert.equal(row.apiMs,row.result.elapsedMilliseconds);
         assert.equal(row.overrunMs,c.budget===null?null:Math.max(0,row.callMs-c.budget));
         assert.ok(row.stats.maxExtensionDepth<=row.extra);
@@ -186,11 +187,12 @@ if(mode==='select-cost') {
         }
         return {...row,origin:p.origin,positionHash:hash(p.state),historyHash:hash(p.state.positionHistory),turn:p.state.turn,selectedActionLegal:true,settings:opts(row.extra),...qualityClassify(p,qualityRefs[p.id],r),...classify(p,refs[p.id],r),evasion,
           pvTerminalReason:r.selectedEvaluation===null?null:observePv(p.state,r.principalVariation).reason,
+          pvTerminalDistancePly:r.selectedEvaluation===null?null:observePv(p.state,r.principalVariation).terminalDistancePly,
           terminalDiscovery:r.evaluationBreakdown?.terminal??'none',
           completedDepth:'completedDepth' in r?r.completedDepth:r.depth,
           resultSource:'resultSource' in r?r.resultSource:'fixed-depth',timedOut:'timedOut' in r?r.timedOut:false};
       });
-      if(existsSync(file('summary.json'))) assert.deepEqual(parse(readFileSync(file('summary.json'),'utf8')),summary); else write('summary.json',summary);
+      if(existsSync(file('summary-v2.json'))) assert.deepEqual(parse(readFileSync(file('summary-v2.json'),'utf8')),summary); else write('summary-v2.json',summary);
       const table=['|condition|extra|n|match / mismatch / indeterminate|wall p50 / p95 ms|maximum overrun ms|completed depth sum|ordinary / q / extra nodes|',
         '|---|---:|---:|---|---|---:|---:|---|'];
       const quantile=(xs:number[],p:number)=>[...xs].sort((a,b)=>a-b)[Math.ceil(xs.length*p)-1];
@@ -207,7 +209,7 @@ if(mode==='select-cost') {
         for(const r of rs.slice(1)) assert.deepEqual({...r.result,elapsedMilliseconds:0},{...rs[0].result,elapsedMilliseconds:0});
       }
       const quality=aggregateQuality(plan.positions,summary);
-      if(existsSync(file('quality-summary.json'))) assert.deepEqual(parse(readFileSync(file('quality-summary.json'),'utf8')),quality); else write('quality-summary.json',quality);
+      if(existsSync(file('quality-summary-v2.json'))) assert.deepEqual(parse(readFileSync(file('quality-summary-v2.json'),'utf8')),quality); else write('quality-summary-v2.json',quality);
       console.log(`${interrupted?'INCOMPLETE partial audit: ':'Complete audit: '}Audited ${rows.length} measured samples, all PV and evaluations; summary regenerated.`);
     }
   }

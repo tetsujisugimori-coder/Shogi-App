@@ -9,7 +9,8 @@ const opts={moveOrdering:'standard' as const,killerMoves:false,usePreviousIterat
 const result=()=>fixed(p.state,1,undefined,undefined,opts);
 describe('tactical quality diagnostic evidence',()=>{
   it('loads frozen 16 positions and two legal-history continuations without mutation',()=>{
-    const before=hash(ps); expect(loadPositions(parse(json(ps)))).toEqual(ps); expect(qualityPositions()).toEqual(ps);
+    const before=hash(ps); expect(loadPositions(parse(json(ps)),hash(ps))).toEqual(ps);
+    expect(()=>loadPositions(ps,'wrong-hash')).toThrow(); expect(qualityPositions()).toEqual(ps);
     expect(ps).toHaveLength(16); expect(ps.at(-1)!.state.history).toHaveLength(8); expect(hash(ps)).toBe(before);
     expect(ps.find(p=>p.id==='hirate-exchange')!.state.senteHand.length).toBeGreaterThan(0);
   });
@@ -33,6 +34,8 @@ describe('tactical quality diagnostic evidence',()=>{
     const r=result();expect(()=>auditQualityResult(p,{...r,selectedAction:{kind:'bad'} as never},0)).toThrow();
     expect(()=>auditQualityResult(p,{...r,principalVariation:[]},0)).toThrow();
     expect(()=>auditQualityResult(p,{...r,selectedEvaluation:12},0)).toThrow();
+    expect(()=>auditQualityResult(p,{...r,rootLegalActionCount:0},0)).toThrow();
+    expect(()=>auditQualityResult(p,{...r,visitedPositionCount:-1},0)).toThrow();
   });
   it('uses full width and reverse traversal, preserving deterministic input',()=>{
     const before=hash(p),ref=qualityReference(p,2,6000);
@@ -79,6 +82,7 @@ describe('tactical quality diagnostic evidence',()=>{
     const rows=[{...row,extra:0},{...row,extra:1},{...row,extra:2,result:{...r,depth:0,selectedAction:getLegalActions(p.state).find(a=>json(a)!==json(r.selectedAction))!}}];
     const a=aggregateQuality([p],rows);expect(aggregateQuality([p],parse(json(rows)))).toEqual(a);
     expect(aggregateQuality([p],rows.slice(1)).unpaired).toHaveLength(2);
+    expect(a.stats[`cell/${p.id}/100ms/extra0`].n).toBe(1);
     expect(a.differences).toHaveLength(1);expect(a.firstDifference).toMatchObject({baselineDepth:1,depth:0});
   });
   it('audits real cooperative fallback and partial-root with a controlled clock',()=>{

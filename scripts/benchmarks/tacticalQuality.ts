@@ -7,7 +7,7 @@ import { compareReference, observePv, type ReferenceLeaf } from './terminalDista
 import { checkEvasionPositions } from './checkEvasionPositions';
 import type { TacticalPosition } from './tacticalPositions';
 
-export function loadPositions(input: unknown): TacticalPosition[] {
+export function loadPositions(input: unknown, expectedHash?: string): TacticalPosition[] {
   assert.ok(Array.isArray(input) && input.length > 0, 'nonempty position array required');
   const seen = new Set<string>();
   for (const p of input) {
@@ -25,6 +25,7 @@ export function loadPositions(input: unknown): TacticalPosition[] {
       assert.equal(hash(replay),hash(p.state),'serialized history/hand/snapshots must match full legal replay');
     }
   }
+  if(expectedHash!==undefined) assert.equal(hash(input),expectedHash,'position set hash mismatch');
   return input;
 }
 export const categories = (p: TacticalPosition): string[] => p.expectation === 'capture' || p.origin.startsWith('hirate')
@@ -92,6 +93,10 @@ export function qualityClassify(p: TacticalPosition, ref: QualityReference, r: R
   return out('QualityGap','finite-horizon full-width preference only; shared evaluator; not a proven error',selected,better);
 }
 export function auditQualityResult(p:TacticalPosition,r:Result,extra:number) {
+  assert.equal(r.rootLegalActionCount,getLegalActions(p.state).length);
+  assert.ok(Number.isSafeInteger(r.depth) && r.depth>=0);
+  assert.ok(Number.isFinite(r.elapsedMilliseconds) && r.elapsedMilliseconds>=0);
+  for(const n of [r.visitedPositionCount,r.quiescenceVisitedPositionCount]) assert.ok(Number.isSafeInteger(n)&&n>=0);
   assert.ok(getLegalActions(p.state).some(a=>json(a)===json(r.selectedAction)));
   if(r.selectedEvaluation===null) { assert.equal('resultSource' in r?r.resultSource:null,'fallback'); assert.deepEqual(r.principalVariation,[]); assert.equal(r.evaluationBreakdown,null); return null; }
   assert.deepEqual(r.selectedAction,r.principalVariation[0]);
@@ -104,7 +109,7 @@ export function aggregateQuality(positions:TacticalPosition[], rows:{position:st
   const groups:Record<string,typeof rows>={};
   for(const row of rows) {
     const p=positions.find(p=>p.id===row.position); assert.ok(p);
-    for(const key of [`position/${p.id}`,`condition/${row.condition}/extra${row.extra}`,...categories(p).map(c=>`category/${c}/extra${row.extra}`)]) (groups[key]??=[]).push(row);
+    for(const key of [`position/${p.id}`,`cell/${p.id}/${row.condition}/extra${row.extra}`,`origin/${p.origin.startsWith('hirate')?'legal-replay':'constructed'}/${row.condition}/extra${row.extra}`,`condition/${row.condition}/extra${row.extra}`,...categories(p).flatMap(c=>[`category/${c}/extra${row.extra}`,`category/${c}/${row.condition}/extra${row.extra}`])]) (groups[key]??=[]).push(row);
   }
   const stats=Object.fromEntries(Object.entries(groups).map(([key,rs])=>{
     const times=rs.map(r=>r.callMs).sort((a,b)=>a-b);
