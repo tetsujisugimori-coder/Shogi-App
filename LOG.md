@@ -1,3 +1,13 @@
+### [2026-10-22 JST] PR #204 レビュー5607667850のP2 2件修正
+
+- PR/remote/local HEAD bb88baef0a629641d3e9f91206520fcad6ea8cd2、作業ツリーcleanを確認。review本文と行コメント4343202326/4343202335を取得し、同じcodex/tactical-quality-diagnosticsで対応。製品src/domain/application/components・依存関係・既定設定は不変。
+- qualityClassifyは非null評価のpartial-root（completedDepth0含む）も必ずInconclusive。fixed正常完了/整数completedDepthとdepthが一致するcompleted-iterationは分類し、次反復のtimeoutとは区別。終局証明の両候補closed・厳密優劣は維持し、QualityGapは暫定差のまま。
+- audit処理を独立した診断moduleへ抽出。audit-partialだけ未作成/空/空白streamを0件とし、予定group n=0・統計null/N/A。failure/missing/interruptedを保持し、coverage-v3で予定/取得/欠測を分離。通常auditは完了マーカーと全cellを要求し、0件/途中終了を成功扱いしない。
+- 原本・v2・元manifestの53保護ファイルがSHA256一致。旧本文2点も保存し旧manifest記載54件を当時bytesで検証。v3のみ追加、通常450観測/予備171観測を各2回再監査して全出力一致。分類は本0/15/180/255、予備0/6/63/102で変更0行。partial-rootの根拠文34/9行を未完走へ変更。性能表byte同一、測定再実行不要。
+- 新規11件、関連8ファイル186件成功。60秒実待機なしで初回warmup停止、warmup後のmeasurement停止、後続条件全欠測、欠落/空/空白、N/A、正常監査、v2不変、分類/終局証明の正例・防止を確認。全体checkは2152成功/既存snapshot mock1件timeout（6.560秒）。単独37件は全成功（1.50秒）、関連実行でも成功。UI timeoutは今回なし。既存テスト/assertion/timeout変更なし。lock/型/lint/個別build成功。
+- 別観点自己レビューで未完走分類・証明閾値・空データ・原本・新旧意味・製品分離を確認。自己レビューは第三者ではなく、参照のルール/評価共有と上限7局面の制約は残る。最終HEAD/Ubuntu・macOS CI、レビュー返信・会話解決はPR本文で確定記録。マージ/自動マージせず再レビュー待ち。
+- [修正/検証/原本hash](docs/benchmarks/tactical-quality-20261022/review-5607667850/README.md)。
+
 ### [2026-10-22 JST] 戦術品質診断基盤
 
 - 基準main f9a78e255e7e0bfa53b3eed9a95b7fa3a143c1b4、PR #202 MERGED確認。専用worktree/branchを作成し原本保護。

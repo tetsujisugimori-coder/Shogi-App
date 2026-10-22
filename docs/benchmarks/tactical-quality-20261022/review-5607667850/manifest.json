@@ -1,0 +1,49 @@
+{
+  "reviewedHead": "bb88baef0a629641d3e9f91206520fcad6ea8cd2",
+  "reviewId": 5607667850,
+  "originalManifestSha256": "9f6fd00009019a7439a6dd3c5e29f1eb59df73c35a25fcefd28c5e098b27a016",
+  "protectedOriginalFiles": 53,
+  "measurementRepeated": false,
+  "codeSha256": {
+    "scripts/benchmarks/tacticalQuality.ts": "d46cf383e35343386ead6463a0044ff0043ac088ea2bc90bd9f2e95d6e3fb982",
+    "scripts/benchmarks/tacticalQualityAudit.ts": "6c9c302fd6177f1a187cc6d080b15d03d0644e540b8a4399c69014f6ccab8f4c",
+    "scripts/measure-tactical-quality.ts": "dfcdd5de0a73a68fe7402d38afbdedfb9e73e0b32b7c6b3f3fb7170ed3331105",
+    "src/test/tactical-quality-review.test.ts": "d077221bbc87b31bccc7090671cd89a3d36d1f17637648865f4180ff4555f98e"
+  },
+  "version3OutputSha256": {
+    "run1/summary-v3.json": "896c4707e0cccbe9b2680ff5d293e3403c6f2f70338f830f4c7fe80f02b821e9",
+    "run1/quality-summary-v3.json": "3af4cc17a2414a789916f317298015525d28e84e2566ce244dbe77a3d14caa47",
+    "run1/results-v3.md": "08012270edfd77ff286ca8b99b542d703e369acd17be3b418ba21c1b7880ee4c",
+    "run1/coverage-v3.json": "abfdef0f51477dc2cb835f672a5dcfd69f47962c121e66d671eaed9b78ebb8f1",
+    "pilot/summary-v3.json": "7b830a4a4889516616f2ddc98812a76dded77107aba62721b054fe8a0bbde8bd",
+    "pilot/quality-summary-v3.json": "81fbd9bd80cf01bcaf6dde5a095db5d7ee45fe7f2612be0e28c3233a038e829d",
+    "pilot/results-v3.md": "afd5fd56885aa6192cf310842923f81a1a44fa19f29e756391704b5092e3a91b",
+    "pilot/coverage-v3.json": "279a62a7f1720fcdca33f8b67d8c8195031075f416b2bbbbb286b101f7be04e5"
+  },
+  "revisionArtifactsSha256": {
+    "comparison.json": "eae5fd4ce163e926a67b29ccb52b09a4a4b6cee04811d56c1c4a677f301aac52",
+    "hash-verification.json": "a8a254151f945760059888ec713114e273c16e2acb289e4cc8664955331a9745",
+    "original-documents/README.md": "c0d8627bf52236910473a5513bfaa4d292ce6c3e2b3a79f7519d1689184e6720",
+    "original-documents/results-report.md": "cb3cbed5de04c22f20362bd42e34a049bb03cf89cae2dd91f00a44a3946499c7",
+    "original-hashes.json": "08d4bb15d3199bb5b7dfe5347ecb7ef6c08fcaf4a441ca63973ff94ce46664db",
+    "README.md": "bd3739afab24dc633a07c3274a631358a6bc863d6e2e2e54542591fa8bb7ffee",
+    "validation/audit-main-1.txt.gz": "723aca05bc67c4d14abf4bc9db7f8ad3f1b514bf2d72dd4a41e8eefb0c6d400a",
+    "validation/audit-main-2.txt.gz": "723aca05bc67c4d14abf4bc9db7f8ad3f1b514bf2d72dd4a41e8eefb0c6d400a",
+    "validation/audit-pilot-1.txt.gz": "b966f2c9281f16ceb56f0de7e6dc12566c84f88d10f6c3d1e83279c67f13ff4f",
+    "validation/audit-pilot-2.txt.gz": "b966f2c9281f16ceb56f0de7e6dc12566c84f88d10f6c3d1e83279c67f13ff4f",
+    "validation/build.txt.gz": "892198b841334ce34bb8a5a272407cdbb4f96d11473da56c0e084ae39c24d13a",
+    "validation/check.txt.gz": "f51755e2286d64fbd1a8312e6e9123ea2374ef81e22a890899077fdb977f5e07",
+    "validation/lint.txt.gz": "fcd25d8d06c63dba5ae178b8b1c7c7e3451ee73474868f8117bec69961757740",
+    "validation/regressions.txt.gz": "ee53a22099749cd8ccaf5082fcee3e4237c4d6a0b0943d46849eb6d9de4c47cd",
+    "validation/related.txt.gz": "7179ac384b454201b1699498d4585dc30ed8d0d5f09474a19ff68d9ae391f0a9",
+    "validation/timeout-isolated.txt.gz": "24077bddcf02ac05161203e9f18f71b995544b268fd9917ffef36dce1bfc38ba"
+  },
+  "updatedDocumentationSha256": {
+    "README.md": "9938a97743961e9c61db7395ddb1732b7d1e4254999cb09bbaef37ab9d00beb0",
+    "LOG.md": "c013cb0d2f3b287b0b5c9868570c80d17968c47f020dcdca6ecad13eeca22759",
+    "docs/benchmarks/tactical-quality-20261022/README.md": "7a0b976d74e26ca61a3d1c96d7b7de256fe99856d48a73387060daf24f52cf79",
+    "docs/benchmarks/tactical-quality-20261022/results-report.md": "fe79cbd025d19a332df36dc2b752672115fd373fcdb5c959bb8a5b6dfc788706"
+  },
+  "finalHead": "recorded with CI SHA in PR #204 body",
+  "codeAndDocumentationHashes": "Git-normalized staged bytes; revision artifacts and v3 outputs retain exact stored bytes"
+}

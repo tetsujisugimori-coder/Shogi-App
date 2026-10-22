@@ -1,5 +1,18 @@
 # 戦術品質診断（2026-10-22）
 
+## レビュー5607667850の修正（v3）
+
+PR #204のP2指摘2件を修正した。製品の探索・評価・ルール・UI・既定設定と測定原本は変更していない。現在の `audit` / `audit-partial` は `summary-v3.json`、`quality-summary-v3.json`、`results-v3.md`、`coverage-v3.json` を生成する。旧v2を上書き・新版の期待値として比較せず、過去の契約として読み取れる状態で保持する。v2の当時の監査を厳密に再現する場合はHEAD `bb88baef0a629641d3e9f91206520fcad6ea8cd2` のコードを使用する。
+
+- fixed-depthは正常な深さ1以上の完了結果を分類する。
+- completed-iterationは `completedDepth === depth >= 1` の整数で評価値がある場合に分類する。次の反復で時間切れになった `timedOut=true` でも、最後の完了反復は利用できる。
+- partial-rootは評価値が非nullでも常にInconclusive。fallback、評価なし、参照上限/逆順未検証もInconclusive。partial-rootに選択手の有限参照品質を付与せず、selectedReference/betterReferenceはnullにする。
+- ProvenErrorの両候補の全応手終局・厳密な優劣という条件は変更しない。QualityGapは有限horizonの暫定差である。別フィールド `verdict` は従来の詰み/fixture参考軸で、探索完了に基づく品質分類 `quality` とは異なる。
+- audit-partialだけが未作成raw/warmupを0件として扱う。空/空白のみも0件、内部の不正な空行/JSONは拒否する。未観測の予定グループはn=0、JSONのp50/p95/max/maxOverrunはnull、表はN/Aとする。
+- coverage-v3でplanned/observed/missingとストリームの存在/件数、元のfailureを分離して記録する。failure.json、missing.json、interrupted-audit.jsonの未完了を保持する。通常auditはcompletedが必要でfailureを拒否し、空データに成功判定を与えない。
+
+保存済み原本からの再集計で十分であり、測定の再実行は不要。実測値・旧v2件数と修正後v3件数を混同しない。元manifestはそのまま保持し、更新前の本文2点も修正記録へbyte同一保存した。[修正・検証・自己レビュー](review-5607667850/README.md)、[新旧比較](review-5607667850/comparison.json)、[原本hash照合](review-5607667850/hash-verification.json)を参照。
+
 ## 目的・事前固定
 
 製品の探索を変更せず、戦術的選択の品質と `maxCheckEvasionExtensions=0/1/2` の効果を区別して測る。

@@ -81,6 +81,12 @@ export function qualityClassify(p: TacticalPosition, ref: QualityReference, r: R
   const out=(quality:Quality,evidence:string,selectedReference:CandidateValue|null=null,betterReference:CandidateValue|null=null)=>
     ({quality,evidence,referenceDepth:ref.depth,selectedReference,betterReference});
   if(!r || r.selectedEvaluation===null) return out('Inconclusive','missing evaluation / fallback');
+  // A completed iteration may time out while attempting the next depth. Its
+  // completed result is usable; a partial root has not completed any iteration.
+  if ('resultSource' in r && (r.resultSource !== 'completed-iteration' ||
+      !Number.isSafeInteger(r.completedDepth) || r.completedDepth < 1 || r.completedDepth !== r.depth))
+    return out('Inconclusive','search incomplete / ' + r.resultSource);
+  if (!('resultSource' in r) && (!Number.isSafeInteger(r.depth) || r.depth < 1)) return out('Inconclusive','fixed search incomplete');
   assert.ok(getLegalActions(p.state).some(a=>json(a)===json(r.selectedAction)),'illegal selected action');
   if(ref.stopped || !ref.reverseVerified) return out('Inconclusive','reference node limit / incomplete traversal');
   assert.deepEqual(ref.candidates.map(c=>c.action),getLegalActions(p.state));
@@ -105,16 +111,19 @@ export function auditQualityResult(p:TacticalPosition,r:Result,extra:number) {
   assert.deepEqual(observed.breakdown,r.evaluationBreakdown); assert.equal(observed.breakdown.total,r.selectedEvaluation);
   return observed;
 }
-export function aggregateQuality(positions:TacticalPosition[], rows:{position:string;condition:string;extra:number;rep:number;quality:Quality;callMs:number;overrunMs:number|null;result:Result}[]) {
+export interface QualityCell { position:string;condition:string;extra:number }
+export function aggregateQuality(positions:TacticalPosition[], rows:{position:string;condition:string;extra:number;rep:number;quality:Quality;callMs:number;overrunMs:number|null;result:Result}[], expectedCells:QualityCell[] = []) {
   const groups:Record<string,typeof rows>={};
-  for(const row of rows) {
+  const keys=(row:QualityCell)=>{
     const p=positions.find(p=>p.id===row.position); assert.ok(p);
-    for(const key of [`position/${p.id}`,`cell/${p.id}/${row.condition}/extra${row.extra}`,`origin/${p.origin.startsWith('hirate')?'legal-replay':'constructed'}/${row.condition}/extra${row.extra}`,`condition/${row.condition}/extra${row.extra}`,...categories(p).flatMap(c=>[`category/${c}/extra${row.extra}`,`category/${c}/${row.condition}/extra${row.extra}`])]) (groups[key]??=[]).push(row);
-  }
+    return [`position/${p.id}`,`cell/${p.id}/${row.condition}/extra${row.extra}`,`origin/${p.origin.startsWith('hirate')?'legal-replay':'constructed'}/${row.condition}/extra${row.extra}`,`condition/${row.condition}/extra${row.extra}`,...categories(p).flatMap(c=>[`category/${c}/extra${row.extra}`,`category/${c}/${row.condition}/extra${row.extra}`])];
+  };
+  for(const cell of expectedCells) for(const key of keys(cell)) groups[key]??=[];
+  for(const row of rows) for(const key of keys(row)) (groups[key]??=[]).push(row);
   const stats=Object.fromEntries(Object.entries(groups).map(([key,rs])=>{
     const times=rs.map(r=>r.callMs).sort((a,b)=>a-b);
     return [key,{n:rs.length,counts:Object.fromEntries(['ProvenError','QualityGap','Inconclusive','NoObservedDifference'].map(q=>[q,rs.filter(r=>r.quality===q).length])),
-      p50:times[Math.ceil(times.length*.5)-1],p95:times[Math.ceil(times.length*.95)-1],max:times.at(-1),maxOverrun:Math.max(...rs.map(r=>r.overrunMs??0))}];
+      p50:times[Math.ceil(times.length*.5)-1]??null,p95:times[Math.ceil(times.length*.95)-1]??null,max:times.at(-1)??null,maxOverrun:rs.length?Math.max(...rs.map(r=>r.overrunMs??0)):null}];
   }));
   const differences=rows.filter(r=>r.extra!==0).flatMap(r=>{
     const baseline=rows.find(b=>b.position===r.position&&b.condition===r.condition&&b.rep===r.rep&&b.extra===0); if(!baseline) return [];

@@ -1,0 +1,60 @@
+{
+  "run1": {
+    "oldCounts": {
+      "ProvenError": 0,
+      "QualityGap": 15,
+      "Inconclusive": 180,
+      "NoObservedDifference": 255
+    },
+    "newCounts": {
+      "ProvenError": 0,
+      "QualityGap": 15,
+      "Inconclusive": 180,
+      "NoObservedDifference": 255
+    },
+    "changedQualityRows": 0,
+    "changedEvidenceRows": 34,
+    "partialRows": 34,
+    "coverage": {
+      "measurement": {
+        "planned": 450,
+        "observed": 450,
+        "missing": 0
+      },
+      "warmup": {
+        "planned": 177,
+        "observed": 177,
+        "missing": 0
+      }
+    }
+  },
+  "pilot": {
+    "oldCounts": {
+      "ProvenError": 0,
+      "QualityGap": 6,
+      "Inconclusive": 63,
+      "NoObservedDifference": 102
+    },
+    "newCounts": {
+      "ProvenError": 0,
+      "QualityGap": 6,
+      "Inconclusive": 63,
+      "NoObservedDifference": 102
+    },
+    "changedQualityRows": 0,
+    "changedEvidenceRows": 9,
+    "partialRows": 9,
+    "coverage": {
+      "measurement": {
+        "planned": 192,
+        "observed": 171,
+        "missing": 21
+      },
+      "warmup": {
+        "planned": 192,
+        "observed": 171,
+        "missing": 21
+      }
+    }
+  }
+}
