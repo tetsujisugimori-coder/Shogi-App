@@ -1,3 +1,6 @@
+import type { BoardState } from '../../types/shogi';
+import type { LegalAction } from './legalActions';
+import type { SearchValue } from './searchValue';
 import { ActionValidationDiagnostics } from './actionValidationDiagnostics';
 import type { PieceType } from '../../types/shogi';
 import { CheckInternalsProbe } from './checkInternalsDiagnostics';
@@ -53,7 +56,19 @@ const dropEntry = (): RootDropEntry => ({ calls: 0, milliseconds: 0, maxMillisec
   stages: { 'drop-board-setup': { calls: 0, milliseconds: 0 },
     'own-check': { calls: 0, milliseconds: 0 }, 'pawn-drop-mate': { calls: 0, milliseconds: 0 } } });
 
+/** Disabled unless a diagnostic caller installs a callback. State is read-only by contract.
+ * Throwing from the callback aborts a fixed diagnostic call; no partial result is returned. */
+export interface SearchTraceEvent {
+  kind: 'enter' | 'return' | 'stop' | 'cutoff';
+  phase: 'normal' | 'quiescence'; state: BoardState; ply: number;
+  remainingDepth: number; remainingCheckEvasions?: number; extensionPly?: number;
+  reason?: string; value?: SearchValue; alpha?: SearchValue; beta?: SearchValue;
+}
 export class SearchDiagnostics {
+  traceNode?: (event: SearchTraceEvent) => void;
+  /** Fixed diagnostic calls only: search this legal root action at the ORIGINAL depth. */
+  rootAction?: LegalAction;
+
   readonly qLegalCounts: QLegalCounts = { boardSources: 0, boardPseudo: 0, boardLegal: 0,
     boardActions: 0, dropTypes: 0, dropCandidates: 0, dropLegal: 0, dropActions: 0, actions: 0 };
   readonly rootDrops: Record<DropPieceType, RootDropEntry> = {
