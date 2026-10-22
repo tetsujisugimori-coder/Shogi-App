@@ -1,0 +1,13 @@
+import {readFileSync,writeFileSync,readdirSync,statSync} from 'node:fs';
+import {execFileSync} from 'node:child_process';
+import {parse,json} from '../scripts/benchmarks/tacticalDiagnostics';
+const dir='.diagnostic-temp/review-p2-before', old='docs/benchmarks/evasion-boundary-20261022/run1/';
+const plan=parse(readFileSync(old+'plan.json','utf8'));
+Object.assign(plan,{depths:[1],extensions:[0],wholeMilliseconds:0,wholeBytes:100000,protectedHashes:{},reference:{...plan.reference,nodes:1}});
+writeFileSync(dir+'/input.json',readFileSync(old+'input.json'));writeFileSync(dir+'/plan.json',json(plan)+'\n');
+try{execFileSync(process.execPath,['--import','tsx','scripts/measure-evasion-boundary.ts','run',dir],{timeout:15000,stdio:'pipe'});}catch(e){console.log('CLI status:',(e as {status:number}).status);}
+const boundary=parse(readFileSync(dir+'/boundary.json','utf8'));
+const actualBytes=readdirSync(dir).reduce((n,f)=>n+statSync(dir+'/'+f).size,0);
+console.log(json({reviewedSha:'79babe1528e571b776b219e6d03417a1c772f58b',wholeMilliseconds:0,
+ referenceStarted:readdirSync(dir).includes('reference.json'),localQCompletedAfterDeadline:boundary.map((b:any)=>b.q!==null),
+ wholeBytes:plan.wholeBytes,actualBytes,timeInvariantPass:!boundary.some((b:any)=>b.q),capacityInvariantPass:actualBytes<=plan.wholeBytes}));

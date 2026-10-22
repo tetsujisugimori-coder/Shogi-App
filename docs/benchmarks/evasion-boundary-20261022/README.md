@@ -36,3 +36,7 @@ npm run diagnose:evasion-boundary -- audit NEW_DIR
 実行SHA、全製品/診断ソースの原本とhash、入力hash、旧証拠全ファイルのhash、環境を保存する。各rawは独立したファイルで、途中の子プロセス停止にも完走値を捏造しない。auditはmanifest対象のbytes、全予定cell、全PVと保存traceの合法再生・root視点内訳・持駒・ply・容量、保存参照による既存v3分類を確認し、rawからsummaryとcomparisonを再生成して比較する。旧原本を上書きしない。hashは署名ではなく、manifestと原本の両方を改変した攻撃の防御ではない。
 
 結果・検証・自己レビューは [results.md](results.md) に記録する。
+
+## PR #208のP2修正後の予算保証
+
+[レビュー修正記録](review-p2-20261022/README.md)を参照。新規plan formatVersion=2では、参照・局所比較も含む単一の探索期限と、prepare済みinput/plan・全出力・終了予約を含む40MiBを強制する。旧run1は変更せず旧audit経路を維持する。上記の旧測定にこの新しい実装保証が存在したとは主張しない。旧トップmanifestが記録したREADME原本はレビュー対象SHAとreview-p2-20261022/before/README-original.mdで確認できる。
