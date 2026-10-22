@@ -85,6 +85,10 @@ export function prove(request: Request, control: { now?: ()=>number; interrupted
   let frontierOmitted=0,frontierBytes=0,currentState=r.state,currentPath:LegalAction[]=[];
   const note=(s:Stop,stateHash?:string,path=currentPath)=>{
     stops[s]=(stops[s]??0)+1;
+    if(s!=='depth'&&frontier.length>=8) {
+      // Preserve the global stopping location even after many local horizons.
+      frontierBytes-=Buffer.byteLength(encode(frontier.pop()!));frontierOmitted++;
+    }
     if(frontier.length>=8||frontierBytes>=Math.min(32768,r.limits.bytes)) {frontierOmitted++;return;}
     const sample={reason:s,stateHash:stateHash??digest(currentState),path:[...path]};
     const size=Buffer.byteLength(encode(sample));

@@ -48,9 +48,9 @@ describe('bounded diagnostic outcome proofs',()=>{
     expect(p.stops.depth).toBeGreaterThan(0);expect(verify(p.certificate!).valid).toBe(true);
   });
   it('cannot complete a universal node with even its final required branch unfinished',()=>{
-    const witness=cert(req(three.state)).proof.branches[0].action;
-    const request={...req(three.state),candidate:witness};
+    const request=req(ps.find(p=>p.id==='resistance')!.state,4);
     const completed=prove(request);expect(completed.certificate!.proof.kind).toBe('all');
+    expect(completed.certificate!.proof.branches.length).toBeGreaterThan(1);
     const partial=prove({...request,limits:{...request.limits,nodes:completed.nodes-1}});
     expect(partial.status).toBe('unknown');expect(partial.stops.nodes).toBeGreaterThan(0);
     expect(partial.frontier.some(f=>f.reason==='nodes'&&f.path.length>0)).toBe(true);
@@ -189,6 +189,14 @@ describe('additive v3 proof classification (artificial history fixture)',()=>{
     expect(classifyWithProofs(p,ref,r,[lose,win]).quality).toBe('ProvenError');
     const corrupt=structuredClone(lose);corrupt.proof.terminal!.winner='sente';
     expect(classifyWithProofs(p,ref,r,[corrupt,win]).quality).not.toBe('ProvenError');
+  });
+  it('keeps an actually horizon-unknown selected move below ProvenError despite an alternative win',()=>{
+    const p=three,ref=qualityReference(p),r=fixed(p.state,1);
+    const selected=ref.candidates.find(c=>!c.closed&&c.value.breakdown.terminal===null)!.action;
+    expect(prove({...req(p.state,1),candidate:selected}).status).toBe('unknown');
+    const witness=cert(req(p.state)).proof.branches[0].action;
+    const win=cert({...req(p.state),candidate:witness});
+    expect(classifyWithProofs(p,ref,{...r,selectedAction:selected},[win]).quality).not.toBe('ProvenError');
   });
   it('does not compare two winning certificates by witness length',()=>{
     const p=ps.find(p=>p.id==='mixed-distance')!,ref=qualityReference(p,1),r=fixed(p.state,1);
