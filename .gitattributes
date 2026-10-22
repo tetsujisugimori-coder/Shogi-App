@@ -2,3 +2,6 @@
 docs/benchmarks/partial-root-matches-20261016-run1/*.json -text
 docs/benchmarks/partial-root-matches-20261016-run1/*.jsonl -text
 docs/benchmarks/check-evasion-20261021/** -text
+
+# Preserve tactical quality raw bytes and source/input hash evidence.
+docs/benchmarks/tactical-quality-20261022/** -text whitespace=blank-at-eol,blank-at-eof,space-before-tab,cr-at-eol

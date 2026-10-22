@@ -1,0 +1,13 @@
+{
+  "baseMainSha": "f9a78e255e7e0bfa53b3eed9a95b7fa3a143c1b4",
+  "pr202": {
+    "state": "MERGED",
+    "mergedAt": "2026-10-21T17:20:44Z",
+    "mergeCommit": "f9a78e255e7e0bfa53b3eed9a95b7fa3a143c1b4"
+  },
+  "initialBranch": "main",
+  "initialStatus": "clean",
+  "worktree": ".worktrees/tactical-quality",
+  "branch": "codex/tactical-quality-diagnostics",
+  "protected": "all prior benchmark directories and existing worktrees; no product source changes"
+}

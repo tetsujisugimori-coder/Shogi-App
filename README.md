@@ -1,5 +1,11 @@
 # SHOGI-APP
 
+PR #204のレビュー修正で、評価値ありpartial-rootも品質分類をInconclusiveへ限定し、初回warmup等で測定ファイルが未作成でも部分監査できるようにしました。旧原本/v2/manifestを保持し、保存データからv3を各2回再生成して一致。分類件数・実測性能は不変です。[修正・検証記録](docs/benchmarks/tactical-quality-20261022/review-5607667850/README.md)。
+
+`npm run diagnose:tactical-quality -- prepare NEW_DIR` / `run DIR` / `audit DIR` で、固定16局面・王手回避追加0/1/2を比較します。全幅/逆順の有限参照と詰み限定証明を分離し、ProvenError / QualityGap / Inconclusive / NoObservedDifferenceを記録します。製品探索と既定設定は変更しません。[設計・実測・再現手順](docs/benchmarks/tactical-quality-20261022/README.md)。
+
+16局面の本測定450件はProvenError 0 / QualityGap 15（2局面）/ Inconclusive 180 / NoObservedDifference 255。追加0/1/2の分類件数は同じで、1,000msのqノードは追加1/2で4.76%増。判断は **C：改善未確認・負荷増加、既定OFF継続**。原本からの2回の再集計は一致。予備の60秒打切りと深さ4の費用選定、参照不足を含め[今回の結果](docs/benchmarks/tactical-quality-20261022/results-report.md)へ記録しています。
+
 静止探索は `quiescence: { maxTacticalDepth: 1, maxCheckEvasionExtensions: 1 }` を明示すると、q深さ0の王手局面だけ合法応手を追加探索します。追加上限は整数0〜2ply、既定0（従来動作）。通常のq予算とは独立し、上限の静的近似をpartial-rootのexact候補へ採用しません。拡張有効時のTTは安全のため迂回します。Worker/UIの既定は変更しません。`npm run diagnose:check-evasion -- prepare NEW_DIR` / `run DIR` / `audit DIR` で比較できます。[設計・固定局面・検証・実測](docs/benchmarks/check-evasion-20261021/README.md)を参照してください。
 
 14局面・追加0/1/2の504呼出しを比較し、本測定336件すべての監査が成功しました。選択手と参照判定は変わらず、戦術品質の改善は未確認です。固定d4のqノードは7.63%増、実時間合計は追加1/2で2.90%/3.51%増、100msの1標本で完了深さが低下しました。判断は **B：安全だが効果未確認、既定OFF継続**。ローカル全体checkは既存snapshotテスト1件のtimeoutを残し、関連209件・型検査・個別buildは成功しています。
