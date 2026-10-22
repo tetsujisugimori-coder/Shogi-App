@@ -4527,3 +4527,18 @@ PR #1のレビュー指摘を受け、簡易APIの`applyMove`と合法手候補�
 - 1,000ms本測定50件は全件timeout、実経過1000.25～1005.21ms、深さ1または2まで完了。100msのしきい値は厳密保証の合否判定に用いない。1台の5回反復・同一対局の2局面だけで一般化せず、次課題は深さ1保証、Worker/UI、結果型、対局記録を含む厳密な時間制御の設計とする。
 - 再実行: `npm run measure:time-limit-stress -- docs/benchmarks/time-limit-stress-local.jsonl`。出力先は上書きされる。関連テスト4ファイル44件、変更途中の`npm run check`はlockfile、lint、61ファイル1729件、build成功。抽出データ一致テスト追加後の最終check結果は別途記録する。
 - 抽出データ一致テスト追加直後の`npm run check`は1件失敗（`import.meta.url`がVitest変換URLで`file:`ではなかった）。テストの参照先をリポジトリrootの`docs/...`へ修正し、製品コード・測定スクリプト・JSONLは変更していない。修正後`npm run check`終了0、lockfile検証・lint・61ファイル1730/1730テスト・build（1755 modules）成功。既存のjsdom navigation未実装通知1件は失敗ではない。
+
+## 2026-10-22 限定AND/OR勝敗証明診断
+
+- origin/main 0868d3e（指定SHAと一致、#204取込済）とcleanなmain、既存worktree、PR本文/レビュー/修正記録を確認。専用codex/bounded-outcome-proofで実装。製品探索/評価/ルール/UI/Worker/保存形式/既定値/依存関係は変更しない。
+- root固定のwin/loss/draw/unknown、必要な存在/全称枝、履歴込み終局結果、v1証明形式と4MiB上限、別処理の全合法枝再生成/再生検証を追加。深さ/ノード/時間/記録/中断/例外は未完了を証明へ変換しない。停止枝の状態hash/手順は最大8件・32KiB（記録予算以下）に制限し、残りの省略件数を明示する。
+- 既存v3を保持する加算分類器で、選択loss＋代替winの両再検証を新根拠にする。部分root/fallback/参照不足はInconclusiveのまま。距離最適性を主張しない。
+- 新規34回帰成功。TEMP rename EPERMによる初回起動失敗後、workspace TEMPで成功。途中の型検査で改変fixtureのunion型エラーを修正。rootの全体checkは既存worktree群の収集を確認して中断（既存UI 1件timeoutを観測）、隔離worktreeで標準チェックを実施する。
+- mate-three/100msとevasion/d1をwarmup1＋本3で直列測定、各新旧選択手と旧参照最良候補へ別々のdepth5/node6000/3000ms/1MBを割当てる。旧原本はhash保護し上書きしない。実測・最終検証はdocs/benchmarks/outcome-proof-20261022/results.mdへ記録する。
+
+### 限定勝敗証明の実測・検証完了
+
+- 専用.worktrees/outcome-proofへ移し、ソース22ced5869dfc618025ac736a2479ea2a52aa55f7で直列実測（warmup各1＋本各3、計8）。4候補へ各depth5/node6000/3秒/1MBを配分。mate-threeは今回d4完了の金を3/3選択し旧d2の玉は非再現。新旧両候補がproven-win、2証明とも保存後再検証成功。最適距離による誤選択とはしない。evasionは有限差が再現するが両候補unknown/time、勝敗上の誤選択確定0。
+- 保存後audit2回で13観測/4候補/2証明とsummary hashが一致。旧原本/v2/v3等80追跡ファイルのSHA256前後一致。旧測定を書き換えず、新観測と過去の再評価を分離した。
+- 新規35回帰成功。全体checkは2187件中2185成功/既存2件timeoutで失敗。その後の関連188件は187成功/既存snapshot1件timeout、新規35件は成功。失敗した既存2ファイルは別の関連実行で成功、snapshot単独37件は全成功。停止サンプルがdepthだけで埋まる新規回帰の失敗を受け、最終node/time等の停止位置を優先して残す修正を実施。最終lint/型/build/lock/diff-check成功。既存assertion/timeoutは不変、全体check成功とは表記しない。
+- 製品/Worker/UI/設定/依存関係は差分なし。第三者ではない自己レビューで視点/全称/unknown/履歴/勝利vs詰み/距離/partial-rootを確認。仕様、詳細表、再現コマンド、制約、未検証、次の候補はdocs/benchmarks/outcome-proof-20261022/results.md、証拠はrun1とvalidation。最終HEADとCI対象SHAはPRで照合し、マージしない。

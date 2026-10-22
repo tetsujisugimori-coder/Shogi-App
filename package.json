@@ -9,6 +9,8 @@
     "npm": ">=11.17.0 <12"
   },
   "scripts": {
+    "diagnose:outcome-proof": "tsx scripts/measure-outcome-proof.ts",
+    "verify:outcome-proof": "tsx scripts/verify-outcome-proof.ts",
     "diagnose:tactical-quality": "tsx scripts/measure-tactical-quality.ts",
     "diagnose:tactical": "tsx scripts/measure-tactical-diagnostics.ts",
     "diagnose:check-evasion": "tsx scripts/measure-check-evasion.ts",
