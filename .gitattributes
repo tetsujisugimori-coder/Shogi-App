@@ -9,3 +9,6 @@ docs/benchmarks/tactical-quality-20261022/** -text whitespace=blank-at-eol,blank
 # Preserve outcome certificates, manifests and validation log hashes across OSes.
 docs/benchmarks/outcome-proof-20261022/run1/** -text whitespace=blank-at-eol,blank-at-eof,space-before-tab,cr-at-eol
 docs/benchmarks/outcome-proof-20261022/validation/** -text whitespace=blank-at-eol,blank-at-eof,space-before-tab,cr-at-eol
+
+# Preserve bounded evasion traces, inputs, source snapshots and log bytes.
+docs/benchmarks/evasion-boundary-20261022/** -text whitespace=blank-at-eol,blank-at-eof,space-before-tab,cr-at-eol

@@ -9,6 +9,7 @@
     "npm": ">=11.17.0 <12"
   },
   "scripts": {
+    "diagnose:evasion-boundary": "tsx scripts/measure-evasion-boundary.ts",
     "diagnose:outcome-proof": "tsx scripts/measure-outcome-proof.ts",
     "verify:outcome-proof": "tsx scripts/verify-outcome-proof.ts",
     "diagnose:tactical-quality": "tsx scripts/measure-tactical-quality.ts",

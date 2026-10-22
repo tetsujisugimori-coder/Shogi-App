@@ -113,10 +113,36 @@ function searchNode(
   extensionPly: number,
   checkEvasionStatistics?: CheckEvasionStatistics
 ): SearchNodeResult {
+  const emit = diagnostics?.traceNode;
+  emit?.({kind:'enter', phase:'quiescence', state, ply, remainingDepth, remainingCheckEvasions, extensionPly, alpha, beta});
+  const result = searchNodeBody(state, remainingDepth, perspective, alpha, beta, evaluation,
+    statistics, interruptionCheck, moveOrdering, diagnostics, ply, remainingCheckEvasions, extensionPly, checkEvasionStatistics);
+  emit?.({kind:'return', phase:'quiescence', state, ply, remainingDepth, remainingCheckEvasions, extensionPly, alpha, beta, value:result.evaluation});
+  return result;
+}
+
+function searchNodeBody(
+  state: BoardState,
+  remainingDepth: number,
+  perspective: Player,
+  alpha: SearchValue,
+  beta: SearchValue,
+  evaluation: SearchEvaluationConfig,
+  statistics: SearchStatistics,
+  interruptionCheck: QuiescenceSearchInterruptionCheck,
+  moveOrdering: QuiescenceMoveOrderingMode,
+  diagnostics: SearchDiagnostics | undefined,
+  ply: number,
+  remainingCheckEvasions: number,
+  extensionPly: number,
+  checkEvasionStatistics?: CheckEvasionStatistics
+): SearchNodeResult {
+  const note = diagnostics?.traceNode ? (kind: 'stop'|'cutoff', reason: string) => diagnostics.traceNode!({kind, phase:'quiescence', state, ply, remainingDepth, remainingCheckEvasions, extensionPly, reason}) : undefined;
   diagnostics?.setStage('quiescence-entry');
   interruptionCheck?.();
   const staticBreakdown = measured(diagnostics, 'q-evaluate', () => evaluateSearchPositionBreakdown(state, perspective, evaluation));
   if (state.status === 'ended' || remainingDepth === 0 && remainingCheckEvasions === 0 && extensionPly === 0) {
+    note?.('stop', state.status === 'ended' ? 'terminal' : 'q-horizon');
     // Preserve the historical zero-option path, including interruption checks.
     return { evaluation: searchValue(staticBreakdown, ply), evaluationBreakdown: staticBreakdown, principalVariation: [] };
   }
@@ -124,6 +150,7 @@ function searchNode(
   const isInCheck = measured(diagnostics, 'q-check', () => isPlayerInCheck(state, state.turn));
   const extending = remainingDepth === 0 && isInCheck && remainingCheckEvasions > 0;
   if (remainingDepth === 0 && !extending) {
+    note?.('stop', isInCheck ? 'evasion-cap' : 'q-horizon');
     if (isInCheck) {
       statistics.checkEvasionLimitReached = true;
       if (checkEvasionStatistics) checkEvasionStatistics.limitReachedCount++;
@@ -140,6 +167,7 @@ function searchNode(
   // extension path, also resolve custom checked roots through the shared evaluator.
   // The historical path preserves its static approximation for custom inputs.
   if (candidates.length === 0) {
+    note?.('stop', extending ? 'no-legal-evasion' : 'no-tactical-candidate');
     if (extending) {
       const breakdown = evaluateNoLegalActionsPositionBreakdown(state, perspective, evaluation);
       return { evaluation: searchValue(breakdown, ply), evaluationBreakdown: breakdown, principalVariation: [] };
@@ -160,6 +188,7 @@ function searchNode(
     if (isMaximizing) { if (compare(selectedEvaluation, alpha) > 0) alpha = selectedEvaluation; }
     else { if (compare(selectedEvaluation, beta) < 0) beta = selectedEvaluation; }
     if (compare(alpha, beta) >= 0) {
+      note?.('cutoff', 'stand-pat-window');
       statistics.cutoffCount += 1;
       statistics.skippedActionCount += candidates.length;
       return { evaluation: selectedEvaluation, evaluationBreakdown: selectedBreakdown!, principalVariation };
@@ -209,6 +238,7 @@ function searchNode(
     else { if (compare(selectedEvaluation, beta) < 0) beta = selectedEvaluation; }
     const remainingActionCount = candidates.length - actionIndex - 1;
     if (compare(alpha, beta) >= 0 && remainingActionCount > 0) {
+      note?.('cutoff', 'alpha-beta');
       statistics.cutoffCount += 1;
       statistics.skippedActionCount += remainingActionCount;
       break;
