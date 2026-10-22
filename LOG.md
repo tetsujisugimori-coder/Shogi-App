@@ -1,3 +1,13 @@
+### [2026-10-22 JST] PR #208 P2予算管理2件修正
+
+- レビュー対象/開始HEAD 79babe1528e571b776b219e6d03417a1c772f58b、既存codex/evasion-boundary-diagnosticsで対応。fetch/ff-only確認、clean、追加変更なし。旧CLIに全体0ms/100,000 bytesを与えると参照と局所q2件が実行され、1,791,547 bytes保存する不具合を再現。
+- v2 planで全matrix/参照/q/ordinary/forcedが単一期限を共有。残時間・個別予算内の協調/子絶対期限/親SIGKILL上限を割当て、同期ルール・参照も子プロセスへ隔離。期限後の結果を破棄し、欠測の構成にdiagnoseを再実行しない。終了はメタデータと停止記録の保存のみ。
+- 40MiB内でprepare済みinput/planからsources/environment/raw/reference/local/summary/comparison/status/manifestまで全証拠の実UTF-8 bytes＋改行を保存前に検査。256KiBを終了用に予約（40MiBに内包）。必須初期証拠不足は探索前失敗、途中容量不足は全ファイルを拒否して予約内に欠測と理由を残す。auditは実合計・hash・上限・欠測状態・予算割当て・再集計を検査。
+- 修正後検証ソース82718f75be47939fa17082cf2c19da382055ad03。12タスクの小規模正常CLIは12完了/2,111,842 bytes。全体0msは0探索/12欠測、参照1nodeは11完了/参照未完了、容量2,077,141 bytesでは1,816,896 bytesで停止、必須証拠1MiB不足は探索前失敗。開始できた4ケースを各2回audit成功。旧測定3dfebee/原因診断/unknown/ProvenError0は不変。
+- 新規19＋既存境界19＝38件、最終関連4ファイル84件成功。制御時計・小容量・差替え実行部で全体/個別期限、後続未実行、exact非昇格、UTF-8直前/一致/超過、非raw・既存ファイル、予約終了、初期不足0探索を検証。実同期子は親25msで停止。製品探索方針・評価・合法手・UI/Worker/保存/既定設定に差分なし。
+- 標準checkは85ファイル2226件中2224成功/既存2timeout（minimax5.230秒、snapshot6.002秒、上限5秒）で失敗。snapshot単独37成功。minimax単独ファイルは71成功/1timeout5.135秒、当該1件だけは627ms成功（71skip）。原ログを分離保存し、全体成功とはしない。既存テスト制限は不変。lock/型/lint/個別build1761 modules/diff-check成功。
+- 旧run1のread-only audit成功、summary hash dce4b2b617b6531e9722afb1ea47122dc27974aa7324c255e4b88c6b70f9d3b6一致。旧raw/source/manifests/ログ93ファイル不変。旧READMEのmanifest原本も別保存。最終HEAD/CIはPR #208へ記録し、新規PR・マージ・自動マージを行わない。[修正/予算範囲/検証/制約](docs/benchmarks/evasion-boundary-20261022/review-p2-20261022/README.md)。
+
 ### [2026-10-22 JST] evasion応手・探索境界診断（製品方針不変）
 
 - #202/#204/#206本文・レビュー・行コメント、保存原本と現在の探索/診断コードを確認。#206 mergeと基準mainは40b811dbaf685cd7fc86a3ef3a1defc5dadf14f0（16:49:30 JST）。clean mainをfetch/ff-only確認し、既存worktreeを変更せず隔離worktree/専用codex/evasion-boundary-diagnosticsで実装した。
