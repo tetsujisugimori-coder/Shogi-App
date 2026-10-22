@@ -37,7 +37,7 @@ if(mode==='run') {
   const sourceHashes=Object.fromEntries(sourceFiles.map(f=>[f,byteHash(readFileSync(f))]));
   const oldFiles=git('ls-files','docs/benchmarks/tactical-quality-20261022').split(/\r?\n/);
   const protectedHashes=Object.fromEntries(oldFiles.map(f=>[f,byteHash(readFileSync(f))]));
-  write('plan.json',{positions,settings,limits,source:{sha:git('rev-parse','HEAD'),filesHash:digest(sourceHashes)},sourceHashes,
+  write('plan.json',{positions,settings,limits,repeats:3,warmup:1,source:{sha:git('rev-parse','HEAD'),filesHash:digest(sourceHashes)},sourceHashes,
     priorRawHash:byteHash(readFileSync(`${old}/raw.jsonl`)),protectedHashes,
     schedule:'serial: mate-three 100ms/maxDepth4 warmup1 + measurement3; evasion fixed depth1 warmup1 + measurement3; then references and per-unique-candidate proofs; no concurrent tests/build/reference',
     candidateRule:'all fresh selected, all historical extra0 selected, best saved depth3 alternative; deduplicate per position; each gets its own identical depth5/node6000/3000ms/1MB budget',
@@ -80,16 +80,33 @@ if(mode==='run') {
 const manifest=read('manifest.json');
 for(const [name,expected] of Object.entries(manifest))assert.equal(byteHash(readFileSync(file(name))),expected);
 const plan=read('plan.json');
+assert.equal(digest(plan.sourceHashes),plan.source.filesHash);
+assert.equal(hash(plan.positions),hash(qualityPositions().filter(p=>['mate-three','evasion'].includes(p.id))));
+assert.equal(byteHash(readFileSync(`${old}/raw.jsonl`)),plan.priorRawHash);
 for(const [name,expected] of Object.entries(plan.protectedHashes))assert.equal(byteHash(readFileSync(name)),expected,'old evidence changed');
 const records=read('candidates.json') as CandidateRecord[];
 const certificates:Certificate[]=records.flatMap(c=>{
   assert.equal(c.requestHash,digest(c.request));
+  const p=plan.positions.find((p:{id:string})=>p.id===c.position);assert.ok(p);
+  assert.equal(hash(c.request.state),hash(p.state));assert.equal(c.request.perspective,p.state.turn);
+  assert.deepEqual(c.request.source,plan.source);assert.deepEqual(c.request.limits,plan.limits);
+  assert.equal(c.request.order,'forward');
   if(!c.certificateFile){assert.equal(c.result.status,'unknown');return [];}
   const saved=read(c.certificateFile) as Certificate,v=verifyProof(saved,c.requestHash);
   assert.ok(v.valid,v.reason);assert.equal(v.outcome,c.result.status);return [saved];
 });
+const fresh=read('observations.json') as Observation[],historical=read('historical.json') as Observation[];
+const savedRefs=parse(readFileSync(`${old}/quality-references.json`,'utf8')) as Record<string,QualityReference>;
+for(const p of plan.positions) {
+  assert.deepEqual(fresh.filter(r=>r.position===p.id).map(r=>`${r.phase}/${r.rep}`).sort(),
+    ['warmup/-1','measurement/0','measurement/1','measurement/2'].sort(),'incomplete/duplicate observations');
+  const best=[...savedRefs[p.id].candidates].sort((a,b)=>compareReference(b.value,a.value))[0].action;
+  const expected=[...new Set([...fresh,...historical].filter(r=>r.position===p.id).map(r=>json(r.result.selectedAction)).concat(json(best)))].sort();
+  assert.deepEqual(records.filter(c=>c.position===p.id).map(c=>json(c.request.candidate)).sort(),expected,'candidate budget/coverage mismatch');
+}
 const summaries=['observations.json','historical.json'].flatMap(stream=>(read(stream) as Observation[]).map(row=>{
   const p=plan.positions.find((p:{id:string})=>p.id===row.position)!;
+  assert.ok(p);auditQualityResult(p,row.result,0);
   const ref=read('references.json')[p.id] as QualityReference;
   const candidates=records.filter(c=>c.position===p.id);
   const evidence=candidates.map(c=>({action:c.request.candidate,status:c.result.status,nodes:c.result.nodes,stops:c.result.stops,
