@@ -1,0 +1,1954 @@
+{
+  "valid": true,
+  "measurementCount": 420,
+  "warmupCount": 140,
+  "compatibilityCount": 20,
+  "summary": [
+    {
+      "ordering": "standard",
+      "limit": null,
+      "metrics": [
+        {
+          "variant": "before",
+          "n": 30,
+          "elapsedSum": 94.75700000000677,
+          "maxOverrun": null,
+          "completedDepthSum": null,
+          "normal": 369,
+          "q": 81,
+          "totalNormal": null,
+          "totalQ": null,
+          "sources": null
+        },
+        {
+          "variant": "on",
+          "n": 30,
+          "elapsedSum": 141.29220000003045,
+          "maxOverrun": null,
+          "completedDepthSum": null,
+          "normal": 369,
+          "q": 282,
+          "totalNormal": null,
+          "totalQ": null,
+          "sources": null
+        }
+      ],
+      "pairs": [
+        {
+          "id": "initial",
+          "run": 1,
+          "depthDelta": 0,
+          "actionChanged": false,
+          "evaluationBefore": 1,
+          "evaluationAfter": 1
+        },
+        {
+          "id": "initial",
+          "run": 2,
+          "depthDelta": 0,
+          "actionChanged": false,
+          "evaluationBefore": 1,
+          "evaluationAfter": 1
+        },
+        {
+          "id": "initial",
+          "run": 3,
+          "depthDelta": 0,
+          "actionChanged": false,
+          "evaluationBefore": 1,
+          "evaluationAfter": 1
+        },
+        {
+          "id": "pawn-recapture",
+          "run": 1,
+          "depthDelta": 0,
+          "actionChanged": false,
+          "evaluationBefore": -404,
+          "evaluationAfter": -404
+        },
+        {
+          "id": "pawn-recapture",
+          "run": 2,
+          "depthDelta": 0,
+          "actionChanged": false,
+          "evaluationBefore": -404,
+          "evaluationAfter": -404
+        },
+        {
+          "id": "pawn-recapture",
+          "run": 3,
+          "depthDelta": 0,
+          "actionChanged": false,
+          "evaluationBefore": -404,
+          "evaluationAfter": -404
+        },
+        {
+          "id": "poisoned-rook",
+          "run": 1,
+          "depthDelta": 0,
+          "actionChanged": false,
+          "evaluationBefore": 497,
+          "evaluationAfter": 497
+        },
+        {
+          "id": "poisoned-rook",
+          "run": 2,
+          "depthDelta": 0,
+          "actionChanged": false,
+          "evaluationBefore": 497,
+          "evaluationAfter": 497
+        },
+        {
+          "id": "poisoned-rook",
+          "run": 3,
+          "depthDelta": 0,
+          "actionChanged": false,
+          "evaluationBefore": 497,
+          "evaluationAfter": 497
+        },
+        {
+          "id": "rook-check",
+          "run": 1,
+          "depthDelta": 0,
+          "actionChanged": true,
+          "evaluationBefore": -1005,
+          "evaluationAfter": -1096
+        },
+        {
+          "id": "rook-check",
+          "run": 2,
+          "depthDelta": 0,
+          "actionChanged": true,
+          "evaluationBefore": -1005,
+          "evaluationAfter": -1096
+        },
+        {
+          "id": "rook-check",
+          "run": 3,
+          "depthDelta": 0,
+          "actionChanged": true,
+          "evaluationBefore": -1005,
+          "evaluationAfter": -1096
+        },
+        {
+          "id": "promotion-capture",
+          "run": 1,
+          "depthDelta": 0,
+          "actionChanged": false,
+          "evaluationBefore": 603,
+          "evaluationAfter": 603
+        },
+        {
+          "id": "promotion-capture",
+          "run": 2,
+          "depthDelta": 0,
+          "actionChanged": false,
+          "evaluationBefore": 603,
+          "evaluationAfter": 603
+        },
+        {
+          "id": "promotion-capture",
+          "run": 3,
+          "depthDelta": 0,
+          "actionChanged": false,
+          "evaluationBefore": 603,
+          "evaluationAfter": 603
+        },
+        {
+          "id": "gold-drop-evasion",
+          "run": 1,
+          "depthDelta": 0,
+          "actionChanged": true,
+          "evaluationBefore": -505,
+          "evaluationAfter": -596
+        },
+        {
+          "id": "gold-drop-evasion",
+          "run": 2,
+          "depthDelta": 0,
+          "actionChanged": true,
+          "evaluationBefore": -505,
+          "evaluationAfter": -596
+        },
+        {
+          "id": "gold-drop-evasion",
+          "run": 3,
+          "depthDelta": 0,
+          "actionChanged": true,
+          "evaluationBefore": -505,
+          "evaluationAfter": -596
+        },
+        {
+          "id": "exchange-chain",
+          "run": 1,
+          "depthDelta": 0,
+          "actionChanged": false,
+          "evaluationBefore": 997,
+          "evaluationAfter": 997
+        },
+        {
+          "id": "exchange-chain",
+          "run": 2,
+          "depthDelta": 0,
+          "actionChanged": false,
+          "evaluationBefore": 997,
+          "evaluationAfter": 997
+        },
+        {
+          "id": "exchange-chain",
+          "run": 3,
+          "depthDelta": 0,
+          "actionChanged": false,
+          "evaluationBefore": 997,
+          "evaluationAfter": 997
+        },
+        {
+          "id": "evasion-promotion",
+          "run": 1,
+          "depthDelta": 0,
+          "actionChanged": true,
+          "evaluationBefore": -1005,
+          "evaluationAfter": -1096
+        },
+        {
+          "id": "evasion-promotion",
+          "run": 2,
+          "depthDelta": 0,
+          "actionChanged": true,
+          "evaluationBefore": -1005,
+          "evaluationAfter": -1096
+        },
+        {
+          "id": "evasion-promotion",
+          "run": 3,
+          "depthDelta": 0,
+          "actionChanged": true,
+          "evaluationBefore": -1005,
+          "evaluationAfter": -1096
+        },
+        {
+          "id": "evasion-promotion-gote",
+          "run": 1,
+          "depthDelta": 0,
+          "actionChanged": true,
+          "evaluationBefore": -1005,
+          "evaluationAfter": -1096
+        },
+        {
+          "id": "evasion-promotion-gote",
+          "run": 2,
+          "depthDelta": 0,
+          "actionChanged": true,
+          "evaluationBefore": -1005,
+          "evaluationAfter": -1096
+        },
+        {
+          "id": "evasion-promotion-gote",
+          "run": 3,
+          "depthDelta": 0,
+          "actionChanged": true,
+          "evaluationBefore": -1005,
+          "evaluationAfter": -1096
+        },
+        {
+          "id": "see-deadline",
+          "run": 1,
+          "depthDelta": 0,
+          "actionChanged": false,
+          "evaluationBefore": 1110,
+          "evaluationAfter": 1110
+        },
+        {
+          "id": "see-deadline",
+          "run": 2,
+          "depthDelta": 0,
+          "actionChanged": false,
+          "evaluationBefore": 1110,
+          "evaluationAfter": 1110
+        },
+        {
+          "id": "see-deadline",
+          "run": 3,
+          "depthDelta": 0,
+          "actionChanged": false,
+          "evaluationBefore": 1110,
+          "evaluationAfter": 1110
+        }
+      ]
+    },
+    {
+      "ordering": "standard",
+      "limit": 100,
+      "metrics": [
+        {
+          "variant": "before",
+          "n": 30,
+          "elapsedSum": 2669.0764000000077,
+          "maxOverrun": 0.9627999999938766,
+          "completedDepthSum": 86,
+          "normal": 10854,
+          "q": 1976,
+          "totalNormal": 13722,
+          "totalQ": 2484,
+          "sources": {
+            "completed-iteration": 30,
+            "partial-root": 0,
+            "fallback": 0
+          }
+        },
+        {
+          "variant": "on",
+          "n": 30,
+          "elapsedSum": 2801.980699999978,
+          "maxOverrun": 2.5727999999980966,
+          "completedDepthSum": 75,
+          "normal": 8037,
+          "q": 3543,
+          "totalNormal": 10794,
+          "totalQ": 5076,
+          "sources": {
+            "completed-iteration": 30,
+            "partial-root": 0,
+            "fallback": 0
+          }
+        }
+      ],
+      "pairs": [
+        {
+          "id": "initial",
+          "run": 1,
+          "depthDelta": 0,
+          "actionChanged": false,
+          "evaluationBefore": 214,
+          "evaluationAfter": 214
+        },
+        {
+          "id": "initial",
+          "run": 2,
+          "depthDelta": 0,
+          "actionChanged": false,
+          "evaluationBefore": 214,
+          "evaluationAfter": 214
+        },
+        {
+          "id": "initial",
+          "run": 3,
+          "depthDelta": 0,
+          "actionChanged": false,
+          "evaluationBefore": 214,
+          "evaluationAfter": 214
+        },
+        {
+          "id": "pawn-recapture",
+          "run": 1,
+          "depthDelta": 0,
+          "actionChanged": false,
+          "evaluationBefore": -400,
+          "evaluationAfter": -400
+        },
+        {
+          "id": "pawn-recapture",
+          "run": 2,
+          "depthDelta": 0,
+          "actionChanged": false,
+          "evaluationBefore": -400,
+          "evaluationAfter": -400
+        },
+        {
+          "id": "pawn-recapture",
+          "run": 3,
+          "depthDelta": 0,
+          "actionChanged": false,
+          "evaluationBefore": -400,
+          "evaluationAfter": -400
+        },
+        {
+          "id": "poisoned-rook",
+          "run": 1,
+          "depthDelta": 0,
+          "actionChanged": false,
+          "evaluationBefore": 697,
+          "evaluationAfter": 697
+        },
+        {
+          "id": "poisoned-rook",
+          "run": 2,
+          "depthDelta": 0,
+          "actionChanged": false,
+          "evaluationBefore": 697,
+          "evaluationAfter": 697
+        },
+        {
+          "id": "poisoned-rook",
+          "run": 3,
+          "depthDelta": 0,
+          "actionChanged": false,
+          "evaluationBefore": 697,
+          "evaluationAfter": 697
+        },
+        {
+          "id": "rook-check",
+          "run": 1,
+          "depthDelta": 0,
+          "actionChanged": false,
+          "evaluationBefore": -1205,
+          "evaluationAfter": -1205
+        },
+        {
+          "id": "rook-check",
+          "run": 2,
+          "depthDelta": 0,
+          "actionChanged": false,
+          "evaluationBefore": -1205,
+          "evaluationAfter": -1205
+        },
+        {
+          "id": "rook-check",
+          "run": 3,
+          "depthDelta": 0,
+          "actionChanged": false,
+          "evaluationBefore": -1205,
+          "evaluationAfter": -1205
+        },
+        {
+          "id": "promotion-capture",
+          "run": 1,
+          "depthDelta": 0,
+          "actionChanged": false,
+          "evaluationBefore": 607,
+          "evaluationAfter": 1006
+        },
+        {
+          "id": "promotion-capture",
+          "run": 2,
+          "depthDelta": 0,
+          "actionChanged": false,
+          "evaluationBefore": 607,
+          "evaluationAfter": 1006
+        },
+        {
+          "id": "promotion-capture",
+          "run": 3,
+          "depthDelta": 0,
+          "actionChanged": false,
+          "evaluationBefore": 607,
+          "evaluationAfter": 1006
+        },
+        {
+          "id": "gold-drop-evasion",
+          "run": 1,
+          "depthDelta": -1,
+          "actionChanged": true,
+          "evaluationBefore": -505,
+          "evaluationAfter": -504
+        },
+        {
+          "id": "gold-drop-evasion",
+          "run": 2,
+          "depthDelta": 0,
+          "actionChanged": false,
+          "evaluationBefore": -504,
+          "evaluationAfter": -504
+        },
+        {
+          "id": "gold-drop-evasion",
+          "run": 3,
+          "depthDelta": -1,
+          "actionChanged": true,
+          "evaluationBefore": -505,
+          "evaluationAfter": -504
+        },
+        {
+          "id": "exchange-chain",
+          "run": 1,
+          "depthDelta": 0,
+          "actionChanged": true,
+          "evaluationBefore": 1202,
+          "evaluationAfter": 1207
+        },
+        {
+          "id": "exchange-chain",
+          "run": 2,
+          "depthDelta": 0,
+          "actionChanged": true,
+          "evaluationBefore": 1202,
+          "evaluationAfter": 1207
+        },
+        {
+          "id": "exchange-chain",
+          "run": 3,
+          "depthDelta": 0,
+          "actionChanged": true,
+          "evaluationBefore": 1202,
+          "evaluationAfter": 1207
+        },
+        {
+          "id": "evasion-promotion",
+          "run": 1,
+          "depthDelta": -1,
+          "actionChanged": false,
+          "evaluationBefore": -1005,
+          "evaluationAfter": -1006
+        },
+        {
+          "id": "evasion-promotion",
+          "run": 2,
+          "depthDelta": -1,
+          "actionChanged": false,
+          "evaluationBefore": -1005,
+          "evaluationAfter": -1006
+        },
+        {
+          "id": "evasion-promotion",
+          "run": 3,
+          "depthDelta": -1,
+          "actionChanged": false,
+          "evaluationBefore": -1005,
+          "evaluationAfter": -1006
+        },
+        {
+          "id": "evasion-promotion-gote",
+          "run": 1,
+          "depthDelta": -1,
+          "actionChanged": false,
+          "evaluationBefore": -1005,
+          "evaluationAfter": -1006
+        },
+        {
+          "id": "evasion-promotion-gote",
+          "run": 2,
+          "depthDelta": -1,
+          "actionChanged": false,
+          "evaluationBefore": -1005,
+          "evaluationAfter": -1006
+        },
+        {
+          "id": "evasion-promotion-gote",
+          "run": 3,
+          "depthDelta": -1,
+          "actionChanged": false,
+          "evaluationBefore": -1005,
+          "evaluationAfter": -1006
+        },
+        {
+          "id": "see-deadline",
+          "run": 1,
+          "depthDelta": -1,
+          "actionChanged": false,
+          "evaluationBefore": 1304,
+          "evaluationAfter": 1110
+        },
+        {
+          "id": "see-deadline",
+          "run": 2,
+          "depthDelta": -1,
+          "actionChanged": false,
+          "evaluationBefore": 1304,
+          "evaluationAfter": 1110
+        },
+        {
+          "id": "see-deadline",
+          "run": 3,
+          "depthDelta": -1,
+          "actionChanged": false,
+          "evaluationBefore": 1304,
+          "evaluationAfter": 1110
+        }
+      ]
+    },
+    {
+      "ordering": "standard",
+      "limit": 1000,
+      "metrics": [
+        {
+          "variant": "before",
+          "n": 30,
+          "elapsedSum": 15079.805899999985,
+          "maxOverrun": 1.5905000000002474,
+          "completedDepthSum": 108,
+          "normal": 57345,
+          "q": 17376,
+          "totalNormal": 67845,
+          "totalQ": 19506,
+          "sources": {
+            "completed-iteration": 30,
+            "partial-root": 0,
+            "fallback": 0
+          }
+        },
+        {
+          "variant": "on",
+          "n": 30,
+          "elapsedSum": 17057.710700000025,
+          "maxOverrun": 0.8495000000038999,
+          "completedDepthSum": 107,
+          "normal": 48755,
+          "q": 31188,
+          "totalNormal": 59547,
+          "totalQ": 40514,
+          "sources": {
+            "completed-iteration": 30,
+            "partial-root": 0,
+            "fallback": 0
+          }
+        }
+      ],
+      "pairs": [
+        {
+          "id": "initial",
+          "run": 1,
+          "depthDelta": 0,
+          "actionChanged": false,
+          "evaluationBefore": 214,
+          "evaluationAfter": 214
+        },
+        {
+          "id": "initial",
+          "run": 2,
+          "depthDelta": 0,
+          "actionChanged": false,
+          "evaluationBefore": 214,
+          "evaluationAfter": 214
+        },
+        {
+          "id": "initial",
+          "run": 3,
+          "depthDelta": 0,
+          "actionChanged": false,
+          "evaluationBefore": 214,
+          "evaluationAfter": 214
+        },
+        {
+          "id": "pawn-recapture",
+          "run": 1,
+          "depthDelta": 0,
+          "actionChanged": false,
+          "evaluationBefore": -404,
+          "evaluationAfter": -200
+        },
+        {
+          "id": "pawn-recapture",
+          "run": 2,
+          "depthDelta": 0,
+          "actionChanged": false,
+          "evaluationBefore": -404,
+          "evaluationAfter": -200
+        },
+        {
+          "id": "pawn-recapture",
+          "run": 3,
+          "depthDelta": 0,
+          "actionChanged": false,
+          "evaluationBefore": -404,
+          "evaluationAfter": -200
+        },
+        {
+          "id": "poisoned-rook",
+          "run": 1,
+          "depthDelta": 0,
+          "actionChanged": true,
+          "evaluationBefore": 696,
+          "evaluationAfter": 736
+        },
+        {
+          "id": "poisoned-rook",
+          "run": 2,
+          "depthDelta": 0,
+          "actionChanged": true,
+          "evaluationBefore": 696,
+          "evaluationAfter": 736
+        },
+        {
+          "id": "poisoned-rook",
+          "run": 3,
+          "depthDelta": 0,
+          "actionChanged": true,
+          "evaluationBefore": 696,
+          "evaluationAfter": 736
+        },
+        {
+          "id": "rook-check",
+          "run": 1,
+          "depthDelta": 0,
+          "actionChanged": false,
+          "evaluationBefore": -1205,
+          "evaluationAfter": -1205
+        },
+        {
+          "id": "rook-check",
+          "run": 2,
+          "depthDelta": 0,
+          "actionChanged": false,
+          "evaluationBefore": -1205,
+          "evaluationAfter": -1205
+        },
+        {
+          "id": "rook-check",
+          "run": 3,
+          "depthDelta": 0,
+          "actionChanged": false,
+          "evaluationBefore": -1205,
+          "evaluationAfter": -1205
+        },
+        {
+          "id": "promotion-capture",
+          "run": 1,
+          "depthDelta": 0,
+          "actionChanged": false,
+          "evaluationBefore": 607,
+          "evaluationAfter": 1006
+        },
+        {
+          "id": "promotion-capture",
+          "run": 2,
+          "depthDelta": 0,
+          "actionChanged": false,
+          "evaluationBefore": 607,
+          "evaluationAfter": 1006
+        },
+        {
+          "id": "promotion-capture",
+          "run": 3,
+          "depthDelta": 0,
+          "actionChanged": false,
+          "evaluationBefore": 607,
+          "evaluationAfter": 1006
+        },
+        {
+          "id": "gold-drop-evasion",
+          "run": 1,
+          "depthDelta": -1,
+          "actionChanged": true,
+          "evaluationBefore": -702,
+          "evaluationAfter": -703
+        },
+        {
+          "id": "gold-drop-evasion",
+          "run": 2,
+          "depthDelta": 0,
+          "actionChanged": false,
+          "evaluationBefore": -702,
+          "evaluationAfter": -702
+        },
+        {
+          "id": "gold-drop-evasion",
+          "run": 3,
+          "depthDelta": 0,
+          "actionChanged": false,
+          "evaluationBefore": -702,
+          "evaluationAfter": -702
+        },
+        {
+          "id": "exchange-chain",
+          "run": 1,
+          "depthDelta": 0,
+          "actionChanged": false,
+          "evaluationBefore": 1199,
+          "evaluationAfter": 1199
+        },
+        {
+          "id": "exchange-chain",
+          "run": 2,
+          "depthDelta": 0,
+          "actionChanged": false,
+          "evaluationBefore": 1199,
+          "evaluationAfter": 1199
+        },
+        {
+          "id": "exchange-chain",
+          "run": 3,
+          "depthDelta": 0,
+          "actionChanged": false,
+          "evaluationBefore": 1199,
+          "evaluationAfter": 1199
+        },
+        {
+          "id": "evasion-promotion",
+          "run": 1,
+          "depthDelta": 0,
+          "actionChanged": false,
+          "evaluationBefore": -1205,
+          "evaluationAfter": -1205
+        },
+        {
+          "id": "evasion-promotion",
+          "run": 2,
+          "depthDelta": 0,
+          "actionChanged": false,
+          "evaluationBefore": -1205,
+          "evaluationAfter": -1205
+        },
+        {
+          "id": "evasion-promotion",
+          "run": 3,
+          "depthDelta": 0,
+          "actionChanged": false,
+          "evaluationBefore": -1205,
+          "evaluationAfter": -1205
+        },
+        {
+          "id": "evasion-promotion-gote",
+          "run": 1,
+          "depthDelta": 0,
+          "actionChanged": false,
+          "evaluationBefore": -1205,
+          "evaluationAfter": -1205
+        },
+        {
+          "id": "evasion-promotion-gote",
+          "run": 2,
+          "depthDelta": 0,
+          "actionChanged": false,
+          "evaluationBefore": -1205,
+          "evaluationAfter": -1205
+        },
+        {
+          "id": "evasion-promotion-gote",
+          "run": 3,
+          "depthDelta": 0,
+          "actionChanged": false,
+          "evaluationBefore": -1205,
+          "evaluationAfter": -1205
+        },
+        {
+          "id": "see-deadline",
+          "run": 1,
+          "depthDelta": 0,
+          "actionChanged": false,
+          "evaluationBefore": 1304,
+          "evaluationAfter": 1304
+        },
+        {
+          "id": "see-deadline",
+          "run": 2,
+          "depthDelta": 0,
+          "actionChanged": false,
+          "evaluationBefore": 1304,
+          "evaluationAfter": 1304
+        },
+        {
+          "id": "see-deadline",
+          "run": 3,
+          "depthDelta": 0,
+          "actionChanged": false,
+          "evaluationBefore": 1304,
+          "evaluationAfter": 1304
+        }
+      ]
+    },
+    {
+      "ordering": "static-exchange",
+      "limit": null,
+      "metrics": [
+        {
+          "variant": "before",
+          "n": 30,
+          "elapsedSum": 131.21520000001692,
+          "maxOverrun": null,
+          "completedDepthSum": null,
+          "normal": 369,
+          "q": 81,
+          "totalNormal": null,
+          "totalQ": null,
+          "sources": null
+        },
+        {
+          "variant": "on",
+          "n": 30,
+          "elapsedSum": 176.95039999997243,
+          "maxOverrun": null,
+          "completedDepthSum": null,
+          "normal": 369,
+          "q": 282,
+          "totalNormal": null,
+          "totalQ": null,
+          "sources": null
+        }
+      ],
+      "pairs": [
+        {
+          "id": "initial",
+          "run": 1,
+          "depthDelta": 0,
+          "actionChanged": false,
+          "evaluationBefore": 1,
+          "evaluationAfter": 1
+        },
+        {
+          "id": "initial",
+          "run": 2,
+          "depthDelta": 0,
+          "actionChanged": false,
+          "evaluationBefore": 1,
+          "evaluationAfter": 1
+        },
+        {
+          "id": "initial",
+          "run": 3,
+          "depthDelta": 0,
+          "actionChanged": false,
+          "evaluationBefore": 1,
+          "evaluationAfter": 1
+        },
+        {
+          "id": "pawn-recapture",
+          "run": 1,
+          "depthDelta": 0,
+          "actionChanged": false,
+          "evaluationBefore": -404,
+          "evaluationAfter": -404
+        },
+        {
+          "id": "pawn-recapture",
+          "run": 2,
+          "depthDelta": 0,
+          "actionChanged": false,
+          "evaluationBefore": -404,
+          "evaluationAfter": -404
+        },
+        {
+          "id": "pawn-recapture",
+          "run": 3,
+          "depthDelta": 0,
+          "actionChanged": false,
+          "evaluationBefore": -404,
+          "evaluationAfter": -404
+        },
+        {
+          "id": "poisoned-rook",
+          "run": 1,
+          "depthDelta": 0,
+          "actionChanged": false,
+          "evaluationBefore": 497,
+          "evaluationAfter": 497
+        },
+        {
+          "id": "poisoned-rook",
+          "run": 2,
+          "depthDelta": 0,
+          "actionChanged": false,
+          "evaluationBefore": 497,
+          "evaluationAfter": 497
+        },
+        {
+          "id": "poisoned-rook",
+          "run": 3,
+          "depthDelta": 0,
+          "actionChanged": false,
+          "evaluationBefore": 497,
+          "evaluationAfter": 497
+        },
+        {
+          "id": "rook-check",
+          "run": 1,
+          "depthDelta": 0,
+          "actionChanged": true,
+          "evaluationBefore": -1005,
+          "evaluationAfter": -1096
+        },
+        {
+          "id": "rook-check",
+          "run": 2,
+          "depthDelta": 0,
+          "actionChanged": true,
+          "evaluationBefore": -1005,
+          "evaluationAfter": -1096
+        },
+        {
+          "id": "rook-check",
+          "run": 3,
+          "depthDelta": 0,
+          "actionChanged": true,
+          "evaluationBefore": -1005,
+          "evaluationAfter": -1096
+        },
+        {
+          "id": "promotion-capture",
+          "run": 1,
+          "depthDelta": 0,
+          "actionChanged": false,
+          "evaluationBefore": 603,
+          "evaluationAfter": 603
+        },
+        {
+          "id": "promotion-capture",
+          "run": 2,
+          "depthDelta": 0,
+          "actionChanged": false,
+          "evaluationBefore": 603,
+          "evaluationAfter": 603
+        },
+        {
+          "id": "promotion-capture",
+          "run": 3,
+          "depthDelta": 0,
+          "actionChanged": false,
+          "evaluationBefore": 603,
+          "evaluationAfter": 603
+        },
+        {
+          "id": "gold-drop-evasion",
+          "run": 1,
+          "depthDelta": 0,
+          "actionChanged": true,
+          "evaluationBefore": -505,
+          "evaluationAfter": -596
+        },
+        {
+          "id": "gold-drop-evasion",
+          "run": 2,
+          "depthDelta": 0,
+          "actionChanged": true,
+          "evaluationBefore": -505,
+          "evaluationAfter": -596
+        },
+        {
+          "id": "gold-drop-evasion",
+          "run": 3,
+          "depthDelta": 0,
+          "actionChanged": true,
+          "evaluationBefore": -505,
+          "evaluationAfter": -596
+        },
+        {
+          "id": "exchange-chain",
+          "run": 1,
+          "depthDelta": 0,
+          "actionChanged": false,
+          "evaluationBefore": 997,
+          "evaluationAfter": 997
+        },
+        {
+          "id": "exchange-chain",
+          "run": 2,
+          "depthDelta": 0,
+          "actionChanged": false,
+          "evaluationBefore": 997,
+          "evaluationAfter": 997
+        },
+        {
+          "id": "exchange-chain",
+          "run": 3,
+          "depthDelta": 0,
+          "actionChanged": false,
+          "evaluationBefore": 997,
+          "evaluationAfter": 997
+        },
+        {
+          "id": "evasion-promotion",
+          "run": 1,
+          "depthDelta": 0,
+          "actionChanged": true,
+          "evaluationBefore": -1005,
+          "evaluationAfter": -1096
+        },
+        {
+          "id": "evasion-promotion",
+          "run": 2,
+          "depthDelta": 0,
+          "actionChanged": true,
+          "evaluationBefore": -1005,
+          "evaluationAfter": -1096
+        },
+        {
+          "id": "evasion-promotion",
+          "run": 3,
+          "depthDelta": 0,
+          "actionChanged": true,
+          "evaluationBefore": -1005,
+          "evaluationAfter": -1096
+        },
+        {
+          "id": "evasion-promotion-gote",
+          "run": 1,
+          "depthDelta": 0,
+          "actionChanged": true,
+          "evaluationBefore": -1005,
+          "evaluationAfter": -1096
+        },
+        {
+          "id": "evasion-promotion-gote",
+          "run": 2,
+          "depthDelta": 0,
+          "actionChanged": true,
+          "evaluationBefore": -1005,
+          "evaluationAfter": -1096
+        },
+        {
+          "id": "evasion-promotion-gote",
+          "run": 3,
+          "depthDelta": 0,
+          "actionChanged": true,
+          "evaluationBefore": -1005,
+          "evaluationAfter": -1096
+        },
+        {
+          "id": "see-deadline",
+          "run": 1,
+          "depthDelta": 0,
+          "actionChanged": false,
+          "evaluationBefore": 1110,
+          "evaluationAfter": 1110
+        },
+        {
+          "id": "see-deadline",
+          "run": 2,
+          "depthDelta": 0,
+          "actionChanged": false,
+          "evaluationBefore": 1110,
+          "evaluationAfter": 1110
+        },
+        {
+          "id": "see-deadline",
+          "run": 3,
+          "depthDelta": 0,
+          "actionChanged": false,
+          "evaluationBefore": 1110,
+          "evaluationAfter": 1110
+        }
+      ]
+    },
+    {
+      "ordering": "static-exchange",
+      "limit": 100,
+      "metrics": [
+        {
+          "variant": "before",
+          "n": 30,
+          "elapsedSum": 2686.1266000000396,
+          "maxOverrun": 1.1295000000100117,
+          "completedDepthSum": 81,
+          "normal": 11679,
+          "q": 1725,
+          "totalNormal": 14451,
+          "totalQ": 2214,
+          "sources": {
+            "completed-iteration": 30,
+            "partial-root": 0,
+            "fallback": 0
+          }
+        },
+        {
+          "variant": "on",
+          "n": 30,
+          "elapsedSum": 2805.60530000005,
+          "maxOverrun": 0.7268000000040047,
+          "completedDepthSum": 72,
+          "normal": 7773,
+          "q": 3375,
+          "totalNormal": 10440,
+          "totalQ": 4908,
+          "sources": {
+            "completed-iteration": 30,
+            "partial-root": 0,
+            "fallback": 0
+          }
+        }
+      ],
+      "pairs": [
+        {
+          "id": "initial",
+          "run": 1,
+          "depthDelta": 0,
+          "actionChanged": false,
+          "evaluationBefore": 1,
+          "evaluationAfter": 1
+        },
+        {
+          "id": "initial",
+          "run": 2,
+          "depthDelta": 0,
+          "actionChanged": false,
+          "evaluationBefore": 1,
+          "evaluationAfter": 1
+        },
+        {
+          "id": "initial",
+          "run": 3,
+          "depthDelta": 0,
+          "actionChanged": false,
+          "evaluationBefore": 1,
+          "evaluationAfter": 1
+        },
+        {
+          "id": "pawn-recapture",
+          "run": 1,
+          "depthDelta": 0,
+          "actionChanged": false,
+          "evaluationBefore": -400,
+          "evaluationAfter": -400
+        },
+        {
+          "id": "pawn-recapture",
+          "run": 2,
+          "depthDelta": 0,
+          "actionChanged": false,
+          "evaluationBefore": -400,
+          "evaluationAfter": -400
+        },
+        {
+          "id": "pawn-recapture",
+          "run": 3,
+          "depthDelta": 0,
+          "actionChanged": false,
+          "evaluationBefore": -400,
+          "evaluationAfter": -400
+        },
+        {
+          "id": "poisoned-rook",
+          "run": 1,
+          "depthDelta": 0,
+          "actionChanged": false,
+          "evaluationBefore": 697,
+          "evaluationAfter": 697
+        },
+        {
+          "id": "poisoned-rook",
+          "run": 2,
+          "depthDelta": 0,
+          "actionChanged": false,
+          "evaluationBefore": 697,
+          "evaluationAfter": 697
+        },
+        {
+          "id": "poisoned-rook",
+          "run": 3,
+          "depthDelta": 0,
+          "actionChanged": false,
+          "evaluationBefore": 697,
+          "evaluationAfter": 697
+        },
+        {
+          "id": "rook-check",
+          "run": 1,
+          "depthDelta": 0,
+          "actionChanged": false,
+          "evaluationBefore": -1205,
+          "evaluationAfter": -1205
+        },
+        {
+          "id": "rook-check",
+          "run": 2,
+          "depthDelta": 0,
+          "actionChanged": false,
+          "evaluationBefore": -1205,
+          "evaluationAfter": -1205
+        },
+        {
+          "id": "rook-check",
+          "run": 3,
+          "depthDelta": 0,
+          "actionChanged": false,
+          "evaluationBefore": -1205,
+          "evaluationAfter": -1205
+        },
+        {
+          "id": "promotion-capture",
+          "run": 1,
+          "depthDelta": 0,
+          "actionChanged": false,
+          "evaluationBefore": 607,
+          "evaluationAfter": 1006
+        },
+        {
+          "id": "promotion-capture",
+          "run": 2,
+          "depthDelta": 0,
+          "actionChanged": false,
+          "evaluationBefore": 607,
+          "evaluationAfter": 1006
+        },
+        {
+          "id": "promotion-capture",
+          "run": 3,
+          "depthDelta": 0,
+          "actionChanged": false,
+          "evaluationBefore": 607,
+          "evaluationAfter": 1006
+        },
+        {
+          "id": "gold-drop-evasion",
+          "run": 1,
+          "depthDelta": -1,
+          "actionChanged": true,
+          "evaluationBefore": -505,
+          "evaluationAfter": -504
+        },
+        {
+          "id": "gold-drop-evasion",
+          "run": 2,
+          "depthDelta": -1,
+          "actionChanged": true,
+          "evaluationBefore": -505,
+          "evaluationAfter": -504
+        },
+        {
+          "id": "gold-drop-evasion",
+          "run": 3,
+          "depthDelta": -1,
+          "actionChanged": true,
+          "evaluationBefore": -505,
+          "evaluationAfter": -504
+        },
+        {
+          "id": "exchange-chain",
+          "run": 1,
+          "depthDelta": 0,
+          "actionChanged": true,
+          "evaluationBefore": 1202,
+          "evaluationAfter": 1207
+        },
+        {
+          "id": "exchange-chain",
+          "run": 2,
+          "depthDelta": 0,
+          "actionChanged": true,
+          "evaluationBefore": 1202,
+          "evaluationAfter": 1207
+        },
+        {
+          "id": "exchange-chain",
+          "run": 3,
+          "depthDelta": 0,
+          "actionChanged": true,
+          "evaluationBefore": 1202,
+          "evaluationAfter": 1207
+        },
+        {
+          "id": "evasion-promotion",
+          "run": 1,
+          "depthDelta": -1,
+          "actionChanged": false,
+          "evaluationBefore": -1005,
+          "evaluationAfter": -1006
+        },
+        {
+          "id": "evasion-promotion",
+          "run": 2,
+          "depthDelta": -1,
+          "actionChanged": false,
+          "evaluationBefore": -1005,
+          "evaluationAfter": -1006
+        },
+        {
+          "id": "evasion-promotion",
+          "run": 3,
+          "depthDelta": -1,
+          "actionChanged": false,
+          "evaluationBefore": -1005,
+          "evaluationAfter": -1006
+        },
+        {
+          "id": "evasion-promotion-gote",
+          "run": 1,
+          "depthDelta": -1,
+          "actionChanged": false,
+          "evaluationBefore": -1005,
+          "evaluationAfter": -1006
+        },
+        {
+          "id": "evasion-promotion-gote",
+          "run": 2,
+          "depthDelta": -1,
+          "actionChanged": false,
+          "evaluationBefore": -1005,
+          "evaluationAfter": -1006
+        },
+        {
+          "id": "evasion-promotion-gote",
+          "run": 3,
+          "depthDelta": -1,
+          "actionChanged": false,
+          "evaluationBefore": -1005,
+          "evaluationAfter": -1006
+        },
+        {
+          "id": "see-deadline",
+          "run": 1,
+          "depthDelta": 0,
+          "actionChanged": false,
+          "evaluationBefore": 1110,
+          "evaluationAfter": 1110
+        },
+        {
+          "id": "see-deadline",
+          "run": 2,
+          "depthDelta": 0,
+          "actionChanged": false,
+          "evaluationBefore": 1110,
+          "evaluationAfter": 1110
+        },
+        {
+          "id": "see-deadline",
+          "run": 3,
+          "depthDelta": 0,
+          "actionChanged": false,
+          "evaluationBefore": 1110,
+          "evaluationAfter": 1110
+        }
+      ]
+    },
+    {
+      "ordering": "static-exchange",
+      "limit": 1000,
+      "metrics": [
+        {
+          "variant": "before",
+          "n": 30,
+          "elapsedSum": 15245.330899999968,
+          "maxOverrun": 1.0335000000050059,
+          "completedDepthSum": 104,
+          "normal": 45370,
+          "q": 12630,
+          "totalNormal": 54365,
+          "totalQ": 14244,
+          "sources": {
+            "completed-iteration": 30,
+            "partial-root": 0,
+            "fallback": 0
+          }
+        },
+        {
+          "variant": "on",
+          "n": 30,
+          "elapsedSum": 16326.843300000004,
+          "maxOverrun": 1.2721000000001368,
+          "completedDepthSum": 103,
+          "normal": 36235,
+          "q": 27975,
+          "totalNormal": 45871,
+          "totalQ": 34661,
+          "sources": {
+            "completed-iteration": 30,
+            "partial-root": 0,
+            "fallback": 0
+          }
+        }
+      ],
+      "pairs": [
+        {
+          "id": "initial",
+          "run": 1,
+          "depthDelta": 0,
+          "actionChanged": false,
+          "evaluationBefore": 214,
+          "evaluationAfter": 214
+        },
+        {
+          "id": "initial",
+          "run": 2,
+          "depthDelta": 0,
+          "actionChanged": false,
+          "evaluationBefore": 214,
+          "evaluationAfter": 214
+        },
+        {
+          "id": "initial",
+          "run": 3,
+          "depthDelta": 0,
+          "actionChanged": false,
+          "evaluationBefore": 214,
+          "evaluationAfter": 214
+        },
+        {
+          "id": "pawn-recapture",
+          "run": 1,
+          "depthDelta": 0,
+          "actionChanged": false,
+          "evaluationBefore": -404,
+          "evaluationAfter": -200
+        },
+        {
+          "id": "pawn-recapture",
+          "run": 2,
+          "depthDelta": 0,
+          "actionChanged": false,
+          "evaluationBefore": -404,
+          "evaluationAfter": -200
+        },
+        {
+          "id": "pawn-recapture",
+          "run": 3,
+          "depthDelta": 0,
+          "actionChanged": false,
+          "evaluationBefore": -404,
+          "evaluationAfter": -200
+        },
+        {
+          "id": "poisoned-rook",
+          "run": 1,
+          "depthDelta": 0,
+          "actionChanged": true,
+          "evaluationBefore": 696,
+          "evaluationAfter": 736
+        },
+        {
+          "id": "poisoned-rook",
+          "run": 2,
+          "depthDelta": 0,
+          "actionChanged": true,
+          "evaluationBefore": 696,
+          "evaluationAfter": 736
+        },
+        {
+          "id": "poisoned-rook",
+          "run": 3,
+          "depthDelta": 0,
+          "actionChanged": true,
+          "evaluationBefore": 696,
+          "evaluationAfter": 736
+        },
+        {
+          "id": "rook-check",
+          "run": 1,
+          "depthDelta": 0,
+          "actionChanged": false,
+          "evaluationBefore": -1205,
+          "evaluationAfter": -1205
+        },
+        {
+          "id": "rook-check",
+          "run": 2,
+          "depthDelta": 0,
+          "actionChanged": false,
+          "evaluationBefore": -1205,
+          "evaluationAfter": -1205
+        },
+        {
+          "id": "rook-check",
+          "run": 3,
+          "depthDelta": 0,
+          "actionChanged": false,
+          "evaluationBefore": -1205,
+          "evaluationAfter": -1205
+        },
+        {
+          "id": "promotion-capture",
+          "run": 1,
+          "depthDelta": 0,
+          "actionChanged": false,
+          "evaluationBefore": 607,
+          "evaluationAfter": 1006
+        },
+        {
+          "id": "promotion-capture",
+          "run": 2,
+          "depthDelta": 0,
+          "actionChanged": false,
+          "evaluationBefore": 607,
+          "evaluationAfter": 1006
+        },
+        {
+          "id": "promotion-capture",
+          "run": 3,
+          "depthDelta": 0,
+          "actionChanged": false,
+          "evaluationBefore": 607,
+          "evaluationAfter": 1006
+        },
+        {
+          "id": "gold-drop-evasion",
+          "run": 1,
+          "depthDelta": 0,
+          "actionChanged": false,
+          "evaluationBefore": -702,
+          "evaluationAfter": -702
+        },
+        {
+          "id": "gold-drop-evasion",
+          "run": 2,
+          "depthDelta": -1,
+          "actionChanged": true,
+          "evaluationBefore": -702,
+          "evaluationAfter": -703
+        },
+        {
+          "id": "gold-drop-evasion",
+          "run": 3,
+          "depthDelta": -1,
+          "actionChanged": true,
+          "evaluationBefore": -505,
+          "evaluationAfter": -504
+        },
+        {
+          "id": "exchange-chain",
+          "run": 1,
+          "depthDelta": 0,
+          "actionChanged": false,
+          "evaluationBefore": 1199,
+          "evaluationAfter": 1199
+        },
+        {
+          "id": "exchange-chain",
+          "run": 2,
+          "depthDelta": 0,
+          "actionChanged": false,
+          "evaluationBefore": 1199,
+          "evaluationAfter": 1199
+        },
+        {
+          "id": "exchange-chain",
+          "run": 3,
+          "depthDelta": 1,
+          "actionChanged": false,
+          "evaluationBefore": 1199,
+          "evaluationAfter": 1392
+        },
+        {
+          "id": "evasion-promotion",
+          "run": 1,
+          "depthDelta": 0,
+          "actionChanged": false,
+          "evaluationBefore": -1205,
+          "evaluationAfter": -1205
+        },
+        {
+          "id": "evasion-promotion",
+          "run": 2,
+          "depthDelta": 0,
+          "actionChanged": false,
+          "evaluationBefore": -1205,
+          "evaluationAfter": -1205
+        },
+        {
+          "id": "evasion-promotion",
+          "run": 3,
+          "depthDelta": 0,
+          "actionChanged": false,
+          "evaluationBefore": -1205,
+          "evaluationAfter": -1205
+        },
+        {
+          "id": "evasion-promotion-gote",
+          "run": 1,
+          "depthDelta": 0,
+          "actionChanged": false,
+          "evaluationBefore": -1205,
+          "evaluationAfter": -1205
+        },
+        {
+          "id": "evasion-promotion-gote",
+          "run": 2,
+          "depthDelta": 0,
+          "actionChanged": false,
+          "evaluationBefore": -1205,
+          "evaluationAfter": -1205
+        },
+        {
+          "id": "evasion-promotion-gote",
+          "run": 3,
+          "depthDelta": 0,
+          "actionChanged": false,
+          "evaluationBefore": -1205,
+          "evaluationAfter": -1205
+        },
+        {
+          "id": "see-deadline",
+          "run": 1,
+          "depthDelta": 0,
+          "actionChanged": false,
+          "evaluationBefore": 1304,
+          "evaluationAfter": 1304
+        },
+        {
+          "id": "see-deadline",
+          "run": 2,
+          "depthDelta": 0,
+          "actionChanged": false,
+          "evaluationBefore": 1304,
+          "evaluationAfter": 1304
+        },
+        {
+          "id": "see-deadline",
+          "run": 3,
+          "depthDelta": 0,
+          "actionChanged": false,
+          "evaluationBefore": 1304,
+          "evaluationAfter": 1304
+        }
+      ]
+    }
+  ],
+  "diagnostics": [
+    {
+      "type": "diagnostic",
+      "id": "initial",
+      "ordering": "standard",
+      "variant": "before",
+      "seeCalls": 0
+    },
+    {
+      "type": "diagnostic",
+      "id": "initial",
+      "ordering": "standard",
+      "variant": "on",
+      "seeCalls": 0
+    },
+    {
+      "type": "diagnostic",
+      "id": "initial",
+      "ordering": "static-exchange",
+      "variant": "before",
+      "seeCalls": 0
+    },
+    {
+      "type": "diagnostic",
+      "id": "initial",
+      "ordering": "static-exchange",
+      "variant": "on",
+      "seeCalls": 0
+    },
+    {
+      "type": "diagnostic",
+      "id": "pawn-recapture",
+      "ordering": "standard",
+      "variant": "before",
+      "seeCalls": 0
+    },
+    {
+      "type": "diagnostic",
+      "id": "pawn-recapture",
+      "ordering": "standard",
+      "variant": "on",
+      "seeCalls": 0
+    },
+    {
+      "type": "diagnostic",
+      "id": "pawn-recapture",
+      "ordering": "static-exchange",
+      "variant": "before",
+      "seeCalls": 0
+    },
+    {
+      "type": "diagnostic",
+      "id": "pawn-recapture",
+      "ordering": "static-exchange",
+      "variant": "on",
+      "seeCalls": 0
+    },
+    {
+      "type": "diagnostic",
+      "id": "poisoned-rook",
+      "ordering": "standard",
+      "variant": "before",
+      "seeCalls": 0
+    },
+    {
+      "type": "diagnostic",
+      "id": "poisoned-rook",
+      "ordering": "standard",
+      "variant": "on",
+      "seeCalls": 0
+    },
+    {
+      "type": "diagnostic",
+      "id": "poisoned-rook",
+      "ordering": "static-exchange",
+      "variant": "before",
+      "seeCalls": 0
+    },
+    {
+      "type": "diagnostic",
+      "id": "poisoned-rook",
+      "ordering": "static-exchange",
+      "variant": "on",
+      "seeCalls": 0
+    },
+    {
+      "type": "diagnostic",
+      "id": "rook-check",
+      "ordering": "standard",
+      "variant": "before",
+      "seeCalls": 0
+    },
+    {
+      "type": "diagnostic",
+      "id": "rook-check",
+      "ordering": "standard",
+      "variant": "on",
+      "seeCalls": 0
+    },
+    {
+      "type": "diagnostic",
+      "id": "rook-check",
+      "ordering": "static-exchange",
+      "variant": "before",
+      "seeCalls": 0
+    },
+    {
+      "type": "diagnostic",
+      "id": "rook-check",
+      "ordering": "static-exchange",
+      "variant": "on",
+      "seeCalls": 0
+    },
+    {
+      "type": "diagnostic",
+      "id": "promotion-capture",
+      "ordering": "standard",
+      "variant": "before",
+      "seeCalls": 0
+    },
+    {
+      "type": "diagnostic",
+      "id": "promotion-capture",
+      "ordering": "standard",
+      "variant": "on",
+      "seeCalls": 0
+    },
+    {
+      "type": "diagnostic",
+      "id": "promotion-capture",
+      "ordering": "static-exchange",
+      "variant": "before",
+      "seeCalls": 0
+    },
+    {
+      "type": "diagnostic",
+      "id": "promotion-capture",
+      "ordering": "static-exchange",
+      "variant": "on",
+      "seeCalls": 0
+    },
+    {
+      "type": "diagnostic",
+      "id": "gold-drop-evasion",
+      "ordering": "standard",
+      "variant": "before",
+      "seeCalls": 0
+    },
+    {
+      "type": "diagnostic",
+      "id": "gold-drop-evasion",
+      "ordering": "standard",
+      "variant": "on",
+      "seeCalls": 0
+    },
+    {
+      "type": "diagnostic",
+      "id": "gold-drop-evasion",
+      "ordering": "static-exchange",
+      "variant": "before",
+      "seeCalls": 6
+    },
+    {
+      "type": "diagnostic",
+      "id": "gold-drop-evasion",
+      "ordering": "static-exchange",
+      "variant": "on",
+      "seeCalls": 6
+    },
+    {
+      "type": "diagnostic",
+      "id": "exchange-chain",
+      "ordering": "standard",
+      "variant": "before",
+      "seeCalls": 0
+    },
+    {
+      "type": "diagnostic",
+      "id": "exchange-chain",
+      "ordering": "standard",
+      "variant": "on",
+      "seeCalls": 0
+    },
+    {
+      "type": "diagnostic",
+      "id": "exchange-chain",
+      "ordering": "static-exchange",
+      "variant": "before",
+      "seeCalls": 3
+    },
+    {
+      "type": "diagnostic",
+      "id": "exchange-chain",
+      "ordering": "static-exchange",
+      "variant": "on",
+      "seeCalls": 3
+    },
+    {
+      "type": "diagnostic",
+      "id": "evasion-promotion",
+      "ordering": "standard",
+      "variant": "before",
+      "seeCalls": 0
+    },
+    {
+      "type": "diagnostic",
+      "id": "evasion-promotion",
+      "ordering": "standard",
+      "variant": "on",
+      "seeCalls": 0
+    },
+    {
+      "type": "diagnostic",
+      "id": "evasion-promotion",
+      "ordering": "static-exchange",
+      "variant": "before",
+      "seeCalls": 0
+    },
+    {
+      "type": "diagnostic",
+      "id": "evasion-promotion",
+      "ordering": "static-exchange",
+      "variant": "on",
+      "seeCalls": 0
+    },
+    {
+      "type": "diagnostic",
+      "id": "evasion-promotion-gote",
+      "ordering": "standard",
+      "variant": "before",
+      "seeCalls": 0
+    },
+    {
+      "type": "diagnostic",
+      "id": "evasion-promotion-gote",
+      "ordering": "standard",
+      "variant": "on",
+      "seeCalls": 0
+    },
+    {
+      "type": "diagnostic",
+      "id": "evasion-promotion-gote",
+      "ordering": "static-exchange",
+      "variant": "before",
+      "seeCalls": 0
+    },
+    {
+      "type": "diagnostic",
+      "id": "evasion-promotion-gote",
+      "ordering": "static-exchange",
+      "variant": "on",
+      "seeCalls": 0
+    },
+    {
+      "type": "diagnostic",
+      "id": "see-deadline",
+      "ordering": "standard",
+      "variant": "before",
+      "seeCalls": 0
+    },
+    {
+      "type": "diagnostic",
+      "id": "see-deadline",
+      "ordering": "standard",
+      "variant": "on",
+      "seeCalls": 0
+    },
+    {
+      "type": "diagnostic",
+      "id": "see-deadline",
+      "ordering": "static-exchange",
+      "variant": "before",
+      "seeCalls": 24
+    },
+    {
+      "type": "diagnostic",
+      "id": "see-deadline",
+      "ordering": "static-exchange",
+      "variant": "on",
+      "seeCalls": 24
+    }
+  ]
+}

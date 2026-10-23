@@ -1,3 +1,16 @@
+### [2026-10-23 JST] 連続交換・SEE調査と非捕獲成りの限定q追加（既定OFF）
+
+- Issue #209。clean main `376bcbabed2309d017b233b4a264504007f70db7` をfetch/ff-only確認、専用 `codex/quiescence-quiet-promotions` で作業。直近PR #194〜#208、関連Issue #177/#201/#207、探索・評価・SEE・王手回避・期限契約を確認。既存worktree・ユーザー変更・旧測定原本は変更しない。
+- SEEは合法な複数段取り返し、成／不成、盤上喪失と不成持駒獲得、唯一の応手を既に扱う。負SEEは捨てず通常探索の順序付けだけ。今回SEEの新たな誤りは再現できず変更しない。既存qのoriginal/materialもSEEを呼ばない。
+- PR #208の非捕獲成り欠落を先後両方で再現し、既存q候補へ `includeQuietPromotions:true` を追加。既定false、同じq手数予算・αβ窓・中断・PV/内訳・終局plyを再利用し、全合法王手応手・partial-root/completedDepth/resultSource・TT/PVの契約を維持。Worker/UI/保存形式・評価重みは不変。
+- evasionのd1選択は玉(8,3)/−1005→玉(7,3)/−1096で旧d3の選択に一致。旧候補直後の合法な非捕獲飛成はmaterial −200（元root視点）。値そのものは旧d3の−1005と異なり、有限horizon・勝敗unknownを解消したとはしない。成り後取り返しはq2で回避するがq1では残る。三段交換は+200/−1800/−1000、既存SEE −1000を確認。
+- 2026-10-23 20:07:14〜20:08:59 JST、Windows/i7-14650HX/Node24.20.0。元main srcを隔離展開して比較、既存10局面・標準評価、通常standard/SEE、q1/original/extra0、killer/PV/TT=false、d1と100/1000ms最大d4、warmup1＋本3、AB/BA直列。560呼出し（本420）＋別d2診断40、互換20、欠測/例外/親停止0。旧/OFFの固定全60本は経過時間以外一致。完全入力履歴・選択/評価/PV/内訳・ノード・ソースgzip/hashを保存。
+- 100msは60対で深さ改善0/悪化20、1000msは改善1/悪化3。固定d1 qは81→282（各順序30本）。standard最大超過100/1000は0.963→2.573/1.591→0.850ms、SEE順序は1.130→0.727/1.034→1.272ms。別d2 SEEバッチはstandard0→0/SEE順序33→33。反転evasionの1000msは同深さで短縮もあったが、元evasionは遅くなり100msではd3→d2。**既定ONは推奨しない。一般棋力向上は未実証。**
+- 新規19件・関連9ファイル314件成功。現在の全体 `vitest run --dir src/test` は86ファイル2245件中2243成功/既存UI・snapshotの2timeout（5.746/5.479秒、上限5秒）で失敗。単独再実行は24/37件全成功だが全体成功とは扱わない。既存assertion/timeout/worker数は不変。標準checkは既存.worktreesの旧テストまで収集したため中止、旧minimax2timeoutと現在UI1timeoutも原ログ保存。初回lintの集計CLI型エラーとTEMP rename EPERMも記録。
+- 保存後再集計2回でsummary SHA256 `877bf1ce61a856d50ff41493cfe0fbe91b406950fc88c26696ca59f333a0e32d` 一致。manifest検査・全PV再生・内訳・入力非破壊・cell照合成功。製品2ファイル/SEEは測定時bytesと一致。測定時fixture説明の三段交換−800は銀価値400に対し誤記で、原本を保持し現説明/回帰を−1000へ訂正（説明以外一致）。[設計・検証・残課題](docs/benchmarks/exchange-promotions-20261023.md)、[全比較](docs/benchmarks/exchange-promotions-20261023-run1/results.md)。独立レビュー待ちで停止し、マージしない。
+
+- 最終lockfile/lint・個別build（1761 modules）・diff-check成功。全体失敗と単独成功を含む9原ログをgzip保存、再集計CLI最終ソースも保存。GitHub CIと最終HEADはPR本文で報告する。
+
 ### [2026-10-22 JST] PR #208 P2予算管理2件修正
 
 - レビュー対象/開始HEAD 79babe1528e571b776b219e6d03417a1c772f58b、既存codex/evasion-boundary-diagnosticsで対応。fetch/ff-only確認、clean、追加変更なし。旧CLIに全体0ms/100,000 bytesを与えると参照と局所q2件が実行され、1,791,547 bytes保存する不具合を再現。

@@ -111,12 +111,13 @@ function searchNode(
   ply: number,
   remainingCheckEvasions: number,
   extensionPly: number,
-  checkEvasionStatistics?: CheckEvasionStatistics
+  checkEvasionStatistics: CheckEvasionStatistics | undefined,
+  includeQuietPromotions: boolean
 ): SearchNodeResult {
   const emit = diagnostics?.traceNode;
   emit?.({kind:'enter', phase:'quiescence', state, ply, remainingDepth, remainingCheckEvasions, extensionPly, alpha, beta});
   const result = searchNodeBody(state, remainingDepth, perspective, alpha, beta, evaluation,
-    statistics, interruptionCheck, moveOrdering, diagnostics, ply, remainingCheckEvasions, extensionPly, checkEvasionStatistics);
+    statistics, interruptionCheck, moveOrdering, diagnostics, ply, remainingCheckEvasions, extensionPly, checkEvasionStatistics, includeQuietPromotions);
   emit?.({kind:'return', phase:'quiescence', state, ply, remainingDepth, remainingCheckEvasions, extensionPly, alpha, beta, value:result.evaluation});
   return result;
 }
@@ -135,7 +136,8 @@ function searchNodeBody(
   ply: number,
   remainingCheckEvasions: number,
   extensionPly: number,
-  checkEvasionStatistics?: CheckEvasionStatistics
+  checkEvasionStatistics: CheckEvasionStatistics | undefined,
+  includeQuietPromotions: boolean
 ): SearchNodeResult {
   const note = diagnostics?.traceNode ? (kind: 'stop'|'cutoff', reason: string) => diagnostics.traceNode!({kind, phase:'quiescence', state, ply, remainingDepth, remainingCheckEvasions, extensionPly, reason}) : undefined;
   diagnostics?.setStage('quiescence-entry');
@@ -161,7 +163,8 @@ function searchNodeBody(
   const actions = measured(diagnostics, 'q-legal', () => diagnostics
     ? getQuiescenceLegalActionsWithDiagnostics(state, diagnostics) : getLegalActions(state));
   if (extensionPly > 0 || extending) interruptionCheck?.();
-  const candidates = isInCheck ? actions : actions.filter((action) => isCapture(state, action));
+  const candidates = isInCheck ? actions : actions.filter((action) => isCapture(state, action) ||
+    includeQuietPromotions && action.kind === 'move' && action.promotion === 'promote');
 
   // Child execution normally adjudicates no-response positions. In the new
   // extension path, also resolve custom checked roots through the shared evaluator.
@@ -222,7 +225,7 @@ function searchNodeBody(
       moveOrdering,
       diagnostics, ply + 1,
       remainingCheckEvasions - (extending ? 1 : 0),
-      extensionPly + (extending ? 1 : 0), checkEvasionStatistics
+      extensionPly + (extending ? 1 : 0), checkEvasionStatistics, includeQuietPromotions
     );
     if (extensionPly > 0 || extending) interruptionCheck?.();
 
@@ -252,7 +255,8 @@ function searchNodeBody(
 }
 
 /**
- * Searches only legal captures in ordinary positions and every legal evasion
+ * Searches legal captures (and opt-in quiet promotions) within the same tactical
+ * depth in ordinary positions, and every legal evasion
  * while the side to move is checked. The fixed `perspective` is maximized on
  * that player's turns and minimized on the opponent's turns.
  */
@@ -264,7 +268,8 @@ export function analyzeQuiescenceSearch(
   interruptionCheck: QuiescenceSearchInterruptionCheck = undefined,
   moveOrdering: QuiescenceMoveOrderingMode = 'original',
   maxCheckEvasionExtensions = 0,
-  checkEvasionStatistics?: CheckEvasionStatistics
+  checkEvasionStatistics?: CheckEvasionStatistics,
+  includeQuietPromotions = false
 ): QuiescenceSearchResult {
   return analyzeQuiescenceSearchWithinBounds(
     state,
@@ -274,7 +279,7 @@ export function analyzeQuiescenceSearch(
     interruptionCheck,
     Number.NEGATIVE_INFINITY,
     Number.POSITIVE_INFINITY,
-    moveOrdering, undefined, maxCheckEvasionExtensions, checkEvasionStatistics
+    moveOrdering, undefined, maxCheckEvasionExtensions, checkEvasionStatistics, includeQuietPromotions
   );
 }
 
@@ -295,8 +300,12 @@ export function analyzeQuiescenceSearchWithInternalBounds(
   diagnostics?: SearchDiagnostics,
   rootPly = 0,
   maxCheckEvasionExtensions = 0,
-  checkEvasionStatistics?: CheckEvasionStatistics
+  checkEvasionStatistics?: CheckEvasionStatistics,
+  includeQuietPromotions = false
 ): QuiescenceSearchResult & { searchValue: SearchValue; checkEvasionLimitReached?: boolean } {
+  if (typeof includeQuietPromotions !== 'boolean') {
+    throw new RangeError('Quiescence includeQuietPromotions must be a boolean.');
+  }
   validateMaxTacticalDepth(maxTacticalDepth);
   validateMaxCheckEvasionExtensions(maxCheckEvasionExtensions);
   const resolvedOrdering = resolveQuiescenceMoveOrdering(moveOrdering);
@@ -311,7 +320,7 @@ export function analyzeQuiescenceSearchWithInternalBounds(
     statistics,
     interruptionCheck,
     resolvedOrdering,
-    diagnostics, rootPly, maxCheckEvasionExtensions, 0, checkEvasionStatistics
+    diagnostics, rootPly, maxCheckEvasionExtensions, 0, checkEvasionStatistics, includeQuietPromotions
   );
   return {
     selectedEvaluation: result.evaluationBreakdown.total,
@@ -330,12 +339,13 @@ export function analyzeQuiescenceSearchWithinBounds(
   alpha: number, beta: number, moveOrdering: QuiescenceMoveOrderingMode = 'original',
   diagnostics?: SearchDiagnostics,
   maxCheckEvasionExtensions = 0,
-  checkEvasionStatistics?: CheckEvasionStatistics
+  checkEvasionStatistics?: CheckEvasionStatistics,
+  includeQuietPromotions = false
 ): QuiescenceSearchResult {
   const { searchValue: _internal, checkEvasionLimitReached: _limit, ...result } = analyzeQuiescenceSearchWithInternalBounds(
     state, perspective, maxTacticalDepth, evaluation, interruptionCheck,
     numericalSearchBound(alpha), numericalSearchBound(beta), moveOrdering, diagnostics, 0,
-    maxCheckEvasionExtensions, checkEvasionStatistics
+    maxCheckEvasionExtensions, checkEvasionStatistics, includeQuietPromotions
   );
   return result;
 }

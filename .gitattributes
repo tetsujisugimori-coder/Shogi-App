@@ -12,3 +12,6 @@ docs/benchmarks/outcome-proof-20261022/validation/** -text whitespace=blank-at-e
 
 # Preserve bounded evasion traces, inputs, source snapshots and log bytes.
 docs/benchmarks/evasion-boundary-20261022/** -text whitespace=blank-at-eol,blank-at-eof,space-before-tab,cr-at-eol
+
+# Preserve the exchange comparison's raw inputs and source hashes.
+docs/benchmarks/exchange-promotions-20261023-run1/** -text whitespace=blank-at-eol,blank-at-eof,space-before-tab,cr-at-eol

@@ -1,0 +1,22 @@
+{
+  "baseline-src.tar.gz": "44ad952432139281e853c35691eb23c23b017398189361cfd62eb247f977ed8f",
+  "raw.jsonl": "8473a76189702501d967caeb4bb1d1c6bce346d63cd6b4c54912543a8f98e389",
+  "results.md": "e533c5ca8b75979f4f6ac762895cb58655688f4f6b610fedf52122e4ac8e6cfd",
+  "scripts__benchmarks__checkEvasionReference.ts.gz": "91df74cc47bb3601dc408c3ec95bf4ec1695907a492f0865463ed4597f9b69d6",
+  "scripts__benchmarks__exchangePositions.ts.gz": "c607c9e2b256e336a4c0aefa90204558e63cd1d45697ce33c1bbbe204b048946",
+  "scripts__measure-exchange-promotions.ts.gz": "6ca0a7bcbbc3474f6974877f8b4dad19ec59529eaaa89157e8539c8f29f6f795",
+  "src__domain__shogi__quiescenceSearch.ts.gz": "b6ff817378e57f62a9279ba89bd630ba1e21361ffca221260289b9c3fed35c76",
+  "src__domain__shogi__staticExchangeEvaluation.ts.gz": "1ec49abce683dc5a1c6d687c0b5e776a4aeb5d840cd700e69a32190f90bfed7e",
+  "src__domain__shogi__twoPlyAlphaBetaAi.ts.gz": "0a77adba4eecb6457617296a65026b2bfd4e42423b506c8b66f3cabc7bf403e2",
+  "summary.json": "877bf1ce61a856d50ff41493cfe0fbe91b406950fc88c26696ca59f333a0e32d",
+  "validation__build-final.txt.gz": "cbae163c2e88ac2c8f3da2804cf33ee46002299eb0196c703a06820031f849c2",
+  "validation__check-interrupted.txt.gz": "6fb68fcc896b2ec9626682fd14f208adf10a4290ab71ec4abd1b628d088984fb",
+  "validation__full-current.txt.gz": "369e7b3371a3c5ab13276fd444388919494403e92149fc6499e5dff08d2ccbc4",
+  "validation__initial-lint-failure.txt.gz": "31e90917580c978b99248fd74ca958320c5b8c83dd5141bb7d23b55de9f7314d",
+  "validation__lint-final.txt.gz": "fcd25d8d06c63dba5ae178b8b1c7c7e3451ee73474868f8117bec69961757740",
+  "validation__new-19.txt.gz": "806b952764dabb0474eb65776764cb5c7c7627e41302a99ff3edd2e9d1bd7ddb",
+  "validation__related-314.txt.gz": "fb37ce871510d9ef9807568ae8784273e293952bc58794f389ec6882f5e5c0e2",
+  "validation__report-source.ts.gz": "c530d2e6c8fee0cbbaef099587f0bcc4690e066989267167f4a56be0f23c59b2",
+  "validation__snapshot-isolated.txt.gz": "04f5719de45be2b050c07e8f035c8f17f375c3f7cf9a1d3c028df9b2d4693d05",
+  "validation__ui-isolated.txt.gz": "91fa4e16097add37388873b92efaf5a4d5f449ace00be8801e369034425524b3"
+}
