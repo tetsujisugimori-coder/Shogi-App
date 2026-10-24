@@ -1,0 +1,41 @@
+{
+  "valid": true,
+  "verifiedHead": "a30761eed4a7743b47ac36e5e652e424ab6f9f14",
+  "originalEvidence": 90,
+  "reviewEvidence": 32,
+  "sourceBlobs": 6,
+  "incomingDocument": {
+    "workingBytesSha256": "0fac206963286a01dae4423be1942e2d31a6e9fb1ccaeaf3a22534b2903e57f5",
+    "gitBlobSha256": "b0d0e7b8ee66987b9bb96ae53f702fb85a8e0e7c32a0cedd9b7b4bbcafefa310",
+    "originalRemoteBlobIdentical": true,
+    "lineEndingOnly": true
+  },
+  "product": [
+    {
+      "file": "src/domain/shogi/quiescenceSearch.ts",
+      "measuredWindowsBytesSha256": "a13d7115ee81223b565c5c3136805cdd83bff94647435428f63c637da3fe9b85",
+      "currentWorkingBytesMatch": true,
+      "gitBlobSha256": "9f91fdc5f675d1ad99dba5352adc7f7edb1fe6975ea607fce86c18086b52198f",
+      "gitBlobMatchesMeasuredAfterCRLFNormalization": true
+    },
+    {
+      "file": "src/domain/shogi/quietPromotionSelection.ts",
+      "measuredWindowsBytesSha256": "b6618a5645439f58821ed2d8f4e22ad2de95b70b8d0bec63dfaa4244ff6a9a04",
+      "currentWorkingBytesMatch": true,
+      "gitBlobSha256": "b38cba18895b226a580aabe0a3e8b5b2f85479ceaf6204b4d2dbd68fd105bba6",
+      "gitBlobMatchesMeasuredAfterCRLFNormalization": true
+    },
+    {
+      "file": "src/domain/shogi/twoPlyAlphaBetaAi.ts",
+      "measuredWindowsBytesSha256": "fa972a9f98142066a0c60773e1b229f01183eaad08c7fca1b63faefdc9d64d1f",
+      "currentWorkingBytesMatch": true,
+      "gitBlobSha256": "d6cee3fb890d31af719be187a8dd54f26aa6a90ab2327e574b02c0af2aeef42c",
+      "gitBlobMatchesMeasuredAfterCRLFNormalization": true
+    }
+  ],
+  "helperFailures": [
+    "First final helper compared incomingDocumentHash (Windows CRLF working bytes) to Git LF blob.",
+    "Next helper corrected the incoming document scope but still compared measured Windows product hashes to Git LF blobs. Neither failed helper wrote this report; the subsequent add/commit attempt had no staged changes and made no commit."
+  ],
+  "scopeCorrection": "Preserve all original bytes/manifests. Compare Windows working bytes to saved measured bytes, Git blobs to recorded Git blob hashes, and CRLF-normalized measured text to Git text. No source/test or payload change."
+}

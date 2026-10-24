@@ -9,6 +9,7 @@
 - 保存rawから2回auditが成功しsummary SHA256 `6ea0f1ad8e746dee2cb8410a338aa7fd923ea1d244610441bd43f4c9eda7aabf` 一致、旧証拠90追跡ファイル不変。新raw/ソース/旧src archive/完全入力/表/manifestへ保存した。
 - 最終全体89ファイル2398件（新124/既存2274）全成功、skip/timeout0、関連9ファイル314件成功。旧snapshot timeoutは今回は再現せず、解消とは断定しない。既存期待値/timeout/worker数不変。fixture再生成96条件もbyte一致（`b65c8aab34e6af07fe014242be3dc8bc6cf18bcb29de2eb5ff381282696608af`）。lockfile/型/lint/build1762 modules（24.38秒）/diff-check成功。最終HEADのCIはPR本文へ別記録する。
 - push直前にremoteが `d15899bce3e00ffaffea38bc52f94523c86e717c`（P2依頼文書1ファイル追加のみ）へ進み、最初の通常pushはfetch-firstで拒否。文書を読み、変更せず保護して修正commitをその上へ競合なしrebase。製品/測定bytes不変、force pushや破棄なし。経緯と再照合を新しい追加記録/manifestへ保存し、既存manifestは変更しない。最終HEADのCIを改めて確認する。
+- 統合後の追加依頼文書hashはWindows作業bytes（CRLF）とGit blob（LF）を区別。最終helper初回は比較対象の取り違えで不一致となったが、改行以外の差0・remote追加時のGit blobと完全一致を別検証。製品ソース3ファイルも測定Windows bytesとGitの改行正規化を区別し、helperの同様の比較不一致を記録。元manifestを変えず `validation/final-git-verification.json` に失敗と両hash、旧90/新32/ソース6のGit格納一致、製品3の測定Windows bytes完全一致・Git改行正規化後一致を分けて記録した。
 - 設計・採否・証拠・最終検証は [docs/benchmarks/selective-promotions-review-20261025/README.md](docs/benchmarks/selective-promotions-review-20261025/README.md)。Worker/UI/保存形式・評価/SEE・候補基準・既定OFF・研究用opt-inは不変。マージ/自動マージせず独立再レビュー待ちとする。
 
 ### [2026-10-24 JST] 選択的非捕獲成りq探索とA/B/C実測（研究用opt-in限定）
