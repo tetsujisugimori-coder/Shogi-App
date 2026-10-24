@@ -32,6 +32,8 @@ export type AlphaBetaMoveOrderingMode = 'standard' | 'static-exchange';
 /** Explicit opt-in tactical extension at ordinary alpha-beta leaves. */
 export interface AlphaBetaQuiescenceOptions {
   readonly maxTacticalDepth: number;
+  /** Include legal non-capturing promotions in the same tactical budget. Default false. */
+  readonly includeQuietPromotions?: boolean;
   /** Additional check-only ply after tactical depth is exhausted. Default 0; maximum 2. */
   readonly maxCheckEvasionExtensions?: number;
   /** Omitted retains legal generation order. Independent of ordinary moveOrdering. */
@@ -102,8 +104,8 @@ function resolveQuiescenceOptions(options: AlphaBetaSearchOptions | undefined): 
   const quiescence = options?.quiescence;
   if (quiescence === undefined) return undefined;
   if (quiescence === null || typeof quiescence !== 'object' || Array.isArray(quiescence) ||
-    Reflect.ownKeys(quiescence).some((key) => key !== 'maxTacticalDepth' && key !== 'moveOrdering' && key !== 'maxCheckEvasionExtensions')) {
-    throw new RangeError('Alpha-beta quiescence options must contain only maxTacticalDepth, moveOrdering and maxCheckEvasionExtensions.');
+    Reflect.ownKeys(quiescence).some((key) => key !== 'maxTacticalDepth' && key !== 'moveOrdering' && key !== 'maxCheckEvasionExtensions' && key !== 'includeQuietPromotions')) {
+    throw new RangeError('Alpha-beta quiescence options must contain only maxTacticalDepth, moveOrdering, maxCheckEvasionExtensions and includeQuietPromotions.');
   }
   const maxTacticalDepth = (quiescence as AlphaBetaQuiescenceOptions).maxTacticalDepth;
   if (typeof maxTacticalDepth !== 'number' || !Number.isFinite(maxTacticalDepth) ||
@@ -113,8 +115,12 @@ function resolveQuiescenceOptions(options: AlphaBetaSearchOptions | undefined): 
   const extensions = quiescence.maxCheckEvasionExtensions === undefined ? 0 : quiescence.maxCheckEvasionExtensions;
   // null is an invalid explicit value, not omission.
   validateMaxCheckEvasionExtensions(extensions);
+  if (quiescence.includeQuietPromotions !== undefined && typeof quiescence.includeQuietPromotions !== 'boolean') {
+    throw new RangeError('Alpha-beta quiescence includeQuietPromotions must be a boolean.');
+  }
   return { maxTacticalDepth, moveOrdering: resolveQuiescenceMoveOrdering(quiescence.moveOrdering),
-    maxCheckEvasionExtensions: extensions, statistics: options?.checkEvasionStatistics };
+    maxCheckEvasionExtensions: extensions, statistics: options?.checkEvasionStatistics,
+    includeQuietPromotions: quiescence.includeQuietPromotions ?? false };
 }
 
 /**
@@ -589,7 +595,8 @@ function searchAlphaBetaNodeUncached(
     const quiescence = measured(diagnostics, 'quiescence', () => analyzeQuiescenceSearchWithInternalBounds(
       state, rootPlayer, quiescenceOptions.maxTacticalDepth, valueTable, interruptionCheck, alpha, beta,
       quiescenceOptions.moveOrdering,
-      diagnostics, ply, quiescenceOptions.maxCheckEvasionExtensions, quiescenceOptions.statistics
+      diagnostics, ply, quiescenceOptions.maxCheckEvasionExtensions, quiescenceOptions.statistics,
+      quiescenceOptions.includeQuietPromotions
     ));
     statistics.quiescenceVisitedPositionCount += quiescence.visitedPositionCount;
     statistics.quiescenceCutoffCount += quiescence.cutoffCount;

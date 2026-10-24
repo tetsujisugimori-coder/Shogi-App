@@ -1,5 +1,7 @@
 # SHOGI-APP
 
+静止探索に `quiescence: { maxTacticalDepth: 1, includeQuietPromotions: true }` を指定すると、合法な非捕獲成りも同じq手数予算で探索します。既定false。PR #208の浅い選択差を先後両方で解消しましたが、10局面の100ms比較は60対中20対で完了深さが悪化し、改善0対でした。一般棋力向上は未実証、既定ONは推奨しません。SEE自体とWorker/UIの既定は維持します。[調査・局面・比較・制約](docs/benchmarks/exchange-promotions-20261023.md)。
+
 戦術診断専用の限定AND/OR勝敗証明・証明保存・独立した再生検証を追加しました。`npm run diagnose:outcome-proof -- run NEW_DIR` / `audit DIR`、`npm run verify:outcome-proof -- PROOF.json TRUSTED_REQUEST_SHA256` を使用します。勝敗・引分・unknownを分け、再検証済みの選択手loss＋代替手winだけを新たな厳密不利益の根拠にします。製品探索・ルール・UI・既定設定は変更しません。[形式・分類・再現手順](docs/benchmarks/outcome-proof-20261022/README.md)。
 
 PR #204のレビュー修正で、評価値ありpartial-rootも品質分類をInconclusiveへ限定し、初回warmup等で測定ファイルが未作成でも部分監査できるようにしました。旧原本/v2/manifestを保持し、保存データからv3を各2回再生成して一致。分類件数・実測性能は不変です。[修正・検証記録](docs/benchmarks/tactical-quality-20261022/review-5607667850/README.md)。
