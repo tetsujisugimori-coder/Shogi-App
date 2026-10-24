@@ -1,0 +1,9 @@
+
+ RUN  v4.1.11 C:/Users/tetsu/Documents/Codex/Shogi-App
+
+
+ Test Files  9 passed (9)
+      Tests  314 passed (314)
+   Start at  00:03:30
+   Duration  8.78s (transform 2.60s, setup 1.52s, import 3.21s, tests 2.35s, environment 8.35s)
+

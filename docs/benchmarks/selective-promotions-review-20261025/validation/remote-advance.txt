@@ -1,0 +1,7 @@
+PR212 remote-advance record (2026-10-25 JST; push output transcribed):
+- Initial local/remote/review HEAD was 1b45ad1cab7a493223495b911fab944985456a2f and working tree was clean.
+- First push of local P2 commit 3378c490404d1f1955cff370b8e405a14e607c60 was rejected: ! [rejected] codex/selective-quiet-promotions -> codex/selective-quiet-promotions (fetch first).
+- Fetch found d15899bce3e00ffaffea38bc52f94523c86e717c, docs: add PR #212 P2 correction instructions. It adds only docs/reviews/pr-212-p2-fix-prompt.md; no product, test, measurement or original evidence changes.
+- Read the incoming request document and preserved it unchanged. Rebased the local P2 commit onto that remote commit with no conflicts. Rebased implementation commit is 800ccc07180802caad0778dbb8e24c4011e6dcc5.
+- No force push, reset, discarded changes, new PR, merge or auto-merge. Existing measurement/evidence manifests remain immutable. This is a supplemental integration record, not a measurement sample.
+- Product bytes, 32 committed review evidence files and six source blobs were rechecked after rebase. Tests are the previously recorded successful 2398 because the integrated change is a request document only; final-head CI will rerun them after push.

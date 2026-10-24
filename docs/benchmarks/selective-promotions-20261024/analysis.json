@@ -1,0 +1,1667 @@
+{
+  "metrics": [
+    {
+      "stage": "performance",
+      "condition": "d1",
+      "variant": "A",
+      "n": 10,
+      "actualMs": 52.13179999996555,
+      "maxOverrunMs": 0,
+      "completedDepth": 10,
+      "normal": 123,
+      "q": 27,
+      "sources": {
+        "completed-iteration": 0,
+        "partial-root": 0,
+        "fallback": 0
+      },
+      "selection": null
+    },
+    {
+      "stage": "performance",
+      "condition": "d1",
+      "variant": "B",
+      "n": 10,
+      "actualMs": 64.23969999996916,
+      "maxOverrunMs": 0,
+      "completedDepth": 10,
+      "normal": 123,
+      "q": 94,
+      "sources": {
+        "completed-iteration": 0,
+        "partial-root": 0,
+        "fallback": 0
+      },
+      "selection": null
+    },
+    {
+      "stage": "performance",
+      "condition": "d1",
+      "variant": "C1",
+      "n": 10,
+      "actualMs": 57.63949999998022,
+      "maxOverrunMs": 0,
+      "completedDepth": 10,
+      "normal": 123,
+      "q": 56,
+      "sources": {
+        "completed-iteration": 0,
+        "partial-root": 0,
+        "fallback": 0
+      },
+      "selection": null
+    },
+    {
+      "stage": "performance",
+      "condition": "d4",
+      "variant": "A",
+      "n": 10,
+      "actualMs": 29895.426399999968,
+      "maxOverrunMs": 0,
+      "completedDepth": 40,
+      "normal": 41065,
+      "q": 30033,
+      "sources": {
+        "completed-iteration": 0,
+        "partial-root": 0,
+        "fallback": 0
+      },
+      "selection": null
+    },
+    {
+      "stage": "performance",
+      "condition": "d4",
+      "variant": "B",
+      "n": 10,
+      "actualMs": 33153.459800000026,
+      "maxOverrunMs": 0,
+      "completedDepth": 40,
+      "normal": 42440,
+      "q": 45138,
+      "sources": {
+        "completed-iteration": 0,
+        "partial-root": 0,
+        "fallback": 0
+      },
+      "selection": null
+    },
+    {
+      "stage": "performance",
+      "condition": "d4",
+      "variant": "C1",
+      "n": 10,
+      "actualMs": 32373.661999999997,
+      "maxOverrunMs": 0,
+      "completedDepth": 40,
+      "normal": 41366,
+      "q": 33328,
+      "sources": {
+        "completed-iteration": 0,
+        "partial-root": 0,
+        "fallback": 0
+      },
+      "selection": null
+    },
+    {
+      "stage": "performance",
+      "condition": "100ms",
+      "variant": "A",
+      "n": 30,
+      "actualMs": 3016.674500000023,
+      "maxOverrunMs": 2.457299999980023,
+      "completedDepth": 67,
+      "normal": 2319,
+      "q": 660,
+      "sources": {
+        "completed-iteration": 30,
+        "partial-root": 0,
+        "fallback": 0
+      },
+      "selection": null
+    },
+    {
+      "stage": "performance",
+      "condition": "100ms",
+      "variant": "B",
+      "n": 30,
+      "actualMs": 3016.9502999999386,
+      "maxOverrunMs": 1.437000000005355,
+      "completedDepth": 56,
+      "normal": 1443,
+      "q": 1382,
+      "sources": {
+        "completed-iteration": 30,
+        "partial-root": 0,
+        "fallback": 0
+      },
+      "selection": null
+    },
+    {
+      "stage": "performance",
+      "condition": "100ms",
+      "variant": "C1",
+      "n": 30,
+      "actualMs": 3015.672799999942,
+      "maxOverrunMs": 2.192200000048615,
+      "completedDepth": 59,
+      "normal": 1644,
+      "q": 1245,
+      "sources": {
+        "completed-iteration": 30,
+        "partial-root": 0,
+        "fallback": 0
+      },
+      "selection": null
+    },
+    {
+      "stage": "performance",
+      "condition": "1000ms",
+      "variant": "A",
+      "n": 30,
+      "actualMs": 21458.300200000114,
+      "maxOverrunMs": 3.417699999990873,
+      "completedDepth": 105,
+      "normal": 31002,
+      "q": 3000,
+      "sources": {
+        "completed-iteration": 30,
+        "partial-root": 0,
+        "fallback": 0
+      },
+      "selection": null
+    },
+    {
+      "stage": "performance",
+      "condition": "1000ms",
+      "variant": "B",
+      "n": 30,
+      "actualMs": 23201.341600000014,
+      "maxOverrunMs": 1.3693999999959487,
+      "completedDepth": 97,
+      "normal": 19872,
+      "q": 8087,
+      "sources": {
+        "completed-iteration": 30,
+        "partial-root": 0,
+        "fallback": 0
+      },
+      "selection": null
+    },
+    {
+      "stage": "performance",
+      "condition": "1000ms",
+      "variant": "C1",
+      "n": 30,
+      "actualMs": 22287.37990000003,
+      "maxOverrunMs": 1.8374000000185333,
+      "completedDepth": 98,
+      "normal": 21513,
+      "q": 8047,
+      "sources": {
+        "completed-iteration": 30,
+        "partial-root": 0,
+        "fallback": 0
+      },
+      "selection": null
+    }
+  ],
+  "pairs": [
+    {
+      "limit": 100,
+      "variant": "B",
+      "better": 1,
+      "worse": 12,
+      "same": 17
+    },
+    {
+      "limit": 100,
+      "variant": "C1",
+      "better": 0,
+      "worse": 8,
+      "same": 22
+    },
+    {
+      "limit": 1000,
+      "variant": "B",
+      "better": 0,
+      "worse": 8,
+      "same": 22
+    },
+    {
+      "limit": 1000,
+      "variant": "C1",
+      "better": 0,
+      "worse": 7,
+      "same": 23
+    }
+  ],
+  "quality": {
+    "A": {
+      "ProvenError": 0,
+      "QualityGap": 1,
+      "Inconclusive": 7,
+      "NoObservedDifference": 8
+    },
+    "B": {
+      "ProvenError": 0,
+      "QualityGap": 0,
+      "Inconclusive": 7,
+      "NoObservedDifference": 9
+    },
+    "C1": {
+      "ProvenError": 0,
+      "QualityGap": 0,
+      "Inconclusive": 7,
+      "NoObservedDifference": 9
+    }
+  },
+  "perPosition": [
+    {
+      "id": "initial",
+      "limit": 100,
+      "values": [
+        {
+          "variant": "A",
+          "depths": [
+            1,
+            1,
+            1
+          ],
+          "actualMs": [
+            100.71369999999297,
+            100.59270000000834,
+            100.55830000000424
+          ],
+          "sources": [
+            "completed-iteration",
+            "completed-iteration",
+            "completed-iteration"
+          ]
+        },
+        {
+          "variant": "B",
+          "depths": [
+            1,
+            1,
+            1
+          ],
+          "actualMs": [
+            101.43700000000536,
+            100.41939999998431,
+            100.44149999998626
+          ],
+          "sources": [
+            "completed-iteration",
+            "completed-iteration",
+            "completed-iteration"
+          ]
+        },
+        {
+          "variant": "C1",
+          "depths": [
+            1,
+            1,
+            1
+          ],
+          "actualMs": [
+            100.33220000000438,
+            100.4936999999918,
+            100.63809999998193
+          ],
+          "sources": [
+            "completed-iteration",
+            "completed-iteration",
+            "completed-iteration"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "pawn-recapture",
+      "limit": 100,
+      "values": [
+        {
+          "variant": "A",
+          "depths": [
+            2,
+            3,
+            2
+          ],
+          "actualMs": [
+            102.45729999998002,
+            100.90720000001602,
+            100.66719999999623
+          ],
+          "sources": [
+            "completed-iteration",
+            "completed-iteration",
+            "completed-iteration"
+          ]
+        },
+        {
+          "variant": "B",
+          "depths": [
+            3,
+            2,
+            2
+          ],
+          "actualMs": [
+            100.76560000001336,
+            100.97570000000997,
+            100.52569999999832
+          ],
+          "sources": [
+            "completed-iteration",
+            "completed-iteration",
+            "completed-iteration"
+          ]
+        },
+        {
+          "variant": "C1",
+          "depths": [
+            2,
+            2,
+            2
+          ],
+          "actualMs": [
+            100.44370000000345,
+            100.46080000000075,
+            100.61129999998957
+          ],
+          "sources": [
+            "completed-iteration",
+            "completed-iteration",
+            "completed-iteration"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "poisoned-rook",
+      "limit": 100,
+      "values": [
+        {
+          "variant": "A",
+          "depths": [
+            2,
+            2,
+            2
+          ],
+          "actualMs": [
+            100.45490000001155,
+            100.73319999998785,
+            100.51469999999972
+          ],
+          "sources": [
+            "completed-iteration",
+            "completed-iteration",
+            "completed-iteration"
+          ]
+        },
+        {
+          "variant": "B",
+          "depths": [
+            2,
+            2,
+            2
+          ],
+          "actualMs": [
+            100.84510000000591,
+            100.71319999999832,
+            100.65339999998105
+          ],
+          "sources": [
+            "completed-iteration",
+            "completed-iteration",
+            "completed-iteration"
+          ]
+        },
+        {
+          "variant": "C1",
+          "depths": [
+            2,
+            2,
+            2
+          ],
+          "actualMs": [
+            100.63689999998314,
+            100.47709999998915,
+            100.7845999999845
+          ],
+          "sources": [
+            "completed-iteration",
+            "completed-iteration",
+            "completed-iteration"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "rook-check",
+      "limit": 100,
+      "values": [
+        {
+          "variant": "A",
+          "depths": [
+            3,
+            3,
+            3
+          ],
+          "actualMs": [
+            100.37959999998566,
+            100.4942999999912,
+            100.35440000001108
+          ],
+          "sources": [
+            "completed-iteration",
+            "completed-iteration",
+            "completed-iteration"
+          ]
+        },
+        {
+          "variant": "B",
+          "depths": [
+            2,
+            2,
+            2
+          ],
+          "actualMs": [
+            100.37450000000536,
+            100.35209999998915,
+            100.38320000001113
+          ],
+          "sources": [
+            "completed-iteration",
+            "completed-iteration",
+            "completed-iteration"
+          ]
+        },
+        {
+          "variant": "C1",
+          "depths": [
+            2,
+            2,
+            2
+          ],
+          "actualMs": [
+            100.33950000000186,
+            100.33809999999357,
+            100.49189999999362
+          ],
+          "sources": [
+            "completed-iteration",
+            "completed-iteration",
+            "completed-iteration"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "promotion-capture",
+      "limit": 100,
+      "values": [
+        {
+          "variant": "A",
+          "depths": [
+            2,
+            2,
+            2
+          ],
+          "actualMs": [
+            100.41500000000815,
+            100.3923000000068,
+            100.3640000000014
+          ],
+          "sources": [
+            "completed-iteration",
+            "completed-iteration",
+            "completed-iteration"
+          ]
+        },
+        {
+          "variant": "B",
+          "depths": [
+            2,
+            2,
+            2
+          ],
+          "actualMs": [
+            100.37069999999949,
+            100.43820000000414,
+            100.7386000000115
+          ],
+          "sources": [
+            "completed-iteration",
+            "completed-iteration",
+            "completed-iteration"
+          ]
+        },
+        {
+          "variant": "C1",
+          "depths": [
+            2,
+            2,
+            2
+          ],
+          "actualMs": [
+            100.36239999998361,
+            100.37890000001062,
+            100.59440000000177
+          ],
+          "sources": [
+            "completed-iteration",
+            "completed-iteration",
+            "completed-iteration"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "gold-drop-evasion",
+      "limit": 100,
+      "values": [
+        {
+          "variant": "A",
+          "depths": [
+            2,
+            2,
+            2
+          ],
+          "actualMs": [
+            100.44639999998617,
+            100.34950000001118,
+            100.44580000001588
+          ],
+          "sources": [
+            "completed-iteration",
+            "completed-iteration",
+            "completed-iteration"
+          ]
+        },
+        {
+          "variant": "B",
+          "depths": [
+            2,
+            2,
+            2
+          ],
+          "actualMs": [
+            100.43599999998696,
+            100.38769999999204,
+            100.500400000019
+          ],
+          "sources": [
+            "completed-iteration",
+            "completed-iteration",
+            "completed-iteration"
+          ]
+        },
+        {
+          "variant": "C1",
+          "depths": [
+            2,
+            2,
+            2
+          ],
+          "actualMs": [
+            100.42600000000675,
+            100.43039999998291,
+            100.43330000000424
+          ],
+          "sources": [
+            "completed-iteration",
+            "completed-iteration",
+            "completed-iteration"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "exchange-chain",
+      "limit": 100,
+      "values": [
+        {
+          "variant": "A",
+          "depths": [
+            2,
+            2,
+            2
+          ],
+          "actualMs": [
+            101.29330000001937,
+            100.37910000002012,
+            100.35869999998249
+          ],
+          "sources": [
+            "completed-iteration",
+            "completed-iteration",
+            "completed-iteration"
+          ]
+        },
+        {
+          "variant": "B",
+          "depths": [
+            2,
+            2,
+            2
+          ],
+          "actualMs": [
+            100.41820000001462,
+            100.50849999999627,
+            100.6762999999919
+          ],
+          "sources": [
+            "completed-iteration",
+            "completed-iteration",
+            "completed-iteration"
+          ]
+        },
+        {
+          "variant": "C1",
+          "depths": [
+            2,
+            2,
+            2
+          ],
+          "actualMs": [
+            100.55939999996917,
+            102.19220000004862,
+            100.62140000000363
+          ],
+          "sources": [
+            "completed-iteration",
+            "completed-iteration",
+            "completed-iteration"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "evasion-promotion",
+      "limit": 100,
+      "values": [
+        {
+          "variant": "A",
+          "depths": [
+            3,
+            3,
+            3
+          ],
+          "actualMs": [
+            100.16680000000633,
+            100.40129999996861,
+            100.43959999998333
+          ],
+          "sources": [
+            "completed-iteration",
+            "completed-iteration",
+            "completed-iteration"
+          ]
+        },
+        {
+          "variant": "B",
+          "depths": [
+            3,
+            2,
+            2
+          ],
+          "actualMs": [
+            100.40659999998752,
+            100.38940000004368,
+            100.42499999998836
+          ],
+          "sources": [
+            "completed-iteration",
+            "completed-iteration",
+            "completed-iteration"
+          ]
+        },
+        {
+          "variant": "C1",
+          "depths": [
+            3,
+            2,
+            3
+          ],
+          "actualMs": [
+            100.27409999998054,
+            100.29930000001332,
+            100.55019999999786
+          ],
+          "sources": [
+            "completed-iteration",
+            "completed-iteration",
+            "completed-iteration"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "evasion-promotion-gote",
+      "limit": 100,
+      "values": [
+        {
+          "variant": "A",
+          "depths": [
+            3,
+            3,
+            3
+          ],
+          "actualMs": [
+            100.55139999999665,
+            100.38740000000689,
+            100.3184000000474
+          ],
+          "sources": [
+            "completed-iteration",
+            "completed-iteration",
+            "completed-iteration"
+          ]
+        },
+        {
+          "variant": "B",
+          "depths": [
+            2,
+            2,
+            2
+          ],
+          "actualMs": [
+            100.3532000000123,
+            100.27309999999125,
+            100.31679999997141
+          ],
+          "sources": [
+            "completed-iteration",
+            "completed-iteration",
+            "completed-iteration"
+          ]
+        },
+        {
+          "variant": "C1",
+          "depths": [
+            2,
+            2,
+            2
+          ],
+          "actualMs": [
+            100.37949999998091,
+            100.43050000001676,
+            100.66180000000168
+          ],
+          "sources": [
+            "completed-iteration",
+            "completed-iteration",
+            "completed-iteration"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "see-deadline",
+      "limit": 100,
+      "values": [
+        {
+          "variant": "A",
+          "depths": [
+            2,
+            2,
+            2
+          ],
+          "actualMs": [
+            100.34340000001248,
+            100.34899999998743,
+            100.44559999997728
+          ],
+          "sources": [
+            "completed-iteration",
+            "completed-iteration",
+            "completed-iteration"
+          ]
+        },
+        {
+          "variant": "B",
+          "depths": [
+            1,
+            1,
+            1
+          ],
+          "actualMs": [
+            100.61009999999078,
+            101.38959999999497,
+            100.4254999999539
+          ],
+          "sources": [
+            "completed-iteration",
+            "completed-iteration",
+            "completed-iteration"
+          ]
+        },
+        {
+          "variant": "C1",
+          "depths": [
+            2,
+            2,
+            2
+          ],
+          "actualMs": [
+            100.3245000000461,
+            100.35479999997187,
+            100.351800000004
+          ],
+          "sources": [
+            "completed-iteration",
+            "completed-iteration",
+            "completed-iteration"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "initial",
+      "limit": 1000,
+      "values": [
+        {
+          "variant": "A",
+          "depths": [
+            2,
+            2,
+            2
+          ],
+          "actualMs": [
+            1000.5428000000247,
+            1003.4176999999909,
+            1001.6263999999792
+          ],
+          "sources": [
+            "completed-iteration",
+            "completed-iteration",
+            "completed-iteration"
+          ]
+        },
+        {
+          "variant": "B",
+          "depths": [
+            2,
+            2,
+            2
+          ],
+          "actualMs": [
+            1001.3239999999932,
+            1000.3728000000119,
+            1000.5482000000193
+          ],
+          "sources": [
+            "completed-iteration",
+            "completed-iteration",
+            "completed-iteration"
+          ]
+        },
+        {
+          "variant": "C1",
+          "depths": [
+            2,
+            2,
+            2
+          ],
+          "actualMs": [
+            1000.444599999988,
+            1001.8374000000185,
+            1000.4255000000121
+          ],
+          "sources": [
+            "completed-iteration",
+            "completed-iteration",
+            "completed-iteration"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "pawn-recapture",
+      "limit": 1000,
+      "values": [
+        {
+          "variant": "A",
+          "depths": [
+            4,
+            4,
+            4
+          ],
+          "actualMs": [
+            994.1766000000061,
+            915.1050000000105,
+            665.0692000000272
+          ],
+          "sources": [
+            "completed-iteration",
+            "completed-iteration",
+            "completed-iteration"
+          ]
+        },
+        {
+          "variant": "B",
+          "depths": [
+            3,
+            3,
+            3
+          ],
+          "actualMs": [
+            1001.369399999996,
+            1000.4498000000021,
+            1000.4195999999938
+          ],
+          "sources": [
+            "completed-iteration",
+            "completed-iteration",
+            "completed-iteration"
+          ]
+        },
+        {
+          "variant": "C1",
+          "depths": [
+            3,
+            3,
+            4
+          ],
+          "actualMs": [
+            1000.440499999997,
+            1000.6546000000089,
+            793.4631999999983
+          ],
+          "sources": [
+            "completed-iteration",
+            "completed-iteration",
+            "completed-iteration"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "poisoned-rook",
+      "limit": 1000,
+      "values": [
+        {
+          "variant": "A",
+          "depths": [
+            4,
+            4,
+            4
+          ],
+          "actualMs": [
+            910.6730000000098,
+            897.2214999999851,
+            798.0442000000039
+          ],
+          "sources": [
+            "completed-iteration",
+            "completed-iteration",
+            "completed-iteration"
+          ]
+        },
+        {
+          "variant": "B",
+          "depths": [
+            3,
+            3,
+            3
+          ],
+          "actualMs": [
+            1000.4119999999821,
+            1001.0334999999905,
+            1000.3748999999953
+          ],
+          "sources": [
+            "completed-iteration",
+            "completed-iteration",
+            "completed-iteration"
+          ]
+        },
+        {
+          "variant": "C1",
+          "depths": [
+            3,
+            3,
+            3
+          ],
+          "actualMs": [
+            1000.7719999999972,
+            1000.9847000000009,
+            1000.4264999999723
+          ],
+          "sources": [
+            "completed-iteration",
+            "completed-iteration",
+            "completed-iteration"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "rook-check",
+      "limit": 1000,
+      "values": [
+        {
+          "variant": "A",
+          "depths": [
+            4,
+            4,
+            4
+          ],
+          "actualMs": [
+            308.2118999999948,
+            313.90929999999935,
+            283.4972000000125
+          ],
+          "sources": [
+            "completed-iteration",
+            "completed-iteration",
+            "completed-iteration"
+          ]
+        },
+        {
+          "variant": "B",
+          "depths": [
+            4,
+            4,
+            4
+          ],
+          "actualMs": [
+            386.50129999997444,
+            385.16539999999804,
+            394.2027999999991
+          ],
+          "sources": [
+            "completed-iteration",
+            "completed-iteration",
+            "completed-iteration"
+          ]
+        },
+        {
+          "variant": "C1",
+          "depths": [
+            4,
+            4,
+            4
+          ],
+          "actualMs": [
+            341.5432000000146,
+            355.3666000000085,
+            345.3368999999948
+          ],
+          "sources": [
+            "completed-iteration",
+            "completed-iteration",
+            "completed-iteration"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "promotion-capture",
+      "limit": 1000,
+      "values": [
+        {
+          "variant": "A",
+          "depths": [
+            4,
+            4,
+            4
+          ],
+          "actualMs": [
+            335.250400000019,
+            344.4199999999837,
+            350.6474000000162
+          ],
+          "sources": [
+            "completed-iteration",
+            "completed-iteration",
+            "completed-iteration"
+          ]
+        },
+        {
+          "variant": "B",
+          "depths": [
+            4,
+            4,
+            4
+          ],
+          "actualMs": [
+            538.6065999999992,
+            545.8524000000034,
+            540.7924999999814
+          ],
+          "sources": [
+            "completed-iteration",
+            "completed-iteration",
+            "completed-iteration"
+          ]
+        },
+        {
+          "variant": "C1",
+          "depths": [
+            4,
+            4,
+            4
+          ],
+          "actualMs": [
+            450.5562000000209,
+            427.4956999999995,
+            421.1343999999808
+          ],
+          "sources": [
+            "completed-iteration",
+            "completed-iteration",
+            "completed-iteration"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "gold-drop-evasion",
+      "limit": 1000,
+      "values": [
+        {
+          "variant": "A",
+          "depths": [
+            3,
+            3,
+            3
+          ],
+          "actualMs": [
+            1000.4482999999891,
+            1000.5486999999848,
+            1000.3276999999653
+          ],
+          "sources": [
+            "completed-iteration",
+            "completed-iteration",
+            "completed-iteration"
+          ]
+        },
+        {
+          "variant": "B",
+          "depths": [
+            3,
+            3,
+            2
+          ],
+          "actualMs": [
+            1001.1029000000271,
+            1000.6407999999938,
+            1000.6807000000263
+          ],
+          "sources": [
+            "completed-iteration",
+            "completed-iteration",
+            "completed-iteration"
+          ]
+        },
+        {
+          "variant": "C1",
+          "depths": [
+            3,
+            3,
+            3
+          ],
+          "actualMs": [
+            1000.4483999999939,
+            1000.426999999996,
+            1000.4019000000262
+          ],
+          "sources": [
+            "completed-iteration",
+            "completed-iteration",
+            "completed-iteration"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "exchange-chain",
+      "limit": 1000,
+      "values": [
+        {
+          "variant": "A",
+          "depths": [
+            3,
+            3,
+            3
+          ],
+          "actualMs": [
+            1002.4001999999746,
+            1000.5152000000235,
+            1000.3320999999996
+          ],
+          "sources": [
+            "completed-iteration",
+            "completed-iteration",
+            "completed-iteration"
+          ]
+        },
+        {
+          "variant": "B",
+          "depths": [
+            3,
+            3,
+            3
+          ],
+          "actualMs": [
+            1000.6516999999876,
+            1000.4554000000353,
+            1000.9829000000027
+          ],
+          "sources": [
+            "completed-iteration",
+            "completed-iteration",
+            "completed-iteration"
+          ]
+        },
+        {
+          "variant": "C1",
+          "depths": [
+            3,
+            3,
+            3
+          ],
+          "actualMs": [
+            1000.8975999999675,
+            1000.5255999999936,
+            1000.3748999999953
+          ],
+          "sources": [
+            "completed-iteration",
+            "completed-iteration",
+            "completed-iteration"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "evasion-promotion",
+      "limit": 1000,
+      "values": [
+        {
+          "variant": "A",
+          "depths": [
+            4,
+            4,
+            4
+          ],
+          "actualMs": [
+            278.3438000000315,
+            203.26150000002235,
+            286.0505000000121
+          ],
+          "sources": [
+            "completed-iteration",
+            "completed-iteration",
+            "completed-iteration"
+          ]
+        },
+        {
+          "variant": "B",
+          "depths": [
+            4,
+            4,
+            4
+          ],
+          "actualMs": [
+            308.93329999997513,
+            370.0991999999969,
+            315.227600000042
+          ],
+          "sources": [
+            "completed-iteration",
+            "completed-iteration",
+            "completed-iteration"
+          ]
+        },
+        {
+          "variant": "C1",
+          "depths": [
+            4,
+            4,
+            4
+          ],
+          "actualMs": [
+            313.5084999999963,
+            313.5503000000026,
+            231.69180000002962
+          ],
+          "sources": [
+            "completed-iteration",
+            "completed-iteration",
+            "completed-iteration"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "evasion-promotion-gote",
+      "limit": 1000,
+      "values": [
+        {
+          "variant": "A",
+          "depths": [
+            4,
+            4,
+            4
+          ],
+          "actualMs": [
+            568.1412000000128,
+            590.0055000000284,
+            403.4572000000044
+          ],
+          "sources": [
+            "completed-iteration",
+            "completed-iteration",
+            "completed-iteration"
+          ]
+        },
+        {
+          "variant": "B",
+          "depths": [
+            4,
+            4,
+            4
+          ],
+          "actualMs": [
+            421.703199999989,
+            489.32579999999143,
+            493.0104000000283
+          ],
+          "sources": [
+            "completed-iteration",
+            "completed-iteration",
+            "completed-iteration"
+          ]
+        },
+        {
+          "variant": "C1",
+          "depths": [
+            4,
+            4,
+            4
+          ],
+          "actualMs": [
+            421.8942999999854,
+            462.7135000000126,
+            398.81879999995
+          ],
+          "sources": [
+            "completed-iteration",
+            "completed-iteration",
+            "completed-iteration"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "see-deadline",
+      "limit": 1000,
+      "values": [
+        {
+          "variant": "A",
+          "depths": [
+            3,
+            3,
+            3
+          ],
+          "actualMs": [
+            1000.375699999975,
+            1001.0862000000197,
+            1001.1938000000082
+          ],
+          "sources": [
+            "completed-iteration",
+            "completed-iteration",
+            "completed-iteration"
+          ]
+        },
+        {
+          "variant": "B",
+          "depths": [
+            2,
+            3,
+            3
+          ],
+          "actualMs": [
+            1000.3704000000143,
+            1000.337200000009,
+            1000.3948999999557
+          ],
+          "sources": [
+            "completed-iteration",
+            "completed-iteration",
+            "completed-iteration"
+          ]
+        },
+        {
+          "variant": "C1",
+          "depths": [
+            2,
+            2,
+            3
+          ],
+          "actualMs": [
+            1000.4219000000157,
+            1000.3453000000445,
+            1000.4781000000075
+          ],
+          "sources": [
+            "completed-iteration",
+            "completed-iteration",
+            "completed-iteration"
+          ]
+        }
+      ]
+    }
+  ],
+  "matches": [
+    {
+      "id": "hirate",
+      "limit": 100,
+      "summary": {
+        "aWins": 0,
+        "bWins": 0,
+        "draws": 1,
+        "maxPlies": 1,
+        "failures": 0
+      },
+      "games": [
+        {
+          "outcome": "max_plies",
+          "status": "max_plies",
+          "plies": 120,
+          "result": null
+        },
+        {
+          "outcome": "draw",
+          "status": "ended",
+          "plies": 61,
+          "result": {
+            "winner": null,
+            "loser": null,
+            "endReason": "repetition",
+            "details": "千日手による無勝負"
+          }
+        }
+      ]
+    },
+    {
+      "id": "hirate-exchange",
+      "limit": 100,
+      "summary": {
+        "aWins": 0,
+        "bWins": 1,
+        "draws": 1,
+        "maxPlies": 0,
+        "failures": 0
+      },
+      "games": [
+        {
+          "outcome": "draw",
+          "status": "ended",
+          "plies": 48,
+          "result": {
+            "winner": null,
+            "loser": null,
+            "endReason": "repetition",
+            "details": "千日手による無勝負"
+          }
+        },
+        {
+          "outcome": "b_win",
+          "status": "ended",
+          "plies": 45,
+          "result": {
+            "winner": "sente",
+            "loser": "gote",
+            "endReason": "checkmate"
+          }
+        }
+      ]
+    },
+    {
+      "id": "evasion",
+      "limit": 100,
+      "summary": {
+        "aWins": 1,
+        "bWins": 1,
+        "draws": 0,
+        "maxPlies": 0,
+        "failures": 0
+      },
+      "games": [
+        {
+          "outcome": "b_win",
+          "status": "ended",
+          "plies": 14,
+          "result": {
+            "winner": "gote",
+            "loser": "sente",
+            "endReason": "no_legal_actions"
+          }
+        },
+        {
+          "outcome": "a_win",
+          "status": "ended",
+          "plies": 14,
+          "result": {
+            "winner": "gote",
+            "loser": "sente",
+            "endReason": "no_legal_actions"
+          }
+        }
+      ]
+    },
+    {
+      "id": "hirate",
+      "limit": 1000,
+      "summary": {
+        "aWins": 1,
+        "bWins": 1,
+        "draws": 0,
+        "maxPlies": 0,
+        "failures": 0
+      },
+      "games": [
+        {
+          "outcome": "b_win",
+          "status": "ended",
+          "plies": 44,
+          "result": {
+            "winner": "gote",
+            "loser": "sente",
+            "endReason": "checkmate"
+          }
+        },
+        {
+          "outcome": "a_win",
+          "status": "ended",
+          "plies": 44,
+          "result": {
+            "winner": "gote",
+            "loser": "sente",
+            "endReason": "checkmate"
+          }
+        }
+      ]
+    },
+    {
+      "id": "evasion",
+      "limit": 1000,
+      "summary": {
+        "aWins": 1,
+        "bWins": 1,
+        "draws": 0,
+        "maxPlies": 0,
+        "failures": 0
+      },
+      "games": [
+        {
+          "outcome": "b_win",
+          "status": "ended",
+          "plies": 16,
+          "result": {
+            "winner": "gote",
+            "loser": "sente",
+            "endReason": "no_legal_actions"
+          }
+        },
+        {
+          "outcome": "a_win",
+          "status": "ended",
+          "plies": 50,
+          "result": {
+            "winner": "gote",
+            "loser": "sente",
+            "endReason": "no_legal_actions"
+          }
+        }
+      ]
+    }
+  ],
+  "proofs": [
+    {
+      "id": "evasion-promotion",
+      "variant": "A",
+      "status": "unknown",
+      "stops": {
+        "depth": 593,
+        "time": 1
+      },
+      "verified": null
+    },
+    {
+      "id": "evasion-promotion",
+      "variant": "C1",
+      "status": "unknown",
+      "stops": {
+        "depth": 617,
+        "time": 1
+      },
+      "verified": null
+    },
+    {
+      "id": "evasion-promotion-gote",
+      "variant": "A",
+      "status": "unknown",
+      "stops": {
+        "depth": 582,
+        "time": 1
+      },
+      "verified": null
+    },
+    {
+      "id": "evasion-promotion-gote",
+      "variant": "C1",
+      "status": "unknown",
+      "stops": {
+        "depth": 587,
+        "time": 1
+      },
+      "verified": null
+    }
+  ]
+}

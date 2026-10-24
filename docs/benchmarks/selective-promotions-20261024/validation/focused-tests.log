@@ -1,0 +1,69 @@
+
+ RUN  v4.1.11 C:/Users/tetsu/Documents/Codex/Shogi-App
+
+ ❯ src/test/shogi-selective-promotions.test.ts (25 tests | 2 failed) 229ms
+     × keeps PR208 shallow correction for both sides (rotate=false) 16ms
+     × keeps PR208 shallow correction for both sides (rotate=true) 13ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 2 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/test/shogi-selective-promotions.test.ts > selective quiet promotions > keeps PR208 shallow correction for both sides (rotate=false)
+AssertionError: expected { kind: 'move', player: 'sente', …(4) } to deeply equal { kind: 'move', player: 'sente', …(4) }
+
+- Expected
++ Received
+
+@@ -7,8 +7,8 @@
+    "pieceType": "king",
+    "player": "sente",
+    "promotion": "none",
+    "to": {
+      "col": 3,
+-     "row": 7,
++     "row": 8,
+    },
+  }
+
+ ❯ src/test/shogi-selective-promotions.test.ts:78:30
+     76|   it.each([false,true])('keeps PR208 shallow correction for both sides…
+     77|     const s=flip?rotate(evasion(),'flip'):evasion();const r=analyzeAlp…
+     78|     expect(r.selectedAction).toEqual(analyzeAlphaBetaSearch(s,3,undefi…
+       |                              ^
+     79|     expect(r.evaluationBreakdown).toEqual(evaluateSearchPositionBreakd…
+     80|   });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/2]⎯
+
+ FAIL  src/test/shogi-selective-promotions.test.ts > selective quiet promotions > keeps PR208 shallow correction for both sides (rotate=true)
+AssertionError: expected { kind: 'move', player: 'gote', …(4) } to deeply equal { kind: 'move', player: 'gote', …(4) }
+
+- Expected
++ Received
+
+@@ -7,8 +7,8 @@
+    "pieceType": "king",
+    "player": "gote",
+    "promotion": "none",
+    "to": {
+      "col": 3,
+-     "row": 1,
++     "row": 0,
+    },
+  }
+
+ ❯ src/test/shogi-selective-promotions.test.ts:78:30
+     76|   it.each([false,true])('keeps PR208 shallow correction for both sides…
+     77|     const s=flip?rotate(evasion(),'flip'):evasion();const r=analyzeAlp…
+     78|     expect(r.selectedAction).toEqual(analyzeAlphaBetaSearch(s,3,undefi…
+       |                              ^
+     79|     expect(r.evaluationBreakdown).toEqual(evaluateSearchPositionBreakd…
+     80|   });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/2]⎯
+
+
+ Test Files  1 failed | 1 passed (2)
+      Tests  2 failed | 42 passed (44)
+   Start at  22:10:23
+   Duration  2.26s (transform 847ms, setup 610ms, import 961ms, tests 367ms, environment 2.13s)
+

@@ -15,3 +15,11 @@ docs/benchmarks/evasion-boundary-20261022/** -text whitespace=blank-at-eol,blank
 
 # Preserve the exchange comparison's raw inputs and source hashes.
 docs/benchmarks/exchange-promotions-20261023-run1/** -text whitespace=blank-at-eol,blank-at-eof,space-before-tab,cr-at-eol
+
+# Preserve selective promotion measurements and validation logs.
+docs/benchmarks/selective-promotions-20261024/** -text whitespace=blank-at-eol,blank-at-eof,space-before-tab,cr-at-eol
+# Preserve original tool stdout, including its terminal blank line.
+docs/benchmarks/selective-promotions-20261024/validation/*.log -text whitespace=blank-at-eol,-blank-at-eof,space-before-tab,cr-at-eol
+# Keep PR212 review evidence and original stdout bytes stable.
+docs/benchmarks/selective-promotions-review-20261025/** -text whitespace=blank-at-eol,blank-at-eof,space-before-tab,cr-at-eol
+docs/benchmarks/selective-promotions-review-20261025/validation/*.log -text whitespace=blank-at-eol,-blank-at-eof,space-before-tab,cr-at-eol
