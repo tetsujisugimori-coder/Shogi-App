@@ -1,0 +1,11 @@
+{"ended":false,"code":null,"bytes":1658631}
+C:\Users\tetsu\Documents\Codex\Shogi-App\scripts\measure-selective-promotions.ts:148
+    console.log(json({ended,code,bytes}));if(!ended||code!==0)reject(Error('incomplete run; raw retained'));else done();});});
+                                                                     ^
+
+Error: incomplete run; raw retained
+    at ChildProcess.<anonymous> (C:\Users\tetsu\Documents\Codex\Shogi-App\scripts\measure-selective-promotions.ts:148:70)
+    at ChildProcess.emit (node:events:514:28)
+    at ChildProcess._handle.onexit (node:internal/child_process:295:12)
+
+Node.js v24.20.0

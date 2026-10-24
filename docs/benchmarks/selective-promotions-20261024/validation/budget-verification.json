@@ -1,0 +1,18 @@
+[
+  {
+    "dir": "budget-zero",
+    "reason": "global time budget",
+    "started": 0,
+    "completed": 0,
+    "bytes": 1649792,
+    "limit": 41943040
+  },
+  {
+    "dir": "budget-small",
+    "reason": "storage budget",
+    "started": 26,
+    "completed": 25,
+    "bytes": 1658631,
+    "limit": 1921191
+  }
+]

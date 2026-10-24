@@ -9,7 +9,7 @@ import { CheckInternalsProbe } from './checkInternalsDiagnostics';
 export type SearchDiagnosticPhase =
   | 'root-legal' | 'normal-legal' | 'normal-order' | 'see' | 'normal-execute'
   | 'normal-other' | 'normal-evaluate' | 'quiescence' | 'root-piece-moves' | 'root-hand-drops'
-  | 'q-evaluate' | 'q-check' | 'q-legal' | 'q-order' | 'q-execute'
+  | 'q-select-promotions' | 'q-evaluate' | 'q-check' | 'q-legal' | 'q-order' | 'q-execute'
   | 'q-board-moves' | 'q-board-pseudo' | 'q-board-simulate' | 'q-board-own-check'
   | 'q-hand-drops' | 'q-drop-board-setup' | 'q-drop-own-check' | 'q-drop-pawn-mate';
 
@@ -65,6 +65,8 @@ export interface SearchTraceEvent {
   reason?: string; value?: SearchValue; alpha?: SearchValue; beta?: SearchValue;
 }
 export class SearchDiagnostics {
+  /** Attempted non-check candidate work, including interrupted iterations. */
+  readonly quietPromotions = { considered: 0, added: 0 };
   traceNode?: (event: SearchTraceEvent) => void;
   /** Fixed diagnostic calls only: search this legal root action at the ORIGINAL depth. */
   rootAction?: LegalAction;
@@ -114,6 +116,7 @@ export class SearchDiagnostics {
     quiescence: { calls: 0, milliseconds: 0 },
     'root-piece-moves': { calls: 0, milliseconds: 0 },
     'root-hand-drops': { calls: 0, milliseconds: 0 },
+    'q-select-promotions': { calls: 0, milliseconds: 0 },
     'q-evaluate': { calls: 0, milliseconds: 0 },
     'q-check': { calls: 0, milliseconds: 0 },
     'q-legal': { calls: 0, milliseconds: 0 },

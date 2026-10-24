@@ -1,0 +1,5 @@
+Validation setup notes (transcribed from tool output; not an original process log):
+- Initial prepare helper used Python default cp932 to read a UTF-8 runner and raised UnicodeDecodeError. No search ran in run1. Kept run1 plan/source snapshots; corrected encoding and snapshot coverage, then prepared run2.
+- Initial Vitest launch failed before collecting tests: sandbox TEMP tsx cache rename EPERM (see initial-tests.log). Workspace-local TEMP/TMP/TMPDIR allowed launch without changing assertions/timeouts.
+- Initial related file filters also selected existing .worktrees suites. Kept all output and then used --dir src/test for current related/full tests.
+- Supplemental JSON replay first failed on absent versus undefined optional members. Kept replay-audit.log; JSON-normalized replay of every saved value passed in v2.

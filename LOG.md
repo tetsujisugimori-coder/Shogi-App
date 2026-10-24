@@ -1,3 +1,16 @@
+### [2026-10-24 JST] 選択的非捕獲成りq探索とA/B/C実測（研究用opt-in限定）
+
+- clean main `0dd33ebe9791b2e14abdbbf6ae549c1257d97041` をfetchしてPR #210マージ・origin/main一致を確認、専用 `codex/selective-quiet-promotions` で作業。README/LOG、#202/#204/#206/#208/#210、Issue #209、既存探索・利き・合法手・SEE・診断/対局基盤を確認。ユーザー変更・既存worktree・旧原本は変更しない。
+- 新オプション `selectiveQuietPromotions:{maxCandidates:1}` は合法な非捕獲成りの成駒価値増分から生の利きによる直後の損失/取り返し概算を引き、正の純駒得または直接王手を候補化、score/直接王手/合法手indexで上限選別。任意の駒種ボーナスなし。合法手再生成・着手適用・SEEを選別に使わない。初案の王手最優先は既知evasion2回帰を検出したため不採用、失敗ログ保持。上限1/2/4を予備比較し、本C1は時間測定前固定。
+- A従来OFF/B全候補ONは実mainモジュールとのd1全20条件で時間以外全結果/統計一致。BのincludeQuietPromotions:trueの意味、全王手応手、捕獲、q予算/窓/stand-pat、終局距離、PV/内訳、partial-root/completedDepth/resultSource、deadline/fallback、TT/PVを維持。selector全設定はTT詳細identityへ入り設定を複製。Worker/UI/保存形式・既定OFFは不変。
+- Windows/i7-14650HX/Node24.20.0、10局面・standard/q1/original/extra0、固定d1/d4、100/1000ms最大d4、固定warmup1本1・時限warmup1本3、ABC巡回/逆順、同期直列・計測中test/buildなし。20互換＋予備120＋性能360＋別診断90＋局所36＋品質16＋証明4＋対局5ペア＝651記録。全体900秒/40MiB、親task watchdog・byte予約、raw非上書き。欠測/例外/親停止0。
+- 固定d1 q A/B/C=27/94/56。d4 API合計29895.426/33153.460/32373.662ms、q=30033/45138/33328。CはB比q−26.16%/API−2.35%だがA比API+8.29%。100ms A比深さ改善/悪化/同じはB=1/12/17、C=0/8/22、1000msはB=0/8/22、C=0/7/23。C最大超過100/1000=2.192/1.837ms。時限は全てcompleted-iteration、partial/fallback0。別診断Cの選別費用は時限APIの約2.8%、同一サンプルと混ぜない。
+- #204有限品質16局面はA=ProvenError0/QualityGap1/Inconclusive7/NoObservedDifference8、B/C=0/0/7/9。既知evasionの順位差を先後回帰で維持。参照不完走を改善に含めず、#206 AND/OR先後A/C4候補は全unknown。勝敗改善とはしない。
+- 既存paired self-playを使い同開始/時間/評価/規則で先後交代10局456ply。C視点100ms=2勝1敗/千日手2/120手打切り1、1000ms=2勝2敗/引分打切り0。全局成功、全手/PV/終局/最終状態を保存rawから再生。少数局・構成局面・先後差により一般棋力向上は未実証。B対局・大規模対局・別PC/SEE通常順序の時限比較は未検証。
+- 判断：第一希望/長時間向け次善策とも未達。実用推奨は不採用、追試用の研究opt-inだけ保持し既定OFF。近似選別は最善手完全性、合法な取り返し・ピン・連続交換・開き王手を保証しない。性能削減を棋力改善と読み替えない。
+- run2 raw/完全履歴/plan/ソースgzip/基準src archiveを保存。再集計2回のsummary SHA256 `83537b299e7f20958bb7afa7aaca2a5808597e5a1dad9be51eac0d1bfd714e16` 一致、全651task/cell、10局456ply、品質再分類、固定診断互換、manifestを追加監査済み。約11.24MB/40MiB。JSON省略undefinedの再生監査初回失敗と修正後成功、TEMP cache EPERMで起動0の初回ログ、王手優先回帰失敗、準備のみrun1も保持。
+- 新規29件、現在の関連13ファイル388件、snapshot単独37件成功。現在の全体88ファイル2274件は2273成功/既存snapshot1件timeout（7.208秒/5秒上限）。先行同型の記録と単独成功を分離し、原因同一性は断定せず全体成功としない。期待値/timeout/worker数不変。最初の関連filterは既存.worktreesも収集し48ファイル1714件成功、現在範囲を再実行済み。lockfile/型/lint/build（1762 modules）/diff-check成功。予算0ms開始0回・容量不足25完了後停止も別rawで確認。詳細・検証・再現・残課題は [docs/benchmarks/selective-promotions-20261024/README.md](docs/benchmarks/selective-promotions-20261024/README.md)。CIは最終HEADのPR本文へ記録する。
+
 ### [2026-10-23 JST] 連続交換・SEE調査と非捕獲成りの限定q追加（既定OFF）
 
 - Issue #209。clean main `376bcbabed2309d017b233b4a264504007f70db7` をfetch/ff-only確認、専用 `codex/quiescence-quiet-promotions` で作業。直近PR #194〜#208、関連Issue #177/#201/#207、探索・評価・SEE・王手回避・期限契約を確認。既存worktree・ユーザー変更・旧測定原本は変更しない。

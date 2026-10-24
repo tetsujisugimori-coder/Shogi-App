@@ -1,0 +1,19 @@
+
+ RUN  v4.1.11 C:/Users/tetsu/Documents/Codex/Shogi-App
+
+ ❯ src/test/shogi-selective-promotions.test.ts (0 test)
+ ❯ src/test/shogi-quiet-promotions.test.ts (0 test)
+
+⎯⎯⎯⎯⎯⎯ Failed Suites 2 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/test/shogi-quiet-promotions.test.ts [ src/test/shogi-quiet-promotions.test.ts ]
+ FAIL  src/test/shogi-selective-promotions.test.ts [ src/test/shogi-selective-promotions.test.ts ]
+Error: EPERM: operation not permitted, rename 'C:\Users\tetsu\AppData\Local\Packages\sandbox.{a1ac0def-b6af-4a62-b82c-a6e4248c43b9}\AC\Temp\WtOlTbo27YbDAgyGiB4Wy\client\.tmp-1792847393776-ka2rod3fsps' -> 'C:\Users\tetsu\AppData\Local\Packages\sandbox.{a1ac0def-b6af-4a62-b82c-a6e4248c43b9}\AC\Temp\WtOlTbo27YbDAgyGiB4Wy\client\8a8cf7568cacf0ba17870ed80cded502ed6cc227'
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/2]⎯
+
+
+ Test Files  2 failed (2)
+      Tests  no tests
+   Start at  22:09:51
+   Duration  2.78s (transform 0ms, setup 0ms, import 0ms, tests 0ms, environment 4.35s)
+
