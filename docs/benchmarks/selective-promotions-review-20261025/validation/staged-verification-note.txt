@@ -1,0 +1,2 @@
+Staged-evidence verification note (transcribed from tool output):
+The first final-manifest helper failed with spawnSync git ENOBUFS while reading :src/test/fixtures/selective-review-before.json. execFileSync used its default approximately 1MiB stdout buffer. No evidence-manifest was written by that failed attempt. The verification-only helper was rerun with maxBuffer=20MiB. No product source, test assertion/timeout, original evidence or measurement bytes were changed.

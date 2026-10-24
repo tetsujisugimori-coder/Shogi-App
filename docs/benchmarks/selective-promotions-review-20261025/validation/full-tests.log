@@ -1,0 +1,10 @@
+
+ RUN  v4.1.11 C:/Users/tetsu/Documents/Codex/Shogi-App
+
+Not implemented: navigation to another Document
+
+ Test Files  89 passed (89)
+      Tests  2398 passed (2398)
+   Start at  00:15:38
+   Duration  208.25s (transform 10.69s, setup 14.06s, import 19.80s, tests 287.95s, environment 74.95s)
+

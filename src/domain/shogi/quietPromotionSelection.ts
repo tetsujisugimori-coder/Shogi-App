@@ -7,14 +7,25 @@ import { getBoardPieceMaterialValue, type MaterialValueTable } from './materialE
  * The caller chooses the per-node cap explicitly; there is no new default policy. */
 export interface QuietPromotionSelection { readonly maxCandidates: number }
 
-export function validateQuietPromotionSelection(value: unknown): asserts value is QuietPromotionSelection | undefined {
-  if (value === undefined) return;
+/** Require an own maxCandidates (enumerable or not). Inherited-only values are
+ * rejected; unknown own keys, including symbols, are rejected. Read once and
+ * build a plain snapshot so validation and copying cannot disagree. */
+export function resolveQuietPromotionSelection(value: unknown): QuietPromotionSelection | undefined {
+  if (value === undefined) return undefined;
   if (value === null || typeof value !== 'object' || Array.isArray(value) ||
-      Reflect.ownKeys(value).some(k => k !== 'maxCandidates') ||
-      !Number.isSafeInteger((value as QuietPromotionSelection).maxCandidates) ||
-      (value as QuietPromotionSelection).maxCandidates < 1) {
-    throw new RangeError('selectiveQuietPromotions requires a positive safe integer maxCandidates.');
+      !Object.prototype.hasOwnProperty.call(value, 'maxCandidates') ||
+      Reflect.ownKeys(value).some(k => k !== 'maxCandidates')) {
+    throw new RangeError('selectiveQuietPromotions requires an own positive safe integer maxCandidates.');
   }
+  const maxCandidates = (value as QuietPromotionSelection).maxCandidates;
+  if (!Number.isSafeInteger(maxCandidates) || maxCandidates < 1) {
+    throw new RangeError('selectiveQuietPromotions requires an own positive safe integer maxCandidates.');
+  }
+  return { maxCandidates };
+}
+
+export function validateQuietPromotionSelection(value: unknown): asserts value is QuietPromotionSelection | undefined {
+  resolveQuietPromotionSelection(value);
 }
 
 /** Rank already legal quiet promotions, without execution, legal regeneration or SEE.
@@ -24,7 +35,7 @@ export function validateQuietPromotionSelection(value: unknown): asserts value i
 export function rankQuietPromotions(state: BoardState, actions: readonly LegalAction[],
   table: MaterialValueTable, interruptionCheck?: () => void) {
   const enemy = state.turn === 'sente' ? 'gote' : 'sente';
-  const king = findKingSquare(state.squares, enemy);
+  let king: ReturnType<typeof findKingSquare> | undefined;
   const ranked = [];
   for (let index = 0; index < actions.length; index++) {
     interruptionCheck?.();
@@ -37,6 +48,9 @@ export function rankQuietPromotions(state: BoardState, actions: readonly LegalAc
     const squares = state.squares.map(row => row.slice());
     squares[action.from.row][action.from.col] = { ...squares[action.from.row][action.from.col], piece: null };
     squares[action.to.row][action.to.col] = { ...squares[action.to.row][action.to.col], piece: promoted };
+    // Most nodes have no quiet promotion. Preserve all interruption checks, but
+    // defer the board scan until it is actually needed by a promotion score.
+    if (king === undefined) king = findKingSquare(state.squares, enemy);
     const check = king !== null && isPieceAttacking(squares, action.to, promoted, king);
     let cheapestAttacker = Infinity, defended = false;
     for (const row of squares) {

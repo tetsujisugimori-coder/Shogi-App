@@ -1,0 +1,31 @@
+import { pathToFileURL } from 'node:url';
+import {resolve} from 'node:path';
+import {writeFileSync,readFileSync} from 'node:fs';
+import {createHash} from 'node:crypto';
+import {constructed,rotate,tacticalPositions,other} from '../scripts/benchmarks/tacticalPositions';
+import {SearchDiagnostics} from '../src/domain/shogi/searchDiagnostics';
+import {evaluateSearchPositionBreakdown} from '../src/domain/shogi/twoPlyMinimaxAi';
+const old=await import(pathToFileURL(resolve('.diagnostic-temp/p212-before/src/domain/shogi/quiescenceSearch.ts')).href);
+const kings:any[]=[[8,8,'king','sente'],[0,8,'king','gote']];
+const base=[
+ {id:'zero',state:constructed('zero',kings)},
+ {id:'safe',state:constructed('safe',[...kings,[3,3,'pawn','sente']])},
+ {id:'multiple',state:constructed('multiple',[...kings,[3,2,'pawn','sente'],[3,4,'pawn','sente']])},
+ {id:'unsafe',state:constructed('unsafe',[...kings,[3,4,'pawn','sente'],[1,4,'gold','gote']])},
+ {id:'checked',state:tacticalPositions().find(p=>p.id==='evasion')!.state},
+ {id:'capture',state:constructed('capture',[...kings,[5,4,'rook','sente'],[4,4,'pawn','gote']])},
+];
+const cases=[];
+for(const p of base)for(const flip of [false,true])for(const maximizing of [false,true]){
+ const state=flip?rotate(p.state,p.id+'-gote'):p.state,perspective=maximizing?state.turn:other(state.turn);
+ const score=evaluateSearchPositionBreakdown(state,perspective).total;
+ const windows=[{name:'full',alpha:-Infinity,beta:Infinity},{name:'equal',alpha:maximizing?-Infinity:score,beta:maximizing?score:Infinity},{name:'open-one',alpha:maximizing?-Infinity:score-1,beta:maximizing?score+1:Infinity},{name:'closed',alpha:score,beta:score}];
+ for(const window of windows){const d=new SearchDiagnostics();let calls=0;
+ const result=old.analyzeQuiescenceSearchWithinBounds(state,perspective,1,undefined,()=>calls++,window.alpha,window.beta,'original',d,0,undefined,false,{maxCandidates:1});
+ cases.push({name:[p.id,flip?'gote':'sente',maximizing?'max':'min',window.name].join('/'),state,perspective,window,result,calls,diagnostics:{...d.quietPromotions,selectionCalls:d.phases['q-select-promotions'].calls}});
+ }
+}
+const sources=['src/domain/shogi/quiescenceSearch.ts','src/domain/shogi/quietPromotionSelection.ts','src/domain/shogi/twoPlyAlphaBetaAi.ts'];
+const sourceHashes=Object.fromEntries(sources.map(p=>[p,createHash('sha256').update(readFileSync('.diagnostic-temp/p212-before/'+p)).digest('hex')]));
+writeFileSync(process.argv[2] ?? 'src/test/fixtures/selective-review-before.json',JSON.stringify({baseline:'1b45ad1cab7a493223495b911fab944985456a2f',sourceHashes,cases},(_k,v)=>typeof v==='number'&&!Number.isFinite(v)?String(v):v)+'\n',{flag:'wx'});
+console.log(cases.length);

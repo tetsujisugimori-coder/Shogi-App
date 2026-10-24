@@ -1,0 +1,23 @@
+[
+  {
+    "name": "plain",
+    "beforeValidationAccepted": true,
+    "error": null,
+    "before": "success",
+    "after": "success"
+  },
+  {
+    "name": "non-enumerable",
+    "beforeValidationAccepted": true,
+    "error": null,
+    "before": "RangeError: selectiveQuietPromotions requires a positive safe integer maxCandidates.",
+    "after": "success"
+  },
+  {
+    "name": "inherited",
+    "beforeValidationAccepted": true,
+    "error": null,
+    "before": "RangeError: selectiveQuietPromotions requires a positive safe integer maxCandidates.",
+    "after": "RangeError: selectiveQuietPromotions requires an own positive safe integer maxCandidates."
+  }
+]

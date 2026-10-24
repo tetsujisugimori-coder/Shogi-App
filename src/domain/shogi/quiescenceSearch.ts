@@ -1,4 +1,4 @@
-import { selectQuietPromotions, validateQuietPromotionSelection, type QuietPromotionSelection } from './quietPromotionSelection';
+import { selectQuietPromotions, resolveQuietPromotionSelection, type QuietPromotionSelection } from './quietPromotionSelection';
 import { searchValue, compareSearchValues as compare, numericalSearchBound, SEARCH_BOTTOM, SEARCH_TOP, type SearchValue } from './searchValue';
 /**
  * A bounded tactical extension for a fixed evaluation perspective. This is a
@@ -166,6 +166,8 @@ function searchNodeBody(
   const actions = measured(diagnostics, 'q-legal', () => diagnostics
     ? getQuiescenceLegalActionsWithDiagnostics(state, diagnostics) : getLegalActions(state));
   if (extensionPly > 0 || extending) interruptionCheck?.();
+  // Keep selection before stand-pat: empty candidates do not count as a cutoff,
+  // and skippedActionCount counts the actual selected set, not potential moves.
   const selectedPromotions = !isInCheck && selectiveQuietPromotions
     ? measured(diagnostics, 'q-select-promotions', () => selectQuietPromotions(state, actions,
       resolveSearchMaterialValueTable(evaluation), selectiveQuietPromotions, interruptionCheck)) : [];
@@ -319,7 +321,7 @@ export function analyzeQuiescenceSearchWithInternalBounds(
   if (typeof includeQuietPromotions !== 'boolean') {
     throw new RangeError('Quiescence includeQuietPromotions must be a boolean.');
   }
-  validateQuietPromotionSelection(selectiveQuietPromotions);
+  selectiveQuietPromotions = resolveQuietPromotionSelection(selectiveQuietPromotions);
   if (includeQuietPromotions && selectiveQuietPromotions) throw new RangeError('Choose all or selective quiet promotions, not both.');
   validateMaxTacticalDepth(maxTacticalDepth);
   validateMaxCheckEvasionExtensions(maxCheckEvasionExtensions);

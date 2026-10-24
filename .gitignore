@@ -13,3 +13,4 @@ coverage/
 /.diagnostic-temp/
 
 !docs/benchmarks/selective-promotions-20261024/validation/*.log
+!docs/benchmarks/selective-promotions-review-20261025/validation/*.log

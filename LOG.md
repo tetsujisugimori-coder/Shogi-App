@@ -1,3 +1,15 @@
+### [2026-10-25 JST] PR #212 P2：stand-pat統計依存の検証と選別設定の正規化
+
+- 指定/remote/local HEAD `1b45ad1cab7a493223495b911fab944985456a2f`、clean・既存ブランチでfetch確認。新規PRを作らず既存#212へ追従。旧測定・検証・manifestを変更せず、全追跡原本hashを新planへ保存して監査する。
+- P2-1第一希望のstand-pat時の選別全省略は見送り。候補0件のcutoff0と、候補ありのcutoff+1/実選別数skippedの違い、診断considered/addedへの依存がある。capや潜在候補での帳尻合わせはしない。次善策は最初の非捕獲成りまで敵玉位置走査を遅延し、候補0件で走査0回、複数候補で従来同様1回。全中断確認・順位/閾値・候補/窓/探索順を維持。窓で止まる成り候補のscoring/sortは残る。
+- P2-2は共通resolve関数がown maxCandidatesを1回読み、正の安全整数を検証してplain objectを構築。通常/非列挙/null prototypeのown値を許可、継承値だけは入口でRangeError、未知own項目（非列挙/Symbolも）を拒否。undefined省略とB/C相互排他を維持。旧HEADで非列挙/継承設定が検証成功後にspreadで失われq再検証失敗することを再現・保存した。
+- 旧HEAD実qから生成した96条件（6局面×先後×max/min×4窓）を新fixtureで固定。全結果/PV/内訳/q統計/considered/added/選別呼出し/中断確認回数が一致。候補0/複数の走査回数、中断、設定各形態/不正値、固定/反復/standalone/TT identityを含む新規124件成功。現在の関連9ファイル314件は新124＋既存190が成功。既存期待値/timeout/worker設定は変更しない。
+- 性能は旧10局面と全状態を再利用した修正前後A/B/C、固定d1/d4・100/1000ms最大d4を同期直列で測定。固定warmup1本1、時限warmup1本3、順序交替、診断OFF720/別ON180。900秒/40MiB/親task watchdog/終了予約を固定、旧「CはA比d4+8.29%」は旧情報として保持する。今回の結果は新技術文書へ記録し、少数標本から一般的な性能・棋力を主張しない。
+- 900サンプル完了/欠測・例外0、固定前後120組と診断固定d1は全非時間結果一致。C d4 API32456.414→32488.714ms（約+0.10%）、100ms深さ61→60（悪化1/30）、1000ms104→105（改善1/30）。C選択手は全時限60対同じ、PVは深さ変化の各1対だけ変化。別診断d1選別2.509→1.500msでもAPIは116.556→118.555msで、全体高速化は未確認。A/Bにも時間・深さの揺れあり。新結果を旧8.29%と混ぜず、一般性能・棋力改善を主張しない。
+- 保存rawから2回auditが成功しsummary SHA256 `6ea0f1ad8e746dee2cb8410a338aa7fd923ea1d244610441bd43f4c9eda7aabf` 一致、旧証拠90追跡ファイル不変。新raw/ソース/旧src archive/完全入力/表/manifestへ保存した。
+- 最終全体89ファイル2398件（新124/既存2274）全成功、skip/timeout0、関連9ファイル314件成功。旧snapshot timeoutは今回は再現せず、解消とは断定しない。既存期待値/timeout/worker数不変。fixture再生成96条件もbyte一致（`b65c8aab34e6af07fe014242be3dc8bc6cf18bcb29de2eb5ff381282696608af`）。lockfile/型/lint/build1762 modules（24.38秒）/diff-check成功。最終HEADのCIはPR本文へ別記録する。
+- 設計・採否・証拠・最終検証は [docs/benchmarks/selective-promotions-review-20261025/README.md](docs/benchmarks/selective-promotions-review-20261025/README.md)。Worker/UI/保存形式・評価/SEE・候補基準・既定OFF・研究用opt-inは不変。マージ/自動マージせず独立再レビュー待ちとする。
+
 ### [2026-10-24 JST] 選択的非捕獲成りq探索とA/B/C実測（研究用opt-in限定）
 
 - clean main `0dd33ebe9791b2e14abdbbf6ae549c1257d97041` をfetchしてPR #210マージ・origin/main一致を確認、専用 `codex/selective-quiet-promotions` で作業。README/LOG、#202/#204/#206/#208/#210、Issue #209、既存探索・利き・合法手・SEE・診断/対局基盤を確認。ユーザー変更・既存worktree・旧原本は変更しない。

@@ -1,4 +1,4 @@
-import { validateQuietPromotionSelection, type QuietPromotionSelection } from './quietPromotionSelection';
+import { resolveQuietPromotionSelection, type QuietPromotionSelection } from './quietPromotionSelection';
 import { ExactTranspositionTable, transpositionIdentity, createTranspositionTableStatistics, type TranspositionTableStatistics } from './transpositionTable';
 import { searchValue, compareSearchValues as compare, SEARCH_BOTTOM, SEARCH_TOP, type SearchValue } from './searchValue';
 /**
@@ -121,9 +121,9 @@ function resolveQuiescenceOptions(options: AlphaBetaSearchOptions | undefined): 
   if (quiescence.includeQuietPromotions !== undefined && typeof quiescence.includeQuietPromotions !== 'boolean') {
     throw new RangeError('Alpha-beta quiescence includeQuietPromotions must be a boolean.');
   }
-  validateQuietPromotionSelection(quiescence.selectiveQuietPromotions);
+  const selectiveQuietPromotions = resolveQuietPromotionSelection(quiescence.selectiveQuietPromotions);
   if (quiescence.includeQuietPromotions && quiescence.selectiveQuietPromotions) throw new RangeError('Choose all or selective quiet promotions, not both.');
-  return { maxTacticalDepth, selectiveQuietPromotions: quiescence.selectiveQuietPromotions === undefined ? undefined : { ...quiescence.selectiveQuietPromotions }, moveOrdering: resolveQuiescenceMoveOrdering(quiescence.moveOrdering),
+  return { maxTacticalDepth, selectiveQuietPromotions, moveOrdering: resolveQuiescenceMoveOrdering(quiescence.moveOrdering),
     maxCheckEvasionExtensions: extensions, statistics: options?.checkEvasionStatistics,
     includeQuietPromotions: quiescence.includeQuietPromotions ?? false };
 }
