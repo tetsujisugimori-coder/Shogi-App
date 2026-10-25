@@ -1,0 +1,32 @@
+
+> shogi-app@0.0.0 test
+> vitest run --dir src/test
+
+
+ RUN  v4.1.11 C:/Users/tetsu/Documents/ChatGPT/将棋アプリ/repo
+
+ ❯ src/test/shogi-evaluation-preset-comparison-ui.test.tsx (24 tests | 1 failed) 46468ms
+     × 不変局面と深さ3で開始し、競合AIを止め、全結果を固定順で表示する 5778ms
+Not implemented: navigation to another Document
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/test/shogi-evaluation-preset-comparison-ui.test.tsx > 解析専用の3プリセット比較UI > 不変局面と深さ3で開始し、競合AIを止め、全結果を固定順で表示する
+Error: Test timed out in 5000ms.
+If this is a long-running test, pass a timeout value as the last argument or configure it globally with "testTimeout".
+ ❯ src/test/shogi-evaluation-preset-comparison-ui.test.tsx:43:3
+     41|
+     42| describe('解析専用の3プリセット比較UI', () => {
+     43|   it('不変局面と深さ3で開始し、競合AIを止め、全結果を固定順で表示する', async () => {
+       |   ^
+     44|     const user = userEvent.setup(); const pending = deferred();
+     45|     const runner = vi.fn((_state: BoardState, _depth: number, _signal?…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed | 88 passed (89)
+      Tests  1 failed | 2397 passed (2398)
+   Start at  23:13:19
+   Duration  200.47s (transform 12.74s, setup 9.90s, import 22.41s, tests 287.45s, environment 63.11s)
+

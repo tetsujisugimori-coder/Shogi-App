@@ -19,6 +19,7 @@ import {
   evaluateSearchPositionBreakdown,
   evaluateNoLegalActionsPositionBreakdown,
   resolveSearchMaterialValueTable,
+  resolveSearchPieceSafetyMode,
   type SearchClock,
   type SearchEvaluationConfig,
   type SearchEvaluationBreakdown,
@@ -534,7 +535,9 @@ function searchAlphaBetaNode(
       if (identity === undefined) {
         transpositions!.statistics.identityGenerations++;
         identity = JSON.stringify([rootPlayer, isMaximizing, quiescenceOptions, moveOrdering,
-          previousPv?.slice(ply), transpositionIdentity(state, remainingDepth + (quiescenceOptions?.maxTacticalDepth ?? 0))]);
+          previousPv?.slice(ply), transpositionIdentity(state, remainingDepth + (quiescenceOptions?.maxTacticalDepth ?? 0)),
+          // Retain legacy bytes/capacity decisions; only the new mode adds a tag.
+          ...(resolveSearchPieceSafetyMode(valueTable) === 'experimental' ? ['piece-safety:experimental'] : [])]);
       }
       return identity;
     };
@@ -931,6 +934,7 @@ export function analyzeAlphaBetaSearch(
   options?: AlphaBetaSearchOptions,
   diagnostics?: SearchDiagnostics
 ): AlphaBetaSearchResult {
+  resolveSearchPieceSafetyMode(valueTable);
   const transpositions = resolveTranspositionTable(options);
   const moveOrdering = resolveMoveOrdering(options);
   const killerMoves = resolveKillerMoves(options);
@@ -971,6 +975,7 @@ export function analyzeIterativeDeepeningAlphaBetaSearch(
   clock: SearchClock = defaultSearchClock,
   options?: AlphaBetaSearchOptions
 ): IterativeDeepeningAlphaBetaSearchResult {
+  resolveSearchPieceSafetyMode(valueTable);
   const transpositions = resolveTranspositionTable(options);
   const moveOrdering = resolveMoveOrdering(options);
   const killerMoves = resolveKillerMoves(options);
@@ -1041,6 +1046,7 @@ export function analyzeTimeLimitedIterativeDeepeningAlphaBetaSearch(
   options?: AlphaBetaSearchOptions,
   diagnostics?: SearchDiagnostics
 ): TimeLimitedIterativeDeepeningAlphaBetaSearchResult {
+  resolveSearchPieceSafetyMode(valueTable);
   const transpositions = resolveTranspositionTable(options);
   const moveOrdering = resolveMoveOrdering(options);
   const killerMoves = resolveKillerMoves(options);

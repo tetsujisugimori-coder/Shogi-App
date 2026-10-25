@@ -1,0 +1,3 @@
+{"type":"environment","at":"2026-10-25T14:43:57.713Z","planHash":"96583b3d2ea978c181c12495b6f2a2d36e05b2feff31a172dd60fd36c244ff12","head":"e2f12e97f2d2c297b3b2ac5648bbfb12dc53faad","cpu":"Intel(R) Core(TM) i7-14650HX","node":"v24.20.0","os":"win32"}
+{"type":"failure","reason":"global budget","pending":null}
+{"type":"exit","code":null,"signal":"SIGKILL","ended":false,"stderr":"","at":"2026-10-25T14:43:57.883Z"}

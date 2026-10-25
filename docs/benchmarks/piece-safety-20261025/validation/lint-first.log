@@ -1,0 +1,6 @@
+
+> shogi-app@0.0.0 lint
+> tsc --noEmit
+
+src/test/shogi-piece-safety-experiment.test.ts(74,145): error TS2339: Property 'terminalDistancePly' does not exist on type 'AlphaBetaSearchResult'.
+src/test/shogi-piece-safety-experiment.test.ts(74,175): error TS2339: Property 'terminalDistancePly' does not exist on type 'AlphaBetaSearchResult'.

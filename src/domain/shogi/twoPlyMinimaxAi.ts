@@ -22,7 +22,7 @@ import {
   evaluateKingSafety,
   type KingSafetyEvaluationWeights,
 } from './kingSafetyEvaluation';
-import { evaluateUndefendedPieceSafety } from './undefendedPieceSafetyEvaluation';
+import { evaluateUndefendedPieceSafety, resolvePieceSafetyMode, type PieceSafetyMode } from './undefendedPieceSafetyEvaluation';
 import { createAttackCountMaps } from './attacks';
 import {
   resolveSearchEvaluationPreset,
@@ -62,6 +62,8 @@ export type SearchClock = () => number;
 
 /** Optional, serializable evaluation tables for search experiments. */
 export interface SearchEvaluationOptions {
+  /** Research opt-in raw pressure warning. Omitted preserves legacy evaluation. */
+  readonly pieceSafetyMode?: PieceSafetyMode;
   readonly coefficients?: SearchEvaluationCoefficients;
   readonly materialValueTable?: MaterialValueTable;
   readonly pieceSquareValueTable?: PieceSquareValueTable;
@@ -89,6 +91,11 @@ function isMaterialValueTable(config: SearchEvaluationConfig): config is Materia
   return 'unpromoted' in config && 'promoted' in config;
 }
 
+/** Resolve at search entry as well as leaves so fallback cannot hide bad modes. */
+export function resolveSearchPieceSafetyMode(config?: SearchEvaluationConfig): PieceSafetyMode {
+  return resolvePieceSafetyMode(config && !isMaterialValueTable(config) ? config.pieceSafetyMode : undefined);
+}
+
 /** Shared material table resolution for static evaluation and capture ordering. */
 export function resolveSearchMaterialValueTable(config?: SearchEvaluationConfig): MaterialValueTable {
   return config && isMaterialValueTable(config)
@@ -100,6 +107,7 @@ function resolveSearchEvaluationOptions(config: SearchEvaluationConfig | undefin
   const materialValueTable = resolveSearchMaterialValueTable(config);
   if (config && isMaterialValueTable(config)) {
     return {
+      pieceSafetyMode: 'legacy',
       materialValueTable,
       pieceSquareValueTable: DEFAULT_PIECE_SQUARE_VALUE_TABLE,
       kingSafetyWeights: DEFAULT_KING_SAFETY_EVALUATION_WEIGHTS,
@@ -107,6 +115,7 @@ function resolveSearchEvaluationOptions(config: SearchEvaluationConfig | undefin
     };
   }
   return {
+    pieceSafetyMode: resolveSearchPieceSafetyMode(config),
     materialValueTable,
     pieceSquareValueTable: config?.pieceSquareValueTable ?? DEFAULT_PIECE_SQUARE_VALUE_TABLE,
     kingSafetyWeights: config?.kingSafetyWeights ?? DEFAULT_KING_SAFETY_EVALUATION_WEIGHTS,
@@ -132,6 +141,7 @@ export function evaluateSearchPositionBreakdown(
   perspective: Player,
   evaluation: SearchEvaluationConfig = DEFAULT_MATERIAL_VALUE_TABLE
 ): SearchEvaluationBreakdown {
+  resolveSearchPieceSafetyMode(evaluation);
   // Validate even for terminal positions; valid multipliers never alter outcomes.
   if (!isMaterialValueTable(evaluation) && evaluation.coefficients !== undefined) {
     validateSearchEvaluationCoefficients(evaluation.coefficients);
@@ -176,7 +186,7 @@ export function evaluateSearchPositionBreakdown(
   if (state.status !== 'active' && state.status !== 'check') {
     throw new Error(`Search evaluation requires an active, check, or ended position; received ${state.status}.`);
   }
-  const { materialValueTable, pieceSquareValueTable, kingSafetyWeights, coefficients } = resolveSearchEvaluationOptions(evaluation);
+  const { materialValueTable, pieceSquareValueTable, kingSafetyWeights, coefficients, pieceSafetyMode } = resolveSearchEvaluationOptions(evaluation);
   // Raw influence is useful to the static heuristics only. It is intentionally
   // rebuilt for this one position evaluation and is not used for legal moves,
   // check detection, or any cross-position cache.
@@ -188,7 +198,8 @@ export function evaluateSearchPositionBreakdown(
     state,
     perspective,
     materialValueTable,
-    attackCountMaps
+    attackCountMaps,
+    pieceSafetyMode
   ) * coefficients.undefendedPieceSafety;
   return {
     total: material + pieceSquare + kingSafety + undefendedPieceSafety,
@@ -336,6 +347,7 @@ export function analyzeTwoPlyMinimaxSearch(
   evaluation: SearchEvaluationConfig = DEFAULT_MATERIAL_VALUE_TABLE,
   clock: SearchClock = defaultSearchClock
 ): TwoPlyMinimaxSearchResult {
+  resolveSearchPieceSafetyMode(evaluation);
   const startedAt = clock();
   const searchResult = searchTwoPlyMinimax(state, evaluation);
   return {
