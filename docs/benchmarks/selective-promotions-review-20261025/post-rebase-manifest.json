@@ -1,0 +1,10 @@
+{
+  "verifiedHead": "800ccc07180802caad0778dbb8e24c4011e6dcc5",
+  "parent": "d15899bce3e00ffaffea38bc52f94523c86e717c",
+  "originalEvidenceUnchanged": 90,
+  "reviewEvidenceUnchanged": 32,
+  "sourceBlobsUnchanged": 6,
+  "evidenceManifestHash": "8fbb7866f18ac45d1de46f65af22c38c30d7a9526c5621d1b3644f422ad2688b",
+  "remoteRecordHash": "b0a638c5acc1d63f427670ffa17f5066dc10d7ef44a400ec215eb97869740a9d",
+  "incomingDocumentHash": "0fac206963286a01dae4423be1942e2d31a6e9fb1ccaeaf3a22534b2903e57f5"
+}

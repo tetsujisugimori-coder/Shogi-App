@@ -11,3 +11,6 @@ coverage/
 /docs/benchmarks/partial-root-matches-20261016-run1/attempts.jsonl
 
 /.diagnostic-temp/
+
+!docs/benchmarks/selective-promotions-20261024/validation/*.log
+!docs/benchmarks/selective-promotions-review-20261025/validation/*.log

@@ -1,5 +1,9 @@
 # SHOGI-APP
 
+PR #212のP2修正では、stand-pat前の候補選別は統計互換性のため維持し、成り候補0件の玉位置走査だけを省く部分削減に限定しました。選別設定はownの正整数 `maxCandidates` を明示的に正規化し、列挙不可値も保持、継承値だけの設定は入口で拒否します。既定OFF・全候補ON・研究用opt-inの位置付けは不変です。[依存関係・設定契約・修正前後の検証](docs/benchmarks/selective-promotions-review-20261025/README.md)。旧測定の固定d4 OFF比+8.29%と、棋力改善未実証の判断は以下に保持します。
+
+静止探索に研究用の選択方式 `quiescence: { maxTacticalDepth: 1, selectiveQuietPromotions: { maxCandidates: 1 } }` を追加しました。成りの駒得・直後の被捕獲と取り返しの利きを概算し、既存の合法な非捕獲成りだけを選別します。従来OFFと `includeQuietPromotions:true` の全候補ONは互換、既定OFF・Worker/UI/保存形式は不変です。10局面の100ms比較ではOFF比の深さ悪化が全候補12/30対から選択8/30対へ減りましたが、改善0対。固定d4実時間はOFF比+8.29%で、1000msにも悪化が残りました。対局は100msで選択2勝1敗・千日手2・打切り1、1000msで2勝2敗という少数局です。**一般棋力向上は未実証、実用推奨せず研究用opt-inに限定します。** 最善手の完全性も保証しません。[方式・性能・戦術・対局・制約とraw再集計](docs/benchmarks/selective-promotions-20261024/README.md)。
+
 静止探索に `quiescence: { maxTacticalDepth: 1, includeQuietPromotions: true }` を指定すると、合法な非捕獲成りも同じq手数予算で探索します。既定false。PR #208の浅い選択差を先後両方で解消しましたが、10局面の100ms比較は60対中20対で完了深さが悪化し、改善0対でした。一般棋力向上は未実証、既定ONは推奨しません。SEE自体とWorker/UIの既定は維持します。[調査・局面・比較・制約](docs/benchmarks/exchange-promotions-20261023.md)。
 
 戦術診断専用の限定AND/OR勝敗証明・証明保存・独立した再生検証を追加しました。`npm run diagnose:outcome-proof -- run NEW_DIR` / `audit DIR`、`npm run verify:outcome-proof -- PROOF.json TRUSTED_REQUEST_SHA256` を使用します。勝敗・引分・unknownを分け、再検証済みの選択手loss＋代替手winだけを新たな厳密不利益の根拠にします。製品探索・ルール・UI・既定設定は変更しません。[形式・分類・再現手順](docs/benchmarks/outcome-proof-20261022/README.md)。

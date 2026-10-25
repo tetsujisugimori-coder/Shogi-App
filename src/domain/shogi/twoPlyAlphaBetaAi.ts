@@ -1,3 +1,4 @@
+import { resolveQuietPromotionSelection, type QuietPromotionSelection } from './quietPromotionSelection';
 import { ExactTranspositionTable, transpositionIdentity, createTranspositionTableStatistics, type TranspositionTableStatistics } from './transpositionTable';
 import { searchValue, compareSearchValues as compare, SEARCH_BOTTOM, SEARCH_TOP, type SearchValue } from './searchValue';
 /**
@@ -34,6 +35,8 @@ export interface AlphaBetaQuiescenceOptions {
   readonly maxTacticalDepth: number;
   /** Include legal non-capturing promotions in the same tactical budget. Default false. */
   readonly includeQuietPromotions?: boolean;
+  /** Research opt-in; incompatible with includeQuietPromotions:true. */
+  readonly selectiveQuietPromotions?: QuietPromotionSelection;
   /** Additional check-only ply after tactical depth is exhausted. Default 0; maximum 2. */
   readonly maxCheckEvasionExtensions?: number;
   /** Omitted retains legal generation order. Independent of ordinary moveOrdering. */
@@ -104,8 +107,8 @@ function resolveQuiescenceOptions(options: AlphaBetaSearchOptions | undefined): 
   const quiescence = options?.quiescence;
   if (quiescence === undefined) return undefined;
   if (quiescence === null || typeof quiescence !== 'object' || Array.isArray(quiescence) ||
-    Reflect.ownKeys(quiescence).some((key) => key !== 'maxTacticalDepth' && key !== 'moveOrdering' && key !== 'maxCheckEvasionExtensions' && key !== 'includeQuietPromotions')) {
-    throw new RangeError('Alpha-beta quiescence options must contain only maxTacticalDepth, moveOrdering, maxCheckEvasionExtensions and includeQuietPromotions.');
+    Reflect.ownKeys(quiescence).some((key) => key !== 'maxTacticalDepth' && key !== 'moveOrdering' && key !== 'maxCheckEvasionExtensions' && key !== 'includeQuietPromotions' && key !== 'selectiveQuietPromotions')) {
+    throw new RangeError('Alpha-beta quiescence options must contain only maxTacticalDepth, moveOrdering, maxCheckEvasionExtensions includeQuietPromotions and selectiveQuietPromotions.');
   }
   const maxTacticalDepth = (quiescence as AlphaBetaQuiescenceOptions).maxTacticalDepth;
   if (typeof maxTacticalDepth !== 'number' || !Number.isFinite(maxTacticalDepth) ||
@@ -118,7 +121,9 @@ function resolveQuiescenceOptions(options: AlphaBetaSearchOptions | undefined): 
   if (quiescence.includeQuietPromotions !== undefined && typeof quiescence.includeQuietPromotions !== 'boolean') {
     throw new RangeError('Alpha-beta quiescence includeQuietPromotions must be a boolean.');
   }
-  return { maxTacticalDepth, moveOrdering: resolveQuiescenceMoveOrdering(quiescence.moveOrdering),
+  const selectiveQuietPromotions = resolveQuietPromotionSelection(quiescence.selectiveQuietPromotions);
+  if (quiescence.includeQuietPromotions && quiescence.selectiveQuietPromotions) throw new RangeError('Choose all or selective quiet promotions, not both.');
+  return { maxTacticalDepth, selectiveQuietPromotions, moveOrdering: resolveQuiescenceMoveOrdering(quiescence.moveOrdering),
     maxCheckEvasionExtensions: extensions, statistics: options?.checkEvasionStatistics,
     includeQuietPromotions: quiescence.includeQuietPromotions ?? false };
 }
@@ -596,7 +601,7 @@ function searchAlphaBetaNodeUncached(
       state, rootPlayer, quiescenceOptions.maxTacticalDepth, valueTable, interruptionCheck, alpha, beta,
       quiescenceOptions.moveOrdering,
       diagnostics, ply, quiescenceOptions.maxCheckEvasionExtensions, quiescenceOptions.statistics,
-      quiescenceOptions.includeQuietPromotions
+      quiescenceOptions.includeQuietPromotions, quiescenceOptions.selectiveQuietPromotions
     ));
     statistics.quiescenceVisitedPositionCount += quiescence.visitedPositionCount;
     statistics.quiescenceCutoffCount += quiescence.cutoffCount;

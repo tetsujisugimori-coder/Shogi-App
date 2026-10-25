@@ -1,3 +1,4 @@
+import { selectQuietPromotions, resolveQuietPromotionSelection, type QuietPromotionSelection } from './quietPromotionSelection';
 import { searchValue, compareSearchValues as compare, numericalSearchBound, SEARCH_BOTTOM, SEARCH_TOP, type SearchValue } from './searchValue';
 /**
  * A bounded tactical extension for a fixed evaluation perspective. This is a
@@ -112,12 +113,13 @@ function searchNode(
   remainingCheckEvasions: number,
   extensionPly: number,
   checkEvasionStatistics: CheckEvasionStatistics | undefined,
-  includeQuietPromotions: boolean
+  includeQuietPromotions: boolean,
+  selectiveQuietPromotions: QuietPromotionSelection | undefined
 ): SearchNodeResult {
   const emit = diagnostics?.traceNode;
   emit?.({kind:'enter', phase:'quiescence', state, ply, remainingDepth, remainingCheckEvasions, extensionPly, alpha, beta});
   const result = searchNodeBody(state, remainingDepth, perspective, alpha, beta, evaluation,
-    statistics, interruptionCheck, moveOrdering, diagnostics, ply, remainingCheckEvasions, extensionPly, checkEvasionStatistics, includeQuietPromotions);
+    statistics, interruptionCheck, moveOrdering, diagnostics, ply, remainingCheckEvasions, extensionPly, checkEvasionStatistics, includeQuietPromotions, selectiveQuietPromotions);
   emit?.({kind:'return', phase:'quiescence', state, ply, remainingDepth, remainingCheckEvasions, extensionPly, alpha, beta, value:result.evaluation});
   return result;
 }
@@ -137,7 +139,8 @@ function searchNodeBody(
   remainingCheckEvasions: number,
   extensionPly: number,
   checkEvasionStatistics: CheckEvasionStatistics | undefined,
-  includeQuietPromotions: boolean
+  includeQuietPromotions: boolean,
+  selectiveQuietPromotions: QuietPromotionSelection | undefined
 ): SearchNodeResult {
   const note = diagnostics?.traceNode ? (kind: 'stop'|'cutoff', reason: string) => diagnostics.traceNode!({kind, phase:'quiescence', state, ply, remainingDepth, remainingCheckEvasions, extensionPly, reason}) : undefined;
   diagnostics?.setStage('quiescence-entry');
@@ -163,8 +166,18 @@ function searchNodeBody(
   const actions = measured(diagnostics, 'q-legal', () => diagnostics
     ? getQuiescenceLegalActionsWithDiagnostics(state, diagnostics) : getLegalActions(state));
   if (extensionPly > 0 || extending) interruptionCheck?.();
+  // Keep selection before stand-pat: empty candidates do not count as a cutoff,
+  // and skippedActionCount counts the actual selected set, not potential moves.
+  const selectedPromotions = !isInCheck && selectiveQuietPromotions
+    ? measured(diagnostics, 'q-select-promotions', () => selectQuietPromotions(state, actions,
+      resolveSearchMaterialValueTable(evaluation), selectiveQuietPromotions, interruptionCheck)) : [];
   const candidates = isInCheck ? actions : actions.filter((action) => isCapture(state, action) ||
-    includeQuietPromotions && action.kind === 'move' && action.promotion === 'promote');
+    includeQuietPromotions && action.kind === 'move' && action.promotion === 'promote' ||
+    selectedPromotions.includes(action));
+  if (diagnostics && !isInCheck) {
+    diagnostics.quietPromotions.considered += actions.filter(a => a.kind === 'move' && a.promotion === 'promote' && !isCapture(state,a)).length;
+    diagnostics.quietPromotions.added += candidates.filter(a => !isCapture(state,a)).length;
+  }
 
   // Child execution normally adjudicates no-response positions. In the new
   // extension path, also resolve custom checked roots through the shared evaluator.
@@ -225,7 +238,7 @@ function searchNodeBody(
       moveOrdering,
       diagnostics, ply + 1,
       remainingCheckEvasions - (extending ? 1 : 0),
-      extensionPly + (extending ? 1 : 0), checkEvasionStatistics, includeQuietPromotions
+      extensionPly + (extending ? 1 : 0), checkEvasionStatistics, includeQuietPromotions, selectiveQuietPromotions
     );
     if (extensionPly > 0 || extending) interruptionCheck?.();
 
@@ -269,7 +282,8 @@ export function analyzeQuiescenceSearch(
   moveOrdering: QuiescenceMoveOrderingMode = 'original',
   maxCheckEvasionExtensions = 0,
   checkEvasionStatistics?: CheckEvasionStatistics,
-  includeQuietPromotions = false
+  includeQuietPromotions = false,
+  selectiveQuietPromotions?: QuietPromotionSelection
 ): QuiescenceSearchResult {
   return analyzeQuiescenceSearchWithinBounds(
     state,
@@ -279,7 +293,7 @@ export function analyzeQuiescenceSearch(
     interruptionCheck,
     Number.NEGATIVE_INFINITY,
     Number.POSITIVE_INFINITY,
-    moveOrdering, undefined, maxCheckEvasionExtensions, checkEvasionStatistics, includeQuietPromotions
+    moveOrdering, undefined, maxCheckEvasionExtensions, checkEvasionStatistics, includeQuietPromotions, selectiveQuietPromotions
   );
 }
 
@@ -301,11 +315,14 @@ export function analyzeQuiescenceSearchWithInternalBounds(
   rootPly = 0,
   maxCheckEvasionExtensions = 0,
   checkEvasionStatistics?: CheckEvasionStatistics,
-  includeQuietPromotions = false
+  includeQuietPromotions = false,
+  selectiveQuietPromotions?: QuietPromotionSelection
 ): QuiescenceSearchResult & { searchValue: SearchValue; checkEvasionLimitReached?: boolean } {
   if (typeof includeQuietPromotions !== 'boolean') {
     throw new RangeError('Quiescence includeQuietPromotions must be a boolean.');
   }
+  selectiveQuietPromotions = resolveQuietPromotionSelection(selectiveQuietPromotions);
+  if (includeQuietPromotions && selectiveQuietPromotions) throw new RangeError('Choose all or selective quiet promotions, not both.');
   validateMaxTacticalDepth(maxTacticalDepth);
   validateMaxCheckEvasionExtensions(maxCheckEvasionExtensions);
   const resolvedOrdering = resolveQuiescenceMoveOrdering(moveOrdering);
@@ -320,7 +337,7 @@ export function analyzeQuiescenceSearchWithInternalBounds(
     statistics,
     interruptionCheck,
     resolvedOrdering,
-    diagnostics, rootPly, maxCheckEvasionExtensions, 0, checkEvasionStatistics, includeQuietPromotions
+    diagnostics, rootPly, maxCheckEvasionExtensions, 0, checkEvasionStatistics, includeQuietPromotions, selectiveQuietPromotions
   );
   return {
     selectedEvaluation: result.evaluationBreakdown.total,
@@ -340,12 +357,13 @@ export function analyzeQuiescenceSearchWithinBounds(
   diagnostics?: SearchDiagnostics,
   maxCheckEvasionExtensions = 0,
   checkEvasionStatistics?: CheckEvasionStatistics,
-  includeQuietPromotions = false
+  includeQuietPromotions = false,
+  selectiveQuietPromotions?: QuietPromotionSelection
 ): QuiescenceSearchResult {
   const { searchValue: _internal, checkEvasionLimitReached: _limit, ...result } = analyzeQuiescenceSearchWithInternalBounds(
     state, perspective, maxTacticalDepth, evaluation, interruptionCheck,
     numericalSearchBound(alpha), numericalSearchBound(beta), moveOrdering, diagnostics, 0,
-    maxCheckEvasionExtensions, checkEvasionStatistics, includeQuietPromotions
+    maxCheckEvasionExtensions, checkEvasionStatistics, includeQuietPromotions, selectiveQuietPromotions
   );
   return result;
 }
