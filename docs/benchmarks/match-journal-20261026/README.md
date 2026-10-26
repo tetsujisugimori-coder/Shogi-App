@@ -14,6 +14,8 @@ Issue [#215](https://github.com/tetsujisugimori-coder/Shogi-App/issues/215)、PR
 
 初期局面は全BoardState、全棋譜とsnapshot/repetition/check履歴を保存する。schema 1の開始入力は初手から履歴が揃ったactive/check局面に限定し、過去手順も既存合法手APIで再生して照合する。人工局面は初期snapshotを起点とし、平手からの到達可能性は主張しない。開始後の規則は既存runSelfPlayGameが扱い、PV葉の内訳も再計算する。
 
+旧JSON棋譜由来stateではPiece.isPromotedのundefined属性が省略される。初期履歴の再生照合に限り、この属性の「欠落」と「undefined」を同じとする。false/trueや他属性の差は許容しない。journal原本、探索結果、手を適用した後の全状態hashはこの正規化を行わず、型付き表現でそのまま保持する。初回prepareはこの差を拒否して測定開始前に停止した。11か所の診断はvalidation/initial-provenance-difference.jsonl、修正後は旧JSON形式の6手棋譜を回帰で検証する。
+
 ## 固定条件と再現
 
 旧 `piece-safety-20261025/run2/plan.json` の平手/6手合法棋譜由来の完全stateとoptsを使用する。先後交換2ペア、計4局。1000ms、max d4、120ply、standard評価、通常standard/q1 original、成りOFF、check evasion extensions 0、TT/PV/killer OFF。今回の全局は新しいrun IDで開始し、旧runへ継ぎ足さない。

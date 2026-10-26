@@ -1,4 +1,11 @@
 {
+  "initialPrepare": {
+    "command": "node --import tsx scripts/measure-match-journal.ts prepare docs/benchmarks/match-journal-20261026/run1",
+    "exitCode": 1,
+    "sourceSha": "4fda0732792dd9bb1a8c2757f6ea46b436daa9df",
+    "diagnostic": "AssertionError: initial history/state mismatch. Replayed hash 1560e46b92b5d2b5e4effdcf0677eea5d903f4588ca88451060b699c9e297097 vs archived 60d7c5abfd784e2755fddaecc043ba74e767b8faff0c03263040618d1590da55.",
+    "resolution": "11 optional Piece.isPromoted properties were omitted by old JSON but explicitly undefined after legal replay. Only initial-history provenance comparison permits this exact difference; no source journal or search values normalized. Failed before creating run directory or executing any game."
+  },
   "initialTypecheck": {
     "command": "npm run lint",
     "exitCode": 1,

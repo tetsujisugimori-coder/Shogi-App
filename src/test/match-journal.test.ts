@@ -154,7 +154,8 @@ describe('durable per-ply journal',()=>{
     expect(decode(saved.games[0].end.finalSearchEncoded)).toMatchObject({selectedEvaluation:-Infinity,completedDepth:-1});
   });
   it('legally replays all prior history in the saved six-ply starting position',()=>{
-    const start=fixtureStart({initialState:tacticalPositions().find(p=>p.id==='hirate-exchange')!.state});start.conditions.maxPlies=0;
+    const archived=JSON.parse(JSON.stringify(tacticalPositions().find(p=>p.id==='hirate-exchange')!.state));
+    const start=fixtureStart({initialState:archived});start.conditions.maxPlies=0;
     const {path}=run(start);expect(auditJournal(path).status).toBe('complete');
     const records=readJournal(path).payloads as JournalRecord[],s=records[0] as StartRecord;
     s.initialState.positionHistory![2].gaveCheck=!s.initialState.positionHistory![2].gaveCheck;

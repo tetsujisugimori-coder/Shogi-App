@@ -32,6 +32,16 @@ export interface EndRecord {
 }
 export type JournalRecord = StartRecord | MoveRecord | EndRecord;
 export const stateHash = (state: BoardState) => valueHash(cloneBoardState(state));
+/** Archived JSON omitted optional undefined Piece.isPromoted; permit ONLY that provenance difference.
+ * Journal payloads, search values and post-move state hashes remain fully lossless. */
+function initialProvenanceHash(state: BoardState) {
+  const copy=cloneBoardState(state);
+  for (const position of [copy,...(copy.positionSnapshots??[])]) {
+    const pieces=[...position.squares.flatMap(row=>row.flatMap(square=>square.piece?[square.piece]:[])),...position.senteHand,...position.goteHand];
+    for (const piece of pieces) if(piece.isPromoted===undefined)delete piece.isPromoted;
+  }
+  return stateHash(copy);
+}
 const count = (x: unknown) => typeof x === 'number' && Number.isSafeInteger(x) && x >= 0;
 const duration = (x: unknown) => typeof x === 'number' && Number.isFinite(x) && x >= 0;
 
@@ -89,7 +99,7 @@ export function validateInitialHistory(state: BoardState): void {
     assert.equal(next.type, 'applied');
     if (next.type === 'applied') replay = next.state;
   }
-  assert.equal(stateHash(replay), stateHash(state), 'initial history/state mismatch');
+  assert.equal(initialProvenanceHash(replay), initialProvenanceHash(state), 'initial history/state mismatch');
 }
 
 export type Search = (state: BoardState, mode: Mode) => SelfPlaySearchResult;
