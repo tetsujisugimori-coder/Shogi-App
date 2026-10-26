@@ -4,6 +4,9 @@
 - scripts内で既存self-playを1手ずつ呼び、子自身が型付きJSONLを追記・fsync。連番/チェーンhash/全状態hash/完全な初期履歴/探索結果を保存。未知schemaや途中破損を拒否し、末尾断片は原本を変えずprefix監査。IO失敗・容量・時間・強制終了・未実行を正式結果と分離し、同一棋譜の重複と未交換ペアを排除する。
 - 新規33テスト、関連4ファイル128件、全体91ファイル2466件成功。初回sandbox esbuild起動失敗、初回新規テストのreadonly代入型エラーを保持。期待値・timeoutは緩和しない。製品の探索・評価・合法手・終局・既定legacy・Worker/UI/利用者保存形式は不変。
 - 前回と同じ平手/6手合法棋譜由来、1000ms/max d4/q1、TT/PV/killer OFF、120plyの先後交換2ペアを新規runで直列測定する。1局290秒/親300秒、全体22分。棋力改善を前提にせず、結果と再集計は[今回の証拠](docs/benchmarks/match-journal-20261026/README.md)に記録する。
+- 測定source `05cbb8cdfe3b7574a630d22a3dfb9a75d379fdcb`、4局394手・2ペア完了。平手は115/91手でそれぞれ先手勝ち、棋譜由来は120手打切り/68手後手勝ち。legacy 2勝・experimental 1勝・規則引分0・打切り1、未完了/中断/破損/未実行0。探索API394,579.019ms、保存/fsync2,952.217ms、run約440.7秒。partial-rootは33/40、fallback0/0。一般棋力向上は未実証で既定legacyを維持。
+- 全合法再生/PV/内訳/終局監査後、2回再集計とplanなし・重複入力の単独再生がbyte一致。summary hash `4db95af66c2ba52350e539e32fa709bae6ae3c8a3d144074ab06ed5154eb0134`、report `1718bdc72316c342fc91b8e44cf2761e10d8de9ae9ffc885ba0b614e47071094`。初回prepareは旧JSONのPiece.isPromoted省略とundefinedの差11か所で測定前に停止し、初期履歴照合だけの限定互換で修正した。原本・探索結果・適用後状態hashは正規化せず保持。
+- 測定後の最終型検査/全体91ファイル2466件/build1762 modules成功。旧1087原本/測定source hash一致。manifestとGit indexのbytes検証を行い、最終HEADのCI結果はDraft PR本文へ記録する。ローカルnpm ci/macOS固有検査は未実行で、CIの実結果と区別する。
 
 ### [2026-10-25 JST] 駒安全度の限定実験と同一時間の品質検証
 
