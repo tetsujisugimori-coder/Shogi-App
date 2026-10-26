@@ -1,3 +1,16 @@
+### [2026-10-25 JST] 駒安全度の限定実験と同一時間の品質検証
+
+- 最新origin/main `e2f12e97f2d2c297b3b2ac5648bbfb12dc53faad` をfetch、#212 MERGED確認。既存clean main/worktree/原本を変更せず、新cloneの専用 `codex/piece-safety-experiment` で実装。Issue #209、#210/#212との関係を記録し、Issue本文・マージ・自動マージを変更しない。
+- 既存SearchEvaluationOptionsへpieceSafetyMode追加、未指定legacy。experimentalはA>0で0.1*盤上価値*A/(A+D)、無防備は既存算術を維持。共有AttackCountMaps/既存走査のみ。玉/持ち駒を除き、成駒価値・4項目内訳・root視点・PV/終局距離・部分探索/期限/fallbackを維持。静的評価へSEE/合法生成を追加せず、ピン・合法取り返し・攻守駒価値差の解決を主張しない。TTのlegacy identity bytesは不変、実験版のみ識別子追加。Worker/UI/保存形式・SEE/q/成り研究オプションの既定は不変。
+- 変更前の全入力/合法手/利き数/価値/4項目/SEE/d1/d3を保存。連続交換は旧安全度0でも飛車の歩取りSEE−1000、金0。ピンされた金の生守備と合法応手の差も再現。基準全体2397成功/既存UI timeout1失敗。npm証明書失敗・sandbox起動失敗・初回新テスト型エラーも隠さず保存。
+- run1は682/698取得で旧SEE-deadline fixtureの空初期履歴を参照検査が拒否、16欠測/対局なし。旧fixtureを編集せずadapterで既存API正規化、全局面事前検査と既存戦術coverageを追加してrun2を新規測定。式は測定後に調整しない。run1の部分集計2回hashは7b8466a144f0b2108fc0da076e7e273f5faf66e56f6b74a7b1d7b546dc598a56。
+- run2は28局面、standard、通常standard/q1 original、成りOFF、TT/PV/killer OFF、d1/d3・100/1000ms最大d4、warmup1＋本3、AB/BA。診断OFF matrix896呼出し/本672、別ON56、互換28、有限参照28を取得。旧main対明示legacyのd1全結果/統計とTT d2全結果/統計が全28局面で一致。主測定とtest/buildは直列。
+- 固定d1のpoisoned-rookで1局面3対の有限参照候補値589→640を観測するが両方QualityGap、件数不変。100ms・1000msの有限参照改善/悪化は0/0（各同値45/不足39）。深さ改善/悪化は100ms 1/1、1000ms 4/2で性能と品質を区別。固定d3 API42,843.304→47,640.232ms（+11.20%）。単独同一入力の全評価−0.12%、共有マップ安全度+3.27%は別測定であり棋力根拠にしない。
+- 100ms3ペアはB1勝1敗・千日手1・120ply打切り3。1000ms平手1ペアは両局120ply打切り。最後の合法棋譜由来ペアは親の全体15分上限でSIGKILL、1012/1013取得/1欠測、全体未完了。ペア完了前の部分棋譜は未保存で、2局分は未保存/未完了として区別。保存済み8局686plyを全合法再生・PV/内訳/最終局面/終局監査し、少数対局から一般棋力を断定しない。
+- JSON省略undefinedと再生後optional属性の差で初回最終局面監査失敗。保存表現への正規化1行のみ修正し、原本と測定時ハーネスgzipを保持。製品bytes不変、run2再集計2回summary hash68853f589d6e682cb4f2c0a459279f0843eda02579e07467fcf8343de1ac6a7d一致。0ms上限0取得/容量縮小2取得後停止を実検証し、双方2回auditと容量上限確認。旧原本975ファイルをhash照合対象として保存。
+- 判定は実用不採用。時限品質の改善未確認・固定d3負荷増のため、再現/反証用研究opt-inのみ保持し既定legacy。強い独立参照、攻守駒価値/合法取り返し/ピンの扱い、対局の逐次journalと1000ms2ペア完走が残課題。[設計・原本・再集計・失敗・検証](docs/benchmarks/piece-safety-20261025/README.md)。最終HEAD/CIはDraft PR本文へ記録し、独立レビュー待ちで停止する。
+- 最終新規35件/全体90ファイル2433件すべて成功、lock/lint（型検査）/build1762 modules/diff-check成功。既存テスト期待値・timeout・worker数不変。report再生成2回hash f8895052ef64ffd79b86ad2c1404ba242c4d6eed3ba4faf63566cd276ddb198f一致。途中の基準UI失敗・監査/型エラー・未完了を保持し、成功結果と分離。全証拠と変更ソースは新manifest、旧975原本は保護manifestで照合する。
+
 ### [2026-10-25 JST] PR #212 P2：stand-pat統計依存の検証と選別設定の正規化
 
 - 指定/remote/local HEAD `1b45ad1cab7a493223495b911fab944985456a2f`、clean・既存ブランチでfetch確認。新規PRを作らず既存#212へ追従。旧測定・検証・manifestを変更せず、全追跡原本hashを新planへ保存して監査する。

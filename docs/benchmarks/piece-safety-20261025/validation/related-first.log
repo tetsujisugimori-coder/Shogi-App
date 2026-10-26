@@ -1,0 +1,13 @@
+
+> shogi-app@0.0.0 test
+> vitest run --dir src/test src/test/shogi-piece-safety-experiment.test.ts src/test/shogi-undefended-piece-safety-evaluation.test.ts src/test/shogi-selective-promotion-contracts.test.ts src/test/shogi-search-evaluation-breakdown.test.ts
+
+
+ RUN  v4.1.11 C:/Users/tetsu/Documents/ChatGPT/将棋アプリ/repo
+
+
+ Test Files  4 passed (4)
+      Tests  48 passed (48)
+   Start at  23:19:39
+   Duration  2.80s (transform 729ms, setup 526ms, import 916ms, tests 238ms, environment 3.21s)
+

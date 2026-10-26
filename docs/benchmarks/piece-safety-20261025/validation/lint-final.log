@@ -1,0 +1,9 @@
+
+> shogi-app@0.0.0 lint
+> tsc --noEmit
+
+scripts/report-piece-safety.ts(62,51): error TS2339: Property 'b_win' does not exist on type '{ incomplete: number; plies: any; bSenteWins: number; bGoteWins: number; limit: number; }'.
+scripts/report-piece-safety.ts(62,62): error TS2339: Property 'a_win' does not exist on type '{ incomplete: number; plies: any; bSenteWins: number; bGoteWins: number; limit: number; }'.
+scripts/report-piece-safety.ts(62,73): error TS2339: Property 'draw' does not exist on type '{ incomplete: number; plies: any; bSenteWins: number; bGoteWins: number; limit: number; }'.
+scripts/report-piece-safety.ts(62,83): error TS2339: Property 'max_plies' does not exist on type '{ incomplete: number; plies: any; bSenteWins: number; bGoteWins: number; limit: number; }'.
+scripts/report-piece-safety.ts(62,98): error TS2339: Property 'failed' does not exist on type '{ incomplete: number; plies: any; bSenteWins: number; bGoteWins: number; limit: number; }'.

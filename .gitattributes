@@ -23,3 +23,7 @@ docs/benchmarks/selective-promotions-20261024/validation/*.log -text whitespace=
 # Keep PR212 review evidence and original stdout bytes stable.
 docs/benchmarks/selective-promotions-review-20261025/** -text whitespace=blank-at-eol,blank-at-eof,space-before-tab,cr-at-eol
 docs/benchmarks/selective-promotions-review-20261025/validation/*.log -text whitespace=blank-at-eol,-blank-at-eof,space-before-tab,cr-at-eol
+
+# Preserve piece-safety raw bytes and original stdout across checkouts.
+docs/benchmarks/piece-safety-20261025/** -text whitespace=blank-at-eol,blank-at-eof,space-before-tab,cr-at-eol
+docs/benchmarks/piece-safety-20261025/validation/*.log -text whitespace=blank-at-eol,-blank-at-eof,space-before-tab,cr-at-eol

@@ -1,5 +1,7 @@
 # SHOGI-APP
 
+駒安全度に研究用 `pieceSafetyMode: 'experimental'` を追加しました。既定は従来のlegacyです。生の攻撃A・守備Dに対する最大10%の警告を `0.1 × 盤上価値 × A/(A+D)` へ限定拡張し、合法な交換損やピン解決とは区別します。28局面の100/1000ms比較で有限参照上の指し手改善は未確認、固定d3は約11.2%遅くなりました。100ms対局は1勝1敗・千日手1・打切り3、1000msは1ペア打切り・残り1ペアが15分上限で未完了です。**実用採用は見送り、再現用opt-inのみ保持します。** [設計・全結果・失敗・原本監査](docs/benchmarks/piece-safety-20261025/README.md)。
+
 PR #212のP2修正では、stand-pat前の候補選別は統計互換性のため維持し、成り候補0件の玉位置走査だけを省く部分削減に限定しました。選別設定はownの正整数 `maxCandidates` を明示的に正規化し、列挙不可値も保持、継承値だけの設定は入口で拒否します。既定OFF・全候補ON・研究用opt-inの位置付けは不変です。[依存関係・設定契約・修正前後の検証](docs/benchmarks/selective-promotions-review-20261025/README.md)。旧測定の固定d4 OFF比+8.29%と、棋力改善未実証の判断は以下に保持します。
 
 静止探索に研究用の選択方式 `quiescence: { maxTacticalDepth: 1, selectiveQuietPromotions: { maxCandidates: 1 } }` を追加しました。成りの駒得・直後の被捕獲と取り返しの利きを概算し、既存の合法な非捕獲成りだけを選別します。従来OFFと `includeQuietPromotions:true` の全候補ONは互換、既定OFF・Worker/UI/保存形式は不変です。10局面の100ms比較ではOFF比の深さ悪化が全候補12/30対から選択8/30対へ減りましたが、改善0対。固定d4実時間はOFF比+8.29%で、1000msにも悪化が残りました。対局は100msで選択2勝1敗・千日手2・打切り1、1000msで2勝2敗という少数局です。**一般棋力向上は未実証、実用推奨せず研究用opt-inに限定します。** 最善手の完全性も保証しません。[方式・性能・戦術・対局・制約とraw再集計](docs/benchmarks/selective-promotions-20261024/README.md)。

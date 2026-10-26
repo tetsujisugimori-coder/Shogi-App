@@ -1,0 +1,6 @@
+{"prepared":"C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\repo\\docs\\benchmarks\\piece-safety-20261025\\budget-zero","tasks":1013,"positions":28}
+{"ended":false,"code":null,"bytes":2175505}
+{"mode":"zero","audit":"{\"complete\":false,\"rows\":0,\"missing\":1013,\"summaryHash\":\"af98bee0f058b6edda67493eb86c642859687d93aa9b79e6429e820584d7ac37\"}","bytes":2286047,"maxBytes":67108864,"completed":0,"missing":1013}
+{"prepared":"C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\repo\\docs\\benchmarks\\piece-safety-20261025\\budget-capacity","tasks":1013,"positions":28}
+{"ended":false,"code":null,"bytes":2183427}
+{"mode":"capacity","audit":"{\"complete\":false,\"rows\":2,\"missing\":1011,\"summaryHash\":\"7ac9b1a5eda0a23ad784ce0d6c6444c0a9d9a1725b82c7c1f19c2c0bd372b47d\"}","bytes":2293910,"maxBytes":2445431,"completed":2,"missing":1011}
