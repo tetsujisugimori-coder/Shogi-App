@@ -1,0 +1,21 @@
+{
+  "reviewed": "3adec10bfc55ee681c3f79bb36dddbe5530a6166",
+  "baseline": "4009cd0e808553af8f0ec9e01411a3eb6714560d",
+  "measured": "05cbb8cdfe3b7574a630d22a3dfb9a75d379fdcb",
+  "oldOriginals": 1087,
+  "oldEvidence": 329,
+  "oldManifestHash": "1b9b785bd1d50968af47117a995b8ee152086568144b27eef1407c5682973ea9",
+  "newlineOnly": [],
+  "measuredSnapshots": 111,
+  "changedSources": [
+    {
+      "path": "scripts/benchmarks/matchJournal.ts",
+      "measured": "faca5fdd60a26c7c61e131566f755f8e2c167b8dcba3aa78ed5d4e8592f12fa7",
+      "current": "d71350bbbb6571f0e966b808bbe59e2395e547bd4f5e9c0abf27065f5c5862fd"
+    }
+  ],
+  "redExpectationsUnchanged": true,
+  "existingTestsUnchanged": true,
+  "currentTestHash": "44b9ce2296b114400bb88cd956a719656da56ff9f7e81fd71e5c3f1242da4ba7",
+  "verified": true
+}

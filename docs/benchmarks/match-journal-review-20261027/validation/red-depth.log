@@ -1,0 +1,71 @@
+
+ RUN  v4.1.11 C:/Users/tetsu/Documents/ChatGPT/将棋アプリ/repo
+
+ ❯ src/test/match-journal.test.ts (39 tests | 5 failed | 33 skipped) 179ms
+     × rejects completedDepth=999 before committing a move at max depth 1 38ms
+     × rejects completedDepth=2 before committing a move at max depth 1 21ms
+     × rejects saved completedDepth=999 with recomputed frames and checksums 38ms
+     × rejects saved completedDepth=2 with recomputed frames and checksums 34ms
+     × preserves a preceding committed move and the original invalid attempt on failure 19ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 5 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/test/match-journal.test.ts > journal timed search contract > rejects completedDepth=999 before committing a move at max depth 1
+ FAIL  src/test/match-journal.test.ts > journal timed search contract > rejects completedDepth=2 before committing a move at max depth 1
+AssertionError: expected 'max_plies' to be 'search_failure' // Object.is equality
+
+Expected: "search_failure"
+Received: "max_plies"
+
+ ❯ src/test/match-journal.test.ts:39:31
+     37|   it.each([999,2])('rejects completedDepth=%i before committing a move…
+     38|     const {path,result}=saveSearch((state,mode)=>({...fixtureSearch(st…
+     39|     expect(result.end.reason).toBe('search_failure');expect(result.end…
+       |                               ^
+     40|     expect(result.end.finalSearch?.completedDepth).toBe(depth);
+     41|     const audit=auditJournal(path);expect(audit.status).toBe('incomple…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/5]⎯
+
+ FAIL  src/test/match-journal.test.ts > journal timed search contract > rejects saved completedDepth=999 with recomputed frames and checksums
+ FAIL  src/test/match-journal.test.ts > journal timed search contract > rejects saved completedDepth=2 with recomputed frames and checksums
+AssertionError: expected 'complete' to be 'corrupt' // Object.is equality
+
+Expected: "corrupt"
+Received: "complete"
+
+ ❯ src/test/match-journal.test.ts:50:59
+     48|     const forged=rewrite(records),before=sha256(readFileSync(forged));
+     49|     expect(readJournal(forged).error).toBeNull();
+     50|     const audit=auditJournal(forged);expect(audit.status).toBe('corrup…
+       |                                                           ^
+     51|     const summary=aggregateJournals([forged]);expect(summary.counts.co…
+     52|     expect(summary.metrics.every(m=>m.plies===0&&m.apiMs===0&&Object.k…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/5]⎯
+
+ FAIL  src/test/match-journal.test.ts > journal timed search contract > preserves a preceding committed move and the original invalid attempt on failure
+AssertionError: expected 3 to be 2 // Object.is equality
+
+- Expected
++ Received
+
+- 2
++ 3
+
+ ❯ src/test/match-journal.test.ts:62:19
+     60|     let calls=0;
+     61|     const {path,result}=saveSearch((state,mode)=>{const r=fixtureSearc…
+     62|     expect(calls).toBe(2);expect(result.end.reason).toBe('search_failu…
+       |                   ^
+     63|     const audit=auditJournal(path);expect(audit.status).toBe('incomple…
+     64|     expect(audit.end?.finalSearch?.completedDepth).toBe(999);
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/5]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  5 failed | 1 passed | 33 skipped (39)
+   Start at  05:13:12
+   Duration  906ms (transform 364ms, setup 178ms, import 409ms, tests 179ms, environment 0ms)
+

@@ -1,0 +1,101 @@
+{
+  "rows": [
+    {
+      "at": 2,
+      "reads": 3,
+      "source": "fallback",
+      "depth": 0,
+      "pv": 0
+    },
+    {
+      "at": 7,
+      "reads": 8,
+      "source": "fallback",
+      "depth": 0,
+      "pv": 0
+    },
+    {
+      "at": 8,
+      "reads": 9,
+      "source": "partial-root",
+      "depth": 0,
+      "pv": 1
+    },
+    {
+      "at": 9,
+      "reads": 10,
+      "source": "partial-root",
+      "depth": 0,
+      "pv": 1
+    },
+    {
+      "at": 10,
+      "reads": 11,
+      "source": "partial-root",
+      "depth": 0,
+      "pv": 1
+    },
+    {
+      "at": 11,
+      "reads": 12,
+      "source": "partial-root",
+      "depth": 0,
+      "pv": 1
+    },
+    {
+      "at": 12,
+      "reads": 13,
+      "source": "partial-root",
+      "depth": 0,
+      "pv": 1
+    },
+    {
+      "at": 15,
+      "reads": 16,
+      "source": "partial-root",
+      "depth": 0,
+      "pv": 1
+    },
+    {
+      "at": 20,
+      "reads": 20,
+      "source": "completed-iteration",
+      "depth": 1,
+      "pv": 1
+    },
+    {
+      "at": 25,
+      "reads": 20,
+      "source": "completed-iteration",
+      "depth": 1,
+      "pv": 1
+    },
+    {
+      "at": 30,
+      "reads": 20,
+      "source": "completed-iteration",
+      "depth": 1,
+      "pv": 1
+    },
+    {
+      "at": 40,
+      "reads": 20,
+      "source": "completed-iteration",
+      "depth": 1,
+      "pv": 1
+    },
+    {
+      "at": 1000,
+      "reads": 20,
+      "source": "completed-iteration",
+      "depth": 1,
+      "pv": 1
+    }
+  ],
+  "completedReads": 20,
+  "interrupted": {
+    "source": "completed-iteration",
+    "completedDepth": 1,
+    "timedOut": true
+  }
+}

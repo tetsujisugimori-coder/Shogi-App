@@ -3,8 +3,10 @@ import type { BoardState, Player, GameResult } from '../../src/types/shogi';
 import { cloneBoardState, createPositionSnapshot, restoreBoardStateAtHistoryIndex } from '../../src/domain/shogi/replay';
 import { getLegalActions, executeLegalAction, type LegalAction } from '../../src/domain/shogi/legalActions';
 import { runSelfPlayGame, type SelfPlaySearchResult } from '../../src/domain/shogi/selfPlayGame';
-import { areLegalActionsEqual, type AlphaBetaSearchOptions } from '../../src/domain/shogi/twoPlyAlphaBetaAi';
-import { evaluateSearchPositionBreakdown } from '../../src/domain/shogi/twoPlyMinimaxAi';
+import { areLegalActionsEqual, type AlphaBetaSearchOptions, type TimeLimitedIterativeDeepeningAlphaBetaSearchResult } from '../../src/domain/shogi/twoPlyAlphaBetaAi';
+import { evaluateSearchPositionBreakdown, evaluateNoLegalActionsPositionBreakdown } from '../../src/domain/shogi/twoPlyMinimaxAi';
+import { validatePartialRoot } from '../../src/application/partialRootValidation';
+import { getDisplayEvaluationBreakdown } from '../../src/application/searchEvaluationBreakdownValidation';
 import { validatePosition } from './tacticalDiagnostics';
 import { CapacityError, JournalWriter, readJournal, valueHash, canonical, encode } from './journalIO';
 
@@ -103,6 +105,75 @@ export function validateInitialHistory(state: BoardState): void {
 }
 
 export type Search = (state: BoardState, mode: Mode) => SelfPlaySearchResult;
+const statisticPairs = [
+  ['visitedPositionCount','totalVisitedPositionCount'], ['cutoffCount','totalCutoffCount'],
+  ['skippedActionCount','totalSkippedActionCount'], ['quiescenceLeafCount','totalQuiescenceLeafCount'],
+  ['quiescenceVisitedPositionCount','totalQuiescenceVisitedPositionCount'],
+  ['quiescenceCutoffCount','totalQuiescenceCutoffCount'], ['quiescenceSkippedActionCount','totalQuiescenceSkippedActionCount'],
+] as const;
+
+/** This journal records the full timed API, not generic nullable self-play observations.
+ * No corrections, wall-time cutoff or PV-length=depth assumption. Legal replay remains in onePly. */
+export function validateJournalSearch(state: BoardState, value: unknown, start: StartRecord): asserts value is TimeLimitedIterativeDeepeningAlphaBetaSearchResult {
+  const check = (valid: unknown, field: string): void => { assert.ok(valid, 'Invalid journal timed search result: ' + field); };
+  check(value !== null && typeof value === 'object' && !Array.isArray(value), 'object');
+  const result = value as TimeLimitedIterativeDeepeningAlphaBetaSearchResult & {actualElapsedMilliseconds?: number};
+  const maxDepth = start.conditions.depth;
+  check(count(result.completedDepth) && result.completedDepth <= maxDepth, 'completedDepth exceeds declared depth or is unavailable');
+  check(result.requestedMaxDepth === maxDepth, 'requestedMaxDepth');
+  check(result.depth === result.completedDepth, 'depth/completedDepth');
+  check(typeof result.timedOut === 'boolean', 'timedOut');
+  check(duration(result.elapsedMilliseconds), 'elapsedMilliseconds');
+  check(result.actualElapsedMilliseconds === undefined || duration(result.actualElapsedMilliseconds), 'actualElapsedMilliseconds');
+  check(Array.isArray(result.principalVariation), 'principalVariation');
+  check(Array.isArray(result.iterations) && result.iterations.length === result.completedDepth, 'iterations/completedDepth');
+  const legal = getLegalActions(state);
+  check(result.rootLegalActionCount === legal.length, 'rootLegalActionCount');
+  for (const [key,total] of statisticPairs) check(count(result[key]) && count(result[total]), key + '/' + total);
+  if (result.resultSource !== 'partial-root') check(result.partialRoot === undefined, 'unexpected partialRoot');
+  if (state.status !== 'ended') check(result.terminalResult === undefined, 'unexpected terminalResult');
+  if (legal.length === 0) {
+    const ended = state.status === 'ended';
+    check(result.resultSource === (ended ? 'ended-position' : 'no-legal-actions'), 'no-action resultSource');
+    check(result.completedDepth === 0 && result.timedOut === false && result.selectedAction === null && result.principalVariation.length === 0, 'no-action metadata');
+    if (ended) assert.deepEqual(result.terminalResult, state.result, 'terminalResult');
+    const evaluate = ended ? evaluateSearchPositionBreakdown : evaluateNoLegalActionsPositionBreakdown;
+    const expected = evaluate(state, state.turn, {pieceSafetyMode:start.seats[state.turn]});
+    assert.deepEqual(result.evaluationBreakdown, expected, 'no-action evaluation');
+    check(result.selectedEvaluation === expected.total, 'no-action selectedEvaluation');
+    check(statisticPairs.every(([key,total]) => result[key] === 0 && result[total] === 0), 'no-action statistics');
+    return;
+  }
+  check(result.timedOut === (result.completedDepth < maxDepth), 'timedOut/completedDepth');
+  check(result.selectedAction !== null && typeof result.selectedAction === 'object', 'selectedAction');
+  if (result.resultSource === 'partial-root') {
+    check(validatePartialRoot(state, result, start.conditions.options.quiescence?.maxTacticalDepth ?? 0) !== null, 'partial-root contract');
+    return;
+  }
+  if (result.resultSource === 'fallback') {
+    check(result.completedDepth === 0 && result.selectedEvaluation === null && result.evaluationBreakdown === null &&
+      result.principalVariation.length === 0, 'fallback metadata');
+    check(areLegalActionsEqual(result.selectedAction!, legal[0]), 'fallback first legal action');
+    check(statisticPairs.every(([key,total]) => result[key] === 0 && result[total] === 0), 'fallback statistics');
+    return;
+  }
+  check(result.resultSource === 'completed-iteration' && result.completedDepth >= 1, 'completed-iteration metadata');
+  check(getDisplayEvaluationBreakdown(result.evaluationBreakdown, result.selectedEvaluation) !== null, 'evaluationBreakdown');
+  for (const [index,iteration] of result.iterations.entries()) {
+    check(iteration && typeof iteration === 'object' && iteration.depth === index + 1, 'iteration depth');
+    check(duration(iteration.elapsedMilliseconds) && iteration.rootLegalActionCount === legal.length, 'iteration time/root count');
+    check(Array.isArray(iteration.principalVariation) && iteration.principalVariation.length > 0 &&
+      getDisplayEvaluationBreakdown(iteration.evaluationBreakdown, iteration.selectedEvaluation) !== null, 'iteration observations');
+    for (const [key] of statisticPairs) check(count(iteration[key]), 'iteration ' + key);
+  }
+  const last = result.iterations.at(-1)!;
+  for (const key of ['depth','selectedAction','selectedEvaluation','principalVariation','evaluationBreakdown'] as const) {
+    assert.deepEqual(result[key], last[key], 'deepest iteration ' + key);
+  }
+  for (const [key,total] of statisticPairs) check(result[key] === last[key] &&
+    result[total] === result.iterations.reduce((sum,iteration) => sum + iteration[key], 0), 'iteration aggregate ' + key);
+}
+
 export function onePly(state: BoardState, search: (state: BoardState) => SelfPlaySearchResult) {
   const participant = { settings: undefined, search };
   return runSelfPlayGame({ initialState: state, sente: participant, gote: participant, maxPlies: 1 });
@@ -128,8 +199,10 @@ export function runJournalGame(start: StartRecord, writer: JournalWriter, search
     let observed: SelfPlaySearchResult | null = null, elapsed = 0;
     const next = onePly(state, s => {
       const before = clock();
-      try { observed = search(s, start.seats[s.turn]); return observed; }
+      try { observed = search(s, start.seats[s.turn]); }
       finally { elapsed = clock() - before; }
+      validateJournalSearch(s, observed, start);
+      return observed;
     });
     if (next.status === 'failed') return end('search_failure', JSON.stringify(next.failure), observed, elapsed);
     if (next.plies.length === 0) {
@@ -181,6 +254,7 @@ export function auditJournal(path: string): Audit {
         assert.ok(record.ply <= first.conditions.maxPlies);
         assert.equal(record.moveNumber, state.moveNumber); assert.equal(record.player, state.turn);
         assert.ok(duration(record.apiMs));
+        validateJournalSearch(state, record.search, first);
         assert.ok(record.search.selectedAction && areLegalActionsEqual(record.action, record.search.selectedAction));
         const next = onePly(state, () => record.search);
         assert.notEqual(next.status, 'failed', next.status === 'failed' ? JSON.stringify(next.failure) : '');
@@ -202,6 +276,7 @@ export function auditJournal(path: string): Audit {
         if (end.reason !== 'search_failure' && !(end.reason === 'rule' && state.status !== 'ended')) assert.equal(end.finalSearch, null);
         if (end.reason === 'rule' && state.status !== 'ended') {
           assert.ok(end.finalSearch && end.finalSearch.selectedAction === null);
+          validateJournalSearch(state, end.finalSearch, first);
           const next = onePly(state, () => end.finalSearch!);
           assert.equal(next.status, 'ended'); assert.equal(next.plies.length, 0); state = next.finalState;
         }

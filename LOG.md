@@ -1,3 +1,15 @@
+### [2026-10-27 JST] PR #216 P2：探索結果と宣言条件の整合検証（Issue #215）
+
+- レビュー/remote/local HEAD `3adec10bfc55ee681c3f79bb36dddbe5530a6166`、cleanの対象ブランチを確認し、同じIssue #215/Draft PR #216を更新する。重複作成・マージ・自動マージなし。
+- 原因はself-playのcompletedDepth非負整数検査だけで宣言depthとの照合が欠けたこと。最大深さ1のcompletedDepth 999/2は保存/監査を通り、999が正式depthCountsへ入った。拒否を期待する6テストは修正前5失敗/正常1成功、修正後同一期待値で6成功。旧コード/テストgzip・赤/緑fixture/logを新証拠へ保持。
+- journal専用共通検証を保存前・読取り監査へ追加し、宣言上限、requestedMaxDepth/depth、resultSource/timedOut/partial-root/fallback、iteration/統計/評価内訳の実API契約を検査。既存partial-root/内訳検証を再利用。必須値のnull/undefined/欠落を拒否し、任意値と未評価nullは契約に従う。PV長=深さや実測timeMs超過の拒否は要求せず、補正・推測もしない。API計測から検証費用を分離。
+- 不正保存はsearch_failureで停止し、型付きfinalSearchに元の観測と理由、先行する合法な保存済み手を保持。不正保存済みmoveは正常frame/hashでもcorruptとして対局全体を正式結果・完了ペア・観測集計から除外する。IO失敗後停止とfsync/codecは不変。製品ソース、既定legacy・experimental研究opt-in、Worker/UI/保存形式は変更なし。
+- 新規92＋既存33のjournal125件、関連3ファイル190件成功。39種類の矛盾を保存前/読取り別に検証。実APIの正常3方式・浅い完了後timeout・終局短PV・1004/1005ms超過・手なし終局、片側破損ペア除外を確認。既存の非有限値/欠落区別、journal有無の決定的互換、実子kill/IO/容量/時間/破損回帰も成功。既存期待値・timeoutを変更しない。
+- 旧run1の4局394手・先後交換2ペアを修正後ソースで再監査。legacy 2勝/experimental 1勝/規則引分0/120ply打切り1、未完了・破損・未実行0。新2回のsummary/reportは旧2回ともbyte一致。summary `4db95af66c2ba52350e539e32fa709bae6ae3c8a3d144074ab06ed5154eb0134`、report `1718bdc72316c342fc91b8e44cf2761e10d8de9ae9ffc885ba0b614e47071094`。元の測定sourceは`05cbb8c`のままで、再測定0局。
+- 旧1087原本を基準main `4009cd0`と内容照合、前回329証拠と測定111ソースgzipをhash確認。改行由来hash差・実内容差とも0、旧manifest/原本/ログ/監査は無変更。新監査ソースを別gzip/hashへ保存し、原本・Git index保全用helperと新manifestで照合する。
+- lock検査、型検査/lint、全体91ファイル2558件（skip/失敗0）、production build1762 modules成功。全体ログのjsdom navigation未実装メッセージはテスト失敗ではない。diff-checkと最終HEADのUbuntu/macOS CIは提出時に確認してPR本文へ記録する。ローカルWindowsでclean npm ci/macOS固有検査は未実施で、CI結果と区別。
+- [新規証拠・契約・再現手順](docs/benchmarks/match-journal-review-20261027/README.md)。一般棋力向上は未実証。ピン・合法取り返し・深い独立参照評価は次段階とし、Draftのまま独立再レビュー待ちで停止する。
+
 ### [2026-10-26 JST] 対局journalと1000ms比較の再実行（Issue #215）
 
 - PR #214 MERGEDと独立レビューを確認し、fetch済みmain `4009cd0e808553af8f0ec9e01411a3eb6714560d` から `codex/match-journal-1000ms`。同目的Issue #215を使用し重複起票を回避。既存作業ツリーはclean、既存1087証拠のSHA256を保存。

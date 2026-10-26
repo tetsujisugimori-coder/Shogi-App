@@ -17,3 +17,4 @@ coverage/
 !docs/benchmarks/selective-promotions-review-20261025/validation/*.log
 !docs/benchmarks/piece-safety-20261025/validation/*.log
 !docs/benchmarks/match-journal-20261026/validation/*.log
+!docs/benchmarks/match-journal-review-20261027/validation/*.log
