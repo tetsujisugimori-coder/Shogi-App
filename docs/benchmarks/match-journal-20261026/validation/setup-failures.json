@@ -1,0 +1,14 @@
+{
+  "initialTypecheck": {
+    "command": "npm run lint",
+    "exitCode": 1,
+    "diagnostic": "src/test/match-journal.test.ts(107,50): error TS2540: Cannot assign to 'useTranspositionTable' because it is a read-only property.",
+    "resolution": "Replaced the test options object instead of mutating a readonly property; no existing test expectation or timeout changed."
+  },
+  "initialTestStartup": {
+    "command": "npx vitest run src/test/match-journal.test.ts",
+    "exitCode": 1,
+    "log": "journal-tests-attempt1.log",
+    "resolution": "esbuild parent-directory access denied under sandbox; normal-permission run succeeded."
+  }
+}

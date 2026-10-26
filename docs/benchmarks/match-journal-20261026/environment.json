@@ -1,0 +1,16 @@
+{
+  "base": "4009cd0e808553af8f0ec9e01411a3eb6714560d",
+  "branch": "codex/match-journal-1000ms",
+  "at": "2026-10-26T13:05:19.024Z",
+  "node": "v24.20.0",
+  "npm": "11.17.0",
+  "os": "win32",
+  "release": "10.0.26300",
+  "arch": "x64",
+  "cpu": "Intel(R) Core(TM) i7-14650HX",
+  "logicalCpus": 24,
+  "originalFiles": 1087,
+  "gitStatus": "clean before work",
+  "instructions": "User AGENTS.md instructions: end response with date/time; no on-disk AGENTS.md found",
+  "githubFallback": "Connector unavailable; sandbox git fetch SEC_E_NO_CREDENTIALS; escalated CLI fetch succeeded without TLS changes"
+}

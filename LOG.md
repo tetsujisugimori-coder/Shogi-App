@@ -1,3 +1,10 @@
+### [2026-10-26 JST] 対局journalと1000ms比較の再実行（Issue #215）
+
+- PR #214 MERGEDと独立レビューを確認し、fetch済みmain `4009cd0e808553af8f0ec9e01411a3eb6714560d` から `codex/match-journal-1000ms`。同目的Issue #215を使用し重複起票を回避。既存作業ツリーはclean、既存1087証拠のSHA256を保存。
+- scripts内で既存self-playを1手ずつ呼び、子自身が型付きJSONLを追記・fsync。連番/チェーンhash/全状態hash/完全な初期履歴/探索結果を保存。未知schemaや途中破損を拒否し、末尾断片は原本を変えずprefix監査。IO失敗・容量・時間・強制終了・未実行を正式結果と分離し、同一棋譜の重複と未交換ペアを排除する。
+- 新規33テスト、関連4ファイル128件、全体91ファイル2466件成功。初回sandbox esbuild起動失敗、初回新規テストのreadonly代入型エラーを保持。期待値・timeoutは緩和しない。製品の探索・評価・合法手・終局・既定legacy・Worker/UI/利用者保存形式は不変。
+- 前回と同じ平手/6手合法棋譜由来、1000ms/max d4/q1、TT/PV/killer OFF、120plyの先後交換2ペアを新規runで直列測定する。1局290秒/親300秒、全体22分。棋力改善を前提にせず、結果と再集計は[今回の証拠](docs/benchmarks/match-journal-20261026/README.md)に記録する。
+
 ### [2026-10-25 JST] 駒安全度の限定実験と同一時間の品質検証
 
 - 最新origin/main `e2f12e97f2d2c297b3b2ac5648bbfb12dc53faad` をfetch、#212 MERGED確認。既存clean main/worktree/原本を変更せず、新cloneの専用 `codex/piece-safety-experiment` で実装。Issue #209、#210/#212との関係を記録し、Issue本文・マージ・自動マージを変更しない。

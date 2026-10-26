@@ -1,0 +1,125 @@
+{
+  "counts": {
+    "games": 2,
+    "complete": 2,
+    "legacyWins": 0,
+    "experimentalWins": 0,
+    "ruleDraws": 0,
+    "maxPlies": 2,
+    "incomplete": 0,
+    "corrupt": 0,
+    "incompleteReasons": {
+      "no_end": 0,
+      "partial_tail": 0,
+      "time_limit": 0,
+      "interrupted": 0,
+      "capacity": 0,
+      "search_failure": 0
+    },
+    "notRun": 0
+  },
+  "completedPairs": 1,
+  "pairedCounts": {
+    "games": 2,
+    "complete": 2,
+    "legacyWins": 0,
+    "experimentalWins": 0,
+    "ruleDraws": 0,
+    "maxPlies": 2,
+    "incomplete": 0,
+    "corrupt": 0,
+    "incompleteReasons": {
+      "no_end": 0,
+      "partial_tail": 0,
+      "time_limit": 0,
+      "interrupted": 0,
+      "capacity": 0,
+      "search_failure": 0
+    }
+  },
+  "metrics": [
+    {
+      "mode": "legacy",
+      "plies": 3,
+      "apiMs": 0,
+      "depthCounts": {
+        "1": 3
+      },
+      "partialRoot": 0,
+      "fallback": 0
+    },
+    {
+      "mode": "experimental",
+      "plies": 3,
+      "apiMs": 0,
+      "depthCounts": {
+        "1": 3
+      },
+      "partialRoot": 0,
+      "fallback": 0
+    }
+  ],
+  "pairs": [
+    {
+      "id": "fixture-run/fixture-pair",
+      "complete": true,
+      "games": [
+        "fixture-run/fixture-pair/fixture-1",
+        "fixture-run/fixture-pair/fixture-2"
+      ]
+    }
+  ],
+  "notRun": [],
+  "games": [
+    {
+      "hash": "3bd46c396cedc0799e4ec1bccea804d78c8d3fe39e5c64a4f5b68dc881d54e4f",
+      "id": "fixture-run/fixture-pair/fixture-1",
+      "status": "complete",
+      "error": null,
+      "partialTailBytes": 0,
+      "plies": 3,
+      "end": {
+        "apiMs": 0,
+        "detail": null,
+        "endedAt": "2026-10-26T13:25:03.386Z",
+        "finalHash": "3d4875167548f5012d11675ff1a4f33fe5df76dc8c5ed36be4071c068666d81e",
+        "gameResult": null,
+        "plies": 3,
+        "reason": "max_plies",
+        "saveMsBeforeEnd": 3.667299999999841,
+        "type": "end",
+        "uncommittedApiMs": 0,
+        "wallMsBeforeEnd": 0,
+        "finalSearchEncoded": [
+          "null"
+        ]
+      },
+      "finalHash": "3d4875167548f5012d11675ff1a4f33fe5df76dc8c5ed36be4071c068666d81e"
+    },
+    {
+      "hash": "8b26d4d68675b814d7eb0ef3236d23ba52ac665e5df0949dac3d4114c90bb3e2",
+      "id": "fixture-run/fixture-pair/fixture-2",
+      "status": "complete",
+      "error": null,
+      "partialTailBytes": 0,
+      "plies": 3,
+      "end": {
+        "apiMs": 0,
+        "detail": null,
+        "endedAt": "2026-10-26T13:25:03.412Z",
+        "finalHash": "3d4875167548f5012d11675ff1a4f33fe5df76dc8c5ed36be4071c068666d81e",
+        "gameResult": null,
+        "plies": 3,
+        "reason": "max_plies",
+        "saveMsBeforeEnd": 2.576699999999846,
+        "type": "end",
+        "uncommittedApiMs": 0,
+        "wallMsBeforeEnd": 0,
+        "finalSearchEncoded": [
+          "null"
+        ]
+      },
+      "finalHash": "3d4875167548f5012d11675ff1a4f33fe5df76dc8c5ed36be4071c068666d81e"
+    }
+  ]
+}
