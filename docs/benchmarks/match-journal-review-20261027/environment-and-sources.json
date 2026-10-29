@@ -1,0 +1,31 @@
+{
+  "recordedAt": "2026-10-26T20:28:10.951Z",
+  "node": "v24.20.0",
+  "npm": "11.17.0",
+  "platform": "win32",
+  "release": "10.0.26300",
+  "arch": "x64",
+  "cpu": "Intel(R) Core(TM) i7-14650HX",
+  "reviewedHead": "3adec10bfc55ee681c3f79bb36dddbe5530a6166",
+  "measurementSource": "05cbb8cdfe3b7574a630d22a3dfb9a75d379fdcb",
+  "auditSourceSnapshots": [
+    {
+      "source": "scripts/benchmarks/matchJournal.ts",
+      "normalizedLFHash": "d71350bbbb6571f0e966b808bbe59e2395e547bd4f5e9c0abf27065f5c5862fd",
+      "snapshot": "docs/benchmarks/match-journal-review-20261027/after-sources/scripts__benchmarks__matchJournal.ts.gz",
+      "compressedHash": "235dd6a9fcae588e940707a38edb45ceb0166dd541c0e056be58946bb2fd0461"
+    },
+    {
+      "source": "scripts/benchmarks/journalIO.ts",
+      "normalizedLFHash": "0284fe757e61420cd66aa601950fd0808d5da1cdfb7a36e890c26d5459da8cba",
+      "snapshot": "docs/benchmarks/match-journal-review-20261027/after-sources/scripts__benchmarks__journalIO.ts.gz",
+      "compressedHash": "cffbc40a8f432dfba21d89bbfbd47b867a1bbf345898a0aa8c2825bb901ce783"
+    },
+    {
+      "source": "src/test/match-journal.test.ts",
+      "normalizedLFHash": "44b9ce2296b114400bb88cd956a719656da56ff9f7e81fd71e5c3f1242da4ba7",
+      "snapshot": "docs/benchmarks/match-journal-review-20261027/after-sources/src__test__match-journal.test.ts.gz",
+      "compressedHash": "c1cf4ca90f9d780fa65051dea278b0e4b7ea542678141d8ada869a9469bac2fd"
+    }
+  ]
+}

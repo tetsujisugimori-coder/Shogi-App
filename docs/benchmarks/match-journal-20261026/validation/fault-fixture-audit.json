@@ -1,0 +1,473 @@
+{
+  "scope": "Intentional fault fixtures; never included in real 1000ms comparison",
+  "files": 58,
+  "complete": 26,
+  "incomplete": 12,
+  "corrupt": 20,
+  "rows": [
+    {
+      "file": "1-case.jsonl",
+      "status": "complete",
+      "error": null,
+      "partialTailBytes": 0,
+      "plies": 1,
+      "end": "rule"
+    },
+    {
+      "file": "10-missing.jsonl",
+      "status": "corrupt",
+      "error": "record sequence mismatch\n\n3 !== 2\n",
+      "partialTailBytes": 0,
+      "plies": 1,
+      "end": null
+    },
+    {
+      "file": "11-case.jsonl",
+      "status": "complete",
+      "error": null,
+      "partialTailBytes": 0,
+      "plies": 3,
+      "end": "max_plies"
+    },
+    {
+      "file": "12-duplicate.jsonl",
+      "status": "corrupt",
+      "error": "record sequence mismatch\n\n2 !== 3\n",
+      "partialTailBytes": 0,
+      "plies": 2,
+      "end": null
+    },
+    {
+      "file": "13-case.jsonl",
+      "status": "complete",
+      "error": null,
+      "partialTailBytes": 0,
+      "plies": 3,
+      "end": "max_plies"
+    },
+    {
+      "file": "14-reverse.jsonl",
+      "status": "corrupt",
+      "error": "record sequence mismatch\n\n2 !== 1\n",
+      "partialTailBytes": 0,
+      "plies": 0,
+      "end": null
+    },
+    {
+      "file": "15-case.jsonl",
+      "status": "complete",
+      "error": null,
+      "partialTailBytes": 0,
+      "plies": 3,
+      "end": "max_plies"
+    },
+    {
+      "file": "16-unknown-schema.jsonl",
+      "status": "corrupt",
+      "error": "missing start",
+      "partialTailBytes": 0,
+      "plies": 0,
+      "end": null
+    },
+    {
+      "file": "17-case.jsonl",
+      "status": "complete",
+      "error": null,
+      "partialTailBytes": 0,
+      "plies": 3,
+      "end": "max_plies"
+    },
+    {
+      "file": "18-invalid-value.jsonl",
+      "status": "corrupt",
+      "error": "record checksum mismatch\n+ actual - expected\n\n+ '6f063bb3bbfa87251f38fb5cab8bdf6dcafe36b243108e41bfec3aa0376aaf15'\n- 'b995e73053c75067591880d182e776e3dc420fa9e6341b5e3d97e1133fa12d22'\n",
+      "partialTailBytes": 0,
+      "plies": 0,
+      "end": null
+    },
+    {
+      "file": "19-case.jsonl",
+      "status": "complete",
+      "error": null,
+      "partialTailBytes": 0,
+      "plies": 3,
+      "end": "max_plies"
+    },
+    {
+      "file": "2-case.jsonl",
+      "status": "complete",
+      "error": null,
+      "partialTailBytes": 0,
+      "plies": 3,
+      "end": "max_plies"
+    },
+    {
+      "file": "20-complete-invalid-tail.jsonl",
+      "status": "corrupt",
+      "error": "Unexpected end of JSON input",
+      "partialTailBytes": 0,
+      "plies": 3,
+      "end": "max_plies"
+    },
+    {
+      "file": "21-case.jsonl",
+      "status": "complete",
+      "error": null,
+      "partialTailBytes": 0,
+      "plies": 3,
+      "end": "max_plies"
+    },
+    {
+      "file": "22-extra-after-end.jsonl",
+      "status": "corrupt",
+      "error": "record after end\n+ actual - expected\n\n+ {\n+   apiMs: 0,\n+   detail: null,\n+   endedAt: '2026-10-26T13:25:02.851Z',\n+   finalHash: '3d4875167548f5012d11675ff1a4f33fe5df76dc8c5ed36be4071c068666d81e',\n+   finalSearch: null,\n+   gameResult: null,\n+   plies: 3,\n+   reason: 'max_plies',\n+   saveMsBeforeEnd: 2.908100000000104,\n+   type: 'end',\n+   uncommittedApiMs: 0,\n+   wallMsBeforeEnd: 0\n+ }\n- null\n",
+      "partialTailBytes": 0,
+      "plies": 3,
+      "end": "max_plies"
+    },
+    {
+      "file": "23-case.jsonl",
+      "status": "complete",
+      "error": null,
+      "partialTailBytes": 0,
+      "plies": 3,
+      "end": "max_plies"
+    },
+    {
+      "file": "24-rewritten.jsonl",
+      "status": "corrupt",
+      "error": "Expected values to be strictly equal:\n\n99 !== 1\n",
+      "partialTailBytes": 0,
+      "plies": 0,
+      "end": null
+    },
+    {
+      "file": "25-case.jsonl",
+      "status": "complete",
+      "error": null,
+      "partialTailBytes": 0,
+      "plies": 3,
+      "end": "max_plies"
+    },
+    {
+      "file": "26-rewritten.jsonl",
+      "status": "corrupt",
+      "error": "Expected values to be strictly equal:\n\n'gote' !== 'sente'\n",
+      "partialTailBytes": 0,
+      "plies": 0,
+      "end": null
+    },
+    {
+      "file": "27-case.jsonl",
+      "status": "complete",
+      "error": null,
+      "partialTailBytes": 0,
+      "plies": 3,
+      "end": "max_plies"
+    },
+    {
+      "file": "28-rewritten.jsonl",
+      "status": "corrupt",
+      "error": "post-move state mismatch\n+ actual - expected\n\n+ '0000000000000000000000000000000000000000000000000000000000000000'\n- '4d77b556a95b8214ef224da67eee1a464db9e7aafc5d874faf1e6824bc91c7a3'\n",
+      "partialTailBytes": 0,
+      "plies": 0,
+      "end": null
+    },
+    {
+      "file": "29-case.jsonl",
+      "status": "complete",
+      "error": null,
+      "partialTailBytes": 0,
+      "plies": 3,
+      "end": "max_plies"
+    },
+    {
+      "file": "3-case.jsonl",
+      "status": "incomplete",
+      "error": null,
+      "partialTailBytes": 0,
+      "plies": 2,
+      "end": "interrupted"
+    },
+    {
+      "file": "30-rewritten.jsonl",
+      "status": "corrupt",
+      "error": "The expression evaluated to a falsy value:\n\n  assert.ok(end.finalSearch && end.finalSearch.selectedAction === null)\n",
+      "partialTailBytes": 0,
+      "plies": 3,
+      "end": null
+    },
+    {
+      "file": "31-case.jsonl",
+      "status": "complete",
+      "error": null,
+      "partialTailBytes": 0,
+      "plies": 3,
+      "end": "max_plies"
+    },
+    {
+      "file": "32-rewritten.jsonl",
+      "status": "corrupt",
+      "error": "{\"ply\":1,\"player\":\"sente\",\"stage\":\"result\",\"code\":\"invalid_result\",\"message\":\"Invalid self-play search result: completedDepth.\"}",
+      "partialTailBytes": 0,
+      "plies": 0,
+      "end": null
+    },
+    {
+      "file": "33-case.jsonl",
+      "status": "complete",
+      "error": null,
+      "partialTailBytes": 0,
+      "plies": 3,
+      "end": "max_plies"
+    },
+    {
+      "file": "34-rewritten.jsonl",
+      "status": "corrupt",
+      "error": "Expected values to be strictly equal:\n\ntrue !== false\n",
+      "partialTailBytes": 0,
+      "plies": 0,
+      "end": null
+    },
+    {
+      "file": "35-case.jsonl",
+      "status": "complete",
+      "error": null,
+      "partialTailBytes": 0,
+      "plies": 3,
+      "end": "max_plies"
+    },
+    {
+      "file": "36-rewritten.jsonl",
+      "status": "corrupt",
+      "error": "Expected values to be strictly deep-equal:\n+ actual - expected\n... Skipped lines\n\n  {\n    killerMoves: false,\n    moveOrdering: 'standard',\n    quiescence: {\n      includeQuietPromotions: false,\n...\n    usePreviousIterationPv: false,\n+   useTranspositionTable: true\n-   useTranspositionTable: false\n  }\n",
+      "partialTailBytes": 0,
+      "plies": 0,
+      "end": null
+    },
+    {
+      "file": "37-short.jsonl",
+      "status": "complete",
+      "error": null,
+      "partialTailBytes": 0,
+      "plies": 3,
+      "end": "max_plies"
+    },
+    {
+      "file": "38-zero.jsonl",
+      "status": "corrupt",
+      "error": "missing start",
+      "partialTailBytes": 0,
+      "plies": 0,
+      "end": null
+    },
+    {
+      "file": "39-sync.jsonl",
+      "status": "corrupt",
+      "error": "record fields\n+ actual - expected\n\n  [\n-   'conditions',\n-   'environment',\n-   'gameId',\n-   'initialState',\n-   'pairId',\n-   'runId',\n-   'seats',\n-   'sourceHashes',\n-   'sourceSha',\n-   'startedAt',\n    'type'\n  ]\n",
+      "partialTailBytes": 0,
+      "plies": 0,
+      "end": null
+    },
+    {
+      "file": "4-killed.jsonl",
+      "status": "incomplete",
+      "error": null,
+      "partialTailBytes": 0,
+      "plies": 3,
+      "end": null
+    },
+    {
+      "file": "40-write-error.jsonl",
+      "status": "incomplete",
+      "error": null,
+      "partialTailBytes": 0,
+      "plies": 1,
+      "end": null
+    },
+    {
+      "file": "41-case.jsonl",
+      "status": "incomplete",
+      "error": null,
+      "partialTailBytes": 0,
+      "plies": 0,
+      "end": "capacity"
+    },
+    {
+      "file": "42-start-capacity.jsonl",
+      "status": "corrupt",
+      "error": "missing start",
+      "partialTailBytes": 0,
+      "plies": 0,
+      "end": null
+    },
+    {
+      "file": "43-case.jsonl",
+      "status": "incomplete",
+      "error": null,
+      "partialTailBytes": 0,
+      "plies": 0,
+      "end": "time_limit"
+    },
+    {
+      "file": "44-midgame-time.jsonl",
+      "status": "incomplete",
+      "error": null,
+      "partialTailBytes": 0,
+      "plies": 1,
+      "end": "time_limit"
+    },
+    {
+      "file": "45-search-error.jsonl",
+      "status": "incomplete",
+      "error": null,
+      "partialTailBytes": 0,
+      "plies": 0,
+      "end": "search_failure"
+    },
+    {
+      "file": "46-nonfinite-failed-result.jsonl",
+      "status": "incomplete",
+      "error": null,
+      "partialTailBytes": 0,
+      "plies": 0,
+      "end": "search_failure"
+    },
+    {
+      "file": "47-case.jsonl",
+      "status": "complete",
+      "error": null,
+      "partialTailBytes": 0,
+      "plies": 0,
+      "end": "max_plies"
+    },
+    {
+      "file": "48-rewritten.jsonl",
+      "status": "corrupt",
+      "error": "initial history/state mismatch\n+ actual - expected\n\n+ '60d7c5abfd784e2755fddaecc043ba74e767b8faff0c03263040618d1590da55'\n- 'd027a02c2698cea5f4043d9cc1eb5b84c27a89a9d9ee63c029542ef0c0badc18'\n",
+      "partialTailBytes": 0,
+      "plies": 0,
+      "end": null
+    },
+    {
+      "file": "49-case.jsonl",
+      "status": "corrupt",
+      "error": "missing start",
+      "partialTailBytes": 0,
+      "plies": 0,
+      "end": null
+    },
+    {
+      "file": "5-case.jsonl",
+      "status": "complete",
+      "error": null,
+      "partialTailBytes": 0,
+      "plies": 3,
+      "end": "max_plies"
+    },
+    {
+      "file": "50-case.jsonl",
+      "status": "complete",
+      "error": null,
+      "partialTailBytes": 0,
+      "plies": 3,
+      "end": "max_plies"
+    },
+    {
+      "file": "51-case.jsonl",
+      "status": "complete",
+      "error": null,
+      "partialTailBytes": 0,
+      "plies": 3,
+      "end": "max_plies"
+    },
+    {
+      "file": "52-copy.jsonl",
+      "status": "complete",
+      "error": null,
+      "partialTailBytes": 0,
+      "plies": 3,
+      "end": "max_plies"
+    },
+    {
+      "file": "53-case.jsonl",
+      "status": "complete",
+      "error": null,
+      "partialTailBytes": 0,
+      "plies": 3,
+      "end": "max_plies"
+    },
+    {
+      "file": "54-case.jsonl",
+      "status": "complete",
+      "error": null,
+      "partialTailBytes": 0,
+      "plies": 3,
+      "end": "max_plies"
+    },
+    {
+      "file": "55-case.jsonl",
+      "status": "complete",
+      "error": null,
+      "partialTailBytes": 0,
+      "plies": 3,
+      "end": "max_plies"
+    },
+    {
+      "file": "56-case.jsonl",
+      "status": "incomplete",
+      "error": null,
+      "partialTailBytes": 0,
+      "plies": 2,
+      "end": "interrupted"
+    },
+    {
+      "file": "57-case.jsonl",
+      "status": "incomplete",
+      "error": null,
+      "partialTailBytes": 0,
+      "plies": 2,
+      "end": "interrupted"
+    },
+    {
+      "file": "58-case.jsonl",
+      "status": "incomplete",
+      "error": null,
+      "partialTailBytes": 0,
+      "plies": 2,
+      "end": "interrupted"
+    },
+    {
+      "file": "6-torn.jsonl",
+      "status": "incomplete",
+      "error": null,
+      "partialTailBytes": 616,
+      "plies": 3,
+      "end": null
+    },
+    {
+      "file": "7-case.jsonl",
+      "status": "complete",
+      "error": null,
+      "partialTailBytes": 0,
+      "plies": 3,
+      "end": "max_plies"
+    },
+    {
+      "file": "8-corrupt.jsonl",
+      "status": "corrupt",
+      "error": "record checksum mismatch\n+ actual - expected\n\n+ '6369426559c9e6be9e3b4bee5e363b4a211fb87b20a581d45ceddb41d6ac154a'\n- '25cb9a2d3d444e337849ce5f56277f22e5c9eb18b3b310d57c8f9da472354750'\n",
+      "partialTailBytes": 0,
+      "plies": 1,
+      "end": null
+    },
+    {
+      "file": "9-case.jsonl",
+      "status": "complete",
+      "error": null,
+      "partialTailBytes": 0,
+      "plies": 3,
+      "end": "max_plies"
+    }
+  ]
+}

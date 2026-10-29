@@ -1,3 +1,25 @@
+### [2026-10-27 JST] PR #216 P2：探索結果と宣言条件の整合検証（Issue #215）
+
+- レビュー/remote/local HEAD `3adec10bfc55ee681c3f79bb36dddbe5530a6166`、cleanの対象ブランチを確認し、同じIssue #215/Draft PR #216を更新する。重複作成・マージ・自動マージなし。
+- 原因はself-playのcompletedDepth非負整数検査だけで宣言depthとの照合が欠けたこと。最大深さ1のcompletedDepth 999/2は保存/監査を通り、999が正式depthCountsへ入った。拒否を期待する6テストは修正前5失敗/正常1成功、修正後同一期待値で6成功。旧コード/テストgzip・赤/緑fixture/logを新証拠へ保持。
+- journal専用共通検証を保存前・読取り監査へ追加し、宣言上限、requestedMaxDepth/depth、resultSource/timedOut/partial-root/fallback、iteration/統計/評価内訳の実API契約を検査。既存partial-root/内訳検証を再利用。必須値のnull/undefined/欠落を拒否し、任意値と未評価nullは契約に従う。PV長=深さや実測timeMs超過の拒否は要求せず、補正・推測もしない。API計測から検証費用を分離。
+- 不正保存はsearch_failureで停止し、型付きfinalSearchに元の観測と理由、先行する合法な保存済み手を保持。不正保存済みmoveは正常frame/hashでもcorruptとして対局全体を正式結果・完了ペア・観測集計から除外する。IO失敗後停止とfsync/codecは不変。製品ソース、既定legacy・experimental研究opt-in、Worker/UI/保存形式は変更なし。
+- 新規92＋既存33のjournal125件、関連3ファイル190件成功。39種類の矛盾を保存前/読取り別に検証。実APIの正常3方式・浅い完了後timeout・終局短PV・1004/1005ms超過・手なし終局、片側破損ペア除外を確認。既存の非有限値/欠落区別、journal有無の決定的互換、実子kill/IO/容量/時間/破損回帰も成功。既存期待値・timeoutを変更しない。
+- 旧run1の4局394手・先後交換2ペアを修正後ソースで再監査。legacy 2勝/experimental 1勝/規則引分0/120ply打切り1、未完了・破損・未実行0。新2回のsummary/reportは旧2回ともbyte一致。summary `4db95af66c2ba52350e539e32fa709bae6ae3c8a3d144074ab06ed5154eb0134`、report `1718bdc72316c342fc91b8e44cf2761e10d8de9ae9ffc885ba0b614e47071094`。元の測定sourceは`05cbb8c`のままで、再測定0局。
+- 旧1087原本を基準main `4009cd0`と内容照合、前回329証拠と測定111ソースgzipをhash確認。改行由来hash差・実内容差とも0、旧manifest/原本/ログ/監査は無変更。新監査ソースを別gzip/hashへ保存し、原本・Git index保全用helperと新manifestで照合する。
+- lock検査、型検査/lint、全体91ファイル2558件（skip/失敗0）、production build1762 modules成功。全体ログのjsdom navigation未実装メッセージはテスト失敗ではない。diff-checkと最終HEADのUbuntu/macOS CIは提出時に確認してPR本文へ記録する。ローカルWindowsでclean npm ci/macOS固有検査は未実施で、CI結果と区別。
+- [新規証拠・契約・再現手順](docs/benchmarks/match-journal-review-20261027/README.md)。一般棋力向上は未実証。ピン・合法取り返し・深い独立参照評価は次段階とし、Draftのまま独立再レビュー待ちで停止する。
+
+### [2026-10-26 JST] 対局journalと1000ms比較の再実行（Issue #215）
+
+- PR #214 MERGEDと独立レビューを確認し、fetch済みmain `4009cd0e808553af8f0ec9e01411a3eb6714560d` から `codex/match-journal-1000ms`。同目的Issue #215を使用し重複起票を回避。既存作業ツリーはclean、既存1087証拠のSHA256を保存。
+- scripts内で既存self-playを1手ずつ呼び、子自身が型付きJSONLを追記・fsync。連番/チェーンhash/全状態hash/完全な初期履歴/探索結果を保存。未知schemaや途中破損を拒否し、末尾断片は原本を変えずprefix監査。IO失敗・容量・時間・強制終了・未実行を正式結果と分離し、同一棋譜の重複と未交換ペアを排除する。
+- 新規33テスト、関連4ファイル128件、全体91ファイル2466件成功。初回sandbox esbuild起動失敗、初回新規テストのreadonly代入型エラーを保持。期待値・timeoutは緩和しない。製品の探索・評価・合法手・終局・既定legacy・Worker/UI/利用者保存形式は不変。
+- 前回と同じ平手/6手合法棋譜由来、1000ms/max d4/q1、TT/PV/killer OFF、120plyの先後交換2ペアを新規runで直列測定する。1局290秒/親300秒、全体22分。棋力改善を前提にせず、結果と再集計は[今回の証拠](docs/benchmarks/match-journal-20261026/README.md)に記録する。
+- 測定source `05cbb8cdfe3b7574a630d22a3dfb9a75d379fdcb`、4局394手・2ペア完了。平手は115/91手でそれぞれ先手勝ち、棋譜由来は120手打切り/68手後手勝ち。legacy 2勝・experimental 1勝・規則引分0・打切り1、未完了/中断/破損/未実行0。探索API394,579.019ms、保存/fsync2,952.217ms、run約440.7秒。partial-rootは33/40、fallback0/0。一般棋力向上は未実証で既定legacyを維持。
+- 全合法再生/PV/内訳/終局監査後、2回再集計とplanなし・重複入力の単独再生がbyte一致。summary hash `4db95af66c2ba52350e539e32fa709bae6ae3c8a3d144074ab06ed5154eb0134`、report `1718bdc72316c342fc91b8e44cf2761e10d8de9ae9ffc885ba0b614e47071094`。初回prepareは旧JSONのPiece.isPromoted省略とundefinedの差11か所で測定前に停止し、初期履歴照合だけの限定互換で修正した。原本・探索結果・適用後状態hashは正規化せず保持。
+- 測定後の最終型検査/全体91ファイル2466件/build1762 modules成功。旧1087原本/測定source hash一致。manifestとGit indexのbytes検証を行い、最終HEADのCI結果はDraft PR本文へ記録する。ローカルnpm ci/macOS固有検査は未実行で、CIの実結果と区別する。
+
 ### [2026-10-25 JST] 駒安全度の限定実験と同一時間の品質検証
 
 - 最新origin/main `e2f12e97f2d2c297b3b2ac5648bbfb12dc53faad` をfetch、#212 MERGED確認。既存clean main/worktree/原本を変更せず、新cloneの専用 `codex/piece-safety-experiment` で実装。Issue #209、#210/#212との関係を記録し、Issue本文・マージ・自動マージを変更しない。

@@ -1,0 +1,23 @@
+{
+  "rawUnchanged": true,
+  "rawFiles": 5,
+  "aggregateIdentical": true,
+  "reportIdentical": true,
+  "duplicatesIgnored": true,
+  "hashes": {
+    "summary.json": "4db95af66c2ba52350e539e32fa709bae6ae3c8a3d144074ab06ed5154eb0134",
+    "report.md": "1718bdc72316c342fc91b8e44cf2761e10d8de9ae9ffc885ba0b614e47071094"
+  },
+  "totals": {
+    "wallIncludingEndMs": 439192.9985,
+    "saveIncludingEndMs": 2952.2174999999943,
+    "processWallMs": 440700.40950000007,
+    "journalBytes": 2269905,
+    "runEnd": {
+      "at": "2026-10-26T13:36:26.316Z",
+      "exitCode": 0,
+      "type": "run-end",
+      "wallMs": 440722.0724
+    }
+  }
+}

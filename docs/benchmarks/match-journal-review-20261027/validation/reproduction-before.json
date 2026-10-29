@@ -1,0 +1,53 @@
+{
+  "reviewHead": "3adec10bfc55ee681c3f79bb36dddbe5530a6166",
+  "declaredDepth": 1,
+  "recordedDepths": [
+    999,
+    999,
+    999
+  ],
+  "status": "complete",
+  "error": null,
+  "metrics": [
+    {
+      "mode": "legacy",
+      "plies": 2,
+      "apiMs": 0,
+      "depthCounts": {
+        "999": 2
+      },
+      "partialRoot": 0,
+      "fallback": 0
+    },
+    {
+      "mode": "experimental",
+      "plies": 1,
+      "apiMs": 0,
+      "depthCounts": {
+        "999": 1
+      },
+      "partialRoot": 0,
+      "fallback": 0
+    }
+  ],
+  "counts": {
+    "games": 1,
+    "complete": 1,
+    "legacyWins": 0,
+    "experimentalWins": 0,
+    "ruleDraws": 0,
+    "maxPlies": 1,
+    "incomplete": 0,
+    "corrupt": 0,
+    "incompleteReasons": {
+      "no_end": 0,
+      "partial_tail": 0,
+      "time_limit": 0,
+      "interrupted": 0,
+      "capacity": 0,
+      "search_failure": 0
+    },
+    "notRun": 0
+  },
+  "testHash": "631b1166c1aa4ce9b0307c17bd8d2cd603a90e0933a0f29dffa1dc160ed7fd80"
+}
