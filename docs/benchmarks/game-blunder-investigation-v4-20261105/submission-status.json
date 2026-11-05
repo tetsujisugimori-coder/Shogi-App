@@ -1,5 +1,5 @@
 {
-  "checkedAt": "2026-11-05T15:28:33.101038+09:00",
+  "checkedAt": "2026-11-05T15:36:20.848347+09:00",
   "repository": "tetsujisugimori-coder/Shogi-App",
   "branch": "codex/game-blunder-diagnostics",
   "baseHead": "b244f4c8a5c02300343ab7f9d6c861c1f656588d",
@@ -10,12 +10,12 @@
     209,
     203
   ],
-  "existingPullRequest": "UNKNOWN (connection unavailable)",
+  "existingPullRequest": "https://github.com/tetsujisugimori-coder/Shogi-App/pull/218",
   "issueCreated": true,
-  "pushAttempted": false,
-  "draftPullRequestCreated": false,
+  "pushAttempted": true,
+  "draftPullRequestCreated": true,
   "remoteFinalHead": "UNKNOWN",
-  "remoteCI": "PENDING_SUBMISSION",
+  "remoteCI": "Initial failure preserved; final-head run pending",
   "localIssueDraft": "ISSUE.md",
   "localPullRequestDraft": "DRAFT_PR.md",
   "merge": false,
@@ -23,5 +23,7 @@
   "forcePush": false,
   "credentialsChanged": false,
   "issueUrl": "https://github.com/tetsujisugimori-coder/Shogi-App/issues/217",
-  "snapshotPhase": "pre-push; final submission and exact final-HEAD CI results are posted as Issue217/PR comments"
+  "snapshotPhase": "pre-push of provenance fix; final HEAD CI results posted to Issue217/PR218 comments",
+  "publishedHeadBeforeFix": "df80b7119c959bd0c858842393f2e7c503d3d2a7",
+  "draftPullRequestUrl": "https://github.com/tetsujisugimori-coder/Shogi-App/pull/218"
 }

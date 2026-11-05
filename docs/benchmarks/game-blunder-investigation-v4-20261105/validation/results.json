@@ -39,7 +39,8 @@
     "durationSeconds": 186.23,
     "command": "npm test -- --testTimeout=15000",
     "environment": "outside restricted sandbox, workspace TEMP, configured default2 workers",
-    "log": "full-tests-harness-15s.log.gz"
+    "log": "full-tests-harness-15s.log.gz",
+    "note": "Pre-provenance-fix run. Final-head full suite is verified by CI; modified test subsequently passed local targeted run."
   },
   "typecheck": {
     "status": "PASS",
@@ -60,7 +61,35 @@
     "log": "verify-lock.log.gz"
   },
   "remoteCI": {
-    "status": "PENDING_SUBMISSION",
-    "finalStatusLocation": "Issue217 submission comment / final response"
+    "status": "PENDING_FINAL_HEAD",
+    "finalStatusLocation": "Issue217/PR218 submission comments and final response"
+  },
+  "provenanceFixTests": {
+    "status": "PASS",
+    "exitCode": 0,
+    "files": 2,
+    "tests": 10,
+    "log": "provenance-fix-tests.log.gz"
+  },
+  "provenanceFixTypecheck": {
+    "status": "PASS",
+    "exitCode": 0,
+    "command": "npm run lint",
+    "log": "lint-provenance-fix.log.gz"
+  },
+  "initialCI": {
+    "status": "FAIL",
+    "head": "df80b7119c959bd0c858842393f2e7c503d3d2a7",
+    "run": "https://github.com/tetsujisugimori-coder/Shogi-App/actions/runs/41980729246",
+    "ubuntu": {
+      "passed": 2585,
+      "failed": 1
+    },
+    "macos": {
+      "passed": 2583,
+      "failed": 1,
+      "skipped": 2
+    },
+    "reason": "New provenance test failed on mixed LF/CRLF. Corrected with verified raw-to-canonical source manifest. No other assertion failures."
   }
 }

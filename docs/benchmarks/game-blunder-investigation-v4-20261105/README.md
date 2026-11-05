@@ -163,7 +163,7 @@ NEW_DIRは存在しないパスを指定する。既存ファイルは上書き�
 ## 変更ファイル・検証・提出
 
 - `scripts/benchmarks/matchJournal.ts`：任意のjournal読取/監査時間を計測。省略時に追加の時計を読まない。
-- `.gitattributes`：game-blunder成果と入力の改行変換を防止し、raw hashをOS間で維持する。ソース来歴の統合試験はLF/CRLFの両checkoutを許容する。
+- `.gitattributes`：game-blunder成果と入力の改行変換を防止し、raw hashをOS間で維持する。`source-provenance.json` は実験時のraw hashとLF正規化hashを対応づける。
 - `scripts/benchmarks/gameBlunderPilot.ts`：任意の復元/候補snapshot時間を計測。従来の1引数呼出しを維持。
 - `scripts/benchmarks/gameBlunderInvestigation.ts`：固定条件、guard、候補検査、比較、分類集計。
 - `scripts/investigate-game-blunders.ts`：24局面と4疑い局面の実験、append-only保存。
@@ -182,6 +182,15 @@ NEW_DIRは存在しないパスを指定する。既存ファイルは上書き�
 15秒はテストハーネスの上限であり、探索の1秒制限、固定node数、製品既定値は変更していない。
 環境とハーネス上限を同時に変えた再試行なので、個々の改善要因は隔離していない。
 最終型検査も成功。既定ローカルの時間切れは解消済みとせず、R8はPARTIALとして記録する。
+
+初回CI（df80b71）はUbuntu/macOSとも新しいソース来歴テストで失敗した。
+実験ソースに混在するLF/CRLFの生hashは、checkout後の一様な改行のhash候補では復元できなかった。
+実験時raw hashに現在の99ソースがbyte単位で一致することを再確認し、LF正規化hashを別manifestに導出した。
+統合テストはraw実験hashとの対応とcanonical LF内容の両方を確認する。全99 git blobとのcanonical照合も成功した。
+実験ソース/条件/JSONLを変えず、来歴テストと補足証拠を修正。修正後の関連2 suite/10テスト成功。
+初回CIはUbuntu 2,585成功/1失敗、macOS 2,583成功/2 skipped/1失敗。失敗は同じ来歴テストのみ。
+macOSの2 skippedは既存 `shogi.test.tsx` のdarwin条件によるもので、成功数に含めない。
+初回の失敗ログもvalidationに保存する。最終HEADのCI結果はIssue #217の提出コメントと完了報告を参照する。
 
 通常sandboxではCLIがinvalid token、Git接続が `getaddrinfo() thread failed to start`、GitHub接続ツールも利用不可だった。
 制限外の読み取り専用再確認では既存CLI認証が有効であることを確認した。認証情報は変更していない。

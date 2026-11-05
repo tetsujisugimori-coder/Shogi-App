@@ -20,11 +20,14 @@ describe('v4 real journal saved evidence integration',()=>{
     expect(summary.fixed.groups.every((g:{conditions:{reproducible:boolean}[]})=>g.conditions.every(c=>c.reproducible))).toBe(true);
     expect(plan.paths.map((p:string)=>sha256(readFileSync(p)))).toEqual(plan.before);
     expect(sha256(readFileSync(plan.priorFile))).toBe(plan.priorHash);expect(sha256(readFileSync(plan.v3File))).toBe(plan.v3Hash);
-    // Source checkouts may use LF or CRLF; raw experiment hashes remain saved.
-    // Journal/input artifacts are byte-exact and protected by .gitattributes.
+    // Windows experiment sources included mixed LF/CRLF. The separate manifest
+    // links byte-verified raw experiment hashes to canonical LF content hashes.
+    const provenance=JSON.parse(readFileSync(dir+'source-provenance.json','utf8'));
+    expect(Object.keys(provenance.sources).sort()).toEqual(Object.keys(plan.sourceHashes).sort());
     for(const [p,hash] of Object.entries(plan.sourceHashes)) {
       const text=readFileSync(p,'utf8'),lf=text.replaceAll('\r\n','\n');
-      expect([sha256(text),sha256(lf),sha256(lf.replaceAll('\n','\r\n'))],p).toContain(hash);
+      expect(provenance.sources[p].experimentRawSha256,p).toBe(hash);
+      expect(sha256(lf),p).toBe(provenance.sources[p].lfSha256);
     }
     expect(summary.counts).toMatchObject({total:56,noFeature:30,noFeatureMeaning:'UNKNOWN',overlap:11,indeterminate:24,notRun:32});
   });
