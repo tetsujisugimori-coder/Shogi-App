@@ -1,0 +1,66 @@
+{
+  "relatedInitial": {
+    "status": "INFRASTRUCTURE_FAILURE",
+    "exitCode": 1,
+    "filesFailedToLoad": 11,
+    "testsRun": 0,
+    "reason": "sandbox TEMP cache rename EPERM",
+    "log": "related-tests.log.gz"
+  },
+  "relatedWorkspaceTemp": {
+    "status": "PASS",
+    "exitCode": 0,
+    "files": 11,
+    "tests": 330,
+    "log": "related-tests-workspace-temp.log.gz"
+  },
+  "fullDefault": {
+    "status": "FAIL_TIMEOUT",
+    "exitCode": 1,
+    "filesPassed": 96,
+    "filesFailed": 2,
+    "testsPassed": 2584,
+    "testsFailed": 2,
+    "log": "full-tests.log.gz"
+  },
+  "fullSingleWorker": {
+    "status": "INTERRUPTED",
+    "exitCode": 1,
+    "observedTimeouts": 3,
+    "testsPassed": null,
+    "reason": "Stopped after further5s harness timeouts; no complete count claimed.",
+    "log": "full-tests-single-worker.log.gz"
+  },
+  "full15sHarness": {
+    "status": "PASS",
+    "exitCode": 0,
+    "files": 98,
+    "tests": 2586,
+    "durationSeconds": 186.23,
+    "command": "npm test -- --testTimeout=15000",
+    "environment": "outside restricted sandbox, workspace TEMP, configured default2 workers",
+    "log": "full-tests-harness-15s.log.gz"
+  },
+  "typecheck": {
+    "status": "PASS",
+    "exitCode": 0,
+    "command": "npm run lint (tsc --noEmit)",
+    "log": "lint-final.log.gz"
+  },
+  "build": {
+    "status": "PASS",
+    "exitCode": 0,
+    "command": "npm run build",
+    "log": "build.log.gz"
+  },
+  "lockfile": {
+    "status": "PASS",
+    "exitCode": 0,
+    "command": "npm run verify:lock",
+    "log": "verify-lock.log.gz"
+  },
+  "remoteCI": {
+    "status": "PENDING_SUBMISSION",
+    "finalStatusLocation": "Issue217 submission comment / final response"
+  }
+}

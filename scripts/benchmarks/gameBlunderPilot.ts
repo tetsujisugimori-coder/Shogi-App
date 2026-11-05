@@ -16,12 +16,22 @@ export function apply(state: BoardState, move: MoveRecord['action']): BoardState
   if (result.type !== 'applied') throw Error('illegal action');
   return result.state;
 }
-export function extract(paths: string[]) {
+export interface ExtractionTiming {
+  journals: Record<string, {readMs:number; auditMs:number; replayMs:number}>;
+  positions: Record<string, {replayPrefixMs:number; snapshotMs:number}>;
+}
+export function extract(paths: string[], timing?: ExtractionTiming) {
   const seen = new Set<string>();
-  const games = paths.map(path => ({ path, audit: auditJournal(path) }));
+  const games = paths.map(path => {
+    const entry = timing ? {readMs:0,auditMs:0,replayMs:0} : undefined;
+    const audit = auditJournal(path, entry);
+    if (timing && entry) timing.journals[path] = entry;
+    return {path,audit};
+  });
   const candidates: { path: string; hash: string; id: string; state: BoardState; move: MoveRecord; next: MoveRecord; mode: 'legacy' | 'experimental'; conditions: NonNullable<ReturnType<typeof auditJournal>['start']>['conditions'] }[] = [];
   for (const {path,audit} of games) {
     if (audit.status !== 'complete' || !audit.start || !audit.end) continue;
+    const began = timing ? performance.now() : 0;
     let state = cloneBoardState(audit.start.initialState);
     for (const [i,move] of audit.moves.entries()) {
       const next = audit.moves[i + 1];
@@ -29,11 +39,14 @@ export function extract(paths: string[]) {
         const id = `${stateHash(state)}/${JSON.stringify(move.action)}/${audit.start.seats[move.player]}/${audit.start.conditions.timeMs}`;
         if (!seen.has(id)) {
           seen.add(id);
+          const snapshotAt = timing ? performance.now() : 0;
           candidates.push({path, hash:audit.hash, id, state:cloneBoardState(state), move, next:next!, mode:audit.start.seats[move.player], conditions:audit.start.conditions});
+          if (timing) timing.positions[id] = {replayPrefixMs:snapshotAt-began,snapshotMs:performance.now()-snapshotAt};
         }
       }
       state = apply(state,move.action);
     }
+    if (timing) timing.journals[path].replayMs = performance.now()-began;
   }
   return {games, candidates};
 }

@@ -1,0 +1,47 @@
+{
+  "build.log": {
+    "bytes": 585,
+    "sha256": "c5e6509fd31a59a4c20b1d044e51a863f2d8ee935dd6d511b283555be519fd70",
+    "compressed": "build.log.gz"
+  },
+  "full-tests-harness-15s.log": {
+    "bytes": 376,
+    "sha256": "fc6a38ed07aad949f45029395f5f18866b9b1bc0cf5ca3cc0d82c324c593b10a",
+    "compressed": "full-tests-harness-15s.log.gz"
+  },
+  "full-tests-single-worker.log": {
+    "bytes": 750,
+    "sha256": "5500d95e1198e8a22bf8dc23c4fa260c853048399341490a8e20532c3224c7a9",
+    "compressed": "full-tests-single-worker.log.gz"
+  },
+  "full-tests.log": {
+    "bytes": 2393,
+    "sha256": "c703a8400ebd1faf9fc9b4b20e5d3c8d490a17ed05b4e6144ba0041a5a8aec47",
+    "compressed": "full-tests.log.gz"
+  },
+  "lint-final.log": {
+    "bytes": 44,
+    "sha256": "ad6bec1b1378356ed1d37de83bed5cf5234df9e06b03d54d4963118d0dea0d0e",
+    "compressed": "lint-final.log.gz"
+  },
+  "lint.log": {
+    "bytes": 44,
+    "sha256": "ad6bec1b1378356ed1d37de83bed5cf5234df9e06b03d54d4963118d0dea0d0e",
+    "compressed": "lint.log.gz"
+  },
+  "related-tests-workspace-temp.log": {
+    "bytes": 260,
+    "sha256": "189813930b73fcc48ae98ba50c3345421d5f266dd64b747185f0003ab917b06e",
+    "compressed": "related-tests-workspace-temp.log.gz"
+  },
+  "related-tests.log": {
+    "bytes": 6990,
+    "sha256": "dd4627a8762482c208b7e8e453ed70e918df5eab999db2e630a594f148d92611",
+    "compressed": "related-tests.log.gz"
+  },
+  "verify-lock.log": {
+    "bytes": 415,
+    "sha256": "7bb24247ca4951914abfb7d570d9a87e32e49492a2c223b476591f64bb50c059",
+    "compressed": "verify-lock.log.gz"
+  }
+}
