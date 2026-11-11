@@ -1,0 +1,13 @@
+{
+  "exitCode": 0,
+  "temp": "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\repo\\.tmp-tests\\review-20261111",
+  "command": [
+    "node",
+    "--import",
+    "tsx",
+    "../.shogi-independent-review-20261111/pair-nan-followup.mjs",
+    "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\repo",
+    "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\.shogi-independent-review-20261111\\pair-nan-followup"
+  ],
+  "cache": "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\repo\\.tmp-tests\\review-20261111\\independent-node-cache"
+}

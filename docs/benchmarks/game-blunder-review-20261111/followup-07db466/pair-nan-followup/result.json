@@ -1,0 +1,133 @@
+{
+  "recordedAt": "2026-11-11T03:48:05.260Z",
+  "head": "07db466b6f11558c9eb257a49c21f1dd6f3a4753",
+  "sourceHead": "1edc169cc9ff27b7c77e825e95b893e5b0252ed1",
+  "change": "Change baseline actual pair-fixed rep0 and rep1 selectedEvaluation/total to NaN tags and recompute repeatKey",
+  "sourceInputSha256": "ba643d6e0222436983ddbe1f05a288e7acc8cfda03de09993d9b72f8c6edbf6e",
+  "mutatedInputSha256": "aab6cf0f72ba1ce1058cfcad35c4eeff69a6293f0aa6fa10a0963f834d3f26f0",
+  "targetId": "af1984db62af0f44b80c676627e2a7879d3af226d65288f0f4863ff554f049e3/{\"from\":{\"col\":1,\"row\":6},\"kind\":\"move\",\"pieceType\":\"pawn\",\"player\":\"sente\",\"promotion\":\"none\",\"to\":{\"col\":1,\"row\":5}}/legacy/1000",
+  "rootReproducible": 24,
+  "condition": {
+    "name": "baseline",
+    "reproducible": false,
+    "judgment": {
+      "verdict": "INDETERMINATE",
+      "delta": null,
+      "reason": "Repetition incomplete or inconsistent."
+    },
+    "actual": null,
+    "alternative": null,
+    "pvActual": null,
+    "pvAlternative": null,
+    "nodes": [
+      {
+        "normal": 35,
+        "quiescence": 68
+      },
+      {
+        "normal": 35,
+        "quiescence": 68
+      },
+      {
+        "normal": 38,
+        "quiescence": 131
+      },
+      {
+        "normal": 38,
+        "quiescence": 131
+      }
+    ],
+    "status": [
+      "completed",
+      "completed",
+      "completed",
+      "completed"
+    ],
+    "reason": [
+      null,
+      null,
+      null,
+      null
+    ]
+  },
+  "invalid": {
+    "count": 2,
+    "byReason": {
+      "non-finite-evaluation": 2
+    },
+    "rows": [
+      {
+        "type": "pair-fixed",
+        "id": "af1984db62af0f44b80c676627e2a7879d3af226d65288f0f4863ff554f049e3/{\"from\":{\"col\":1,\"row\":6},\"kind\":\"move\",\"pieceType\":\"pawn\",\"player\":\"sente\",\"promotion\":\"none\",\"to\":{\"col\":1,\"row\":5}}/legacy/1000",
+        "rep": 0,
+        "condition": "baseline",
+        "kind": "actual",
+        "reason": "non-finite-evaluation"
+      },
+      {
+        "type": "pair-fixed",
+        "id": "af1984db62af0f44b80c676627e2a7879d3af226d65288f0f4863ff554f049e3/{\"from\":{\"col\":1,\"row\":6},\"kind\":\"move\",\"pieceType\":\"pawn\",\"player\":\"sente\",\"promotion\":\"none\",\"to\":{\"col\":1,\"row\":5}}/legacy/1000",
+        "rep": 1,
+        "condition": "baseline",
+        "kind": "actual",
+        "reason": "non-finite-evaluation"
+      }
+    ]
+  },
+  "affectedFactors": [
+    {
+      "condition": "q0",
+      "changedFields": [
+        "options.quiescence.maxTacticalDepth"
+      ],
+      "fixed": [
+        "position",
+        "candidate actions",
+        "perspective",
+        "mode",
+        "node/time caps",
+        "other settings"
+      ],
+      "status": "EXPERIMENT_INVALID",
+      "deltaChange": null,
+      "interpretation": "Effect within bounded search; cause of historical move UNKNOWN."
+    },
+    {
+      "condition": "depth1",
+      "changedFields": [
+        "depth"
+      ],
+      "fixed": [
+        "position",
+        "candidate actions",
+        "perspective",
+        "mode",
+        "node/time caps",
+        "other settings"
+      ],
+      "status": "EXPERIMENT_INVALID",
+      "deltaChange": null,
+      "interpretation": "Effect within bounded search; cause of historical move UNKNOWN."
+    },
+    {
+      "condition": "see-order",
+      "changedFields": [
+        "options.moveOrdering"
+      ],
+      "fixed": [
+        "position",
+        "candidate actions",
+        "perspective",
+        "mode",
+        "node/time caps",
+        "other settings"
+      ],
+      "status": "EXPERIMENT_INVALID",
+      "deltaChange": null,
+      "interpretation": "Existing ordering policy, not isolated SEE arithmetic; original standard ordering does not use SEE."
+    }
+  ],
+  "verdict": "INDETERMINATE",
+  "priority": "NOT_READY",
+  "status": "PASS"
+}
