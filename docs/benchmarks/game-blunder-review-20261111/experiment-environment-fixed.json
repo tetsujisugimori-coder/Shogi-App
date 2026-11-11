@@ -1,0 +1,43 @@
+[
+  {
+    "command": [
+      "node",
+      "--import",
+      "tsx",
+      "scripts/investigate-game-blunders.ts",
+      "docs/benchmarks/game-blunder-review-20261111/fixed-run",
+      "docs/benchmarks/game-blunder-pilot-balanced-20261029/candidates.json",
+      "docs/benchmarks/game-blunder-rediagnosis-v3-20261030/diagnosis.json",
+      "docs/benchmarks/match-journal-20261026/run1/hirate-1.jsonl",
+      "docs/benchmarks/match-journal-20261026/run1/hirate-2.jsonl",
+      "docs/benchmarks/match-journal-20261026/run1/replay-1.jsonl",
+      "docs/benchmarks/match-journal-20261026/run1/replay-2.jsonl"
+    ],
+    "seconds": 70.8311314,
+    "environment": "exec_command require_escalated",
+    "head": "1edc169cc9ff27b7c77e825e95b893e5b0252ed1",
+    "temp": "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\repo\\.tmp-tests\\review-20261111",
+    "exitCode": 0,
+    "name": "new-experiment"
+  },
+  {
+    "name": "new-reaggregation",
+    "head": "1edc169cc9ff27b7c77e825e95b893e5b0252ed1",
+    "exitCode": 0
+  },
+  {
+    "name": "red-green-fixed",
+    "head": "1edc169cc9ff27b7c77e825e95b893e5b0252ed1",
+    "exitCode": 0
+  },
+  {
+    "name": "legacy-reaggregation",
+    "head": "1edc169cc9ff27b7c77e825e95b893e5b0252ed1",
+    "exitCode": 0
+  },
+  {
+    "name": "related-fixed-final",
+    "head": "1edc169cc9ff27b7c77e825e95b893e5b0252ed1",
+    "exitCode": 0
+  }
+]

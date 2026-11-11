@@ -1,0 +1,796 @@
+{
+  "recordedAt": "2026-11-11T03:36:31.025590+00:00",
+  "sourceHead": "1edc169cc9ff27b7c77e825e95b893e5b0252ed1",
+  "headAtAudit": "1edc169cc9ff27b7c77e825e95b893e5b0252ed1",
+  "originalFiles": 48,
+  "originalHashesAllEqual": true,
+  "currentOriginals": [
+    {
+      "path": "docs/benchmarks/game-blunder-investigation-20261030/README.md",
+      "sha256": "ac1ad7769d11dd6f15de9371b647a4ecf6ab8a0cfa6b2c8ed37290e77fa45884"
+    },
+    {
+      "path": "docs/benchmarks/game-blunder-investigation-20261030/observations.jsonl",
+      "sha256": "9c01b64e777c34120cec4bfbac59328625f51dd0dfa52933c2166f2f20df6b9a"
+    },
+    {
+      "path": "docs/benchmarks/game-blunder-investigation-20261030/summary.json",
+      "sha256": "344fd4bee8da8cbe198f8cc5b3f98d180c7cf5e2ef422b4e0e0c8f8056ee9b63"
+    },
+    {
+      "path": "docs/benchmarks/game-blunder-investigation-v4-20261105/DRAFT_PR.md",
+      "sha256": "17691c34d51167134fa297af0259f529fe44a94682529cd0a237d4993fede1bb"
+    },
+    {
+      "path": "docs/benchmarks/game-blunder-investigation-v4-20261105/ISSUE.md",
+      "sha256": "f0cbecdab66613ac899fbefd05461e24fb090736b275d7eceb612e3cab540713"
+    },
+    {
+      "path": "docs/benchmarks/game-blunder-investigation-v4-20261105/README.md",
+      "sha256": "e883c2a338beb1be8f4e1bccccebdced6e0baf9538b396c93499495904792f37"
+    },
+    {
+      "path": "docs/benchmarks/game-blunder-investigation-v4-20261105/acceptance.json",
+      "sha256": "c4fdce17b20c9c49d58af647ccb6f822590d241ceb512faa6d7726432bddee30"
+    },
+    {
+      "path": "docs/benchmarks/game-blunder-investigation-v4-20261105/hypotheses.json",
+      "sha256": "5fe7317bc326a2cf0dfea80c7664427f4cc8fe984042c299a7877fbed6511d8c"
+    },
+    {
+      "path": "docs/benchmarks/game-blunder-investigation-v4-20261105/observations.jsonl",
+      "sha256": "66cb941288aeca77ee41c3d66c853d420004e3c4b474ada5c612c24017d4afa6"
+    },
+    {
+      "path": "docs/benchmarks/game-blunder-investigation-v4-20261105/preservation.json",
+      "sha256": "d51559f0f17f44962c2d1b91013187ffaaab2222b2f4697c2cc9de9e9dbd46ea"
+    },
+    {
+      "path": "docs/benchmarks/game-blunder-investigation-v4-20261105/source-provenance.json",
+      "sha256": "1757a756f2e3cae09e476144abb5105b9c0c1c3b8d3f4aa41e3aade94f5c6527"
+    },
+    {
+      "path": "docs/benchmarks/game-blunder-investigation-v4-20261105/submission-status.json",
+      "sha256": "42c4ea0c55e25d65fbf82d5b399b48fb65f0fda8e526332fd073c8986cb70bc1"
+    },
+    {
+      "path": "docs/benchmarks/game-blunder-investigation-v4-20261105/summary.json",
+      "sha256": "96e14c0a0af655403c50a84769e1430b9fd0556b5fe086a731d9e4764d1bee08"
+    },
+    {
+      "path": "docs/benchmarks/game-blunder-investigation-v4-20261105/validation/build.log.gz",
+      "sha256": "1317634306c4136bfb697a4bf3e902c41094b0dcf43fbbb4a45678ae72fe251e"
+    },
+    {
+      "path": "docs/benchmarks/game-blunder-investigation-v4-20261105/validation/ci-initial-failed.log.gz",
+      "sha256": "6012ec0d67e5a00aeee1681e69013516843953bfd5e7bd2704cc8bc32166d2aa"
+    },
+    {
+      "path": "docs/benchmarks/game-blunder-investigation-v4-20261105/validation/ci-initial.json",
+      "sha256": "f3742695c685b266e14385bc7888869cc18c119747a1b8f9cc7606276e306c64"
+    },
+    {
+      "path": "docs/benchmarks/game-blunder-investigation-v4-20261105/validation/full-tests-harness-15s.log.gz",
+      "sha256": "404de5bc23d78a0733d4ca5bf5c2873f1b3c78c785ceb17c2747771dbef4da27"
+    },
+    {
+      "path": "docs/benchmarks/game-blunder-investigation-v4-20261105/validation/full-tests-single-worker.log.gz",
+      "sha256": "f63f387346794cebeb0eee571abd5eb8a08f1eb1b6a0e97fc0f872a2cc53a1bd"
+    },
+    {
+      "path": "docs/benchmarks/game-blunder-investigation-v4-20261105/validation/full-tests.log.gz",
+      "sha256": "ac82285d5eed994ba10872280f00eea3211365ce4d43b53f9d2dfc3f4da5770c"
+    },
+    {
+      "path": "docs/benchmarks/game-blunder-investigation-v4-20261105/validation/lint-final.log.gz",
+      "sha256": "fcd25d8d06c63dba5ae178b8b1c7c7e3451ee73474868f8117bec69961757740"
+    },
+    {
+      "path": "docs/benchmarks/game-blunder-investigation-v4-20261105/validation/lint-provenance-fix.log.gz",
+      "sha256": "fcd25d8d06c63dba5ae178b8b1c7c7e3451ee73474868f8117bec69961757740"
+    },
+    {
+      "path": "docs/benchmarks/game-blunder-investigation-v4-20261105/validation/lint.log.gz",
+      "sha256": "fcd25d8d06c63dba5ae178b8b1c7c7e3451ee73474868f8117bec69961757740"
+    },
+    {
+      "path": "docs/benchmarks/game-blunder-investigation-v4-20261105/validation/log-manifest.json",
+      "sha256": "651f8985a1b649d2084807aae35155ff64ce7d0203f60d735c63770c2ea87258"
+    },
+    {
+      "path": "docs/benchmarks/game-blunder-investigation-v4-20261105/validation/provenance-fix-tests.log.gz",
+      "sha256": "2d40889b19071aa720ee1dac5164f3d7597c81c40251e369aac82992f8c45941"
+    },
+    {
+      "path": "docs/benchmarks/game-blunder-investigation-v4-20261105/validation/related-tests-workspace-temp.log.gz",
+      "sha256": "30f9550f1414605150bb286e782815f48fb372c6234849593cb5778c0825dc24"
+    },
+    {
+      "path": "docs/benchmarks/game-blunder-investigation-v4-20261105/validation/related-tests.log.gz",
+      "sha256": "bc0ba2048c9eaef3866566334e51fe21d6110d912d416a28103639c9daf80a9a"
+    },
+    {
+      "path": "docs/benchmarks/game-blunder-investigation-v4-20261105/validation/results.json",
+      "sha256": "e8c0638a6740df97381f92a6ffc72c19f5e957f3c2e51851c64afc98f9e5bba7"
+    },
+    {
+      "path": "docs/benchmarks/game-blunder-investigation-v4-20261105/validation/source-canonical-check.json",
+      "sha256": "5cd96c1b6a0661c3d402c30faca993dc31d62b90d4b36fd5cc1807110b6be674"
+    },
+    {
+      "path": "docs/benchmarks/game-blunder-investigation-v4-20261105/validation/verify-lock.log.gz",
+      "sha256": "8a751e88ced8b25eabd100bb07520b2f89637ecd2fc6e85a01bdc6fc269f92ee"
+    },
+    {
+      "path": "docs/benchmarks/game-blunder-pilot-20261029/candidates.json",
+      "sha256": "95e2e2ebbc0547c18ac7529873caa0220d03b4f55944ee7c70dda6d6a208e7a4"
+    },
+    {
+      "path": "docs/benchmarks/game-blunder-pilot-20261029/report.md",
+      "sha256": "677bcc91d64b59d6ff2798c2e269268f85fbfbd0345126152e15b66f1f366cf9"
+    },
+    {
+      "path": "docs/benchmarks/game-blunder-pilot-balanced-20261029/README.md",
+      "sha256": "cdacc4ba4cb77a44fc5a10bced991553c5727424f5bbc4c680ce8a06d0bd6a64"
+    },
+    {
+      "path": "docs/benchmarks/game-blunder-pilot-balanced-20261029/candidates.json",
+      "sha256": "ca95de6ad016d8e00986f4d981272d628008e589ac36a6ba6eca180dfc034e57"
+    },
+    {
+      "path": "docs/benchmarks/game-blunder-pilot-balanced-20261029/report.md",
+      "sha256": "83679703b749208182abe804499d82deb6fd075b05552d0c1070f2d5cbbfd011"
+    },
+    {
+      "path": "docs/benchmarks/game-blunder-proofs-20261030/proofs.json",
+      "sha256": "69be3ea29b295125fda7653fa5673adb9a8c8b4be7e4b90c411e5832dfca92b8"
+    },
+    {
+      "path": "docs/benchmarks/game-blunder-proofs-v2-20261030/README.md",
+      "sha256": "8ab33be8234ee1a1d0782c1b822a4788a5238c8034f5ee8b3bf1172c0f52d681"
+    },
+    {
+      "path": "docs/benchmarks/game-blunder-proofs-v2-20261030/proofs.json",
+      "sha256": "9e22d5f42dba8500f73744711000caa5ac8f5b66e3314bcee907d09cb3c02564"
+    },
+    {
+      "path": "docs/benchmarks/game-blunder-rediagnosis-20261030/diagnosis.json",
+      "sha256": "76b28c0d6943e3d35355f787b9d4da6b14b43a8f51f70ac1794d07a5ba823d0f"
+    },
+    {
+      "path": "docs/benchmarks/game-blunder-rediagnosis-20261030/report.md",
+      "sha256": "7988b7b73679cee763978927f36f1dfb292570b3f60b7b87eb065076e9fc7912"
+    },
+    {
+      "path": "docs/benchmarks/game-blunder-rediagnosis-v2-20261030/diagnosis.json",
+      "sha256": "6b79a64bea8e2291afb906f496553b8860c0b79a8af5f96329b7bde3fe635270"
+    },
+    {
+      "path": "docs/benchmarks/game-blunder-rediagnosis-v2-20261030/report.md",
+      "sha256": "d4a272e6353020aef70d511e6237e3f0a76c49bc7fcf51cb310f1f18bac1c987"
+    },
+    {
+      "path": "docs/benchmarks/game-blunder-rediagnosis-v3-20261030/README.md",
+      "sha256": "baefe065bdda3b80b6b1761a14e5563c99744484d73cf265ecb88318864976b3"
+    },
+    {
+      "path": "docs/benchmarks/game-blunder-rediagnosis-v3-20261030/diagnosis.json",
+      "sha256": "461677290f66de491ec1aca26407c0a88e76068a94e4ad489384ec72a4815579"
+    },
+    {
+      "path": "docs/benchmarks/game-blunder-rediagnosis-v3-20261030/report.md",
+      "sha256": "6cdc122c89b17f658b95eaf12909a9b04120fe3de3be2847b0053da92b2499b5"
+    },
+    {
+      "path": "docs/benchmarks/match-journal-20261026/run1/hirate-1.jsonl",
+      "sha256": "25fb004b362046c9f5af978825f4a66f1578b6ab7d17e633ac773f693556422b"
+    },
+    {
+      "path": "docs/benchmarks/match-journal-20261026/run1/hirate-2.jsonl",
+      "sha256": "c1ee4522e95c6fe95fa69be3969137656155b8835b1a59a526e43480196d2c6f"
+    },
+    {
+      "path": "docs/benchmarks/match-journal-20261026/run1/replay-1.jsonl",
+      "sha256": "64df4641977cb4955013371283179ad1097c92669d0ff55dd831ed1b3e0cabb3"
+    },
+    {
+      "path": "docs/benchmarks/match-journal-20261026/run1/replay-2.jsonl",
+      "sha256": "9f6e932e75a023c925cafd64bf2c52b53d5fcbe3b562b13cf52feaed7000270b"
+    }
+  ],
+  "sourceFiles": 99,
+  "sourceFilesAllVerified": true,
+  "sources": [
+    {
+      "path": "scripts/benchmarks/checkEvasionPositions.ts",
+      "rawHashMatchesPlan": true,
+      "canonicalLFMatchesFixedGitBlob": true
+    },
+    {
+      "path": "scripts/benchmarks/checkEvasionReference.ts",
+      "rawHashMatchesPlan": true,
+      "canonicalLFMatchesFixedGitBlob": true
+    },
+    {
+      "path": "scripts/benchmarks/evasionBoundary.ts",
+      "rawHashMatchesPlan": true,
+      "canonicalLFMatchesFixedGitBlob": true
+    },
+    {
+      "path": "scripts/benchmarks/evasionBudgetRun.ts",
+      "rawHashMatchesPlan": true,
+      "canonicalLFMatchesFixedGitBlob": true
+    },
+    {
+      "path": "scripts/benchmarks/evasionRunBudget.ts",
+      "rawHashMatchesPlan": true,
+      "canonicalLFMatchesFixedGitBlob": true
+    },
+    {
+      "path": "scripts/benchmarks/exchangePositions.ts",
+      "rawHashMatchesPlan": true,
+      "canonicalLFMatchesFixedGitBlob": true
+    },
+    {
+      "path": "scripts/benchmarks/fallbackQuality.ts",
+      "rawHashMatchesPlan": true,
+      "canonicalLFMatchesFixedGitBlob": true
+    },
+    {
+      "path": "scripts/benchmarks/fixtures/self-play-99-actions.json",
+      "rawHashMatchesPlan": true,
+      "canonicalLFMatchesFixedGitBlob": true
+    },
+    {
+      "path": "scripts/benchmarks/gameBlunderDiagnosis.ts",
+      "rawHashMatchesPlan": true,
+      "canonicalLFMatchesFixedGitBlob": true
+    },
+    {
+      "path": "scripts/benchmarks/gameBlunderFixed.ts",
+      "rawHashMatchesPlan": true,
+      "canonicalLFMatchesFixedGitBlob": true
+    },
+    {
+      "path": "scripts/benchmarks/gameBlunderInvestigation.ts",
+      "rawHashMatchesPlan": true,
+      "canonicalLFMatchesFixedGitBlob": true
+    },
+    {
+      "path": "scripts/benchmarks/gameBlunderPilot.ts",
+      "rawHashMatchesPlan": true,
+      "canonicalLFMatchesFixedGitBlob": true
+    },
+    {
+      "path": "scripts/benchmarks/journalFixtures.ts",
+      "rawHashMatchesPlan": true,
+      "canonicalLFMatchesFixedGitBlob": true
+    },
+    {
+      "path": "scripts/benchmarks/journalIO.ts",
+      "rawHashMatchesPlan": true,
+      "canonicalLFMatchesFixedGitBlob": true
+    },
+    {
+      "path": "scripts/benchmarks/matchJournal.ts",
+      "rawHashMatchesPlan": true,
+      "canonicalLFMatchesFixedGitBlob": true
+    },
+    {
+      "path": "scripts/benchmarks/outcomeProof.ts",
+      "rawHashMatchesPlan": true,
+      "canonicalLFMatchesFixedGitBlob": true
+    },
+    {
+      "path": "scripts/benchmarks/outcomeQuality.ts",
+      "rawHashMatchesPlan": true,
+      "canonicalLFMatchesFixedGitBlob": true
+    },
+    {
+      "path": "scripts/benchmarks/partialRootMatches.ts",
+      "rawHashMatchesPlan": true,
+      "canonicalLFMatchesFixedGitBlob": true
+    },
+    {
+      "path": "scripts/benchmarks/pieceSafetyPositions.ts",
+      "rawHashMatchesPlan": true,
+      "canonicalLFMatchesFixedGitBlob": true
+    },
+    {
+      "path": "scripts/benchmarks/postRootDepthOne.ts",
+      "rawHashMatchesPlan": true,
+      "canonicalLFMatchesFixedGitBlob": true
+    },
+    {
+      "path": "scripts/benchmarks/qLegalBreakdown.ts",
+      "rawHashMatchesPlan": true,
+      "canonicalLFMatchesFixedGitBlob": true
+    },
+    {
+      "path": "scripts/benchmarks/quiescenceOrderingRepeated.ts",
+      "rawHashMatchesPlan": true,
+      "canonicalLFMatchesFixedGitBlob": true
+    },
+    {
+      "path": "scripts/benchmarks/quiescenceOrderingSelfPlay.ts",
+      "rawHashMatchesPlan": true,
+      "canonicalLFMatchesFixedGitBlob": true
+    },
+    {
+      "path": "scripts/benchmarks/quiescenceOrderingSelfPlayScenarios.ts",
+      "rawHashMatchesPlan": true,
+      "canonicalLFMatchesFixedGitBlob": true
+    },
+    {
+      "path": "scripts/benchmarks/quiescenceOrderingSelfPlaySuite.ts",
+      "rawHashMatchesPlan": true,
+      "canonicalLFMatchesFixedGitBlob": true
+    },
+    {
+      "path": "scripts/benchmarks/quiescenceOrderingSuite.ts",
+      "rawHashMatchesPlan": true,
+      "canonicalLFMatchesFixedGitBlob": true
+    },
+    {
+      "path": "scripts/benchmarks/quiescenceOrderingSuiteComparison.ts",
+      "rawHashMatchesPlan": true,
+      "canonicalLFMatchesFixedGitBlob": true
+    },
+    {
+      "path": "scripts/benchmarks/quiescencePositions.ts",
+      "rawHashMatchesPlan": true,
+      "canonicalLFMatchesFixedGitBlob": true
+    },
+    {
+      "path": "scripts/benchmarks/quiescenceSuite.ts",
+      "rawHashMatchesPlan": true,
+      "canonicalLFMatchesFixedGitBlob": true
+    },
+    {
+      "path": "scripts/benchmarks/rootLegalTargets.ts",
+      "rawHashMatchesPlan": true,
+      "canonicalLFMatchesFixedGitBlob": true
+    },
+    {
+      "path": "scripts/benchmarks/seeDeadlinePosition.ts",
+      "rawHashMatchesPlan": true,
+      "canonicalLFMatchesFixedGitBlob": true
+    },
+    {
+      "path": "scripts/benchmarks/tacticalDiagnostics.ts",
+      "rawHashMatchesPlan": true,
+      "canonicalLFMatchesFixedGitBlob": true
+    },
+    {
+      "path": "scripts/benchmarks/tacticalObservations.ts",
+      "rawHashMatchesPlan": true,
+      "canonicalLFMatchesFixedGitBlob": true
+    },
+    {
+      "path": "scripts/benchmarks/tacticalPositions.ts",
+      "rawHashMatchesPlan": true,
+      "canonicalLFMatchesFixedGitBlob": true
+    },
+    {
+      "path": "scripts/benchmarks/tacticalQuality.ts",
+      "rawHashMatchesPlan": true,
+      "canonicalLFMatchesFixedGitBlob": true
+    },
+    {
+      "path": "scripts/benchmarks/tacticalQualityAudit.ts",
+      "rawHashMatchesPlan": true,
+      "canonicalLFMatchesFixedGitBlob": true
+    },
+    {
+      "path": "scripts/benchmarks/terminalDistanceReference.ts",
+      "rawHashMatchesPlan": true,
+      "canonicalLFMatchesFixedGitBlob": true
+    },
+    {
+      "path": "scripts/benchmarks/timeLimitStressMeasurement.ts",
+      "rawHashMatchesPlan": true,
+      "canonicalLFMatchesFixedGitBlob": true
+    },
+    {
+      "path": "scripts/benchmarks/timeLimitStressPositions.ts",
+      "rawHashMatchesPlan": true,
+      "canonicalLFMatchesFixedGitBlob": true
+    },
+    {
+      "path": "scripts/benchmarks/timedDepthOneDiagnostics.ts",
+      "rawHashMatchesPlan": true,
+      "canonicalLFMatchesFixedGitBlob": true
+    },
+    {
+      "path": "scripts/benchmarks/timedFallbackSelfPlay.ts",
+      "rawHashMatchesPlan": true,
+      "canonicalLFMatchesFixedGitBlob": true
+    },
+    {
+      "path": "scripts/benchmarks/timedLongTail.ts",
+      "rawHashMatchesPlan": true,
+      "canonicalLFMatchesFixedGitBlob": true
+    },
+    {
+      "path": "scripts/benchmarks/verifyOutcomeProof.ts",
+      "rawHashMatchesPlan": true,
+      "canonicalLFMatchesFixedGitBlob": true
+    },
+    {
+      "path": "src/domain/shogi/actionValidationDiagnostics.ts",
+      "rawHashMatchesPlan": true,
+      "canonicalLFMatchesFixedGitBlob": true
+    },
+    {
+      "path": "src/domain/shogi/adjudication.ts",
+      "rawHashMatchesPlan": true,
+      "canonicalLFMatchesFixedGitBlob": true
+    },
+    {
+      "path": "src/domain/shogi/agreedJishogi.ts",
+      "rawHashMatchesPlan": true,
+      "canonicalLFMatchesFixedGitBlob": true
+    },
+    {
+      "path": "src/domain/shogi/attacks.ts",
+      "rawHashMatchesPlan": true,
+      "canonicalLFMatchesFixedGitBlob": true
+    },
+    {
+      "path": "src/domain/shogi/boardStateUtils.ts",
+      "rawHashMatchesPlan": true,
+      "canonicalLFMatchesFixedGitBlob": true
+    },
+    {
+      "path": "src/domain/shogi/branchReplay.ts",
+      "rawHashMatchesPlan": true,
+      "canonicalLFMatchesFixedGitBlob": true
+    },
+    {
+      "path": "src/domain/shogi/branchSession.ts",
+      "rawHashMatchesPlan": true,
+      "canonicalLFMatchesFixedGitBlob": true
+    },
+    {
+      "path": "src/domain/shogi/checkInternalsDiagnostics.ts",
+      "rawHashMatchesPlan": true,
+      "canonicalLFMatchesFixedGitBlob": true
+    },
+    {
+      "path": "src/domain/shogi/checkmate.ts",
+      "rawHashMatchesPlan": true,
+      "canonicalLFMatchesFixedGitBlob": true
+    },
+    {
+      "path": "src/domain/shogi/coordinates.ts",
+      "rawHashMatchesPlan": true,
+      "canonicalLFMatchesFixedGitBlob": true
+    },
+    {
+      "path": "src/domain/shogi/dropRules.ts",
+      "rawHashMatchesPlan": true,
+      "canonicalLFMatchesFixedGitBlob": true
+    },
+    {
+      "path": "src/domain/shogi/drops.ts",
+      "rawHashMatchesPlan": true,
+      "canonicalLFMatchesFixedGitBlob": true
+    },
+    {
+      "path": "src/domain/shogi/enteringKing.ts",
+      "rawHashMatchesPlan": true,
+      "canonicalLFMatchesFixedGitBlob": true
+    },
+    {
+      "path": "src/domain/shogi/evaluationPresetComparison.ts",
+      "rawHashMatchesPlan": true,
+      "canonicalLFMatchesFixedGitBlob": true
+    },
+    {
+      "path": "src/domain/shogi/executionPolicy.ts",
+      "rawHashMatchesPlan": true,
+      "canonicalLFMatchesFixedGitBlob": true
+    },
+    {
+      "path": "src/domain/shogi/gameRecord.ts",
+      "rawHashMatchesPlan": true,
+      "canonicalLFMatchesFixedGitBlob": true
+    },
+    {
+      "path": "src/domain/shogi/gameRecordImport.ts",
+      "rawHashMatchesPlan": true,
+      "canonicalLFMatchesFixedGitBlob": true
+    },
+    {
+      "path": "src/domain/shogi/gameRecordSession.ts",
+      "rawHashMatchesPlan": true,
+      "canonicalLFMatchesFixedGitBlob": true
+    },
+    {
+      "path": "src/domain/shogi/gameState.ts",
+      "rawHashMatchesPlan": true,
+      "canonicalLFMatchesFixedGitBlob": true
+    },
+    {
+      "path": "src/domain/shogi/index.ts",
+      "rawHashMatchesPlan": true,
+      "canonicalLFMatchesFixedGitBlob": true
+    },
+    {
+      "path": "src/domain/shogi/jishogiPoints.ts",
+      "rawHashMatchesPlan": true,
+      "canonicalLFMatchesFixedGitBlob": true
+    },
+    {
+      "path": "src/domain/shogi/kifExport.ts",
+      "rawHashMatchesPlan": true,
+      "canonicalLFMatchesFixedGitBlob": true
+    },
+    {
+      "path": "src/domain/shogi/kifImport.ts",
+      "rawHashMatchesPlan": true,
+      "canonicalLFMatchesFixedGitBlob": true
+    },
+    {
+      "path": "src/domain/shogi/kingSafetyEvaluation.ts",
+      "rawHashMatchesPlan": true,
+      "canonicalLFMatchesFixedGitBlob": true
+    },
+    {
+      "path": "src/domain/shogi/legalActions.ts",
+      "rawHashMatchesPlan": true,
+      "canonicalLFMatchesFixedGitBlob": true
+    },
+    {
+      "path": "src/domain/shogi/materialAi.ts",
+      "rawHashMatchesPlan": true,
+      "canonicalLFMatchesFixedGitBlob": true
+    },
+    {
+      "path": "src/domain/shogi/materialEvaluation.ts",
+      "rawHashMatchesPlan": true,
+      "canonicalLFMatchesFixedGitBlob": true
+    },
+    {
+      "path": "src/domain/shogi/moveLimitJishogi.ts",
+      "rawHashMatchesPlan": true,
+      "canonicalLFMatchesFixedGitBlob": true
+    },
+    {
+      "path": "src/domain/shogi/moves.ts",
+      "rawHashMatchesPlan": true,
+      "canonicalLFMatchesFixedGitBlob": true
+    },
+    {
+      "path": "src/domain/shogi/pairedSelfPlayMatch.ts",
+      "rawHashMatchesPlan": true,
+      "canonicalLFMatchesFixedGitBlob": true
+    },
+    {
+      "path": "src/domain/shogi/pieceSquareEvaluation.ts",
+      "rawHashMatchesPlan": true,
+      "canonicalLFMatchesFixedGitBlob": true
+    },
+    {
+      "path": "src/domain/shogi/promotion.ts",
+      "rawHashMatchesPlan": true,
+      "canonicalLFMatchesFixedGitBlob": true
+    },
+    {
+      "path": "src/domain/shogi/quiescenceComparison.ts",
+      "rawHashMatchesPlan": true,
+      "canonicalLFMatchesFixedGitBlob": true
+    },
+    {
+      "path": "src/domain/shogi/quiescenceOrdering.ts",
+      "rawHashMatchesPlan": true,
+      "canonicalLFMatchesFixedGitBlob": true
+    },
+    {
+      "path": "src/domain/shogi/quiescenceSearch.ts",
+      "rawHashMatchesPlan": true,
+      "canonicalLFMatchesFixedGitBlob": true
+    },
+    {
+      "path": "src/domain/shogi/quietPromotionSelection.ts",
+      "rawHashMatchesPlan": true,
+      "canonicalLFMatchesFixedGitBlob": true
+    },
+    {
+      "path": "src/domain/shogi/randomAi.ts",
+      "rawHashMatchesPlan": true,
+      "canonicalLFMatchesFixedGitBlob": true
+    },
+    {
+      "path": "src/domain/shogi/recordIdentity.ts",
+      "rawHashMatchesPlan": true,
+      "canonicalLFMatchesFixedGitBlob": true
+    },
+    {
+      "path": "src/domain/shogi/repeatedPairedSelfPlayMatches.ts",
+      "rawHashMatchesPlan": true,
+      "canonicalLFMatchesFixedGitBlob": true
+    },
+    {
+      "path": "src/domain/shogi/repetition.ts",
+      "rawHashMatchesPlan": true,
+      "canonicalLFMatchesFixedGitBlob": true
+    },
+    {
+      "path": "src/domain/shogi/replay.ts",
+      "rawHashMatchesPlan": true,
+      "canonicalLFMatchesFixedGitBlob": true
+    },
+    {
+      "path": "src/domain/shogi/resignation.ts",
+      "rawHashMatchesPlan": true,
+      "canonicalLFMatchesFixedGitBlob": true
+    },
+    {
+      "path": "src/domain/shogi/searchDiagnostics.ts",
+      "rawHashMatchesPlan": true,
+      "canonicalLFMatchesFixedGitBlob": true
+    },
+    {
+      "path": "src/domain/shogi/searchEvaluationPresets.ts",
+      "rawHashMatchesPlan": true,
+      "canonicalLFMatchesFixedGitBlob": true
+    },
+    {
+      "path": "src/domain/shogi/searchValue.ts",
+      "rawHashMatchesPlan": true,
+      "canonicalLFMatchesFixedGitBlob": true
+    },
+    {
+      "path": "src/domain/shogi/selfPlayGame.ts",
+      "rawHashMatchesPlan": true,
+      "canonicalLFMatchesFixedGitBlob": true
+    },
+    {
+      "path": "src/domain/shogi/staticExchangeEvaluation.ts",
+      "rawHashMatchesPlan": true,
+      "canonicalLFMatchesFixedGitBlob": true
+    },
+    {
+      "path": "src/domain/shogi/timeLimitedQuiescenceComparison.ts",
+      "rawHashMatchesPlan": true,
+      "canonicalLFMatchesFixedGitBlob": true
+    },
+    {
+      "path": "src/domain/shogi/transpositionTable.ts",
+      "rawHashMatchesPlan": true,
+      "canonicalLFMatchesFixedGitBlob": true
+    },
+    {
+      "path": "src/domain/shogi/twoPlyAlphaBetaAi.ts",
+      "rawHashMatchesPlan": true,
+      "canonicalLFMatchesFixedGitBlob": true
+    },
+    {
+      "path": "src/domain/shogi/twoPlyMinimaxAi.ts",
+      "rawHashMatchesPlan": true,
+      "canonicalLFMatchesFixedGitBlob": true
+    },
+    {
+      "path": "src/domain/shogi/undefendedPieceSafetyEvaluation.ts",
+      "rawHashMatchesPlan": true,
+      "canonicalLFMatchesFixedGitBlob": true
+    },
+    {
+      "path": "src/domain/shogi/validation.ts",
+      "rawHashMatchesPlan": true,
+      "canonicalLFMatchesFixedGitBlob": true
+    },
+    {
+      "path": "src/types/shogi.ts",
+      "rawHashMatchesPlan": true,
+      "canonicalLFMatchesFixedGitBlob": true
+    },
+    {
+      "path": "scripts/investigate-game-blunders.ts",
+      "rawHashMatchesPlan": true,
+      "canonicalLFMatchesFixedGitBlob": true
+    },
+    {
+      "path": "scripts/summarize-game-blunders.ts",
+      "rawHashMatchesPlan": true,
+      "canonicalLFMatchesFixedGitBlob": true
+    }
+  ],
+  "legacyRawLogs": [
+    {
+      "path": "docs/benchmarks/game-blunder-investigation-v4-20261105/validation/build.log",
+      "currentSha256": "c5e6509fd31a59a4c20b1d044e51a863f2d8ee935dd6d511b283555be519fd70",
+      "archiveSha256": "1317634306c4136bfb697a4bf3e902c41094b0dcf43fbbb4a45678ae72fe251e",
+      "matchesArchivedDecompressedBytes": true
+    },
+    {
+      "path": "docs/benchmarks/game-blunder-investigation-v4-20261105/validation/full-tests-harness-15s.log",
+      "currentSha256": "fc6a38ed07aad949f45029395f5f18866b9b1bc0cf5ca3cc0d82c324c593b10a",
+      "archiveSha256": "404de5bc23d78a0733d4ca5bf5c2873f1b3c78c785ceb17c2747771dbef4da27",
+      "matchesArchivedDecompressedBytes": true
+    },
+    {
+      "path": "docs/benchmarks/game-blunder-investigation-v4-20261105/validation/full-tests-single-worker.log",
+      "currentSha256": "5500d95e1198e8a22bf8dc23c4fa260c853048399341490a8e20532c3224c7a9",
+      "archiveSha256": "f63f387346794cebeb0eee571abd5eb8a08f1eb1b6a0e97fc0f872a2cc53a1bd",
+      "matchesArchivedDecompressedBytes": true
+    },
+    {
+      "path": "docs/benchmarks/game-blunder-investigation-v4-20261105/validation/full-tests.log",
+      "currentSha256": "c703a8400ebd1faf9fc9b4b20e5d3c8d490a17ed05b4e6144ba0041a5a8aec47",
+      "archiveSha256": "ac82285d5eed994ba10872280f00eea3211365ce4d43b53f9d2dfc3f4da5770c",
+      "matchesArchivedDecompressedBytes": true
+    },
+    {
+      "path": "docs/benchmarks/game-blunder-investigation-v4-20261105/validation/lint-final.log",
+      "currentSha256": "ad6bec1b1378356ed1d37de83bed5cf5234df9e06b03d54d4963118d0dea0d0e",
+      "archiveSha256": "fcd25d8d06c63dba5ae178b8b1c7c7e3451ee73474868f8117bec69961757740",
+      "matchesArchivedDecompressedBytes": true
+    },
+    {
+      "path": "docs/benchmarks/game-blunder-investigation-v4-20261105/validation/lint-provenance-fix.log",
+      "currentSha256": "ad6bec1b1378356ed1d37de83bed5cf5234df9e06b03d54d4963118d0dea0d0e",
+      "archiveSha256": "fcd25d8d06c63dba5ae178b8b1c7c7e3451ee73474868f8117bec69961757740",
+      "matchesArchivedDecompressedBytes": true
+    },
+    {
+      "path": "docs/benchmarks/game-blunder-investigation-v4-20261105/validation/lint.log",
+      "currentSha256": "ad6bec1b1378356ed1d37de83bed5cf5234df9e06b03d54d4963118d0dea0d0e",
+      "archiveSha256": "fcd25d8d06c63dba5ae178b8b1c7c7e3451ee73474868f8117bec69961757740",
+      "matchesArchivedDecompressedBytes": true
+    },
+    {
+      "path": "docs/benchmarks/game-blunder-investigation-v4-20261105/validation/provenance-fix-tests.log",
+      "currentSha256": "1650d923df241ab95b8eeaba7c3981b387095fc69529ce80f947cd5b64f5774c",
+      "archiveSha256": "2d40889b19071aa720ee1dac5164f3d7597c81c40251e369aac82992f8c45941",
+      "matchesArchivedDecompressedBytes": true
+    },
+    {
+      "path": "docs/benchmarks/game-blunder-investigation-v4-20261105/validation/related-tests-workspace-temp.log",
+      "currentSha256": "189813930b73fcc48ae98ba50c3345421d5f266dd64b747185f0003ab917b06e",
+      "archiveSha256": "30f9550f1414605150bb286e782815f48fb372c6234849593cb5778c0825dc24",
+      "matchesArchivedDecompressedBytes": true
+    },
+    {
+      "path": "docs/benchmarks/game-blunder-investigation-v4-20261105/validation/related-tests.log",
+      "currentSha256": "dd4627a8762482c208b7e8e453ed70e918df5eab999db2e630a594f148d92611",
+      "archiveSha256": "bc0ba2048c9eaef3866566334e51fe21d6110d912d416a28103639c9daf80a9a",
+      "matchesArchivedDecompressedBytes": true
+    },
+    {
+      "path": "docs/benchmarks/game-blunder-investigation-v4-20261105/validation/verify-lock.log",
+      "currentSha256": "7bb24247ca4951914abfb7d570d9a87e32e49492a2c223b476591f64bb50c059",
+      "archiveSha256": "8a751e88ced8b25eabd100bb07520b2f89637ecd2fc6e85a01bdc6fc269f92ee",
+      "matchesArchivedDecompressedBytes": true
+    }
+  ],
+  "baselineSnapshots": [
+    {
+      "path": "scripts/benchmarks/gameBlunderInvestigation.ts",
+      "matchesBaselineGitBlob": true
+    },
+    {
+      "path": "scripts/benchmarks/gameBlunderPilot.ts",
+      "matchesBaselineGitBlob": true
+    },
+    {
+      "path": "scripts/investigate-game-blunders.ts",
+      "matchesBaselineGitBlob": true
+    },
+    {
+      "path": "scripts/summarize-game-blunders.ts",
+      "matchesBaselineGitBlob": true
+    }
+  ],
+  "legacyReaggregationMatchesSavedSummary": true,
+  "protectedPaths": [
+    "src/domain",
+    "src/types",
+    "package.json",
+    "package-lock.json",
+    "vite.config.ts",
+    ".github/workflows"
+  ],
+  "protectedDiff": ""
+}

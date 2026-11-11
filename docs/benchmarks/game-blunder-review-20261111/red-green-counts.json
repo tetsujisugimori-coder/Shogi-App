@@ -1,0 +1,22 @@
+{
+  "control": {
+    "cases": 1,
+    "previouslyAcceptedNowProtected": 0,
+    "previouslyProtected": 0
+  },
+  "P2-01": {
+    "cases": 10,
+    "previouslyAcceptedNowProtected": 6,
+    "previouslyProtected": 4
+  },
+  "P2-02": {
+    "cases": 4,
+    "previouslyAcceptedNowProtected": 4,
+    "previouslyProtected": 0
+  },
+  "P3-01": {
+    "cases": 15,
+    "previouslyAcceptedNowProtected": 11,
+    "previouslyProtected": 4
+  }
+}

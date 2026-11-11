@@ -1,0 +1,15 @@
+{
+  "recordedAt": "2026-11-11T03:00:36.444Z",
+  "head": "4d626a46426ea5a5b88f357330897f919fd7b2bd",
+  "platform": "win32",
+  "os": "10.0.26300",
+  "cpu": "Intel(R) Core(TM) i7-14650HX",
+  "logicalCPUs": 24,
+  "node": "v24.20.0",
+  "npm": "11.17.0",
+  "totalMemory": 16869351424,
+  "freeMemory": 1946492928,
+  "sandbox": "exec_command default workspace-write",
+  "temp": "C:\\Users\\tetsu\\AppData\\Local\\Packages\\openai.codex_2p2nqsd0c76g0\\AC\\#!sandbox.{3efe8330-822e-4006-b5f1-7d5ffd4c32e6}\\Temp",
+  "notes": "Experiment/test commands set workspace TEMP/TMP and NODE_COMPILE_CACHE as recorded per command."
+}
