@@ -1,5 +1,7 @@
 import {describe,it,expect} from 'vitest';
 import {readFileSync} from 'node:fs';
+import {basename} from 'node:path';
+import {gunzipSync} from 'node:zlib';
 import {summarizeV4} from '../../scripts/summarize-game-blunders';
 import {CONDITIONS,repeatKey,runFixed} from '../../scripts/benchmarks/gameBlunderInvestigation';
 import {readJournal,sha256} from '../../scripts/benchmarks/journalIO';
@@ -11,10 +13,13 @@ import {getLegalActions} from '../domain/shogi/legalActions';
 const dir='docs/benchmarks/game-blunder-investigation-v4-20261105/';
 const raw=readFileSync(dir+'observations.jsonl','utf8'),rows=raw.trim().split('\n').map(s=>JSON.parse(s));
 const plan=rows[0];
+const historicalSources=new Set([
+  'scripts/benchmarks/gameBlunderInvestigation.ts','scripts/benchmarks/gameBlunderPilot.ts',
+  'scripts/investigate-game-blunders.ts','scripts/summarize-game-blunders.ts',
+]);
 describe('v4 real journal saved evidence integration',()=>{
-  it('reaggregates complete coverage and verifies four unchanged journal hashes and source/input provenance',()=>{
+  it('verifies four unchanged journal hashes and source/input provenance',()=>{
     const summary=JSON.parse(readFileSync(dir+'summary.json','utf8'));
-    expect(summarizeV4(raw)).toEqual(summary);
     expect(summary.fixed.rootCalls).toBe(48);expect(summary.fixed.pairCalls).toBe(64);
     expect(summary.fixed.rootReproducibility.every((r:{reproducible:boolean})=>r.reproducible)).toBe(true);
     expect(summary.fixed.groups.every((g:{conditions:{reproducible:boolean}[]})=>g.conditions.every(c=>c.reproducible))).toBe(true);
@@ -25,7 +30,10 @@ describe('v4 real journal saved evidence integration',()=>{
     const provenance=JSON.parse(readFileSync(dir+'source-provenance.json','utf8'));
     expect(Object.keys(provenance.sources).sort()).toEqual(Object.keys(plan.sourceHashes).sort());
     for(const [p,hash] of Object.entries(plan.sourceHashes)) {
-      const text=readFileSync(p,'utf8'),lf=text.replaceAll('\r\n','\n');
+      const bytes=historicalSources.has(p)
+        ? gunzipSync(readFileSync('docs/benchmarks/game-blunder-review-20261111/baseline-sources/'+basename(p)+'.gz'))
+        : readFileSync(p);
+      const lf=bytes.toString('utf8').replaceAll('\r\n','\n');
       expect(provenance.sources[p].experimentRawSha256,p).toBe(hash);
       expect(sha256(lf),p).toBe(provenance.sources[p].lfSha256);
     }
@@ -37,10 +45,35 @@ describe('v4 real journal saved evidence integration',()=>{
     let changed=clone();changed.splice(2,0,changed.find((r:{type:string})=>r.type==='timed'));expect(()=>summarizeV4(changed.map((r:unknown)=>JSON.stringify(r)).join('\n'))).toThrow();
     changed=clone();changed.find((r:{type:string})=>r.type==='pair-fixed').condition.options.killerMoves=true;
     expect(()=>summarizeV4(changed.map((r:unknown)=>JSON.stringify(r)).join('\n'))).toThrow();
+    changed=clone();changed.find((r:{type:string})=>r.type==='root-fixed').condition.options.killerMoves=true;
+    expect(()=>summarizeV4(changed.map((r:unknown)=>JSON.stringify(r)).join('\n'))).toThrow('fixed condition');
+    changed=clone();
+    for(const condition of [changed[0].conditions[1],...changed.filter((r:{type:string;condition?:{name:string}})=>r.type==='pair-fixed'&&r.condition?.name==='q0').map((r:{condition:unknown})=>r.condition)]) {
+      condition.options.quiescence.maxTacticalDepth=1;
+      condition.options.killerMoves=true;
+    }
+    expect(()=>summarizeV4(changed.map((r:unknown)=>JSON.stringify(r)).join('\n'))).toThrow('plan condition contract');
     changed=clone();changed.find((r:{type:string})=>r.type==='pair-fixed').result.selectedEvaluation+=1;
     expect(()=>summarizeV4(changed.map((r:unknown)=>JSON.stringify(r)).join('\n'))).toThrow();
   });
-  it('replays the four historical positions, validates both candidates and all saved PVs, and reruns one fixed pair',()=>{
+  it('reaggregates evidence, rejects invalid root results, and replays the historical pairs',()=>{
+    const summary=JSON.parse(readFileSync(dir+'summary.json','utf8'));
+    const rebuilt=summarizeV4(raw);
+    const {rootPositionHashSource,invalidObservations,...previousFixed}=rebuilt.fixed;
+    expect(rootPositionHashSource).toBe('journal-reconstructed');
+    expect(invalidObservations.count).toBe(0);
+    expect({...rebuilt,fixed:previousFixed}).toEqual(summary);
+    const invalid=JSON.parse(JSON.stringify(rows));
+    const id=plan.selection[0];
+    for(const r of invalid.filter((r:{type:string;id:string})=>r.type==='root-fixed'&&r.id===id)) {
+      r.result.selectedEvaluation={nonfinite:'NaN'};
+      r.result.evaluationBreakdown.total=r.result.selectedEvaluation;
+      r.repeatKey=repeatKey(r);
+    }
+    const result=summarizeV4(invalid.map((r:unknown)=>JSON.stringify(r)).join('\n'));
+    expect(result.fixed.rootReproducibility[0]).toMatchObject({id,reproducible:false,score:null});
+    expect(result.fixed.invalidObservations).toMatchObject({count:2,byReason:{'non-finite-evaluation':2}});
+
     const groups=rows.filter(r=>r.type==='candidates');let reran=false;
     for(const path of plan.paths) {
       const journal=readJournal(path);expect(journal.error).toBeNull();

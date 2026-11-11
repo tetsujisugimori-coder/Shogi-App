@@ -7,7 +7,7 @@ import {analyzeTimeLimitedIterativeDeepeningAlphaBetaSearch,areLegalActionsEqual
 import {SearchDiagnostics} from '../src/domain/shogi/searchDiagnostics';
 import {extract,type ExtractionTiming} from './benchmarks/gameBlunderPilot';
 import {completedTimedIteration} from './benchmarks/gameBlunderFixed';
-import {BUDGET,CONDITIONS,classificationCounts,inspectCandidate,json,repeatKey,runFixed} from './benchmarks/gameBlunderInvestigation';
+import {BUDGET,CONDITIONS,ROOT_CONDITION,classificationCounts,inspectCandidate,json,repeatKey,runFixed} from './benchmarks/gameBlunderInvestigation';
 import {sha256} from './benchmarks/journalIO';
 import {stateHash} from './benchmarks/matchJournal';
 
@@ -28,7 +28,7 @@ const save=(row:{type:string;[key:string]:unknown})=>{
 const hashes=()=>paths.map(p=>sha256(readFileSync(p))),before=hashes();
 const sources=[...execFileSync('git',['ls-files','src/domain/shogi','src/types/shogi.ts','scripts/benchmarks'],{encoding:'utf8'}).trim().split('\n'),
   'scripts/benchmarks/gameBlunderFixed.ts','scripts/benchmarks/gameBlunderInvestigation.ts','scripts/investigate-game-blunders.ts','scripts/summarize-game-blunders.ts'];
-save({type:'plan',schema:2,startedAt:new Date().toISOString(),baseHead:execFileSync('git',['rev-parse','HEAD'],{encoding:'utf8'}).trim(),
+save({type:'plan',schema:3,startedAt:new Date().toISOString(),baseHead:execFileSync('git',['rev-parse','HEAD'],{encoding:'utf8'}).trim(),
   sourceDirty:execFileSync('git',['status','--porcelain'],{encoding:'utf8'}).trim().length>0,
   sourceHashes:Object.fromEntries([...new Set(sources)].map(p=>[p,sha256(readFileSync(p))])),
   paths,before,priorFile,priorHash:sha256(readFileSync(priorFile)),v3File,v3Hash:sha256(readFileSync(v3File)),
@@ -71,9 +71,10 @@ for(const {c,p} of selection) {
 }
 // Repeat full root selection too, not only evaluation of two preselected moves.
 for(const {c} of selection)for(let rep=0;rep<2;rep++) {
-  if(!withinBudget()) {save({type:'root-fixed',id:c.id,rep,status:'not-run',reason:'experiment-budget'});continue;}
-  const condition={...CONDITIONS[0],name:'root-depth1',depth:1},r=runFixed(c.state,null,c.mode,condition);
-  save({type:'root-fixed',id:c.id,rep,condition,mode:c.mode,budget:BUDGET,repeatKey:repeatKey(r),...r});
+  const identity={type:'root-fixed',id:c.id,rep,condition:ROOT_CONDITION,mode:c.mode,positionHash:stateHash(c.state),budget:BUDGET};
+  if(!withinBudget()) {save({...identity,status:'not-run',reason:'experiment-budget'});continue;}
+  const r=runFixed(c.state,null,c.mode,ROOT_CONDITION);
+  save({...identity,repeatKey:repeatKey(r),...r});
 }
 for(const {c,p} of selection.filter(x=>x.p.verdict==='SUSPECTED')) {
   const legal=getLegalActions(c.state),actual=legal.find(a=>areLegalActionsEqual(a,c.move.action)),alternative=p.alternative&&legal.find(a=>areLegalActionsEqual(a,p.alternative!));
@@ -82,16 +83,18 @@ for(const {c,p} of selection.filter(x=>x.p.verdict==='SUSPECTED')) {
     actual:inspectCandidate(c.state,actual),alternative:inspectCandidate(c.state,alternative),
     recordedExchange:v3.rows.find(r=>r.id===c.id)});
   for(const condition of CONDITIONS)for(const [kind,a] of [['actual',actual],['alternative',alternative]] as const)for(let rep=0;rep<2;rep++) {
-    if(!withinBudget()) {save({type:'pair-fixed',id:c.id,kind,rep,condition,budget:BUDGET,status:'not-run',reason:'experiment-budget'});continue;}
+    const identity={type:'pair-fixed',id:c.id,kind,rep,condition,mode:c.mode,positionHash:stateHash(c.state),budget:BUDGET};
+    if(!withinBudget()) {save({...identity,status:'not-run',reason:'experiment-budget'});continue;}
     const r=runFixed(c.state,a,c.mode,condition);
-    save({type:'pair-fixed',id:c.id,kind,rep,condition,mode:c.mode,positionHash:stateHash(c.state),budget:BUDGET,repeatKey:repeatKey(r),...r});
+    save({...identity,repeatKey:repeatKey(r),...r});
   }
   // Same deterministic task with detailed spans OFF and ON. Node counting and
   // root restriction remain ON in both. Durations are observations, not speed claims.
   for(const detailed of [false,true])for(let rep=0;rep<2;rep++) {
-    if(!withinBudget()) {save({type:'probe-control',id:c.id,detailed,rep,status:'not-run'});continue;}
+    const identity={type:'probe-control',id:c.id,detailed,rep,condition:CONDITIONS[0],mode:c.mode,positionHash:stateHash(c.state),budget:BUDGET};
+    if(!withinBudget()) {save({...identity,status:'not-run',reason:'experiment-budget'});continue;}
     const r=runFixed(c.state,actual,c.mode,CONDITIONS[0],BUDGET,()=>performance.now(),detailed);
-    save({type:'probe-control',id:c.id,detailed,rep,repeatKey:repeatKey(r),...r});
+    save({...identity,repeatKey:repeatKey(r),...r});
   }
 }
 const after=hashes();

@@ -16,6 +16,9 @@ export function apply(state: BoardState, move: MoveRecord['action']): BoardState
   if (result.type !== 'applied') throw Error('illegal action');
   return result.state;
 }
+export const candidateId = (hash:string,move:MoveRecord,mode:'legacy'|'experimental',timeMs:number) =>
+  `${hash}/${JSON.stringify(move.action)}/${mode}/${timeMs}`;
+
 export interface ExtractionTiming {
   journals: Record<string, {readMs:number; auditMs:number; replayMs:number}>;
   positions: Record<string, {replayPrefixMs:number; snapshotMs:number}>;
@@ -36,7 +39,7 @@ export function extract(paths: string[], timing?: ExtractionTiming) {
     for (const [i,move] of audit.moves.entries()) {
       const next = audit.moves[i + 1];
       if (capturedNext(move,next)) {
-        const id = `${stateHash(state)}/${JSON.stringify(move.action)}/${audit.start.seats[move.player]}/${audit.start.conditions.timeMs}`;
+        const id = candidateId(stateHash(state),move,audit.start.seats[move.player],audit.start.conditions.timeMs);
         if (!seen.has(id)) {
           seen.add(id);
           const snapshotAt = timing ? performance.now() : 0;

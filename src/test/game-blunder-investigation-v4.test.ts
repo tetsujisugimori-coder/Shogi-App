@@ -1,6 +1,6 @@
 import {describe,it,expect} from 'vitest';
 import {constructed} from '../../scripts/benchmarks/tacticalPositions';
-import {CONDITIONS,BUDGET,runFixed,repeatKey,compareFixed,inspectCandidate} from '../../scripts/benchmarks/gameBlunderInvestigation';
+import {CONDITIONS,BUDGET,runFixed,repeatKey,compareFixed,fixedInvalidReason,inspectCandidate} from '../../scripts/benchmarks/gameBlunderInvestigation';
 import {changedFields} from '../../scripts/summarize-game-blunders';
 import {getLegalActions} from '../domain/shogi/legalActions';
 import {analyzeAlphaBetaSearch,analyzeTimeLimitedIterativeDeepeningAlphaBetaSearch} from '../domain/shogi/twoPlyAlphaBetaAi';
@@ -42,12 +42,24 @@ describe('v4 constructed diagnostic controls',()=>{
     expect(compareFixed(r,{...r,completedDepth:2}).verdict).toBe('INDETERMINATE');
     expect(compareFixed(r,{...r,result:{...r.result!,selectedEvaluation:Infinity}}).verdict).toBe('INDETERMINATE');
     expect(compareFixed(r,{...r,status:'error'}).verdict).toBe('INDETERMINATE');
-    expect(compareFixed(r,{...r,result:{...r.result!,selectedEvaluation:r.result!.selectedEvaluation!+500}})).toMatchObject({verdict:'SUSPECTED',delta:500});
+    const result=r.result!, score=result.selectedEvaluation!+500;
+    expect(compareFixed(r,{...r,result:{...result,selectedEvaluation:score,evaluationBreakdown:{...result.evaluationBreakdown,total:score}}}))
+      .toMatchObject({verdict:'SUSPECTED',delta:500});
+    expect(fixedInvalidReason(r,1)).toBeNull();
+    for(const selectedEvaluation of [null,NaN,Infinity,-Infinity])
+      expect(fixedInvalidReason({...r,result:{...result,selectedEvaluation}},1)).toBe('non-finite-evaluation');
+    expect(fixedInvalidReason({...r,nodes:{...r.nodes,normal:r.nodes.normal+1}},1)).toBe('inconsistent-node-counts');
+    expect(fixedInvalidReason({...r,validity:'unusable'},1)).toBe('invalid-completion');
+    expect(fixedInvalidReason({...r,result:{...result,selectedEvaluation:score}},1)).toBe('inconsistent-result');
   });
   it('changes exactly one setting and holds the same budget for each ablation',()=>{
     const {name:_name,...base}=CONDITIONS[0];
     const expected=['options.quiescence.maxTacticalDepth','depth','options.moveOrdering'];
     CONDITIONS.slice(1).forEach((c,i)=>{const {name:_changed,...other}=c;expect(changedFields(base,other)).toEqual([expected[i]]);});
+    expect(CONDITIONS[0]).toEqual({name:'baseline',depth:2,options:{
+      moveOrdering:'standard',killerMoves:false,usePreviousIterationPv:false,useTranspositionTable:false,
+      quiescence:{maxTacticalDepth:1,moveOrdering:'original',includeQuietPromotions:false,maxCheckEvasionExtensions:0},
+    }});
     expect(BUDGET).toEqual({nodes:1500,ms:3000});
   });
   it('lists legal captures and recaptures without declaring a sacrifice erroneous',()=>{

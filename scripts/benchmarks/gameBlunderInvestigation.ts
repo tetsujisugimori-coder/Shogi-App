@@ -3,23 +3,65 @@ import type {BoardState} from '../../src/types/shogi';
 import {getLegalActions, type LegalAction} from '../../src/domain/shogi/legalActions';
 import {analyzeAlphaBetaSearch, areLegalActionsEqual, type AlphaBetaSearchOptions} from '../../src/domain/shogi/twoPlyAlphaBetaAi';
 import {SearchDiagnostics} from '../../src/domain/shogi/searchDiagnostics';
-import {stateHash} from './matchJournal';
-import {apply} from './gameBlunderPilot';
+import {stateHash,type JournalRecord} from './matchJournal';
+import {readJournal} from './journalIO';
+import {apply,candidateId,capturedNext} from './gameBlunderPilot';
 import {traceExchange} from './gameBlunderDiagnosis';
 import {fixedOptions} from './gameBlunderFixed';
 
 export const json = (value:unknown) => JSON.stringify(value, (_key,v) =>
   typeof v==='number' && !Number.isFinite(v) ? {nonfinite:String(v)} : v);
 export const BUDGET = {nodes:1500, ms:3000} as const;
+const baselineOptions = fixedOptions(1);
 export const CONDITIONS = [
-  {name:'baseline',depth:2,options:fixedOptions(1)},
-  {name:'q0',depth:2,options:fixedOptions(0)},
-  {name:'depth1',depth:1,options:fixedOptions(1)},
-  // Existing SEE ordering policy also changes capture/promotion priorities.
-  // This is one API setting, not a pure ablation of SEE arithmetic.
-  {name:'see-order',depth:2,options:{...fixedOptions(1),moveOrdering:'static-exchange' as const}},
-] as const;
+  {name:'baseline',depth:2,options:baselineOptions},
+  {name:'q0',depth:2,options:{...baselineOptions,quiescence:{...baselineOptions.quiescence,maxTacticalDepth:0}}},
+  {name:'depth1',depth:1,options:baselineOptions},
+  // Existing SEE ordering also changes capture and promotion priorities.
+  {name:'see-order',depth:2,options:{...baselineOptions,moveOrdering:'static-exchange'}},
+] as const satisfies readonly Condition[];
+export const ROOT_CONDITION = {...CONDITIONS[2],name:'root-depth1'} as const;
+export const CONDITION_CHANGES = ['options.quiescence.maxTacticalDepth','depth','options.moveOrdering'] as const;
 export type Condition = {name:string;depth:number;options:AlphaBetaSearchOptions};
+export type RestoredPosition = {path:string;state:BoardState;positionHash:string;mode:'legacy'|'experimental';move:Extract<JournalRecord,{type:'move'}>};
+
+export function restoreInvestigationPositions(paths:string[],hashes:string[],selection:ReadonlySet<string>) {
+  // Validate the journal chain and replay its moves. The runner separately
+  // audits the historical search payloads when it creates the experiment.
+  const candidates=new Map<string,RestoredPosition>();
+  for(const [i,path] of paths.entries()) {
+    const journal=readJournal(path);
+    assert.equal(journal.hash,hashes[i],'journal hash mismatch: '+path);
+    assert.equal(journal.error,null,'journal chain invalid: '+path);
+    assert.equal(journal.partialTailBytes,0,'journal tail incomplete: '+path);
+    const records=journal.payloads as JournalRecord[];
+    const start=records[0],end=records.at(-1),moves=records.slice(1,-1);
+    assert.ok(start?.type==='start' && end?.type==='end' && ['rule','max_plies'].includes(end.reason),'journal incomplete: '+path);
+    assert.equal(end.plies,moves.length);
+    let state=start.initialState,hash=stateHash(state);
+    for(const [index,move] of moves.entries()) {
+      assert.ok(move.type==='move');
+      assert.equal(move.ply,index+1);
+      assert.equal(move.player,state.turn);
+      assert.equal(move.moveNumber,state.moveNumber);
+      const next=moves[index+1];
+      if(next?.type==='move' && capturedNext(move,next)) {
+        const mode=start.seats[move.player];
+        assert.ok(mode==='legacy'||mode==='experimental');
+        const id=candidateId(hash,move,mode,start.conditions.timeMs);
+        if(!candidates.has(id)) {
+          if(selection.has(id)) assert.equal(stateHash(state),hash,'journal position mismatch: '+id);
+          candidates.set(id,{path,state,positionHash:hash,mode,move});
+        }
+      }
+      state=apply(state,move.action);
+      hash=move.afterHash;
+    }
+    assert.equal(hash,end.finalHash,'journal final state mismatch: '+path);
+  }
+  return candidates;
+}
+
 class Stop extends Error {
   constructor(readonly reason:'node-limit'|'deadline') {super(reason);}
 }
@@ -62,7 +104,7 @@ export function runFixed(state:BoardState, saved:LegalAction|null, mode:'legacy'
     status=e instanceof Stop?'interrupted':'error'; reason=e instanceof Stop?e.reason:String(e); result=null;
   } finally {assert.equal(stateHash(state),before,'input state mutated');}
   const searchMs=clock()-searchAt;
-  return {status,reason,requestedDepth:condition.depth,completedDepth:result?.depth??0,
+  return {positionHash:before,status,reason,requestedDepth:condition.depth,completedDepth:result?.depth??0,
     validity:result && Number.isFinite(result.selectedEvaluation) ? 'finite-completed' : 'unusable',
     rootLegalCount:legal.length,candidateCount:action?1:legal.length,action:action??null,
     nodes,lastEvent,elapsedMs:clock()-began,legalMs,candidateMs,preparationMs,searchMs,
@@ -74,15 +116,36 @@ export function repeatKey(r:FixedObservation) {
     score:r.result?.selectedEvaluation??null,pv:r.result?.principalVariation??null,
     completedDepth:r.completedDepth,nodes:r.nodes});
 }
+export function fixedInvalidReason(row:FixedObservation, expectedDepth:number):string|null {
+  if (row.status!=='completed') {
+    if(typeof row.status!=='string'||!row.status) return 'invalid-status';
+    return row.reason ? row.status+': '+row.reason : row.status;
+  }
+  if (row.requestedDepth!==expectedDepth || row.completedDepth!==expectedDepth || row.result?.depth!==expectedDepth)
+    return 'depth-mismatch';
+  const score=row.result.selectedEvaluation;
+  if (typeof score!=='number' || !Number.isFinite(score)) return 'non-finite-evaluation';
+  if (row.validity!=='finite-completed') return 'invalid-completion';
+  const result=row.result;
+  if(![result.visitedPositionCount,result.quiescenceVisitedPositionCount,result.quiescenceLeafCount]
+      .every(n=>Number.isInteger(n)&&n>=0) ||
+      row.nodes.normal!==result.visitedPositionCount ||
+      row.nodes.quiescence!==result.quiescenceVisitedPositionCount+result.quiescenceLeafCount)
+    return 'inconsistent-node-counts';
+  if (row.reason!==null || row.result.evaluationBreakdown?.total!==score) return 'inconsistent-result';
+  const selected=row.result.selectedAction, pv=row.result.principalVariation;
+  if (!selected || !Array.isArray(pv) || !pv[0] || !areLegalActionsEqual(selected,pv[0]) ||
+      (row.action && !areLegalActionsEqual(selected,row.action))) return 'inconsistent-action-or-pv';
+  return null;
+}
+
 /** Both roots are the original mover; unlike paired child searches, no sign flip. */
 export function compareFixed(a:FixedObservation,b:FixedObservation, threshold=300) {
   assert.ok(Number.isFinite(threshold) && threshold>=0);
-  const valid=(x:FixedObservation)=>x.status==='completed' && x.validity==='finite-completed' &&
-    x.result!==null && typeof x.result.selectedEvaluation==='number' && Number.isFinite(x.result.selectedEvaluation) &&
-    x.completedDepth===x.requestedDepth && x.result.depth===x.completedDepth;
-  if (!valid(a)||!valid(b)||a.completedDepth!==b.completedDepth)
+  if (fixedInvalidReason(a,a.requestedDepth)||fixedInvalidReason(b,b.requestedDepth)||a.completedDepth!==b.completedDepth)
     return {verdict:'INDETERMINATE',delta:null,reason:'Interrupted, non-finite, invalid or unequal-depth pair.'} as const;
   const delta=b.result!.selectedEvaluation!-a.result!.selectedEvaluation!;
+  if (!Number.isFinite(delta)) return {verdict:'INDETERMINATE',delta:null,reason:'Non-finite evaluation difference.'} as const;
   return {verdict:delta>=threshold?'SUSPECTED':'NOT_CONFIRMED',delta,
     reason:'Finite bounded preference from original mover perspective; no proof of a blunder.'} as const;
 }
