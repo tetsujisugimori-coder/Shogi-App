@@ -127,9 +127,13 @@ export function fixedInvalidReason(row:FixedObservation, expectedDepth:number):s
   if (typeof score!=='number' || !Number.isFinite(score)) return 'non-finite-evaluation';
   if (row.validity!=='finite-completed') return 'invalid-completion';
   const result=row.result;
-  if(![result.visitedPositionCount,result.quiescenceVisitedPositionCount,result.quiescenceLeafCount]
-      .every(n=>Number.isInteger(n)&&n>=0) ||
-      row.nodes.normal!==result.visitedPositionCount ||
+  const counters=[result.rootLegalActionCount,result.visitedPositionCount,result.quiescenceVisitedPositionCount,
+    result.quiescenceLeafCount,result.cutoffCount,result.skippedActionCount,
+    result.quiescenceCutoffCount,result.quiescenceSkippedActionCount];
+  if(!counters.every(n=>Number.isInteger(n)&&n>=0) ||
+      typeof result.elapsedMilliseconds!=='number'||!Number.isFinite(result.elapsedMilliseconds)||result.elapsedMilliseconds<0)
+    return 'invalid-result-statistics';
+  if(row.nodes.normal!==result.visitedPositionCount ||
       row.nodes.quiescence!==result.quiescenceVisitedPositionCount+result.quiescenceLeafCount)
     return 'inconsistent-node-counts';
   if (row.reason!==null || row.result.evaluationBreakdown?.total!==score) return 'inconsistent-result';

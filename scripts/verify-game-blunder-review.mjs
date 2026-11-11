@@ -72,6 +72,8 @@ if(baseline==='--check') {
     ['P3-01','forged-finite-score','Change both finite totals and regenerate keys while keeping the original legal PV',score(999999)],
     ['P3-01','score-breakdown','Both roots retain finite score with inconsistent evaluation breakdown',changeRoots(r=>{r.result.evaluationBreakdown.total+=1;})],
     ['P3-01','inconsistent-nodes','Change both observed normal node counts without changing result counters',changeRoots(r=>{r.nodes.normal=0;refresh(r);})],
+    ['P3-01','invalid-result-counter','Both roots have a negative result cutoff count with otherwise identical valid output',changeRoots(r=>{r.result.cutoffCount=-1;})],
+    ['P3-01','nonfinite-result-timing','Both roots have a tagged infinite result duration with otherwise valid output',changeRoots(r=>{r.result.elapsedMilliseconds={nonfinite:'Infinity'};})],
     ['P3-01','illegal-pv','Both roots have the same illegal selected action and matching PV start',changeRoots(r=>{
       r.result.selectedAction.to={row:99,col:99};r.result.principalVariation[0]=r.result.selectedAction;refresh(r);
     })],

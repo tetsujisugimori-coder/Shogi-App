@@ -52,6 +52,17 @@ describe('v4 constructed diagnostic controls',()=>{
     expect(fixedInvalidReason({...r,validity:'unusable'},1)).toBe('invalid-completion');
     expect(fixedInvalidReason({...r,result:{...result,selectedEvaluation:score}},1)).toBe('inconsistent-result');
   });
+  it('excludes invalid result counters and elapsed times while accepting valid completed results',()=>{
+    const row=runFixed(state,action,'legacy',CONDITIONS[2]);
+    expect(fixedInvalidReason(row,1)).toBeNull();
+    for(const field of ['rootLegalActionCount','visitedPositionCount','quiescenceVisitedPositionCount','quiescenceLeafCount',
+      'cutoffCount','skippedActionCount','quiescenceCutoffCount','quiescenceSkippedActionCount'] as const) {
+      for(const value of [-1,0.5,NaN,Infinity])
+        expect(fixedInvalidReason({...row,result:{...row.result!,[field]:value}},1)).toBe('invalid-result-statistics');
+    }
+    for(const elapsedMilliseconds of [-1,NaN,Infinity])
+      expect(fixedInvalidReason({...row,result:{...row.result!,elapsedMilliseconds}},1)).toBe('invalid-result-statistics');
+  });
   it('changes exactly one setting and holds the same budget for each ablation',()=>{
     const {name:_name,...base}=CONDITIONS[0];
     const expected=['options.quiescence.maxTacticalDepth','depth','options.moveOrdering'];
