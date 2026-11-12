@@ -1,0 +1,32 @@
+{
+  "created": "2026-11-12T09:39:07.3541163+09:00",
+  "order": [
+    "old",
+    "new",
+    "new",
+    "old",
+    "new",
+    "old",
+    "old",
+    "new"
+  ],
+  "sampling": [
+    1,
+    2,
+    5,
+    6
+  ],
+  "control": [
+    3,
+    4,
+    7,
+    8
+  ],
+  "reason": "Prior eight processes terminated at startup (130 / 0xC000013A); no completed test results. Start-Process -NoNewWindow passed a short test and JSON output smoke test.",
+  "caveats": [
+    "All runs use Vitest JSON reporter; controls omit only external sampling.",
+    "Sampling assignment is confounded with order.",
+    "Prior aborted attempts and old-only smoke tests may warm caches differently.",
+    "Copied dependency trees not yet hash-verified."
+  ]
+}

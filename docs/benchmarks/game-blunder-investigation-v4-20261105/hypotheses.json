@@ -1,0 +1,55 @@
+{
+  "schema": 1,
+  "interpretation": "Support means the stated bounded-search hypothesis only; historical move causality and playing-strength improvement remain UNKNOWN.",
+  "items": [
+    {
+      "factor": "quiescence depth",
+      "hypothesis": "Changing only tactical depth changes the same paired finite evaluations.",
+      "experimentStatus": "VALID",
+      "support": "SUPPORTED_WITHIN_TESTED_CONDITIONS",
+      "positionsWithObservedEffect": 4,
+      "historicalMoveCause": "UNKNOWN"
+    },
+    {
+      "factor": "ordinary depth",
+      "hypothesis": "Finite preference depends on normal depth.",
+      "experimentStatus": "VALID",
+      "support": "SUPPORTED_WITHIN_TESTED_CONDITIONS",
+      "positionsWithObservedEffect": 4,
+      "historicalMoveCause": "UNKNOWN"
+    },
+    {
+      "factor": "existing SEE ordering policy",
+      "hypothesis": "Enabling existing SEE policy changes finite value or PV at depth2/q1.",
+      "experimentStatus": "VALID_FOR_POLICY_COMPARISON",
+      "support": "NO_OBSERVED_VALUE_OR_PV_CHANGE",
+      "positionsWithObservedEffect": 0,
+      "historicalMoveCause": "NOT_APPLICABLE_TO_ORIGINAL_STANDARD_PATH",
+      "limitation": "Policy also changes capture/promotion priority. Some node counts change; not a pure SEE arithmetic isolation."
+    },
+    {
+      "factor": "pure SEE arithmetic",
+      "experimentStatus": "NOT_RUN",
+      "support": "UNKNOWN",
+      "reason": "No isolated arithmetic switch; original standard policy does not call SEE."
+    },
+    {
+      "factor": "time limit",
+      "experimentStatus": "OBSERVATIONAL_ONLY",
+      "support": "UNKNOWN",
+      "observations": "24/24 next iterations hit deadline; all retained a completed iteration. No paired time-budget ablation."
+    },
+    {
+      "factor": "evaluation coefficients",
+      "experimentStatus": "NOT_RUN",
+      "support": "UNKNOWN"
+    },
+    {
+      "factor": "legal-action/check handling defect",
+      "experimentStatus": "LEGALITY_VALIDATION_ONLY",
+      "support": "INSUFFICIENT_EVIDENCE",
+      "historicalMoveCause": "UNKNOWN"
+    }
+  ],
+  "priority": "NOT_READY"
+}

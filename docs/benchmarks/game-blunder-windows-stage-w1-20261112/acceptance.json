@@ -1,0 +1,13 @@
+{
+  "measurementInfrastructure": "PARTIAL",
+  "causeIsolation": "UNKNOWN",
+  "R8": "UNKNOWN",
+  "mergeRecommended": false,
+  "H1": "UNKNOWN: no target failure reproduced on old HEAD",
+  "H2": "UNKNOWN: no failures in either head; eight trials cannot exclude intermittent regression",
+  "H3": "UNKNOWN: no target failure and worker/GC/paging attribution unavailable",
+  "H4": "UNKNOWN: no target failure and cleanup/timing unavailable",
+  "completedTrials": 8,
+  "abortedPreliminaryLaunches": 8,
+  "limitations": ["host TEMP not captured", "dependency copies not hash verified", "individual test timestamps and worker IDs not measured", "GC, paging and cleanup not measured", "sampling and order confounded", "prior attempts and smoke tests may affect caches", "background diagnostic unit test overlapped experiment at an unknown time"]
+}

@@ -1,0 +1,5178 @@
+{
+  "source": {
+    "sha": "85d856b9bc6b7939977cdb2867f2cff3a84a9025",
+    "filesHash": "3a6f2a9634cf836bf63a85ff3d33bf3de381877d86f4462eede103d209a2158e",
+    "dirty": true
+  },
+  "limits": {
+    "depth": 5,
+    "nodes": 1000,
+    "milliseconds": 1250,
+    "bytes": 1048576
+  },
+  "before": [
+    "25fb004b362046c9f5af978825f4a66f1578b6ab7d17e633ac773f693556422b",
+    "c1ee4522e95c6fe95fa69be3969137656155b8835b1a59a526e43480196d2c6f",
+    "64df4641977cb4955013371283179ad1097c92669d0ff55dd831ed1b3e0cabb3",
+    "9f6e932e75a023c925cafd64bf2c52b53d5fcbe3b562b13cf52feaed7000270b"
+  ],
+  "after": [
+    "25fb004b362046c9f5af978825f4a66f1578b6ab7d17e633ac773f693556422b",
+    "c1ee4522e95c6fe95fa69be3969137656155b8835b1a59a526e43480196d2c6f",
+    "64df4641977cb4955013371283179ad1097c92669d0ff55dd831ed1b3e0cabb3",
+    "9f6e932e75a023c925cafd64bf2c52b53d5fcbe3b562b13cf52feaed7000270b"
+  ],
+  "observations": [
+    {
+      "journal": "docs/benchmarks/match-journal-20261026/run1/hirate-1.jsonl",
+      "ply": 9,
+      "positionId": "af1984db62af0f44b80c676627e2a7879d3af226d65288f0f4863ff554f049e3/{\"from\":{\"col\":1,\"row\":6},\"kind\":\"move\",\"pieceType\":\"pawn\",\"player\":\"sente\",\"promotion\":\"none\",\"to\":{\"col\":1,\"row\":5}}/legacy/1000",
+      "kind": "actual",
+      "candidate": {
+        "kind": "move",
+        "player": "sente",
+        "from": {
+          "row": 6,
+          "col": 1
+        },
+        "to": {
+          "row": 5,
+          "col": 1
+        },
+        "pieceType": "pawn",
+        "promotion": "none"
+      },
+      "requestHash": "1d6e218831116e634af3e4222a7a1e1071bf3c67caea77407be0162bda066c01",
+      "result": {
+        "status": "unknown",
+        "certificate": null,
+        "nodes": 188,
+        "stops": {
+          "depth": 179,
+          "time": 1
+        },
+        "finished": "incomplete",
+        "error": null,
+        "frontier": [
+          {
+            "reason": "depth",
+            "stateHash": "46394d621e8eca33efd2632f3287df1a4a79759b43077169c42d81767b2b3ff1",
+            "path": [
+              {
+                "kind": "move",
+                "player": "sente",
+                "from": {
+                  "row": 6,
+                  "col": 1
+                },
+                "to": {
+                  "row": 5,
+                  "col": 1
+                },
+                "pieceType": "pawn",
+                "promotion": "none"
+              },
+              {
+                "kind": "move",
+                "player": "gote",
+                "from": {
+                  "row": 0,
+                  "col": 0
+                },
+                "to": {
+                  "row": 1,
+                  "col": 0
+                },
+                "pieceType": "lance",
+                "promotion": "none"
+              },
+              {
+                "kind": "move",
+                "player": "sente",
+                "from": {
+                  "row": 4,
+                  "col": 5
+                },
+                "to": {
+                  "row": 3,
+                  "col": 4
+                },
+                "pieceType": "bishop",
+                "promotion": "none"
+              },
+              {
+                "kind": "move",
+                "player": "gote",
+                "from": {
+                  "row": 0,
+                  "col": 2
+                },
+                "to": {
+                  "row": 1,
+                  "col": 2
+                },
+                "pieceType": "silver",
+                "promotion": "none"
+              },
+              {
+                "kind": "move",
+                "player": "sente",
+                "from": {
+                  "row": 3,
+                  "col": 4
+                },
+                "to": {
+                  "row": 2,
+                  "col": 3
+                },
+                "pieceType": "bishop",
+                "promotion": "decline"
+              }
+            ]
+          },
+          {
+            "reason": "depth",
+            "stateHash": "afc657f7ec80a89dee3c50af89d85af3973f7eb85faf6e92b5260bed6b7741ac",
+            "path": [
+              {
+                "kind": "move",
+                "player": "sente",
+                "from": {
+                  "row": 6,
+                  "col": 1
+                },
+                "to": {
+                  "row": 5,
+                  "col": 1
+                },
+                "pieceType": "pawn",
+                "promotion": "none"
+              },
+              {
+                "kind": "move",
+                "player": "gote",
+                "from": {
+                  "row": 0,
+                  "col": 0
+                },
+                "to": {
+                  "row": 1,
+                  "col": 0
+                },
+                "pieceType": "lance",
+                "promotion": "none"
+              },
+              {
+                "kind": "move",
+                "player": "sente",
+                "from": {
+                  "row": 4,
+                  "col": 5
+                },
+                "to": {
+                  "row": 3,
+                  "col": 4
+                },
+                "pieceType": "bishop",
+                "promotion": "none"
+              },
+              {
+                "kind": "move",
+                "player": "gote",
+                "from": {
+                  "row": 0,
+                  "col": 2
+                },
+                "to": {
+                  "row": 1,
+                  "col": 2
+                },
+                "pieceType": "silver",
+                "promotion": "none"
+              },
+              {
+                "kind": "move",
+                "player": "sente",
+                "from": {
+                  "row": 3,
+                  "col": 4
+                },
+                "to": {
+                  "row": 2,
+                  "col": 3
+                },
+                "pieceType": "bishop",
+                "promotion": "promote"
+              }
+            ]
+          },
+          {
+            "reason": "depth",
+            "stateHash": "a900ae70eb648cd6de698a3ac5b220d6847f2ab10fb84911af15c8aeb1dce8a5",
+            "path": [
+              {
+                "kind": "move",
+                "player": "sente",
+                "from": {
+                  "row": 6,
+                  "col": 1
+                },
+                "to": {
+                  "row": 5,
+                  "col": 1
+                },
+                "pieceType": "pawn",
+                "promotion": "none"
+              },
+              {
+                "kind": "move",
+                "player": "gote",
+                "from": {
+                  "row": 0,
+                  "col": 0
+                },
+                "to": {
+                  "row": 1,
+                  "col": 0
+                },
+                "pieceType": "lance",
+                "promotion": "none"
+              },
+              {
+                "kind": "move",
+                "player": "sente",
+                "from": {
+                  "row": 4,
+                  "col": 5
+                },
+                "to": {
+                  "row": 3,
+                  "col": 4
+                },
+                "pieceType": "bishop",
+                "promotion": "none"
+              },
+              {
+                "kind": "move",
+                "player": "gote",
+                "from": {
+                  "row": 0,
+                  "col": 2
+                },
+                "to": {
+                  "row": 1,
+                  "col": 2
+                },
+                "pieceType": "silver",
+                "promotion": "none"
+              },
+              {
+                "kind": "move",
+                "player": "sente",
+                "from": {
+                  "row": 3,
+                  "col": 4
+                },
+                "to": {
+                  "row": 2,
+                  "col": 5
+                },
+                "pieceType": "bishop",
+                "promotion": "decline"
+              }
+            ]
+          },
+          {
+            "reason": "depth",
+            "stateHash": "4a0679abc242cafb175a681b8304307bc88182d7eb969f33b8267d7e595bcc42",
+            "path": [
+              {
+                "kind": "move",
+                "player": "sente",
+                "from": {
+                  "row": 6,
+                  "col": 1
+                },
+                "to": {
+                  "row": 5,
+                  "col": 1
+                },
+                "pieceType": "pawn",
+                "promotion": "none"
+              },
+              {
+                "kind": "move",
+                "player": "gote",
+                "from": {
+                  "row": 0,
+                  "col": 0
+                },
+                "to": {
+                  "row": 1,
+                  "col": 0
+                },
+                "pieceType": "lance",
+                "promotion": "none"
+              },
+              {
+                "kind": "move",
+                "player": "sente",
+                "from": {
+                  "row": 4,
+                  "col": 5
+                },
+                "to": {
+                  "row": 3,
+                  "col": 4
+                },
+                "pieceType": "bishop",
+                "promotion": "none"
+              },
+              {
+                "kind": "move",
+                "player": "gote",
+                "from": {
+                  "row": 0,
+                  "col": 2
+                },
+                "to": {
+                  "row": 1,
+                  "col": 2
+                },
+                "pieceType": "silver",
+                "promotion": "none"
+              },
+              {
+                "kind": "move",
+                "player": "sente",
+                "from": {
+                  "row": 3,
+                  "col": 4
+                },
+                "to": {
+                  "row": 2,
+                  "col": 5
+                },
+                "pieceType": "bishop",
+                "promotion": "promote"
+              }
+            ]
+          },
+          {
+            "reason": "depth",
+            "stateHash": "6fe25e55041235e27f4d4b6d57d280f2d68ed7400e187c2e9deb26e11776ee80",
+            "path": [
+              {
+                "kind": "move",
+                "player": "sente",
+                "from": {
+                  "row": 6,
+                  "col": 1
+                },
+                "to": {
+                  "row": 5,
+                  "col": 1
+                },
+                "pieceType": "pawn",
+                "promotion": "none"
+              },
+              {
+                "kind": "move",
+                "player": "gote",
+                "from": {
+                  "row": 0,
+                  "col": 0
+                },
+                "to": {
+                  "row": 1,
+                  "col": 0
+                },
+                "pieceType": "lance",
+                "promotion": "none"
+              },
+              {
+                "kind": "move",
+                "player": "sente",
+                "from": {
+                  "row": 4,
+                  "col": 5
+                },
+                "to": {
+                  "row": 3,
+                  "col": 4
+                },
+                "pieceType": "bishop",
+                "promotion": "none"
+              },
+              {
+                "kind": "move",
+                "player": "gote",
+                "from": {
+                  "row": 0,
+                  "col": 2
+                },
+                "to": {
+                  "row": 1,
+                  "col": 2
+                },
+                "pieceType": "silver",
+                "promotion": "none"
+              },
+              {
+                "kind": "move",
+                "player": "sente",
+                "from": {
+                  "row": 3,
+                  "col": 4
+                },
+                "to": {
+                  "row": 4,
+                  "col": 3
+                },
+                "pieceType": "bishop",
+                "promotion": "none"
+              }
+            ]
+          },
+          {
+            "reason": "depth",
+            "stateHash": "c320dd464aa472ab86a34d24ec1fbf8dfe967cda509c0777e31eb58a6ec6c2b9",
+            "path": [
+              {
+                "kind": "move",
+                "player": "sente",
+                "from": {
+                  "row": 6,
+                  "col": 1
+                },
+                "to": {
+                  "row": 5,
+                  "col": 1
+                },
+                "pieceType": "pawn",
+                "promotion": "none"
+              },
+              {
+                "kind": "move",
+                "player": "gote",
+                "from": {
+                  "row": 0,
+                  "col": 0
+                },
+                "to": {
+                  "row": 1,
+                  "col": 0
+                },
+                "pieceType": "lance",
+                "promotion": "none"
+              },
+              {
+                "kind": "move",
+                "player": "sente",
+                "from": {
+                  "row": 4,
+                  "col": 5
+                },
+                "to": {
+                  "row": 3,
+                  "col": 4
+                },
+                "pieceType": "bishop",
+                "promotion": "none"
+              },
+              {
+                "kind": "move",
+                "player": "gote",
+                "from": {
+                  "row": 0,
+                  "col": 2
+                },
+                "to": {
+                  "row": 1,
+                  "col": 2
+                },
+                "pieceType": "silver",
+                "promotion": "none"
+              },
+              {
+                "kind": "move",
+                "player": "sente",
+                "from": {
+                  "row": 3,
+                  "col": 4
+                },
+                "to": {
+                  "row": 4,
+                  "col": 5
+                },
+                "pieceType": "bishop",
+                "promotion": "none"
+              }
+            ]
+          },
+          {
+            "reason": "depth",
+            "stateHash": "1e567f53b3dc714a34519087307e75e7d17c3b358734df9b22333003163b2761",
+            "path": [
+              {
+                "kind": "move",
+                "player": "sente",
+                "from": {
+                  "row": 6,
+                  "col": 1
+                },
+                "to": {
+                  "row": 5,
+                  "col": 1
+                },
+                "pieceType": "pawn",
+                "promotion": "none"
+              },
+              {
+                "kind": "move",
+                "player": "gote",
+                "from": {
+                  "row": 0,
+                  "col": 0
+                },
+                "to": {
+                  "row": 1,
+                  "col": 0
+                },
+                "pieceType": "lance",
+                "promotion": "none"
+              },
+              {
+                "kind": "move",
+                "player": "sente",
+                "from": {
+                  "row": 4,
+                  "col": 5
+                },
+                "to": {
+                  "row": 3,
+                  "col": 4
+                },
+                "pieceType": "bishop",
+                "promotion": "none"
+              },
+              {
+                "kind": "move",
+                "player": "gote",
+                "from": {
+                  "row": 0,
+                  "col": 2
+                },
+                "to": {
+                  "row": 1,
+                  "col": 2
+                },
+                "pieceType": "silver",
+                "promotion": "none"
+              },
+              {
+                "kind": "move",
+                "player": "sente",
+                "from": {
+                  "row": 3,
+                  "col": 4
+                },
+                "to": {
+                  "row": 5,
+                  "col": 6
+                },
+                "pieceType": "bishop",
+                "promotion": "none"
+              }
+            ]
+          },
+          {
+            "reason": "time",
+            "stateHash": "d98cd3b4c97511261117a94ec3fae3da630c9e26c75954ca848eda71906cfba0",
+            "path": [
+              {
+                "kind": "move",
+                "player": "sente",
+                "from": {
+                  "row": 6,
+                  "col": 1
+                },
+                "to": {
+                  "row": 5,
+                  "col": 1
+                },
+                "pieceType": "pawn",
+                "promotion": "none"
+              },
+              {
+                "kind": "move",
+                "player": "gote",
+                "from": {
+                  "row": 0,
+                  "col": 0
+                },
+                "to": {
+                  "row": 1,
+                  "col": 0
+                },
+                "pieceType": "lance",
+                "promotion": "none"
+              },
+              {
+                "kind": "move",
+                "player": "sente",
+                "from": {
+                  "row": 4,
+                  "col": 5
+                },
+                "to": {
+                  "row": 3,
+                  "col": 4
+                },
+                "pieceType": "bishop",
+                "promotion": "none"
+              },
+              {
+                "kind": "move",
+                "player": "gote",
+                "from": {
+                  "row": 0,
+                  "col": 4
+                },
+                "to": {
+                  "row": 1,
+                  "col": 3
+                },
+                "pieceType": "king",
+                "promotion": "none"
+              },
+              {
+                "kind": "move",
+                "player": "sente",
+                "from": {
+                  "row": 3,
+                  "col": 4
+                },
+                "to": {
+                  "row": 4,
+                  "col": 3
+                },
+                "pieceType": "bishop",
+                "promotion": "none"
+              }
+            ]
+          }
+        ],
+        "frontierOmitted": 172
+      },
+      "verification": null,
+      "elapsedMs": 1275.4062000000013
+    },
+    {
+      "journal": "docs/benchmarks/match-journal-20261026/run1/hirate-1.jsonl",
+      "ply": 9,
+      "positionId": "af1984db62af0f44b80c676627e2a7879d3af226d65288f0f4863ff554f049e3/{\"from\":{\"col\":1,\"row\":6},\"kind\":\"move\",\"pieceType\":\"pawn\",\"player\":\"sente\",\"promotion\":\"none\",\"to\":{\"col\":1,\"row\":5}}/legacy/1000",
+      "kind": "alternative",
+      "candidate": {
+        "kind": "move",
+        "player": "sente",
+        "from": {
+          "row": 4,
+          "col": 5
+        },
+        "to": {
+          "row": 3,
+          "col": 4
+        },
+        "pieceType": "bishop",
+        "promotion": "none"
+      },
+      "requestHash": "7a89ff58f767d94e4ff08d10141eb180af91e676aa1af539039af40e6ed8fb68",
+      "result": {
+        "status": "unknown",
+        "certificate": null,
+        "nodes": 203,
+        "stops": {
+          "depth": 195,
+          "time": 1
+        },
+        "finished": "incomplete",
+        "error": null,
+        "frontier": [
+          {
+            "reason": "depth",
+            "stateHash": "fc22b32202b9aa8e36d49c5adfa129cd8ba2ea060049d15c752914dc07acce52",
+            "path": [
+              {
+                "kind": "move",
+                "player": "sente",
+                "from": {
+                  "row": 4,
+                  "col": 5
+                },
+                "to": {
+                  "row": 3,
+                  "col": 4
+                },
+                "pieceType": "bishop",
+                "promotion": "none"
+              },
+              {
+                "kind": "move",
+                "player": "gote",
+                "from": {
+                  "row": 0,
+                  "col": 0
+                },
+                "to": {
+                  "row": 1,
+                  "col": 0
+                },
+                "pieceType": "lance",
+                "promotion": "none"
+              },
+              {
+                "kind": "move",
+                "player": "sente",
+                "from": {
+                  "row": 3,
+                  "col": 4
+                },
+                "to": {
+                  "row": 2,
+                  "col": 3
+                },
+                "pieceType": "bishop",
+                "promotion": "decline"
+              },
+              {
+                "kind": "move",
+                "player": "gote",
+                "from": {
+                  "row": 0,
+                  "col": 2
+                },
+                "to": {
+                  "row": 1,
+                  "col": 2
+                },
+                "pieceType": "silver",
+                "promotion": "none"
+              },
+              {
+                "kind": "move",
+                "player": "sente",
+                "from": {
+                  "row": 2,
+                  "col": 3
+                },
+                "to": {
+                  "row": 0,
+                  "col": 5
+                },
+                "pieceType": "bishop",
+                "promotion": "decline"
+              }
+            ]
+          },
+          {
+            "reason": "depth",
+            "stateHash": "0dfdbb4e24fe14846ad1574e1aff4d121a39c37b28757602137576034e10848f",
+            "path": [
+              {
+                "kind": "move",
+                "player": "sente",
+                "from": {
+                  "row": 4,
+                  "col": 5
+                },
+                "to": {
+                  "row": 3,
+                  "col": 4
+                },
+                "pieceType": "bishop",
+                "promotion": "none"
+              },
+              {
+                "kind": "move",
+                "player": "gote",
+                "from": {
+                  "row": 0,
+                  "col": 0
+                },
+                "to": {
+                  "row": 1,
+                  "col": 0
+                },
+                "pieceType": "lance",
+                "promotion": "none"
+              },
+              {
+                "kind": "move",
+                "player": "sente",
+                "from": {
+                  "row": 3,
+                  "col": 4
+                },
+                "to": {
+                  "row": 2,
+                  "col": 3
+                },
+                "pieceType": "bishop",
+                "promotion": "decline"
+              },
+              {
+                "kind": "move",
+                "player": "gote",
+                "from": {
+                  "row": 0,
+                  "col": 2
+                },
+                "to": {
+                  "row": 1,
+                  "col": 2
+                },
+                "pieceType": "silver",
+                "promotion": "none"
+              },
+              {
+                "kind": "move",
+                "player": "sente",
+                "from": {
+                  "row": 2,
+                  "col": 3
+                },
+                "to": {
+                  "row": 0,
+                  "col": 5
+                },
+                "pieceType": "bishop",
+                "promotion": "promote"
+              }
+            ]
+          },
+          {
+            "reason": "depth",
+            "stateHash": "e0654bd8b3744ace2169e15bdc9861cc404a94547f9f1d6158bc52ba072f6bfe",
+            "path": [
+              {
+                "kind": "move",
+                "player": "sente",
+                "from": {
+                  "row": 4,
+                  "col": 5
+                },
+                "to": {
+                  "row": 3,
+                  "col": 4
+                },
+                "pieceType": "bishop",
+                "promotion": "none"
+              },
+              {
+                "kind": "move",
+                "player": "gote",
+                "from": {
+                  "row": 0,
+                  "col": 0
+                },
+                "to": {
+                  "row": 1,
+                  "col": 0
+                },
+                "pieceType": "lance",
+                "promotion": "none"
+              },
+              {
+                "kind": "move",
+                "player": "sente",
+                "from": {
+                  "row": 3,
+                  "col": 4
+                },
+                "to": {
+                  "row": 2,
+                  "col": 3
+                },
+                "pieceType": "bishop",
+                "promotion": "decline"
+              },
+              {
+                "kind": "move",
+                "player": "gote",
+                "from": {
+                  "row": 0,
+                  "col": 2
+                },
+                "to": {
+                  "row": 1,
+                  "col": 2
+                },
+                "pieceType": "silver",
+                "promotion": "none"
+              },
+              {
+                "kind": "move",
+                "player": "sente",
+                "from": {
+                  "row": 2,
+                  "col": 3
+                },
+                "to": {
+                  "row": 1,
+                  "col": 2
+                },
+                "pieceType": "bishop",
+                "promotion": "decline"
+              }
+            ]
+          },
+          {
+            "reason": "depth",
+            "stateHash": "7219980ff53154c9bf5012caab3b9ce7d84057a5537df3d014e5af3c80ddec51",
+            "path": [
+              {
+                "kind": "move",
+                "player": "sente",
+                "from": {
+                  "row": 4,
+                  "col": 5
+                },
+                "to": {
+                  "row": 3,
+                  "col": 4
+                },
+                "pieceType": "bishop",
+                "promotion": "none"
+              },
+              {
+                "kind": "move",
+                "player": "gote",
+                "from": {
+                  "row": 0,
+                  "col": 0
+                },
+                "to": {
+                  "row": 1,
+                  "col": 0
+                },
+                "pieceType": "lance",
+                "promotion": "none"
+              },
+              {
+                "kind": "move",
+                "player": "sente",
+                "from": {
+                  "row": 3,
+                  "col": 4
+                },
+                "to": {
+                  "row": 2,
+                  "col": 3
+                },
+                "pieceType": "bishop",
+                "promotion": "decline"
+              },
+              {
+                "kind": "move",
+                "player": "gote",
+                "from": {
+                  "row": 0,
+                  "col": 2
+                },
+                "to": {
+                  "row": 1,
+                  "col": 2
+                },
+                "pieceType": "silver",
+                "promotion": "none"
+              },
+              {
+                "kind": "move",
+                "player": "sente",
+                "from": {
+                  "row": 2,
+                  "col": 3
+                },
+                "to": {
+                  "row": 1,
+                  "col": 2
+                },
+                "pieceType": "bishop",
+                "promotion": "promote"
+              }
+            ]
+          },
+          {
+            "reason": "depth",
+            "stateHash": "7da4a47c866233673628d2887d2955ada263b18842521dbea0f694d000fe1bfb",
+            "path": [
+              {
+                "kind": "move",
+                "player": "sente",
+                "from": {
+                  "row": 4,
+                  "col": 5
+                },
+                "to": {
+                  "row": 3,
+                  "col": 4
+                },
+                "pieceType": "bishop",
+                "promotion": "none"
+              },
+              {
+                "kind": "move",
+                "player": "gote",
+                "from": {
+                  "row": 0,
+                  "col": 0
+                },
+                "to": {
+                  "row": 1,
+                  "col": 0
+                },
+                "pieceType": "lance",
+                "promotion": "none"
+              },
+              {
+                "kind": "move",
+                "player": "sente",
+                "from": {
+                  "row": 3,
+                  "col": 4
+                },
+                "to": {
+                  "row": 2,
+                  "col": 3
+                },
+                "pieceType": "bishop",
+                "promotion": "decline"
+              },
+              {
+                "kind": "move",
+                "player": "gote",
+                "from": {
+                  "row": 0,
+                  "col": 2
+                },
+                "to": {
+                  "row": 1,
+                  "col": 2
+                },
+                "pieceType": "silver",
+                "promotion": "none"
+              },
+              {
+                "kind": "move",
+                "player": "sente",
+                "from": {
+                  "row": 2,
+                  "col": 3
+                },
+                "to": {
+                  "row": 1,
+                  "col": 4
+                },
+                "pieceType": "bishop",
+                "promotion": "decline"
+              }
+            ]
+          },
+          {
+            "reason": "depth",
+            "stateHash": "9253dabec16fb1488b4e1dbabe41843869d650ed423013cd7af1d774f2101a75",
+            "path": [
+              {
+                "kind": "move",
+                "player": "sente",
+                "from": {
+                  "row": 4,
+                  "col": 5
+                },
+                "to": {
+                  "row": 3,
+                  "col": 4
+                },
+                "pieceType": "bishop",
+                "promotion": "none"
+              },
+              {
+                "kind": "move",
+                "player": "gote",
+                "from": {
+                  "row": 0,
+                  "col": 0
+                },
+                "to": {
+                  "row": 1,
+                  "col": 0
+                },
+                "pieceType": "lance",
+                "promotion": "none"
+              },
+              {
+                "kind": "move",
+                "player": "sente",
+                "from": {
+                  "row": 3,
+                  "col": 4
+                },
+                "to": {
+                  "row": 2,
+                  "col": 3
+                },
+                "pieceType": "bishop",
+                "promotion": "decline"
+              },
+              {
+                "kind": "move",
+                "player": "gote",
+                "from": {
+                  "row": 0,
+                  "col": 2
+                },
+                "to": {
+                  "row": 1,
+                  "col": 2
+                },
+                "pieceType": "silver",
+                "promotion": "none"
+              },
+              {
+                "kind": "move",
+                "player": "sente",
+                "from": {
+                  "row": 2,
+                  "col": 3
+                },
+                "to": {
+                  "row": 1,
+                  "col": 4
+                },
+                "pieceType": "bishop",
+                "promotion": "promote"
+              }
+            ]
+          },
+          {
+            "reason": "depth",
+            "stateHash": "1d4185e961b616b25edb8102130c069a185af99e37da46d0dc5fd9e46eddc7da",
+            "path": [
+              {
+                "kind": "move",
+                "player": "sente",
+                "from": {
+                  "row": 4,
+                  "col": 5
+                },
+                "to": {
+                  "row": 3,
+                  "col": 4
+                },
+                "pieceType": "bishop",
+                "promotion": "none"
+              },
+              {
+                "kind": "move",
+                "player": "gote",
+                "from": {
+                  "row": 0,
+                  "col": 0
+                },
+                "to": {
+                  "row": 1,
+                  "col": 0
+                },
+                "pieceType": "lance",
+                "promotion": "none"
+              },
+              {
+                "kind": "move",
+                "player": "sente",
+                "from": {
+                  "row": 3,
+                  "col": 4
+                },
+                "to": {
+                  "row": 2,
+                  "col": 3
+                },
+                "pieceType": "bishop",
+                "promotion": "decline"
+              },
+              {
+                "kind": "move",
+                "player": "gote",
+                "from": {
+                  "row": 0,
+                  "col": 2
+                },
+                "to": {
+                  "row": 1,
+                  "col": 2
+                },
+                "pieceType": "silver",
+                "promotion": "none"
+              },
+              {
+                "kind": "move",
+                "player": "sente",
+                "from": {
+                  "row": 2,
+                  "col": 3
+                },
+                "to": {
+                  "row": 3,
+                  "col": 2
+                },
+                "pieceType": "bishop",
+                "promotion": "decline"
+              }
+            ]
+          },
+          {
+            "reason": "time",
+            "stateHash": "865355c4d311bef7921f8176277adb6848c9742ae9851d262b0ac09b663645b4",
+            "path": [
+              {
+                "kind": "move",
+                "player": "sente",
+                "from": {
+                  "row": 4,
+                  "col": 5
+                },
+                "to": {
+                  "row": 3,
+                  "col": 4
+                },
+                "pieceType": "bishop",
+                "promotion": "none"
+              },
+              {
+                "kind": "move",
+                "player": "gote",
+                "from": {
+                  "row": 0,
+                  "col": 0
+                },
+                "to": {
+                  "row": 1,
+                  "col": 0
+                },
+                "pieceType": "lance",
+                "promotion": "none"
+              },
+              {
+                "kind": "move",
+                "player": "sente",
+                "from": {
+                  "row": 3,
+                  "col": 4
+                },
+                "to": {
+                  "row": 2,
+                  "col": 3
+                },
+                "pieceType": "bishop",
+                "promotion": "decline"
+              },
+              {
+                "kind": "move",
+                "player": "gote",
+                "from": {
+                  "row": 0,
+                  "col": 3
+                },
+                "to": {
+                  "row": 1,
+                  "col": 4
+                },
+                "pieceType": "gold",
+                "promotion": "none"
+              },
+              {
+                "kind": "move",
+                "player": "sente",
+                "from": {
+                  "row": 2,
+                  "col": 3
+                },
+                "to": {
+                  "row": 4,
+                  "col": 1
+                },
+                "pieceType": "bishop",
+                "promotion": "promote"
+              }
+            ]
+          }
+        ],
+        "frontierOmitted": 188
+      },
+      "verification": null,
+      "elapsedMs": 1257.895199999999
+    },
+    {
+      "journal": "docs/benchmarks/match-journal-20261026/run1/hirate-1.jsonl",
+      "ply": 20,
+      "positionId": "76b90464a7633a735fd2aafbae9105c89ef732ff1c214b8830ad73e11e12d363/{\"from\":{\"col\":7,\"row\":4},\"kind\":\"move\",\"pieceType\":\"knight\",\"player\":\"gote\",\"promotion\":\"decline\",\"to\":{\"col\":6,\"row\":6}}/experimental/1000",
+      "kind": "actual",
+      "candidate": {
+        "kind": "move",
+        "player": "gote",
+        "from": {
+          "row": 4,
+          "col": 7
+        },
+        "to": {
+          "row": 6,
+          "col": 6
+        },
+        "pieceType": "knight",
+        "promotion": "decline"
+      },
+      "requestHash": "4cf1330202f1410c321838b93ab6b935f0d4ae47da65fda7169ade5b77381165",
+      "result": {
+        "status": "unknown",
+        "certificate": null,
+        "nodes": 103,
+        "stops": {
+          "depth": 98,
+          "time": 1
+        },
+        "finished": "incomplete",
+        "error": null,
+        "frontier": [
+          {
+            "reason": "depth",
+            "stateHash": "165f19e0142aba9684da2c13c7fc7f9d03c9e9b11dc39e899cbe7b3a371d0913",
+            "path": [
+              {
+                "kind": "move",
+                "player": "gote",
+                "from": {
+                  "row": 4,
+                  "col": 7
+                },
+                "to": {
+                  "row": 6,
+                  "col": 6
+                },
+                "pieceType": "knight",
+                "promotion": "decline"
+              },
+              {
+                "kind": "move",
+                "player": "sente",
+                "from": {
+                  "row": 3,
+                  "col": 4
+                },
+                "to": {
+                  "row": 2,
+                  "col": 3
+                },
+                "pieceType": "bishop",
+                "promotion": "decline"
+              },
+              {
+                "kind": "move",
+                "player": "gote",
+                "from": {
+                  "row": 1,
+                  "col": 4
+                },
+                "to": {
+                  "row": 0,
+                  "col": 4
+                },
+                "pieceType": "king",
+                "promotion": "none"
+              },
+              {
+                "kind": "move",
+                "player": "sente",
+                "from": {
+                  "row": 2,
+                  "col": 3
+                },
+                "to": {
+                  "row": 0,
+                  "col": 1
+                },
+                "pieceType": "bishop",
+                "promotion": "decline"
+              },
+              {
+                "kind": "move",
+                "player": "gote",
+                "from": {
+                  "row": 0,
+                  "col": 0
+                },
+                "to": {
+                  "row": 1,
+                  "col": 0
+                },
+                "pieceType": "lance",
+                "promotion": "none"
+              }
+            ]
+          },
+          {
+            "reason": "depth",
+            "stateHash": "f6bfedc21320497444bc983d442a07e3d7b839ce486d9d5071a2e3960c746ddb",
+            "path": [
+              {
+                "kind": "move",
+                "player": "gote",
+                "from": {
+                  "row": 4,
+                  "col": 7
+                },
+                "to": {
+                  "row": 6,
+                  "col": 6
+                },
+                "pieceType": "knight",
+                "promotion": "decline"
+              },
+              {
+                "kind": "move",
+                "player": "sente",
+                "from": {
+                  "row": 3,
+                  "col": 4
+                },
+                "to": {
+                  "row": 2,
+                  "col": 3
+                },
+                "pieceType": "bishop",
+                "promotion": "decline"
+              },
+              {
+                "kind": "move",
+                "player": "gote",
+                "from": {
+                  "row": 1,
+                  "col": 4
+                },
+                "to": {
+                  "row": 0,
+                  "col": 4
+                },
+                "pieceType": "king",
+                "promotion": "none"
+              },
+              {
+                "kind": "move",
+                "player": "sente",
+                "from": {
+                  "row": 2,
+                  "col": 3
+                },
+                "to": {
+                  "row": 0,
+                  "col": 1
+                },
+                "pieceType": "bishop",
+                "promotion": "decline"
+              },
+              {
+                "kind": "move",
+                "player": "gote",
+                "from": {
+                  "row": 0,
+                  "col": 2
+                },
+                "to": {
+                  "row": 1,
+                  "col": 2
+                },
+                "pieceType": "silver",
+                "promotion": "none"
+              }
+            ]
+          },
+          {
+            "reason": "depth",
+            "stateHash": "5a998e43eb3dce9eff2df4cb62406424b669aeb2e7c08e31067c894913cfe2b7",
+            "path": [
+              {
+                "kind": "move",
+                "player": "gote",
+                "from": {
+                  "row": 4,
+                  "col": 7
+                },
+                "to": {
+                  "row": 6,
+                  "col": 6
+                },
+                "pieceType": "knight",
+                "promotion": "decline"
+              },
+              {
+                "kind": "move",
+                "player": "sente",
+                "from": {
+                  "row": 3,
+                  "col": 4
+                },
+                "to": {
+                  "row": 2,
+                  "col": 3
+                },
+                "pieceType": "bishop",
+                "promotion": "decline"
+              },
+              {
+                "kind": "move",
+                "player": "gote",
+                "from": {
+                  "row": 1,
+                  "col": 4
+                },
+                "to": {
+                  "row": 0,
+                  "col": 4
+                },
+                "pieceType": "king",
+                "promotion": "none"
+              },
+              {
+                "kind": "move",
+                "player": "sente",
+                "from": {
+                  "row": 2,
+                  "col": 3
+                },
+                "to": {
+                  "row": 0,
+                  "col": 1
+                },
+                "pieceType": "bishop",
+                "promotion": "decline"
+              },
+              {
+                "kind": "move",
+                "player": "gote",
+                "from": {
+                  "row": 0,
+                  "col": 2
+                },
+                "to": {
+                  "row": 1,
+                  "col": 3
+                },
+                "pieceType": "silver",
+                "promotion": "none"
+              }
+            ]
+          },
+          {
+            "reason": "depth",
+            "stateHash": "825764ddcf06e3037e522c116554976c149c616707833c2a9f105a38d728edfe",
+            "path": [
+              {
+                "kind": "move",
+                "player": "gote",
+                "from": {
+                  "row": 4,
+                  "col": 7
+                },
+                "to": {
+                  "row": 6,
+                  "col": 6
+                },
+                "pieceType": "knight",
+                "promotion": "decline"
+              },
+              {
+                "kind": "move",
+                "player": "sente",
+                "from": {
+                  "row": 3,
+                  "col": 4
+                },
+                "to": {
+                  "row": 2,
+                  "col": 3
+                },
+                "pieceType": "bishop",
+                "promotion": "decline"
+              },
+              {
+                "kind": "move",
+                "player": "gote",
+                "from": {
+                  "row": 1,
+                  "col": 4
+                },
+                "to": {
+                  "row": 0,
+                  "col": 4
+                },
+                "pieceType": "king",
+                "promotion": "none"
+              },
+              {
+                "kind": "move",
+                "player": "sente",
+                "from": {
+                  "row": 2,
+                  "col": 3
+                },
+                "to": {
+                  "row": 0,
+                  "col": 1
+                },
+                "pieceType": "bishop",
+                "promotion": "decline"
+              },
+              {
+                "kind": "move",
+                "player": "gote",
+                "from": {
+                  "row": 0,
+                  "col": 3
+                },
+                "to": {
+                  "row": 1,
+                  "col": 2
+                },
+                "pieceType": "gold",
+                "promotion": "none"
+              }
+            ]
+          },
+          {
+            "reason": "depth",
+            "stateHash": "397197a64110995e9e2fc7ca691fcd5d11b159f579e4923b2d39f82a6543dc8b",
+            "path": [
+              {
+                "kind": "move",
+                "player": "gote",
+                "from": {
+                  "row": 4,
+                  "col": 7
+                },
+                "to": {
+                  "row": 6,
+                  "col": 6
+                },
+                "pieceType": "knight",
+                "promotion": "decline"
+              },
+              {
+                "kind": "move",
+                "player": "sente",
+                "from": {
+                  "row": 3,
+                  "col": 4
+                },
+                "to": {
+                  "row": 2,
+                  "col": 3
+                },
+                "pieceType": "bishop",
+                "promotion": "decline"
+              },
+              {
+                "kind": "move",
+                "player": "gote",
+                "from": {
+                  "row": 1,
+                  "col": 4
+                },
+                "to": {
+                  "row": 0,
+                  "col": 4
+                },
+                "pieceType": "king",
+                "promotion": "none"
+              },
+              {
+                "kind": "move",
+                "player": "sente",
+                "from": {
+                  "row": 2,
+                  "col": 3
+                },
+                "to": {
+                  "row": 0,
+                  "col": 1
+                },
+                "pieceType": "bishop",
+                "promotion": "decline"
+              },
+              {
+                "kind": "move",
+                "player": "gote",
+                "from": {
+                  "row": 0,
+                  "col": 3
+                },
+                "to": {
+                  "row": 1,
+                  "col": 3
+                },
+                "pieceType": "gold",
+                "promotion": "none"
+              }
+            ]
+          },
+          {
+            "reason": "depth",
+            "stateHash": "78a93060424c6d09f6fb42aa65e1d73badc47cde139173d5a1f3543de8692b39",
+            "path": [
+              {
+                "kind": "move",
+                "player": "gote",
+                "from": {
+                  "row": 4,
+                  "col": 7
+                },
+                "to": {
+                  "row": 6,
+                  "col": 6
+                },
+                "pieceType": "knight",
+                "promotion": "decline"
+              },
+              {
+                "kind": "move",
+                "player": "sente",
+                "from": {
+                  "row": 3,
+                  "col": 4
+                },
+                "to": {
+                  "row": 2,
+                  "col": 3
+                },
+                "pieceType": "bishop",
+                "promotion": "decline"
+              },
+              {
+                "kind": "move",
+                "player": "gote",
+                "from": {
+                  "row": 1,
+                  "col": 4
+                },
+                "to": {
+                  "row": 0,
+                  "col": 4
+                },
+                "pieceType": "king",
+                "promotion": "none"
+              },
+              {
+                "kind": "move",
+                "player": "sente",
+                "from": {
+                  "row": 2,
+                  "col": 3
+                },
+                "to": {
+                  "row": 0,
+                  "col": 1
+                },
+                "pieceType": "bishop",
+                "promotion": "decline"
+              },
+              {
+                "kind": "move",
+                "player": "gote",
+                "from": {
+                  "row": 0,
+                  "col": 3
+                },
+                "to": {
+                  "row": 1,
+                  "col": 4
+                },
+                "pieceType": "gold",
+                "promotion": "none"
+              }
+            ]
+          },
+          {
+            "reason": "depth",
+            "stateHash": "87fe5ee039e1b5b554ec6a8033cb7f3f2253b94065f68347b7b24cbb88e0c456",
+            "path": [
+              {
+                "kind": "move",
+                "player": "gote",
+                "from": {
+                  "row": 4,
+                  "col": 7
+                },
+                "to": {
+                  "row": 6,
+                  "col": 6
+                },
+                "pieceType": "knight",
+                "promotion": "decline"
+              },
+              {
+                "kind": "move",
+                "player": "sente",
+                "from": {
+                  "row": 3,
+                  "col": 4
+                },
+                "to": {
+                  "row": 2,
+                  "col": 3
+                },
+                "pieceType": "bishop",
+                "promotion": "decline"
+              },
+              {
+                "kind": "move",
+                "player": "gote",
+                "from": {
+                  "row": 1,
+                  "col": 4
+                },
+                "to": {
+                  "row": 0,
+                  "col": 4
+                },
+                "pieceType": "king",
+                "promotion": "none"
+              },
+              {
+                "kind": "move",
+                "player": "sente",
+                "from": {
+                  "row": 2,
+                  "col": 3
+                },
+                "to": {
+                  "row": 0,
+                  "col": 1
+                },
+                "pieceType": "bishop",
+                "promotion": "decline"
+              },
+              {
+                "kind": "move",
+                "player": "gote",
+                "from": {
+                  "row": 0,
+                  "col": 4
+                },
+                "to": {
+                  "row": 1,
+                  "col": 3
+                },
+                "pieceType": "king",
+                "promotion": "none"
+              }
+            ]
+          },
+          {
+            "reason": "time",
+            "stateHash": "1aff6a9bc8c318ee9334131f066e0eb3c27e0645e68817d94a3353c523093328",
+            "path": [
+              {
+                "kind": "move",
+                "player": "gote",
+                "from": {
+                  "row": 4,
+                  "col": 7
+                },
+                "to": {
+                  "row": 6,
+                  "col": 6
+                },
+                "pieceType": "knight",
+                "promotion": "decline"
+              },
+              {
+                "kind": "move",
+                "player": "sente",
+                "from": {
+                  "row": 3,
+                  "col": 4
+                },
+                "to": {
+                  "row": 2,
+                  "col": 3
+                },
+                "pieceType": "bishop",
+                "promotion": "decline"
+              },
+              {
+                "kind": "move",
+                "player": "gote",
+                "from": {
+                  "row": 1,
+                  "col": 4
+                },
+                "to": {
+                  "row": 0,
+                  "col": 4
+                },
+                "pieceType": "king",
+                "promotion": "none"
+              },
+              {
+                "kind": "move",
+                "player": "sente",
+                "from": {
+                  "row": 2,
+                  "col": 3
+                },
+                "to": {
+                  "row": 0,
+                  "col": 1
+                },
+                "pieceType": "bishop",
+                "promotion": "promote"
+              },
+              {
+                "kind": "drop",
+                "player": "gote",
+                "pieceId": "sente-pawn-3",
+                "pieceType": "pawn",
+                "to": {
+                  "row": 3,
+                  "col": 3
+                },
+                "promotion": "none"
+              }
+            ]
+          }
+        ],
+        "frontierOmitted": 91
+      },
+      "verification": null,
+      "elapsedMs": 1273.9408000000003
+    },
+    {
+      "journal": "docs/benchmarks/match-journal-20261026/run1/hirate-1.jsonl",
+      "ply": 20,
+      "positionId": "76b90464a7633a735fd2aafbae9105c89ef732ff1c214b8830ad73e11e12d363/{\"from\":{\"col\":7,\"row\":4},\"kind\":\"move\",\"pieceType\":\"knight\",\"player\":\"gote\",\"promotion\":\"decline\",\"to\":{\"col\":6,\"row\":6}}/experimental/1000",
+      "kind": "alternative",
+      "candidate": {
+        "kind": "move",
+        "player": "gote",
+        "from": {
+          "row": 1,
+          "col": 4
+        },
+        "to": {
+          "row": 2,
+          "col": 4
+        },
+        "pieceType": "king",
+        "promotion": "none"
+      },
+      "requestHash": "51abbb806e0e3f5548179e58208b39390d004517ac1bf8e4d06563be4e1a75d2",
+      "result": {
+        "status": "unknown",
+        "certificate": null,
+        "nodes": 109,
+        "stops": {
+          "depth": 103,
+          "time": 1
+        },
+        "finished": "incomplete",
+        "error": null,
+        "frontier": [
+          {
+            "reason": "depth",
+            "stateHash": "c87971f69864eeaba5d7b089f87f58f22a7e99c30f0f0eb68d24562e3941e304",
+            "path": [
+              {
+                "kind": "move",
+                "player": "gote",
+                "from": {
+                  "row": 1,
+                  "col": 4
+                },
+                "to": {
+                  "row": 2,
+                  "col": 4
+                },
+                "pieceType": "king",
+                "promotion": "none"
+              },
+              {
+                "kind": "move",
+                "player": "sente",
+                "from": {
+                  "row": 3,
+                  "col": 4
+                },
+                "to": {
+                  "row": 2,
+                  "col": 3
+                },
+                "pieceType": "bishop",
+                "promotion": "decline"
+              },
+              {
+                "kind": "move",
+                "player": "gote",
+                "from": {
+                  "row": 0,
+                  "col": 0
+                },
+                "to": {
+                  "row": 1,
+                  "col": 0
+                },
+                "pieceType": "lance",
+                "promotion": "none"
+              },
+              {
+                "kind": "move",
+                "player": "sente",
+                "from": {
+                  "row": 2,
+                  "col": 3
+                },
+                "to": {
+                  "row": 0,
+                  "col": 1
+                },
+                "pieceType": "bishop",
+                "promotion": "decline"
+              },
+              {
+                "kind": "move",
+                "player": "gote",
+                "from": {
+                  "row": 0,
+                  "col": 2
+                },
+                "to": {
+                  "row": 1,
+                  "col": 2
+                },
+                "pieceType": "silver",
+                "promotion": "none"
+              }
+            ]
+          },
+          {
+            "reason": "depth",
+            "stateHash": "52862315bfc8607955009700e3fa44dceb08414d132508c3e7f6d9beafd35377",
+            "path": [
+              {
+                "kind": "move",
+                "player": "gote",
+                "from": {
+                  "row": 1,
+                  "col": 4
+                },
+                "to": {
+                  "row": 2,
+                  "col": 4
+                },
+                "pieceType": "king",
+                "promotion": "none"
+              },
+              {
+                "kind": "move",
+                "player": "sente",
+                "from": {
+                  "row": 3,
+                  "col": 4
+                },
+                "to": {
+                  "row": 2,
+                  "col": 3
+                },
+                "pieceType": "bishop",
+                "promotion": "decline"
+              },
+              {
+                "kind": "move",
+                "player": "gote",
+                "from": {
+                  "row": 0,
+                  "col": 0
+                },
+                "to": {
+                  "row": 1,
+                  "col": 0
+                },
+                "pieceType": "lance",
+                "promotion": "none"
+              },
+              {
+                "kind": "move",
+                "player": "sente",
+                "from": {
+                  "row": 2,
+                  "col": 3
+                },
+                "to": {
+                  "row": 0,
+                  "col": 1
+                },
+                "pieceType": "bishop",
+                "promotion": "decline"
+              },
+              {
+                "kind": "move",
+                "player": "gote",
+                "from": {
+                  "row": 0,
+                  "col": 2
+                },
+                "to": {
+                  "row": 1,
+                  "col": 3
+                },
+                "pieceType": "silver",
+                "promotion": "none"
+              }
+            ]
+          },
+          {
+            "reason": "depth",
+            "stateHash": "23e6665575519b163caeb25631795eaec7744ab5576198651cf1b3005d44c086",
+            "path": [
+              {
+                "kind": "move",
+                "player": "gote",
+                "from": {
+                  "row": 1,
+                  "col": 4
+                },
+                "to": {
+                  "row": 2,
+                  "col": 4
+                },
+                "pieceType": "king",
+                "promotion": "none"
+              },
+              {
+                "kind": "move",
+                "player": "sente",
+                "from": {
+                  "row": 3,
+                  "col": 4
+                },
+                "to": {
+                  "row": 2,
+                  "col": 3
+                },
+                "pieceType": "bishop",
+                "promotion": "decline"
+              },
+              {
+                "kind": "move",
+                "player": "gote",
+                "from": {
+                  "row": 0,
+                  "col": 0
+                },
+                "to": {
+                  "row": 1,
+                  "col": 0
+                },
+                "pieceType": "lance",
+                "promotion": "none"
+              },
+              {
+                "kind": "move",
+                "player": "sente",
+                "from": {
+                  "row": 2,
+                  "col": 3
+                },
+                "to": {
+                  "row": 0,
+                  "col": 1
+                },
+                "pieceType": "bishop",
+                "promotion": "decline"
+              },
+              {
+                "kind": "move",
+                "player": "gote",
+                "from": {
+                  "row": 0,
+                  "col": 3
+                },
+                "to": {
+                  "row": 0,
+                  "col": 4
+                },
+                "pieceType": "gold",
+                "promotion": "none"
+              }
+            ]
+          },
+          {
+            "reason": "depth",
+            "stateHash": "097658455d79d304d1e8a164cba512c58adb48fe2db8e83cf712d7e4b90ca4d1",
+            "path": [
+              {
+                "kind": "move",
+                "player": "gote",
+                "from": {
+                  "row": 1,
+                  "col": 4
+                },
+                "to": {
+                  "row": 2,
+                  "col": 4
+                },
+                "pieceType": "king",
+                "promotion": "none"
+              },
+              {
+                "kind": "move",
+                "player": "sente",
+                "from": {
+                  "row": 3,
+                  "col": 4
+                },
+                "to": {
+                  "row": 2,
+                  "col": 3
+                },
+                "pieceType": "bishop",
+                "promotion": "decline"
+              },
+              {
+                "kind": "move",
+                "player": "gote",
+                "from": {
+                  "row": 0,
+                  "col": 0
+                },
+                "to": {
+                  "row": 1,
+                  "col": 0
+                },
+                "pieceType": "lance",
+                "promotion": "none"
+              },
+              {
+                "kind": "move",
+                "player": "sente",
+                "from": {
+                  "row": 2,
+                  "col": 3
+                },
+                "to": {
+                  "row": 0,
+                  "col": 1
+                },
+                "pieceType": "bishop",
+                "promotion": "decline"
+              },
+              {
+                "kind": "move",
+                "player": "gote",
+                "from": {
+                  "row": 0,
+                  "col": 3
+                },
+                "to": {
+                  "row": 1,
+                  "col": 2
+                },
+                "pieceType": "gold",
+                "promotion": "none"
+              }
+            ]
+          },
+          {
+            "reason": "depth",
+            "stateHash": "0114445cb2572e43b9ce8d7c0a726e8a47c9425fb72d97ff1f227f66f220a4ac",
+            "path": [
+              {
+                "kind": "move",
+                "player": "gote",
+                "from": {
+                  "row": 1,
+                  "col": 4
+                },
+                "to": {
+                  "row": 2,
+                  "col": 4
+                },
+                "pieceType": "king",
+                "promotion": "none"
+              },
+              {
+                "kind": "move",
+                "player": "sente",
+                "from": {
+                  "row": 3,
+                  "col": 4
+                },
+                "to": {
+                  "row": 2,
+                  "col": 3
+                },
+                "pieceType": "bishop",
+                "promotion": "decline"
+              },
+              {
+                "kind": "move",
+                "player": "gote",
+                "from": {
+                  "row": 0,
+                  "col": 0
+                },
+                "to": {
+                  "row": 1,
+                  "col": 0
+                },
+                "pieceType": "lance",
+                "promotion": "none"
+              },
+              {
+                "kind": "move",
+                "player": "sente",
+                "from": {
+                  "row": 2,
+                  "col": 3
+                },
+                "to": {
+                  "row": 0,
+                  "col": 1
+                },
+                "pieceType": "bishop",
+                "promotion": "decline"
+              },
+              {
+                "kind": "move",
+                "player": "gote",
+                "from": {
+                  "row": 0,
+                  "col": 3
+                },
+                "to": {
+                  "row": 1,
+                  "col": 3
+                },
+                "pieceType": "gold",
+                "promotion": "none"
+              }
+            ]
+          },
+          {
+            "reason": "depth",
+            "stateHash": "5f14e3cb603d05a6e15270eff193978711b61eb8fc130578d98879bbd95f753f",
+            "path": [
+              {
+                "kind": "move",
+                "player": "gote",
+                "from": {
+                  "row": 1,
+                  "col": 4
+                },
+                "to": {
+                  "row": 2,
+                  "col": 4
+                },
+                "pieceType": "king",
+                "promotion": "none"
+              },
+              {
+                "kind": "move",
+                "player": "sente",
+                "from": {
+                  "row": 3,
+                  "col": 4
+                },
+                "to": {
+                  "row": 2,
+                  "col": 3
+                },
+                "pieceType": "bishop",
+                "promotion": "decline"
+              },
+              {
+                "kind": "move",
+                "player": "gote",
+                "from": {
+                  "row": 0,
+                  "col": 0
+                },
+                "to": {
+                  "row": 1,
+                  "col": 0
+                },
+                "pieceType": "lance",
+                "promotion": "none"
+              },
+              {
+                "kind": "move",
+                "player": "sente",
+                "from": {
+                  "row": 2,
+                  "col": 3
+                },
+                "to": {
+                  "row": 0,
+                  "col": 1
+                },
+                "pieceType": "bishop",
+                "promotion": "decline"
+              },
+              {
+                "kind": "move",
+                "player": "gote",
+                "from": {
+                  "row": 0,
+                  "col": 3
+                },
+                "to": {
+                  "row": 1,
+                  "col": 4
+                },
+                "pieceType": "gold",
+                "promotion": "none"
+              }
+            ]
+          },
+          {
+            "reason": "depth",
+            "stateHash": "e56873bd8c14dacfbfe1da093170e249fc688b996dd0face9449e2b6de996e64",
+            "path": [
+              {
+                "kind": "move",
+                "player": "gote",
+                "from": {
+                  "row": 1,
+                  "col": 4
+                },
+                "to": {
+                  "row": 2,
+                  "col": 4
+                },
+                "pieceType": "king",
+                "promotion": "none"
+              },
+              {
+                "kind": "move",
+                "player": "sente",
+                "from": {
+                  "row": 3,
+                  "col": 4
+                },
+                "to": {
+                  "row": 2,
+                  "col": 3
+                },
+                "pieceType": "bishop",
+                "promotion": "decline"
+              },
+              {
+                "kind": "move",
+                "player": "gote",
+                "from": {
+                  "row": 0,
+                  "col": 0
+                },
+                "to": {
+                  "row": 1,
+                  "col": 0
+                },
+                "pieceType": "lance",
+                "promotion": "none"
+              },
+              {
+                "kind": "move",
+                "player": "sente",
+                "from": {
+                  "row": 2,
+                  "col": 3
+                },
+                "to": {
+                  "row": 0,
+                  "col": 1
+                },
+                "pieceType": "bishop",
+                "promotion": "decline"
+              },
+              {
+                "kind": "move",
+                "player": "gote",
+                "from": {
+                  "row": 0,
+                  "col": 5
+                },
+                "to": {
+                  "row": 0,
+                  "col": 4
+                },
+                "pieceType": "gold",
+                "promotion": "none"
+              }
+            ]
+          },
+          {
+            "reason": "time",
+            "stateHash": "278a6d991b68f58c593c6e566099cb8f2d52b5a13107cc3551ca7a455cf28360",
+            "path": [
+              {
+                "kind": "move",
+                "player": "gote",
+                "from": {
+                  "row": 1,
+                  "col": 4
+                },
+                "to": {
+                  "row": 2,
+                  "col": 4
+                },
+                "pieceType": "king",
+                "promotion": "none"
+              },
+              {
+                "kind": "move",
+                "player": "sente",
+                "from": {
+                  "row": 3,
+                  "col": 4
+                },
+                "to": {
+                  "row": 2,
+                  "col": 3
+                },
+                "pieceType": "bishop",
+                "promotion": "decline"
+              },
+              {
+                "kind": "move",
+                "player": "gote",
+                "from": {
+                  "row": 0,
+                  "col": 0
+                },
+                "to": {
+                  "row": 1,
+                  "col": 0
+                },
+                "pieceType": "lance",
+                "promotion": "none"
+              },
+              {
+                "kind": "move",
+                "player": "sente",
+                "from": {
+                  "row": 2,
+                  "col": 3
+                },
+                "to": {
+                  "row": 0,
+                  "col": 5
+                },
+                "pieceType": "bishop",
+                "promotion": "decline"
+              },
+              {
+                "kind": "move",
+                "player": "gote",
+                "from": {
+                  "row": 2,
+                  "col": 4
+                },
+                "to": {
+                  "row": 1,
+                  "col": 3
+                },
+                "pieceType": "king",
+                "promotion": "none"
+              }
+            ]
+          }
+        ],
+        "frontierOmitted": 96
+      },
+      "verification": null,
+      "elapsedMs": 1272.981200000002
+    },
+    {
+      "journal": "docs/benchmarks/match-journal-20261026/run1/hirate-2.jsonl",
+      "ply": 36,
+      "positionId": "e53a261c1976524fb2e6a4a8924464f16b87e61f97469cd82751b884ac5fc1a5/{\"from\":{\"col\":1,\"row\":4},\"kind\":\"move\",\"pieceType\":\"bishop\",\"player\":\"gote\",\"promotion\":\"promote\",\"to\":{\"col\":5,\"row\":8}}/legacy/1000",
+      "kind": "actual",
+      "candidate": {
+        "kind": "move",
+        "player": "gote",
+        "from": {
+          "row": 4,
+          "col": 1
+        },
+        "to": {
+          "row": 8,
+          "col": 5
+        },
+        "pieceType": "bishop",
+        "promotion": "promote"
+      },
+      "requestHash": "dc2aa16e6dc254eb853538603be595a071aa729d631d562f97970770c14b258d",
+      "result": {
+        "status": "unknown",
+        "certificate": null,
+        "nodes": 66,
+        "stops": {
+          "depth": 62,
+          "time": 1
+        },
+        "finished": "incomplete",
+        "error": null,
+        "frontier": [
+          {
+            "reason": "depth",
+            "stateHash": "d65547d68de9a0816fa2e473a3d1ad03fd611d1d528fccc2ceea55859d856212",
+            "path": [
+              {
+                "kind": "move",
+                "player": "gote",
+                "from": {
+                  "row": 4,
+                  "col": 1
+                },
+                "to": {
+                  "row": 8,
+                  "col": 5
+                },
+                "pieceType": "bishop",
+                "promotion": "promote"
+              },
+              {
+                "kind": "move",
+                "player": "sente",
+                "from": {
+                  "row": 7,
+                  "col": 6
+                },
+                "to": {
+                  "row": 8,
+                  "col": 5
+                },
+                "pieceType": "silver",
+                "promotion": "none"
+              },
+              {
+                "kind": "move",
+                "player": "gote",
+                "from": {
+                  "row": 0,
+                  "col": 1
+                },
+                "to": {
+                  "row": 2,
+                  "col": 2
+                },
+                "pieceType": "knight",
+                "promotion": "none"
+              },
+              {
+                "kind": "move",
+                "player": "sente",
+                "from": {
+                  "row": 2,
+                  "col": 4
+                },
+                "to": {
+                  "row": 0,
+                  "col": 2
+                },
+                "pieceType": "bishop",
+                "promotion": "decline"
+              },
+              {
+                "kind": "move",
+                "player": "gote",
+                "from": {
+                  "row": 0,
+                  "col": 3
+                },
+                "to": {
+                  "row": 0,
+                  "col": 2
+                },
+                "pieceType": "gold",
+                "promotion": "none"
+              }
+            ]
+          },
+          {
+            "reason": "depth",
+            "stateHash": "0ea9856aca47e83dca0461a87812317932d3c913ef0b62f819b4edb511b53d34",
+            "path": [
+              {
+                "kind": "move",
+                "player": "gote",
+                "from": {
+                  "row": 4,
+                  "col": 1
+                },
+                "to": {
+                  "row": 8,
+                  "col": 5
+                },
+                "pieceType": "bishop",
+                "promotion": "promote"
+              },
+              {
+                "kind": "move",
+                "player": "sente",
+                "from": {
+                  "row": 7,
+                  "col": 6
+                },
+                "to": {
+                  "row": 8,
+                  "col": 5
+                },
+                "pieceType": "silver",
+                "promotion": "none"
+              },
+              {
+                "kind": "move",
+                "player": "gote",
+                "from": {
+                  "row": 0,
+                  "col": 1
+                },
+                "to": {
+                  "row": 2,
+                  "col": 2
+                },
+                "pieceType": "knight",
+                "promotion": "none"
+              },
+              {
+                "kind": "move",
+                "player": "sente",
+                "from": {
+                  "row": 2,
+                  "col": 4
+                },
+                "to": {
+                  "row": 0,
+                  "col": 2
+                },
+                "pieceType": "bishop",
+                "promotion": "decline"
+              },
+              {
+                "kind": "move",
+                "player": "gote",
+                "from": {
+                  "row": 0,
+                  "col": 3
+                },
+                "to": {
+                  "row": 1,
+                  "col": 2
+                },
+                "pieceType": "gold",
+                "promotion": "none"
+              }
+            ]
+          },
+          {
+            "reason": "depth",
+            "stateHash": "ee5b014b4d2f88ef7281f94c9c83403c848d14a4586ad45bc4c1da3fc4eb78ec",
+            "path": [
+              {
+                "kind": "move",
+                "player": "gote",
+                "from": {
+                  "row": 4,
+                  "col": 1
+                },
+                "to": {
+                  "row": 8,
+                  "col": 5
+                },
+                "pieceType": "bishop",
+                "promotion": "promote"
+              },
+              {
+                "kind": "move",
+                "player": "sente",
+                "from": {
+                  "row": 7,
+                  "col": 6
+                },
+                "to": {
+                  "row": 8,
+                  "col": 5
+                },
+                "pieceType": "silver",
+                "promotion": "none"
+              },
+              {
+                "kind": "move",
+                "player": "gote",
+                "from": {
+                  "row": 0,
+                  "col": 1
+                },
+                "to": {
+                  "row": 2,
+                  "col": 2
+                },
+                "pieceType": "knight",
+                "promotion": "none"
+              },
+              {
+                "kind": "move",
+                "player": "sente",
+                "from": {
+                  "row": 2,
+                  "col": 4
+                },
+                "to": {
+                  "row": 0,
+                  "col": 2
+                },
+                "pieceType": "bishop",
+                "promotion": "decline"
+              },
+              {
+                "kind": "move",
+                "player": "gote",
+                "from": {
+                  "row": 0,
+                  "col": 3
+                },
+                "to": {
+                  "row": 1,
+                  "col": 3
+                },
+                "pieceType": "gold",
+                "promotion": "none"
+              }
+            ]
+          },
+          {
+            "reason": "depth",
+            "stateHash": "337c919478560c14e8e5e6364f01d905190befdeb8df612c98f5f3c624521f17",
+            "path": [
+              {
+                "kind": "move",
+                "player": "gote",
+                "from": {
+                  "row": 4,
+                  "col": 1
+                },
+                "to": {
+                  "row": 8,
+                  "col": 5
+                },
+                "pieceType": "bishop",
+                "promotion": "promote"
+              },
+              {
+                "kind": "move",
+                "player": "sente",
+                "from": {
+                  "row": 7,
+                  "col": 6
+                },
+                "to": {
+                  "row": 8,
+                  "col": 5
+                },
+                "pieceType": "silver",
+                "promotion": "none"
+              },
+              {
+                "kind": "move",
+                "player": "gote",
+                "from": {
+                  "row": 0,
+                  "col": 1
+                },
+                "to": {
+                  "row": 2,
+                  "col": 2
+                },
+                "pieceType": "knight",
+                "promotion": "none"
+              },
+              {
+                "kind": "move",
+                "player": "sente",
+                "from": {
+                  "row": 2,
+                  "col": 4
+                },
+                "to": {
+                  "row": 0,
+                  "col": 2
+                },
+                "pieceType": "bishop",
+                "promotion": "decline"
+              },
+              {
+                "kind": "move",
+                "player": "gote",
+                "from": {
+                  "row": 0,
+                  "col": 3
+                },
+                "to": {
+                  "row": 1,
+                  "col": 4
+                },
+                "pieceType": "gold",
+                "promotion": "none"
+              }
+            ]
+          },
+          {
+            "reason": "depth",
+            "stateHash": "f7c21b1fa2ec089b24c5355d767f54be893cb440e79d9bb40a542702231319fe",
+            "path": [
+              {
+                "kind": "move",
+                "player": "gote",
+                "from": {
+                  "row": 4,
+                  "col": 1
+                },
+                "to": {
+                  "row": 8,
+                  "col": 5
+                },
+                "pieceType": "bishop",
+                "promotion": "promote"
+              },
+              {
+                "kind": "move",
+                "player": "sente",
+                "from": {
+                  "row": 7,
+                  "col": 6
+                },
+                "to": {
+                  "row": 8,
+                  "col": 5
+                },
+                "pieceType": "silver",
+                "promotion": "none"
+              },
+              {
+                "kind": "move",
+                "player": "gote",
+                "from": {
+                  "row": 0,
+                  "col": 1
+                },
+                "to": {
+                  "row": 2,
+                  "col": 2
+                },
+                "pieceType": "knight",
+                "promotion": "none"
+              },
+              {
+                "kind": "move",
+                "player": "sente",
+                "from": {
+                  "row": 2,
+                  "col": 4
+                },
+                "to": {
+                  "row": 0,
+                  "col": 2
+                },
+                "pieceType": "bishop",
+                "promotion": "decline"
+              },
+              {
+                "kind": "move",
+                "player": "gote",
+                "from": {
+                  "row": 0,
+                  "col": 4
+                },
+                "to": {
+                  "row": 1,
+                  "col": 4
+                },
+                "pieceType": "king",
+                "promotion": "none"
+              }
+            ]
+          },
+          {
+            "reason": "depth",
+            "stateHash": "781339f4f7129ec2ae135abcc71233b816891970805093ee96be8c29cd05639e",
+            "path": [
+              {
+                "kind": "move",
+                "player": "gote",
+                "from": {
+                  "row": 4,
+                  "col": 1
+                },
+                "to": {
+                  "row": 8,
+                  "col": 5
+                },
+                "pieceType": "bishop",
+                "promotion": "promote"
+              },
+              {
+                "kind": "move",
+                "player": "sente",
+                "from": {
+                  "row": 7,
+                  "col": 6
+                },
+                "to": {
+                  "row": 8,
+                  "col": 5
+                },
+                "pieceType": "silver",
+                "promotion": "none"
+              },
+              {
+                "kind": "move",
+                "player": "gote",
+                "from": {
+                  "row": 0,
+                  "col": 1
+                },
+                "to": {
+                  "row": 2,
+                  "col": 2
+                },
+                "pieceType": "knight",
+                "promotion": "none"
+              },
+              {
+                "kind": "move",
+                "player": "sente",
+                "from": {
+                  "row": 2,
+                  "col": 4
+                },
+                "to": {
+                  "row": 0,
+                  "col": 2
+                },
+                "pieceType": "bishop",
+                "promotion": "decline"
+              },
+              {
+                "kind": "move",
+                "player": "gote",
+                "from": {
+                  "row": 0,
+                  "col": 5
+                },
+                "to": {
+                  "row": 0,
+                  "col": 6
+                },
+                "pieceType": "gold",
+                "promotion": "none"
+              }
+            ]
+          },
+          {
+            "reason": "depth",
+            "stateHash": "e70dcdd8880a0397760c36027125b8276a5d9130c3607e427532cdbf1920e375",
+            "path": [
+              {
+                "kind": "move",
+                "player": "gote",
+                "from": {
+                  "row": 4,
+                  "col": 1
+                },
+                "to": {
+                  "row": 8,
+                  "col": 5
+                },
+                "pieceType": "bishop",
+                "promotion": "promote"
+              },
+              {
+                "kind": "move",
+                "player": "sente",
+                "from": {
+                  "row": 7,
+                  "col": 6
+                },
+                "to": {
+                  "row": 8,
+                  "col": 5
+                },
+                "pieceType": "silver",
+                "promotion": "none"
+              },
+              {
+                "kind": "move",
+                "player": "gote",
+                "from": {
+                  "row": 0,
+                  "col": 1
+                },
+                "to": {
+                  "row": 2,
+                  "col": 2
+                },
+                "pieceType": "knight",
+                "promotion": "none"
+              },
+              {
+                "kind": "move",
+                "player": "sente",
+                "from": {
+                  "row": 2,
+                  "col": 4
+                },
+                "to": {
+                  "row": 0,
+                  "col": 2
+                },
+                "pieceType": "bishop",
+                "promotion": "decline"
+              },
+              {
+                "kind": "move",
+                "player": "gote",
+                "from": {
+                  "row": 0,
+                  "col": 5
+                },
+                "to": {
+                  "row": 1,
+                  "col": 4
+                },
+                "pieceType": "gold",
+                "promotion": "none"
+              }
+            ]
+          },
+          {
+            "reason": "time",
+            "stateHash": "1bcbaccc8bb599817a72724d113ba07783e35a6591b10530335fb358d6217a59",
+            "path": [
+              {
+                "kind": "move",
+                "player": "gote",
+                "from": {
+                  "row": 4,
+                  "col": 1
+                },
+                "to": {
+                  "row": 8,
+                  "col": 5
+                },
+                "pieceType": "bishop",
+                "promotion": "promote"
+              },
+              {
+                "kind": "move",
+                "player": "sente",
+                "from": {
+                  "row": 7,
+                  "col": 6
+                },
+                "to": {
+                  "row": 8,
+                  "col": 5
+                },
+                "pieceType": "silver",
+                "promotion": "none"
+              },
+              {
+                "kind": "move",
+                "player": "gote",
+                "from": {
+                  "row": 0,
+                  "col": 1
+                },
+                "to": {
+                  "row": 2,
+                  "col": 2
+                },
+                "pieceType": "knight",
+                "promotion": "none"
+              },
+              {
+                "kind": "move",
+                "player": "sente",
+                "from": {
+                  "row": 2,
+                  "col": 4
+                },
+                "to": {
+                  "row": 0,
+                  "col": 2
+                },
+                "pieceType": "bishop",
+                "promotion": "decline"
+              },
+              {
+                "kind": "drop",
+                "player": "gote",
+                "pieceId": "sente-gold-4",
+                "pieceType": "gold",
+                "to": {
+                  "row": 6,
+                  "col": 0
+                },
+                "promotion": "none"
+              }
+            ]
+          }
+        ],
+        "frontierOmitted": 55
+      },
+      "verification": null,
+      "elapsedMs": 1289.0616999999984
+    },
+    {
+      "journal": "docs/benchmarks/match-journal-20261026/run1/hirate-2.jsonl",
+      "ply": 36,
+      "positionId": "e53a261c1976524fb2e6a4a8924464f16b87e61f97469cd82751b884ac5fc1a5/{\"from\":{\"col\":1,\"row\":4},\"kind\":\"move\",\"pieceType\":\"bishop\",\"player\":\"gote\",\"promotion\":\"promote\",\"to\":{\"col\":5,\"row\":8}}/legacy/1000",
+      "kind": "alternative",
+      "candidate": {
+        "kind": "move",
+        "player": "gote",
+        "from": {
+          "row": 1,
+          "col": 5
+        },
+        "to": {
+          "row": 1,
+          "col": 4
+        },
+        "pieceType": "rook",
+        "promotion": "none"
+      },
+      "requestHash": "e07397e0b2458413c87ccefd0020b5e0bbe2270e615a87030903a75aeb34fd0d",
+      "result": {
+        "status": "unknown",
+        "certificate": null,
+        "nodes": 71,
+        "stops": {
+          "depth": 66,
+          "time": 1
+        },
+        "finished": "incomplete",
+        "error": null,
+        "frontier": [
+          {
+            "reason": "depth",
+            "stateHash": "8b249c440387db41730f75d81091a0b11de8f94a2993340de3e5bbd533f37763",
+            "path": [
+              {
+                "kind": "move",
+                "player": "gote",
+                "from": {
+                  "row": 1,
+                  "col": 5
+                },
+                "to": {
+                  "row": 1,
+                  "col": 4
+                },
+                "pieceType": "rook",
+                "promotion": "none"
+              },
+              {
+                "kind": "move",
+                "player": "sente",
+                "from": {
+                  "row": 2,
+                  "col": 4
+                },
+                "to": {
+                  "row": 0,
+                  "col": 2
+                },
+                "pieceType": "bishop",
+                "promotion": "decline"
+              },
+              {
+                "kind": "move",
+                "player": "gote",
+                "from": {
+                  "row": 0,
+                  "col": 1
+                },
+                "to": {
+                  "row": 2,
+                  "col": 2
+                },
+                "pieceType": "knight",
+                "promotion": "none"
+              },
+              {
+                "kind": "move",
+                "player": "sente",
+                "from": {
+                  "row": 0,
+                  "col": 2
+                },
+                "to": {
+                  "row": 1,
+                  "col": 1
+                },
+                "pieceType": "bishop",
+                "promotion": "decline"
+              },
+              {
+                "kind": "move",
+                "player": "gote",
+                "from": {
+                  "row": 0,
+                  "col": 3
+                },
+                "to": {
+                  "row": 0,
+                  "col": 2
+                },
+                "pieceType": "gold",
+                "promotion": "none"
+              }
+            ]
+          },
+          {
+            "reason": "depth",
+            "stateHash": "5671ec1181dab1e0b33c6a8d4dc8264640420c40bb4d1563ffe93c7fb07ae5c0",
+            "path": [
+              {
+                "kind": "move",
+                "player": "gote",
+                "from": {
+                  "row": 1,
+                  "col": 5
+                },
+                "to": {
+                  "row": 1,
+                  "col": 4
+                },
+                "pieceType": "rook",
+                "promotion": "none"
+              },
+              {
+                "kind": "move",
+                "player": "sente",
+                "from": {
+                  "row": 2,
+                  "col": 4
+                },
+                "to": {
+                  "row": 0,
+                  "col": 2
+                },
+                "pieceType": "bishop",
+                "promotion": "decline"
+              },
+              {
+                "kind": "move",
+                "player": "gote",
+                "from": {
+                  "row": 0,
+                  "col": 1
+                },
+                "to": {
+                  "row": 2,
+                  "col": 2
+                },
+                "pieceType": "knight",
+                "promotion": "none"
+              },
+              {
+                "kind": "move",
+                "player": "sente",
+                "from": {
+                  "row": 0,
+                  "col": 2
+                },
+                "to": {
+                  "row": 1,
+                  "col": 1
+                },
+                "pieceType": "bishop",
+                "promotion": "decline"
+              },
+              {
+                "kind": "move",
+                "player": "gote",
+                "from": {
+                  "row": 0,
+                  "col": 3
+                },
+                "to": {
+                  "row": 1,
+                  "col": 2
+                },
+                "pieceType": "gold",
+                "promotion": "none"
+              }
+            ]
+          },
+          {
+            "reason": "depth",
+            "stateHash": "22d88eba24f3eb6b641e38bb4c1266094610b6ed5c9344b568ee605c043dad61",
+            "path": [
+              {
+                "kind": "move",
+                "player": "gote",
+                "from": {
+                  "row": 1,
+                  "col": 5
+                },
+                "to": {
+                  "row": 1,
+                  "col": 4
+                },
+                "pieceType": "rook",
+                "promotion": "none"
+              },
+              {
+                "kind": "move",
+                "player": "sente",
+                "from": {
+                  "row": 2,
+                  "col": 4
+                },
+                "to": {
+                  "row": 0,
+                  "col": 2
+                },
+                "pieceType": "bishop",
+                "promotion": "decline"
+              },
+              {
+                "kind": "move",
+                "player": "gote",
+                "from": {
+                  "row": 0,
+                  "col": 1
+                },
+                "to": {
+                  "row": 2,
+                  "col": 2
+                },
+                "pieceType": "knight",
+                "promotion": "none"
+              },
+              {
+                "kind": "move",
+                "player": "sente",
+                "from": {
+                  "row": 0,
+                  "col": 2
+                },
+                "to": {
+                  "row": 1,
+                  "col": 1
+                },
+                "pieceType": "bishop",
+                "promotion": "decline"
+              },
+              {
+                "kind": "move",
+                "player": "gote",
+                "from": {
+                  "row": 0,
+                  "col": 3
+                },
+                "to": {
+                  "row": 1,
+                  "col": 3
+                },
+                "pieceType": "gold",
+                "promotion": "none"
+              }
+            ]
+          },
+          {
+            "reason": "depth",
+            "stateHash": "da4f137daf258783ac0d577cd1ef0e680312a87182aa37143df11c6359920faf",
+            "path": [
+              {
+                "kind": "move",
+                "player": "gote",
+                "from": {
+                  "row": 1,
+                  "col": 5
+                },
+                "to": {
+                  "row": 1,
+                  "col": 4
+                },
+                "pieceType": "rook",
+                "promotion": "none"
+              },
+              {
+                "kind": "move",
+                "player": "sente",
+                "from": {
+                  "row": 2,
+                  "col": 4
+                },
+                "to": {
+                  "row": 0,
+                  "col": 2
+                },
+                "pieceType": "bishop",
+                "promotion": "decline"
+              },
+              {
+                "kind": "move",
+                "player": "gote",
+                "from": {
+                  "row": 0,
+                  "col": 1
+                },
+                "to": {
+                  "row": 2,
+                  "col": 2
+                },
+                "pieceType": "knight",
+                "promotion": "none"
+              },
+              {
+                "kind": "move",
+                "player": "sente",
+                "from": {
+                  "row": 0,
+                  "col": 2
+                },
+                "to": {
+                  "row": 1,
+                  "col": 1
+                },
+                "pieceType": "bishop",
+                "promotion": "decline"
+              },
+              {
+                "kind": "move",
+                "player": "gote",
+                "from": {
+                  "row": 0,
+                  "col": 4
+                },
+                "to": {
+                  "row": 1,
+                  "col": 3
+                },
+                "pieceType": "king",
+                "promotion": "none"
+              }
+            ]
+          },
+          {
+            "reason": "depth",
+            "stateHash": "48be9e35af2d23c28899b590049884327ca96935b731fb149f2392e7cb819dc7",
+            "path": [
+              {
+                "kind": "move",
+                "player": "gote",
+                "from": {
+                  "row": 1,
+                  "col": 5
+                },
+                "to": {
+                  "row": 1,
+                  "col": 4
+                },
+                "pieceType": "rook",
+                "promotion": "none"
+              },
+              {
+                "kind": "move",
+                "player": "sente",
+                "from": {
+                  "row": 2,
+                  "col": 4
+                },
+                "to": {
+                  "row": 0,
+                  "col": 2
+                },
+                "pieceType": "bishop",
+                "promotion": "decline"
+              },
+              {
+                "kind": "move",
+                "player": "gote",
+                "from": {
+                  "row": 0,
+                  "col": 1
+                },
+                "to": {
+                  "row": 2,
+                  "col": 2
+                },
+                "pieceType": "knight",
+                "promotion": "none"
+              },
+              {
+                "kind": "move",
+                "player": "sente",
+                "from": {
+                  "row": 0,
+                  "col": 2
+                },
+                "to": {
+                  "row": 1,
+                  "col": 1
+                },
+                "pieceType": "bishop",
+                "promotion": "decline"
+              },
+              {
+                "kind": "move",
+                "player": "gote",
+                "from": {
+                  "row": 0,
+                  "col": 4
+                },
+                "to": {
+                  "row": 1,
+                  "col": 5
+                },
+                "pieceType": "king",
+                "promotion": "none"
+              }
+            ]
+          },
+          {
+            "reason": "depth",
+            "stateHash": "48eb741d3012a2afc8a0c37ae207505e1840d7c32f0f37173cda58916184e0b7",
+            "path": [
+              {
+                "kind": "move",
+                "player": "gote",
+                "from": {
+                  "row": 1,
+                  "col": 5
+                },
+                "to": {
+                  "row": 1,
+                  "col": 4
+                },
+                "pieceType": "rook",
+                "promotion": "none"
+              },
+              {
+                "kind": "move",
+                "player": "sente",
+                "from": {
+                  "row": 2,
+                  "col": 4
+                },
+                "to": {
+                  "row": 0,
+                  "col": 2
+                },
+                "pieceType": "bishop",
+                "promotion": "decline"
+              },
+              {
+                "kind": "move",
+                "player": "gote",
+                "from": {
+                  "row": 0,
+                  "col": 1
+                },
+                "to": {
+                  "row": 2,
+                  "col": 2
+                },
+                "pieceType": "knight",
+                "promotion": "none"
+              },
+              {
+                "kind": "move",
+                "player": "sente",
+                "from": {
+                  "row": 0,
+                  "col": 2
+                },
+                "to": {
+                  "row": 1,
+                  "col": 1
+                },
+                "pieceType": "bishop",
+                "promotion": "decline"
+              },
+              {
+                "kind": "move",
+                "player": "gote",
+                "from": {
+                  "row": 0,
+                  "col": 5
+                },
+                "to": {
+                  "row": 0,
+                  "col": 6
+                },
+                "pieceType": "gold",
+                "promotion": "none"
+              }
+            ]
+          },
+          {
+            "reason": "depth",
+            "stateHash": "1f04ec3d857f32f422e8606ee6a3adb34155073a3ea169ad03a3e48ed18ccae2",
+            "path": [
+              {
+                "kind": "move",
+                "player": "gote",
+                "from": {
+                  "row": 1,
+                  "col": 5
+                },
+                "to": {
+                  "row": 1,
+                  "col": 4
+                },
+                "pieceType": "rook",
+                "promotion": "none"
+              },
+              {
+                "kind": "move",
+                "player": "sente",
+                "from": {
+                  "row": 2,
+                  "col": 4
+                },
+                "to": {
+                  "row": 0,
+                  "col": 2
+                },
+                "pieceType": "bishop",
+                "promotion": "decline"
+              },
+              {
+                "kind": "move",
+                "player": "gote",
+                "from": {
+                  "row": 0,
+                  "col": 1
+                },
+                "to": {
+                  "row": 2,
+                  "col": 2
+                },
+                "pieceType": "knight",
+                "promotion": "none"
+              },
+              {
+                "kind": "move",
+                "player": "sente",
+                "from": {
+                  "row": 0,
+                  "col": 2
+                },
+                "to": {
+                  "row": 1,
+                  "col": 1
+                },
+                "pieceType": "bishop",
+                "promotion": "decline"
+              },
+              {
+                "kind": "move",
+                "player": "gote",
+                "from": {
+                  "row": 0,
+                  "col": 5
+                },
+                "to": {
+                  "row": 1,
+                  "col": 5
+                },
+                "pieceType": "gold",
+                "promotion": "none"
+              }
+            ]
+          },
+          {
+            "reason": "time",
+            "stateHash": "afe16c25b75c9ac9cb7f7ab4e21744ea0c06a6d477e9e13bce0c361f365daf1a",
+            "path": [
+              {
+                "kind": "move",
+                "player": "gote",
+                "from": {
+                  "row": 1,
+                  "col": 5
+                },
+                "to": {
+                  "row": 1,
+                  "col": 4
+                },
+                "pieceType": "rook",
+                "promotion": "none"
+              },
+              {
+                "kind": "move",
+                "player": "sente",
+                "from": {
+                  "row": 2,
+                  "col": 4
+                },
+                "to": {
+                  "row": 0,
+                  "col": 2
+                },
+                "pieceType": "bishop",
+                "promotion": "decline"
+              },
+              {
+                "kind": "move",
+                "player": "gote",
+                "from": {
+                  "row": 0,
+                  "col": 1
+                },
+                "to": {
+                  "row": 2,
+                  "col": 2
+                },
+                "pieceType": "knight",
+                "promotion": "none"
+              },
+              {
+                "kind": "move",
+                "player": "sente",
+                "from": {
+                  "row": 0,
+                  "col": 2
+                },
+                "to": {
+                  "row": 1,
+                  "col": 1
+                },
+                "pieceType": "bishop",
+                "promotion": "promote"
+              },
+              {
+                "kind": "move",
+                "player": "gote",
+                "from": {
+                  "row": 2,
+                  "col": 2
+                },
+                "to": {
+                  "row": 4,
+                  "col": 3
+                },
+                "pieceType": "knight",
+                "promotion": "none"
+              }
+            ]
+          }
+        ],
+        "frontierOmitted": 59
+      },
+      "verification": null,
+      "elapsedMs": 1292.0699999999997
+    },
+    {
+      "journal": "docs/benchmarks/match-journal-20261026/run1/hirate-1.jsonl",
+      "ply": 31,
+      "positionId": "b18e7cb2dce7930ba48d783ce9b224a329797e606a3e41fbe0570f677178b19a/{\"from\":{\"col\":4,\"row\":5},\"kind\":\"move\",\"pieceType\":\"lance\",\"player\":\"sente\",\"promotion\":\"decline\",\"to\":{\"col\":4,\"row\":2}}/legacy/1000",
+      "kind": "actual",
+      "candidate": {
+        "kind": "move",
+        "player": "sente",
+        "from": {
+          "row": 5,
+          "col": 4
+        },
+        "to": {
+          "row": 2,
+          "col": 4
+        },
+        "pieceType": "lance",
+        "promotion": "decline"
+      },
+      "requestHash": "e00bc052f31176eddae0abc6c49f333a1332da05e5cafdce47875914e03bf86a",
+      "result": {
+        "status": "unknown",
+        "certificate": null,
+        "nodes": 85,
+        "stops": {
+          "depth": 80,
+          "time": 1
+        },
+        "finished": "incomplete",
+        "error": null,
+        "frontier": [
+          {
+            "reason": "depth",
+            "stateHash": "304712d1b9f0cdfae32c36367421a7fda7282f36813f323e058891e5f50e4df2",
+            "path": [
+              {
+                "kind": "move",
+                "player": "sente",
+                "from": {
+                  "row": 5,
+                  "col": 4
+                },
+                "to": {
+                  "row": 2,
+                  "col": 4
+                },
+                "pieceType": "lance",
+                "promotion": "decline"
+              },
+              {
+                "kind": "move",
+                "player": "gote",
+                "from": {
+                  "row": 1,
+                  "col": 4
+                },
+                "to": {
+                  "row": 1,
+                  "col": 3
+                },
+                "pieceType": "king",
+                "promotion": "none"
+              },
+              {
+                "kind": "move",
+                "player": "sente",
+                "from": {
+                  "row": 0,
+                  "col": 8
+                },
+                "to": {
+                  "row": 0,
+                  "col": 7
+                },
+                "pieceType": "bishop",
+                "promotion": "none"
+              },
+              {
+                "kind": "move",
+                "player": "gote",
+                "from": {
+                  "row": 0,
+                  "col": 0
+                },
+                "to": {
+                  "row": 1,
+                  "col": 0
+                },
+                "pieceType": "lance",
+                "promotion": "none"
+              },
+              {
+                "kind": "move",
+                "player": "sente",
+                "from": {
+                  "row": 0,
+                  "col": 7
+                },
+                "to": {
+                  "row": 0,
+                  "col": 6
+                },
+                "pieceType": "bishop",
+                "promotion": "none"
+              }
+            ]
+          },
+          {
+            "reason": "depth",
+            "stateHash": "6ed2eda63b88394a8c6352e9d11342d32420c1566b9e28f4ef77a432f7a41f55",
+            "path": [
+              {
+                "kind": "move",
+                "player": "sente",
+                "from": {
+                  "row": 5,
+                  "col": 4
+                },
+                "to": {
+                  "row": 2,
+                  "col": 4
+                },
+                "pieceType": "lance",
+                "promotion": "decline"
+              },
+              {
+                "kind": "move",
+                "player": "gote",
+                "from": {
+                  "row": 1,
+                  "col": 4
+                },
+                "to": {
+                  "row": 1,
+                  "col": 3
+                },
+                "pieceType": "king",
+                "promotion": "none"
+              },
+              {
+                "kind": "move",
+                "player": "sente",
+                "from": {
+                  "row": 0,
+                  "col": 8
+                },
+                "to": {
+                  "row": 0,
+                  "col": 7
+                },
+                "pieceType": "bishop",
+                "promotion": "none"
+              },
+              {
+                "kind": "move",
+                "player": "gote",
+                "from": {
+                  "row": 0,
+                  "col": 0
+                },
+                "to": {
+                  "row": 1,
+                  "col": 0
+                },
+                "pieceType": "lance",
+                "promotion": "none"
+              },
+              {
+                "kind": "move",
+                "player": "sente",
+                "from": {
+                  "row": 0,
+                  "col": 7
+                },
+                "to": {
+                  "row": 0,
+                  "col": 8
+                },
+                "pieceType": "bishop",
+                "promotion": "none"
+              }
+            ]
+          },
+          {
+            "reason": "depth",
+            "stateHash": "40021208b9ee8508e76d42a212edc97c70a21d36351d9ff39869f2853a3b8ae9",
+            "path": [
+              {
+                "kind": "move",
+                "player": "sente",
+                "from": {
+                  "row": 5,
+                  "col": 4
+                },
+                "to": {
+                  "row": 2,
+                  "col": 4
+                },
+                "pieceType": "lance",
+                "promotion": "decline"
+              },
+              {
+                "kind": "move",
+                "player": "gote",
+                "from": {
+                  "row": 1,
+                  "col": 4
+                },
+                "to": {
+                  "row": 1,
+                  "col": 3
+                },
+                "pieceType": "king",
+                "promotion": "none"
+              },
+              {
+                "kind": "move",
+                "player": "sente",
+                "from": {
+                  "row": 0,
+                  "col": 8
+                },
+                "to": {
+                  "row": 0,
+                  "col": 7
+                },
+                "pieceType": "bishop",
+                "promotion": "none"
+              },
+              {
+                "kind": "move",
+                "player": "gote",
+                "from": {
+                  "row": 0,
+                  "col": 0
+                },
+                "to": {
+                  "row": 1,
+                  "col": 0
+                },
+                "pieceType": "lance",
+                "promotion": "none"
+              },
+              {
+                "kind": "move",
+                "player": "sente",
+                "from": {
+                  "row": 0,
+                  "col": 7
+                },
+                "to": {
+                  "row": 1,
+                  "col": 6
+                },
+                "pieceType": "bishop",
+                "promotion": "none"
+              }
+            ]
+          },
+          {
+            "reason": "depth",
+            "stateHash": "b9bc0968ff3c3beb87ff183f8f0bcca2194bf555b0a8cd615e1acb839293ad28",
+            "path": [
+              {
+                "kind": "move",
+                "player": "sente",
+                "from": {
+                  "row": 5,
+                  "col": 4
+                },
+                "to": {
+                  "row": 2,
+                  "col": 4
+                },
+                "pieceType": "lance",
+                "promotion": "decline"
+              },
+              {
+                "kind": "move",
+                "player": "gote",
+                "from": {
+                  "row": 1,
+                  "col": 4
+                },
+                "to": {
+                  "row": 1,
+                  "col": 3
+                },
+                "pieceType": "king",
+                "promotion": "none"
+              },
+              {
+                "kind": "move",
+                "player": "sente",
+                "from": {
+                  "row": 0,
+                  "col": 8
+                },
+                "to": {
+                  "row": 0,
+                  "col": 7
+                },
+                "pieceType": "bishop",
+                "promotion": "none"
+              },
+              {
+                "kind": "move",
+                "player": "gote",
+                "from": {
+                  "row": 0,
+                  "col": 0
+                },
+                "to": {
+                  "row": 1,
+                  "col": 0
+                },
+                "pieceType": "lance",
+                "promotion": "none"
+              },
+              {
+                "kind": "move",
+                "player": "sente",
+                "from": {
+                  "row": 0,
+                  "col": 7
+                },
+                "to": {
+                  "row": 1,
+                  "col": 7
+                },
+                "pieceType": "bishop",
+                "promotion": "none"
+              }
+            ]
+          },
+          {
+            "reason": "depth",
+            "stateHash": "3bdb805b8422df90d319e5bd4532f7cfc73e0fcddb664fe1328bba1b78d918c0",
+            "path": [
+              {
+                "kind": "move",
+                "player": "sente",
+                "from": {
+                  "row": 5,
+                  "col": 4
+                },
+                "to": {
+                  "row": 2,
+                  "col": 4
+                },
+                "pieceType": "lance",
+                "promotion": "decline"
+              },
+              {
+                "kind": "move",
+                "player": "gote",
+                "from": {
+                  "row": 1,
+                  "col": 4
+                },
+                "to": {
+                  "row": 1,
+                  "col": 3
+                },
+                "pieceType": "king",
+                "promotion": "none"
+              },
+              {
+                "kind": "move",
+                "player": "sente",
+                "from": {
+                  "row": 0,
+                  "col": 8
+                },
+                "to": {
+                  "row": 0,
+                  "col": 7
+                },
+                "pieceType": "bishop",
+                "promotion": "none"
+              },
+              {
+                "kind": "move",
+                "player": "gote",
+                "from": {
+                  "row": 0,
+                  "col": 0
+                },
+                "to": {
+                  "row": 1,
+                  "col": 0
+                },
+                "pieceType": "lance",
+                "promotion": "none"
+              },
+              {
+                "kind": "move",
+                "player": "sente",
+                "from": {
+                  "row": 0,
+                  "col": 7
+                },
+                "to": {
+                  "row": 1,
+                  "col": 8
+                },
+                "pieceType": "bishop",
+                "promotion": "none"
+              }
+            ]
+          },
+          {
+            "reason": "depth",
+            "stateHash": "fe76067750f61dc60b720b449cb9d65e58dd49c5eb1819cb87cc2b5f80bb377e",
+            "path": [
+              {
+                "kind": "move",
+                "player": "sente",
+                "from": {
+                  "row": 5,
+                  "col": 4
+                },
+                "to": {
+                  "row": 2,
+                  "col": 4
+                },
+                "pieceType": "lance",
+                "promotion": "decline"
+              },
+              {
+                "kind": "move",
+                "player": "gote",
+                "from": {
+                  "row": 1,
+                  "col": 4
+                },
+                "to": {
+                  "row": 1,
+                  "col": 3
+                },
+                "pieceType": "king",
+                "promotion": "none"
+              },
+              {
+                "kind": "move",
+                "player": "sente",
+                "from": {
+                  "row": 0,
+                  "col": 8
+                },
+                "to": {
+                  "row": 0,
+                  "col": 7
+                },
+                "pieceType": "bishop",
+                "promotion": "none"
+              },
+              {
+                "kind": "move",
+                "player": "gote",
+                "from": {
+                  "row": 0,
+                  "col": 0
+                },
+                "to": {
+                  "row": 1,
+                  "col": 0
+                },
+                "pieceType": "lance",
+                "promotion": "none"
+              },
+              {
+                "kind": "move",
+                "player": "sente",
+                "from": {
+                  "row": 0,
+                  "col": 7
+                },
+                "to": {
+                  "row": 2,
+                  "col": 5
+                },
+                "pieceType": "bishop",
+                "promotion": "none"
+              }
+            ]
+          },
+          {
+            "reason": "depth",
+            "stateHash": "6a480bb946a7fc47001a3c75095a14d772b9ff22bfb4c42144f95e615f6cdb6c",
+            "path": [
+              {
+                "kind": "move",
+                "player": "sente",
+                "from": {
+                  "row": 5,
+                  "col": 4
+                },
+                "to": {
+                  "row": 2,
+                  "col": 4
+                },
+                "pieceType": "lance",
+                "promotion": "decline"
+              },
+              {
+                "kind": "move",
+                "player": "gote",
+                "from": {
+                  "row": 1,
+                  "col": 4
+                },
+                "to": {
+                  "row": 1,
+                  "col": 3
+                },
+                "pieceType": "king",
+                "promotion": "none"
+              },
+              {
+                "kind": "move",
+                "player": "sente",
+                "from": {
+                  "row": 0,
+                  "col": 8
+                },
+                "to": {
+                  "row": 0,
+                  "col": 7
+                },
+                "pieceType": "bishop",
+                "promotion": "none"
+              },
+              {
+                "kind": "move",
+                "player": "gote",
+                "from": {
+                  "row": 0,
+                  "col": 0
+                },
+                "to": {
+                  "row": 1,
+                  "col": 0
+                },
+                "pieceType": "lance",
+                "promotion": "none"
+              },
+              {
+                "kind": "move",
+                "player": "sente",
+                "from": {
+                  "row": 0,
+                  "col": 7
+                },
+                "to": {
+                  "row": 3,
+                  "col": 4
+                },
+                "pieceType": "bishop",
+                "promotion": "none"
+              }
+            ]
+          },
+          {
+            "reason": "time",
+            "stateHash": "dc1a4d5361421839e307c66ae1b2ab531da7fb191174327b8b0c7cb473ede13a",
+            "path": [
+              {
+                "kind": "move",
+                "player": "sente",
+                "from": {
+                  "row": 5,
+                  "col": 4
+                },
+                "to": {
+                  "row": 2,
+                  "col": 4
+                },
+                "pieceType": "lance",
+                "promotion": "decline"
+              },
+              {
+                "kind": "move",
+                "player": "gote",
+                "from": {
+                  "row": 1,
+                  "col": 4
+                },
+                "to": {
+                  "row": 1,
+                  "col": 3
+                },
+                "pieceType": "king",
+                "promotion": "none"
+              },
+              {
+                "kind": "move",
+                "player": "sente",
+                "from": {
+                  "row": 0,
+                  "col": 8
+                },
+                "to": {
+                  "row": 0,
+                  "col": 7
+                },
+                "pieceType": "bishop",
+                "promotion": "none"
+              },
+              {
+                "kind": "move",
+                "player": "gote",
+                "from": {
+                  "row": 0,
+                  "col": 3
+                },
+                "to": {
+                  "row": 0,
+                  "col": 2
+                },
+                "pieceType": "gold",
+                "promotion": "none"
+              },
+              {
+                "kind": "move",
+                "player": "sente",
+                "from": {
+                  "row": 8,
+                  "col": 6
+                },
+                "to": {
+                  "row": 7,
+                  "col": 7
+                },
+                "pieceType": "silver",
+                "promotion": "none"
+              }
+            ]
+          }
+        ],
+        "frontierOmitted": 73
+      },
+      "verification": null,
+      "elapsedMs": 1277.9233999999997
+    },
+    {
+      "journal": "docs/benchmarks/match-journal-20261026/run1/hirate-1.jsonl",
+      "ply": 31,
+      "positionId": "b18e7cb2dce7930ba48d783ce9b224a329797e606a3e41fbe0570f677178b19a/{\"from\":{\"col\":4,\"row\":5},\"kind\":\"move\",\"pieceType\":\"lance\",\"player\":\"sente\",\"promotion\":\"decline\",\"to\":{\"col\":4,\"row\":2}}/legacy/1000",
+      "kind": "alternative",
+      "candidate": {
+        "kind": "move",
+        "player": "sente",
+        "from": {
+          "row": 0,
+          "col": 8
+        },
+        "to": {
+          "row": 3,
+          "col": 5
+        },
+        "pieceType": "bishop",
+        "promotion": "none"
+      },
+      "requestHash": "1593d5d2eb3a1b3794a0e79a992a91942f5046acc90db665d37965ed38a4ad48",
+      "result": {
+        "status": "unknown",
+        "certificate": null,
+        "nodes": 86,
+        "stops": {
+          "depth": 81,
+          "time": 1
+        },
+        "finished": "incomplete",
+        "error": null,
+        "frontier": [
+          {
+            "reason": "depth",
+            "stateHash": "130bb2aea6f9129f0e018331eb4deb7b49c451b5d0193c5df01d925a4bdfe800",
+            "path": [
+              {
+                "kind": "move",
+                "player": "sente",
+                "from": {
+                  "row": 0,
+                  "col": 8
+                },
+                "to": {
+                  "row": 3,
+                  "col": 5
+                },
+                "pieceType": "bishop",
+                "promotion": "none"
+              },
+              {
+                "kind": "move",
+                "player": "gote",
+                "from": {
+                  "row": 0,
+                  "col": 0
+                },
+                "to": {
+                  "row": 1,
+                  "col": 0
+                },
+                "pieceType": "lance",
+                "promotion": "none"
+              },
+              {
+                "kind": "move",
+                "player": "sente",
+                "from": {
+                  "row": 3,
+                  "col": 5
+                },
+                "to": {
+                  "row": 0,
+                  "col": 8
+                },
+                "pieceType": "bishop",
+                "promotion": "none"
+              },
+              {
+                "kind": "move",
+                "player": "gote",
+                "from": {
+                  "row": 0,
+                  "col": 3
+                },
+                "to": {
+                  "row": 0,
+                  "col": 2
+                },
+                "pieceType": "gold",
+                "promotion": "none"
+              },
+              {
+                "kind": "move",
+                "player": "sente",
+                "from": {
+                  "row": 0,
+                  "col": 8
+                },
+                "to": {
+                  "row": 0,
+                  "col": 7
+                },
+                "pieceType": "bishop",
+                "promotion": "none"
+              }
+            ]
+          },
+          {
+            "reason": "depth",
+            "stateHash": "a6aae27f2b075cf7375aade752c1e6eb897a4d09c63e25d9812254cc8b54c7f1",
+            "path": [
+              {
+                "kind": "move",
+                "player": "sente",
+                "from": {
+                  "row": 0,
+                  "col": 8
+                },
+                "to": {
+                  "row": 3,
+                  "col": 5
+                },
+                "pieceType": "bishop",
+                "promotion": "none"
+              },
+              {
+                "kind": "move",
+                "player": "gote",
+                "from": {
+                  "row": 0,
+                  "col": 0
+                },
+                "to": {
+                  "row": 1,
+                  "col": 0
+                },
+                "pieceType": "lance",
+                "promotion": "none"
+              },
+              {
+                "kind": "move",
+                "player": "sente",
+                "from": {
+                  "row": 3,
+                  "col": 5
+                },
+                "to": {
+                  "row": 0,
+                  "col": 8
+                },
+                "pieceType": "bishop",
+                "promotion": "none"
+              },
+              {
+                "kind": "move",
+                "player": "gote",
+                "from": {
+                  "row": 0,
+                  "col": 3
+                },
+                "to": {
+                  "row": 0,
+                  "col": 2
+                },
+                "pieceType": "gold",
+                "promotion": "none"
+              },
+              {
+                "kind": "move",
+                "player": "sente",
+                "from": {
+                  "row": 0,
+                  "col": 8
+                },
+                "to": {
+                  "row": 1,
+                  "col": 7
+                },
+                "pieceType": "bishop",
+                "promotion": "none"
+              }
+            ]
+          },
+          {
+            "reason": "depth",
+            "stateHash": "81123bff222cf13ccde031d5d72312d587c80d7be0ee7702c015dcd8ceb916c4",
+            "path": [
+              {
+                "kind": "move",
+                "player": "sente",
+                "from": {
+                  "row": 0,
+                  "col": 8
+                },
+                "to": {
+                  "row": 3,
+                  "col": 5
+                },
+                "pieceType": "bishop",
+                "promotion": "none"
+              },
+              {
+                "kind": "move",
+                "player": "gote",
+                "from": {
+                  "row": 0,
+                  "col": 0
+                },
+                "to": {
+                  "row": 1,
+                  "col": 0
+                },
+                "pieceType": "lance",
+                "promotion": "none"
+              },
+              {
+                "kind": "move",
+                "player": "sente",
+                "from": {
+                  "row": 3,
+                  "col": 5
+                },
+                "to": {
+                  "row": 0,
+                  "col": 8
+                },
+                "pieceType": "bishop",
+                "promotion": "none"
+              },
+              {
+                "kind": "move",
+                "player": "gote",
+                "from": {
+                  "row": 0,
+                  "col": 3
+                },
+                "to": {
+                  "row": 0,
+                  "col": 2
+                },
+                "pieceType": "gold",
+                "promotion": "none"
+              },
+              {
+                "kind": "move",
+                "player": "sente",
+                "from": {
+                  "row": 0,
+                  "col": 8
+                },
+                "to": {
+                  "row": 1,
+                  "col": 8
+                },
+                "pieceType": "bishop",
+                "promotion": "none"
+              }
+            ]
+          },
+          {
+            "reason": "depth",
+            "stateHash": "fe99502c4f9dd0af48ba20e8f79811685e82cdd69158d550805b2b9fad755aef",
+            "path": [
+              {
+                "kind": "move",
+                "player": "sente",
+                "from": {
+                  "row": 0,
+                  "col": 8
+                },
+                "to": {
+                  "row": 3,
+                  "col": 5
+                },
+                "pieceType": "bishop",
+                "promotion": "none"
+              },
+              {
+                "kind": "move",
+                "player": "gote",
+                "from": {
+                  "row": 0,
+                  "col": 0
+                },
+                "to": {
+                  "row": 1,
+                  "col": 0
+                },
+                "pieceType": "lance",
+                "promotion": "none"
+              },
+              {
+                "kind": "move",
+                "player": "sente",
+                "from": {
+                  "row": 3,
+                  "col": 5
+                },
+                "to": {
+                  "row": 0,
+                  "col": 8
+                },
+                "pieceType": "bishop",
+                "promotion": "none"
+              },
+              {
+                "kind": "move",
+                "player": "gote",
+                "from": {
+                  "row": 0,
+                  "col": 3
+                },
+                "to": {
+                  "row": 0,
+                  "col": 2
+                },
+                "pieceType": "gold",
+                "promotion": "none"
+              },
+              {
+                "kind": "move",
+                "player": "sente",
+                "from": {
+                  "row": 0,
+                  "col": 8
+                },
+                "to": {
+                  "row": 2,
+                  "col": 6
+                },
+                "pieceType": "bishop",
+                "promotion": "none"
+              }
+            ]
+          },
+          {
+            "reason": "depth",
+            "stateHash": "5dcc10166f5f722e5100a7870a35ef7e20fc24ee4e4a11d71186d9119f528607",
+            "path": [
+              {
+                "kind": "move",
+                "player": "sente",
+                "from": {
+                  "row": 0,
+                  "col": 8
+                },
+                "to": {
+                  "row": 3,
+                  "col": 5
+                },
+                "pieceType": "bishop",
+                "promotion": "none"
+              },
+              {
+                "kind": "move",
+                "player": "gote",
+                "from": {
+                  "row": 0,
+                  "col": 0
+                },
+                "to": {
+                  "row": 1,
+                  "col": 0
+                },
+                "pieceType": "lance",
+                "promotion": "none"
+              },
+              {
+                "kind": "move",
+                "player": "sente",
+                "from": {
+                  "row": 3,
+                  "col": 5
+                },
+                "to": {
+                  "row": 0,
+                  "col": 8
+                },
+                "pieceType": "bishop",
+                "promotion": "none"
+              },
+              {
+                "kind": "move",
+                "player": "gote",
+                "from": {
+                  "row": 0,
+                  "col": 3
+                },
+                "to": {
+                  "row": 0,
+                  "col": 2
+                },
+                "pieceType": "gold",
+                "promotion": "none"
+              },
+              {
+                "kind": "move",
+                "player": "sente",
+                "from": {
+                  "row": 0,
+                  "col": 8
+                },
+                "to": {
+                  "row": 3,
+                  "col": 5
+                },
+                "pieceType": "bishop",
+                "promotion": "none"
+              }
+            ]
+          },
+          {
+            "reason": "depth",
+            "stateHash": "ca3e350118de77d76f5c9fb5684953b68e396290cb88958f9e64ad0b158376ca",
+            "path": [
+              {
+                "kind": "move",
+                "player": "sente",
+                "from": {
+                  "row": 0,
+                  "col": 8
+                },
+                "to": {
+                  "row": 3,
+                  "col": 5
+                },
+                "pieceType": "bishop",
+                "promotion": "none"
+              },
+              {
+                "kind": "move",
+                "player": "gote",
+                "from": {
+                  "row": 0,
+                  "col": 0
+                },
+                "to": {
+                  "row": 1,
+                  "col": 0
+                },
+                "pieceType": "lance",
+                "promotion": "none"
+              },
+              {
+                "kind": "move",
+                "player": "sente",
+                "from": {
+                  "row": 3,
+                  "col": 5
+                },
+                "to": {
+                  "row": 0,
+                  "col": 8
+                },
+                "pieceType": "bishop",
+                "promotion": "none"
+              },
+              {
+                "kind": "move",
+                "player": "gote",
+                "from": {
+                  "row": 0,
+                  "col": 3
+                },
+                "to": {
+                  "row": 0,
+                  "col": 2
+                },
+                "pieceType": "gold",
+                "promotion": "none"
+              },
+              {
+                "kind": "move",
+                "player": "sente",
+                "from": {
+                  "row": 0,
+                  "col": 8
+                },
+                "to": {
+                  "row": 4,
+                  "col": 4
+                },
+                "pieceType": "bishop",
+                "promotion": "none"
+              }
+            ]
+          },
+          {
+            "reason": "depth",
+            "stateHash": "6c1d63ab7eb152daaa4c0f880d1ac3de0f9242ef0efa34d457096926ddd1f0c0",
+            "path": [
+              {
+                "kind": "move",
+                "player": "sente",
+                "from": {
+                  "row": 0,
+                  "col": 8
+                },
+                "to": {
+                  "row": 3,
+                  "col": 5
+                },
+                "pieceType": "bishop",
+                "promotion": "none"
+              },
+              {
+                "kind": "move",
+                "player": "gote",
+                "from": {
+                  "row": 0,
+                  "col": 0
+                },
+                "to": {
+                  "row": 1,
+                  "col": 0
+                },
+                "pieceType": "lance",
+                "promotion": "none"
+              },
+              {
+                "kind": "move",
+                "player": "sente",
+                "from": {
+                  "row": 3,
+                  "col": 5
+                },
+                "to": {
+                  "row": 0,
+                  "col": 8
+                },
+                "pieceType": "bishop",
+                "promotion": "none"
+              },
+              {
+                "kind": "move",
+                "player": "gote",
+                "from": {
+                  "row": 0,
+                  "col": 3
+                },
+                "to": {
+                  "row": 0,
+                  "col": 2
+                },
+                "pieceType": "gold",
+                "promotion": "none"
+              },
+              {
+                "kind": "move",
+                "player": "sente",
+                "from": {
+                  "row": 0,
+                  "col": 8
+                },
+                "to": {
+                  "row": 5,
+                  "col": 3
+                },
+                "pieceType": "bishop",
+                "promotion": "none"
+              }
+            ]
+          },
+          {
+            "reason": "time",
+            "stateHash": "7a809ba57e1e885ce74b7c41dbea1eac6b06ce3501e09030b928d7c12a35a029",
+            "path": [
+              {
+                "kind": "move",
+                "player": "sente",
+                "from": {
+                  "row": 0,
+                  "col": 8
+                },
+                "to": {
+                  "row": 3,
+                  "col": 5
+                },
+                "pieceType": "bishop",
+                "promotion": "none"
+              },
+              {
+                "kind": "move",
+                "player": "gote",
+                "from": {
+                  "row": 0,
+                  "col": 0
+                },
+                "to": {
+                  "row": 1,
+                  "col": 0
+                },
+                "pieceType": "lance",
+                "promotion": "none"
+              },
+              {
+                "kind": "move",
+                "player": "sente",
+                "from": {
+                  "row": 3,
+                  "col": 5
+                },
+                "to": {
+                  "row": 0,
+                  "col": 8
+                },
+                "pieceType": "bishop",
+                "promotion": "none"
+              },
+              {
+                "kind": "move",
+                "player": "gote",
+                "from": {
+                  "row": 0,
+                  "col": 3
+                },
+                "to": {
+                  "row": 0,
+                  "col": 4
+                },
+                "pieceType": "gold",
+                "promotion": "none"
+              },
+              {
+                "kind": "drop",
+                "player": "sente",
+                "pieceId": "gote-pawn-4",
+                "pieceType": "pawn",
+                "to": {
+                  "row": 2,
+                  "col": 6
+                },
+                "promotion": "none"
+              }
+            ]
+          }
+        ],
+        "frontierOmitted": 74
+      },
+      "verification": null,
+      "elapsedMs": 1292.8738000000012
+    }
+  ]
+}

@@ -1,0 +1,171 @@
+{
+  "schema": 1,
+  "recordedAt": "2026-11-05T15:36:20.848347+09:00",
+  "overall": "PARTIAL",
+  "criteria": {
+    "R1": {
+      "status": "PASS",
+      "evidence": "24/24 deadlines have phase/stage, deadline crossing, completed depth, all enter nodes and timing breakdown. No stop-condition defect established."
+    },
+    "R2": {
+      "status": "PASS",
+      "evidence": "24 root repetition pairs and 32 forced-candidate repetition pairs all identical on action/value/PV/depth/nodes/reason."
+    },
+    "R3": {
+      "status": "PASS",
+      "evidence": "All four actual/historical alternative pairs legal and compared under same conditions. All replies and legal recaptures saved; bounded exchange scope explicit. Final verdict INDETERMINATE for all four."
+    },
+    "R4": {
+      "status": "PASS",
+      "evidence": "q depth and ordinary depth isolated individually, effects in all four positions. Existing SEE policy also compared, no value/PV change; pure SEE arithmetic UNKNOWN."
+    },
+    "R5": {
+      "status": "PASS",
+      "evidence": "Interrupted/error fixed searches expose no result. Finite equal-depth pairs only; no CONFIRMED output. Regression tests cover invalid/mate/partial/deadline values."
+    },
+    "R6": {
+      "status": "PASS",
+      "evidence": "56 saved classification rows independently aggregated: A-F 21/1/3/1/0/11, overlap11, noFeature30 UNKNOWN, INDETERMINATE24, NOT_RUN32."
+    },
+    "R7": {
+      "status": "PASS",
+      "evidence": "No product source diff. Existing fixed-depth engine and diagnostic hooks reused. Only optional benchmark timing and diagnostic wrappers added."
+    },
+    "R8": {
+      "status": "PARTIAL",
+      "evidence": "Related330, final typecheck, build and lock check pass. Full2586 pass with15s harness outside sandbox. Default5s local suite has2 timeouts; single-worker retry interrupted after3 timeouts. Default local timing stability unresolved."
+    },
+    "R9": {
+      "status": "PASS",
+      "evidence": "All four raw journal SHA256 before/after match; tests independently rehash. Existing nine untracked source/evidence files unchanged and backed up."
+    },
+    "R10": {
+      "status": "PENDING_FINAL_HEAD_CI",
+      "evidence": "Issue217 and Draft PR218 created, first commit pushed. Initial CI source-provenance failure corrected; final-head CI will be recorded in Issue217/PR218 comments."
+    }
+  },
+  "reviewFindings": {
+    "P2-1": {
+      "status": "ADDRESSED_MEASUREMENT",
+      "remaining": "Actual deadline remains24/24; fixed path comparable. Q dominates measured work; no algorithmic defect established."
+    },
+    "P2-2": {
+      "status": "PARTIAL",
+      "remaining": "Counts explicit; precision and30 no-feature cases UNKNOWN."
+    },
+    "P2-3": {
+      "status": "ADDRESSED_SCOPED",
+      "evidence": "No proof dependency in reply/exchange/search comparisons. Proof scope limited to forced outcomes."
+    },
+    "P2-4": {
+      "status": "PASS_FOR_Q_DEPTH_AND_NORMAL_DEPTH",
+      "remaining": "Historical causality and pure SEE arithmetic UNKNOWN."
+    }
+  },
+  "validation": {
+    "relatedInitial": {
+      "status": "INFRASTRUCTURE_FAILURE",
+      "exitCode": 1,
+      "filesFailedToLoad": 11,
+      "testsRun": 0,
+      "reason": "sandbox TEMP cache rename EPERM",
+      "log": "related-tests.log.gz"
+    },
+    "relatedWorkspaceTemp": {
+      "status": "PASS",
+      "exitCode": 0,
+      "files": 11,
+      "tests": 330,
+      "log": "related-tests-workspace-temp.log.gz"
+    },
+    "fullDefault": {
+      "status": "FAIL_TIMEOUT",
+      "exitCode": 1,
+      "filesPassed": 96,
+      "filesFailed": 2,
+      "testsPassed": 2584,
+      "testsFailed": 2,
+      "log": "full-tests.log.gz"
+    },
+    "fullSingleWorker": {
+      "status": "INTERRUPTED",
+      "exitCode": 1,
+      "observedTimeouts": 3,
+      "testsPassed": null,
+      "reason": "Stopped after further5s harness timeouts; no complete count claimed.",
+      "log": "full-tests-single-worker.log.gz"
+    },
+    "full15sHarness": {
+      "status": "PASS",
+      "exitCode": 0,
+      "files": 98,
+      "tests": 2586,
+      "durationSeconds": 186.23,
+      "command": "npm test -- --testTimeout=15000",
+      "environment": "outside restricted sandbox, workspace TEMP, configured default2 workers",
+      "log": "full-tests-harness-15s.log.gz",
+      "note": "Pre-provenance-fix run. Final-head full suite is verified by CI; modified test subsequently passed local targeted run."
+    },
+    "typecheck": {
+      "status": "PASS",
+      "exitCode": 0,
+      "command": "npm run lint (tsc --noEmit)",
+      "log": "lint-final.log.gz"
+    },
+    "build": {
+      "status": "PASS",
+      "exitCode": 0,
+      "command": "npm run build",
+      "log": "build.log.gz"
+    },
+    "lockfile": {
+      "status": "PASS",
+      "exitCode": 0,
+      "command": "npm run verify:lock",
+      "log": "verify-lock.log.gz"
+    },
+    "remoteCI": {
+      "status": "PENDING_FINAL_HEAD",
+      "finalStatusLocation": "Issue217/PR218 submission comments and final response"
+    },
+    "provenanceFixTests": {
+      "status": "PASS",
+      "exitCode": 0,
+      "files": 2,
+      "tests": 10,
+      "log": "provenance-fix-tests.log.gz"
+    },
+    "provenanceFixTypecheck": {
+      "status": "PASS",
+      "exitCode": 0,
+      "command": "npm run lint",
+      "log": "lint-provenance-fix.log.gz"
+    },
+    "initialCI": {
+      "status": "FAIL",
+      "head": "df80b7119c959bd0c858842393f2e7c503d3d2a7",
+      "run": "https://github.com/tetsujisugimori-coder/Shogi-App/actions/runs/41980729246",
+      "ubuntu": {
+        "passed": 2585,
+        "failed": 1
+      },
+      "macos": {
+        "passed": 2583,
+        "failed": 1,
+        "skipped": 2
+      },
+      "reason": "New provenance test failed on mixed LF/CRLF. Corrected with verified raw-to-canonical source manifest. No other assertion failures."
+    }
+  },
+  "mergeRecommendation": "NO",
+  "mergeReason": "Independent review required; default local harness timeouts remain. Final remote CI must be checked after publication.",
+  "priority": "NOT_READY",
+  "playingStrengthImprovement": "UNKNOWN",
+  "finalVerdicts": {
+    "oldSuspected4": {
+      "INDETERMINATE": 4,
+      "CONFIRMED": 0
+    }
+  },
+  "issue": "https://github.com/tetsujisugimori-coder/Shogi-App/issues/217"
+}

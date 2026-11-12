@@ -1,0 +1,11 @@
+
+ RUN  v4.1.11 C:/Users/tetsu/Documents/ChatGPT/将棋アプリ/stage-w1-snapshots/old
+
+ ✓ src/test/game-blunder-investigation-v4.test.ts (7 tests) 38ms
+
+ Test Files  1 passed (1)
+      Tests  7 passed (7)
+   Start at  09:38:51
+   Duration  1.51s (transform 379ms, setup 84ms, import 535ms, tests 38ms, environment 518ms)
+
+JSON report written to C:/Users/tetsu/Documents/ChatGPT/将棋アプリ/repo/docs/benchmarks/game-blunder-windows-stage-w1-20261112/smoke-vitest.json

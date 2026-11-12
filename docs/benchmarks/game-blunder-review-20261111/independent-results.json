@@ -1,0 +1,1013 @@
+{
+  "recordedAt": "2026-11-11T03:34:24.352Z",
+  "sourceHead": "1edc169cc9ff27b7c77e825e95b893e5b0252ed1",
+  "headAtStart": "1edc169cc9ff27b7c77e825e95b893e5b0252ed1",
+  "headAtEnd": "1edc169cc9ff27b7c77e825e95b893e5b0252ed1",
+  "source": "docs/benchmarks/game-blunder-review-20261111/fixed-run/observations.jsonl",
+  "sourceHash": "ba643d6e0222436983ddbe1f05a288e7acc8cfda03de09993d9b72f8c6edbf6e",
+  "node": "v24.20.0",
+  "platform": "win32",
+  "sourceHashes": {
+    "scripts/summarize-game-blunders.ts": "55e4627ce0cbe35c24267a6c7013d92341f1136c4a29a8531b82542bee70ce8f",
+    "scripts/benchmarks/gameBlunderInvestigation.ts": "32d23d9a6179b9a7a523e64463ef67248c0f2b448efab9c44686fab047d2413c"
+  },
+  "trackedStatusAtStart": "",
+  "trackedStatusAtEnd": "",
+  "temp": "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\repo\\.tmp-tests\\review-20261111",
+  "cache": "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\repo\\.tmp-tests\\review-20261111\\independent-node-cache",
+  "results": [
+    {
+      "name": "normal",
+      "change": "Untouched final schema 3 evidence",
+      "inputSha256": "ba643d6e0222436983ddbe1f05a288e7acc8cfda03de09993d9b72f8c6edbf6e",
+      "exitCode": 0,
+      "seconds": 0.5553607,
+      "decision": "aggregated",
+      "roots": 24,
+      "invalid": {
+        "count": 0,
+        "byReason": {},
+        "rows": []
+      },
+      "hashSource": "recorded-and-journal-verified",
+      "groups": [
+        {
+          "id": "af1984db62af0f44b80c676627e2a7879d3af226d65288f0f4863ff554f049e3/{\"from\":{\"col\":1,\"row\":6},\"kind\":\"move\",\"pieceType\":\"pawn\",\"player\":\"sente\",\"promotion\":\"none\",\"to\":{\"col\":1,\"row\":5}}/legacy/1000",
+          "legalReplies": {
+            "actual": 34,
+            "alternative": 37
+          },
+          "legalCaptures": {
+            "actual": 1,
+            "alternative": 0
+          },
+          "comparable": 4,
+          "delta": [
+            520,
+            -532,
+            -532,
+            520
+          ]
+        },
+        {
+          "id": "76b90464a7633a735fd2aafbae9105c89ef732ff1c214b8830ad73e11e12d363/{\"from\":{\"col\":7,\"row\":4},\"kind\":\"move\",\"pieceType\":\"knight\",\"player\":\"gote\",\"promotion\":\"decline\",\"to\":{\"col\":6,\"row\":6}}/experimental/1000",
+          "legalReplies": {
+            "actual": 43,
+            "alternative": 38
+          },
+          "legalCaptures": {
+            "actual": 1,
+            "alternative": 0
+          },
+          "comparable": 4,
+          "delta": [
+            378.66666666666663,
+            -120,
+            -120,
+            378.66666666666663
+          ]
+        },
+        {
+          "id": "e53a261c1976524fb2e6a4a8924464f16b87e61f97469cd82751b884ac5fc1a5/{\"from\":{\"col\":1,\"row\":4},\"kind\":\"move\",\"pieceType\":\"bishop\",\"player\":\"gote\",\"promotion\":\"promote\",\"to\":{\"col\":5,\"row\":8}}/legacy/1000",
+          "legalReplies": {
+            "actual": 2,
+            "alternative": 41
+          },
+          "legalCaptures": {
+            "actual": 2,
+            "alternative": 0
+          },
+          "comparable": 4,
+          "delta": [
+            1309,
+            -318,
+            -318,
+            1309
+          ]
+        },
+        {
+          "id": "b18e7cb2dce7930ba48d783ce9b224a329797e606a3e41fbe0570f677178b19a/{\"from\":{\"col\":4,\"row\":5},\"kind\":\"move\",\"pieceType\":\"lance\",\"player\":\"sente\",\"promotion\":\"decline\",\"to\":{\"col\":4,\"row\":2}}/legacy/1000",
+          "legalReplies": {
+            "actual": 5,
+            "alternative": 64
+          },
+          "legalCaptures": {
+            "actual": 3,
+            "alternative": 0
+          },
+          "comparable": 4,
+          "delta": [
+            721,
+            -196,
+            -196,
+            721
+          ]
+        }
+      ]
+    },
+    {
+      "name": "finite-score-and-total",
+      "change": "Change both finite selectedEvaluation and breakdown.total by +17 in both root repetitions, regenerate keys",
+      "inputSha256": "260dcbf2f91384c7a06e887b68a1cdd431f59b0f8910a056089a8b2694a20ed3",
+      "exitCode": 0,
+      "seconds": 0.559988,
+      "decision": "aggregated",
+      "roots": 23,
+      "invalid": {
+        "count": 2,
+        "byReason": {
+          "pv-evaluation-mismatch": 2
+        },
+        "rows": [
+          {
+            "type": "root-fixed",
+            "id": "7ee4b05fb4030e72e782e158706312fcd0e336fcd5dfa6f2092bbfde33a2df4a/{\"from\":{\"col\":1,\"row\":7},\"kind\":\"move\",\"pieceType\":\"bishop\",\"player\":\"sente\",\"promotion\":\"decline\",\"to\":{\"col\":7,\"row\":1}}/legacy/1000",
+            "rep": 0,
+            "condition": "root-depth1",
+            "reason": "pv-evaluation-mismatch"
+          },
+          {
+            "type": "root-fixed",
+            "id": "7ee4b05fb4030e72e782e158706312fcd0e336fcd5dfa6f2092bbfde33a2df4a/{\"from\":{\"col\":1,\"row\":7},\"kind\":\"move\",\"pieceType\":\"bishop\",\"player\":\"sente\",\"promotion\":\"decline\",\"to\":{\"col\":7,\"row\":1}}/legacy/1000",
+            "rep": 1,
+            "condition": "root-depth1",
+            "reason": "pv-evaluation-mismatch"
+          }
+        ]
+      },
+      "hashSource": "recorded-and-journal-verified",
+      "groups": [
+        {
+          "id": "af1984db62af0f44b80c676627e2a7879d3af226d65288f0f4863ff554f049e3/{\"from\":{\"col\":1,\"row\":6},\"kind\":\"move\",\"pieceType\":\"pawn\",\"player\":\"sente\",\"promotion\":\"none\",\"to\":{\"col\":1,\"row\":5}}/legacy/1000",
+          "legalReplies": {
+            "actual": 34,
+            "alternative": 37
+          },
+          "legalCaptures": {
+            "actual": 1,
+            "alternative": 0
+          },
+          "comparable": 4,
+          "delta": [
+            520,
+            -532,
+            -532,
+            520
+          ]
+        },
+        {
+          "id": "76b90464a7633a735fd2aafbae9105c89ef732ff1c214b8830ad73e11e12d363/{\"from\":{\"col\":7,\"row\":4},\"kind\":\"move\",\"pieceType\":\"knight\",\"player\":\"gote\",\"promotion\":\"decline\",\"to\":{\"col\":6,\"row\":6}}/experimental/1000",
+          "legalReplies": {
+            "actual": 43,
+            "alternative": 38
+          },
+          "legalCaptures": {
+            "actual": 1,
+            "alternative": 0
+          },
+          "comparable": 4,
+          "delta": [
+            378.66666666666663,
+            -120,
+            -120,
+            378.66666666666663
+          ]
+        },
+        {
+          "id": "e53a261c1976524fb2e6a4a8924464f16b87e61f97469cd82751b884ac5fc1a5/{\"from\":{\"col\":1,\"row\":4},\"kind\":\"move\",\"pieceType\":\"bishop\",\"player\":\"gote\",\"promotion\":\"promote\",\"to\":{\"col\":5,\"row\":8}}/legacy/1000",
+          "legalReplies": {
+            "actual": 2,
+            "alternative": 41
+          },
+          "legalCaptures": {
+            "actual": 2,
+            "alternative": 0
+          },
+          "comparable": 4,
+          "delta": [
+            1309,
+            -318,
+            -318,
+            1309
+          ]
+        },
+        {
+          "id": "b18e7cb2dce7930ba48d783ce9b224a329797e606a3e41fbe0570f677178b19a/{\"from\":{\"col\":4,\"row\":5},\"kind\":\"move\",\"pieceType\":\"lance\",\"player\":\"sente\",\"promotion\":\"decline\",\"to\":{\"col\":4,\"row\":2}}/legacy/1000",
+          "legalReplies": {
+            "actual": 5,
+            "alternative": 64
+          },
+          "legalCaptures": {
+            "actual": 3,
+            "alternative": 0
+          },
+          "comparable": 4,
+          "delta": [
+            721,
+            -196,
+            -196,
+            721
+          ]
+        }
+      ]
+    },
+    {
+      "name": "coherent-fake-components",
+      "change": "Change both finite score and material component and total by +17 in both root repetitions, regenerate keys",
+      "inputSha256": "cd9ed14f52016dea6ecee949d1333217e61767f1433ec0eee20a38705810e709",
+      "exitCode": 0,
+      "seconds": 0.5857140000000002,
+      "decision": "aggregated",
+      "roots": 23,
+      "invalid": {
+        "count": 2,
+        "byReason": {
+          "pv-evaluation-mismatch": 2
+        },
+        "rows": [
+          {
+            "type": "root-fixed",
+            "id": "7ee4b05fb4030e72e782e158706312fcd0e336fcd5dfa6f2092bbfde33a2df4a/{\"from\":{\"col\":1,\"row\":7},\"kind\":\"move\",\"pieceType\":\"bishop\",\"player\":\"sente\",\"promotion\":\"decline\",\"to\":{\"col\":7,\"row\":1}}/legacy/1000",
+            "rep": 0,
+            "condition": "root-depth1",
+            "reason": "pv-evaluation-mismatch"
+          },
+          {
+            "type": "root-fixed",
+            "id": "7ee4b05fb4030e72e782e158706312fcd0e336fcd5dfa6f2092bbfde33a2df4a/{\"from\":{\"col\":1,\"row\":7},\"kind\":\"move\",\"pieceType\":\"bishop\",\"player\":\"sente\",\"promotion\":\"decline\",\"to\":{\"col\":7,\"row\":1}}/legacy/1000",
+            "rep": 1,
+            "condition": "root-depth1",
+            "reason": "pv-evaluation-mismatch"
+          }
+        ]
+      },
+      "hashSource": "recorded-and-journal-verified",
+      "groups": [
+        {
+          "id": "af1984db62af0f44b80c676627e2a7879d3af226d65288f0f4863ff554f049e3/{\"from\":{\"col\":1,\"row\":6},\"kind\":\"move\",\"pieceType\":\"pawn\",\"player\":\"sente\",\"promotion\":\"none\",\"to\":{\"col\":1,\"row\":5}}/legacy/1000",
+          "legalReplies": {
+            "actual": 34,
+            "alternative": 37
+          },
+          "legalCaptures": {
+            "actual": 1,
+            "alternative": 0
+          },
+          "comparable": 4,
+          "delta": [
+            520,
+            -532,
+            -532,
+            520
+          ]
+        },
+        {
+          "id": "76b90464a7633a735fd2aafbae9105c89ef732ff1c214b8830ad73e11e12d363/{\"from\":{\"col\":7,\"row\":4},\"kind\":\"move\",\"pieceType\":\"knight\",\"player\":\"gote\",\"promotion\":\"decline\",\"to\":{\"col\":6,\"row\":6}}/experimental/1000",
+          "legalReplies": {
+            "actual": 43,
+            "alternative": 38
+          },
+          "legalCaptures": {
+            "actual": 1,
+            "alternative": 0
+          },
+          "comparable": 4,
+          "delta": [
+            378.66666666666663,
+            -120,
+            -120,
+            378.66666666666663
+          ]
+        },
+        {
+          "id": "e53a261c1976524fb2e6a4a8924464f16b87e61f97469cd82751b884ac5fc1a5/{\"from\":{\"col\":1,\"row\":4},\"kind\":\"move\",\"pieceType\":\"bishop\",\"player\":\"gote\",\"promotion\":\"promote\",\"to\":{\"col\":5,\"row\":8}}/legacy/1000",
+          "legalReplies": {
+            "actual": 2,
+            "alternative": 41
+          },
+          "legalCaptures": {
+            "actual": 2,
+            "alternative": 0
+          },
+          "comparable": 4,
+          "delta": [
+            1309,
+            -318,
+            -318,
+            1309
+          ]
+        },
+        {
+          "id": "b18e7cb2dce7930ba48d783ce9b224a329797e606a3e41fbe0570f677178b19a/{\"from\":{\"col\":4,\"row\":5},\"kind\":\"move\",\"pieceType\":\"lance\",\"player\":\"sente\",\"promotion\":\"decline\",\"to\":{\"col\":4,\"row\":2}}/legacy/1000",
+          "legalReplies": {
+            "actual": 5,
+            "alternative": 64
+          },
+          "legalCaptures": {
+            "actual": 3,
+            "alternative": 0
+          },
+          "comparable": 4,
+          "delta": [
+            721,
+            -196,
+            -196,
+            721
+          ]
+        }
+      ]
+    },
+    {
+      "name": "normal-node-count",
+      "change": "Change observed normal enter count in both root repetitions while preserving result counts, regenerate keys",
+      "inputSha256": "5181eac663c3e3bb4b05fd56d11ab0821dc10cbb1c34ebb63a4016687732b2c6",
+      "exitCode": 0,
+      "seconds": 0.5797301000000002,
+      "decision": "aggregated",
+      "roots": 23,
+      "invalid": {
+        "count": 2,
+        "byReason": {
+          "inconsistent-node-counts": 2
+        },
+        "rows": [
+          {
+            "type": "root-fixed",
+            "id": "7ee4b05fb4030e72e782e158706312fcd0e336fcd5dfa6f2092bbfde33a2df4a/{\"from\":{\"col\":1,\"row\":7},\"kind\":\"move\",\"pieceType\":\"bishop\",\"player\":\"sente\",\"promotion\":\"decline\",\"to\":{\"col\":7,\"row\":1}}/legacy/1000",
+            "rep": 0,
+            "condition": "root-depth1",
+            "reason": "inconsistent-node-counts"
+          },
+          {
+            "type": "root-fixed",
+            "id": "7ee4b05fb4030e72e782e158706312fcd0e336fcd5dfa6f2092bbfde33a2df4a/{\"from\":{\"col\":1,\"row\":7},\"kind\":\"move\",\"pieceType\":\"bishop\",\"player\":\"sente\",\"promotion\":\"decline\",\"to\":{\"col\":7,\"row\":1}}/legacy/1000",
+            "rep": 1,
+            "condition": "root-depth1",
+            "reason": "inconsistent-node-counts"
+          }
+        ]
+      },
+      "hashSource": "recorded-and-journal-verified",
+      "groups": [
+        {
+          "id": "af1984db62af0f44b80c676627e2a7879d3af226d65288f0f4863ff554f049e3/{\"from\":{\"col\":1,\"row\":6},\"kind\":\"move\",\"pieceType\":\"pawn\",\"player\":\"sente\",\"promotion\":\"none\",\"to\":{\"col\":1,\"row\":5}}/legacy/1000",
+          "legalReplies": {
+            "actual": 34,
+            "alternative": 37
+          },
+          "legalCaptures": {
+            "actual": 1,
+            "alternative": 0
+          },
+          "comparable": 4,
+          "delta": [
+            520,
+            -532,
+            -532,
+            520
+          ]
+        },
+        {
+          "id": "76b90464a7633a735fd2aafbae9105c89ef732ff1c214b8830ad73e11e12d363/{\"from\":{\"col\":7,\"row\":4},\"kind\":\"move\",\"pieceType\":\"knight\",\"player\":\"gote\",\"promotion\":\"decline\",\"to\":{\"col\":6,\"row\":6}}/experimental/1000",
+          "legalReplies": {
+            "actual": 43,
+            "alternative": 38
+          },
+          "legalCaptures": {
+            "actual": 1,
+            "alternative": 0
+          },
+          "comparable": 4,
+          "delta": [
+            378.66666666666663,
+            -120,
+            -120,
+            378.66666666666663
+          ]
+        },
+        {
+          "id": "e53a261c1976524fb2e6a4a8924464f16b87e61f97469cd82751b884ac5fc1a5/{\"from\":{\"col\":1,\"row\":4},\"kind\":\"move\",\"pieceType\":\"bishop\",\"player\":\"gote\",\"promotion\":\"promote\",\"to\":{\"col\":5,\"row\":8}}/legacy/1000",
+          "legalReplies": {
+            "actual": 2,
+            "alternative": 41
+          },
+          "legalCaptures": {
+            "actual": 2,
+            "alternative": 0
+          },
+          "comparable": 4,
+          "delta": [
+            1309,
+            -318,
+            -318,
+            1309
+          ]
+        },
+        {
+          "id": "b18e7cb2dce7930ba48d783ce9b224a329797e606a3e41fbe0570f677178b19a/{\"from\":{\"col\":4,\"row\":5},\"kind\":\"move\",\"pieceType\":\"lance\",\"player\":\"sente\",\"promotion\":\"decline\",\"to\":{\"col\":4,\"row\":2}}/legacy/1000",
+          "legalReplies": {
+            "actual": 5,
+            "alternative": 64
+          },
+          "legalCaptures": {
+            "actual": 3,
+            "alternative": 0
+          },
+          "comparable": 4,
+          "delta": [
+            721,
+            -196,
+            -196,
+            721
+          ]
+        }
+      ]
+    },
+    {
+      "name": "q-node-count",
+      "change": "Change observed q enter count in both root repetitions while preserving result counts, regenerate keys",
+      "inputSha256": "f3001b0a05faa844b2738ea210949faa56e3f2be70d6ec4f36308bf16cea0d36",
+      "exitCode": 0,
+      "seconds": 0.6514689000000004,
+      "decision": "aggregated",
+      "roots": 23,
+      "invalid": {
+        "count": 2,
+        "byReason": {
+          "inconsistent-node-counts": 2
+        },
+        "rows": [
+          {
+            "type": "root-fixed",
+            "id": "7ee4b05fb4030e72e782e158706312fcd0e336fcd5dfa6f2092bbfde33a2df4a/{\"from\":{\"col\":1,\"row\":7},\"kind\":\"move\",\"pieceType\":\"bishop\",\"player\":\"sente\",\"promotion\":\"decline\",\"to\":{\"col\":7,\"row\":1}}/legacy/1000",
+            "rep": 0,
+            "condition": "root-depth1",
+            "reason": "inconsistent-node-counts"
+          },
+          {
+            "type": "root-fixed",
+            "id": "7ee4b05fb4030e72e782e158706312fcd0e336fcd5dfa6f2092bbfde33a2df4a/{\"from\":{\"col\":1,\"row\":7},\"kind\":\"move\",\"pieceType\":\"bishop\",\"player\":\"sente\",\"promotion\":\"decline\",\"to\":{\"col\":7,\"row\":1}}/legacy/1000",
+            "rep": 1,
+            "condition": "root-depth1",
+            "reason": "inconsistent-node-counts"
+          }
+        ]
+      },
+      "hashSource": "recorded-and-journal-verified",
+      "groups": [
+        {
+          "id": "af1984db62af0f44b80c676627e2a7879d3af226d65288f0f4863ff554f049e3/{\"from\":{\"col\":1,\"row\":6},\"kind\":\"move\",\"pieceType\":\"pawn\",\"player\":\"sente\",\"promotion\":\"none\",\"to\":{\"col\":1,\"row\":5}}/legacy/1000",
+          "legalReplies": {
+            "actual": 34,
+            "alternative": 37
+          },
+          "legalCaptures": {
+            "actual": 1,
+            "alternative": 0
+          },
+          "comparable": 4,
+          "delta": [
+            520,
+            -532,
+            -532,
+            520
+          ]
+        },
+        {
+          "id": "76b90464a7633a735fd2aafbae9105c89ef732ff1c214b8830ad73e11e12d363/{\"from\":{\"col\":7,\"row\":4},\"kind\":\"move\",\"pieceType\":\"knight\",\"player\":\"gote\",\"promotion\":\"decline\",\"to\":{\"col\":6,\"row\":6}}/experimental/1000",
+          "legalReplies": {
+            "actual": 43,
+            "alternative": 38
+          },
+          "legalCaptures": {
+            "actual": 1,
+            "alternative": 0
+          },
+          "comparable": 4,
+          "delta": [
+            378.66666666666663,
+            -120,
+            -120,
+            378.66666666666663
+          ]
+        },
+        {
+          "id": "e53a261c1976524fb2e6a4a8924464f16b87e61f97469cd82751b884ac5fc1a5/{\"from\":{\"col\":1,\"row\":4},\"kind\":\"move\",\"pieceType\":\"bishop\",\"player\":\"gote\",\"promotion\":\"promote\",\"to\":{\"col\":5,\"row\":8}}/legacy/1000",
+          "legalReplies": {
+            "actual": 2,
+            "alternative": 41
+          },
+          "legalCaptures": {
+            "actual": 2,
+            "alternative": 0
+          },
+          "comparable": 4,
+          "delta": [
+            1309,
+            -318,
+            -318,
+            1309
+          ]
+        },
+        {
+          "id": "b18e7cb2dce7930ba48d783ce9b224a329797e606a3e41fbe0570f677178b19a/{\"from\":{\"col\":4,\"row\":5},\"kind\":\"move\",\"pieceType\":\"lance\",\"player\":\"sente\",\"promotion\":\"decline\",\"to\":{\"col\":4,\"row\":2}}/legacy/1000",
+          "legalReplies": {
+            "actual": 5,
+            "alternative": 64
+          },
+          "legalCaptures": {
+            "actual": 3,
+            "alternative": 0
+          },
+          "comparable": 4,
+          "delta": [
+            721,
+            -196,
+            -196,
+            721
+          ]
+        }
+      ]
+    },
+    {
+      "name": "unused-negative-counters",
+      "scope": "additional-statistics",
+      "change": "Set unused cutoff and skipped-action result counters to -1 in both root repetitions",
+      "inputSha256": "6771541da00a20d7af5c658447409daacb3f5e7cca69659ad7ea2dd6bab13312",
+      "exitCode": 0,
+      "seconds": 0.7550976999999998,
+      "decision": "aggregated",
+      "roots": 23,
+      "invalid": {
+        "count": 2,
+        "byReason": {
+          "invalid-result-statistics": 2
+        },
+        "rows": [
+          {
+            "type": "root-fixed",
+            "id": "7ee4b05fb4030e72e782e158706312fcd0e336fcd5dfa6f2092bbfde33a2df4a/{\"from\":{\"col\":1,\"row\":7},\"kind\":\"move\",\"pieceType\":\"bishop\",\"player\":\"sente\",\"promotion\":\"decline\",\"to\":{\"col\":7,\"row\":1}}/legacy/1000",
+            "rep": 0,
+            "condition": "root-depth1",
+            "reason": "invalid-result-statistics"
+          },
+          {
+            "type": "root-fixed",
+            "id": "7ee4b05fb4030e72e782e158706312fcd0e336fcd5dfa6f2092bbfde33a2df4a/{\"from\":{\"col\":1,\"row\":7},\"kind\":\"move\",\"pieceType\":\"bishop\",\"player\":\"sente\",\"promotion\":\"decline\",\"to\":{\"col\":7,\"row\":1}}/legacy/1000",
+            "rep": 1,
+            "condition": "root-depth1",
+            "reason": "invalid-result-statistics"
+          }
+        ]
+      },
+      "hashSource": "recorded-and-journal-verified",
+      "groups": [
+        {
+          "id": "af1984db62af0f44b80c676627e2a7879d3af226d65288f0f4863ff554f049e3/{\"from\":{\"col\":1,\"row\":6},\"kind\":\"move\",\"pieceType\":\"pawn\",\"player\":\"sente\",\"promotion\":\"none\",\"to\":{\"col\":1,\"row\":5}}/legacy/1000",
+          "legalReplies": {
+            "actual": 34,
+            "alternative": 37
+          },
+          "legalCaptures": {
+            "actual": 1,
+            "alternative": 0
+          },
+          "comparable": 4,
+          "delta": [
+            520,
+            -532,
+            -532,
+            520
+          ]
+        },
+        {
+          "id": "76b90464a7633a735fd2aafbae9105c89ef732ff1c214b8830ad73e11e12d363/{\"from\":{\"col\":7,\"row\":4},\"kind\":\"move\",\"pieceType\":\"knight\",\"player\":\"gote\",\"promotion\":\"decline\",\"to\":{\"col\":6,\"row\":6}}/experimental/1000",
+          "legalReplies": {
+            "actual": 43,
+            "alternative": 38
+          },
+          "legalCaptures": {
+            "actual": 1,
+            "alternative": 0
+          },
+          "comparable": 4,
+          "delta": [
+            378.66666666666663,
+            -120,
+            -120,
+            378.66666666666663
+          ]
+        },
+        {
+          "id": "e53a261c1976524fb2e6a4a8924464f16b87e61f97469cd82751b884ac5fc1a5/{\"from\":{\"col\":1,\"row\":4},\"kind\":\"move\",\"pieceType\":\"bishop\",\"player\":\"gote\",\"promotion\":\"promote\",\"to\":{\"col\":5,\"row\":8}}/legacy/1000",
+          "legalReplies": {
+            "actual": 2,
+            "alternative": 41
+          },
+          "legalCaptures": {
+            "actual": 2,
+            "alternative": 0
+          },
+          "comparable": 4,
+          "delta": [
+            1309,
+            -318,
+            -318,
+            1309
+          ]
+        },
+        {
+          "id": "b18e7cb2dce7930ba48d783ce9b224a329797e606a3e41fbe0570f677178b19a/{\"from\":{\"col\":4,\"row\":5},\"kind\":\"move\",\"pieceType\":\"lance\",\"player\":\"sente\",\"promotion\":\"decline\",\"to\":{\"col\":4,\"row\":2}}/legacy/1000",
+          "legalReplies": {
+            "actual": 5,
+            "alternative": 64
+          },
+          "legalCaptures": {
+            "actual": 3,
+            "alternative": 0
+          },
+          "comparable": 4,
+          "delta": [
+            721,
+            -196,
+            -196,
+            721
+          ]
+        }
+      ]
+    },
+    {
+      "name": "unused-nonfinite-counters",
+      "scope": "additional-statistics",
+      "change": "Set unused cutoff result counter and elapsedMilliseconds to tagged nonfinite values",
+      "inputSha256": "e745a27a4a9b658f8fdbe52246154f485f1fd05d73421b8604570575b8911d97",
+      "exitCode": 0,
+      "seconds": 0.5986220999999996,
+      "decision": "aggregated",
+      "roots": 23,
+      "invalid": {
+        "count": 2,
+        "byReason": {
+          "invalid-result-statistics": 2
+        },
+        "rows": [
+          {
+            "type": "root-fixed",
+            "id": "7ee4b05fb4030e72e782e158706312fcd0e336fcd5dfa6f2092bbfde33a2df4a/{\"from\":{\"col\":1,\"row\":7},\"kind\":\"move\",\"pieceType\":\"bishop\",\"player\":\"sente\",\"promotion\":\"decline\",\"to\":{\"col\":7,\"row\":1}}/legacy/1000",
+            "rep": 0,
+            "condition": "root-depth1",
+            "reason": "invalid-result-statistics"
+          },
+          {
+            "type": "root-fixed",
+            "id": "7ee4b05fb4030e72e782e158706312fcd0e336fcd5dfa6f2092bbfde33a2df4a/{\"from\":{\"col\":1,\"row\":7},\"kind\":\"move\",\"pieceType\":\"bishop\",\"player\":\"sente\",\"promotion\":\"decline\",\"to\":{\"col\":7,\"row\":1}}/legacy/1000",
+            "rep": 1,
+            "condition": "root-depth1",
+            "reason": "invalid-result-statistics"
+          }
+        ]
+      },
+      "hashSource": "recorded-and-journal-verified",
+      "groups": [
+        {
+          "id": "af1984db62af0f44b80c676627e2a7879d3af226d65288f0f4863ff554f049e3/{\"from\":{\"col\":1,\"row\":6},\"kind\":\"move\",\"pieceType\":\"pawn\",\"player\":\"sente\",\"promotion\":\"none\",\"to\":{\"col\":1,\"row\":5}}/legacy/1000",
+          "legalReplies": {
+            "actual": 34,
+            "alternative": 37
+          },
+          "legalCaptures": {
+            "actual": 1,
+            "alternative": 0
+          },
+          "comparable": 4,
+          "delta": [
+            520,
+            -532,
+            -532,
+            520
+          ]
+        },
+        {
+          "id": "76b90464a7633a735fd2aafbae9105c89ef732ff1c214b8830ad73e11e12d363/{\"from\":{\"col\":7,\"row\":4},\"kind\":\"move\",\"pieceType\":\"knight\",\"player\":\"gote\",\"promotion\":\"decline\",\"to\":{\"col\":6,\"row\":6}}/experimental/1000",
+          "legalReplies": {
+            "actual": 43,
+            "alternative": 38
+          },
+          "legalCaptures": {
+            "actual": 1,
+            "alternative": 0
+          },
+          "comparable": 4,
+          "delta": [
+            378.66666666666663,
+            -120,
+            -120,
+            378.66666666666663
+          ]
+        },
+        {
+          "id": "e53a261c1976524fb2e6a4a8924464f16b87e61f97469cd82751b884ac5fc1a5/{\"from\":{\"col\":1,\"row\":4},\"kind\":\"move\",\"pieceType\":\"bishop\",\"player\":\"gote\",\"promotion\":\"promote\",\"to\":{\"col\":5,\"row\":8}}/legacy/1000",
+          "legalReplies": {
+            "actual": 2,
+            "alternative": 41
+          },
+          "legalCaptures": {
+            "actual": 2,
+            "alternative": 0
+          },
+          "comparable": 4,
+          "delta": [
+            1309,
+            -318,
+            -318,
+            1309
+          ]
+        },
+        {
+          "id": "b18e7cb2dce7930ba48d783ce9b224a329797e606a3e41fbe0570f677178b19a/{\"from\":{\"col\":4,\"row\":5},\"kind\":\"move\",\"pieceType\":\"lance\",\"player\":\"sente\",\"promotion\":\"decline\",\"to\":{\"col\":4,\"row\":2}}/legacy/1000",
+          "legalReplies": {
+            "actual": 5,
+            "alternative": 64
+          },
+          "legalCaptures": {
+            "actual": 3,
+            "alternative": 0
+          },
+          "comparable": 4,
+          "delta": [
+            721,
+            -196,
+            -196,
+            721
+          ]
+        }
+      ]
+    },
+    {
+      "name": "missing-runtime-positionHash",
+      "change": "Delete required runtime positionHash from schema 3 root rep1 while preserving result and repeatKey",
+      "inputSha256": "f2ba72b28de6a3a29bc7ae5d3bd726633482c499ef1d75107f58f94377c2fcba",
+      "exitCode": 1,
+      "seconds": 0.6389303,
+      "decision": "rejected",
+      "reason": "fixed position hash: 7ee4b05fb4030e72e782e158706312fcd0e336fcd5dfa6f2092bbfde33a2df4a/{\"from\":{\"col\":1,\"row\":7},\"kind\":\"move\",\"pieceType\":\"bishop\",\"player\":\"sente\",\"promotion\":\"decline\",\"to\":{\"col\":7,\"row\":1}}/legacy/1000\n+ actual - expected\n\n+ undefined\n- '7ee4b05fb4030e72e782e158706312fcd0e336fcd5dfa6f2092bbfde33a2df4a'\n"
+    },
+    {
+      "name": "missing-runtime-mode",
+      "change": "Delete required runtime mode from schema 3 root rep1 while preserving result and repeatKey",
+      "inputSha256": "231ad838faa4fa35ba3bf5c2665a6546aea292757766a51079710fc4159fa6b5",
+      "exitCode": 1,
+      "seconds": 0.5618298000000004,
+      "decision": "rejected",
+      "reason": "fixed mode: 7ee4b05fb4030e72e782e158706312fcd0e336fcd5dfa6f2092bbfde33a2df4a/{\"from\":{\"col\":1,\"row\":7},\"kind\":\"move\",\"pieceType\":\"bishop\",\"player\":\"sente\",\"promotion\":\"decline\",\"to\":{\"col\":7,\"row\":1}}/legacy/1000\n+ actual - expected\n\n+ undefined\n- 'legacy'\n"
+    },
+    {
+      "name": "missing-runtime-condition",
+      "change": "Delete required runtime condition from schema 3 root rep1 while preserving result and repeatKey",
+      "inputSha256": "d04950c56aa3ebdeae640a03bcfabd61f0b33024b3c2c1fef19ee43c1ada583a",
+      "exitCode": 1,
+      "seconds": 0.31563770000000024,
+      "decision": "rejected",
+      "reason": "fixed condition: 7ee4b05fb4030e72e782e158706312fcd0e336fcd5dfa6f2092bbfde33a2df4a/{\"from\":{\"col\":1,\"row\":7},\"kind\":\"move\",\"pieceType\":\"bishop\",\"player\":\"sente\",\"promotion\":\"decline\",\"to\":{\"col\":7,\"row\":1}}/legacy/1000\n+ actual - expected\n\n+ undefined\n- {\n-   depth: 1,\n-   name: 'root-depth1',\n-   options: {\n-     killerMoves: false,\n-     moveOrdering: 'standard',\n-     quiescence: {\n-       includeQuietPromotions: false,\n-       maxCheckEvasionExtensions: 0,\n-       maxTacticalDepth: 1,\n-       moveOrdering: 'original'\n-     },\n-     usePreviousIterationPv: false,\n-     useTranspositionTable: false\n-   }\n- }\n"
+    },
+    {
+      "name": "missing-runtime-budget",
+      "change": "Delete required runtime budget from schema 3 root rep1 while preserving result and repeatKey",
+      "inputSha256": "f35d2d3077b3cbd9039ec3625bb0310b7faad7a09e5cfa57c6738ee1017397cf",
+      "exitCode": 1,
+      "seconds": 0.34246180000000004,
+      "decision": "rejected",
+      "reason": "fixed budget: 7ee4b05fb4030e72e782e158706312fcd0e336fcd5dfa6f2092bbfde33a2df4a/{\"from\":{\"col\":1,\"row\":7},\"kind\":\"move\",\"pieceType\":\"bishop\",\"player\":\"sente\",\"promotion\":\"decline\",\"to\":{\"col\":7,\"row\":1}}/legacy/1000\n+ actual - expected\n\n+ undefined\n- {\n-   ms: 3000,\n-   nodes: 1500\n- }\n"
+    },
+    {
+      "name": "schema-downgrade",
+      "change": "Demote schema 3 to2 and delete root and probe runtime identity fields",
+      "inputSha256": "2310b277763775e7047959b26488ca849046f1bb6d6289b041e3de34967f8e79",
+      "exitCode": 1,
+      "seconds": 0.7431709999999994,
+      "decision": "rejected",
+      "reason": "schema does not match runner provenance\n\ntrue !== false\n"
+    },
+    {
+      "name": "reply-capture-spoof",
+      "change": "Replace saved actual candidate replies/captures/branches with empty arrays",
+      "inputSha256": "4112fa069e3af6c3e56d6ba22f095cdfb028915ec2bbe07031b8169ad0ece8a9",
+      "exitCode": 1,
+      "seconds": 0.6111284999999999,
+      "decision": "rejected",
+      "reason": "candidate reply or exchange metadata mismatch: af1984db62af0f44b80c676627e2a7879d3af226d65288f0f4863ff554f049e3/{\"from\":{\"col\":1,\"row\":6},\"kind\":\"move\",\"pieceType\":\"pawn\",\"player\":\"sente\",\"promotion\":\"none\",\"to\":{\"col\":1,\"row\":5}}/legacy/1000 actual\n+ actual - expected\n... Skipped lines\n\n  {\n    action: {\n      from: {\n        col: 1,\n        row: 6\n...\n    },\n+   branches: [],\n+   captures: [],\n-   branches: [\n-     {\n-       legalRecaptures: [],\n-       reply: {\n-         from: {\n-           col: 0,\n-           row: 4\n-         },\n-         kind: 'move',\n-         pieceType: 'bishop',\n-         player: 'gote',\n-         promotion: 'none',\n-         to: {\n-           col: 1,\n-           row: 5\n-         }\n-       }\n-     }\n-   ],\n-   captures: [\n-     {\n-       from: {\n-         col: 0,\n-         row: 4\n-       },\n-       kind: 'move',\n-       pieceType: 'bishop',\n-       player: 'gote',\n-       promotion: 'none',\n-       to: {\n-         col: 1,\n-         row: 5\n-       }\n-     }\n-   ],\n    childStatus: 'active',\n    deterministicExchange: {\n      afterPlayedMaterial: 0,\n      baselineMaterial: 0,\n      limitation: 'Recorded legal same-square line only; declining the exchange, checks elsewhere, sacrifices and alternative branches are not solved.',\n...\n    exchangeScope: 'First legal same-square capture at each step, at most 4 captures. All immediate captures and legal recaptures listed separately; no minimax exchange or compensation proof.',\n+   replies: []\n-   replies: [\n-     {\n-       from: {\n-         col: 0,\n-         row: 0\n-       },\n-       kind: 'move',\n-       pieceType: 'lance',\n-       player: 'gote',\n-       promotion: 'none',\n-       to: {\n-         col: 0,\n-         row: 1\n-       }\n-     },\n-     {\n-       from: {\n-         col: 2,\n-         row: 0\n-       },\n-       kind: 'move',\n-       pieceType: 'silver',\n-       player: 'gote',\n-       promotion: 'none',\n-       to: {\n-         col: 2,\n-         row: 1\n-       }\n-     },\n-     {\n-       from: {\n-         col: 2,\n-         row: 0\n-       },\n-       kind: 'move',\n-       pieceType: 'silver',\n-       player: 'gote',\n-       promotion: 'none',\n-       to: {\n-         col: 3,\n-         row: 1\n-       }\n-     },\n-     {\n-       from: {\n-         col: 3,\n-         row: 0\n-       },\n-       kind: 'move',\n-       pieceType: 'gold',\n-       player: 'gote',\n-       promotion: 'none',\n-       to: {\n-         col: 2,\n-         row: 1\n-       }\n-     },\n-     {\n-       from: {\n-         col: 3,\n-         row: 0\n-       },\n-       kind: 'move',\n-       pieceType: 'gold',\n-       player: 'gote',\n-       promotion: 'none',\n-       to: {\n-         col: 3,\n-         row: 1\n-       }\n-     },\n-     {\n-       from: {\n-         col: 3,\n-         row: 0\n-       },\n-       kind: 'move',\n-       pieceType: 'gold',\n-       player: 'gote',\n-       promotion: 'none',\n-       to: {\n-         col: 4,\n-         row: 1\n-       }\n-     },\n-     {\n-       from: {\n-         col: 4,\n-         row: 0\n-       },\n-       kind: 'move',\n-       pieceType: 'king',\n-       player: 'gote',\n-       promotion: 'none',\n-       to: {\n-         col: 3,\n-         row: 1\n-       }\n-     },\n-     {\n-       from: {\n-         col: 4,\n-         row: 0\n-       },\n-       kind: 'move',\n-       pieceType: 'king',\n-       player: 'gote',\n-       promotion: 'none',\n-       to: {\n-         col: 4,\n-         row: 1\n-       }\n-     },\n-     {\n-       from: {\n-         col: 4,\n-         row: 0\n-       },\n-       kind: 'move',\n-       pieceType: 'king',\n-       player: 'gote',\n-       promotion: 'none',\n-       to: {\n-         col: 5,\n-         row: 1\n-       }\n-     },\n-     {\n-       from: {\n-         col: 5,\n-         row: 0\n-       },\n-       kind: 'move',\n-       pieceType: 'gold',\n-       player: 'gote',\n-       promotion: 'none',\n-       to: {\n-         col: 6,\n-         row: 0\n-       }\n-     },\n-     {\n-       from: {\n-         col: 5,\n-         row: 0\n-       },\n-       kind: 'move',\n-       pieceType: 'gold',\n-       player: 'gote',\n-       promotion: 'none',\n-       to: {\n-         col: 4,\n-         row: 1\n-       }\n-     },\n-     {\n-       from: {\n-         col: 5,\n-         row: 0\n-       },\n-       kind: 'move',\n-       pieceType: 'gold',\n-       player: 'gote',\n-       promotion: 'none',\n-       to: {\n-         col: 5,\n-         row: 1\n-       }\n-     },\n-     {\n-       from: {\n-         col: 5,\n-         row: 0\n-       },\n-       kind: 'move',\n-       pieceType: 'gold',\n-       player: 'gote',\n-       promotion: 'none',\n-       to: {\n-         col: 6,\n-         row: 1\n-       }\n-     },\n-     {\n-       from: {\n-         col: 7,\n-         row: 0\n-       },\n-       kind: 'move',\n-       pieceType: 'knight',\n-       player: 'gote',\n-       promotion: 'none',\n-       to: {\n-         col: 6,\n-         row: 2\n-       }\n-     },\n-     {\n-       from: {\n-         col: 8,\n-         row: 0\n-       },\n-       kind: 'move',\n-       pieceType: 'lance',\n-       player: 'gote',\n-       promotion: 'none',\n-       to: {\n-         col: 8,\n-         row: 1\n-       }\n-     },\n-     {\n-       from: {\n-         col: 1,\n-         row: 1\n-       },\n-       kind: 'move',\n-       pieceType: 'rook',\n-       player: 'gote',\n-       promotion: 'none',\n-       to: {\n-         col: 0,\n-         row: 1\n-       }\n-     },\n-     {\n-       from: {\n-         col: 1,\n-         row: 1\n-       },\n-       kind: 'move',\n-       pieceType: 'rook',\n-       player: 'gote',\n-       promotion: 'none',\n-       to: {\n-         col: 2,\n-         row: 1\n-       }\n-     },\n-     {\n-       from: {\n-         col: 1,\n-         row: 1\n-       },\n-       kind: 'move',\n-       pieceType: 'rook',\n-       player: 'gote',\n-       promotion: 'none',\n-       to: {\n-         col: 3,\n-         row: 1\n-       }\n-     },\n-     {\n-       from: {\n-         col: 1,\n-         row: 1\n-       },\n-       kind: 'move',\n-       pieceType: 'rook',\n-       player: 'gote',\n-       promotion: 'none',\n-       to: {\n-         col: 4,\n-         row: 1\n-       }\n-     },\n-     {\n-       from: {\n-         col: 1,\n-         row: 1\n-       },\n-       kind: 'move',\n-       pieceType: 'rook',\n-       player: 'gote',\n-       promotion: 'none',\n-       to: {\n-         col: 5,\n-         row: 1\n-       }\n-     },\n-     {\n-       from: {\n-         col: 1,\n-         row: 1\n-       },\n-       kind: 'move',\n-       pieceType: 'rook',\n-       player: 'gote',\n-       promotion: 'none',\n-       to: {\n-         col: 6,\n-         row: 1\n-       }\n-     },\n-     {\n-       from: {\n-         col: 7,\n-         row: 1\n-       },\n-       kind: 'move',\n-       pieceType: 'silver',\n-       player: 'gote',\n-       promotion: 'none',\n-       to: {\n-         col: 6,\n-         row: 0\n-       }\n-     },\n-     {\n-       from: {\n-         col: 7,\n-         row: 1\n-       },\n-       kind: 'move',\n-       pieceType: 'silver',\n-       player: 'gote',\n-       promotion: 'none',\n-       to: {\n-         col: 6,\n-         row: 2\n-       }\n-     },\n-     {\n-       from: {\n-         col: 0,\n-         row: 2\n-       },\n-       kind: 'move',\n-       pieceType: 'pawn',\n-       player: 'gote',\n-       promotion: 'none',\n-       to: {\n-         col: 0,\n-         row: 3\n-       }\n-     },\n-     {\n-       from: {\n-         col: 1,\n-         row: 2\n-       },\n-       kind: 'move',\n-       pieceType: 'pawn',\n-       player: 'gote',\n-       promotion: 'none',\n-       to: {\n-         col: 1,\n-         row: 3\n-       }\n-     },\n-     {\n-       from: {\n-         col: 2,\n-         row: 2\n-       },\n-       kind: 'move',\n-       pieceType: 'pawn',\n-       player: 'gote',\n-       promotion: 'none',\n-       to: {\n-         col: 2,\n-         row: 3\n-       }\n-     },\n-     {\n-       from: {\n-         col: 3,\n-         row: 2\n-       },\n-       kind: 'move',\n-       pieceType: 'pawn',\n-       player: 'gote',\n-       promotion: 'none',\n-       to: {\n-         col: 3,\n-         row: 3\n-       }\n-     },\n-     {\n-       from: {\n-         col: 5,\n-         row: 2\n-       },\n-       kind: 'move',\n-       pieceType: 'pawn',\n-       player: 'gote',\n-       promotion: 'none',\n-       to: {\n-         col: 5,\n-         row: 3\n-       }\n-     },\n-     {\n-       from: {\n-         col: 7,\n-         row: 2\n-       },\n-       kind: 'move',\n-       pieceType: 'pawn',\n-       player: 'gote',\n-       promotion: 'none',\n-       to: {\n-         col: 7,\n-         row: 3\n-       }\n-     },\n-     {\n-       from: {\n-         col: 8,\n-         row: 2\n-       },\n-       kind: 'move',\n-       pieceType: 'pawn',\n-       player: 'gote',\n-       promotion: 'none',\n-       to: {\n-         col: 8,\n-         row: 3\n-       }\n-     },\n-     {\n-       from: {\n-         col: 4,\n-         row: 3\n-       },\n-       kind: 'move',\n-       pieceType: 'pawn',\n-       player: 'gote',\n-       promotion: 'none',\n-       to: {\n-         col: 4,\n-         row: 4\n-       }\n-     },\n-     {\n-       from: {\n-         col: 6,\n-         row: 3\n-       },\n-       kind: 'move',\n-       pieceType: 'pawn',\n-       player: 'gote',\n-       promotion: 'none',\n-       to: {\n-         col: 6,\n-         row: 4\n-       }\n-     },\n-     {\n-       from: {\n-         col: 0,\n-         row: 4\n-       },\n-       kind: 'move',\n-       pieceType: 'bishop',\n-       player: 'gote',\n-       promotion: 'none',\n-       to: {\n-         col: 1,\n-         row: 3\n-       }\n-     },\n-     {\n-       from: {\n-         col: 0,\n-         row: 4\n-       },\n-       kind: 'move',\n-       pieceType: 'bishop',\n-       player: 'gote',\n-       promotion: 'none',\n-       to: {\n-         col: 1,\n-         row: 5\n-       }\n-     }\n-   ]\n  }\n"
+    },
+    {
+      "name": "overlong-legal-pv",
+      "change": "Extend an existing root PV to3 plies only through legal captures, evaluate new leaf and update both repeats and keys",
+      "inputSha256": "1d12e4a60e142bce703d53269c6dc060c11dc50110e51a3cf96b07019ef2aeba",
+      "exitCode": 0,
+      "seconds": 0.604234699999999,
+      "decision": "aggregated",
+      "roots": 23,
+      "invalid": {
+        "count": 2,
+        "byReason": {
+          "pv-exceeds-search-horizon": 2
+        },
+        "rows": [
+          {
+            "type": "root-fixed",
+            "id": "af1984db62af0f44b80c676627e2a7879d3af226d65288f0f4863ff554f049e3/{\"from\":{\"col\":1,\"row\":6},\"kind\":\"move\",\"pieceType\":\"pawn\",\"player\":\"sente\",\"promotion\":\"none\",\"to\":{\"col\":1,\"row\":5}}/legacy/1000",
+            "rep": 0,
+            "condition": "root-depth1",
+            "reason": "pv-exceeds-search-horizon"
+          },
+          {
+            "type": "root-fixed",
+            "id": "af1984db62af0f44b80c676627e2a7879d3af226d65288f0f4863ff554f049e3/{\"from\":{\"col\":1,\"row\":6},\"kind\":\"move\",\"pieceType\":\"pawn\",\"player\":\"sente\",\"promotion\":\"none\",\"to\":{\"col\":1,\"row\":5}}/legacy/1000",
+            "rep": 1,
+            "condition": "root-depth1",
+            "reason": "pv-exceeds-search-horizon"
+          }
+        ]
+      },
+      "hashSource": "recorded-and-journal-verified",
+      "groups": [
+        {
+          "id": "af1984db62af0f44b80c676627e2a7879d3af226d65288f0f4863ff554f049e3/{\"from\":{\"col\":1,\"row\":6},\"kind\":\"move\",\"pieceType\":\"pawn\",\"player\":\"sente\",\"promotion\":\"none\",\"to\":{\"col\":1,\"row\":5}}/legacy/1000",
+          "legalReplies": {
+            "actual": 34,
+            "alternative": 37
+          },
+          "legalCaptures": {
+            "actual": 1,
+            "alternative": 0
+          },
+          "comparable": 4,
+          "delta": [
+            520,
+            -532,
+            -532,
+            520
+          ]
+        },
+        {
+          "id": "76b90464a7633a735fd2aafbae9105c89ef732ff1c214b8830ad73e11e12d363/{\"from\":{\"col\":7,\"row\":4},\"kind\":\"move\",\"pieceType\":\"knight\",\"player\":\"gote\",\"promotion\":\"decline\",\"to\":{\"col\":6,\"row\":6}}/experimental/1000",
+          "legalReplies": {
+            "actual": 43,
+            "alternative": 38
+          },
+          "legalCaptures": {
+            "actual": 1,
+            "alternative": 0
+          },
+          "comparable": 4,
+          "delta": [
+            378.66666666666663,
+            -120,
+            -120,
+            378.66666666666663
+          ]
+        },
+        {
+          "id": "e53a261c1976524fb2e6a4a8924464f16b87e61f97469cd82751b884ac5fc1a5/{\"from\":{\"col\":1,\"row\":4},\"kind\":\"move\",\"pieceType\":\"bishop\",\"player\":\"gote\",\"promotion\":\"promote\",\"to\":{\"col\":5,\"row\":8}}/legacy/1000",
+          "legalReplies": {
+            "actual": 2,
+            "alternative": 41
+          },
+          "legalCaptures": {
+            "actual": 2,
+            "alternative": 0
+          },
+          "comparable": 4,
+          "delta": [
+            1309,
+            -318,
+            -318,
+            1309
+          ]
+        },
+        {
+          "id": "b18e7cb2dce7930ba48d783ce9b224a329797e606a3e41fbe0570f677178b19a/{\"from\":{\"col\":4,\"row\":5},\"kind\":\"move\",\"pieceType\":\"lance\",\"player\":\"sente\",\"promotion\":\"decline\",\"to\":{\"col\":4,\"row\":2}}/legacy/1000",
+          "legalReplies": {
+            "actual": 5,
+            "alternative": 64
+          },
+          "legalCaptures": {
+            "actual": 3,
+            "alternative": 0
+          },
+          "comparable": 4,
+          "delta": [
+            721,
+            -196,
+            -196,
+            721
+          ]
+        }
+      ]
+    },
+    {
+      "name": "quiet-q-suffix",
+      "change": "Replace q suffix by a legal quiet move in a nonchecked position, recompute real leaf evaluation and keys",
+      "inputSha256": "693ac098d5e7cbfbb0edfbbd9819fea963c98b726f520501318fea3764c27326",
+      "exitCode": 0,
+      "seconds": 0.5996232999999993,
+      "decision": "aggregated",
+      "roots": 23,
+      "invalid": {
+        "count": 2,
+        "byReason": {
+          "non-tactical-quiescence-pv": 2
+        },
+        "rows": [
+          {
+            "type": "root-fixed",
+            "id": "7ee4b05fb4030e72e782e158706312fcd0e336fcd5dfa6f2092bbfde33a2df4a/{\"from\":{\"col\":1,\"row\":7},\"kind\":\"move\",\"pieceType\":\"bishop\",\"player\":\"sente\",\"promotion\":\"decline\",\"to\":{\"col\":7,\"row\":1}}/legacy/1000",
+            "rep": 0,
+            "condition": "root-depth1",
+            "reason": "non-tactical-quiescence-pv"
+          },
+          {
+            "type": "root-fixed",
+            "id": "7ee4b05fb4030e72e782e158706312fcd0e336fcd5dfa6f2092bbfde33a2df4a/{\"from\":{\"col\":1,\"row\":7},\"kind\":\"move\",\"pieceType\":\"bishop\",\"player\":\"sente\",\"promotion\":\"decline\",\"to\":{\"col\":7,\"row\":1}}/legacy/1000",
+            "rep": 1,
+            "condition": "root-depth1",
+            "reason": "non-tactical-quiescence-pv"
+          }
+        ]
+      },
+      "hashSource": "recorded-and-journal-verified",
+      "groups": [
+        {
+          "id": "af1984db62af0f44b80c676627e2a7879d3af226d65288f0f4863ff554f049e3/{\"from\":{\"col\":1,\"row\":6},\"kind\":\"move\",\"pieceType\":\"pawn\",\"player\":\"sente\",\"promotion\":\"none\",\"to\":{\"col\":1,\"row\":5}}/legacy/1000",
+          "legalReplies": {
+            "actual": 34,
+            "alternative": 37
+          },
+          "legalCaptures": {
+            "actual": 1,
+            "alternative": 0
+          },
+          "comparable": 4,
+          "delta": [
+            520,
+            -532,
+            -532,
+            520
+          ]
+        },
+        {
+          "id": "76b90464a7633a735fd2aafbae9105c89ef732ff1c214b8830ad73e11e12d363/{\"from\":{\"col\":7,\"row\":4},\"kind\":\"move\",\"pieceType\":\"knight\",\"player\":\"gote\",\"promotion\":\"decline\",\"to\":{\"col\":6,\"row\":6}}/experimental/1000",
+          "legalReplies": {
+            "actual": 43,
+            "alternative": 38
+          },
+          "legalCaptures": {
+            "actual": 1,
+            "alternative": 0
+          },
+          "comparable": 4,
+          "delta": [
+            378.66666666666663,
+            -120,
+            -120,
+            378.66666666666663
+          ]
+        },
+        {
+          "id": "e53a261c1976524fb2e6a4a8924464f16b87e61f97469cd82751b884ac5fc1a5/{\"from\":{\"col\":1,\"row\":4},\"kind\":\"move\",\"pieceType\":\"bishop\",\"player\":\"gote\",\"promotion\":\"promote\",\"to\":{\"col\":5,\"row\":8}}/legacy/1000",
+          "legalReplies": {
+            "actual": 2,
+            "alternative": 41
+          },
+          "legalCaptures": {
+            "actual": 2,
+            "alternative": 0
+          },
+          "comparable": 4,
+          "delta": [
+            1309,
+            -318,
+            -318,
+            1309
+          ]
+        },
+        {
+          "id": "b18e7cb2dce7930ba48d783ce9b224a329797e606a3e41fbe0570f677178b19a/{\"from\":{\"col\":4,\"row\":5},\"kind\":\"move\",\"pieceType\":\"lance\",\"player\":\"sente\",\"promotion\":\"decline\",\"to\":{\"col\":4,\"row\":2}}/legacy/1000",
+          "legalReplies": {
+            "actual": 5,
+            "alternative": 64
+          },
+          "legalCaptures": {
+            "actual": 3,
+            "alternative": 0
+          },
+          "comparable": 4,
+          "delta": [
+            721,
+            -196,
+            -196,
+            721
+          ]
+        }
+      ]
+    }
+  ]
+}

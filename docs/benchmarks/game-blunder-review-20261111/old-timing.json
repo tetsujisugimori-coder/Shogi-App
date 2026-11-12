@@ -1,0 +1,95 @@
+{
+  "temp": "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\repo\\.tmp-tests\\review-20261111",
+  "cache": "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\repo\\.tmp-tests\\review-20261111/node-compile-cache",
+  "cpus": 24,
+  "node": "v24.20.0",
+  "runs": [
+    {
+      "seconds": 3.1876934,
+      "pattern": "accepts terminal PV shorter",
+      "workers": 1,
+      "run": "single-1-0",
+      "exit": 0,
+      "testTimeout": 5000,
+      "file": "src/test/match-journal.test.ts"
+    },
+    {
+      "seconds": 3.7617104,
+      "pattern": "深さ3の途中で詰み",
+      "workers": 1,
+      "run": "single-1-1",
+      "exit": 0,
+      "testTimeout": 5000,
+      "file": "src/test/shogi-two-ply-minimax-ai.test.ts"
+    },
+    {
+      "seconds": 3.3086315,
+      "pattern": "accepts terminal PV shorter|深さ3の途中で詰み",
+      "workers": 2,
+      "run": "parallel-1-5000",
+      "files": [
+        "src/test/match-journal.test.ts",
+        "src/test/shogi-two-ply-minimax-ai.test.ts"
+      ],
+      "exit": 0,
+      "testTimeout": 5000
+    },
+    {
+      "seconds": 3.6950339,
+      "pattern": "accepts terminal PV shorter|深さ3の途中で詰み",
+      "workers": 2,
+      "run": "parallel-1-15000",
+      "files": [
+        "src/test/match-journal.test.ts",
+        "src/test/shogi-two-ply-minimax-ai.test.ts"
+      ],
+      "exit": 0,
+      "testTimeout": 15000
+    },
+    {
+      "seconds": 2.5942408,
+      "pattern": "accepts terminal PV shorter",
+      "workers": 1,
+      "run": "single-2-0",
+      "exit": 0,
+      "testTimeout": 5000,
+      "file": "src/test/match-journal.test.ts"
+    },
+    {
+      "seconds": 3.2046082,
+      "pattern": "深さ3の途中で詰み",
+      "workers": 1,
+      "run": "single-2-1",
+      "exit": 0,
+      "testTimeout": 5000,
+      "file": "src/test/shogi-two-ply-minimax-ai.test.ts"
+    },
+    {
+      "seconds": 3.0906209,
+      "pattern": "accepts terminal PV shorter|深さ3の途中で詰み",
+      "workers": 2,
+      "run": "parallel-2-5000",
+      "files": [
+        "src/test/match-journal.test.ts",
+        "src/test/shogi-two-ply-minimax-ai.test.ts"
+      ],
+      "exit": 0,
+      "testTimeout": 5000
+    },
+    {
+      "seconds": 3.8028406,
+      "pattern": "accepts terminal PV shorter|深さ3の途中で詰み",
+      "workers": 2,
+      "run": "parallel-2-15000",
+      "files": [
+        "src/test/match-journal.test.ts",
+        "src/test/shogi-two-ply-minimax-ai.test.ts"
+      ],
+      "exit": 0,
+      "testTimeout": 15000
+    }
+  ],
+  "head": "e1ccb1a2412e7faa86c2c1f60fdad1dca154023a",
+  "os": "Microsoft Windows NT 10.0.26300.0",
+  "cachePolicy": "Fresh dedicated directory on first invocation, reused for subsequent runs"
+}

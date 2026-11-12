@@ -1,0 +1,194 @@
+{
+  "recordedAtJST": "2026-11-11T12:51:42.753003+09:00",
+  "head": "07db466b6f11558c9eb257a49c21f1dd6f3a4753",
+  "sourceHead": "1edc169cc9ff27b7c77e825e95b893e5b0252ed1",
+  "overall": "PARTIAL",
+  "mergeRecommendation": "NO",
+  "closures": {
+    "P2-01": "PASS",
+    "P2-02": "PASS",
+    "P3-01": "PASS"
+  },
+  "newUnresolvedFindings": [],
+  "unresolved": {
+    "R8": "PARTIAL",
+    "windowsRootCause": "UNKNOWN"
+  },
+  "finalSourceVerification": {
+    "docsOnlyDiff": true,
+    "changedEvidenceFiles": 85,
+    "codeDiff": "",
+    "sourceFilesVerified": 99,
+    "archiveFilesVerified": 41,
+    "evidenceManifestFilesVerified": 88,
+    "archiveSha256": "da2281b44b1f6638db605b457ac0b3eac3f68318219071799a29fe3997b626e7",
+    "readableCopiesByteIdentical": true,
+    "originalFilesVerified": 48
+  },
+  "ci": {
+    "source": "direct gh run view and --log",
+    "url": "https://github.com/tetsujisugimori-coder/Shogi-App/actions/runs/42954635780",
+    "headSha": "07db466b6f11558c9eb257a49c21f1dd6f3a4753",
+    "status": "completed",
+    "conclusion": "success",
+    "jobs": [
+      {
+        "name": "Verify on macos-latest",
+        "status": "completed",
+        "conclusion": "success",
+        "suitesPassed": 98,
+        "testsPassed": 2585,
+        "testsSkipped": 2,
+        "steps": [
+          {
+            "name": "Verify package-lock integrity",
+            "conclusion": "success"
+          },
+          {
+            "name": "Run TypeScript type check",
+            "conclusion": "success"
+          },
+          {
+            "name": "Run test suite",
+            "conclusion": "success"
+          },
+          {
+            "name": "Run production build",
+            "conclusion": "success"
+          }
+        ]
+      },
+      {
+        "name": "Verify on ubuntu-latest",
+        "status": "completed",
+        "conclusion": "success",
+        "suitesPassed": 98,
+        "testsPassed": 2587,
+        "testsSkipped": 0,
+        "steps": [
+          {
+            "name": "Verify package-lock integrity",
+            "conclusion": "success"
+          },
+          {
+            "name": "Run TypeScript type check",
+            "conclusion": "success"
+          },
+          {
+            "name": "Run test suite",
+            "conclusion": "success"
+          },
+          {
+            "name": "Run production build",
+            "conclusion": "success"
+          }
+        ]
+      }
+    ],
+    "directJsonSha256": "9faa417504bfadcfc1eb0c313ddc45782c6d8d079d56ac291acd621096f15a79",
+    "directLogSha256": "1704bda98e78d96a832add1a933059c16f23ba22b4b1508dd8b8ba87b44574e9",
+    "matchesImplementationProvidedHeadAndConclusion": true
+  },
+  "pullRequest": {
+    "url": "https://github.com/tetsujisugimori-coder/Shogi-App/pull/218",
+    "headRefOid": "07db466b6f11558c9eb257a49c21f1dd6f3a4753",
+    "isDraft": true,
+    "state": "OPEN",
+    "mergedAt": null,
+    "autoMergeRequest": null
+  },
+  "pairNaN": {
+    "processExitCode": 0,
+    "inputSha256": "aab6cf0f72ba1ce1058cfcad35c4eeff69a6293f0aa6fa10a0963f834d3f26f0",
+    "sourceInputSha256": "ba643d6e0222436983ddbe1f05a288e7acc8cfda03de09993d9b72f8c6edbf6e",
+    "targetId": "af1984db62af0f44b80c676627e2a7879d3af226d65288f0f4863ff554f049e3/{\"from\":{\"col\":1,\"row\":6},\"kind\":\"move\",\"pieceType\":\"pawn\",\"player\":\"sente\",\"promotion\":\"none\",\"to\":{\"col\":1,\"row\":5}}/legacy/1000",
+    "condition": "baseline",
+    "kind": "actual",
+    "repetitions": [
+      0,
+      1
+    ],
+    "reproducible": false,
+    "delta": null,
+    "invalid": {
+      "count": 2,
+      "byReason": {
+        "non-finite-evaluation": 2
+      },
+      "rows": [
+        {
+          "type": "pair-fixed",
+          "id": "af1984db62af0f44b80c676627e2a7879d3af226d65288f0f4863ff554f049e3/{\"from\":{\"col\":1,\"row\":6},\"kind\":\"move\",\"pieceType\":\"pawn\",\"player\":\"sente\",\"promotion\":\"none\",\"to\":{\"col\":1,\"row\":5}}/legacy/1000",
+          "rep": 0,
+          "condition": "baseline",
+          "kind": "actual",
+          "reason": "non-finite-evaluation"
+        },
+        {
+          "type": "pair-fixed",
+          "id": "af1984db62af0f44b80c676627e2a7879d3af226d65288f0f4863ff554f049e3/{\"from\":{\"col\":1,\"row\":6},\"kind\":\"move\",\"pieceType\":\"pawn\",\"player\":\"sente\",\"promotion\":\"none\",\"to\":{\"col\":1,\"row\":5}}/legacy/1000",
+          "rep": 1,
+          "condition": "baseline",
+          "kind": "actual",
+          "reason": "non-finite-evaluation"
+        }
+      ]
+    },
+    "rootReproducible": 24,
+    "affectedFactors": [
+      {
+        "condition": "q0",
+        "changedFields": [
+          "options.quiescence.maxTacticalDepth"
+        ],
+        "fixed": [
+          "position",
+          "candidate actions",
+          "perspective",
+          "mode",
+          "node/time caps",
+          "other settings"
+        ],
+        "status": "EXPERIMENT_INVALID",
+        "deltaChange": null,
+        "interpretation": "Effect within bounded search; cause of historical move UNKNOWN."
+      },
+      {
+        "condition": "depth1",
+        "changedFields": [
+          "depth"
+        ],
+        "fixed": [
+          "position",
+          "candidate actions",
+          "perspective",
+          "mode",
+          "node/time caps",
+          "other settings"
+        ],
+        "status": "EXPERIMENT_INVALID",
+        "deltaChange": null,
+        "interpretation": "Effect within bounded search; cause of historical move UNKNOWN."
+      },
+      {
+        "condition": "see-order",
+        "changedFields": [
+          "options.moveOrdering"
+        ],
+        "fixed": [
+          "position",
+          "candidate actions",
+          "perspective",
+          "mode",
+          "node/time caps",
+          "other settings"
+        ],
+        "status": "EXPERIMENT_INVALID",
+        "deltaChange": null,
+        "interpretation": "Existing ordering policy, not isolated SEE arithmetic; original standard ordering does not use SEE."
+      }
+    ],
+    "verdict": "INDETERMINATE",
+    "priority": "NOT_READY"
+  }
+}

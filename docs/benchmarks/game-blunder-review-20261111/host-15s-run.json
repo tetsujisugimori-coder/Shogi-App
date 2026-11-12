@@ -1,0 +1,19 @@
+{
+  "runnerTimeout": 15000,
+  "exitCode": 0,
+  "environment": "exec_command require_escalated",
+  "seconds": 168.7507543,
+  "temp": "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\repo\\.tmp-tests\\review-20261111",
+  "cache": "retained shared workspace cache",
+  "head": "1edc169cc9ff27b7c77e825e95b893e5b0252ed1",
+  "workers": 2,
+  "command": [
+    "node",
+    "node_modules/vitest/vitest.mjs",
+    "run",
+    "--testTimeout=15000",
+    "--reporter=default",
+    "--reporter=json",
+    "--outputFile=docs/benchmarks/game-blunder-review-20261111/host-full-15s.json"
+  ]
+}
