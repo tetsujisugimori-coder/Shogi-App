@@ -1,0 +1,37 @@
+{
+  "captured": "2026-11-12T09:36:58.4481459+09:00",
+  "repositoryHead": "2a8a57b6ff207831c77ce62d27d3151eba7c1dc3",
+  "branch": "codex/game-blunder-diagnostics",
+  "gitStatusBefore": "?? .tmp-tests/",
+  "github": {
+    "state": "OPEN",
+    "head": "2a8a57b6ff207831c77ce62d27d3151eba7c1dc3",
+    "checks": "ubuntu and macos SUCCESS",
+    "issue217": "OPEN",
+    "pr": 218,
+    "draft": true
+  },
+  "windows": "Microsoft Windows NT 10.0.26300.0",
+  "node": "v24.20.0",
+  "npm": "11.17.0",
+  "vitest": "vitest/4.1.11 win32-x64 node-v24.20.0",
+  "hostResources": {
+    "logical": 24,
+    "totalBytes": 16869351424,
+    "freeBytes": 3253710848
+  },
+  "temp": "C:\\Users\\tetsu\\AppData\\Local\\Packages\\openai.codex_2p2nqsd0c76g0\\AC\\#!sandbox.{8d32eb6e-c457-4522-a317-a4f4e18a9f8d}\\Temp",
+  "tmp": "C:\\Users\\tetsu\\AppData\\Local\\Packages\\openai.codex_2p2nqsd0c76g0\\AC\\#!sandbox.{8d32eb6e-c457-4522-a317-a4f4e18a9f8d}\\Temp",
+  "nodeOptions": null,
+  "nodeCompileCache": null,
+  "npmCache": null,
+  "worker": "maxWorkers 2; Vitest default pool",
+  "timeout": "Vitest default 5000 ms",
+  "dependency": "copies of preexisting node_modules, identical lockfile blobs, no clean install",
+  "cache": "separate snapshot node_modules/.vite, initial cache excluded, retained per snapshot",
+  "clock": "ISO 8601 local offset or UTC",
+  "limitations": [
+    "CIM unavailable in sandbox",
+    "GC, per-test timestamps and worker attribution NOT_MEASURED"
+  ]
+}

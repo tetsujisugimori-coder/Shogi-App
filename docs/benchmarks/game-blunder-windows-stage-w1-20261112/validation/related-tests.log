@@ -1,0 +1,13 @@
+
+> shogi-app@0.0.0 test
+> vitest run src/test/game-blunder-investigation-v4.test.ts src/test/game-blunder-v4-journal-integration.test.ts
+
+
+ RUN  v4.1.11 C:/Users/tetsu/Documents/ChatGPT/将棋アプリ/stage-w1-snapshots/new
+
+
+ Test Files  2 passed (2)
+      Tests  11 passed (11)
+   Start at  09:55:20
+   Duration  2.56s (transform 586ms, setup 171ms, import 873ms, tests 1.02s, environment 1.09s)
+

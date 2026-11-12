@@ -1,0 +1,36 @@
+
+ RUN  v4.1.11 C:/Users/tetsu/Documents/ChatGPT/将棋アプリ/stage-w1-snapshots/new
+
+ ✓ src/test/shogi-two-ply-minimax-ai.test.ts (72 tests) 2364ms
+     ✓ 深さ3では並べ替えなしαβより少ない局面を生成し、選択手と評価値を保つ  397ms
+     ✓ 深さ3は最大化→最小化→最大化で3 ply先を評価し、枝刈りなし参照探索と選択・評価が一致する  364ms
+     ✓ 深さ3の途中で詰みへ到達した枝は、それ以上の子局面を生成せず既存の終局評価を返す  635ms
+stdout | src/test/shogi.test.tsx > 6. macOS 検証スクリプトの公開API・内部処理・本番cleanup経路の単体テスト > 公開検証関数 (verifyMacOsFsevents) > 非macOS環境では platform が実OSと一致し、isDarwin: false, nativeVerified: false を返すこと
+[verify:macos-fsevents] Running on platform: win32 (Windows_NT 10.0.26300)
+[verify:macos-fsevents] Current platform is not darwin (macOS).
+[verify:macos-fsevents] Static inspection note: macOS native watching was NOT executed on this platform.
+[verify:macos-fsevents] Static inspection note: Vite watcher macOS native path was NOT executed on this platform.
+[verify:macos-fsevents] Inspecting package-lock.json for fsevents metadata:
+ - fsevents version: 2.3.3
+ - fsevents optional: true
+ - fsevents os constraint: ["darwin"]
+ - fsevents hasInstallScript: true
+[verify:macos-fsevents] Non-darwin platform static check passed (native macOS watch skipped).
+
+stdout | src/test/shogi.test.tsx > 6. macOS 検証スクリプトの公開API・内部処理・本番cleanup経路の単体テスト > 公開検証関数 (verifyMacOsFsevents) > 非macOS環境では引数を渡しても内部で無視され、macOSの成功結果（nativeVerified: true）を偽装できないこと
+[verify:macos-fsevents] Running on platform: win32 (Windows_NT 10.0.26300)
+[verify:macos-fsevents] Current platform is not darwin (macOS).
+[verify:macos-fsevents] Static inspection note: macOS native watching was NOT executed on this platform.
+[verify:macos-fsevents] Static inspection note: Vite watcher macOS native path was NOT executed on this platform.
+[verify:macos-fsevents] Inspecting package-lock.json for fsevents metadata:
+ - fsevents version: 2.3.3
+ - fsevents optional: true
+ - fsevents os constraint: ["darwin"]
+ - fsevents hasInstallScript: true
+[verify:macos-fsevents] Non-darwin platform static check passed (native macOS watch skipped).
+
+ ✓ src/test/shogi.test.tsx (152 tests) 3662ms
+         ✓ 任意成り先でARIA付きダイアログを開き、ダイアログ内へフォーカスすること  385ms
+         ✓ 「成る」で成駒、「不成」で未成駒として着手すること  373ms
+     ✓ ロックファイル検証スクリプト verify-lockfile.mjs が存在し正常終了すること  364ms
+ ✓ src/test/shogi-drop.test.tsx (67 tests) 1055ms
