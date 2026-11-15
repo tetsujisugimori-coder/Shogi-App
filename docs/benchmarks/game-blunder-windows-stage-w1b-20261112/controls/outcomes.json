@@ -1,0 +1,58 @@
+[
+  {
+    "name": "zero",
+    "old": "PASS",
+    "new": "INCOMPLETE",
+    "oldExit": 0,
+    "newExit": 0
+  },
+  {
+    "name": "missing-file",
+    "old": "PASS",
+    "new": "INCOMPLETE",
+    "oldExit": 0,
+    "newExit": 0
+  },
+  {
+    "name": "count-mismatch",
+    "old": "PASS",
+    "new": "INVALID",
+    "oldExit": 0,
+    "newExit": 0
+  },
+  {
+    "name": "unfinished-suite",
+    "old": "PASS",
+    "new": "INCOMPLETE",
+    "oldExit": 0,
+    "newExit": 0
+  },
+  {
+    "name": "malformed-json",
+    "old": "ERROR",
+    "new": "INVALID",
+    "oldExit": 1,
+    "newExit": 0
+  },
+  {
+    "name": "failure-zero-exit",
+    "old": "NONPASS_OR_SIGNAL",
+    "new": "FAIL",
+    "oldExit": 0,
+    "newExit": 0
+  },
+  {
+    "name": "normal",
+    "old": "PASS",
+    "new": "PASS",
+    "oldExit": 0,
+    "newExit": 0
+  },
+  {
+    "name": "duplicates",
+    "old": "PASS",
+    "new": "PASS",
+    "oldExit": 0,
+    "newExit": 0
+  }
+]

@@ -1,0 +1,9 @@
+{
+  "command": "npm test -- src/test",
+  "trackedTestFiles": 98,
+  "collectedProductFiles": 98,
+  "missing": [],
+  "unexpected": [],
+  "temporaryFixturesInUnfilteredList": 15,
+  "reason": "Preserve all temporary fixtures; select every tracked product suite, without changing timeout, workers, or source configuration."
+}

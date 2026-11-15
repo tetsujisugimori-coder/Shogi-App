@@ -1,0 +1,19 @@
+{
+  "at": "2026-11-15T11:05:28.199Z",
+  "old": {
+    "count": 13704,
+    "sha256": "e1013dabe266b8909d3c8f663a2dae8cf28dfd7a31fe6d5c6fb4b403d718d85e"
+  },
+  "new": {
+    "count": 13704,
+    "sha256": "e34e0eb7050984e7b50e4385f37eeb7b4660f11a9bd45cac2c889172168a4550"
+  },
+  "differences": [
+    {
+      "path": ".vite/vitest/da39a3ee5e6b4b0d3255bfef95601890afd80709/results.json",
+      "oldSha256": "a5c8dcb66775acc9b5485e2a0602ae7a6e6adf54c3abf313658deaf7a9ebb1de",
+      "newSha256": "cb1f0c7d9365d8b3dcc2df1e2f36f2a58af009fb6ab36851d2fcbe0c67d8d661"
+    }
+  ],
+  "note": "Raw file differences only; do not exclude caches or normalize dependency bytes to authorize comparison. Different hashes cannot establish the environment of past trials."
+}

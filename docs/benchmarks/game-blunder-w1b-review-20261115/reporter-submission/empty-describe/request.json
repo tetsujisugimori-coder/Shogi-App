@@ -1,0 +1,15 @@
+{
+  "mode": "run",
+  "dir": "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\repo\\.tmp-tests\\w1b-review-20261115-reporter-submission\\empty-describe",
+  "output": "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\repo\\docs\\benchmarks\\game-blunder-w1b-review-20261115\\reporter-submission\\empty-describe",
+  "filters": [],
+  "command": [
+    "createVitest",
+    "test",
+    "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\repo\\.tmp-tests\\w1b-review-20261115-reporter-submission\\empty-describe"
+  ],
+  "runId": "reporter-empty-describe",
+  "trialId": "empty-describe",
+  "preflightSha256": "DIRECT-REPORTER-OBSERVATION-NO-PREFLIGHT",
+  "inventorySha256": "NOT-A-COMPARISON"
+}

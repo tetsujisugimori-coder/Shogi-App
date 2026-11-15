@@ -1,0 +1,3 @@
+{"file":"a.test.ts","name":"one","status":"passed","durationMs":null,"start":"NOT_MEASURED","end":"NOT_MEASURED","worker":"NOT_MEASURED","timeout":false}
+{"file":"a.test.ts","name":"one","status":"passed","durationMs":null,"start":"NOT_MEASURED","end":"NOT_MEASURED","worker":"NOT_MEASURED","timeout":false}
+{"file":"b.test.ts","name":"two","status":"passed","durationMs":null,"start":"NOT_MEASURED","end":"NOT_MEASURED","worker":"NOT_MEASURED","timeout":false}

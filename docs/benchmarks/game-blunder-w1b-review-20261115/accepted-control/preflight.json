@@ -1,0 +1,100 @@
+{
+  "runId": "50ca8ca9-605b-4f68-b6f2-3954332ec304",
+  "at": "2026-11-15T11:07:16.153Z",
+  "output": "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\repo\\docs\\benchmarks\\game-blunder-w1b-review-20261115\\accepted-control",
+  "plan": {
+    "targets": [
+      {
+        "repo": "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\repo\\.tmp-tests\\w1b-review-20261115-submission\\git-source",
+        "dir": "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\repo\\.tmp-tests\\w1b-review-20261115-submission\\a",
+        "head": "3873eb41dac34b7ee99ee2959086ad85b8525373"
+      },
+      {
+        "repo": "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\repo\\.tmp-tests\\w1b-review-20261115-submission\\git-source",
+        "dir": "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\repo\\.tmp-tests\\w1b-review-20261115-submission\\b",
+        "head": "3873eb41dac34b7ee99ee2959086ad85b8525373"
+      }
+    ],
+    "filters": [],
+    "expected": {
+      "pool": "forks",
+      "maxWorkers": 2,
+      "testTimeout": 5000,
+      "cache": false
+    }
+  },
+  "observations": [
+    {
+      "dir": "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\repo\\.tmp-tests\\w1b-review-20261115-submission\\a",
+      "head": "3873eb41dac34b7ee99ee2959086ad85b8525373",
+      "source": [
+        {
+          "path": "package-lock.json",
+          "sha256": "5118d0c609db7c079c5ffa9f9a8c54cf81f04bec314d930a9ad29764551e473b"
+        },
+        {
+          "path": "package.json",
+          "sha256": "3ca9d4afd21425087cf31893b8f9f63c81b0b8408db5e343ca76e5f8aa26ab9a"
+        },
+        {
+          "path": "tiny.test.js",
+          "sha256": "b723bbb1399834f56fab8a657e44772310f674b3ec93373ce2570aee88584071"
+        },
+        {
+          "path": "vitest.config.mjs",
+          "sha256": "b517ddaeb53d7055318e7676a50ec91fa144e121495ce3554feed8fc2c5a073a"
+        }
+      ],
+      "sourceSha256": "26bd3e49a2e06edeae95c8dd0f6c307c932573c23e6725a031c53d6c737f12ef",
+      "dependencyRoot": "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\repo\\node_modules",
+      "dependencyCount": 13704,
+      "dependenciesSha256": "4a13a6252894fedbcf28d8b609f2f79373d7c44f1d20782bf3e463d52fb696f0",
+      "lockSha256": "5118d0c609db7c079c5ffa9f9a8c54cf81f04bec314d930a9ad29764551e473b",
+      "vitest": "4.1.11"
+    },
+    {
+      "dir": "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\repo\\.tmp-tests\\w1b-review-20261115-submission\\b",
+      "head": "3873eb41dac34b7ee99ee2959086ad85b8525373",
+      "source": [
+        {
+          "path": "package-lock.json",
+          "sha256": "5118d0c609db7c079c5ffa9f9a8c54cf81f04bec314d930a9ad29764551e473b"
+        },
+        {
+          "path": "package.json",
+          "sha256": "3ca9d4afd21425087cf31893b8f9f63c81b0b8408db5e343ca76e5f8aa26ab9a"
+        },
+        {
+          "path": "tiny.test.js",
+          "sha256": "b723bbb1399834f56fab8a657e44772310f674b3ec93373ce2570aee88584071"
+        },
+        {
+          "path": "vitest.config.mjs",
+          "sha256": "b517ddaeb53d7055318e7676a50ec91fa144e121495ce3554feed8fc2c5a073a"
+        }
+      ],
+      "sourceSha256": "26bd3e49a2e06edeae95c8dd0f6c307c932573c23e6725a031c53d6c737f12ef",
+      "dependencyRoot": "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\repo\\node_modules",
+      "dependencyCount": 13704,
+      "dependenciesSha256": "4a13a6252894fedbcf28d8b609f2f79373d7c44f1d20782bf3e463d52fb696f0",
+      "lockSha256": "5118d0c609db7c079c5ffa9f9a8c54cf81f04bec314d930a9ad29764551e473b",
+      "vitest": "4.1.11"
+    }
+  ],
+  "tooling": {
+    "runner": "a03cbe796d22fd91c83770d66b02fcb1c3459fb7f2a05d00a8ed29b688f2eccc",
+    "worker": "fb1e76cdbc6a4c9e6e52b8497b3643eb1b44bcf8092a8b0b1e6a6d3fa9e14666",
+    "preflight": "9717bf98dc84407ccb301444647337799b83fd444af168743a087bc5246edece",
+    "summary": "4143527f40a363855a91613e34f280cf1a8b1c18717ab22cbe8230d8ef0066cb"
+  },
+  "execution": {
+    "node": "v24.20.0",
+    "nodePath": "C:\\Program Files\\nodejs\\node.exe",
+    "cwd": "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\repo"
+  },
+  "status": "SOURCE_DEPENDENCIES_VERIFIED",
+  "limitations": [
+    "Point-in-time raw bytes; hashes do not prove authenticity or historical execution.",
+    "Collection executes setup and module code; revalidate every source/dependency before comparison."
+  ]
+}

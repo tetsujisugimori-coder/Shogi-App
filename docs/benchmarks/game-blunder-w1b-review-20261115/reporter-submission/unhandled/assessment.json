@@ -1,0 +1,24 @@
+{
+  "status": "INVALID",
+  "invalid": [
+    "runtime unhandled errors",
+    "nonzero exit without recorded test failure",
+    "success disagrees with exit code or failures"
+  ],
+  "incomplete": [],
+  "failures": [],
+  "counts": {
+    "total": 1,
+    "passed": 1,
+    "failed": 0,
+    "skipped": 0,
+    "todo": 0
+  },
+  "tests": [
+    {
+      "file": "C:/Users/tetsu/Documents/ChatGPT/将棋アプリ/repo/.tmp-tests/w1b-review-20261115-reporter-submission/unhandled/tiny.test.js",
+      "name": "passes",
+      "status": "passed"
+    }
+  ]
+}

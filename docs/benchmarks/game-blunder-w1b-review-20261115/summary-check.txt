@@ -1,0 +1,24 @@
+✔ zero (1.0451ms)
+✔ missing file (0.1599ms)
+✔ count mismatch (0.1174ms)
+✔ unfinished suite (0.1266ms)
+✔ failure with zero exit (0.1326ms)
+✔ normal duplicates (0.0906ms)
+✔ unverified inventory cannot pass (0.0971ms)
+✔ failure survives contradictory count (0.1401ms)
+✔ zero suite counts (0.1168ms)
+✔ false failed suite (0.1357ms)
+✔ runtime extensions (0.5039ms)
+✔ runtime count wrong type (0.0898ms)
+✔ runtime errors wrong type (0.0621ms)
+✔ runtime extension contradiction (0.0502ms)
+✔ real runtime errors without JSON extensions (0.058ms)
+✔ external verified flag insufficient (0.07ms)
+ℹ tests 16
+ℹ suites 0
+ℹ pass 16
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 351.5523

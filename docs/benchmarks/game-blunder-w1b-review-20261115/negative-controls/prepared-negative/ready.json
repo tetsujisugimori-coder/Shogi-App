@@ -1,0 +1,90 @@
+{
+  "runId": "e86b2135-2465-4eda-bfb9-feb3e897f795",
+  "preflightSha256": "a8b87238492d18f8313665d9aa50fc61a77a100819b0d2fa6579d29599c2981c",
+  "trials": [
+    {
+      "trialId": "5dba0299-df4d-4ed0-99d0-1251a7a3fae2",
+      "request": {
+        "mode": "collect",
+        "runId": "e86b2135-2465-4eda-bfb9-feb3e897f795",
+        "trialId": "5dba0299-df4d-4ed0-99d0-1251a7a3fae2",
+        "preflightSha256": "a8b87238492d18f8313665d9aa50fc61a77a100819b0d2fa6579d29599c2981c",
+        "dir": "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\repo\\.tmp-tests\\w1b-review-20261115-final\\a",
+        "output": "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\repo\\docs\\benchmarks\\game-blunder-w1b-review-20261115\\negative-controls\\prepared-negative\\collect-0",
+        "filters": [],
+        "command": [
+          "createVitest",
+          "test",
+          "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\repo\\.tmp-tests\\w1b-review-20261115-final\\a"
+        ]
+      },
+      "settings": {
+        "pool": "forks",
+        "maxWorkers": 2,
+        "testTimeout": 5000,
+        "hookTimeout": 10000,
+        "isolate": true,
+        "environment": "node",
+        "cache": false,
+        "cacheDir": "C:/Users/tetsu/Documents/ChatGPT/将棋アプリ/repo/.tmp-tests/w1b-review-20261115-final/cache/vitest/da39a3ee5e6b4b0d3255bfef95601890afd80709",
+        "setupFiles": [],
+        "node": "v24.20.0",
+        "nodePath": "C:\\Program Files\\nodejs\\node.exe",
+        "npm": "11.17.0",
+        "npmCache": "C:\\Users\\tetsu\\AppData\\Roaming\\npm-cache",
+        "TEMP": "C:\\Users\\tetsu\\AppData\\Local\\Temp",
+        "TMP": "C:\\Users\\tetsu\\AppData\\Local\\Temp",
+        "cwd": "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\repo\\.tmp-tests\\w1b-review-20261115-final\\a",
+        "command": [
+          "createVitest",
+          "test",
+          "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\repo\\.tmp-tests\\w1b-review-20261115-final\\a"
+        ]
+      },
+      "inventorySha256": "2443e52f59cc58c9547577f2778eb28f404281714d4a90df01428cb5ca810953",
+      "settingsSha256": "5ba58986e6cbd779ad049f420091eb59378a9b6c38673247a16f468a030323ab"
+    },
+    {
+      "trialId": "67a782d6-a7a3-4903-8cf9-8161f89e8db3",
+      "request": {
+        "mode": "collect",
+        "runId": "e86b2135-2465-4eda-bfb9-feb3e897f795",
+        "trialId": "67a782d6-a7a3-4903-8cf9-8161f89e8db3",
+        "preflightSha256": "a8b87238492d18f8313665d9aa50fc61a77a100819b0d2fa6579d29599c2981c",
+        "dir": "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\repo\\.tmp-tests\\w1b-review-20261115-final\\b",
+        "output": "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\repo\\docs\\benchmarks\\game-blunder-w1b-review-20261115\\negative-controls\\prepared-negative\\collect-1",
+        "filters": [],
+        "command": [
+          "createVitest",
+          "test",
+          "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\repo\\.tmp-tests\\w1b-review-20261115-final\\b"
+        ]
+      },
+      "settings": {
+        "pool": "forks",
+        "maxWorkers": 2,
+        "testTimeout": 5000,
+        "hookTimeout": 10000,
+        "isolate": true,
+        "environment": "node",
+        "cache": false,
+        "cacheDir": "C:/Users/tetsu/Documents/ChatGPT/将棋アプリ/repo/.tmp-tests/w1b-review-20261115-final/cache/vitest/da39a3ee5e6b4b0d3255bfef95601890afd80709",
+        "setupFiles": [],
+        "node": "v24.20.0",
+        "nodePath": "C:\\Program Files\\nodejs\\node.exe",
+        "npm": "11.17.0",
+        "npmCache": "C:\\Users\\tetsu\\AppData\\Roaming\\npm-cache",
+        "TEMP": "C:\\Users\\tetsu\\AppData\\Local\\Temp",
+        "TMP": "C:\\Users\\tetsu\\AppData\\Local\\Temp",
+        "cwd": "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\repo\\.tmp-tests\\w1b-review-20261115-final\\b",
+        "command": [
+          "createVitest",
+          "test",
+          "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\repo\\.tmp-tests\\w1b-review-20261115-final\\b"
+        ]
+      },
+      "inventorySha256": "8ef347db8a39f62d35a25cb329879169ec0e8f5c545d950328e3c5f0d1b6578e",
+      "settingsSha256": "41fd9f1a8786309cbd5148ffe197b9c977d72fd40b450c23846404eec2b38dde"
+    }
+  ]
+}

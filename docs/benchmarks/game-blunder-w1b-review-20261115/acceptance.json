@@ -1,0 +1,390 @@
+{
+  "at": "2026-11-15T11:10:16.587Z",
+  "overall": "PARTIAL / WIP / NOT_READY",
+  "startHead": "6624dd964c51d26f84c338985ef4f94001611d27",
+  "finalHead": "The commit containing this record; final exact SHA and CI are recorded in PR #218 after push.",
+  "findings": {
+    "P2-01": "IMPLEMENTED_AND_VERIFIED / independent re-review pending",
+    "P2-02": "IMPLEMENTED_AND_VERIFIED / independent re-review pending",
+    "P3-01": "PARTIAL: connected fixture admission works; real snapshots inadmissible; broader isolation/effective configuration work remains"
+  },
+  "synthetic": [
+    {
+      "name": "normal",
+      "inputSha256": "43a0da97453ff570b1ceac303139523c399b1511fa3c311064f5288644585c9c",
+      "before": "PASS",
+      "after": "INCOMPLETE"
+    },
+    {
+      "name": "duplicates",
+      "inputSha256": "3841f1f5cb992f4cf6793b6e4ce6bc4f4f42b9a163f17b63ac061e57c4cd26e1",
+      "before": "PASS",
+      "after": "INCOMPLETE"
+    },
+    {
+      "name": "zero-suites",
+      "inputSha256": "37e01e974a43c8e99d6747d80e398a9deb645b34370bc4e0dbcc8aca9472e718",
+      "before": "PASS",
+      "after": "INVALID"
+    },
+    {
+      "name": "false-failed-suite",
+      "inputSha256": "3e0d2e20d62fb598b0396f562a007aa25fef0c0db8631a24b30388169e1f249f",
+      "before": "PASS",
+      "after": "INVALID"
+    },
+    {
+      "name": "runtime-errors",
+      "inputSha256": "bf3fbc9b7982f7589b6212c40b04fdb334d191d3c309741382b5d03cfd4116e8",
+      "before": "PASS",
+      "after": "INVALID"
+    },
+    {
+      "name": "runtime-type",
+      "inputSha256": "e02c0661b4e4d5cc531b0ae88840d93a6fe73e823bf2b664cb8a7b6603483250",
+      "before": "PASS",
+      "after": "INVALID"
+    },
+    {
+      "name": "runtime-count-contradiction",
+      "inputSha256": "be09a2834a1edee9d64cd838d44092d383f9f8143be205b5dee00cda9f470923",
+      "before": "PASS",
+      "after": "INVALID"
+    },
+    {
+      "name": "zero",
+      "inputSha256": "48765a6a31cec87377b26700716d82bf68f4da54b2ce35109a27e4843e6ec76b",
+      "before": "INCOMPLETE",
+      "after": "INCOMPLETE"
+    },
+    {
+      "name": "missing-file",
+      "inputSha256": "a0557fea509eea9f5adfacf11ec0a9d2aac263926af001c2789b7df2202158e8",
+      "before": "INVALID",
+      "after": "INVALID"
+    },
+    {
+      "name": "unfinished-suite",
+      "inputSha256": "cbc32727b9e1a1efc05f1079a497395cb1a50f7c357e75476b02fc20f3c0bb3a",
+      "before": "INCOMPLETE",
+      "after": "INCOMPLETE"
+    },
+    {
+      "name": "malformed-json",
+      "inputSha256": "40b5cafe045b9c9e31a1c3fdcfbc89f934906ff06a6276b55c2a0e517be21655",
+      "before": "INVALID",
+      "after": "INVALID"
+    },
+    {
+      "name": "missing-log",
+      "inputSha256": "43a0da97453ff570b1ceac303139523c399b1511fa3c311064f5288644585c9c",
+      "before": "INCOMPLETE",
+      "after": "INCOMPLETE"
+    },
+    {
+      "name": "failure-zero-exit",
+      "inputSha256": "1b51c23650faa02630b8b3163ad5ad6cc2641ea5b7f6f51862d0b5363f0fd820",
+      "before": "FAIL",
+      "after": "FAIL"
+    },
+    {
+      "name": "success-nonzero-exit",
+      "inputSha256": "43a0da97453ff570b1ceac303139523c399b1511fa3c311064f5288644585c9c",
+      "before": "INVALID",
+      "after": "INVALID"
+    }
+  ],
+  "normal": {
+    "runId": "50ca8ca9-605b-4f68-b6f2-3954332ec304",
+    "results": [
+      {
+        "trialId": "36bf30e1-9175-41e3-9a35-e36dcf4b471b",
+        "status": "PASS"
+      },
+      {
+        "trialId": "2144e643-be31-46ed-aa8b-488b2e1e189b",
+        "status": "PASS"
+      }
+    ],
+    "status": "PASS"
+  },
+  "negative": [
+    {
+      "name": "missing effective setting",
+      "result": {
+        "status": "UNKNOWN",
+        "reason": "Error: UNKNOWN expected cache"
+      },
+      "comparisonChildrenBefore": 0,
+      "comparisonChildrenAfter": 0
+    },
+    {
+      "name": "dependency mismatch",
+      "result": {
+        "status": "UNKNOWN",
+        "reason": "Error: target mismatch: dependenciesSha256"
+      },
+      "comparisonChildrenBefore": 0,
+      "comparisonChildrenAfter": 0
+    },
+    {
+      "name": "source mismatch",
+      "result": {
+        "status": "UNKNOWN",
+        "reason": "Error: raw blob mismatch: tiny.test.js; no CRLF normalization permitted"
+      },
+      "comparisonChildrenBefore": 0,
+      "comparisonChildrenAfter": 0
+    },
+    {
+      "name": "preflight modified",
+      "result": {
+        "status": "UNKNOWN",
+        "reason": "Error: preflight binding mismatch"
+      },
+      "comparisonChildrenBefore": 0,
+      "comparisonChildrenAfter": 0
+    },
+    {
+      "name": "inventory modified",
+      "result": {
+        "status": "UNKNOWN",
+        "reason": "Error: inventory.json changed"
+      },
+      "comparisonChildrenBefore": 0,
+      "comparisonChildrenAfter": 0
+    },
+    {
+      "name": "settings modified",
+      "result": {
+        "status": "UNKNOWN",
+        "reason": "Error: settings.json changed"
+      },
+      "comparisonChildrenBefore": 0,
+      "comparisonChildrenAfter": 0
+    },
+    {
+      "name": "source changed after collection",
+      "result": {
+        "status": "UNKNOWN",
+        "reason": "Error: raw blob mismatch: tiny.test.js; no CRLF normalization permitted"
+      },
+      "comparisonChildrenBefore": 0,
+      "comparisonChildrenAfter": 0
+    },
+    {
+      "name": "another trial identity",
+      "result": {
+        "status": "UNKNOWN",
+        "reason": "Error: ready record changed"
+      },
+      "comparisonChildrenBefore": 0,
+      "comparisonChildrenAfter": 0
+    },
+    {
+      "name": "reused result before launch",
+      "result": {
+        "status": "UNKNOWN",
+        "reason": "Error: EEXIST: file already exists, mkdir 'C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\repo\\docs\\benchmarks\\game-blunder-w1b-review-20261115\\negative-submission\\prepared-negative\\trial-0'"
+      },
+      "comparisonChildrenBefore": 0,
+      "comparisonChildrenAfter": 0
+    },
+    {
+      "name": "another trial result offline",
+      "result": {
+        "status": "INVALID",
+        "reason": "Error: changed or missing runtime.json"
+      },
+      "comparisonChildrenStarted": 0
+    }
+  ],
+  "realReporter": [
+    {
+      "name": "unhandled",
+      "exitCode": 1,
+      "jsonSuccess": true,
+      "jsonFiles": 1,
+      "jsonSuites": 1,
+      "runtimeErrors": 1,
+      "status": "INVALID",
+      "note": "Direct real reporter observation; not a preflight-authorized comparison"
+    },
+    {
+      "name": "assertion-failure",
+      "exitCode": 1,
+      "jsonSuccess": false,
+      "jsonFiles": 1,
+      "jsonSuites": 1,
+      "runtimeErrors": 0,
+      "status": "FAIL",
+      "note": "Direct real reporter observation; not a preflight-authorized comparison"
+    },
+    {
+      "name": "empty-describe",
+      "exitCode": 1,
+      "jsonSuccess": false,
+      "jsonFiles": 1,
+      "jsonSuites": 2,
+      "runtimeErrors": 0,
+      "status": "FAIL",
+      "note": "Direct real reporter observation; not a preflight-authorized comparison"
+    },
+    {
+      "name": "normal",
+      "exitCode": 0,
+      "jsonSuccess": true,
+      "jsonFiles": 1,
+      "jsonSuites": 3,
+      "runtimeErrors": 0,
+      "status": "PASS",
+      "note": "Direct real reporter observation; not a preflight-authorized comparison"
+    }
+  ],
+  "setupMutation": {
+    "result": {
+      "status": "UNKNOWN",
+      "reason": "Error: raw blob mismatch: state.txt; no CRLF normalization permitted"
+    },
+    "collectionChildren": 2,
+    "comparisonChildren": 0,
+    "setupSideEffects": "Both snapshots retain the modified state.txt; never normalized or repaired."
+  },
+  "validation": [
+    {
+      "name": "related-summary",
+      "command": [
+        "C:\\Program Files\\nodejs\\node.exe",
+        "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\repo\\scripts\\stage-w1b-summary-check.mjs"
+      ],
+      "cwd": "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\repo",
+      "started": "2026-11-15T10:57:24.944Z",
+      "finished": "2026-11-15T10:57:25.274Z",
+      "exitCode": 0,
+      "signal": null,
+      "error": null
+    },
+    {
+      "name": "related-w1",
+      "command": [
+        "C:\\Program Files\\nodejs\\node.exe",
+        "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\repo\\scripts\\stage-w1-summary-check.mjs"
+      ],
+      "cwd": "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\repo",
+      "started": "2026-11-15T10:57:25.274Z",
+      "finished": "2026-11-15T10:57:25.577Z",
+      "exitCode": 0,
+      "signal": null,
+      "error": null
+    },
+    {
+      "name": "related-product",
+      "command": [
+        "C:\\Program Files\\nodejs\\node.exe",
+        "C:\\Program Files\\nodejs\\node_modules\\npm\\bin\\npm-cli.js",
+        "test",
+        "--",
+        "game-blunder",
+        "match-journal"
+      ],
+      "cwd": "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\repo",
+      "started": "2026-11-15T10:57:25.577Z",
+      "finished": "2026-11-15T10:57:35.916Z",
+      "exitCode": 0,
+      "signal": null,
+      "error": null
+    },
+    {
+      "name": "lock",
+      "command": [
+        "C:\\Program Files\\nodejs\\node.exe",
+        "C:\\Program Files\\nodejs\\node_modules\\npm\\bin\\npm-cli.js",
+        "run",
+        "verify:lock"
+      ],
+      "cwd": "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\repo",
+      "started": "2026-11-15T10:57:35.916Z",
+      "finished": "2026-11-15T10:57:36.693Z",
+      "exitCode": 0,
+      "signal": null,
+      "error": null
+    },
+    {
+      "name": "typecheck",
+      "command": [
+        "C:\\Program Files\\nodejs\\node.exe",
+        "C:\\Program Files\\nodejs\\node_modules\\npm\\bin\\npm-cli.js",
+        "run",
+        "lint"
+      ],
+      "cwd": "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\repo",
+      "started": "2026-11-15T10:57:36.694Z",
+      "finished": "2026-11-15T10:57:44.908Z",
+      "exitCode": 0,
+      "signal": null,
+      "error": null
+    },
+    {
+      "name": "build",
+      "command": [
+        "C:\\Program Files\\nodejs\\node.exe",
+        "C:\\Program Files\\nodejs\\node_modules\\npm\\bin\\npm-cli.js",
+        "run",
+        "build"
+      ],
+      "cwd": "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\repo",
+      "started": "2026-11-15T10:57:44.909Z",
+      "finished": "2026-11-15T10:57:53.819Z",
+      "exitCode": 0,
+      "signal": null,
+      "error": null
+    },
+    {
+      "name": "full-product",
+      "command": [
+        "C:\\Program Files\\nodejs\\node.exe",
+        "C:\\Program Files\\nodejs\\node_modules\\npm\\bin\\npm-cli.js",
+        "test",
+        "--",
+        "src/test"
+      ],
+      "cwd": "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\repo",
+      "started": "2026-11-15T10:57:53.819Z",
+      "finished": "2026-11-15T11:00:03.857Z",
+      "exitCode": 0,
+      "signal": null,
+      "error": null
+    }
+  ],
+  "finalSummaryChecks": {
+    "passed": 19,
+    "failed": 0,
+    "log": "summary-check-submission.txt"
+  },
+  "preservation": {
+    "rawFiles": 103,
+    "originalFiles": 98,
+    "oldScripts": 5,
+    "beforeAfterMismatches": 0,
+    "prior103ManifestMismatches": 0,
+    "oldW1ManifestMismatches": 0
+  },
+  "historical": {
+    "trials": 8,
+    "interpretation": "INCOMPLETE inventory provenance does not revoke successful observations or mean test failure. No retrospective environment proof.",
+    "R8": "UNKNOWN",
+    "H1": "UNKNOWN",
+    "H2": "UNKNOWN",
+    "H3": "UNKNOWN",
+    "H4": "UNKNOWN"
+  },
+  "notTested": [
+    "Large Windows causal comparison: prohibited/out of scope; real snapshots fail raw admission.",
+    "Detailed CPU/RSS/GC sampling: deliberately deferred.",
+    "Full isolation of setup/cache/TEMP effects outside sealed source/dependencies: not established.",
+    "Multi-project/planned skip equivalence: unsupported, runner blocks."
+  ],
+  "ci": "PENDING_PUSH: final SHA CI checked externally after commit, see PR body and local .tmp-tests submission records.",
+  "draft": true,
+  "merge": false
+}

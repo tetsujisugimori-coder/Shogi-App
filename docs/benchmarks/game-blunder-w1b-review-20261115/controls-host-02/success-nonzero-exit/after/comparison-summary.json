@@ -1,0 +1,27 @@
+{
+  "runs": [
+    {
+      "name": "run-01",
+      "head": "old",
+      "exitCode": 1,
+      "status": "INVALID",
+      "invalid": [
+        "nonzero exit without recorded test failure",
+        "success disagrees with exit code or failures"
+      ],
+      "incomplete": [
+        "runner artifact binding unavailable; verified:true alone is insufficient",
+        "runtime suite/error evidence unavailable"
+      ],
+      "failures": [],
+      "counts": {
+        "total": 1,
+        "passed": 1,
+        "failed": 0,
+        "skipped": 0,
+        "todo": 0
+      },
+      "signals": []
+    }
+  ]
+}

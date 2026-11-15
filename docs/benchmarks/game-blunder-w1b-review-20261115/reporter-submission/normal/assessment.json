@@ -1,0 +1,25 @@
+{
+  "status": "PASS",
+  "invalid": [],
+  "incomplete": [],
+  "failures": [],
+  "counts": {
+    "total": 2,
+    "passed": 2,
+    "failed": 0,
+    "skipped": 0,
+    "todo": 0
+  },
+  "tests": [
+    {
+      "file": "C:/Users/tetsu/Documents/ChatGPT/将棋アプリ/repo/.tmp-tests/w1b-review-20261115-reporter-submission/normal/tiny.test.js",
+      "name": "outer inner same",
+      "status": "passed"
+    },
+    {
+      "file": "C:/Users/tetsu/Documents/ChatGPT/将棋アプリ/repo/.tmp-tests/w1b-review-20261115-reporter-submission/normal/tiny.test.js",
+      "name": "outer inner same",
+      "status": "passed"
+    }
+  ]
+}

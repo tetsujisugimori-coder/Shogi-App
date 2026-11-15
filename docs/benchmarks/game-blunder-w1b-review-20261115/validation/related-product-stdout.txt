@@ -1,0 +1,13 @@
+
+> shogi-app@0.0.0 test
+> vitest run game-blunder match-journal
+
+
+ RUN  v4.1.11 C:/Users/tetsu/Documents/ChatGPT/将棋アプリ/repo
+
+
+ Test Files  8 passed (8)
+      Tests  154 passed (154)
+   Start at  19:57:27
+   Duration  8.49s (transform 883ms, setup 707ms, import 1.48s, tests 6.40s, environment 4.16s)
+

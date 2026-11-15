@@ -1,0 +1,42 @@
+[
+  {
+    "name": "unhandled",
+    "exitCode": 1,
+    "jsonSuccess": true,
+    "jsonFiles": 1,
+    "jsonSuites": 1,
+    "runtimeErrors": 1,
+    "status": "INVALID",
+    "note": "Direct real reporter observation; not a preflight-authorized comparison"
+  },
+  {
+    "name": "assertion-failure",
+    "exitCode": 1,
+    "jsonSuccess": false,
+    "jsonFiles": 1,
+    "jsonSuites": 1,
+    "runtimeErrors": 0,
+    "status": "FAIL",
+    "note": "Direct real reporter observation; not a preflight-authorized comparison"
+  },
+  {
+    "name": "empty-describe",
+    "exitCode": 1,
+    "jsonSuccess": false,
+    "jsonFiles": 1,
+    "jsonSuites": 2,
+    "runtimeErrors": 0,
+    "status": "FAIL",
+    "note": "Direct real reporter observation; not a preflight-authorized comparison"
+  },
+  {
+    "name": "normal",
+    "exitCode": 0,
+    "jsonSuccess": true,
+    "jsonFiles": 1,
+    "jsonSuites": 3,
+    "runtimeErrors": 0,
+    "status": "PASS",
+    "note": "Direct real reporter observation; not a preflight-authorized comparison"
+  }
+]

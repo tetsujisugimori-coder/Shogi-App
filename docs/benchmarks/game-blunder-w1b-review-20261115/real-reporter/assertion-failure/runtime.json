@@ -1,0 +1,17 @@
+{
+  "runId": "reporter-assertion-failure",
+  "trialId": "assertion-failure",
+  "preflightSha256": "DIRECT-REPORTER-OBSERVATION-NO-PREFLIGHT",
+  "inventorySha256": "NOT-A-COMPARISON",
+  "reason": "failed",
+  "unhandledErrors": [],
+  "suites": [
+    {
+      "id": "-270551241",
+      "file": "C:/Users/tetsu/Documents/ChatGPT/将棋アプリ/repo/.tmp-tests/w1b-review-20261115-reporter/assertion-failure/tiny.test.js",
+      "root": true,
+      "mode": "run",
+      "state": "fail"
+    }
+  ]
+}

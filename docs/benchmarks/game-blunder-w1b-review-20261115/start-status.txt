@@ -1,0 +1,7 @@
+?? .tmp-tests/
+?? docs/benchmarks/game-blunder-w1b-review-20261115/
+?? docs/benchmarks/game-blunder-windows-stage-w1b-20261112/
+?? scripts/stage-w1b-control-harness.mjs
+?? scripts/stage-w1b-preflight.mjs
+?? scripts/stage-w1b-summary-check.mjs
+?? scripts/stage-w1b-summary.mjs

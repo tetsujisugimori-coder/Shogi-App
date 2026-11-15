@@ -1,0 +1,37 @@
+{
+  "runs": [
+    {
+      "name": "run-01",
+      "head": "old",
+      "exitCode": 0,
+      "status": "FAIL",
+      "invalid": [
+        "failures with zero exit code"
+      ],
+      "incomplete": [
+        "runner artifact binding unavailable; verified:true alone is insufficient",
+        "runtime suite/error evidence unavailable"
+      ],
+      "failures": [
+        {
+          "file": "a.test.ts",
+          "name": null,
+          "kind": "suite"
+        },
+        {
+          "file": "a.test.ts",
+          "name": "one",
+          "kind": "test"
+        }
+      ],
+      "counts": {
+        "total": 1,
+        "passed": 0,
+        "failed": 1,
+        "skipped": 0,
+        "todo": 0
+      },
+      "signals": []
+    }
+  ]
+}

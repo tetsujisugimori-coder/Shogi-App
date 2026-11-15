@@ -1,0 +1,9 @@
+function getTasks(tasks = []) {
+	return toArray(tasks).flatMap((s) => isTestCase(s) ? [s] : [s, ...getTasks(s.tasks)]);
+}
+function getSuites(suite) {
+	return toArray(suite).flatMap((s) => s.type === "suite" ? [s, ...getSuites(s.tasks)] : []);
+}
+function hasTests(suite) {
+	return toArray(suite).some((s) => s.tasks.some((c) => isTestCase(c) || hasTests(c)));
+}

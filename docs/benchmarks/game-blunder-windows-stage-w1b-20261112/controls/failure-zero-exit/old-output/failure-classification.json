@@ -1,0 +1,16 @@
+[
+  {
+    "sequence": 1,
+    "head": "old",
+    "failures": [
+      {
+        "file": "a.test.ts",
+        "name": "one",
+        "primary": "unknown",
+        "detectedSignals": [],
+        "messages": []
+      }
+    ],
+    "logSignals": []
+  }
+]

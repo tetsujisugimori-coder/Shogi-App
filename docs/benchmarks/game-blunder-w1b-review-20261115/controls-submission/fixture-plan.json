@@ -1,0 +1,21 @@
+{
+  "targets": [
+    {
+      "repo": "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\repo\\.tmp-tests\\w1b-review-20261115-submission\\git-source",
+      "dir": "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\repo\\.tmp-tests\\w1b-review-20261115-submission\\a",
+      "head": "3873eb41dac34b7ee99ee2959086ad85b8525373"
+    },
+    {
+      "repo": "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\repo\\.tmp-tests\\w1b-review-20261115-submission\\git-source",
+      "dir": "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\repo\\.tmp-tests\\w1b-review-20261115-submission\\b",
+      "head": "3873eb41dac34b7ee99ee2959086ad85b8525373"
+    }
+  ],
+  "filters": [],
+  "expected": {
+    "pool": "forks",
+    "maxWorkers": 2,
+    "testTimeout": 5000,
+    "cache": false
+  }
+}

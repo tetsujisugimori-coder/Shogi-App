@@ -1,0 +1,6 @@
+{
+  "at": "2026-11-15T10:54:07.911Z",
+  "action": "blocked",
+  "phase": "launch",
+  "reason": "Error: inventory.json changed"
+}

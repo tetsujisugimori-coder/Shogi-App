@@ -1,0 +1,15 @@
+{
+  "mode": "run",
+  "dir": "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\repo\\.tmp-tests\\w1b-review-20261115-reporter\\assertion-failure",
+  "output": "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\repo\\docs\\benchmarks\\game-blunder-w1b-review-20261115\\real-reporter\\assertion-failure",
+  "filters": [],
+  "command": [
+    "createVitest",
+    "test",
+    "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\repo\\.tmp-tests\\w1b-review-20261115-reporter\\assertion-failure"
+  ],
+  "runId": "reporter-assertion-failure",
+  "trialId": "assertion-failure",
+  "preflightSha256": "DIRECT-REPORTER-OBSERVATION-NO-PREFLIGHT",
+  "inventorySha256": "NOT-A-COMPARISON"
+}

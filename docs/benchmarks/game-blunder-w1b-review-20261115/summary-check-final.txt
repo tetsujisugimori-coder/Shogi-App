@@ -1,0 +1,43 @@
+✔ zero (2.1361ms)
+✔ missing file (0.3612ms)
+✔ count mismatch (0.2622ms)
+✔ unfinished suite (0.2242ms)
+✔ failure with zero exit (0.3815ms)
+✔ normal duplicates (0.1866ms)
+✔ unverified inventory cannot pass (0.2089ms)
+✔ failure survives contradictory count (0.2001ms)
+✔ zero suite counts (0.2116ms)
+✔ false failed suite (0.2249ms)
+✔ runtime extensions (0.2915ms)
+✔ runtime count wrong type (0.1152ms)
+✔ runtime errors wrong type (0.0838ms)
+✔ runtime extension contradiction (0.0762ms)
+✔ real runtime errors without JSON extensions (0.1359ms)
+✔ external verified flag insufficient (0.141ms)
+✖ malformed nested records rejected (0.2978ms)
+✔ malformed inventory rejected (0.1482ms)
+✔ runtime suite failure survives JSON success (0.1411ms)
+ℹ tests 19
+ℹ suites 0
+ℹ pass 18
+ℹ fail 1
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 374.0708
+
+✖ failing tests:
+
+test at scripts\stage-w1b-summary-check.mjs:29:1
+✖ malformed nested records rejected (0.2978ms)
+  TypeError: Cannot read properties of null (reading 'status')
+      at file:///C:/Users/tetsu/Documents/ChatGPT/%E5%B0%86%E6%A3%8B%E3%82%A2%E3%83%97%E3%83%AA/repo/scripts/stage-w1b-summary.mjs:78:67
+      at Array.filter (<anonymous>)
+      at assess (file:///C:/Users/tetsu/Documents/ChatGPT/%E5%B0%86%E6%A3%8B%E3%82%A2%E3%83%97%E3%83%AA/repo/scripts/stage-w1b-summary.mjs:78:55)
+      at TestContext.<anonymous> (file:///C:/Users/tetsu/Documents/ChatGPT/%E5%B0%86%E6%A3%8B%E3%82%A2%E3%83%97%E3%83%AA/repo/scripts/stage-w1b-summary-check.mjs:29:100)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1397:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:969:18)
+      at Test.postRun (node:internal/test_runner/test:1537:19)
+      at Test.run (node:internal/test_runner/test:1462:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:969:7)

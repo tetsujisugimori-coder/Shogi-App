@@ -1,0 +1,36 @@
+{
+  "status": "FAIL",
+  "invalid": [],
+  "incomplete": [],
+  "failures": [
+    {
+      "file": "C:/Users/tetsu/Documents/ChatGPT/将棋アプリ/repo/.tmp-tests/w1b-review-20261115-reporter-submission/assertion-failure/tiny.test.js",
+      "name": null,
+      "kind": "runtime-suite"
+    },
+    {
+      "file": "C:/Users/tetsu/Documents/ChatGPT/将棋アプリ/repo/.tmp-tests/w1b-review-20261115-reporter-submission/assertion-failure/tiny.test.js",
+      "name": null,
+      "kind": "suite"
+    },
+    {
+      "file": "C:/Users/tetsu/Documents/ChatGPT/将棋アプリ/repo/.tmp-tests/w1b-review-20261115-reporter-submission/assertion-failure/tiny.test.js",
+      "name": "fails",
+      "kind": "test"
+    }
+  ],
+  "counts": {
+    "total": 1,
+    "passed": 0,
+    "failed": 1,
+    "skipped": 0,
+    "todo": 0
+  },
+  "tests": [
+    {
+      "file": "C:/Users/tetsu/Documents/ChatGPT/将棋アプリ/repo/.tmp-tests/w1b-review-20261115-reporter-submission/assertion-failure/tiny.test.js",
+      "name": "fails",
+      "status": "failed"
+    }
+  ]
+}

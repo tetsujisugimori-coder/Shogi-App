@@ -1,0 +1,6 @@
+{
+  "at": "2026-11-15T11:08:33.018Z",
+  "action": "blocked",
+  "phase": "launch",
+  "reason": "Error: EEXIST: file already exists, mkdir 'C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\repo\\docs\\benchmarks\\game-blunder-w1b-review-20261115\\negative-submission\\prepared-negative\\trial-0'"
+}

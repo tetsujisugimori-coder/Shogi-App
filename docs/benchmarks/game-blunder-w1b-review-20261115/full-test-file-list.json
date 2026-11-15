@@ -1,0 +1,341 @@
+[
+  {
+    "file": "C:/Users/tetsu/Documents/ChatGPT/将棋アプリ/repo/src/test/evaluation-preset-comparison-worker.test.ts"
+  },
+  {
+    "file": "C:/Users/tetsu/Documents/ChatGPT/将棋アプリ/repo/src/test/evasion-boundary.test.ts"
+  },
+  {
+    "file": "C:/Users/tetsu/Documents/ChatGPT/将棋アプリ/repo/src/test/evasion-run-budget.test.ts"
+  },
+  {
+    "file": "C:/Users/tetsu/Documents/ChatGPT/将棋アプリ/repo/src/test/game-blunder-diagnosis.test.ts"
+  },
+  {
+    "file": "C:/Users/tetsu/Documents/ChatGPT/将棋アプリ/repo/src/test/game-blunder-fixed.test.ts"
+  },
+  {
+    "file": "C:/Users/tetsu/Documents/ChatGPT/将棋アプリ/repo/src/test/game-blunder-investigation-integration.test.ts"
+  },
+  {
+    "file": "C:/Users/tetsu/Documents/ChatGPT/将棋アプリ/repo/src/test/game-blunder-investigation-v4.test.ts"
+  },
+  {
+    "file": "C:/Users/tetsu/Documents/ChatGPT/将棋アプリ/repo/src/test/game-blunder-pilot.test.ts"
+  },
+  {
+    "file": "C:/Users/tetsu/Documents/ChatGPT/将棋アプリ/repo/src/test/game-blunder-timeout-integration.test.ts"
+  },
+  {
+    "file": "C:/Users/tetsu/Documents/ChatGPT/将棋アプリ/repo/src/test/game-blunder-v4-journal-integration.test.ts"
+  },
+  {
+    "file": "C:/Users/tetsu/Documents/ChatGPT/将棋アプリ/repo/src/test/match-journal.test.ts"
+  },
+  {
+    "file": "C:/Users/tetsu/Documents/ChatGPT/将棋アプリ/repo/src/test/outcome-proof.test.ts"
+  },
+  {
+    "file": "C:/Users/tetsu/Documents/ChatGPT/将棋アプリ/repo/src/test/quiescence-benchmark.test.ts"
+  },
+  {
+    "file": "C:/Users/tetsu/Documents/ChatGPT/将棋アプリ/repo/src/test/quiescence-comparison-worker.test.ts"
+  },
+  {
+    "file": "C:/Users/tetsu/Documents/ChatGPT/将棋アプリ/repo/src/test/quiescence-ordering-benchmark.test.ts"
+  },
+  {
+    "file": "C:/Users/tetsu/Documents/ChatGPT/将棋アプリ/repo/src/test/quiescence-ordering-repeated.test.ts"
+  },
+  {
+    "file": "C:/Users/tetsu/Documents/ChatGPT/将棋アプリ/repo/src/test/quiescence-ordering-self-play-suite.test.ts"
+  },
+  {
+    "file": "C:/Users/tetsu/Documents/ChatGPT/将棋アプリ/repo/src/test/quiescence-ordering-self-play.test.ts"
+  },
+  {
+    "file": "C:/Users/tetsu/Documents/ChatGPT/将棋アプリ/repo/src/test/quiescence-ordering-suite-comparison.test.ts"
+  },
+  {
+    "file": "C:/Users/tetsu/Documents/ChatGPT/将棋アプリ/repo/src/test/shogi-action-revalidation-regression.test.ts"
+  },
+  {
+    "file": "C:/Users/tetsu/Documents/ChatGPT/将棋アプリ/repo/src/test/shogi-action-revalidation.test.ts"
+  },
+  {
+    "file": "C:/Users/tetsu/Documents/ChatGPT/将棋アプリ/repo/src/test/shogi-agreed-jishogi.test.tsx"
+  },
+  {
+    "file": "C:/Users/tetsu/Documents/ChatGPT/将棋アプリ/repo/src/test/shogi-ai-judgment-ui.test.tsx"
+  },
+  {
+    "file": "C:/Users/tetsu/Documents/ChatGPT/将棋アプリ/repo/src/test/shogi-ai-search-metrics-ui.test.tsx"
+  },
+  {
+    "file": "C:/Users/tetsu/Documents/ChatGPT/将棋アプリ/repo/src/test/shogi-attacks.test.ts"
+  },
+  {
+    "file": "C:/Users/tetsu/Documents/ChatGPT/将棋アプリ/repo/src/test/shogi-branch-replay.test.ts"
+  },
+  {
+    "file": "C:/Users/tetsu/Documents/ChatGPT/将棋アプリ/repo/src/test/shogi-branch-session-ui.test.tsx"
+  },
+  {
+    "file": "C:/Users/tetsu/Documents/ChatGPT/将棋アプリ/repo/src/test/shogi-branch-session.test.ts"
+  },
+  {
+    "file": "C:/Users/tetsu/Documents/ChatGPT/将棋アプリ/repo/src/test/shogi-check-evasion.test.ts"
+  },
+  {
+    "file": "C:/Users/tetsu/Documents/ChatGPT/将棋アプリ/repo/src/test/shogi-checkmate.test.tsx"
+  },
+  {
+    "file": "C:/Users/tetsu/Documents/ChatGPT/将棋アプリ/repo/src/test/shogi-drop.test.tsx"
+  },
+  {
+    "file": "C:/Users/tetsu/Documents/ChatGPT/将棋アプリ/repo/src/test/shogi-entering-king.test.tsx"
+  },
+  {
+    "file": "C:/Users/tetsu/Documents/ChatGPT/将棋アプリ/repo/src/test/shogi-evaluation-preset-comparison-ui.test.tsx"
+  },
+  {
+    "file": "C:/Users/tetsu/Documents/ChatGPT/将棋アプリ/repo/src/test/shogi-evaluation-preset-comparison.test.ts"
+  },
+  {
+    "file": "C:/Users/tetsu/Documents/ChatGPT/将棋アプリ/repo/src/test/shogi-evaluation-presets.test.ts"
+  },
+  {
+    "file": "C:/Users/tetsu/Documents/ChatGPT/将棋アプリ/repo/src/test/shogi-fallback-quality.test.ts"
+  },
+  {
+    "file": "C:/Users/tetsu/Documents/ChatGPT/将棋アプリ/repo/src/test/shogi-game-record-import.test.tsx"
+  },
+  {
+    "file": "C:/Users/tetsu/Documents/ChatGPT/将棋アプリ/repo/src/test/shogi-game-record-session.test.ts"
+  },
+  {
+    "file": "C:/Users/tetsu/Documents/ChatGPT/将棋アプリ/repo/src/test/shogi-game-record.test.tsx"
+  },
+  {
+    "file": "C:/Users/tetsu/Documents/ChatGPT/将棋アプリ/repo/src/test/shogi-json-exchange-contract.test.ts"
+  },
+  {
+    "file": "C:/Users/tetsu/Documents/ChatGPT/将棋アプリ/repo/src/test/shogi-kif-export.test.ts"
+  },
+  {
+    "file": "C:/Users/tetsu/Documents/ChatGPT/将棋アプリ/repo/src/test/shogi-kif-import-ui.test.tsx"
+  },
+  {
+    "file": "C:/Users/tetsu/Documents/ChatGPT/将棋アプリ/repo/src/test/shogi-kif-import.test.ts"
+  },
+  {
+    "file": "C:/Users/tetsu/Documents/ChatGPT/将棋アプリ/repo/src/test/shogi-killer-moves.test.ts"
+  },
+  {
+    "file": "C:/Users/tetsu/Documents/ChatGPT/将棋アプリ/repo/src/test/shogi-king-safety-evaluation.test.ts"
+  },
+  {
+    "file": "C:/Users/tetsu/Documents/ChatGPT/将棋アプリ/repo/src/test/shogi-legal-actions.test.ts"
+  },
+  {
+    "file": "C:/Users/tetsu/Documents/ChatGPT/将棋アプリ/repo/src/test/shogi-material-ai.test.ts"
+  },
+  {
+    "file": "C:/Users/tetsu/Documents/ChatGPT/将棋アプリ/repo/src/test/shogi-material-evaluation.test.ts"
+  },
+  {
+    "file": "C:/Users/tetsu/Documents/ChatGPT/将棋アプリ/repo/src/test/shogi-move-history.test.tsx"
+  },
+  {
+    "file": "C:/Users/tetsu/Documents/ChatGPT/将棋アプリ/repo/src/test/shogi-move-limit-jishogi.test.tsx"
+  },
+  {
+    "file": "C:/Users/tetsu/Documents/ChatGPT/将棋アプリ/repo/src/test/shogi-move-ordering-modes.test.ts"
+  },
+  {
+    "file": "C:/Users/tetsu/Documents/ChatGPT/将棋アプリ/repo/src/test/shogi-new-game.test.tsx"
+  },
+  {
+    "file": "C:/Users/tetsu/Documents/ChatGPT/将棋アプリ/repo/src/test/shogi-no-legal-actions.test.tsx"
+  },
+  {
+    "file": "C:/Users/tetsu/Documents/ChatGPT/将棋アプリ/repo/src/test/shogi-no-legal-review.test.tsx"
+  },
+  {
+    "file": "C:/Users/tetsu/Documents/ChatGPT/将棋アプリ/repo/src/test/shogi-numeric-coordinates.test.ts"
+  },
+  {
+    "file": "C:/Users/tetsu/Documents/ChatGPT/将棋アプリ/repo/src/test/shogi-paired-self-play-match.test.ts"
+  },
+  {
+    "file": "C:/Users/tetsu/Documents/ChatGPT/将棋アプリ/repo/src/test/shogi-partial-root-matches.test.ts"
+  },
+  {
+    "file": "C:/Users/tetsu/Documents/ChatGPT/将棋アプリ/repo/src/test/shogi-partial-root.test.ts"
+  },
+  {
+    "file": "C:/Users/tetsu/Documents/ChatGPT/将棋アプリ/repo/src/test/shogi-piece-safety-experiment.test.ts"
+  },
+  {
+    "file": "C:/Users/tetsu/Documents/ChatGPT/将棋アプリ/repo/src/test/shogi-piece-square-evaluation.test.ts"
+  },
+  {
+    "file": "C:/Users/tetsu/Documents/ChatGPT/将棋アプリ/repo/src/test/shogi-previous-pv.test.ts"
+  },
+  {
+    "file": "C:/Users/tetsu/Documents/ChatGPT/将棋アプリ/repo/src/test/shogi-quiescence-comparison-ui.test.tsx"
+  },
+  {
+    "file": "C:/Users/tetsu/Documents/ChatGPT/将棋アプリ/repo/src/test/shogi-quiescence-comparison.test.ts"
+  },
+  {
+    "file": "C:/Users/tetsu/Documents/ChatGPT/将棋アプリ/repo/src/test/shogi-quiescence-ordering.test.ts"
+  },
+  {
+    "file": "C:/Users/tetsu/Documents/ChatGPT/将棋アプリ/repo/src/test/shogi-quiescence-search.test.ts"
+  },
+  {
+    "file": "C:/Users/tetsu/Documents/ChatGPT/将棋アプリ/repo/src/test/shogi-quiet-promotions.test.ts"
+  },
+  {
+    "file": "C:/Users/tetsu/Documents/ChatGPT/将棋アプリ/repo/src/test/shogi-random-ai.test.ts"
+  },
+  {
+    "file": "C:/Users/tetsu/Documents/ChatGPT/将棋アプリ/repo/src/test/shogi-repeated-paired-self-play-matches.test.ts"
+  },
+  {
+    "file": "C:/Users/tetsu/Documents/ChatGPT/将棋アプリ/repo/src/test/shogi-repetition.test.tsx"
+  },
+  {
+    "file": "C:/Users/tetsu/Documents/ChatGPT/将棋アプリ/repo/src/test/shogi-resignation.test.tsx"
+  },
+  {
+    "file": "C:/Users/tetsu/Documents/ChatGPT/将棋アプリ/repo/src/test/shogi-search-evaluation-breakdown.test.ts"
+  },
+  {
+    "file": "C:/Users/tetsu/Documents/ChatGPT/将棋アプリ/repo/src/test/shogi-search-value-nan.test.ts"
+  },
+  {
+    "file": "C:/Users/tetsu/Documents/ChatGPT/将棋アプリ/repo/src/test/shogi-see-deadline.test.ts"
+  },
+  {
+    "file": "C:/Users/tetsu/Documents/ChatGPT/将棋アプリ/repo/src/test/shogi-see-move-ordering.test.ts"
+  },
+  {
+    "file": "C:/Users/tetsu/Documents/ChatGPT/将棋アプリ/repo/src/test/shogi-selective-promotion-contracts.test.ts"
+  },
+  {
+    "file": "C:/Users/tetsu/Documents/ChatGPT/将棋アプリ/repo/src/test/shogi-selective-promotions.test.ts"
+  },
+  {
+    "file": "C:/Users/tetsu/Documents/ChatGPT/将棋アプリ/repo/src/test/shogi-selective-review.test.ts"
+  },
+  {
+    "file": "C:/Users/tetsu/Documents/ChatGPT/将棋アプリ/repo/src/test/shogi-self-play-game.test.ts"
+  },
+  {
+    "file": "C:/Users/tetsu/Documents/ChatGPT/将棋アプリ/repo/src/test/shogi-static-exchange-evaluation.test.ts"
+  },
+  {
+    "file": "C:/Users/tetsu/Documents/ChatGPT/将棋アプリ/repo/src/test/shogi-terminal-distance.test.ts"
+  },
+  {
+    "file": "C:/Users/tetsu/Documents/ChatGPT/将棋アプリ/repo/src/test/shogi-time-limit-overrun.test.ts"
+  },
+  {
+    "file": "C:/Users/tetsu/Documents/ChatGPT/将棋アプリ/repo/src/test/shogi-time-limit-stress.test.ts"
+  },
+  {
+    "file": "C:/Users/tetsu/Documents/ChatGPT/将棋アプリ/repo/src/test/shogi-time-limited-quiescence-comparison-ui.test.tsx"
+  },
+  {
+    "file": "C:/Users/tetsu/Documents/ChatGPT/将棋アプリ/repo/src/test/shogi-time-limited-quiescence-comparison.test.ts"
+  },
+  {
+    "file": "C:/Users/tetsu/Documents/ChatGPT/将棋アプリ/repo/src/test/shogi-time-limited-worker-ai-ui.test.tsx"
+  },
+  {
+    "file": "C:/Users/tetsu/Documents/ChatGPT/将棋アプリ/repo/src/test/shogi-timed-depth-one-diagnostics.test.ts"
+  },
+  {
+    "file": "C:/Users/tetsu/Documents/ChatGPT/将棋アプリ/repo/src/test/shogi-timed-fallback-self-play.test.ts"
+  },
+  {
+    "file": "C:/Users/tetsu/Documents/ChatGPT/将棋アプリ/repo/src/test/shogi-transposition-table.test.ts"
+  },
+  {
+    "file": "C:/Users/tetsu/Documents/ChatGPT/将棋アプリ/repo/src/test/shogi-two-ply-minimax-ai.test.ts"
+  },
+  {
+    "file": "C:/Users/tetsu/Documents/ChatGPT/将棋アプリ/repo/src/test/shogi-undefended-piece-safety-evaluation.test.ts"
+  },
+  {
+    "file": "C:/Users/tetsu/Documents/ChatGPT/将棋アプリ/repo/src/test/shogi.test.tsx"
+  },
+  {
+    "file": "C:/Users/tetsu/Documents/ChatGPT/将棋アプリ/repo/src/test/tactical-classification.test.ts"
+  },
+  {
+    "file": "C:/Users/tetsu/Documents/ChatGPT/将棋アプリ/repo/src/test/tactical-diagnostics.test.ts"
+  },
+  {
+    "file": "C:/Users/tetsu/Documents/ChatGPT/将棋アプリ/repo/src/test/tactical-quality-review.test.ts"
+  },
+  {
+    "file": "C:/Users/tetsu/Documents/ChatGPT/将棋アプリ/repo/src/test/tactical-quality.test.ts"
+  },
+  {
+    "file": "C:/Users/tetsu/Documents/ChatGPT/将棋アプリ/repo/src/test/time-limited-iterative-alpha-beta-worker.test.ts"
+  },
+  {
+    "file": "C:/Users/tetsu/Documents/ChatGPT/将棋アプリ/repo/src/test/time-limited-quiescence-comparison-worker.test.ts"
+  },
+  {
+    "file": "C:/Users/tetsu/Documents/ChatGPT/将棋アプリ/repo/src/test/tt-bottleneck-audit.test.ts"
+  },
+  {
+    "file": "C:/Users/tetsu/Documents/ChatGPT/将棋アプリ/repo/.tmp-tests/w1b-review-20261115-final/a/tiny.test.js"
+  },
+  {
+    "file": "C:/Users/tetsu/Documents/ChatGPT/将棋アプリ/repo/.tmp-tests/w1b-review-20261115-final/b/tiny.test.js"
+  },
+  {
+    "file": "C:/Users/tetsu/Documents/ChatGPT/将棋アプリ/repo/.tmp-tests/w1b-review-20261115-final/git-source/tiny.test.js"
+  },
+  {
+    "file": "C:/Users/tetsu/Documents/ChatGPT/将棋アプリ/repo/.tmp-tests/w1b-review-20261115-host-01/b/tiny.test.js"
+  },
+  {
+    "file": "C:/Users/tetsu/Documents/ChatGPT/将棋アプリ/repo/.tmp-tests/w1b-review-20261115-host-01/a/tiny.test.js"
+  },
+  {
+    "file": "C:/Users/tetsu/Documents/ChatGPT/将棋アプリ/repo/.tmp-tests/w1b-review-20261115-host-01/git-source/tiny.test.js"
+  },
+  {
+    "file": "C:/Users/tetsu/Documents/ChatGPT/将棋アプリ/repo/.tmp-tests/w1b-review-20261115-host-02/a/tiny.test.js"
+  },
+  {
+    "file": "C:/Users/tetsu/Documents/ChatGPT/将棋アプリ/repo/.tmp-tests/w1b-review-20261115-host-02/git-source/tiny.test.js"
+  },
+  {
+    "file": "C:/Users/tetsu/Documents/ChatGPT/将棋アプリ/repo/.tmp-tests/w1b-review-20261115-host-02/b/tiny.test.js"
+  },
+  {
+    "file": "C:/Users/tetsu/Documents/ChatGPT/将棋アプリ/repo/.tmp-tests/w1b-review-20261115-01/a/tiny.test.js"
+  },
+  {
+    "file": "C:/Users/tetsu/Documents/ChatGPT/将棋アプリ/repo/.tmp-tests/w1b-review-20261115-01/git-source/tiny.test.js"
+  },
+  {
+    "file": "C:/Users/tetsu/Documents/ChatGPT/将棋アプリ/repo/.tmp-tests/w1b-review-20261115-reporter/assertion-failure/tiny.test.js"
+  },
+  {
+    "file": "C:/Users/tetsu/Documents/ChatGPT/将棋アプリ/repo/.tmp-tests/w1b-review-20261115-reporter/empty-describe/tiny.test.js"
+  },
+  {
+    "file": "C:/Users/tetsu/Documents/ChatGPT/将棋アプリ/repo/.tmp-tests/w1b-review-20261115-reporter/unhandled/tiny.test.js"
+  },
+  {
+    "file": "C:/Users/tetsu/Documents/ChatGPT/将棋アプリ/repo/.tmp-tests/w1b-review-20261115-reporter/normal/tiny.test.js"
+  }
+]

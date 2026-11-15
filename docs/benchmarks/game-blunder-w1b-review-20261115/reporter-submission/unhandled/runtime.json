@@ -1,0 +1,23 @@
+{
+  "runId": "reporter-unhandled",
+  "trialId": "unhandled",
+  "preflightSha256": "DIRECT-REPORTER-OBSERVATION-NO-PREFLIGHT",
+  "inventorySha256": "NOT-A-COMPARISON",
+  "reason": "passed",
+  "unhandledErrors": [
+    {
+      "name": "Error",
+      "message": "W1b real unhandled fixture",
+      "type": "Uncaught Exception"
+    }
+  ],
+  "suites": [
+    {
+      "id": "-270551241",
+      "file": "C:/Users/tetsu/Documents/ChatGPT/将棋アプリ/repo/.tmp-tests/w1b-review-20261115-reporter-submission/unhandled/tiny.test.js",
+      "root": true,
+      "mode": "run",
+      "state": "pass"
+    }
+  ]
+}

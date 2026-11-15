@@ -1,0 +1,13 @@
+
+> shogi-app@0.0.0 test
+> vitest run src/test
+
+
+ RUN  v4.1.11 C:/Users/tetsu/Documents/ChatGPT/将棋アプリ/repo
+
+
+ Test Files  98 passed (98)
+      Tests  2587 passed (2587)
+   Start at  19:57:55
+   Duration  128.39s (transform 4.18s, setup 10.07s, import 14.75s, tests 124.54s, environment 66.70s)
+
