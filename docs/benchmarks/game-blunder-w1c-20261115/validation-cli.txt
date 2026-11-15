@@ -1,0 +1,14 @@
+Starting related-summary
+related-summary: exit 0
+Starting related-w1
+related-w1: exit 0
+Starting related-product
+related-product: exit 0
+Starting lock
+lock: exit 0
+Starting typecheck
+typecheck: exit 0
+Starting build
+build: exit 0
+Starting full-product
+full-product: exit 0

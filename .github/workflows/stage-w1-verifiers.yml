@@ -1,0 +1,20 @@
+name: Stage W1 verifier regression
+on:
+  pull_request:
+    branches: [main, master]
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  pure-verifiers:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version: '24.19.0'
+      # No product/dependency installation or Windows junction assumptions required.
+      - name: Aggregation and fail-closed admission controls
+        run: node --test scripts/stage-w1-summary-check.mjs scripts/stage-w1b-summary-check.mjs scripts/stage-w1c-check.mjs
+      - name: Prove false PASS mutation is detected
+        run: node scripts/stage-w1c-mutation-check.mjs

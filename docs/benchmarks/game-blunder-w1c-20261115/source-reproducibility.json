@@ -1,0 +1,20 @@
+[
+  {
+    "label": "old",
+    "head": "e1ccb1a2412e7faa86c2c1f60fdad1dca154023a",
+    "count": 2104,
+    "firstSha256": "eb5e166fbbb122b02f2df73386e71c744d107ea1966f4a502f10079739e24b7c",
+    "recomputedSha256": "eb5e166fbbb122b02f2df73386e71c744d107ea1966f4a502f10079739e24b7c",
+    "reproducible": true,
+    "rawMismatchCount": 0
+  },
+  {
+    "label": "new",
+    "head": "2a8a57b6ff207831c77ce62d27d3151eba7c1dc3",
+    "count": 2211,
+    "firstSha256": "6725f9a713eb93bc5a9fbd0e52ca81231964103346cbe114bb6ae938ff972ade",
+    "recomputedSha256": "6725f9a713eb93bc5a9fbd0e52ca81231964103346cbe114bb6ae938ff972ade",
+    "reproducible": true,
+    "rawMismatchCount": 0
+  }
+]

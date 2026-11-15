@@ -1,0 +1,24 @@
+{
+  "file": "src/test/game-blunder-pilot.test.ts",
+  "testIds": [
+    "game blunder pilot > uses next-ply capture as a trigger, not any unrelated move or drop",
+    "game blunder pilot > excludes incomplete and corrupt journals"
+  ],
+  "reason": "Two deterministic assertion/journal-reader controls, no time-limited search, no UI interaction. Identical tracked test blob at both target commits.",
+  "targets": [
+    {
+      "head": "e1ccb1a2412e7faa86c2c1f60fdad1dca154023a",
+      "blob": "d681c33291b7d83c331f710fccd773fadb07a4ef"
+    },
+    {
+      "head": "2a8a57b6ff207831c77ce62d27d3151eba7c1dc3",
+      "blob": "d681c33291b7d83c331f710fccd773fadb07a4ef"
+    }
+  ],
+  "expected": {
+    "pool": "forks",
+    "maxWorkers": 2,
+    "testTimeout": 5000,
+    "cache": true
+  }
+}

@@ -1,0 +1,46 @@
+{
+  "attempts": [
+    {
+      "id": "initial sandbox snapshot build",
+      "status": "FAILED",
+      "reason": "registry access denied/ENOTFOUND; bundled npm 11.19.0, not the accepted pinned build",
+      "raw": "old-install-stdout.txt / old-install-stderr.txt / old-install.json",
+      "root": "../stage-w1c-20261115-01"
+    },
+    {
+      "id": "build-02",
+      "status": "FAILED",
+      "reason": "npm 11.17.0 TLS certificate validation",
+      "root": "../stage-w1c-20261115-02"
+    },
+    {
+      "id": "controls-dev-01",
+      "status": "FAILED",
+      "reason": "EPERM creating fixture root node_modules junction; exception observed in tool output, standalone CLI exception log not captured"
+    },
+    {
+      "id": "initial portable test",
+      "status": "FAILED",
+      "reason": "test fixture incorrectly retained .git in snapshot; assertion failure in positive controls exposed it; corrected with separate Git metadata directory",
+      "raw": "initial tool output only; subsequent portable-dev-02.txt retained"
+    },
+    {
+      "id": "controls-host-02",
+      "status": "UNKNOWN",
+      "reason": "actual npm probe cache/TEMP side effects",
+      "evidence": "connected-normal/preflight.json and remaining fixture trees"
+    },
+    {
+      "id": "controls-host-03",
+      "status": "UNKNOWN",
+      "reason": "tool hashes changed during development before launch",
+      "raw": "controls-host-03-cli.txt"
+    },
+    {
+      "id": "collection-host-01",
+      "status": "UNKNOWN",
+      "note": "outcome prose assumed both targets changed; collection-final and collection-final-02 retain actual per-target bytes (first changed, second clean)"
+    }
+  ],
+  "note": "Development attempts are retained, not substituted for accepted-final. No unsuccessful attempt is counted as PASS."
+}

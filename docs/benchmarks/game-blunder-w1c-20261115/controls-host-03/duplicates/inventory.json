@@ -1,0 +1,15 @@
+{
+  "old": {
+    "verified": true,
+    "tests": [
+      {
+        "file": "a.test.ts",
+        "name": "one"
+      },
+      {
+        "file": "a.test.ts",
+        "name": "one"
+      }
+    ]
+  }
+}

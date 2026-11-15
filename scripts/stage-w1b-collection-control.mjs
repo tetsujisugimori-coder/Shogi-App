@@ -1,4 +1,4 @@
-import { mkdirSync, writeFileSync, symlinkSync, readdirSync } from 'node:fs';
+import { mkdirSync, writeFileSync, symlinkSync, readdirSync, readFileSync } from 'node:fs';
 import { execFileSync } from 'node:child_process';
 import { join, resolve } from 'node:path';
 import assert from 'node:assert/strict';
@@ -24,9 +24,11 @@ for(const name of ['a','b']) {
  symlinkSync(resolve('node_modules'),join(dir,'node_modules'),'junction');targets.push({repo:source,dir,head});
 }
 const plan={targets,filters:[],expected:{pool:'forks',maxWorkers:2,testTimeout:5000,cache:false}},run=join(out,'run');
+for(const name of ['temp','npm-cache','cache']) mkdirSync(join(root,name),{recursive:true});
+plan.environment={TEMP:join(root,'temp'),TMP:join(root,'temp'),npm_config_cache:join(root,'npm-cache')};plan.isolationPaths=[join(root,'cache')];
 writeFileSync(join(out,'plan.json'),JSON.stringify(plan,null,2));
 const result=prepare(plan,run),events=readdirSync(run).filter(f=>f.startsWith('event-')).map(f=>read(join(run,f)));
 const starts=events.filter(e=>e.phase==='run'&&e.action==='spawn').length;
 assert.equal(result.status,'UNKNOWN');assert.match(result.reason,/blob mismatch|changed/);assert.equal(starts,0);
-writeFileSync(join(out,'outcome.json'),JSON.stringify({result,collectionChildren:events.filter(e=>e.phase==='collect').length,comparisonChildren:starts,setupSideEffects:'Both snapshots retain the modified state.txt; never normalized or repaired.'},null,2));
+writeFileSync(join(out,'outcome.json'),JSON.stringify({result,collectionChildren:events.filter(e=>e.phase==='collect').length,comparisonChildren:starts,setupSideEffects:targets.map(t=>({dir:t.dir,state:readFileSync(join(t.dir,'state.txt'),'utf8')})),note:'Collection is now checked after each target; later targets need not execute setup. Modified fixture bytes are retained.'},null,2));
 console.log(JSON.stringify({result,comparisonChildren:starts}));

@@ -1,0 +1,19 @@
+{
+  "result": {
+    "status": "UNKNOWN",
+    "reason": "Error: raw blob mismatch: state.txt; no CRLF normalization permitted"
+  },
+  "collectionChildren": 1,
+  "comparisonChildren": 0,
+  "setupSideEffects": [
+    {
+      "dir": "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\repo\\.tmp-tests\\w1c-collection-final-02\\a",
+      "state": "changed by collection setup\n"
+    },
+    {
+      "dir": "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\repo\\.tmp-tests\\w1c-collection-final-02\\b",
+      "state": "clean\n"
+    }
+  ],
+  "note": "Collection is now checked after each target; later targets need not execute setup. Modified fixture bytes are retained."
+}

@@ -1,0 +1,1 @@
+{"name":"untracked regular file","expected":"UNKNOWN, exit 1, comparison starts 0","stdout":"{\"status\":\"UNKNOWN\",\"reason\":\"Error: untracked snapshot entry/type: unknown\"}\n","stderr":"","exitCode":1,"comparisonStarts":0}

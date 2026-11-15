@@ -1,0 +1,29 @@
+{
+  "targets": [
+    {
+      "repo": "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\repo\\.tmp-tests\\w1c-controls-02\\git-source",
+      "dir": "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\repo\\.tmp-tests\\w1c-controls-02\\a",
+      "head": "1aca45193ca5111b81a4ddb5ebb31a0577f5a598"
+    },
+    {
+      "repo": "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\repo\\.tmp-tests\\w1c-controls-02\\git-source",
+      "dir": "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\repo\\.tmp-tests\\w1c-controls-02\\b",
+      "head": "1aca45193ca5111b81a4ddb5ebb31a0577f5a598"
+    }
+  ],
+  "filters": [],
+  "expected": {
+    "pool": "forks",
+    "maxWorkers": 2,
+    "testTimeout": 5000,
+    "cache": false
+  },
+  "environment": {
+    "TEMP": "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\repo\\.tmp-tests\\w1c-controls-02\\temp",
+    "TMP": "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\repo\\.tmp-tests\\w1c-controls-02\\temp",
+    "npm_config_cache": "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\repo\\.tmp-tests\\w1c-controls-02\\npm-cache"
+  },
+  "isolationPaths": [
+    "C:/Users/tetsu/Documents/ChatGPT/将棋アプリ/repo/.tmp-tests/w1c-controls-02/cache"
+  ]
+}

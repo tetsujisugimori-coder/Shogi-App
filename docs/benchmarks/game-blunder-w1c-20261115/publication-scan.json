@@ -1,0 +1,7 @@
+{
+  "at": "2026-11-15T12:11:27.901Z",
+  "filesScanned": 1303,
+  "patterns": "credential token prefixes, Authorization headers, signed private retrieval URLs",
+  "candidatePaths": [],
+  "note": "Pattern scan plus scope review; not a proof of absence of every possible secret."
+}

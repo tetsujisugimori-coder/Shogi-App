@@ -1,0 +1,9 @@
+{
+  "result": {
+    "status": "UNKNOWN",
+    "reason": "Error: raw blob mismatch: state.txt; no CRLF normalization permitted"
+  },
+  "collectionChildren": 1,
+  "comparisonChildren": 0,
+  "setupSideEffects": "Both snapshots retain the modified state.txt; never normalized or repaired."
+}

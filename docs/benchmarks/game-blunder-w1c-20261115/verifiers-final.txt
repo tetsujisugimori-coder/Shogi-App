@@ -1,0 +1,38 @@
+✔ classifies common failures without inventing a timeout (0.8868ms)
+✔ preserves duplicates and leaves unobserved timing and worker unknown (1.5873ms)
+✔ zero (1.4103ms)
+✔ missing file (0.1888ms)
+✔ count mismatch (0.1614ms)
+✔ unfinished suite (0.1598ms)
+✔ failure with zero exit (0.1779ms)
+✔ normal duplicates (0.1145ms)
+✔ unverified inventory cannot pass (0.1156ms)
+✔ failure survives contradictory count (0.1433ms)
+✔ zero suite counts (0.156ms)
+✔ false failed suite (0.7648ms)
+✔ runtime extensions (0.1682ms)
+✔ runtime count wrong type (0.0972ms)
+✔ runtime errors wrong type (0.0685ms)
+✔ runtime extension contradiction (0.0578ms)
+✔ real runtime errors without JSON extensions (0.1217ms)
+✔ external verified flag insufficient (0.1297ms)
+✔ malformed nested records rejected (0.0777ms)
+✔ malformed inventory rejected (0.0725ms)
+✔ runtime suite failure survives JSON success (0.0882ms)
+Retained portable fixtures: C:\Users\tetsu\Documents\ChatGPT\将棋アプリ\repo\.tmp-tests\shogi-w1c-Wyo8fh
+✔ normal raw source accepted and manifests reproducible (613.65ms)
+✔ path containment respects directory boundary (0.3082ms)
+✔ CRLF raw blob mismatch (720.8839ms)
+✔ untracked empty directory (784.9573ms)
+✔ untracked regular file (785.4238ms)
+✔ tracked file becomes directory (683.7059ms)
+✔ dependency contents AND empty directories affect the seal (743.3184ms)
+✔ internal symlinks and cycles rejected (429.4616ms)
+ℹ tests 29
+ℹ suites 0
+ℹ pass 29
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 5377.2637

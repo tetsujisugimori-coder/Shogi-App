@@ -1,0 +1,1 @@
+{"name":"untracked empty directory","expected":"UNKNOWN, exit 1, comparison starts 0","stdout":"{\"status\":\"UNKNOWN\",\"reason\":\"Error: untracked snapshot directory: unknown-empty\"}\n","stderr":"","exitCode":1,"comparisonStarts":0}

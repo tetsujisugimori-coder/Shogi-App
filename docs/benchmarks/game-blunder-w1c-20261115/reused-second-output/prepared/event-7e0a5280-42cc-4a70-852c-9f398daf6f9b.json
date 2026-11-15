@@ -1,0 +1,6 @@
+{
+  "at": "2026-11-15T12:06:15.517Z",
+  "action": "blocked",
+  "phase": "launch",
+  "reason": "Error: reused trial output: trial-1"
+}

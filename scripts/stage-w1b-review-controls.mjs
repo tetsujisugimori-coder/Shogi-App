@@ -55,6 +55,9 @@ git('init');git('add','.');git('-c','user.name=W1b fixture','-c','user.email=fix
 const head=git('rev-parse','HEAD');
 for(const dir of [a,b]) {for(const f of ['package.json','package-lock.json','vitest.config.mjs','tiny.test.js'])writeFileSync(join(dir,f),execFileSync('git',['-C',bare,'show',`${head}:${f}`]));symlinkSync(resolve('node_modules'),join(dir,'node_modules'),'junction');}
 const plan={targets:[a,b].map(dir=>({repo:bare,dir,head})),filters:[],expected:{pool:'forks',maxWorkers:2,testTimeout:5000,cache:false}};
+for(const name of ['temp','npm-cache','cache']) mkdirSync(join(fixtureRoot,name),{recursive:true});
+plan.environment={TEMP:join(fixtureRoot,'temp'),TMP:join(fixtureRoot,'temp'),npm_config_cache:join(fixtureRoot,'npm-cache')};
+plan.isolationPaths=[cacheDir];
 write(join(output,'fixture-plan.json'),plan);
 const normal=join(output,'connected-normal');
 const prepared=prepare(plan,normal);write(join(output,'normal-prepare.json'),prepared);

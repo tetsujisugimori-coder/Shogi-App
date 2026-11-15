@@ -1,0 +1,14 @@
+{
+  "runId": "c1fec995-70fc-4a32-b7fe-01dbde1d2cb1",
+  "results": [
+    {
+      "trialId": "0c99bb8b-01b5-4378-b908-8cfa1900891b",
+      "status": "PASS"
+    },
+    {
+      "trialId": "39fdf294-3ca5-4046-9e24-e307218c3ac8",
+      "status": "PASS"
+    }
+  ],
+  "status": "PASS"
+}

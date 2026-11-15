@@ -1,0 +1,1633 @@
+ .gitattributes                                     |     3 +
+ LOG.md                                             |    14 +
+ .../game-blunder-investigation-20261030/README.md  |    37 +
+ .../observations.jsonl                             |    62 +
+ .../summary.json                                   |   272 +
+ .../DRAFT_PR.md                                    |    21 +
+ .../ISSUE.md                                       |    28 +
+ .../README.md                                      |   210 +
+ .../acceptance.json                                |   171 +
+ .../hypotheses.json                                |    55 +
+ .../observations.jsonl                             |   159 +
+ .../preservation.json                              |    57 +
+ .../source-provenance.json                         |   402 +
+ .../submission-status.json                         |    29 +
+ .../summary.json                                   |  4047 ++
+ .../validation/build.log.gz                        |   Bin 0 -> 319 bytes
+ .../validation/ci-initial-failed.log.gz            |   Bin 0 -> 18527 bytes
+ .../validation/ci-initial.json                     |     1 +
+ .../validation/full-tests-harness-15s.log.gz       |   Bin 0 -> 299 bytes
+ .../validation/full-tests-single-worker.log.gz     |   Bin 0 -> 565 bytes
+ .../validation/full-tests.log.gz                   |   Bin 0 -> 1051 bytes
+ .../validation/lint-final.log.gz                   |   Bin 0 -> 60 bytes
+ .../validation/lint-provenance-fix.log.gz          |   Bin 0 -> 60 bytes
+ .../validation/lint.log.gz                         |   Bin 0 -> 60 bytes
+ .../validation/log-manifest.json                   |    62 +
+ .../validation/provenance-fix-tests.log.gz         |   Bin 0 -> 224 bytes
+ .../validation/related-tests-workspace-temp.log.gz |   Bin 0 -> 228 bytes
+ .../validation/related-tests.log.gz                |   Bin 0 -> 905 bytes
+ .../validation/results.json                        |    95 +
+ .../validation/source-canonical-check.json         |     5 +
+ .../validation/verify-lock.log.gz                  |   Bin 0 -> 267 bytes
+ .../game-blunder-pilot-20261029/candidates.json    | 12375 ++++++
+ .../game-blunder-pilot-20261029/report.md          |    28 +
+ .../game-blunder-pilot-balanced-20261029/README.md |    19 +
+ .../candidates.json                                | 14360 +++++++
+ .../game-blunder-pilot-balanced-20261029/report.md |    28 +
+ .../game-blunder-proofs-20261030/proofs.json       |  2757 ++
+ .../game-blunder-proofs-v2-20261030/README.md      |    13 +
+ .../game-blunder-proofs-v2-20261030/proofs.json    |  5178 +++
+ .../diagnosis.json                                 | 41182 ++++++++++++++++++
+ .../game-blunder-rediagnosis-20261030/report.md    |    12 +
+ .../diagnosis.json                                 | 41187 +++++++++++++++++++
+ .../game-blunder-rediagnosis-v2-20261030/report.md |    12 +
+ .../game-blunder-rediagnosis-v3-20261030/README.md |    35 +
+ .../diagnosis.json                                 | 41183 ++++++++++++++++++
+ .../game-blunder-rediagnosis-v3-20261030/report.md |    12 +
+ .../game-blunder-review-20261111/README.md         |   105 +
+ .../game-blunder-review-20261111/acceptance.json   |    40 +
+ .../gameBlunderInvestigation.ts.gz                 |   Bin 0 -> 3079 bytes
+ .../baseline-sources/gameBlunderPilot.ts.gz        |   Bin 0 -> 1795 bytes
+ .../investigate-game-blunders.ts.gz                |   Bin 0 -> 3410 bytes
+ .../baseline-sources/summarize-game-blunders.ts.gz |   Bin 0 -> 3877 bytes
+ .../build-final.log.gz                             |   Bin 0 -> 316 bytes
+ .../game-blunder-review-20261111/environment.json  |    15 +
+ .../evidence-manifest.json                         |   444 +
+ .../experiment-environment-fixed.json              |    43 +
+ .../experiment-fixed.log.gz                        |   Bin 0 -> 20 bytes
+ .../game-blunder-review-20261111/experiment.log.gz |   Bin 0 -> 20 bytes
+ .../final-parallel-1-15000.log.gz                  |   Bin 0 -> 5138 bytes
+ .../final-parallel-1-5000.log.gz                   |   Bin 0 -> 5140 bytes
+ .../final-parallel-2-15000.log.gz                  |   Bin 0 -> 5139 bytes
+ .../final-parallel-2-5000.log.gz                   |   Bin 0 -> 5139 bytes
+ .../final-single-1-0.log.gz                        |   Bin 0 -> 2109 bytes
+ .../final-single-1-1.log.gz                        |   Bin 0 -> 3201 bytes
+ .../final-single-2-0.log.gz                        |   Bin 0 -> 2108 bytes
+ .../final-single-2-1.log.gz                        |   Bin 0 -> 3203 bytes
+ .../final-target-timing.json                       |    92 +
+ .../fixed-run/observations.jsonl                   |   159 +
+ .../fixed-run/summary.json                         |  4054 ++
+ .../followup-07db466/FINAL-FOLLOWUP.json           |   194 +
+ .../followup-07db466/FINAL-FOLLOWUP.md             |    33 +
+ .../followup-07db466/README.md                     |    21 +
+ .../followup-07db466/ci-direct.json                |     1 +
+ .../followup-07db466/ci-direct.log.gz              |   Bin 0 -> 29846 bytes
+ .../followup-07db466/ci-final.json                 |     1 +
+ .../followup-07db466/ci-final.log.gz               |   Bin 0 -> 29846 bytes
+ .../followup-07db466/ci-watch-final.log.gz         |   Bin 0 -> 647 bytes
+ .../followup-07db466/manifest.json                 |    86 +
+ .../followup-07db466/pair-nan-followup-exit.json   |    13 +
+ .../followup-07db466/pair-nan-followup.log.gz      |   Bin 0 -> 289 bytes
+ .../followup-07db466/pair-nan-followup.mjs         |    52 +
+ .../followup-07db466/pair-nan-followup/input.jsonl |   159 +
+ .../followup-07db466/pair-nan-followup/result.json |   133 +
+ .../pair-nan-followup/summary.json                 |  3987 ++
+ .../followup-07db466/pr-direct.json                |     1 +
+ .../followup-07db466/write-final-followup.py       |   133 +
+ .../game-blunder-review-20261111/full-15s.log.gz   |   Bin 0 -> 259 bytes
+ .../full-default-1.log.gz                          |   Bin 0 -> 10397 bytes
+ .../full-default-2.log.gz                          |   Bin 0 -> 2290 bytes
+ .../game-blunder-review-20261111/host-15s-run.json |    19 +
+ .../host-build-final.log.gz                        |   Bin 0 -> 316 bytes
+ .../host-full-15s.json                             |     1 +
+ .../host-full-15s.log.gz                           |   Bin 0 -> 8362 bytes
+ .../host-full-5s-1.json                            |     1 +
+ .../host-full-5s-1.log.gz                          |   Bin 0 -> 18472 bytes
+ .../host-full-5s-2.json                            |     1 +
+ .../host-full-5s-2.log.gz                          |   Bin 0 -> 8121 bytes
+ .../host-lint-final.log.gz                         |   Bin 0 -> 60 bytes
+ .../host-test-runs.json                            |    76 +
+ .../host-verify-lock-final.log.gz                  |   Bin 0 -> 267 bytes
+ .../independent-archive-manifest.json              |   211 +
+ .../independent-audit.json                         |   796 +
+ .../independent-results.json                       |  1013 +
+ .../independent-review-evidence.tar.gz             |   Bin 0 -> 3688807 bytes
+ .../independent-review.md                          |    71 +
+ .../game-blunder-review-20261111/issue-start.json  |     1 +
+ .../legacy-raw-log-verification.json               |   115 +
+ .../legacy-reaggregated-fixed.json                 |  4053 ++
+ .../legacy-reaggregated.json                       |  4053 ++
+ .../game-blunder-review-20261111/lint-code.log.gz  |   Bin 0 -> 60 bytes
+ .../game-blunder-review-20261111/lint-final.log.gz |   Bin 0 -> 60 bytes
+ .../lint-precommit.log.gz                          |   Bin 0 -> 60 bytes
+ .../game-blunder-review-20261111/lint-ready.log.gz |   Bin 0 -> 60 bytes
+ .../lint-statistics.log.gz                         |   Bin 0 -> 60 bytes
+ .../game-blunder-review-20261111/log-manifest.json |   333 +
+ .../old-parallel-1-15000.log.gz                    |   Bin 0 -> 5140 bytes
+ .../old-parallel-1-5000.log.gz                     |   Bin 0 -> 5139 bytes
+ .../old-parallel-2-15000.log.gz                    |   Bin 0 -> 5140 bytes
+ .../old-parallel-2-5000.log.gz                     |   Bin 0 -> 5140 bytes
+ .../old-single-1-0.log.gz                          |   Bin 0 -> 2111 bytes
+ .../old-single-1-1.log.gz                          |   Bin 0 -> 3205 bytes
+ .../old-single-2-0.log.gz                          |   Bin 0 -> 2109 bytes
+ .../old-single-2-1.log.gz                          |   Bin 0 -> 3204 bytes
+ .../game-blunder-review-20261111/old-timing.json   |    95 +
+ .../originals-after.json                           |   246 +
+ .../originals-before.json                          |   194 +
+ .../game-blunder-review-20261111/pr-start.json     |     1 +
+ .../reaggregate-fixed.log.gz                       |   Bin 0 -> 20 bytes
+ .../reaggregate-legacy-fixed.log.gz                |   Bin 0 -> 20 bytes
+ .../red-green-counts.json                          |    22 +
+ .../red-green-fixed.json                           |   902 +
+ .../red-green-fixed.log.gz                         |   Bin 0 -> 333 bytes
+ .../game-blunder-review-20261111/red-green.json    |   803 +
+ .../game-blunder-review-20261111/red-green.log.gz  |   Bin 0 -> 301 bytes
+ .../related-code.log.gz                            |   Bin 0 -> 226 bytes
+ .../related-final.log.gz                           |   Bin 0 -> 227 bytes
+ .../related-first.log.gz                           |   Bin 0 -> 1498 bytes
+ .../related-fixed-final.log.gz                     |   Bin 0 -> 226 bytes
+ .../related-leaf.log.gz                            |   Bin 0 -> 224 bytes
+ .../related-precommit.log.gz                       |   Bin 0 -> 223 bytes
+ .../related-ready.log.gz                           |   Bin 0 -> 226 bytes
+ .../related-second.log.gz                          |   Bin 0 -> 224 bytes
+ .../related-statistics.log.gz                      |   Bin 0 -> 227 bytes
+ .../review-original-comments.json                  |     1 +
+ .../review-original.json                           |     1 +
+ .../run/observations.jsonl                         |   159 +
+ .../source-provenance-fixed.json                   |   503 +
+ .../start-git-observed.txt                         |    25 +
+ .../game-blunder-review-20261111/start-git.txt     |     4 +
+ .../game-blunder-review-20261111/test-runs.json    |   106 +
+ .../verify-lock-final.log.gz                       |   Bin 0 -> 267 bytes
+ .../windows-host-analysis.json                     |  1993 +
+ .../game-blunder-w1b-review-20261115/README.md     |    53 +
+ .../acceptance.json                                |   390 +
+ .../accepted-control/collect-0/exit.json           |     5 +
+ .../accepted-control/collect-0/inventory.json      |    31 +
+ .../accepted-control/collect-0/request.json        |    14 +
+ .../accepted-control/collect-0/settings.json       |    23 +
+ .../accepted-control/collect-0/stderr.log          |     0
+ .../accepted-control/collect-0/stdout.log          |     0
+ .../accepted-control/collect-1/exit.json           |     5 +
+ .../accepted-control/collect-1/inventory.json      |    31 +
+ .../accepted-control/collect-1/request.json        |    14 +
+ .../accepted-control/collect-1/settings.json       |    23 +
+ .../accepted-control/collect-1/stderr.log          |     0
+ .../accepted-control/collect-1/stdout.log          |     0
+ .../accepted-control/comparison.json               |    14 +
+ ...event-004a3bc9-bce6-4492-a4dc-75ff7e23e804.json |    12 +
+ ...event-11abc567-d49a-47ca-9753-d96f68f7c7ad.json |    12 +
+ ...event-5825cf82-7166-4c3f-acd9-baff1bd96599.json |    12 +
+ ...event-e6ff1c26-470f-460b-8e9f-98001eb08df2.json |    12 +
+ .../accepted-control/launched.json                 |     3 +
+ .../accepted-control/preflight.json                |   100 +
+ .../accepted-control/ready.json                    |    90 +
+ .../accepted-control/ready.sha256.json             |     3 +
+ .../accepted-control/trial-0/assessment.json       |    42 +
+ .../accepted-control/trial-0/exit.json             |     5 +
+ .../accepted-control/trial-0/request.json          |    38 +
+ .../accepted-control/trial-0/runtime.json          |    31 +
+ .../accepted-control/trial-0/settings.json         |    23 +
+ .../accepted-control/trial-0/stderr.log            |     0
+ .../accepted-control/trial-0/stdout.log            |     1 +
+ .../accepted-control/trial-0/vitest.json           |     1 +
+ .../accepted-control/trial-1/assessment.json       |    42 +
+ .../accepted-control/trial-1/exit.json             |     5 +
+ .../accepted-control/trial-1/request.json          |    38 +
+ .../accepted-control/trial-1/runtime.json          |    31 +
+ .../accepted-control/trial-1/settings.json         |    23 +
+ .../accepted-control/trial-1/stderr.log            |     0
+ .../accepted-control/trial-1/stdout.log            |     1 +
+ .../accepted-control/trial-1/vitest.json           |     1 +
+ .../accepted-launch-cli.txt                        |     1 +
+ .../accepted-prepare-cli.txt                       |     1 +
+ .../collection-side-effect/outcome.json            |     9 +
+ .../collection-side-effect/plan.json               |    21 +
+ .../run/blocked-prepare.json                       |     5 +
+ .../collection-side-effect/run/collect-0/exit.json |     5 +
+ .../run/collect-0/inventory.json                   |    16 +
+ .../run/collect-0/request.json                     |    14 +
+ .../run/collect-0/settings.json                    |    25 +
+ .../run/collect-0/stderr.log                       |     0
+ .../run/collect-0/stdout.log                       |     0
+ .../collection-side-effect/run/collect-1/exit.json |     5 +
+ .../run/collect-1/inventory.json                   |    16 +
+ .../run/collect-1/request.json                     |    14 +
+ .../run/collect-1/settings.json                    |    25 +
+ .../run/collect-1/stderr.log                       |     0
+ .../run/collect-1/stdout.log                       |     0
+ ...event-90a83af8-f0f6-48a3-be2a-2e0cbe5d4558.json |    12 +
+ ...event-fe8d7ccd-7915-42b9-b7ab-55b3614d278b.json |    12 +
+ .../collection-side-effect/run/preflight.json      |   116 +
+ .../collection-submission/outcome.json             |     9 +
+ .../collection-submission/plan.json                |    21 +
+ .../collection-submission/run/blocked-prepare.json |     5 +
+ .../collection-submission/run/collect-0/exit.json  |     5 +
+ .../run/collect-0/inventory.json                   |    16 +
+ .../run/collect-0/request.json                     |    14 +
+ .../run/collect-0/settings.json                    |    25 +
+ .../collection-submission/run/collect-0/stderr.log |     0
+ .../collection-submission/run/collect-0/stdout.log |     0
+ .../collection-submission/run/collect-1/exit.json  |     5 +
+ .../run/collect-1/inventory.json                   |    16 +
+ .../run/collect-1/request.json                     |    14 +
+ .../run/collect-1/settings.json                    |    25 +
+ .../collection-submission/run/collect-1/stderr.log |     0
+ .../collection-submission/run/collect-1/stdout.log |     0
+ ...event-e95b45b9-362f-4838-853b-e2ec39c091be.json |    12 +
+ ...event-f0457e5a-88cd-4a2c-ac29-973ff0350e90.json |    12 +
+ .../collection-submission/run/preflight.json       |   116 +
+ .../connected-normal/collect-0/exit.json           |     5 +
+ .../connected-normal/collect-0/inventory.json      |    31 +
+ .../connected-normal/collect-0/request.json        |    14 +
+ .../connected-normal/collect-0/settings.json       |    23 +
+ .../connected-normal/collect-0/stderr.log          |     0
+ .../connected-normal/collect-0/stdout.log          |     0
+ .../connected-normal/collect-1/exit.json           |     5 +
+ .../connected-normal/collect-1/inventory.json      |    31 +
+ .../connected-normal/collect-1/request.json        |    14 +
+ .../connected-normal/collect-1/settings.json       |    23 +
+ .../connected-normal/collect-1/stderr.log          |     0
+ .../connected-normal/collect-1/stdout.log          |     0
+ .../connected-normal/comparison.json               |    14 +
+ ...event-222af6e1-454d-423f-aedd-2ad5fa365ac4.json |    12 +
+ ...event-395f2f75-d2d1-49b6-8620-30ae104f23f8.json |    12 +
+ ...event-5fc60efe-97ee-4706-acd5-4eccd6a267cd.json |    12 +
+ ...event-e356da80-ba96-47d8-bd2d-4f744dcde802.json |    12 +
+ .../connected-normal/launched.json                 |     3 +
+ .../connected-normal/preflight.json                |   100 +
+ .../controls-final-02/connected-normal/ready.json  |    90 +
+ .../connected-normal/ready.sha256.json             |     3 +
+ .../connected-normal/trial-0/assessment.json       |    42 +
+ .../connected-normal/trial-0/exit.json             |     5 +
+ .../connected-normal/trial-0/request.json          |    38 +
+ .../connected-normal/trial-0/runtime.json          |    31 +
+ .../connected-normal/trial-0/settings.json         |    23 +
+ .../connected-normal/trial-0/stderr.log            |     0
+ .../connected-normal/trial-0/stdout.log            |     1 +
+ .../connected-normal/trial-0/vitest.json           |     1 +
+ .../connected-normal/trial-1/assessment.json       |    42 +
+ .../connected-normal/trial-1/exit.json             |     5 +
+ .../connected-normal/trial-1/request.json          |    38 +
+ .../connected-normal/trial-1/runtime.json          |    31 +
+ .../connected-normal/trial-1/settings.json         |    23 +
+ .../connected-normal/trial-1/stderr.log            |     0
+ .../connected-normal/trial-1/stdout.log            |     1 +
+ .../connected-normal/trial-1/vitest.json           |     1 +
+ .../controls-final-02/duplicates/after-cli.json    |     5 +
+ .../duplicates/after/comparison-summary.json       |    24 +
+ .../controls-final-02/duplicates/before-cli.json   |     5 +
+ .../duplicates/before/comparison-summary.json      |    21 +
+ .../duplicates/input/run-01/run.json               |     4 +
+ .../duplicates/input/run-01/stderr.log             |     0
+ .../duplicates/input/run-01/stdout.log             |     0
+ .../duplicates/input/run-01/vitest.json            |     1 +
+ .../controls-final-02/duplicates/inventory.json    |    15 +
+ .../failure-zero-exit/after-cli.json               |     5 +
+ .../after/comparison-summary.json                  |    37 +
+ .../failure-zero-exit/before-cli.json              |     5 +
+ .../before/comparison-summary.json                 |    34 +
+ .../failure-zero-exit/input/run-01/run.json        |     4 +
+ .../failure-zero-exit/input/run-01/stderr.log      |     0
+ .../failure-zero-exit/input/run-01/stdout.log      |     0
+ .../failure-zero-exit/input/run-01/vitest.json     |     1 +
+ .../failure-zero-exit/inventory.json               |    11 +
+ .../false-failed-suite/after-cli.json              |     5 +
+ .../after/comparison-summary.json                  |    26 +
+ .../false-failed-suite/before-cli.json             |     5 +
+ .../before/comparison-summary.json                 |    21 +
+ .../false-failed-suite/input/run-01/run.json       |     4 +
+ .../false-failed-suite/input/run-01/stderr.log     |     0
+ .../false-failed-suite/input/run-01/stdout.log     |     0
+ .../false-failed-suite/input/run-01/vitest.json    |     1 +
+ .../false-failed-suite/inventory.json              |    11 +
+ .../controls-final-02/fixture-plan.json            |    21 +
+ .../malformed-json/after-cli.json                  |     5 +
+ .../malformed-json/after/comparison-summary.json   |     9 +
+ .../malformed-json/before-cli.json                 |     5 +
+ .../malformed-json/before/comparison-summary.json  |     9 +
+ .../malformed-json/input/run-01/run.json           |     4 +
+ .../malformed-json/input/run-01/stderr.log         |     0
+ .../malformed-json/input/run-01/stdout.log         |     0
+ .../malformed-json/input/run-01/vitest.json        |     1 +
+ .../malformed-json/inventory.json                  |    11 +
+ .../controls-final-02/missing-file/after-cli.json  |     5 +
+ .../missing-file/after/comparison-summary.json     |    29 +
+ .../controls-final-02/missing-file/before-cli.json |     5 +
+ .../missing-file/before/comparison-summary.json    |    27 +
+ .../missing-file/input/run-01/run.json             |     4 +
+ .../missing-file/input/run-01/stderr.log           |     0
+ .../missing-file/input/run-01/stdout.log           |     0
+ .../missing-file/input/run-01/vitest.json          |     1 +
+ .../controls-final-02/missing-file/inventory.json  |    11 +
+ .../controls-final-02/missing-log/after-cli.json   |     5 +
+ .../missing-log/after/comparison-summary.json      |    24 +
+ .../controls-final-02/missing-log/before-cli.json  |     5 +
+ .../missing-log/before/comparison-summary.json     |    23 +
+ .../missing-log/input/run-01/run.json              |     4 +
+ .../missing-log/input/run-01/stdout.log            |     0
+ .../missing-log/input/run-01/vitest.json           |     1 +
+ .../controls-final-02/missing-log/inventory.json   |    11 +
+ .../controls-final-02/normal-launch.json           |    14 +
+ .../controls-final-02/normal-prepare.json          |     4 +
+ .../controls-final-02/normal/after-cli.json        |     5 +
+ .../normal/after/comparison-summary.json           |    24 +
+ .../controls-final-02/normal/before-cli.json       |     5 +
+ .../normal/before/comparison-summary.json          |    21 +
+ .../controls-final-02/normal/input/run-01/run.json |     4 +
+ .../normal/input/run-01/stderr.log                 |     0
+ .../normal/input/run-01/stdout.log                 |     0
+ .../normal/input/run-01/vitest.json                |     1 +
+ .../controls-final-02/normal/inventory.json        |    11 +
+ .../runtime-count-contradiction/after-cli.json     |     5 +
+ .../after/comparison-summary.json                  |    27 +
+ .../runtime-count-contradiction/before-cli.json    |     5 +
+ .../before/comparison-summary.json                 |    21 +
+ .../input/run-01/run.json                          |     4 +
+ .../input/run-01/stderr.log                        |     0
+ .../input/run-01/stdout.log                        |     0
+ .../input/run-01/vitest.json                       |     1 +
+ .../runtime-count-contradiction/inventory.json     |    11 +
+ .../runtime-errors/after-cli.json                  |     5 +
+ .../runtime-errors/after/comparison-summary.json   |    27 +
+ .../runtime-errors/before-cli.json                 |     5 +
+ .../runtime-errors/before/comparison-summary.json  |    21 +
+ .../runtime-errors/input/run-01/run.json           |     4 +
+ .../runtime-errors/input/run-01/stderr.log         |     0
+ .../runtime-errors/input/run-01/stdout.log         |     0
+ .../runtime-errors/input/run-01/vitest.json        |     1 +
+ .../runtime-errors/inventory.json                  |    11 +
+ .../controls-final-02/runtime-type/after-cli.json  |     5 +
+ .../runtime-type/after/comparison-summary.json     |    26 +
+ .../controls-final-02/runtime-type/before-cli.json |     5 +
+ .../runtime-type/before/comparison-summary.json    |    21 +
+ .../runtime-type/input/run-01/run.json             |     4 +
+ .../runtime-type/input/run-01/stderr.log           |     0
+ .../runtime-type/input/run-01/stdout.log           |     0
+ .../runtime-type/input/run-01/vitest.json          |     1 +
+ .../controls-final-02/runtime-type/inventory.json  |    11 +
+ .../success-nonzero-exit/after-cli.json            |     5 +
+ .../after/comparison-summary.json                  |    27 +
+ .../success-nonzero-exit/before-cli.json           |     5 +
+ .../before/comparison-summary.json                 |    24 +
+ .../success-nonzero-exit/input/run-01/run.json     |     4 +
+ .../success-nonzero-exit/input/run-01/stderr.log   |     0
+ .../success-nonzero-exit/input/run-01/stdout.log   |     0
+ .../success-nonzero-exit/input/run-01/vitest.json  |     1 +
+ .../success-nonzero-exit/inventory.json            |    11 +
+ .../controls-final-02/synthetic-outcomes.json      |    86 +
+ .../unfinished-suite/after-cli.json                |     5 +
+ .../unfinished-suite/after/comparison-summary.json |    25 +
+ .../unfinished-suite/before-cli.json               |     5 +
+ .../before/comparison-summary.json                 |    23 +
+ .../unfinished-suite/input/run-01/run.json         |     4 +
+ .../unfinished-suite/input/run-01/stderr.log       |     0
+ .../unfinished-suite/input/run-01/stdout.log       |     0
+ .../unfinished-suite/input/run-01/vitest.json      |     1 +
+ .../unfinished-suite/inventory.json                |    11 +
+ .../controls-final-02/zero-suites/after-cli.json   |     5 +
+ .../zero-suites/after/comparison-summary.json      |    26 +
+ .../controls-final-02/zero-suites/before-cli.json  |     5 +
+ .../zero-suites/before/comparison-summary.json     |    21 +
+ .../zero-suites/input/run-01/run.json              |     4 +
+ .../zero-suites/input/run-01/stderr.log            |     0
+ .../zero-suites/input/run-01/stdout.log            |     0
+ .../zero-suites/input/run-01/vitest.json           |     1 +
+ .../controls-final-02/zero-suites/inventory.json   |    11 +
+ .../controls-final-02/zero/after-cli.json          |     5 +
+ .../zero/after/comparison-summary.json             |    26 +
+ .../controls-final-02/zero/before-cli.json         |     5 +
+ .../zero/before/comparison-summary.json            |    24 +
+ .../controls-final-02/zero/input/run-01/run.json   |     4 +
+ .../controls-final-02/zero/input/run-01/stderr.log |     0
+ .../controls-final-02/zero/input/run-01/stdout.log |     0
+ .../zero/input/run-01/vitest.json                  |     1 +
+ .../controls-final-02/zero/inventory.json          |    11 +
+ .../connected-normal/collect-0/exit.json           |     5 +
+ .../connected-normal/collect-0/inventory.json      |    31 +
+ .../connected-normal/collect-0/request.json        |    14 +
+ .../connected-normal/collect-0/settings.json       |    23 +
+ .../connected-normal/collect-0/stderr.log          |     0
+ .../connected-normal/collect-0/stdout.log          |     0
+ .../connected-normal/collect-1/exit.json           |     5 +
+ .../connected-normal/collect-1/inventory.json      |    31 +
+ .../connected-normal/collect-1/request.json        |    14 +
+ .../connected-normal/collect-1/settings.json       |    23 +
+ .../connected-normal/collect-1/stderr.log          |     0
+ .../connected-normal/collect-1/stdout.log          |     0
+ .../connected-normal/comparison.json               |    14 +
+ ...event-2454d009-1f11-4e17-86fe-97bf550eb8b0.json |    12 +
+ ...event-74010cce-f849-495d-8b8f-a7a1bee6d042.json |    12 +
+ ...event-808f5370-846d-41ec-8b8e-138d72bb43e9.json |    12 +
+ ...event-8f46b793-2b63-4655-87c2-8833ca8b8dfa.json |    12 +
+ .../controls-final/connected-normal/launched.json  |     3 +
+ .../controls-final/connected-normal/preflight.json |   100 +
+ .../controls-final/connected-normal/ready.json     |    90 +
+ .../connected-normal/ready.sha256.json             |     3 +
+ .../connected-normal/trial-0/assessment.json       |    42 +
+ .../connected-normal/trial-0/exit.json             |     5 +
+ .../connected-normal/trial-0/request.json          |    38 +
+ .../connected-normal/trial-0/runtime.json          |    31 +
+ .../connected-normal/trial-0/settings.json         |    23 +
+ .../connected-normal/trial-0/stderr.log            |     0
+ .../connected-normal/trial-0/stdout.log            |     1 +
+ .../connected-normal/trial-0/vitest.json           |     1 +
+ .../connected-normal/trial-1/assessment.json       |    42 +
+ .../connected-normal/trial-1/exit.json             |     5 +
+ .../connected-normal/trial-1/request.json          |    38 +
+ .../connected-normal/trial-1/runtime.json          |    31 +
+ .../connected-normal/trial-1/settings.json         |    23 +
+ .../connected-normal/trial-1/stderr.log            |     0
+ .../connected-normal/trial-1/stdout.log            |     1 +
+ .../connected-normal/trial-1/vitest.json           |     1 +
+ .../controls-final/duplicates/after-cli.json       |     5 +
+ .../duplicates/after/comparison-summary.json       |    24 +
+ .../controls-final/duplicates/before-cli.json      |     5 +
+ .../duplicates/before/comparison-summary.json      |    21 +
+ .../duplicates/input/run-01/run.json               |     4 +
+ .../duplicates/input/run-01/stderr.log             |     0
+ .../duplicates/input/run-01/stdout.log             |     0
+ .../duplicates/input/run-01/vitest.json            |     1 +
+ .../controls-final/duplicates/inventory.json       |    15 +
+ .../failure-zero-exit/after-cli.json               |     5 +
+ .../after/comparison-summary.json                  |    37 +
+ .../failure-zero-exit/before-cli.json              |     5 +
+ .../before/comparison-summary.json                 |    34 +
+ .../failure-zero-exit/input/run-01/run.json        |     4 +
+ .../failure-zero-exit/input/run-01/stderr.log      |     0
+ .../failure-zero-exit/input/run-01/stdout.log      |     0
+ .../failure-zero-exit/input/run-01/vitest.json     |     1 +
+ .../failure-zero-exit/inventory.json               |    11 +
+ .../false-failed-suite/after-cli.json              |     5 +
+ .../after/comparison-summary.json                  |    26 +
+ .../false-failed-suite/before-cli.json             |     5 +
+ .../before/comparison-summary.json                 |    21 +
+ .../false-failed-suite/input/run-01/run.json       |     4 +
+ .../false-failed-suite/input/run-01/stderr.log     |     0
+ .../false-failed-suite/input/run-01/stdout.log     |     0
+ .../false-failed-suite/input/run-01/vitest.json    |     1 +
+ .../false-failed-suite/inventory.json              |    11 +
+ .../controls-final/fixture-plan.json               |    21 +
+ .../controls-final/malformed-json/after-cli.json   |     5 +
+ .../malformed-json/after/comparison-summary.json   |     9 +
+ .../controls-final/malformed-json/before-cli.json  |     5 +
+ .../malformed-json/before/comparison-summary.json  |     9 +
+ .../malformed-json/input/run-01/run.json           |     4 +
+ .../malformed-json/input/run-01/stderr.log         |     0
+ .../malformed-json/input/run-01/stdout.log         |     0
+ .../malformed-json/input/run-01/vitest.json        |     1 +
+ .../controls-final/malformed-json/inventory.json   |    11 +
+ .../controls-final/missing-file/after-cli.json     |     5 +
+ .../missing-file/after/comparison-summary.json     |    29 +
+ .../controls-final/missing-file/before-cli.json    |     5 +
+ .../missing-file/before/comparison-summary.json    |    27 +
+ .../missing-file/input/run-01/run.json             |     4 +
+ .../missing-file/input/run-01/stderr.log           |     0
+ .../missing-file/input/run-01/stdout.log           |     0
+ .../missing-file/input/run-01/vitest.json          |     1 +
+ .../controls-final/missing-file/inventory.json     |    11 +
+ .../controls-final/missing-log/after-cli.json      |     5 +
+ .../missing-log/after/comparison-summary.json      |    24 +
+ .../controls-final/missing-log/before-cli.json     |     5 +
+ .../missing-log/before/comparison-summary.json     |    23 +
+ .../missing-log/input/run-01/run.json              |     4 +
+ .../missing-log/input/run-01/stdout.log            |     0
+ .../missing-log/input/run-01/vitest.json           |     1 +
+ .../controls-final/missing-log/inventory.json      |    11 +
+ .../controls-final/normal-launch.json              |    14 +
+ .../controls-final/normal-prepare.json             |     4 +
+ .../controls-final/normal/after-cli.json           |     5 +
+ .../normal/after/comparison-summary.json           |    24 +
+ .../controls-final/normal/before-cli.json          |     5 +
+ .../normal/before/comparison-summary.json          |    21 +
+ .../controls-final/normal/input/run-01/run.json    |     4 +
+ .../controls-final/normal/input/run-01/stderr.log  |     0
+ .../controls-final/normal/input/run-01/stdout.log  |     0
+ .../controls-final/normal/input/run-01/vitest.json |     1 +
+ .../controls-final/normal/inventory.json           |    11 +
+ .../runtime-count-contradiction/after-cli.json     |     5 +
+ .../after/comparison-summary.json                  |    27 +
+ .../runtime-count-contradiction/before-cli.json    |     5 +
+ .../before/comparison-summary.json                 |    21 +
+ .../input/run-01/run.json                          |     4 +
+ .../input/run-01/stderr.log                        |     0
+ .../input/run-01/stdout.log                        |     0
+ .../input/run-01/vitest.json                       |     1 +
+ .../runtime-count-contradiction/inventory.json     |    11 +
+ .../controls-final/runtime-errors/after-cli.json   |     5 +
+ .../runtime-errors/after/comparison-summary.json   |    27 +
+ .../controls-final/runtime-errors/before-cli.json  |     5 +
+ .../runtime-errors/before/comparison-summary.json  |    21 +
+ .../runtime-errors/input/run-01/run.json           |     4 +
+ .../runtime-errors/input/run-01/stderr.log         |     0
+ .../runtime-errors/input/run-01/stdout.log         |     0
+ .../runtime-errors/input/run-01/vitest.json        |     1 +
+ .../controls-final/runtime-errors/inventory.json   |    11 +
+ .../controls-final/runtime-type/after-cli.json     |     5 +
+ .../runtime-type/after/comparison-summary.json     |    26 +
+ .../controls-final/runtime-type/before-cli.json    |     5 +
+ .../runtime-type/before/comparison-summary.json    |    21 +
+ .../runtime-type/input/run-01/run.json             |     4 +
+ .../runtime-type/input/run-01/stderr.log           |     0
+ .../runtime-type/input/run-01/stdout.log           |     0
+ .../runtime-type/input/run-01/vitest.json          |     1 +
+ .../controls-final/runtime-type/inventory.json     |    11 +
+ .../success-nonzero-exit/after-cli.json            |     5 +
+ .../after/comparison-summary.json                  |    27 +
+ .../success-nonzero-exit/before-cli.json           |     5 +
+ .../before/comparison-summary.json                 |    24 +
+ .../success-nonzero-exit/input/run-01/run.json     |     4 +
+ .../success-nonzero-exit/input/run-01/stderr.log   |     0
+ .../success-nonzero-exit/input/run-01/stdout.log   |     0
+ .../success-nonzero-exit/input/run-01/vitest.json  |     1 +
+ .../success-nonzero-exit/inventory.json            |    11 +
+ .../controls-final/synthetic-outcomes.json         |    86 +
+ .../controls-final/unfinished-suite/after-cli.json |     5 +
+ .../unfinished-suite/after/comparison-summary.json |    25 +
+ .../unfinished-suite/before-cli.json               |     5 +
+ .../before/comparison-summary.json                 |    23 +
+ .../unfinished-suite/input/run-01/run.json         |     4 +
+ .../unfinished-suite/input/run-01/stderr.log       |     0
+ .../unfinished-suite/input/run-01/stdout.log       |     0
+ .../unfinished-suite/input/run-01/vitest.json      |     1 +
+ .../controls-final/unfinished-suite/inventory.json |    11 +
+ .../controls-final/zero-suites/after-cli.json      |     5 +
+ .../zero-suites/after/comparison-summary.json      |    26 +
+ .../controls-final/zero-suites/before-cli.json     |     5 +
+ .../zero-suites/before/comparison-summary.json     |    21 +
+ .../zero-suites/input/run-01/run.json              |     4 +
+ .../zero-suites/input/run-01/stderr.log            |     0
+ .../zero-suites/input/run-01/stdout.log            |     0
+ .../zero-suites/input/run-01/vitest.json           |     1 +
+ .../controls-final/zero-suites/inventory.json      |    11 +
+ .../controls-final/zero/after-cli.json             |     5 +
+ .../zero/after/comparison-summary.json             |    26 +
+ .../controls-final/zero/before-cli.json            |     5 +
+ .../zero/before/comparison-summary.json            |    24 +
+ .../controls-final/zero/input/run-01/run.json      |     4 +
+ .../controls-final/zero/input/run-01/stderr.log    |     0
+ .../controls-final/zero/input/run-01/stdout.log    |     0
+ .../controls-final/zero/input/run-01/vitest.json   |     1 +
+ .../controls-final/zero/inventory.json             |    11 +
+ .../connected-normal/collect-0/exit.json           |     5 +
+ .../connected-normal/collect-0/inventory.json      |    36 +
+ .../connected-normal/collect-0/request.json        |    14 +
+ .../connected-normal/collect-0/settings.json       |    23 +
+ .../connected-normal/collect-0/stderr.log          |     0
+ .../connected-normal/collect-0/stdout.log          |     0
+ .../connected-normal/collect-1/exit.json           |     5 +
+ .../connected-normal/collect-1/inventory.json      |    36 +
+ .../connected-normal/collect-1/request.json        |    14 +
+ .../connected-normal/collect-1/settings.json       |    23 +
+ .../connected-normal/collect-1/stderr.log          |     0
+ .../connected-normal/collect-1/stdout.log          |     0
+ .../connected-normal/comparison.json               |    14 +
+ ...event-4eca4120-77f4-4928-a4d5-5847ea5b9bfd.json |    12 +
+ ...event-a4a76dd5-ecb3-4d85-a94c-0923513c4641.json |    12 +
+ ...event-c9a9c64b-0f81-44dd-979d-62efb6928bb4.json |    12 +
+ ...event-f72fec8c-a37f-4b91-81cb-69b03c1449de.json |    12 +
+ .../connected-normal/launched.json                 |     3 +
+ .../connected-normal/preflight.json                |    88 +
+ .../controls-host-01/connected-normal/ready.json   |    90 +
+ .../connected-normal/ready.sha256.json             |     3 +
+ .../connected-normal/trial-0/assessment.json       |    50 +
+ .../connected-normal/trial-0/exit.json             |     5 +
+ .../connected-normal/trial-0/request.json          |    38 +
+ .../connected-normal/trial-0/runtime.json          |    38 +
+ .../connected-normal/trial-0/settings.json         |    23 +
+ .../connected-normal/trial-0/stderr.log            |     0
+ .../connected-normal/trial-0/stdout.log            |     1 +
+ .../connected-normal/trial-0/vitest.json           |     1 +
+ .../connected-normal/trial-1/assessment.json       |    50 +
+ .../connected-normal/trial-1/exit.json             |     5 +
+ .../connected-normal/trial-1/request.json          |    38 +
+ .../connected-normal/trial-1/runtime.json          |    38 +
+ .../connected-normal/trial-1/settings.json         |    23 +
+ .../connected-normal/trial-1/stderr.log            |     0
+ .../connected-normal/trial-1/stdout.log            |     1 +
+ .../connected-normal/trial-1/vitest.json           |     1 +
+ .../controls-host-01/duplicates/after-cli.json     |     5 +
+ .../duplicates/after/comparison-summary.json       |    24 +
+ .../controls-host-01/duplicates/before-cli.json    |     5 +
+ .../duplicates/before/comparison-summary.json      |    21 +
+ .../duplicates/input/run-01/run.json               |     4 +
+ .../duplicates/input/run-01/stderr.log             |     0
+ .../duplicates/input/run-01/stdout.log             |     0
+ .../duplicates/input/run-01/vitest.json            |     1 +
+ .../controls-host-01/duplicates/inventory.json     |    15 +
+ .../failure-zero-exit/after-cli.json               |     5 +
+ .../after/comparison-summary.json                  |    37 +
+ .../failure-zero-exit/before-cli.json              |     5 +
+ .../before/comparison-summary.json                 |    34 +
+ .../failure-zero-exit/input/run-01/run.json        |     4 +
+ .../failure-zero-exit/input/run-01/stderr.log      |     0
+ .../failure-zero-exit/input/run-01/stdout.log      |     0
+ .../failure-zero-exit/input/run-01/vitest.json     |     1 +
+ .../failure-zero-exit/inventory.json               |    11 +
+ .../false-failed-suite/after-cli.json              |     5 +
+ .../after/comparison-summary.json                  |    26 +
+ .../false-failed-suite/before-cli.json             |     5 +
+ .../before/comparison-summary.json                 |    21 +
+ .../false-failed-suite/input/run-01/run.json       |     4 +
+ .../false-failed-suite/input/run-01/stderr.log     |     0
+ .../false-failed-suite/input/run-01/stdout.log     |     0
+ .../false-failed-suite/input/run-01/vitest.json    |     1 +
+ .../false-failed-suite/inventory.json              |    11 +
+ .../controls-host-01/fixture-plan.json             |    21 +
+ .../controls-host-01/malformed-json/after-cli.json |     5 +
+ .../malformed-json/after/comparison-summary.json   |     9 +
+ .../malformed-json/before-cli.json                 |     5 +
+ .../malformed-json/before/comparison-summary.json  |     9 +
+ .../malformed-json/input/run-01/run.json           |     4 +
+ .../malformed-json/input/run-01/stderr.log         |     0
+ .../malformed-json/input/run-01/stdout.log         |     0
+ .../malformed-json/input/run-01/vitest.json        |     1 +
+ .../controls-host-01/malformed-json/inventory.json |    11 +
+ .../controls-host-01/missing-file/after-cli.json   |     5 +
+ .../missing-file/after/comparison-summary.json     |    29 +
+ .../controls-host-01/missing-file/before-cli.json  |     5 +
+ .../missing-file/before/comparison-summary.json    |    27 +
+ .../missing-file/input/run-01/run.json             |     4 +
+ .../missing-file/input/run-01/stderr.log           |     0
+ .../missing-file/input/run-01/stdout.log           |     0
+ .../missing-file/input/run-01/vitest.json          |     1 +
+ .../controls-host-01/missing-file/inventory.json   |    11 +
+ .../controls-host-01/missing-log/after-cli.json    |     5 +
+ .../missing-log/after/comparison-summary.json      |    24 +
+ .../controls-host-01/missing-log/before-cli.json   |     5 +
+ .../missing-log/before/comparison-summary.json     |    23 +
+ .../missing-log/input/run-01/run.json              |     4 +
+ .../missing-log/input/run-01/stdout.log            |     0
+ .../missing-log/input/run-01/vitest.json           |     1 +
+ .../controls-host-01/missing-log/inventory.json    |    11 +
+ .../controls-host-01/normal-launch.json            |    14 +
+ .../controls-host-01/normal-prepare.json           |     4 +
+ .../controls-host-01/normal/after-cli.json         |     5 +
+ .../normal/after/comparison-summary.json           |    24 +
+ .../controls-host-01/normal/before-cli.json        |     5 +
+ .../normal/before/comparison-summary.json          |    21 +
+ .../controls-host-01/normal/input/run-01/run.json  |     4 +
+ .../normal/input/run-01/stderr.log                 |     0
+ .../normal/input/run-01/stdout.log                 |     0
+ .../normal/input/run-01/vitest.json                |     1 +
+ .../controls-host-01/normal/inventory.json         |    11 +
+ .../runtime-count-contradiction/after-cli.json     |     5 +
+ .../after/comparison-summary.json                  |    27 +
+ .../runtime-count-contradiction/before-cli.json    |     5 +
+ .../before/comparison-summary.json                 |    21 +
+ .../input/run-01/run.json                          |     4 +
+ .../input/run-01/stderr.log                        |     0
+ .../input/run-01/stdout.log                        |     0
+ .../input/run-01/vitest.json                       |     1 +
+ .../runtime-count-contradiction/inventory.json     |    11 +
+ .../controls-host-01/runtime-errors/after-cli.json |     5 +
+ .../runtime-errors/after/comparison-summary.json   |    27 +
+ .../runtime-errors/before-cli.json                 |     5 +
+ .../runtime-errors/before/comparison-summary.json  |    21 +
+ .../runtime-errors/input/run-01/run.json           |     4 +
+ .../runtime-errors/input/run-01/stderr.log         |     0
+ .../runtime-errors/input/run-01/stdout.log         |     0
+ .../runtime-errors/input/run-01/vitest.json        |     1 +
+ .../controls-host-01/runtime-errors/inventory.json |    11 +
+ .../controls-host-01/runtime-type/after-cli.json   |     5 +
+ .../runtime-type/after/comparison-summary.json     |    26 +
+ .../controls-host-01/runtime-type/before-cli.json  |     5 +
+ .../runtime-type/before/comparison-summary.json    |    21 +
+ .../runtime-type/input/run-01/run.json             |     4 +
+ .../runtime-type/input/run-01/stderr.log           |     0
+ .../runtime-type/input/run-01/stdout.log           |     0
+ .../runtime-type/input/run-01/vitest.json          |     1 +
+ .../controls-host-01/runtime-type/inventory.json   |    11 +
+ .../success-nonzero-exit/after-cli.json            |     5 +
+ .../after/comparison-summary.json                  |    27 +
+ .../success-nonzero-exit/before-cli.json           |     5 +
+ .../before/comparison-summary.json                 |    24 +
+ .../success-nonzero-exit/input/run-01/run.json     |     4 +
+ .../success-nonzero-exit/input/run-01/stderr.log   |     0
+ .../success-nonzero-exit/input/run-01/stdout.log   |     0
+ .../success-nonzero-exit/input/run-01/vitest.json  |     1 +
+ .../success-nonzero-exit/inventory.json            |    11 +
+ .../controls-host-01/synthetic-outcomes.json       |    86 +
+ .../unfinished-suite/after-cli.json                |     5 +
+ .../unfinished-suite/after/comparison-summary.json |    25 +
+ .../unfinished-suite/before-cli.json               |     5 +
+ .../before/comparison-summary.json                 |    23 +
+ .../unfinished-suite/input/run-01/run.json         |     4 +
+ .../unfinished-suite/input/run-01/stderr.log       |     0
+ .../unfinished-suite/input/run-01/stdout.log       |     0
+ .../unfinished-suite/input/run-01/vitest.json      |     1 +
+ .../unfinished-suite/inventory.json                |    11 +
+ .../controls-host-01/zero-suites/after-cli.json    |     5 +
+ .../zero-suites/after/comparison-summary.json      |    26 +
+ .../controls-host-01/zero-suites/before-cli.json   |     5 +
+ .../zero-suites/before/comparison-summary.json     |    21 +
+ .../zero-suites/input/run-01/run.json              |     4 +
+ .../zero-suites/input/run-01/stderr.log            |     0
+ .../zero-suites/input/run-01/stdout.log            |     0
+ .../zero-suites/input/run-01/vitest.json           |     1 +
+ .../controls-host-01/zero-suites/inventory.json    |    11 +
+ .../controls-host-01/zero/after-cli.json           |     5 +
+ .../zero/after/comparison-summary.json             |    26 +
+ .../controls-host-01/zero/before-cli.json          |     5 +
+ .../zero/before/comparison-summary.json            |    24 +
+ .../controls-host-01/zero/input/run-01/run.json    |     4 +
+ .../controls-host-01/zero/input/run-01/stderr.log  |     0
+ .../controls-host-01/zero/input/run-01/stdout.log  |     0
+ .../controls-host-01/zero/input/run-01/vitest.json |     1 +
+ .../controls-host-01/zero/inventory.json           |    11 +
+ .../connected-normal/collect-0/exit.json           |     5 +
+ .../connected-normal/collect-0/inventory.json      |    31 +
+ .../connected-normal/collect-0/request.json        |    14 +
+ .../connected-normal/collect-0/settings.json       |    23 +
+ .../connected-normal/collect-0/stderr.log          |     0
+ .../connected-normal/collect-0/stdout.log          |     0
+ .../connected-normal/collect-1/exit.json           |     5 +
+ .../connected-normal/collect-1/inventory.json      |    31 +
+ .../connected-normal/collect-1/request.json        |    14 +
+ .../connected-normal/collect-1/settings.json       |    23 +
+ .../connected-normal/collect-1/stderr.log          |     0
+ .../connected-normal/collect-1/stdout.log          |     0
+ .../connected-normal/comparison.json               |    14 +
+ ...event-1a32baf0-e47e-47a5-a477-ac1dcb4a5f55.json |    12 +
+ ...event-866eceb8-6f98-48fb-890b-36cfec2d4c6e.json |    12 +
+ ...event-86991224-b013-40c6-810d-78af7300c636.json |    12 +
+ ...event-d28b9748-7fff-480a-8e9d-e3d6cad40f2d.json |    12 +
+ .../connected-normal/launched.json                 |     3 +
+ .../connected-normal/preflight.json                |    88 +
+ .../controls-host-02/connected-normal/ready.json   |    90 +
+ .../connected-normal/ready.sha256.json             |     3 +
+ .../connected-normal/trial-0/assessment.json       |    42 +
+ .../connected-normal/trial-0/exit.json             |     5 +
+ .../connected-normal/trial-0/request.json          |    38 +
+ .../connected-normal/trial-0/runtime.json          |    31 +
+ .../connected-normal/trial-0/settings.json         |    23 +
+ .../connected-normal/trial-0/stderr.log            |     0
+ .../connected-normal/trial-0/stdout.log            |     1 +
+ .../connected-normal/trial-0/vitest.json           |     1 +
+ .../connected-normal/trial-1/assessment.json       |    42 +
+ .../connected-normal/trial-1/exit.json             |     5 +
+ .../connected-normal/trial-1/request.json          |    38 +
+ .../connected-normal/trial-1/runtime.json          |    31 +
+ .../connected-normal/trial-1/settings.json         |    23 +
+ .../connected-normal/trial-1/stderr.log            |     0
+ .../connected-normal/trial-1/stdout.log            |     1 +
+ .../connected-normal/trial-1/vitest.json           |     1 +
+ .../controls-host-02/duplicates/after-cli.json     |     5 +
+ .../duplicates/after/comparison-summary.json       |    24 +
+ .../controls-host-02/duplicates/before-cli.json    |     5 +
+ .../duplicates/before/comparison-summary.json      |    21 +
+ .../duplicates/input/run-01/run.json               |     4 +
+ .../duplicates/input/run-01/stderr.log             |     0
+ .../duplicates/input/run-01/stdout.log             |     0
+ .../duplicates/input/run-01/vitest.json            |     1 +
+ .../controls-host-02/duplicates/inventory.json     |    15 +
+ .../failure-zero-exit/after-cli.json               |     5 +
+ .../after/comparison-summary.json                  |    37 +
+ .../failure-zero-exit/before-cli.json              |     5 +
+ .../before/comparison-summary.json                 |    34 +
+ .../failure-zero-exit/input/run-01/run.json        |     4 +
+ .../failure-zero-exit/input/run-01/stderr.log      |     0
+ .../failure-zero-exit/input/run-01/stdout.log      |     0
+ .../failure-zero-exit/input/run-01/vitest.json     |     1 +
+ .../failure-zero-exit/inventory.json               |    11 +
+ .../false-failed-suite/after-cli.json              |     5 +
+ .../after/comparison-summary.json                  |    26 +
+ .../false-failed-suite/before-cli.json             |     5 +
+ .../before/comparison-summary.json                 |    21 +
+ .../false-failed-suite/input/run-01/run.json       |     4 +
+ .../false-failed-suite/input/run-01/stderr.log     |     0
+ .../false-failed-suite/input/run-01/stdout.log     |     0
+ .../false-failed-suite/input/run-01/vitest.json    |     1 +
+ .../false-failed-suite/inventory.json              |    11 +
+ .../controls-host-02/fixture-plan.json             |    21 +
+ .../controls-host-02/malformed-json/after-cli.json |     5 +
+ .../malformed-json/after/comparison-summary.json   |     9 +
+ .../malformed-json/before-cli.json                 |     5 +
+ .../malformed-json/before/comparison-summary.json  |     9 +
+ .../malformed-json/input/run-01/run.json           |     4 +
+ .../malformed-json/input/run-01/stderr.log         |     0
+ .../malformed-json/input/run-01/stdout.log         |     0
+ .../malformed-json/input/run-01/vitest.json        |     1 +
+ .../controls-host-02/malformed-json/inventory.json |    11 +
+ .../controls-host-02/missing-file/after-cli.json   |     5 +
+ .../missing-file/after/comparison-summary.json     |    29 +
+ .../controls-host-02/missing-file/before-cli.json  |     5 +
+ .../missing-file/before/comparison-summary.json    |    27 +
+ .../missing-file/input/run-01/run.json             |     4 +
+ .../missing-file/input/run-01/stderr.log           |     0
+ .../missing-file/input/run-01/stdout.log           |     0
+ .../missing-file/input/run-01/vitest.json          |     1 +
+ .../controls-host-02/missing-file/inventory.json   |    11 +
+ .../controls-host-02/missing-log/after-cli.json    |     5 +
+ .../missing-log/after/comparison-summary.json      |    24 +
+ .../controls-host-02/missing-log/before-cli.json   |     5 +
+ .../missing-log/before/comparison-summary.json     |    23 +
+ .../missing-log/input/run-01/run.json              |     4 +
+ .../missing-log/input/run-01/stdout.log            |     0
+ .../missing-log/input/run-01/vitest.json           |     1 +
+ .../controls-host-02/missing-log/inventory.json    |    11 +
+ .../controls-host-02/normal-launch.json            |    14 +
+ .../controls-host-02/normal-prepare.json           |     4 +
+ .../controls-host-02/normal/after-cli.json         |     5 +
+ .../normal/after/comparison-summary.json           |    24 +
+ .../controls-host-02/normal/before-cli.json        |     5 +
+ .../normal/before/comparison-summary.json          |    21 +
+ .../controls-host-02/normal/input/run-01/run.json  |     4 +
+ .../normal/input/run-01/stderr.log                 |     0
+ .../normal/input/run-01/stdout.log                 |     0
+ .../normal/input/run-01/vitest.json                |     1 +
+ .../controls-host-02/normal/inventory.json         |    11 +
+ .../runtime-count-contradiction/after-cli.json     |     5 +
+ .../after/comparison-summary.json                  |    27 +
+ .../runtime-count-contradiction/before-cli.json    |     5 +
+ .../before/comparison-summary.json                 |    21 +
+ .../input/run-01/run.json                          |     4 +
+ .../input/run-01/stderr.log                        |     0
+ .../input/run-01/stdout.log                        |     0
+ .../input/run-01/vitest.json                       |     1 +
+ .../runtime-count-contradiction/inventory.json     |    11 +
+ .../controls-host-02/runtime-errors/after-cli.json |     5 +
+ .../runtime-errors/after/comparison-summary.json   |    27 +
+ .../runtime-errors/before-cli.json                 |     5 +
+ .../runtime-errors/before/comparison-summary.json  |    21 +
+ .../runtime-errors/input/run-01/run.json           |     4 +
+ .../runtime-errors/input/run-01/stderr.log         |     0
+ .../runtime-errors/input/run-01/stdout.log         |     0
+ .../runtime-errors/input/run-01/vitest.json        |     1 +
+ .../controls-host-02/runtime-errors/inventory.json |    11 +
+ .../controls-host-02/runtime-type/after-cli.json   |     5 +
+ .../runtime-type/after/comparison-summary.json     |    26 +
+ .../controls-host-02/runtime-type/before-cli.json  |     5 +
+ .../runtime-type/before/comparison-summary.json    |    21 +
+ .../runtime-type/input/run-01/run.json             |     4 +
+ .../runtime-type/input/run-01/stderr.log           |     0
+ .../runtime-type/input/run-01/stdout.log           |     0
+ .../runtime-type/input/run-01/vitest.json          |     1 +
+ .../controls-host-02/runtime-type/inventory.json   |    11 +
+ .../success-nonzero-exit/after-cli.json            |     5 +
+ .../after/comparison-summary.json                  |    27 +
+ .../success-nonzero-exit/before-cli.json           |     5 +
+ .../before/comparison-summary.json                 |    24 +
+ .../success-nonzero-exit/input/run-01/run.json     |     4 +
+ .../success-nonzero-exit/input/run-01/stderr.log   |     0
+ .../success-nonzero-exit/input/run-01/stdout.log   |     0
+ .../success-nonzero-exit/input/run-01/vitest.json  |     1 +
+ .../success-nonzero-exit/inventory.json            |    11 +
+ .../controls-host-02/synthetic-outcomes.json       |    86 +
+ .../unfinished-suite/after-cli.json                |     5 +
+ .../unfinished-suite/after/comparison-summary.json |    25 +
+ .../unfinished-suite/before-cli.json               |     5 +
+ .../before/comparison-summary.json                 |    23 +
+ .../unfinished-suite/input/run-01/run.json         |     4 +
+ .../unfinished-suite/input/run-01/stderr.log       |     0
+ .../unfinished-suite/input/run-01/stdout.log       |     0
+ .../unfinished-suite/input/run-01/vitest.json      |     1 +
+ .../unfinished-suite/inventory.json                |    11 +
+ .../controls-host-02/zero-suites/after-cli.json    |     5 +
+ .../zero-suites/after/comparison-summary.json      |    26 +
+ .../controls-host-02/zero-suites/before-cli.json   |     5 +
+ .../zero-suites/before/comparison-summary.json     |    21 +
+ .../zero-suites/input/run-01/run.json              |     4 +
+ .../zero-suites/input/run-01/stderr.log            |     0
+ .../zero-suites/input/run-01/stdout.log            |     0
+ .../zero-suites/input/run-01/vitest.json           |     1 +
+ .../controls-host-02/zero-suites/inventory.json    |    11 +
+ .../controls-host-02/zero/after-cli.json           |     5 +
+ .../zero/after/comparison-summary.json             |    26 +
+ .../controls-host-02/zero/before-cli.json          |     5 +
+ .../zero/before/comparison-summary.json            |    24 +
+ .../controls-host-02/zero/input/run-01/run.json    |     4 +
+ .../controls-host-02/zero/input/run-01/stderr.log  |     0
+ .../controls-host-02/zero/input/run-01/stdout.log  |     0
+ .../controls-host-02/zero/input/run-01/vitest.json |     1 +
+ .../controls-host-02/zero/inventory.json           |    11 +
+ .../connected-normal/collect-0/exit.json           |     5 +
+ .../connected-normal/collect-0/inventory.json      |    31 +
+ .../connected-normal/collect-0/request.json        |    14 +
+ .../connected-normal/collect-0/settings.json       |    23 +
+ .../connected-normal/collect-0/stderr.log          |     0
+ .../connected-normal/collect-0/stdout.log          |     0
+ .../connected-normal/collect-1/exit.json           |     5 +
+ .../connected-normal/collect-1/inventory.json      |    31 +
+ .../connected-normal/collect-1/request.json        |    14 +
+ .../connected-normal/collect-1/settings.json       |    23 +
+ .../connected-normal/collect-1/stderr.log          |     0
+ .../connected-normal/collect-1/stdout.log          |     0
+ .../connected-normal/comparison.json               |    14 +
+ ...event-26ce051a-9784-44ec-8998-290a797511d2.json |    12 +
+ ...event-3eb94874-18eb-40fe-8b1b-7579cf456319.json |    12 +
+ ...event-9adc72d3-e47a-473f-93bb-ad3e17b2297d.json |    12 +
+ ...event-cda3a659-eb90-4885-b3f7-fe0bd28dad33.json |    12 +
+ .../connected-normal/launched.json                 |     3 +
+ .../connected-normal/preflight.json                |   100 +
+ .../connected-normal/ready.json                    |    90 +
+ .../connected-normal/ready.sha256.json             |     3 +
+ .../connected-normal/trial-0/assessment.json       |    42 +
+ .../connected-normal/trial-0/exit.json             |     5 +
+ .../connected-normal/trial-0/request.json          |    38 +
+ .../connected-normal/trial-0/runtime.json          |    31 +
+ .../connected-normal/trial-0/settings.json         |    23 +
+ .../connected-normal/trial-0/stderr.log            |     0
+ .../connected-normal/trial-0/stdout.log            |     1 +
+ .../connected-normal/trial-0/vitest.json           |     1 +
+ .../connected-normal/trial-1/assessment.json       |    42 +
+ .../connected-normal/trial-1/exit.json             |     5 +
+ .../connected-normal/trial-1/request.json          |    38 +
+ .../connected-normal/trial-1/runtime.json          |    31 +
+ .../connected-normal/trial-1/settings.json         |    23 +
+ .../connected-normal/trial-1/stderr.log            |     0
+ .../connected-normal/trial-1/stdout.log            |     1 +
+ .../connected-normal/trial-1/vitest.json           |     1 +
+ .../controls-submission/duplicates/after-cli.json  |     5 +
+ .../duplicates/after/comparison-summary.json       |    24 +
+ .../controls-submission/duplicates/before-cli.json |     5 +
+ .../duplicates/before/comparison-summary.json      |    21 +
+ .../duplicates/input/run-01/run.json               |     4 +
+ .../duplicates/input/run-01/stderr.log             |     0
+ .../duplicates/input/run-01/stdout.log             |     0
+ .../duplicates/input/run-01/vitest.json            |     1 +
+ .../controls-submission/duplicates/inventory.json  |    15 +
+ .../failure-zero-exit/after-cli.json               |     5 +
+ .../after/comparison-summary.json                  |    37 +
+ .../failure-zero-exit/before-cli.json              |     5 +
+ .../before/comparison-summary.json                 |    34 +
+ .../failure-zero-exit/input/run-01/run.json        |     4 +
+ .../failure-zero-exit/input/run-01/stderr.log      |     0
+ .../failure-zero-exit/input/run-01/stdout.log      |     0
+ .../failure-zero-exit/input/run-01/vitest.json     |     1 +
+ .../failure-zero-exit/inventory.json               |    11 +
+ .../false-failed-suite/after-cli.json              |     5 +
+ .../after/comparison-summary.json                  |    26 +
+ .../false-failed-suite/before-cli.json             |     5 +
+ .../before/comparison-summary.json                 |    21 +
+ .../false-failed-suite/input/run-01/run.json       |     4 +
+ .../false-failed-suite/input/run-01/stderr.log     |     0
+ .../false-failed-suite/input/run-01/stdout.log     |     0
+ .../false-failed-suite/input/run-01/vitest.json    |     1 +
+ .../false-failed-suite/inventory.json              |    11 +
+ .../controls-submission/fixture-plan.json          |    21 +
+ .../malformed-json/after-cli.json                  |     5 +
+ .../malformed-json/after/comparison-summary.json   |     9 +
+ .../malformed-json/before-cli.json                 |     5 +
+ .../malformed-json/before/comparison-summary.json  |     9 +
+ .../malformed-json/input/run-01/run.json           |     4 +
+ .../malformed-json/input/run-01/stderr.log         |     0
+ .../malformed-json/input/run-01/stdout.log         |     0
+ .../malformed-json/input/run-01/vitest.json        |     1 +
+ .../malformed-json/inventory.json                  |    11 +
+ .../missing-file/after-cli.json                    |     5 +
+ .../missing-file/after/comparison-summary.json     |    29 +
+ .../missing-file/before-cli.json                   |     5 +
+ .../missing-file/before/comparison-summary.json    |    27 +
+ .../missing-file/input/run-01/run.json             |     4 +
+ .../missing-file/input/run-01/stderr.log           |     0
+ .../missing-file/input/run-01/stdout.log           |     0
+ .../missing-file/input/run-01/vitest.json          |     1 +
+ .../missing-file/inventory.json                    |    11 +
+ .../controls-submission/missing-log/after-cli.json |     5 +
+ .../missing-log/after/comparison-summary.json      |    25 +
+ .../missing-log/before-cli.json                    |     5 +
+ .../missing-log/before/comparison-summary.json     |    23 +
+ .../missing-log/input/run-01/run.json              |     4 +
+ .../missing-log/input/run-01/stdout.log            |     0
+ .../missing-log/input/run-01/vitest.json           |     1 +
+ .../controls-submission/missing-log/inventory.json |    11 +
+ .../controls-submission/normal-launch.json         |    14 +
+ .../controls-submission/normal-prepare.json        |     4 +
+ .../controls-submission/normal/after-cli.json      |     5 +
+ .../normal/after/comparison-summary.json           |    24 +
+ .../controls-submission/normal/before-cli.json     |     5 +
+ .../normal/before/comparison-summary.json          |    21 +
+ .../normal/input/run-01/run.json                   |     4 +
+ .../normal/input/run-01/stderr.log                 |     0
+ .../normal/input/run-01/stdout.log                 |     0
+ .../normal/input/run-01/vitest.json                |     1 +
+ .../controls-submission/normal/inventory.json      |    11 +
+ .../runtime-count-contradiction/after-cli.json     |     5 +
+ .../after/comparison-summary.json                  |    27 +
+ .../runtime-count-contradiction/before-cli.json    |     5 +
+ .../before/comparison-summary.json                 |    21 +
+ .../input/run-01/run.json                          |     4 +
+ .../input/run-01/stderr.log                        |     0
+ .../input/run-01/stdout.log                        |     0
+ .../input/run-01/vitest.json                       |     1 +
+ .../runtime-count-contradiction/inventory.json     |    11 +
+ .../runtime-errors/after-cli.json                  |     5 +
+ .../runtime-errors/after/comparison-summary.json   |    27 +
+ .../runtime-errors/before-cli.json                 |     5 +
+ .../runtime-errors/before/comparison-summary.json  |    21 +
+ .../runtime-errors/input/run-01/run.json           |     4 +
+ .../runtime-errors/input/run-01/stderr.log         |     0
+ .../runtime-errors/input/run-01/stdout.log         |     0
+ .../runtime-errors/input/run-01/vitest.json        |     1 +
+ .../runtime-errors/inventory.json                  |    11 +
+ .../runtime-type/after-cli.json                    |     5 +
+ .../runtime-type/after/comparison-summary.json     |    26 +
+ .../runtime-type/before-cli.json                   |     5 +
+ .../runtime-type/before/comparison-summary.json    |    21 +
+ .../runtime-type/input/run-01/run.json             |     4 +
+ .../runtime-type/input/run-01/stderr.log           |     0
+ .../runtime-type/input/run-01/stdout.log           |     0
+ .../runtime-type/input/run-01/vitest.json          |     1 +
+ .../runtime-type/inventory.json                    |    11 +
+ .../success-nonzero-exit/after-cli.json            |     5 +
+ .../after/comparison-summary.json                  |    27 +
+ .../success-nonzero-exit/before-cli.json           |     5 +
+ .../before/comparison-summary.json                 |    24 +
+ .../success-nonzero-exit/input/run-01/run.json     |     4 +
+ .../success-nonzero-exit/input/run-01/stderr.log   |     0
+ .../success-nonzero-exit/input/run-01/stdout.log   |     0
+ .../success-nonzero-exit/input/run-01/vitest.json  |     1 +
+ .../success-nonzero-exit/inventory.json            |    11 +
+ .../controls-submission/synthetic-outcomes.json    |    86 +
+ .../unfinished-suite/after-cli.json                |     5 +
+ .../unfinished-suite/after/comparison-summary.json |    25 +
+ .../unfinished-suite/before-cli.json               |     5 +
+ .../before/comparison-summary.json                 |    23 +
+ .../unfinished-suite/input/run-01/run.json         |     4 +
+ .../unfinished-suite/input/run-01/stderr.log       |     0
+ .../unfinished-suite/input/run-01/stdout.log       |     0
+ .../unfinished-suite/input/run-01/vitest.json      |     1 +
+ .../unfinished-suite/inventory.json                |    11 +
+ .../controls-submission/zero-suites/after-cli.json |     5 +
+ .../zero-suites/after/comparison-summary.json      |    26 +
+ .../zero-suites/before-cli.json                    |     5 +
+ .../zero-suites/before/comparison-summary.json     |    21 +
+ .../zero-suites/input/run-01/run.json              |     4 +
+ .../zero-suites/input/run-01/stderr.log            |     0
+ .../zero-suites/input/run-01/stdout.log            |     0
+ .../zero-suites/input/run-01/vitest.json           |     1 +
+ .../controls-submission/zero-suites/inventory.json |    11 +
+ .../controls-submission/zero/after-cli.json        |     5 +
+ .../zero/after/comparison-summary.json             |    26 +
+ .../controls-submission/zero/before-cli.json       |     5 +
+ .../zero/before/comparison-summary.json            |    24 +
+ .../controls-submission/zero/input/run-01/run.json |     4 +
+ .../zero/input/run-01/stderr.log                   |     0
+ .../zero/input/run-01/stdout.log                   |     0
+ .../zero/input/run-01/vitest.json                  |     1 +
+ .../controls-submission/zero/inventory.json        |    11 +
+ .../controls/duplicates/after-cli.json             |     5 +
+ .../duplicates/after/comparison-summary.json       |    24 +
+ .../controls/duplicates/before-cli.json            |     5 +
+ .../duplicates/before/comparison-summary.json      |    21 +
+ .../controls/duplicates/input/run-01/run.json      |     4 +
+ .../controls/duplicates/input/run-01/stderr.log    |     0
+ .../controls/duplicates/input/run-01/stdout.log    |     0
+ .../controls/duplicates/input/run-01/vitest.json   |     1 +
+ .../controls/duplicates/inventory.json             |    15 +
+ .../controls/failure-zero-exit/after-cli.json      |     5 +
+ .../after/comparison-summary.json                  |    37 +
+ .../controls/failure-zero-exit/before-cli.json     |     5 +
+ .../before/comparison-summary.json                 |    34 +
+ .../failure-zero-exit/input/run-01/run.json        |     4 +
+ .../failure-zero-exit/input/run-01/stderr.log      |     0
+ .../failure-zero-exit/input/run-01/stdout.log      |     0
+ .../failure-zero-exit/input/run-01/vitest.json     |     1 +
+ .../controls/failure-zero-exit/inventory.json      |    11 +
+ .../controls/false-failed-suite/after-cli.json     |     5 +
+ .../after/comparison-summary.json                  |    26 +
+ .../controls/false-failed-suite/before-cli.json    |     5 +
+ .../before/comparison-summary.json                 |    21 +
+ .../false-failed-suite/input/run-01/run.json       |     4 +
+ .../false-failed-suite/input/run-01/stderr.log     |     0
+ .../false-failed-suite/input/run-01/stdout.log     |     0
+ .../false-failed-suite/input/run-01/vitest.json    |     1 +
+ .../controls/false-failed-suite/inventory.json     |    11 +
+ .../controls/malformed-json/after-cli.json         |     5 +
+ .../malformed-json/after/comparison-summary.json   |     9 +
+ .../controls/malformed-json/before-cli.json        |     5 +
+ .../malformed-json/before/comparison-summary.json  |     9 +
+ .../controls/malformed-json/input/run-01/run.json  |     4 +
+ .../malformed-json/input/run-01/stderr.log         |     0
+ .../malformed-json/input/run-01/stdout.log         |     0
+ .../malformed-json/input/run-01/vitest.json        |     1 +
+ .../controls/malformed-json/inventory.json         |    11 +
+ .../controls/missing-file/after-cli.json           |     5 +
+ .../missing-file/after/comparison-summary.json     |    29 +
+ .../controls/missing-file/before-cli.json          |     5 +
+ .../missing-file/before/comparison-summary.json    |    27 +
+ .../controls/missing-file/input/run-01/run.json    |     4 +
+ .../controls/missing-file/input/run-01/stderr.log  |     0
+ .../controls/missing-file/input/run-01/stdout.log  |     0
+ .../controls/missing-file/input/run-01/vitest.json |     1 +
+ .../controls/missing-file/inventory.json           |    11 +
+ .../controls/missing-log/after-cli.json            |     5 +
+ .../missing-log/after/comparison-summary.json      |    24 +
+ .../controls/missing-log/before-cli.json           |     5 +
+ .../missing-log/before/comparison-summary.json     |    23 +
+ .../controls/missing-log/input/run-01/run.json     |     4 +
+ .../controls/missing-log/input/run-01/stdout.log   |     0
+ .../controls/missing-log/input/run-01/vitest.json  |     1 +
+ .../controls/missing-log/inventory.json            |    11 +
+ .../controls/normal/after-cli.json                 |     5 +
+ .../controls/normal/after/comparison-summary.json  |    24 +
+ .../controls/normal/before-cli.json                |     5 +
+ .../controls/normal/before/comparison-summary.json |    21 +
+ .../controls/normal/input/run-01/run.json          |     4 +
+ .../controls/normal/input/run-01/stderr.log        |     0
+ .../controls/normal/input/run-01/stdout.log        |     0
+ .../controls/normal/input/run-01/vitest.json       |     1 +
+ .../controls/normal/inventory.json                 |    11 +
+ .../runtime-count-contradiction/after-cli.json     |     5 +
+ .../after/comparison-summary.json                  |    27 +
+ .../runtime-count-contradiction/before-cli.json    |     5 +
+ .../before/comparison-summary.json                 |    21 +
+ .../input/run-01/run.json                          |     4 +
+ .../input/run-01/stderr.log                        |     0
+ .../input/run-01/stdout.log                        |     0
+ .../input/run-01/vitest.json                       |     1 +
+ .../runtime-count-contradiction/inventory.json     |    11 +
+ .../controls/runtime-errors/after-cli.json         |     5 +
+ .../runtime-errors/after/comparison-summary.json   |    27 +
+ .../controls/runtime-errors/before-cli.json        |     5 +
+ .../runtime-errors/before/comparison-summary.json  |    21 +
+ .../controls/runtime-errors/input/run-01/run.json  |     4 +
+ .../runtime-errors/input/run-01/stderr.log         |     0
+ .../runtime-errors/input/run-01/stdout.log         |     0
+ .../runtime-errors/input/run-01/vitest.json        |     1 +
+ .../controls/runtime-errors/inventory.json         |    11 +
+ .../controls/runtime-type/after-cli.json           |     5 +
+ .../runtime-type/after/comparison-summary.json     |    26 +
+ .../controls/runtime-type/before-cli.json          |     5 +
+ .../runtime-type/before/comparison-summary.json    |    21 +
+ .../controls/runtime-type/input/run-01/run.json    |     4 +
+ .../controls/runtime-type/input/run-01/stderr.log  |     0
+ .../controls/runtime-type/input/run-01/stdout.log  |     0
+ .../controls/runtime-type/input/run-01/vitest.json |     1 +
+ .../controls/runtime-type/inventory.json           |    11 +
+ .../controls/success-nonzero-exit/after-cli.json   |     5 +
+ .../after/comparison-summary.json                  |    27 +
+ .../controls/success-nonzero-exit/before-cli.json  |     5 +
+ .../before/comparison-summary.json                 |    24 +
+ .../success-nonzero-exit/input/run-01/run.json     |     4 +
+ .../success-nonzero-exit/input/run-01/stderr.log   |     0
+ .../success-nonzero-exit/input/run-01/stdout.log   |     0
+ .../success-nonzero-exit/input/run-01/vitest.json  |     1 +
+ .../controls/success-nonzero-exit/inventory.json   |    11 +
+ .../controls/synthetic-outcomes.json               |    86 +
+ .../controls/unfinished-suite/after-cli.json       |     5 +
+ .../unfinished-suite/after/comparison-summary.json |    25 +
+ .../controls/unfinished-suite/before-cli.json      |     5 +
+ .../before/comparison-summary.json                 |    23 +
+ .../unfinished-suite/input/run-01/run.json         |     4 +
+ .../unfinished-suite/input/run-01/stderr.log       |     0
+ .../unfinished-suite/input/run-01/stdout.log       |     0
+ .../unfinished-suite/input/run-01/vitest.json      |     1 +
+ .../controls/unfinished-suite/inventory.json       |    11 +
+ .../controls/zero-suites/after-cli.json            |     5 +
+ .../zero-suites/after/comparison-summary.json      |    26 +
+ .../controls/zero-suites/before-cli.json           |     5 +
+ .../zero-suites/before/comparison-summary.json     |    21 +
+ .../controls/zero-suites/input/run-01/run.json     |     4 +
+ .../controls/zero-suites/input/run-01/stderr.log   |     0
+ .../controls/zero-suites/input/run-01/stdout.log   |     0
+ .../controls/zero-suites/input/run-01/vitest.json  |     1 +
+ .../controls/zero-suites/inventory.json            |    11 +
+ .../controls/zero/after-cli.json                   |     5 +
+ .../controls/zero/after/comparison-summary.json    |    26 +
+ .../controls/zero/before-cli.json                  |     5 +
+ .../controls/zero/before/comparison-summary.json   |    24 +
+ .../controls/zero/input/run-01/run.json            |     4 +
+ .../controls/zero/input/run-01/stderr.log          |     0
+ .../controls/zero/input/run-01/stdout.log          |     0
+ .../controls/zero/input/run-01/vitest.json         |     1 +
+ .../controls/zero/inventory.json                   |    11 +
+ .../dependency-cache-new.json                      |     1 +
+ .../dependency-cache-old.json                      |     1 +
+ .../dependency-differences.json                    |    19 +
+ .../evidence-manifest.json                         |  5449 +++
+ .../fixture-source/package-lock.json.txt           |  5574 +++
+ .../fixture-source/package.json.txt                |     3 +
+ .../fixture-source/tiny.test.js.txt                |     2 +
+ .../fixture-source/vitest.config.mjs.txt           |     1 +
+ .../full-test-file-list.json                       |   341 +
+ .../dependency-mismatch/blocked-prepare.json       |     5 +
+ .../missing-config/blocked-prepare.json            |     5 +
+ .../negative-controls-final/outcomes.json          |    91 +
+ .../prepared-negative/collect-0/exit.json          |     5 +
+ .../prepared-negative/collect-0/inventory.json     |    31 +
+ .../prepared-negative/collect-0/request.json       |    14 +
+ .../prepared-negative/collect-0/settings.json      |    23 +
+ .../prepared-negative/collect-0/stderr.log         |     0
+ .../prepared-negative/collect-0/stdout.log         |     0
+ .../prepared-negative/collect-1/exit.json          |     5 +
+ .../prepared-negative/collect-1/inventory.json     |    31 +
+ .../prepared-negative/collect-1/request.json       |    14 +
+ .../prepared-negative/collect-1/settings.json      |    23 +
+ .../prepared-negative/collect-1/stderr.log         |     0
+ .../prepared-negative/collect-1/stdout.log         |     0
+ ...event-2849a26a-2abb-4160-a75a-5eb93b2f74dd.json |     6 +
+ ...event-3182836e-6669-475b-b2e4-ba694d705776.json |     6 +
+ ...event-32de4eda-041d-43d0-b34b-dd94bfbe9e3d.json |     6 +
+ ...event-92f3d9fa-66d3-43b7-a8e9-ae8236794134.json |     6 +
+ ...event-a5c6423a-d8a2-4df9-bb2b-fd149a80abe0.json |    12 +
+ ...event-dc61fb10-077a-4120-8221-c7b23defaf11.json |     6 +
+ ...event-ec81bf48-dbc3-4282-b131-eb2a1ead37a0.json |     6 +
+ ...event-f1e35b1d-0685-4ff8-8712-b8d8ce848ff6.json |    12 +
+ .../prepared-negative/launched.json                |     3 +
+ .../prepared-negative/preflight.json               |   100 +
+ .../prepared-negative/ready.json                   |    90 +
+ .../prepared-negative/ready.sha256.json            |     3 +
+ .../prepared-negative/trial-0/runtime.json         |    31 +
+ .../source-mismatch/blocked-prepare.json           |     5 +
+ .../dependency-mismatch/blocked-prepare.json       |     5 +
+ .../fake-target-0/node_modules/payload             |     1 +
+ .../fake-target-0/node_modules/vitest/package.json |     3 +
+ .../fake-target-0/package-lock.json                |  5574 +++
+ .../negative-controls/fake-target-0/package.json   |     3 +
+ .../fake-target-0/tiny.test.js.txt                 |     2 +
+ .../fake-target-0/vitest.config.mjs                |     1 +
+ .../fake-target-1/node_modules/payload             |     1 +
+ .../fake-target-1/node_modules/vitest/package.json |     3 +
+ .../fake-target-1/package-lock.json                |  5574 +++
+ .../negative-controls/fake-target-1/package.json   |     3 +
+ .../fake-target-1/tiny.test.js.txt                 |     2 +
+ .../fake-target-1/vitest.config.mjs                |     1 +
+ .../missing-config/blocked-prepare.json            |     5 +
+ .../negative-controls/outcomes.json                |    91 +
+ .../prepared-negative/collect-0/exit.json          |     5 +
+ .../prepared-negative/collect-0/inventory.json     |    31 +
+ .../prepared-negative/collect-0/request.json       |    14 +
+ .../prepared-negative/collect-0/settings.json      |    23 +
+ .../prepared-negative/collect-0/stderr.log         |     0
+ .../prepared-negative/collect-0/stdout.log         |     0
+ .../prepared-negative/collect-1/exit.json          |     5 +
+ .../prepared-negative/collect-1/inventory.json     |    31 +
+ .../prepared-negative/collect-1/request.json       |    14 +
+ .../prepared-negative/collect-1/settings.json      |    23 +
+ .../prepared-negative/collect-1/stderr.log         |     0
+ .../prepared-negative/collect-1/stdout.log         |     0
+ ...event-29c46823-98c9-4dd2-bf2a-7fd379a9b49b.json |     6 +
+ ...event-3d80f5db-ddb9-4a9b-a8c6-f4234efcb18f.json |     6 +
+ ...event-9209efd9-885e-48c9-9821-c7cb90c8ee11.json |    12 +
+ ...event-a62c42e6-dcac-4693-843d-1192ba261ac0.json |     6 +
+ ...event-bbbfafa7-8ddb-4bf5-9637-8f8a1fbba9ba.json |     6 +
+ ...event-bec67854-ba19-4d84-8d15-1d1a88bb3db3.json |     6 +
+ ...event-c053d466-1be3-4fca-ba85-90394edb3471.json |     6 +
+ ...event-d1f91b84-99b0-46c3-9b0e-e4b110f10d93.json |    12 +
+ .../prepared-negative/launched.json                |     3 +
+ .../prepared-negative/preflight.json               |   100 +
+ .../negative-controls/prepared-negative/ready.json |    90 +
+ .../prepared-negative/ready.sha256.json            |     3 +
+ .../prepared-negative/trial-0/runtime.json         |    31 +
+ .../source-mismatch/blocked-prepare.json           |     5 +
+ .../dependency-mismatch/blocked-prepare.json       |     5 +
+ .../missing-config/blocked-prepare.json            |     5 +
+ .../negative-submission/outcomes.json              |    91 +
+ .../prepared-negative/collect-0/exit.json          |     5 +
+ .../prepared-negative/collect-0/inventory.json     |    31 +
+ .../prepared-negative/collect-0/request.json       |    14 +
+ .../prepared-negative/collect-0/settings.json      |    23 +
+ .../prepared-negative/collect-0/stderr.log         |     0
+ .../prepared-negative/collect-0/stdout.log         |     0
+ .../prepared-negative/collect-1/exit.json          |     5 +
+ .../prepared-negative/collect-1/inventory.json     |    31 +
+ .../prepared-negative/collect-1/request.json       |    14 +
+ .../prepared-negative/collect-1/settings.json      |    23 +
+ .../prepared-negative/collect-1/stderr.log         |     0
+ .../prepared-negative/collect-1/stdout.log         |     0
+ ...event-1e49e88e-4960-4ae9-b488-654c2b67de37.json |     6 +
+ ...event-59cb3d55-22d3-4822-9f91-0bd196cac60d.json |    12 +
+ ...event-718a20c9-5802-4dcc-8aac-87694000ca41.json |     6 +
+ ...event-8fd89aaa-8b82-4c03-937b-09919b30f205.json |     6 +
+ ...event-98554a19-bf35-46f6-9560-0b42679388a9.json |    12 +
+ ...event-a3dcf402-b4da-45f0-a4fb-a0e23a5e7be9.json |     6 +
+ ...event-ab28a2b1-1bff-4bf6-ac9f-0705126cf22f.json |     6 +
+ ...event-f37b7b92-5d5f-41d0-96f6-4e7965e67f59.json |     6 +
+ .../prepared-negative/launched.json                |     3 +
+ .../prepared-negative/preflight.json               |   100 +
+ .../prepared-negative/ready.json                   |    90 +
+ .../prepared-negative/ready.sha256.json            |     3 +
+ .../prepared-negative/trial-0/runtime.json         |    31 +
+ .../source-mismatch/blocked-prepare.json           |     5 +
+ .../preservation-and-snapshot-audit.json           | 10478 +++++
+ .../product-test-coverage.json                     |     9 +
+ .../protected-after.json                           |   414 +
+ .../protected-before.json                          |   414 +
+ .../prototype/stage-w1-summary.mjs                 |    64 +
+ .../prototype/stage-w1b-control-harness.mjs        |    30 +
+ .../prototype/stage-w1b-preflight.mjs              |    36 +
+ .../prototype/stage-w1b-summary-check.mjs          |    17 +
+ .../prototype/stage-w1b-summary.mjs                |    73 +
+ .../assertion-failure/assessment.json              |    31 +
+ .../real-reporter/assertion-failure/request.json   |    15 +
+ .../real-reporter/assertion-failure/runtime.json   |    17 +
+ .../real-reporter/assertion-failure/settings.json  |    23 +
+ .../real-reporter/assertion-failure/stderr.log     |     0
+ .../real-reporter/assertion-failure/stdout.log     |     1 +
+ .../real-reporter/assertion-failure/vitest.json    |     1 +
+ .../real-reporter/empty-describe/assessment.json   |    26 +
+ .../real-reporter/empty-describe/request.json      |    15 +
+ .../real-reporter/empty-describe/runtime.json      |    24 +
+ .../real-reporter/empty-describe/settings.json     |    23 +
+ .../real-reporter/empty-describe/stderr.log        |     0
+ .../real-reporter/empty-describe/stdout.log        |     1 +
+ .../real-reporter/empty-describe/vitest.json       |     1 +
+ .../real-reporter/normal/assessment.json           |    25 +
+ .../real-reporter/normal/request.json              |    15 +
+ .../real-reporter/normal/runtime.json              |    31 +
+ .../real-reporter/normal/settings.json             |    23 +
+ .../real-reporter/normal/stderr.log                |     0
+ .../real-reporter/normal/stdout.log                |     1 +
+ .../real-reporter/normal/vitest.json               |     1 +
+ .../real-reporter/outcomes.json                    |    42 +
+ .../real-reporter/unhandled/assessment.json        |    24 +
+ .../real-reporter/unhandled/request.json           |    15 +
+ .../real-reporter/unhandled/runtime.json           |    23 +
+ .../real-reporter/unhandled/settings.json          |    23 +
+ .../real-reporter/unhandled/stderr.log             |     0
+ .../real-reporter/unhandled/stdout.log             |     1 +
+ .../real-reporter/unhandled/vitest.json            |     1 +
+ .../reporter-contract-files.json                   |    18 +
+ .../reporter-implementation-excerpt.txt            |    80 +
+ .../assertion-failure/assessment.json              |    36 +
+ .../assertion-failure/request.json                 |    15 +
+ .../assertion-failure/runtime.json                 |    17 +
+ .../assertion-failure/settings.json                |    23 +
+ .../assertion-failure/stderr.log                   |     0
+ .../assertion-failure/stdout.log                   |     1 +
+ .../assertion-failure/vitest.json                  |     1 +
+ .../empty-describe/assessment.json                 |    36 +
+ .../empty-describe/request.json                    |    15 +
+ .../empty-describe/runtime.json                    |    24 +
+ .../empty-describe/settings.json                   |    23 +
+ .../reporter-submission/empty-describe/stderr.log  |     0
+ .../reporter-submission/empty-describe/stdout.log  |     1 +
+ .../reporter-submission/empty-describe/vitest.json |     1 +
+ .../reporter-submission/normal/assessment.json     |    25 +
+ .../reporter-submission/normal/request.json        |    15 +
+ .../reporter-submission/normal/runtime.json        |    31 +
+ .../reporter-submission/normal/settings.json       |    23 +
+ .../reporter-submission/normal/stderr.log          |     0
+ .../reporter-submission/normal/stdout.log          |     1 +
+ .../reporter-submission/normal/vitest.json         |     1 +
+ .../reporter-submission/outcomes.json              |    42 +
+ .../reporter-submission/unhandled/assessment.json  |    24 +
+ .../reporter-submission/unhandled/request.json     |    15 +
+ .../reporter-submission/unhandled/runtime.json     |    23 +
+ .../reporter-submission/unhandled/settings.json    |    23 +
+ .../reporter-submission/unhandled/stderr.log       |     0
+ .../reporter-submission/unhandled/stdout.log       |     1 +
+ .../reporter-submission/unhandled/vitest.json      |     1 +
+ .../review-comment.json                            |     1 +
+ .../start-github-pr.json                           |     1 +
+ .../start-status.txt                               |     7 +
+ .../stage-w1b-collection-control.mjs.txt           |    32 +
+ .../stage-w1b-control-harness.mjs.txt              |    30 +
+ .../stage-w1b-dependency-diff.mjs.txt              |     9 +
+ .../stage-w1b-evidence-audit.mjs.txt               |    39 +
+ .../stage-w1b-negative-controls.mjs.txt            |    43 +
+ .../submitted-scripts/stage-w1b-preflight.mjs.txt  |    53 +
+ .../stage-w1b-reporter-controls.mjs.txt            |    34 +
+ .../stage-w1b-review-controls.mjs.txt              |    64 +
+ .../submitted-scripts/stage-w1b-runner.mjs.txt     |   118 +
+ .../stage-w1b-summary-check.mjs.txt                |    31 +
+ .../submitted-scripts/stage-w1b-summary.mjs.txt    |   118 +
+ .../submitted-scripts/stage-w1b-validate.mjs.txt   |    24 +
+ .../submitted-scripts/stage-w1b-worker.mjs.txt     |    39 +
+ .../suite-definition-excerpt.txt                   |     9 +
+ .../summary-check-final-02.txt                     |    27 +
+ .../summary-check-final.txt                        |    43 +
+ .../summary-check-submission.txt                   |    27 +
+ .../summary-check.txt                              |    24 +
+ .../validation/build-stderr.txt                    |     0
+ .../validation/build-stdout.txt                    |    14 +
+ .../validation/full-product-stderr.txt             |     1 +
+ .../validation/full-product-stdout.txt             |    13 +
+ .../validation/lock-stderr.txt                     |     0
+ .../validation/lock-stdout.txt                     |    16 +
+ .../validation/related-product-stderr.txt          |     0
+ .../validation/related-product-stdout.txt          |    13 +
+ .../validation/related-summary-stderr.txt          |     0
+ .../validation/related-summary-stdout.txt          |    24 +
+ .../validation/related-w1-stderr.txt               |     0
+ .../validation/related-w1-stdout.txt               |    10 +
+ .../validation/results.json                        |   106 +
+ .../validation/typecheck-stderr.txt                |     0
+ .../validation/typecheck-stdout.txt                |     4 +
+ .../verify-final.json                              |     1 +
+ .../README.md                                      |    38 +
+ .../abba/plan.json                                 |    32 +
+ .../abba/run-01/process-metrics.jsonl              |    55 +
+ .../abba/run-01/run.json                           |    26 +
+ .../abba/run-01/stderr.log                         |     1 +
+ .../abba/run-01/stdout.log                         |   214 +
+ .../abba/run-01/vitest.json                        |     1 +
+ .../abba/run-02/process-metrics.jsonl              |    59 +
+ .../abba/run-02/run.json                           |    26 +
+ .../abba/run-02/stderr.log                         |     1 +
+ .../abba/run-02/stdout.log                         |   245 +
+ .../abba/run-02/vitest.json                        |     1 +
+ .../abba/run-03/run.json                           |    26 +
+ .../abba/run-03/stderr.log                         |     1 +
+ .../abba/run-03/stdout.log                         |   234 +
+ .../abba/run-03/vitest.json                        |     1 +
+ .../abba/run-04/run.json                           |    26 +
+ .../abba/run-04/stderr.log                         |     1 +
+ .../abba/run-04/stdout.log                         |   224 +
+ .../abba/run-04/vitest.json                        |     1 +
+ .../abba/run-05/process-metrics.jsonl              |    54 +
+ .../abba/run-05/run.json                           |    26 +
+ .../abba/run-05/stderr.log                         |     1 +
+ .../abba/run-05/stdout.log                         |   224 +
+ .../abba/run-05/vitest.json                        |     1 +
+ .../abba/run-06/process-metrics.jsonl              |    54 +
+ .../abba/run-06/run.json                           |    26 +
+ .../abba/run-06/stderr.log                         |     1 +
+ .../abba/run-06/stdout.log                         |   231 +
+ .../abba/run-06/vitest.json                        |     1 +
+ .../abba/run-07/run.json                           |    26 +
+ .../abba/run-07/stderr.log                         |     1 +
+ .../abba/run-07/stdout.log                         |   227 +
+ .../abba/run-07/vitest.json                        |     1 +
+ .../abba/run-08/run.json                           |    26 +
+ .../abba/run-08/stderr.log                         |     1 +
+ .../abba/run-08/stdout.log                         |   229 +
+ .../abba/run-08/vitest.json                        |     1 +
+ .../acceptance.json                                |    13 +
+ .../analysis/comparison-summary.json               |   165 +
+ .../analysis/failure-classification.json           |    50 +
+ .../analysis/resource-summary.json                 |   128 +
+ .../analysis/run-01-test-timing.jsonl              |  2586 ++
+ .../analysis/run-02-test-timing.jsonl              |  2587 ++
+ .../analysis/run-03-test-timing.jsonl              |  2587 ++
+ .../analysis/run-04-test-timing.jsonl              |  2586 ++
+ .../analysis/run-05-test-timing.jsonl              |  2587 ++
+ .../analysis/run-06-test-timing.jsonl              |  2586 ++
+ .../analysis/run-07-test-timing.jsonl              |  2586 ++
+ .../analysis/run-08-test-timing.jsonl              |  2587 ++
+ .../environment.json                               |    37 +
+ .../evidence-manifest.json                         |   428 +
+ .../experiment-plan.json                           |    21 +
+ .../head-diff.json                                 |   127 +
+ .../head-diff.txt                                  |   113 +
+ .../independent-review.md                          |     7 +
+ .../new-test-files.txt                             |   116 +
+ .../new-vitest-suites.json                         |   104 +
+ .../old-test-files.txt                             |   116 +
+ .../old-vitest-suites.json                         |   104 +
+ .../run-01/process-metrics.jsonl                   |     1 +
+ .../run-01/run.json                                |    26 +
+ .../run-01/stderr.log                              |     0
+ .../run-01/stdout.log                              |     3 +
+ .../run-02/process-metrics.jsonl                   |     2 +
+ .../run-02/run.json                                |    26 +
+ .../run-02/stderr.log                              |     0
+ .../run-02/stdout.log                              |     3 +
+ .../run-03/run.json                                |    26 +
+ .../run-03/stderr.log                              |     0
+ .../run-03/stdout.log                              |     0
+ .../run-04/run.json                                |    26 +
+ .../run-04/stderr.log                              |     0
+ .../run-04/stdout.log                              |     3 +
+ .../run-05/process-metrics.jsonl                   |     2 +
+ .../run-05/run.json                                |    26 +
+ .../run-05/stderr.log                              |     0
+ .../run-05/stdout.log                              |     3 +
+ .../run-06/process-metrics.jsonl                   |     3 +
+ .../run-06/run.json                                |    26 +
+ .../run-06/stderr.log                              |     0
+ .../run-06/stdout.log                              |     3 +
+ .../run-07/run.json                                |    26 +
+ .../run-07/stderr.log                              |     0
+ .../run-07/stdout.log                              |     3 +
+ .../run-08/run.json                                |    26 +
+ .../run-08/stderr.log                              |     0
+ .../run-08/stdout.log                              |    36 +
+ .../smoke-stderr.log                               |     0
+ .../smoke-stdout.log                               |    11 +
+ .../smoke-vitest.json                              |     1 +
+ .../start-status.txt                               |     3 +
+ .../validation/build.log                           |    14 +
+ .../validation/harness-test.log                    |    10 +
+ .../validation/lint.log                            |     4 +
+ .../validation/lock.log                            |    16 +
+ .../validation/related-tests.log                   |    13 +
+ .../validation/results.json                        |     7 +
+ .../README.md                                      |    13 +
+ .../controls/count-mismatch/input/run-01/run.json  |     1 +
+ .../count-mismatch/input/run-01/stderr.log         |     0
+ .../count-mismatch/input/run-01/stdout.log         |     0
+ .../count-mismatch/input/run-01/vitest.json        |     1 +
+ .../controls/count-mismatch/inventory.json         |     1 +
+ .../new-output/comparison-summary.json             |    23 +
+ .../controls/count-mismatch/new-stderr.txt         |     0
+ .../old-output/comparison-summary.json             |    46 +
+ .../old-output/failure-classification.json         |     8 +
+ .../old-output/run-01-test-timing.jsonl            |     2 +
+ .../controls/count-mismatch/old-stderr.txt         |     0
+ .../controls/duplicates/input/run-01/run.json      |     1 +
+ .../controls/duplicates/input/run-01/stderr.log    |     0
+ .../controls/duplicates/input/run-01/stdout.log    |     0
+ .../controls/duplicates/input/run-01/vitest.json   |     1 +
+ .../controls/duplicates/inventory.json             |     1 +
+ .../duplicates/new-output/comparison-summary.json  |    21 +
+ .../controls/duplicates/new-stderr.txt             |     0
+ .../duplicates/old-output/comparison-summary.json  |    46 +
+ .../old-output/failure-classification.json         |     8 +
+ .../duplicates/old-output/run-01-test-timing.jsonl |     3 +
+ .../controls/duplicates/old-stderr.txt             |     0
+ .../failure-zero-exit/input/run-01/run.json        |     1 +
+ .../failure-zero-exit/input/run-01/stderr.log      |     0
+ .../failure-zero-exit/input/run-01/stdout.log      |     0
+ .../failure-zero-exit/input/run-01/vitest.json     |     1 +
+ .../controls/failure-zero-exit/inventory.json      |     1 +
+ .../new-output/comparison-summary.json             |    35 +
+ .../controls/failure-zero-exit/new-stderr.txt      |     0
+ .../old-output/comparison-summary.json             |    46 +
+ .../old-output/failure-classification.json         |    16 +
+ .../old-output/run-01-test-timing.jsonl            |     2 +
+ .../controls/failure-zero-exit/old-stderr.txt      |     0
+ .../controls/malformed-json/input/run-01/run.json  |     1 +
+ .../malformed-json/input/run-01/stderr.log         |     0
+ .../malformed-json/input/run-01/stdout.log         |     0
+ .../malformed-json/input/run-01/vitest.json        |     1 +
+ .../controls/malformed-json/inventory.json         |     1 +
+ .../new-output/comparison-summary.json             |     9 +
+ .../controls/malformed-json/new-stderr.txt         |     0
+ .../controls/malformed-json/old-stderr.txt         |    13 +
+ .../controls/missing-file/input/run-01/run.json    |     1 +
+ .../controls/missing-file/input/run-01/stderr.log  |     0
+ .../controls/missing-file/input/run-01/stdout.log  |     0
+ .../controls/missing-file/input/run-01/vitest.json |     1 +
+ .../controls/missing-file/inventory.json           |     1 +
+ .../new-output/comparison-summary.json             |    23 +
+ .../controls/missing-file/new-stderr.txt           |     0
+ .../old-output/comparison-summary.json             |    42 +
+ .../old-output/failure-classification.json         |     8 +
+ .../old-output/run-01-test-timing.jsonl            |     1 +
+ .../controls/missing-file/old-stderr.txt           |     0
+ .../controls/normal/input/run-01/run.json          |     1 +
+ .../controls/normal/input/run-01/stderr.log        |     0
+ .../controls/normal/input/run-01/stdout.log        |     0
+ .../controls/normal/input/run-01/vitest.json       |     1 +
+ .../controls/normal/inventory.json                 |     1 +
+ .../normal/new-output/comparison-summary.json      |    21 +
+ .../controls/normal/new-stderr.txt                 |     0
+ .../normal/old-output/comparison-summary.json      |    46 +
+ .../normal/old-output/failure-classification.json  |     8 +
+ .../normal/old-output/run-01-test-timing.jsonl     |     2 +
+ .../controls/normal/old-stderr.txt                 |     0
+ .../controls/outcomes.json                         |    58 +
+ .../unfinished-suite/input/run-01/run.json         |     1 +
+ .../unfinished-suite/input/run-01/stderr.log       |     0
+ .../unfinished-suite/input/run-01/stdout.log       |     0
+ .../unfinished-suite/input/run-01/vitest.json      |     1 +
+ .../controls/unfinished-suite/inventory.json       |     1 +
+ .../new-output/comparison-summary.json             |    23 +
+ .../controls/unfinished-suite/new-stderr.txt       |     0
+ .../old-output/comparison-summary.json             |    46 +
+ .../old-output/failure-classification.json         |     8 +
+ .../old-output/run-01-test-timing.jsonl            |     2 +
+ .../controls/unfinished-suite/old-stderr.txt       |     0
+ .../controls/zero/input/run-01/run.json            |     1 +
+ .../controls/zero/input/run-01/stderr.log          |     0
+ .../controls/zero/input/run-01/stdout.log          |     0
+ .../controls/zero/input/run-01/vitest.json         |     1 +
+ .../controls/zero/inventory.json                   |     1 +
+ .../zero/new-output/comparison-summary.json        |    25 +
+ .../controls/zero/new-stderr.txt                   |     0
+ .../zero/old-output/comparison-summary.json        |    37 +
+ .../zero/old-output/failure-classification.json    |     8 +
+ .../zero/old-output/run-01-test-timing.jsonl       |     1 +
+ .../controls/zero/old-stderr.txt                   |     0
+ .../full-test-exit.txt                             |     1 +
+ .../full-test.log                                  |    14 +
+ .../inventory-unverified.json                      | 20706 ++++++++++
+ .../new-collection.json                            | 10350 +++++
+ .../old-collection.json                            | 10346 +++++
+ .../preflight-sandbox.json                         |  1505 +
+ .../protected-after.json                           |   414 +
+ .../protected-before.json                          |   414 +
+ .../reaggregate/comparison-summary.json            |   156 +
+ .../summary-check.log                              |    16 +
+ scripts/benchmarks/gameBlunderDiagnosis.ts         |    81 +
+ scripts/benchmarks/gameBlunderFixed.ts             |    43 +
+ scripts/benchmarks/gameBlunderInvestigation.ts     |   188 +
+ scripts/benchmarks/gameBlunderPilot.ts             |    72 +
+ scripts/benchmarks/matchJournal.ts                 |     8 +-
+ scripts/diagnose-blunder-investigation.ts          |    53 +
+ scripts/diagnose-blunder-proofs.ts                 |    33 +
+ scripts/diagnose-game-blunder-pilot.ts             |    29 +
+ scripts/diagnose-game-blunders.ts                  |    43 +
+ scripts/investigate-game-blunders.ts               |   103 +
+ scripts/stage-w1-manifest.mjs                      |     9 +
+ scripts/stage-w1-resource-summary.mjs              |    18 +
+ scripts/stage-w1-run.ps1                           |    34 +
+ scripts/stage-w1-summary-check.mjs                 |    22 +
+ scripts/stage-w1-summary.mjs                       |    64 +
+ scripts/stage-w1b-collection-control.mjs           |    32 +
+ scripts/stage-w1b-control-harness.mjs              |    30 +
+ scripts/stage-w1b-dependency-diff.mjs              |     9 +
+ scripts/stage-w1b-evidence-audit.mjs               |    39 +
+ scripts/stage-w1b-negative-controls.mjs            |    43 +
+ scripts/stage-w1b-preflight.mjs                    |    53 +
+ scripts/stage-w1b-reporter-controls.mjs            |    34 +
+ scripts/stage-w1b-review-controls.mjs              |    64 +
+ scripts/stage-w1b-runner.mjs                       |   118 +
+ scripts/stage-w1b-summary-check.mjs                |    31 +
+ scripts/stage-w1b-summary.mjs                      |   118 +
+ scripts/stage-w1b-validate.mjs                     |    24 +
+ scripts/stage-w1b-worker.mjs                       |    39 +
+ scripts/summarize-blunder-investigation.ts         |    39 +
+ scripts/summarize-game-blunders.ts                 |   255 +
+ scripts/verify-game-blunder-review.mjs             |   103 +
+ src/test/game-blunder-diagnosis.test.ts            |    73 +
+ src/test/game-blunder-fixed.test.ts                |    27 +
+ .../game-blunder-investigation-integration.test.ts |    20 +
+ src/test/game-blunder-investigation-v4.test.ts     |    92 +
+ src/test/game-blunder-pilot.test.ts                |    20 +
+ src/test/game-blunder-timeout-integration.test.ts  |    19 +
+ .../game-blunder-v4-journal-integration.test.ts    |   111 +
+ 1632 files changed, 311078 insertions(+), 1 deletion(-)
