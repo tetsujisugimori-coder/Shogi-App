@@ -1,0 +1,29 @@
+{
+  "targets": [
+    {
+      "repo": "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\stage-w1d-20261115-runtime\\normal-duplicates\\source",
+      "dir": "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\stage-w1d-20261115-runtime\\normal-duplicates\\a",
+      "head": "24afccf02fc267d7c869a2d428a68893c1a41f47"
+    },
+    {
+      "repo": "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\stage-w1d-20261115-runtime\\normal-duplicates\\source",
+      "dir": "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\stage-w1d-20261115-runtime\\normal-duplicates\\b",
+      "head": "24afccf02fc267d7c869a2d428a68893c1a41f47"
+    }
+  ],
+  "filters": [],
+  "expected": {
+    "pool": "forks",
+    "maxWorkers": 2,
+    "testTimeout": 5000,
+    "cache": false
+  },
+  "environment": {
+    "TEMP": "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\stage-w1d-20261115-runtime\\normal-duplicates\\temp",
+    "TMP": "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\stage-w1d-20261115-runtime\\normal-duplicates\\temp",
+    "npm_config_cache": "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\stage-w1d-20261115-runtime\\normal-duplicates\\npm-cache"
+  },
+  "isolationPaths": [
+    "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\stage-w1d-20261115-runtime\\normal-duplicates\\cache"
+  ]
+}

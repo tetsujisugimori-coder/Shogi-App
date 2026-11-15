@@ -1,0 +1,5 @@
+{
+  "exitCode": 1,
+  "stdout": "{\"status\":\"INVALID\",\"reason\":\"Error: changed or missing runtime.json\"}\n",
+  "stderr": ""
+}

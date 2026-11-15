@@ -1,0 +1,29 @@
+{
+  "targets": [
+    {
+      "repo": "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\stage-w1d-20261115-collection\\source",
+      "dir": "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\stage-w1d-20261115-collection\\a",
+      "head": "30de9fc2db8414023ff4f413b2ba29b74d6ab890"
+    },
+    {
+      "repo": "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\stage-w1d-20261115-collection\\source",
+      "dir": "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\stage-w1d-20261115-collection\\b",
+      "head": "30de9fc2db8414023ff4f413b2ba29b74d6ab890"
+    }
+  ],
+  "filters": [],
+  "expected": {
+    "pool": "forks",
+    "maxWorkers": 2,
+    "testTimeout": 5000,
+    "cache": false
+  },
+  "environment": {
+    "TEMP": "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\stage-w1d-20261115-collection\\temp",
+    "TMP": "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\stage-w1d-20261115-collection\\temp",
+    "npm_config_cache": "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\stage-w1d-20261115-collection\\npm-cache"
+  },
+  "isolationPaths": [
+    "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\stage-w1d-20261115-collection\\cache"
+  ]
+}

@@ -1,0 +1,76 @@
+[
+  {
+    "label": "old",
+    "head": "e1ccb1a2412e7faa86c2c1f60fdad1dca154023a",
+    "node": "v24.20.0",
+    "npm": "11.17.0",
+    "commands": [
+      {
+        "command": [
+          "C:\\Program Files\\nodejs\\node.exe",
+          "C:\\Users\\tetsu\\AppData\\Roaming\\npm\\node_modules\\npm\\bin\\npm-cli.js",
+          "--version"
+        ],
+        "cwd": "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\stage-w1d-20261115-pair\\old",
+        "exitCode": 0,
+        "signal": null,
+        "error": null
+      },
+      {
+        "command": [
+          "C:\\Program Files\\nodejs\\node.exe",
+          "C:\\Users\\tetsu\\AppData\\Roaming\\npm\\node_modules\\npm\\bin\\npm-cli.js",
+          "ls",
+          "--all",
+          "--json"
+        ],
+        "cwd": "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\stage-w1d-20261115-pair\\old",
+        "exitCode": 0,
+        "signal": null,
+        "error": null
+      }
+    ],
+    "lockSha256": "5118d0c609db7c079c5ffa9f9a8c54cf81f04bec314d930a9ad29764551e473b",
+    "initialEntries": 13642,
+    "currentEntries": 13643,
+    "installationCacheUnchanged": false,
+    "installationTempUnchanged": true
+  },
+  {
+    "label": "new",
+    "head": "2a8a57b6ff207831c77ce62d27d3151eba7c1dc3",
+    "node": "v24.20.0",
+    "npm": "11.17.0",
+    "commands": [
+      {
+        "command": [
+          "C:\\Program Files\\nodejs\\node.exe",
+          "C:\\Users\\tetsu\\AppData\\Roaming\\npm\\node_modules\\npm\\bin\\npm-cli.js",
+          "--version"
+        ],
+        "cwd": "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\stage-w1d-20261115-pair\\new",
+        "exitCode": 0,
+        "signal": null,
+        "error": null
+      },
+      {
+        "command": [
+          "C:\\Program Files\\nodejs\\node.exe",
+          "C:\\Users\\tetsu\\AppData\\Roaming\\npm\\node_modules\\npm\\bin\\npm-cli.js",
+          "ls",
+          "--all",
+          "--json"
+        ],
+        "cwd": "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\stage-w1d-20261115-pair\\new",
+        "exitCode": 0,
+        "signal": null,
+        "error": null
+      }
+    ],
+    "lockSha256": "5118d0c609db7c079c5ffa9f9a8c54cf81f04bec314d930a9ad29764551e473b",
+    "initialEntries": 13642,
+    "currentEntries": 13643,
+    "installationCacheUnchanged": false,
+    "installationTempUnchanged": true
+  }
+]

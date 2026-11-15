@@ -1,0 +1,18 @@
+{
+  "status": "NOT_READY",
+  "comparison": "NOT_TESTED",
+  "comparisonSpawns": 0,
+  "rows": [
+    {
+      "index": 0,
+      "exitCode": 0
+    },
+    {
+      "index": 1,
+      "exitCode": 0
+    }
+  ],
+  "reason": "No runtime cache transition exception has been implemented or validated. Preparation observations alone do not authorize a comparison.",
+  "S4": "NOT_TESTED",
+  "S5": "NOT_TESTED"
+}

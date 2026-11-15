@@ -1,0 +1,17 @@
+{
+  "runId": "eabca151-c742-4d78-98c6-d8c9d4961956",
+  "trialId": "ef9728e3-c64b-4dcb-ba9b-d93f9c7bb924",
+  "preflightSha256": "1c39c0c25054f1be94f0cafb955aa5d610ac10d16fe808ce0437c7831da6fb0b",
+  "inventorySha256": "f841fa272b653820c7e3c8c3b154e174cfd1051f2cc7ab2e5c412a083e5ff0de",
+  "reason": "failed",
+  "unhandledErrors": [],
+  "suites": [
+    {
+      "id": "-270551241",
+      "file": "C:/Users/tetsu/Documents/ChatGPT/将棋アプリ/stage-w1d-20261115-runtime/assertion-failure/a/tiny.test.js",
+      "root": true,
+      "mode": "run",
+      "state": "fail"
+    }
+  ]
+}

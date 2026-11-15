@@ -1,0 +1,29 @@
+{
+  "targets": [
+    {
+      "repo": "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\stage-w1d-20261115-runtime\\runtime-error\\source",
+      "dir": "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\stage-w1d-20261115-runtime\\runtime-error\\a",
+      "head": "e7ae62d1a7e708eb73f4fc4334092122e18751b9"
+    },
+    {
+      "repo": "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\stage-w1d-20261115-runtime\\runtime-error\\source",
+      "dir": "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\stage-w1d-20261115-runtime\\runtime-error\\b",
+      "head": "e7ae62d1a7e708eb73f4fc4334092122e18751b9"
+    }
+  ],
+  "filters": [],
+  "expected": {
+    "pool": "forks",
+    "maxWorkers": 2,
+    "testTimeout": 5000,
+    "cache": false
+  },
+  "environment": {
+    "TEMP": "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\stage-w1d-20261115-runtime\\runtime-error\\temp",
+    "TMP": "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\stage-w1d-20261115-runtime\\runtime-error\\temp",
+    "npm_config_cache": "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\stage-w1d-20261115-runtime\\runtime-error\\npm-cache"
+  },
+  "isolationPaths": [
+    "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\stage-w1d-20261115-runtime\\runtime-error\\cache"
+  ]
+}

@@ -1,0 +1,1062 @@
+[
+  {
+    "name": "normal",
+    "expected": "PASS / exit 0",
+    "classification": "red",
+    "command": [
+      "C:\\Program Files\\nodejs\\node.exe",
+      "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\repo\\scripts\\stage-w1b-runner.mjs",
+      "verify",
+      "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\stage-w1d-20261115-offline\\normal"
+    ],
+    "stdout": "{\"status\":\"PASS\",\"runId\":\"492ef3a0-1da5-48a3-a51e-1c04b59ed26e\",\"results\":[{\"trialId\":\"e1b0dd63-fe21-49ac-b011-16fb0f469dff\",\"status\":\"PASS\"},{\"trialId\":\"1ac79709-0c32-4637-9541-efc342bbb45b\",\"status\":\"PASS\"}]}\n",
+    "stderr": "",
+    "exitCode": 0,
+    "signal": null,
+    "error": null,
+    "result": {
+      "status": "PASS",
+      "runId": "492ef3a0-1da5-48a3-a51e-1c04b59ed26e",
+      "results": [
+        {
+          "trialId": "e1b0dd63-fe21-49ac-b011-16fb0f469dff",
+          "status": "PASS"
+        },
+        {
+          "trialId": "1ac79709-0c32-4637-9541-efc342bbb45b",
+          "status": "PASS"
+        }
+      ]
+    },
+    "newComparisonSpawns": 0
+  },
+  {
+    "name": "assessment-status",
+    "expected": "INVALID / exit 1",
+    "classification": "RED_FALSE_ACCEPT",
+    "command": [
+      "C:\\Program Files\\nodejs\\node.exe",
+      "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\repo\\scripts\\stage-w1b-runner.mjs",
+      "verify",
+      "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\stage-w1d-20261115-offline\\assessment-status"
+    ],
+    "stdout": "{\"status\":\"PASS\",\"runId\":\"492ef3a0-1da5-48a3-a51e-1c04b59ed26e\",\"results\":[{\"trialId\":\"e1b0dd63-fe21-49ac-b011-16fb0f469dff\",\"status\":\"PASS\"},{\"trialId\":\"1ac79709-0c32-4637-9541-efc342bbb45b\",\"status\":\"PASS\"}]}\n",
+    "stderr": "",
+    "exitCode": 0,
+    "signal": null,
+    "error": null,
+    "result": {
+      "status": "PASS",
+      "runId": "492ef3a0-1da5-48a3-a51e-1c04b59ed26e",
+      "results": [
+        {
+          "trialId": "e1b0dd63-fe21-49ac-b011-16fb0f469dff",
+          "status": "PASS"
+        },
+        {
+          "trialId": "1ac79709-0c32-4637-9541-efc342bbb45b",
+          "status": "PASS"
+        }
+      ]
+    },
+    "newComparisonSpawns": 0
+  },
+  {
+    "name": "assessment-counts",
+    "expected": "INVALID / exit 1",
+    "classification": "RED_FALSE_ACCEPT",
+    "command": [
+      "C:\\Program Files\\nodejs\\node.exe",
+      "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\repo\\scripts\\stage-w1b-runner.mjs",
+      "verify",
+      "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\stage-w1d-20261115-offline\\assessment-counts"
+    ],
+    "stdout": "{\"status\":\"PASS\",\"runId\":\"492ef3a0-1da5-48a3-a51e-1c04b59ed26e\",\"results\":[{\"trialId\":\"e1b0dd63-fe21-49ac-b011-16fb0f469dff\",\"status\":\"PASS\"},{\"trialId\":\"1ac79709-0c32-4637-9541-efc342bbb45b\",\"status\":\"PASS\"}]}\n",
+    "stderr": "",
+    "exitCode": 0,
+    "signal": null,
+    "error": null,
+    "result": {
+      "status": "PASS",
+      "runId": "492ef3a0-1da5-48a3-a51e-1c04b59ed26e",
+      "results": [
+        {
+          "trialId": "e1b0dd63-fe21-49ac-b011-16fb0f469dff",
+          "status": "PASS"
+        },
+        {
+          "trialId": "1ac79709-0c32-4637-9541-efc342bbb45b",
+          "status": "PASS"
+        }
+      ]
+    },
+    "newComparisonSpawns": 0
+  },
+  {
+    "name": "assessment-tests",
+    "expected": "INVALID / exit 1",
+    "classification": "RED_FALSE_ACCEPT",
+    "command": [
+      "C:\\Program Files\\nodejs\\node.exe",
+      "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\repo\\scripts\\stage-w1b-runner.mjs",
+      "verify",
+      "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\stage-w1d-20261115-offline\\assessment-tests"
+    ],
+    "stdout": "{\"status\":\"PASS\",\"runId\":\"492ef3a0-1da5-48a3-a51e-1c04b59ed26e\",\"results\":[{\"trialId\":\"e1b0dd63-fe21-49ac-b011-16fb0f469dff\",\"status\":\"PASS\"},{\"trialId\":\"1ac79709-0c32-4637-9541-efc342bbb45b\",\"status\":\"PASS\"}]}\n",
+    "stderr": "",
+    "exitCode": 0,
+    "signal": null,
+    "error": null,
+    "result": {
+      "status": "PASS",
+      "runId": "492ef3a0-1da5-48a3-a51e-1c04b59ed26e",
+      "results": [
+        {
+          "trialId": "e1b0dd63-fe21-49ac-b011-16fb0f469dff",
+          "status": "PASS"
+        },
+        {
+          "trialId": "1ac79709-0c32-4637-9541-efc342bbb45b",
+          "status": "PASS"
+        }
+      ]
+    },
+    "newComparisonSpawns": 0
+  },
+  {
+    "name": "assessment-invalid",
+    "expected": "INVALID / exit 1",
+    "classification": "RED_FALSE_ACCEPT",
+    "command": [
+      "C:\\Program Files\\nodejs\\node.exe",
+      "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\repo\\scripts\\stage-w1b-runner.mjs",
+      "verify",
+      "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\stage-w1d-20261115-offline\\assessment-invalid"
+    ],
+    "stdout": "{\"status\":\"PASS\",\"runId\":\"492ef3a0-1da5-48a3-a51e-1c04b59ed26e\",\"results\":[{\"trialId\":\"e1b0dd63-fe21-49ac-b011-16fb0f469dff\",\"status\":\"PASS\"},{\"trialId\":\"1ac79709-0c32-4637-9541-efc342bbb45b\",\"status\":\"PASS\"}]}\n",
+    "stderr": "",
+    "exitCode": 0,
+    "signal": null,
+    "error": null,
+    "result": {
+      "status": "PASS",
+      "runId": "492ef3a0-1da5-48a3-a51e-1c04b59ed26e",
+      "results": [
+        {
+          "trialId": "e1b0dd63-fe21-49ac-b011-16fb0f469dff",
+          "status": "PASS"
+        },
+        {
+          "trialId": "1ac79709-0c32-4637-9541-efc342bbb45b",
+          "status": "PASS"
+        }
+      ]
+    },
+    "newComparisonSpawns": 0
+  },
+  {
+    "name": "assessment-incomplete",
+    "expected": "INVALID / exit 1",
+    "classification": "RED_FALSE_ACCEPT",
+    "command": [
+      "C:\\Program Files\\nodejs\\node.exe",
+      "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\repo\\scripts\\stage-w1b-runner.mjs",
+      "verify",
+      "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\stage-w1d-20261115-offline\\assessment-incomplete"
+    ],
+    "stdout": "{\"status\":\"PASS\",\"runId\":\"492ef3a0-1da5-48a3-a51e-1c04b59ed26e\",\"results\":[{\"trialId\":\"e1b0dd63-fe21-49ac-b011-16fb0f469dff\",\"status\":\"PASS\"},{\"trialId\":\"1ac79709-0c32-4637-9541-efc342bbb45b\",\"status\":\"PASS\"}]}\n",
+    "stderr": "",
+    "exitCode": 0,
+    "signal": null,
+    "error": null,
+    "result": {
+      "status": "PASS",
+      "runId": "492ef3a0-1da5-48a3-a51e-1c04b59ed26e",
+      "results": [
+        {
+          "trialId": "e1b0dd63-fe21-49ac-b011-16fb0f469dff",
+          "status": "PASS"
+        },
+        {
+          "trialId": "1ac79709-0c32-4637-9541-efc342bbb45b",
+          "status": "PASS"
+        }
+      ]
+    },
+    "newComparisonSpawns": 0
+  },
+  {
+    "name": "assessment-failures",
+    "expected": "INVALID / exit 1",
+    "classification": "RED_FALSE_ACCEPT",
+    "command": [
+      "C:\\Program Files\\nodejs\\node.exe",
+      "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\repo\\scripts\\stage-w1b-runner.mjs",
+      "verify",
+      "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\stage-w1d-20261115-offline\\assessment-failures"
+    ],
+    "stdout": "{\"status\":\"PASS\",\"runId\":\"492ef3a0-1da5-48a3-a51e-1c04b59ed26e\",\"results\":[{\"trialId\":\"e1b0dd63-fe21-49ac-b011-16fb0f469dff\",\"status\":\"PASS\"},{\"trialId\":\"1ac79709-0c32-4637-9541-efc342bbb45b\",\"status\":\"PASS\"}]}\n",
+    "stderr": "",
+    "exitCode": 0,
+    "signal": null,
+    "error": null,
+    "result": {
+      "status": "PASS",
+      "runId": "492ef3a0-1da5-48a3-a51e-1c04b59ed26e",
+      "results": [
+        {
+          "trialId": "e1b0dd63-fe21-49ac-b011-16fb0f469dff",
+          "status": "PASS"
+        },
+        {
+          "trialId": "1ac79709-0c32-4637-9541-efc342bbb45b",
+          "status": "PASS"
+        }
+      ]
+    },
+    "newComparisonSpawns": 0
+  },
+  {
+    "name": "assessment-plausible",
+    "expected": "INVALID / exit 1",
+    "classification": "RED_FALSE_ACCEPT",
+    "command": [
+      "C:\\Program Files\\nodejs\\node.exe",
+      "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\repo\\scripts\\stage-w1b-runner.mjs",
+      "verify",
+      "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\stage-w1d-20261115-offline\\assessment-plausible"
+    ],
+    "stdout": "{\"status\":\"PASS\",\"runId\":\"492ef3a0-1da5-48a3-a51e-1c04b59ed26e\",\"results\":[{\"trialId\":\"e1b0dd63-fe21-49ac-b011-16fb0f469dff\",\"status\":\"PASS\"},{\"trialId\":\"1ac79709-0c32-4637-9541-efc342bbb45b\",\"status\":\"PASS\"}]}\n",
+    "stderr": "",
+    "exitCode": 0,
+    "signal": null,
+    "error": null,
+    "result": {
+      "status": "PASS",
+      "runId": "492ef3a0-1da5-48a3-a51e-1c04b59ed26e",
+      "results": [
+        {
+          "trialId": "e1b0dd63-fe21-49ac-b011-16fb0f469dff",
+          "status": "PASS"
+        },
+        {
+          "trialId": "1ac79709-0c32-4637-9541-efc342bbb45b",
+          "status": "PASS"
+        }
+      ]
+    },
+    "newComparisonSpawns": 0
+  },
+  {
+    "name": "exit-disagreement",
+    "expected": "INVALID / exit 1",
+    "classification": "RED_FALSE_ACCEPT",
+    "command": [
+      "C:\\Program Files\\nodejs\\node.exe",
+      "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\repo\\scripts\\stage-w1b-runner.mjs",
+      "verify",
+      "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\stage-w1d-20261115-offline\\exit-disagreement"
+    ],
+    "stdout": "{\"status\":\"PASS\",\"runId\":\"492ef3a0-1da5-48a3-a51e-1c04b59ed26e\",\"results\":[{\"trialId\":\"e1b0dd63-fe21-49ac-b011-16fb0f469dff\",\"status\":\"PASS\"},{\"trialId\":\"1ac79709-0c32-4637-9541-efc342bbb45b\",\"status\":\"PASS\"}]}\n",
+    "stderr": "",
+    "exitCode": 0,
+    "signal": null,
+    "error": null,
+    "result": {
+      "status": "PASS",
+      "runId": "492ef3a0-1da5-48a3-a51e-1c04b59ed26e",
+      "results": [
+        {
+          "trialId": "e1b0dd63-fe21-49ac-b011-16fb0f469dff",
+          "status": "PASS"
+        },
+        {
+          "trialId": "1ac79709-0c32-4637-9541-efc342bbb45b",
+          "status": "PASS"
+        }
+      ]
+    },
+    "newComparisonSpawns": 0
+  },
+  {
+    "name": "request-mode-only",
+    "expected": "INVALID / exit 1",
+    "classification": "EXISTING_PROTECTION",
+    "command": [
+      "C:\\Program Files\\nodejs\\node.exe",
+      "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\repo\\scripts\\stage-w1b-runner.mjs",
+      "verify",
+      "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\stage-w1d-20261115-offline\\request-mode-only"
+    ],
+    "stdout": "{\"status\":\"INVALID\",\"reason\":\"Error: changed or missing request.json\"}\n",
+    "stderr": "",
+    "exitCode": 1,
+    "signal": null,
+    "error": null,
+    "result": {
+      "status": "INVALID",
+      "reason": "Error: changed or missing request.json"
+    },
+    "newComparisonSpawns": 0
+  },
+  {
+    "name": "request-mode-rehash",
+    "expected": "INVALID / exit 1",
+    "classification": "RED_FALSE_ACCEPT",
+    "command": [
+      "C:\\Program Files\\nodejs\\node.exe",
+      "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\repo\\scripts\\stage-w1b-runner.mjs",
+      "verify",
+      "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\stage-w1d-20261115-offline\\request-mode-rehash"
+    ],
+    "stdout": "{\"status\":\"PASS\",\"runId\":\"492ef3a0-1da5-48a3-a51e-1c04b59ed26e\",\"results\":[{\"trialId\":\"e1b0dd63-fe21-49ac-b011-16fb0f469dff\",\"status\":\"PASS\"},{\"trialId\":\"1ac79709-0c32-4637-9541-efc342bbb45b\",\"status\":\"PASS\"}]}\n",
+    "stderr": "",
+    "exitCode": 0,
+    "signal": null,
+    "error": null,
+    "result": {
+      "status": "PASS",
+      "runId": "492ef3a0-1da5-48a3-a51e-1c04b59ed26e",
+      "results": [
+        {
+          "trialId": "e1b0dd63-fe21-49ac-b011-16fb0f469dff",
+          "status": "PASS"
+        },
+        {
+          "trialId": "1ac79709-0c32-4637-9541-efc342bbb45b",
+          "status": "PASS"
+        }
+      ]
+    },
+    "newComparisonSpawns": 0
+  },
+  {
+    "name": "request-filters-only",
+    "expected": "INVALID / exit 1",
+    "classification": "EXISTING_PROTECTION",
+    "command": [
+      "C:\\Program Files\\nodejs\\node.exe",
+      "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\repo\\scripts\\stage-w1b-runner.mjs",
+      "verify",
+      "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\stage-w1d-20261115-offline\\request-filters-only"
+    ],
+    "stdout": "{\"status\":\"INVALID\",\"reason\":\"Error: changed or missing request.json\"}\n",
+    "stderr": "",
+    "exitCode": 1,
+    "signal": null,
+    "error": null,
+    "result": {
+      "status": "INVALID",
+      "reason": "Error: changed or missing request.json"
+    },
+    "newComparisonSpawns": 0
+  },
+  {
+    "name": "request-filters-rehash",
+    "expected": "INVALID / exit 1",
+    "classification": "RED_FALSE_ACCEPT",
+    "command": [
+      "C:\\Program Files\\nodejs\\node.exe",
+      "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\repo\\scripts\\stage-w1b-runner.mjs",
+      "verify",
+      "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\stage-w1d-20261115-offline\\request-filters-rehash"
+    ],
+    "stdout": "{\"status\":\"PASS\",\"runId\":\"492ef3a0-1da5-48a3-a51e-1c04b59ed26e\",\"results\":[{\"trialId\":\"e1b0dd63-fe21-49ac-b011-16fb0f469dff\",\"status\":\"PASS\"},{\"trialId\":\"1ac79709-0c32-4637-9541-efc342bbb45b\",\"status\":\"PASS\"}]}\n",
+    "stderr": "",
+    "exitCode": 0,
+    "signal": null,
+    "error": null,
+    "result": {
+      "status": "PASS",
+      "runId": "492ef3a0-1da5-48a3-a51e-1c04b59ed26e",
+      "results": [
+        {
+          "trialId": "e1b0dd63-fe21-49ac-b011-16fb0f469dff",
+          "status": "PASS"
+        },
+        {
+          "trialId": "1ac79709-0c32-4637-9541-efc342bbb45b",
+          "status": "PASS"
+        }
+      ]
+    },
+    "newComparisonSpawns": 0
+  },
+  {
+    "name": "request-preflightSha256-only",
+    "expected": "INVALID / exit 1",
+    "classification": "EXISTING_PROTECTION",
+    "command": [
+      "C:\\Program Files\\nodejs\\node.exe",
+      "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\repo\\scripts\\stage-w1b-runner.mjs",
+      "verify",
+      "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\stage-w1d-20261115-offline\\request-preflightSha256-only"
+    ],
+    "stdout": "{\"status\":\"INVALID\",\"reason\":\"Error: changed or missing request.json\"}\n",
+    "stderr": "",
+    "exitCode": 1,
+    "signal": null,
+    "error": null,
+    "result": {
+      "status": "INVALID",
+      "reason": "Error: changed or missing request.json"
+    },
+    "newComparisonSpawns": 0
+  },
+  {
+    "name": "request-preflightSha256-rehash",
+    "expected": "INVALID / exit 1",
+    "classification": "RED_FALSE_ACCEPT",
+    "command": [
+      "C:\\Program Files\\nodejs\\node.exe",
+      "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\repo\\scripts\\stage-w1b-runner.mjs",
+      "verify",
+      "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\stage-w1d-20261115-offline\\request-preflightSha256-rehash"
+    ],
+    "stdout": "{\"status\":\"PASS\",\"runId\":\"492ef3a0-1da5-48a3-a51e-1c04b59ed26e\",\"results\":[{\"trialId\":\"e1b0dd63-fe21-49ac-b011-16fb0f469dff\",\"status\":\"PASS\"},{\"trialId\":\"1ac79709-0c32-4637-9541-efc342bbb45b\",\"status\":\"PASS\"}]}\n",
+    "stderr": "",
+    "exitCode": 0,
+    "signal": null,
+    "error": null,
+    "result": {
+      "status": "PASS",
+      "runId": "492ef3a0-1da5-48a3-a51e-1c04b59ed26e",
+      "results": [
+        {
+          "trialId": "e1b0dd63-fe21-49ac-b011-16fb0f469dff",
+          "status": "PASS"
+        },
+        {
+          "trialId": "1ac79709-0c32-4637-9541-efc342bbb45b",
+          "status": "PASS"
+        }
+      ]
+    },
+    "newComparisonSpawns": 0
+  },
+  {
+    "name": "request-inventorySha256-only",
+    "expected": "INVALID / exit 1",
+    "classification": "EXISTING_PROTECTION",
+    "command": [
+      "C:\\Program Files\\nodejs\\node.exe",
+      "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\repo\\scripts\\stage-w1b-runner.mjs",
+      "verify",
+      "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\stage-w1d-20261115-offline\\request-inventorySha256-only"
+    ],
+    "stdout": "{\"status\":\"INVALID\",\"reason\":\"Error: changed or missing request.json\"}\n",
+    "stderr": "",
+    "exitCode": 1,
+    "signal": null,
+    "error": null,
+    "result": {
+      "status": "INVALID",
+      "reason": "Error: changed or missing request.json"
+    },
+    "newComparisonSpawns": 0
+  },
+  {
+    "name": "request-inventorySha256-rehash",
+    "expected": "INVALID / exit 1",
+    "classification": "RED_FALSE_ACCEPT",
+    "command": [
+      "C:\\Program Files\\nodejs\\node.exe",
+      "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\repo\\scripts\\stage-w1b-runner.mjs",
+      "verify",
+      "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\stage-w1d-20261115-offline\\request-inventorySha256-rehash"
+    ],
+    "stdout": "{\"status\":\"PASS\",\"runId\":\"492ef3a0-1da5-48a3-a51e-1c04b59ed26e\",\"results\":[{\"trialId\":\"e1b0dd63-fe21-49ac-b011-16fb0f469dff\",\"status\":\"PASS\"},{\"trialId\":\"1ac79709-0c32-4637-9541-efc342bbb45b\",\"status\":\"PASS\"}]}\n",
+    "stderr": "",
+    "exitCode": 0,
+    "signal": null,
+    "error": null,
+    "result": {
+      "status": "PASS",
+      "runId": "492ef3a0-1da5-48a3-a51e-1c04b59ed26e",
+      "results": [
+        {
+          "trialId": "e1b0dd63-fe21-49ac-b011-16fb0f469dff",
+          "status": "PASS"
+        },
+        {
+          "trialId": "1ac79709-0c32-4637-9541-efc342bbb45b",
+          "status": "PASS"
+        }
+      ]
+    },
+    "newComparisonSpawns": 0
+  },
+  {
+    "name": "request-target-only",
+    "expected": "INVALID / exit 1",
+    "classification": "EXISTING_PROTECTION",
+    "command": [
+      "C:\\Program Files\\nodejs\\node.exe",
+      "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\repo\\scripts\\stage-w1b-runner.mjs",
+      "verify",
+      "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\stage-w1d-20261115-offline\\request-target-only"
+    ],
+    "stdout": "{\"status\":\"INVALID\",\"reason\":\"Error: changed or missing request.json\"}\n",
+    "stderr": "",
+    "exitCode": 1,
+    "signal": null,
+    "error": null,
+    "result": {
+      "status": "INVALID",
+      "reason": "Error: changed or missing request.json"
+    },
+    "newComparisonSpawns": 0
+  },
+  {
+    "name": "request-target-rehash",
+    "expected": "INVALID / exit 1",
+    "classification": "EXISTING_PROTECTION",
+    "command": [
+      "C:\\Program Files\\nodejs\\node.exe",
+      "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\repo\\scripts\\stage-w1b-runner.mjs",
+      "verify",
+      "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\stage-w1d-20261115-offline\\request-target-rehash"
+    ],
+    "stdout": "{\"status\":\"INVALID\",\"reason\":\"Error: request/settings binding mismatch\"}\n",
+    "stderr": "",
+    "exitCode": 1,
+    "signal": null,
+    "error": null,
+    "result": {
+      "status": "INVALID",
+      "reason": "Error: request/settings binding mismatch"
+    },
+    "newComparisonSpawns": 0
+  },
+  {
+    "name": "request-runId-only",
+    "expected": "INVALID / exit 1",
+    "classification": "EXISTING_PROTECTION",
+    "command": [
+      "C:\\Program Files\\nodejs\\node.exe",
+      "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\repo\\scripts\\stage-w1b-runner.mjs",
+      "verify",
+      "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\stage-w1d-20261115-offline\\request-runId-only"
+    ],
+    "stdout": "{\"status\":\"INVALID\",\"reason\":\"Error: changed or missing request.json\"}\n",
+    "stderr": "",
+    "exitCode": 1,
+    "signal": null,
+    "error": null,
+    "result": {
+      "status": "INVALID",
+      "reason": "Error: changed or missing request.json"
+    },
+    "newComparisonSpawns": 0
+  },
+  {
+    "name": "request-runId-rehash",
+    "expected": "INVALID / exit 1",
+    "classification": "EXISTING_PROTECTION",
+    "command": [
+      "C:\\Program Files\\nodejs\\node.exe",
+      "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\repo\\scripts\\stage-w1b-runner.mjs",
+      "verify",
+      "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\stage-w1d-20261115-offline\\request-runId-rehash"
+    ],
+    "stdout": "{\"status\":\"INVALID\",\"reason\":\"Error: request/settings binding mismatch\"}\n",
+    "stderr": "",
+    "exitCode": 1,
+    "signal": null,
+    "error": null,
+    "result": {
+      "status": "INVALID",
+      "reason": "Error: request/settings binding mismatch"
+    },
+    "newComparisonSpawns": 0
+  },
+  {
+    "name": "request-trialId-only",
+    "expected": "INVALID / exit 1",
+    "classification": "EXISTING_PROTECTION",
+    "command": [
+      "C:\\Program Files\\nodejs\\node.exe",
+      "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\repo\\scripts\\stage-w1b-runner.mjs",
+      "verify",
+      "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\stage-w1d-20261115-offline\\request-trialId-only"
+    ],
+    "stdout": "{\"status\":\"INVALID\",\"reason\":\"Error: changed or missing request.json\"}\n",
+    "stderr": "",
+    "exitCode": 1,
+    "signal": null,
+    "error": null,
+    "result": {
+      "status": "INVALID",
+      "reason": "Error: changed or missing request.json"
+    },
+    "newComparisonSpawns": 0
+  },
+  {
+    "name": "request-trialId-rehash",
+    "expected": "INVALID / exit 1",
+    "classification": "EXISTING_PROTECTION",
+    "command": [
+      "C:\\Program Files\\nodejs\\node.exe",
+      "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\repo\\scripts\\stage-w1b-runner.mjs",
+      "verify",
+      "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\stage-w1d-20261115-offline\\request-trialId-rehash"
+    ],
+    "stdout": "{\"status\":\"INVALID\",\"reason\":\"Error: request/settings binding mismatch\"}\n",
+    "stderr": "",
+    "exitCode": 1,
+    "signal": null,
+    "error": null,
+    "result": {
+      "status": "INVALID",
+      "reason": "Error: request/settings binding mismatch"
+    },
+    "newComparisonSpawns": 0
+  },
+  {
+    "name": "request-command-only",
+    "expected": "INVALID / exit 1",
+    "classification": "EXISTING_PROTECTION",
+    "command": [
+      "C:\\Program Files\\nodejs\\node.exe",
+      "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\repo\\scripts\\stage-w1b-runner.mjs",
+      "verify",
+      "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\stage-w1d-20261115-offline\\request-command-only"
+    ],
+    "stdout": "{\"status\":\"INVALID\",\"reason\":\"Error: changed or missing request.json\"}\n",
+    "stderr": "",
+    "exitCode": 1,
+    "signal": null,
+    "error": null,
+    "result": {
+      "status": "INVALID",
+      "reason": "Error: changed or missing request.json"
+    },
+    "newComparisonSpawns": 0
+  },
+  {
+    "name": "request-command-rehash",
+    "expected": "INVALID / exit 1",
+    "classification": "RED_FALSE_ACCEPT",
+    "command": [
+      "C:\\Program Files\\nodejs\\node.exe",
+      "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\repo\\scripts\\stage-w1b-runner.mjs",
+      "verify",
+      "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\stage-w1d-20261115-offline\\request-command-rehash"
+    ],
+    "stdout": "{\"status\":\"PASS\",\"runId\":\"492ef3a0-1da5-48a3-a51e-1c04b59ed26e\",\"results\":[{\"trialId\":\"e1b0dd63-fe21-49ac-b011-16fb0f469dff\",\"status\":\"PASS\"},{\"trialId\":\"1ac79709-0c32-4637-9541-efc342bbb45b\",\"status\":\"PASS\"}]}\n",
+    "stderr": "",
+    "exitCode": 0,
+    "signal": null,
+    "error": null,
+    "result": {
+      "status": "PASS",
+      "runId": "492ef3a0-1da5-48a3-a51e-1c04b59ed26e",
+      "results": [
+        {
+          "trialId": "e1b0dd63-fe21-49ac-b011-16fb0f469dff",
+          "status": "PASS"
+        },
+        {
+          "trialId": "1ac79709-0c32-4637-9541-efc342bbb45b",
+          "status": "PASS"
+        }
+      ]
+    },
+    "newComparisonSpawns": 0
+  },
+  {
+    "name": "request-output-only",
+    "expected": "INVALID / exit 1",
+    "classification": "EXISTING_PROTECTION",
+    "command": [
+      "C:\\Program Files\\nodejs\\node.exe",
+      "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\repo\\scripts\\stage-w1b-runner.mjs",
+      "verify",
+      "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\stage-w1d-20261115-offline\\request-output-only"
+    ],
+    "stdout": "{\"status\":\"INVALID\",\"reason\":\"Error: changed or missing request.json\"}\n",
+    "stderr": "",
+    "exitCode": 1,
+    "signal": null,
+    "error": null,
+    "result": {
+      "status": "INVALID",
+      "reason": "Error: changed or missing request.json"
+    },
+    "newComparisonSpawns": 0
+  },
+  {
+    "name": "request-output-rehash",
+    "expected": "INVALID / exit 1",
+    "classification": "RED_FALSE_ACCEPT",
+    "command": [
+      "C:\\Program Files\\nodejs\\node.exe",
+      "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\repo\\scripts\\stage-w1b-runner.mjs",
+      "verify",
+      "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\stage-w1d-20261115-offline\\request-output-rehash"
+    ],
+    "stdout": "{\"status\":\"PASS\",\"runId\":\"492ef3a0-1da5-48a3-a51e-1c04b59ed26e\",\"results\":[{\"trialId\":\"e1b0dd63-fe21-49ac-b011-16fb0f469dff\",\"status\":\"PASS\"},{\"trialId\":\"1ac79709-0c32-4637-9541-efc342bbb45b\",\"status\":\"PASS\"}]}\n",
+    "stderr": "",
+    "exitCode": 0,
+    "signal": null,
+    "error": null,
+    "result": {
+      "status": "PASS",
+      "runId": "492ef3a0-1da5-48a3-a51e-1c04b59ed26e",
+      "results": [
+        {
+          "trialId": "e1b0dd63-fe21-49ac-b011-16fb0f469dff",
+          "status": "PASS"
+        },
+        {
+          "trialId": "1ac79709-0c32-4637-9541-efc342bbb45b",
+          "status": "PASS"
+        }
+      ]
+    },
+    "newComparisonSpawns": 0
+  },
+  {
+    "name": "request-environment-only",
+    "expected": "INVALID / exit 1",
+    "classification": "EXISTING_PROTECTION",
+    "command": [
+      "C:\\Program Files\\nodejs\\node.exe",
+      "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\repo\\scripts\\stage-w1b-runner.mjs",
+      "verify",
+      "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\stage-w1d-20261115-offline\\request-environment-only"
+    ],
+    "stdout": "{\"status\":\"INVALID\",\"reason\":\"Error: changed or missing request.json\"}\n",
+    "stderr": "",
+    "exitCode": 1,
+    "signal": null,
+    "error": null,
+    "result": {
+      "status": "INVALID",
+      "reason": "Error: changed or missing request.json"
+    },
+    "newComparisonSpawns": 0
+  },
+  {
+    "name": "request-environment-rehash",
+    "expected": "INVALID / exit 1",
+    "classification": "RED_FALSE_ACCEPT",
+    "command": [
+      "C:\\Program Files\\nodejs\\node.exe",
+      "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\repo\\scripts\\stage-w1b-runner.mjs",
+      "verify",
+      "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\stage-w1d-20261115-offline\\request-environment-rehash"
+    ],
+    "stdout": "{\"status\":\"PASS\",\"runId\":\"492ef3a0-1da5-48a3-a51e-1c04b59ed26e\",\"results\":[{\"trialId\":\"e1b0dd63-fe21-49ac-b011-16fb0f469dff\",\"status\":\"PASS\"},{\"trialId\":\"1ac79709-0c32-4637-9541-efc342bbb45b\",\"status\":\"PASS\"}]}\n",
+    "stderr": "",
+    "exitCode": 0,
+    "signal": null,
+    "error": null,
+    "result": {
+      "status": "PASS",
+      "runId": "492ef3a0-1da5-48a3-a51e-1c04b59ed26e",
+      "results": [
+        {
+          "trialId": "e1b0dd63-fe21-49ac-b011-16fb0f469dff",
+          "status": "PASS"
+        },
+        {
+          "trialId": "1ac79709-0c32-4637-9541-efc342bbb45b",
+          "status": "PASS"
+        }
+      ]
+    },
+    "newComparisonSpawns": 0
+  },
+  {
+    "name": "request-observation-only",
+    "expected": "INVALID / exit 1",
+    "classification": "EXISTING_PROTECTION",
+    "command": [
+      "C:\\Program Files\\nodejs\\node.exe",
+      "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\repo\\scripts\\stage-w1b-runner.mjs",
+      "verify",
+      "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\stage-w1d-20261115-offline\\request-observation-only"
+    ],
+    "stdout": "{\"status\":\"INVALID\",\"reason\":\"Error: changed or missing request.json\"}\n",
+    "stderr": "",
+    "exitCode": 1,
+    "signal": null,
+    "error": null,
+    "result": {
+      "status": "INVALID",
+      "reason": "Error: changed or missing request.json"
+    },
+    "newComparisonSpawns": 0
+  },
+  {
+    "name": "request-observation-rehash",
+    "expected": "INVALID / exit 1",
+    "classification": "RED_FALSE_ACCEPT",
+    "command": [
+      "C:\\Program Files\\nodejs\\node.exe",
+      "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\repo\\scripts\\stage-w1b-runner.mjs",
+      "verify",
+      "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\stage-w1d-20261115-offline\\request-observation-rehash"
+    ],
+    "stdout": "{\"status\":\"PASS\",\"runId\":\"492ef3a0-1da5-48a3-a51e-1c04b59ed26e\",\"results\":[{\"trialId\":\"e1b0dd63-fe21-49ac-b011-16fb0f469dff\",\"status\":\"PASS\"},{\"trialId\":\"1ac79709-0c32-4637-9541-efc342bbb45b\",\"status\":\"PASS\"}]}\n",
+    "stderr": "",
+    "exitCode": 0,
+    "signal": null,
+    "error": null,
+    "result": {
+      "status": "PASS",
+      "runId": "492ef3a0-1da5-48a3-a51e-1c04b59ed26e",
+      "results": [
+        {
+          "trialId": "e1b0dd63-fe21-49ac-b011-16fb0f469dff",
+          "status": "PASS"
+        },
+        {
+          "trialId": "1ac79709-0c32-4637-9541-efc342bbb45b",
+          "status": "PASS"
+        }
+      ]
+    },
+    "newComparisonSpawns": 0
+  },
+  {
+    "name": "request-dir-only",
+    "expected": "INVALID / exit 1",
+    "classification": "EXISTING_PROTECTION",
+    "command": [
+      "C:\\Program Files\\nodejs\\node.exe",
+      "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\repo\\scripts\\stage-w1b-runner.mjs",
+      "verify",
+      "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\stage-w1d-20261115-offline\\request-dir-only"
+    ],
+    "stdout": "{\"status\":\"INVALID\",\"reason\":\"Error: changed or missing request.json\"}\n",
+    "stderr": "",
+    "exitCode": 1,
+    "signal": null,
+    "error": null,
+    "result": {
+      "status": "INVALID",
+      "reason": "Error: changed or missing request.json"
+    },
+    "newComparisonSpawns": 0
+  },
+  {
+    "name": "request-dir-rehash",
+    "expected": "INVALID / exit 1",
+    "classification": "RED_FALSE_ACCEPT",
+    "command": [
+      "C:\\Program Files\\nodejs\\node.exe",
+      "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\repo\\scripts\\stage-w1b-runner.mjs",
+      "verify",
+      "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\stage-w1d-20261115-offline\\request-dir-rehash"
+    ],
+    "stdout": "{\"status\":\"PASS\",\"runId\":\"492ef3a0-1da5-48a3-a51e-1c04b59ed26e\",\"results\":[{\"trialId\":\"e1b0dd63-fe21-49ac-b011-16fb0f469dff\",\"status\":\"PASS\"},{\"trialId\":\"1ac79709-0c32-4637-9541-efc342bbb45b\",\"status\":\"PASS\"}]}\n",
+    "stderr": "",
+    "exitCode": 0,
+    "signal": null,
+    "error": null,
+    "result": {
+      "status": "PASS",
+      "runId": "492ef3a0-1da5-48a3-a51e-1c04b59ed26e",
+      "results": [
+        {
+          "trialId": "e1b0dd63-fe21-49ac-b011-16fb0f469dff",
+          "status": "PASS"
+        },
+        {
+          "trialId": "1ac79709-0c32-4637-9541-efc342bbb45b",
+          "status": "PASS"
+        }
+      ]
+    },
+    "newComparisonSpawns": 0
+  },
+  {
+    "name": "request-isolationPlan-only",
+    "expected": "INVALID / exit 1",
+    "classification": "EXISTING_PROTECTION",
+    "command": [
+      "C:\\Program Files\\nodejs\\node.exe",
+      "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\repo\\scripts\\stage-w1b-runner.mjs",
+      "verify",
+      "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\stage-w1d-20261115-offline\\request-isolationPlan-only"
+    ],
+    "stdout": "{\"status\":\"INVALID\",\"reason\":\"Error: changed or missing request.json\"}\n",
+    "stderr": "",
+    "exitCode": 1,
+    "signal": null,
+    "error": null,
+    "result": {
+      "status": "INVALID",
+      "reason": "Error: changed or missing request.json"
+    },
+    "newComparisonSpawns": 0
+  },
+  {
+    "name": "request-isolationPlan-rehash",
+    "expected": "INVALID / exit 1",
+    "classification": "RED_FALSE_ACCEPT",
+    "command": [
+      "C:\\Program Files\\nodejs\\node.exe",
+      "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\repo\\scripts\\stage-w1b-runner.mjs",
+      "verify",
+      "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\stage-w1d-20261115-offline\\request-isolationPlan-rehash"
+    ],
+    "stdout": "{\"status\":\"PASS\",\"runId\":\"492ef3a0-1da5-48a3-a51e-1c04b59ed26e\",\"results\":[{\"trialId\":\"e1b0dd63-fe21-49ac-b011-16fb0f469dff\",\"status\":\"PASS\"},{\"trialId\":\"1ac79709-0c32-4637-9541-efc342bbb45b\",\"status\":\"PASS\"}]}\n",
+    "stderr": "",
+    "exitCode": 0,
+    "signal": null,
+    "error": null,
+    "result": {
+      "status": "PASS",
+      "runId": "492ef3a0-1da5-48a3-a51e-1c04b59ed26e",
+      "results": [
+        {
+          "trialId": "e1b0dd63-fe21-49ac-b011-16fb0f469dff",
+          "status": "PASS"
+        },
+        {
+          "trialId": "1ac79709-0c32-4637-9541-efc342bbb45b",
+          "status": "PASS"
+        }
+      ]
+    },
+    "newComparisonSpawns": 0
+  },
+  {
+    "name": "request-environmentTrees-only",
+    "expected": "INVALID / exit 1",
+    "classification": "EXISTING_PROTECTION",
+    "command": [
+      "C:\\Program Files\\nodejs\\node.exe",
+      "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\repo\\scripts\\stage-w1b-runner.mjs",
+      "verify",
+      "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\stage-w1d-20261115-offline\\request-environmentTrees-only"
+    ],
+    "stdout": "{\"status\":\"INVALID\",\"reason\":\"Error: changed or missing request.json\"}\n",
+    "stderr": "",
+    "exitCode": 1,
+    "signal": null,
+    "error": null,
+    "result": {
+      "status": "INVALID",
+      "reason": "Error: changed or missing request.json"
+    },
+    "newComparisonSpawns": 0
+  },
+  {
+    "name": "request-environmentTrees-rehash",
+    "expected": "INVALID / exit 1",
+    "classification": "RED_FALSE_ACCEPT",
+    "command": [
+      "C:\\Program Files\\nodejs\\node.exe",
+      "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\repo\\scripts\\stage-w1b-runner.mjs",
+      "verify",
+      "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\stage-w1d-20261115-offline\\request-environmentTrees-rehash"
+    ],
+    "stdout": "{\"status\":\"PASS\",\"runId\":\"492ef3a0-1da5-48a3-a51e-1c04b59ed26e\",\"results\":[{\"trialId\":\"e1b0dd63-fe21-49ac-b011-16fb0f469dff\",\"status\":\"PASS\"},{\"trialId\":\"1ac79709-0c32-4637-9541-efc342bbb45b\",\"status\":\"PASS\"}]}\n",
+    "stderr": "",
+    "exitCode": 0,
+    "signal": null,
+    "error": null,
+    "result": {
+      "status": "PASS",
+      "runId": "492ef3a0-1da5-48a3-a51e-1c04b59ed26e",
+      "results": [
+        {
+          "trialId": "e1b0dd63-fe21-49ac-b011-16fb0f469dff",
+          "status": "PASS"
+        },
+        {
+          "trialId": "1ac79709-0c32-4637-9541-efc342bbb45b",
+          "status": "PASS"
+        }
+      ]
+    },
+    "newComparisonSpawns": 0
+  },
+  {
+    "name": "request-expectedSettings-only",
+    "expected": "INVALID / exit 1",
+    "classification": "EXISTING_PROTECTION",
+    "command": [
+      "C:\\Program Files\\nodejs\\node.exe",
+      "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\repo\\scripts\\stage-w1b-runner.mjs",
+      "verify",
+      "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\stage-w1d-20261115-offline\\request-expectedSettings-only"
+    ],
+    "stdout": "{\"status\":\"INVALID\",\"reason\":\"Error: changed or missing request.json\"}\n",
+    "stderr": "",
+    "exitCode": 1,
+    "signal": null,
+    "error": null,
+    "result": {
+      "status": "INVALID",
+      "reason": "Error: changed or missing request.json"
+    },
+    "newComparisonSpawns": 0
+  },
+  {
+    "name": "request-expectedSettings-rehash",
+    "expected": "INVALID / exit 1",
+    "classification": "RED_FALSE_ACCEPT",
+    "command": [
+      "C:\\Program Files\\nodejs\\node.exe",
+      "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\repo\\scripts\\stage-w1b-runner.mjs",
+      "verify",
+      "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\stage-w1d-20261115-offline\\request-expectedSettings-rehash"
+    ],
+    "stdout": "{\"status\":\"PASS\",\"runId\":\"492ef3a0-1da5-48a3-a51e-1c04b59ed26e\",\"results\":[{\"trialId\":\"e1b0dd63-fe21-49ac-b011-16fb0f469dff\",\"status\":\"PASS\"},{\"trialId\":\"1ac79709-0c32-4637-9541-efc342bbb45b\",\"status\":\"PASS\"}]}\n",
+    "stderr": "",
+    "exitCode": 0,
+    "signal": null,
+    "error": null,
+    "result": {
+      "status": "PASS",
+      "runId": "492ef3a0-1da5-48a3-a51e-1c04b59ed26e",
+      "results": [
+        {
+          "trialId": "e1b0dd63-fe21-49ac-b011-16fb0f469dff",
+          "status": "PASS"
+        },
+        {
+          "trialId": "1ac79709-0c32-4637-9541-efc342bbb45b",
+          "status": "PASS"
+        }
+      ]
+    },
+    "newComparisonSpawns": 0
+  },
+  {
+    "name": "collect-request-rehash",
+    "expected": "INVALID / exit 1",
+    "classification": "RED_FALSE_ACCEPT",
+    "command": [
+      "C:\\Program Files\\nodejs\\node.exe",
+      "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\repo\\scripts\\stage-w1b-runner.mjs",
+      "verify",
+      "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\stage-w1d-20261115-offline\\collect-request-rehash"
+    ],
+    "stdout": "{\"status\":\"PASS\",\"runId\":\"492ef3a0-1da5-48a3-a51e-1c04b59ed26e\",\"results\":[{\"trialId\":\"e1b0dd63-fe21-49ac-b011-16fb0f469dff\",\"status\":\"PASS\"},{\"trialId\":\"1ac79709-0c32-4637-9541-efc342bbb45b\",\"status\":\"PASS\"}]}\n",
+    "stderr": "",
+    "exitCode": 0,
+    "signal": null,
+    "error": null,
+    "result": {
+      "status": "PASS",
+      "runId": "492ef3a0-1da5-48a3-a51e-1c04b59ed26e",
+      "results": [
+        {
+          "trialId": "e1b0dd63-fe21-49ac-b011-16fb0f469dff",
+          "status": "PASS"
+        },
+        {
+          "trialId": "1ac79709-0c32-4637-9541-efc342bbb45b",
+          "status": "PASS"
+        }
+      ]
+    },
+    "newComparisonSpawns": 0
+  }
+]

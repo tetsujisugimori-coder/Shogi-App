@@ -1,0 +1,26 @@
+{
+  "command": [
+    "C:\\Program Files\\nodejs\\node.exe",
+    "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\repo\\scripts\\stage-w1b-runner.mjs",
+    "launch",
+    "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\repo\\docs\\benchmarks\\game-blunder-w1d-20261115\\runtime\\normal-duplicates\\record"
+  ],
+  "exitCode": 0,
+  "signal": null,
+  "stdout": "{\"runId\":\"e95698e4-109a-4215-8de0-a082e471b835\",\"results\":[{\"trialId\":\"ae7a672c-e3a8-4ef9-87f6-86f71375501f\",\"status\":\"PASS\"},{\"trialId\":\"742fb526-a1ab-4431-9494-eb44626d5c09\",\"status\":\"PASS\"}],\"status\":\"PASS\"}\n",
+  "stderr": "",
+  "result": {
+    "runId": "e95698e4-109a-4215-8de0-a082e471b835",
+    "results": [
+      {
+        "trialId": "ae7a672c-e3a8-4ef9-87f6-86f71375501f",
+        "status": "PASS"
+      },
+      {
+        "trialId": "742fb526-a1ab-4431-9494-eb44626d5c09",
+        "status": "PASS"
+      }
+    ],
+    "status": "PASS"
+  }
+}

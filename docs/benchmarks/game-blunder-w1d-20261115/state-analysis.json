@@ -1,0 +1,316 @@
+{
+  "rows": [
+    {
+      "target": "old",
+      "S0toS1": [],
+      "transitions": [
+        {
+          "from": "S1-before-config",
+          "to": "S2-config-loaded",
+          "dependencies": [
+            {
+              "path": ".vite-temp",
+              "before": null,
+              "after": {
+                "path": ".vite-temp",
+                "type": "directory"
+              }
+            }
+          ],
+          "sourceUnchanged": true,
+          "executionEnvironmentUnchanged": true,
+          "installationEnvironmentUnchanged": true
+        },
+        {
+          "from": "S2-config-loaded",
+          "to": "S3-inventory-collected",
+          "dependencies": [],
+          "sourceUnchanged": true,
+          "executionEnvironmentUnchanged": false,
+          "installationEnvironmentUnchanged": true
+        },
+        {
+          "from": "S3-inventory-collected",
+          "to": "post-close",
+          "dependencies": [],
+          "sourceUnchanged": true,
+          "executionEnvironmentUnchanged": false,
+          "installationEnvironmentUnchanged": true
+        }
+      ],
+      "settings": {
+        "pool": "forks",
+        "maxWorkers": 2,
+        "testTimeout": 5000,
+        "hookTimeout": 10000,
+        "isolate": true,
+        "fileParallelism": true,
+        "environment": "jsdom",
+        "cache": {
+          "dir": "C:/Users/tetsu/Documents/ChatGPT/将棋アプリ/stage-w1d-20261115-pair/old/node_modules/.vite/vitest/da39a3ee5e6b4b0d3255bfef95601890afd80709"
+        },
+        "cacheDir": "C:/Users/tetsu/Documents/ChatGPT/将棋アプリ/stage-w1d-20261115-pair/old/node_modules/.vite/vitest/da39a3ee5e6b4b0d3255bfef95601890afd80709",
+        "setupFiles": [
+          "C:/Users/tetsu/Documents/ChatGPT/将棋アプリ/stage-w1d-20261115-pair/old/src/test/setup.ts"
+        ]
+      },
+      "inventory": {
+        "tests": [
+          {
+            "id": "260848957_0_0",
+            "name": "uses next-ply capture as a trigger, not any unrelated move or drop",
+            "file": "C:/Users/tetsu/Documents/ChatGPT/将棋アプリ/stage-w1d-20261115-pair/old/src/test/game-blunder-pilot.test.ts",
+            "mode": "run"
+          },
+          {
+            "id": "260848957_0_1",
+            "name": "excludes incomplete and corrupt journals",
+            "file": "C:/Users/tetsu/Documents/ChatGPT/将棋アプリ/stage-w1d-20261115-pair/old/src/test/game-blunder-pilot.test.ts",
+            "mode": "run"
+          }
+        ],
+        "suites": [
+          {
+            "id": "260848957",
+            "name": "src/test/game-blunder-pilot.test.ts",
+            "file": "C:/Users/tetsu/Documents/ChatGPT/将棋アプリ/stage-w1d-20261115-pair/old/src/test/game-blunder-pilot.test.ts",
+            "mode": "run"
+          },
+          {
+            "id": "260848957_0",
+            "name": "game blunder pilot",
+            "file": "C:/Users/tetsu/Documents/ChatGPT/将棋アプリ/stage-w1d-20261115-pair/old/src/test/game-blunder-pilot.test.ts",
+            "mode": "run"
+          }
+        ],
+        "unhandledErrors": []
+      },
+      "transient": [
+        {
+          "operation": "writeFile",
+          "path": "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\stage-w1d-20261115-pair\\old\\node_modules\\.vite-temp\\vite.config.ts.timestamp-1794753218872-03acc08bf10588.mjs",
+          "at": "2026-11-15T14:33:38.872Z",
+          "sha256": "f99fc4d1fa59f47e6ad03b9a0765052c7415c443e4eb2ac7acd0b223880edc6a"
+        },
+        {
+          "operation": "unlink-request",
+          "path": "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\stage-w1d-20261115-pair\\old\\node_modules\\.vite-temp\\vite.config.ts.timestamp-1794753218872-03acc08bf10588.mjs",
+          "at": "2026-11-15T14:33:38.961Z"
+        }
+      ]
+    },
+    {
+      "target": "new",
+      "S0toS1": [],
+      "transitions": [
+        {
+          "from": "S1-before-config",
+          "to": "S2-config-loaded",
+          "dependencies": [
+            {
+              "path": ".vite-temp",
+              "before": null,
+              "after": {
+                "path": ".vite-temp",
+                "type": "directory"
+              }
+            }
+          ],
+          "sourceUnchanged": true,
+          "executionEnvironmentUnchanged": true,
+          "installationEnvironmentUnchanged": true
+        },
+        {
+          "from": "S2-config-loaded",
+          "to": "S3-inventory-collected",
+          "dependencies": [],
+          "sourceUnchanged": true,
+          "executionEnvironmentUnchanged": false,
+          "installationEnvironmentUnchanged": true
+        },
+        {
+          "from": "S3-inventory-collected",
+          "to": "post-close",
+          "dependencies": [],
+          "sourceUnchanged": true,
+          "executionEnvironmentUnchanged": false,
+          "installationEnvironmentUnchanged": true
+        }
+      ],
+      "settings": {
+        "pool": "forks",
+        "maxWorkers": 2,
+        "testTimeout": 5000,
+        "hookTimeout": 10000,
+        "isolate": true,
+        "fileParallelism": true,
+        "environment": "jsdom",
+        "cache": {
+          "dir": "C:/Users/tetsu/Documents/ChatGPT/将棋アプリ/stage-w1d-20261115-pair/new/node_modules/.vite/vitest/da39a3ee5e6b4b0d3255bfef95601890afd80709"
+        },
+        "cacheDir": "C:/Users/tetsu/Documents/ChatGPT/将棋アプリ/stage-w1d-20261115-pair/new/node_modules/.vite/vitest/da39a3ee5e6b4b0d3255bfef95601890afd80709",
+        "setupFiles": [
+          "C:/Users/tetsu/Documents/ChatGPT/将棋アプリ/stage-w1d-20261115-pair/new/src/test/setup.ts"
+        ]
+      },
+      "inventory": {
+        "tests": [
+          {
+            "id": "260848957_0_0",
+            "name": "uses next-ply capture as a trigger, not any unrelated move or drop",
+            "file": "C:/Users/tetsu/Documents/ChatGPT/将棋アプリ/stage-w1d-20261115-pair/new/src/test/game-blunder-pilot.test.ts",
+            "mode": "run"
+          },
+          {
+            "id": "260848957_0_1",
+            "name": "excludes incomplete and corrupt journals",
+            "file": "C:/Users/tetsu/Documents/ChatGPT/将棋アプリ/stage-w1d-20261115-pair/new/src/test/game-blunder-pilot.test.ts",
+            "mode": "run"
+          }
+        ],
+        "suites": [
+          {
+            "id": "260848957",
+            "name": "src/test/game-blunder-pilot.test.ts",
+            "file": "C:/Users/tetsu/Documents/ChatGPT/将棋アプリ/stage-w1d-20261115-pair/new/src/test/game-blunder-pilot.test.ts",
+            "mode": "run"
+          },
+          {
+            "id": "260848957_0",
+            "name": "game blunder pilot",
+            "file": "C:/Users/tetsu/Documents/ChatGPT/将棋アプリ/stage-w1d-20261115-pair/new/src/test/game-blunder-pilot.test.ts",
+            "mode": "run"
+          }
+        ],
+        "unhandledErrors": []
+      },
+      "transient": [
+        {
+          "operation": "writeFile",
+          "path": "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\stage-w1d-20261115-pair\\new\\node_modules\\.vite-temp\\vite.config.ts.timestamp-1794753240030-32d51617b36808.mjs",
+          "at": "2026-11-15T14:34:00.030Z",
+          "sha256": "bc4f4a2db34937b0df008d19c033a25524c1f3fa3bd0a6b064caa571be89085b"
+        },
+        {
+          "operation": "unlink-request",
+          "path": "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\stage-w1d-20261115-pair\\new\\node_modules\\.vite-temp\\vite.config.ts.timestamp-1794753240030-32d51617b36808.mjs",
+          "at": "2026-11-15T14:34:00.127Z"
+        }
+      ]
+    }
+  ],
+  "settingsEqual": true,
+  "inventoryEqual": true,
+  "canonical": [
+    {
+      "settings": {
+        "pool": "forks",
+        "maxWorkers": 2,
+        "testTimeout": 5000,
+        "hookTimeout": 10000,
+        "isolate": true,
+        "fileParallelism": true,
+        "environment": "jsdom",
+        "cache": {
+          "dir": "<snapshot>/node_modules/.vite/vitest/da39a3ee5e6b4b0d3255bfef95601890afd80709"
+        },
+        "cacheDir": "<snapshot>/node_modules/.vite/vitest/da39a3ee5e6b4b0d3255bfef95601890afd80709",
+        "setupFiles": [
+          "<snapshot>/src/test/setup.ts"
+        ]
+      },
+      "inventory": {
+        "tests": [
+          {
+            "id": "260848957_0_0",
+            "name": "uses next-ply capture as a trigger, not any unrelated move or drop",
+            "file": "<snapshot>/src/test/game-blunder-pilot.test.ts",
+            "mode": "run"
+          },
+          {
+            "id": "260848957_0_1",
+            "name": "excludes incomplete and corrupt journals",
+            "file": "<snapshot>/src/test/game-blunder-pilot.test.ts",
+            "mode": "run"
+          }
+        ],
+        "suites": [
+          {
+            "id": "260848957",
+            "name": "src/test/game-blunder-pilot.test.ts",
+            "file": "<snapshot>/src/test/game-blunder-pilot.test.ts",
+            "mode": "run"
+          },
+          {
+            "id": "260848957_0",
+            "name": "game blunder pilot",
+            "file": "<snapshot>/src/test/game-blunder-pilot.test.ts",
+            "mode": "run"
+          }
+        ],
+        "unhandledErrors": []
+      }
+    },
+    {
+      "settings": {
+        "pool": "forks",
+        "maxWorkers": 2,
+        "testTimeout": 5000,
+        "hookTimeout": 10000,
+        "isolate": true,
+        "fileParallelism": true,
+        "environment": "jsdom",
+        "cache": {
+          "dir": "<snapshot>/node_modules/.vite/vitest/da39a3ee5e6b4b0d3255bfef95601890afd80709"
+        },
+        "cacheDir": "<snapshot>/node_modules/.vite/vitest/da39a3ee5e6b4b0d3255bfef95601890afd80709",
+        "setupFiles": [
+          "<snapshot>/src/test/setup.ts"
+        ]
+      },
+      "inventory": {
+        "tests": [
+          {
+            "id": "260848957_0_0",
+            "name": "uses next-ply capture as a trigger, not any unrelated move or drop",
+            "file": "<snapshot>/src/test/game-blunder-pilot.test.ts",
+            "mode": "run"
+          },
+          {
+            "id": "260848957_0_1",
+            "name": "excludes incomplete and corrupt journals",
+            "file": "<snapshot>/src/test/game-blunder-pilot.test.ts",
+            "mode": "run"
+          }
+        ],
+        "suites": [
+          {
+            "id": "260848957",
+            "name": "src/test/game-blunder-pilot.test.ts",
+            "file": "<snapshot>/src/test/game-blunder-pilot.test.ts",
+            "mode": "run"
+          },
+          {
+            "id": "260848957_0",
+            "name": "game blunder pilot",
+            "file": "<snapshot>/src/test/game-blunder-pilot.test.ts",
+            "mode": "run"
+          }
+        ],
+        "unhandledErrors": []
+      }
+    }
+  ],
+  "policy": {
+    "runtimeExclusions": [],
+    "status": "NOT_ESTABLISHED",
+    "candidate": "Load config in a separate preparatory observation, then seal the complete resulting dependency tree including .vite-temp. No blanket ignore.",
+    "blocking": "Vitest writes version/results/duration/failed to results.json on runFiles. Neither asymmetric outputs nor timing-dependent cache transitions have a validated allowance. No comparison launch authorized."
+  },
+  "S4": "NOT_TESTED",
+  "S5": "NOT_TESTED",
+  "comparisonSpawns": {
+    "old": 0,
+    "new": 0
+  }
+}

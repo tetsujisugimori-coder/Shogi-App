@@ -1,6 +1,7 @@
 import { mkdirSync, writeFileSync, readFileSync, existsSync } from 'node:fs';
 import { spawnSync } from 'node:child_process';
 import { randomUUID } from 'node:crypto';
+import { isDeepStrictEqual } from 'node:util';
 import { join, resolve } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import { inspect, requirePair, requireUnchanged, read, hash, digest, contains, environment, physical } from './stage-w1b-preflight.mjs';
@@ -110,17 +111,36 @@ export function verify(out) {
     const ready=read(join(out,'ready.json')),preflight=read(join(out,'preflight.json'));
     if(fileHash(join(out,'ready.json'))!==read(join(out,'ready.sha256.json')).sha256 || fileHash(join(out,'preflight.json'))!==ready.preflightSha256 || ready.runId!==preflight.runId) throw Error('changed execution record');
     if(ready.trials.length!==2||new Set(ready.trials.map(t=>t.trialId)).size!==2) throw Error('invalid trial count/identity');
+    validatePlan(preflight.plan,preflight.output);
+    const same=(a,b)=>isDeepStrictEqual(a,JSON.parse(JSON.stringify(b)));
+    if(!same(preflight.observations,preflight.sealed.observations)) throw Error('preflight observation binding mismatch');
     const results=ready.trials.map((trial,i)=>{
       const dir=join(out,`trial-${i}`),record=read(join(dir,'assessment.json'));
       if(record.runId!==ready.runId||record.trialId!==trial.trialId||record.inventorySha256!==trial.inventorySha256||record.preflightSha256!==ready.preflightSha256) throw Error('another trial assessment');
       for(const f of ['vitest.json','runtime.json','settings.json','request.json','stdout.log','stderr.log','exit.json']) if(fileHash(join(dir,f))!==record.bindings[f]) throw Error(`changed or missing ${f}`);
-      if(fileHash(join(trial.request.output,'inventory.json'))!==trial.inventorySha256 || fileHash(join(trial.request.output,'settings.json'))!==trial.settingsSha256) throw Error('changed collection');
+      // Reconstruct semantics from the sealed plan, not from a request's own hash.
+      // Recorded paths retain their execution identity when evidence is copied.
+      const target=preflight.plan.targets[i],collection=join(out,`collect-${i}`);
+      const expectedCollection={mode:'collect',runId:ready.runId,trialId:trial.trialId,preflightSha256:ready.preflightSha256,target,observation:preflight.observations[i],environment:preflight.plan.environment,isolationPlan:{environment:preflight.plan.environment,isolationPaths:preflight.plan.isolationPaths},environmentTrees:preflight.sealed.environment.trees,dir:resolve(target.dir),output:join(preflight.output,`collect-${i}`),filters:preflight.plan.filters,command:['createVitest','test',resolve(target.dir),...preflight.plan.filters]};
+      if(!same(trial.request,expectedCollection)||!same(read(join(collection,'request.json')),expectedCollection)) throw Error('collection request semantics mismatch');
+      if(fileHash(join(collection,'inventory.json'))!==trial.inventorySha256 || fileHash(join(collection,'settings.json'))!==trial.settingsSha256 || !same(read(join(collection,'settings.json')),trial.settings)) throw Error('changed collection');
+      if(!same(trial.settings.command,expectedCollection.command)) throw Error('collection command mismatch');
+      for(const [k,v] of Object.entries(preflight.plan.expected)) if(!same(k==='cache'&&typeof v==='boolean'?trial.settings[k]!==false:trial.settings[k],v)) throw Error(`recorded effective setting mismatch: ${k}`);
+      const collectedExit=read(join(collection,'exit.json'));
+      if(collectedExit.exitCode!==0||collectedExit.signal!==null||collectedExit.error!==null) throw Error('collection did not terminate successfully');
+      const inventory=read(join(collection,'inventory.json'));
+      if(inventory.tests.some(t=>t.mode!=='run')||inventory.suites.some(s=>s.mode!=='run')) throw Error('unverified planned skipped/todo status');
       const runtime=read(join(dir,'runtime.json'));
       if(runtime.runId!==ready.runId||runtime.trialId!==trial.trialId||runtime.inventorySha256!==trial.inventorySha256||runtime.preflightSha256!==ready.preflightSha256) throw Error('another trial runtime');
+      if(!same(inventory.suites.map(s=>s.id).sort(),runtime.suites.map(s=>s.id).sort())) throw Error('runtime suite inventory mismatch');
       const request=read(join(dir,'request.json')),settings=read(join(dir,'settings.json'));
-      if(digest(request.target)!==digest(preflight.plan.targets[i])||request.runId!==ready.runId||request.trialId!==trial.trialId||digest(settings)!==digest(trial.settings)) throw Error('request/settings binding mismatch');
+      const expectedRequest={...expectedCollection,mode:'run',output:join(preflight.output,`trial-${i}`),inventorySha256:trial.inventorySha256,expectedSettings:trial.settings};
+      if(!same(request,expectedRequest)||!same(settings,trial.settings)) throw Error('request/settings binding mismatch');
       const signals=['stdout.log','stderr.log'].flatMap(f=>readFileSync(join(dir,f),'utf8').split(/\r?\n/).filter(l=>/unhandled (?:rejection|error)|AbortError|worker.*(?:crash|exit)/i.test(l)));
-      const assessed=assess({exitCode:read(join(dir,'exit.json')).exitCode,runtime,provenanceVerified:true},read(join(dir,'vitest.json')),read(join(trial.request.output,'inventory.json')),signals);
+      const exit=read(join(dir,'exit.json'));
+      if(record.exitCode!==exit.exitCode||record.provenanceVerified!==true||exit.signal!==null||exit.error!==null) throw Error('inconsistent or incomplete recorded termination');
+      const assessed=assess({exitCode:exit.exitCode,runtime,provenanceVerified:true},read(join(dir,'vitest.json')),inventory,signals);
+      if(!same(record.assessment,assessed)) throw Error('saved assessment differs from recomputation');
       return {trialId:trial.trialId,status:assessed.status};
     });
     const result={status:results.every(r=>r.status==='PASS')?'PASS':'NONPASS',runId:ready.runId,results};
