@@ -1,0 +1,20 @@
+{
+  "head": "53f913804b1bcd91c88decd0870b26a796d1f32b",
+  "tree": "4ec00e6c7d95290711ba3f8bfdedbbc59bc0bbdb",
+  "method": "filesystem readback in independent process",
+  "files": 513,
+  "bodies": 2756,
+  "mismatches": 0,
+  "opaqueJson": [
+    {
+      "path": "p2/malformed-json/input/run-01/vitest.json",
+      "reason": "raw retained malformed JSON fixture; integrity only, not JSON validity"
+    },
+    {
+      "path": "runtime-retry/normal-duplicates/interrupted/trial-0/runtime.json",
+      "reason": "raw retained malformed JSON fixture; integrity only, not JSON validity"
+    }
+  ],
+  "manifestSha256": "80ef0d7e3f9a72b06575bedbf75d2af1ec85ce422261e95cae2d145f5a874ff9",
+  "limits": "byte integrity is not historical execution authenticity"
+}

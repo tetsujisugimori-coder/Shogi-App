@@ -1,0 +1,41 @@
+{
+  "targets": [
+    {
+      "repo": "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\repo",
+      "dir": "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\stage-w1f-20261116\\pair-retry\\old",
+      "head": "e1ccb1a2412e7faa86c2c1f60fdad1dca154023a"
+    },
+    {
+      "repo": "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\repo",
+      "dir": "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\stage-w1f-20261116\\pair-retry\\new",
+      "head": "2a8a57b6ff207831c77ce62d27d3151eba7c1dc3"
+    }
+  ],
+  "filters": [
+    "src/test/game-blunder-pilot.test.ts"
+  ],
+  "expected": {
+    "pool": "forks",
+    "maxWorkers": 2,
+    "testTimeout": 5000,
+    "cache": true
+  },
+  "environments": [
+    {
+      "TEMP": "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\stage-w1f-20261116\\pair-retry\\0-temp",
+      "TMP": "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\stage-w1f-20261116\\pair-retry\\0-temp",
+      "npm_config_cache": "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\stage-w1f-20261116\\pair-retry\\0-npm-cache"
+    },
+    {
+      "TEMP": "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\stage-w1f-20261116\\pair-retry\\1-temp",
+      "TMP": "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\stage-w1f-20261116\\pair-retry\\1-temp",
+      "npm_config_cache": "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\stage-w1f-20261116\\pair-retry\\1-npm-cache"
+    }
+  ],
+  "runId": "stage-w1f-20261116",
+  "trialId": "fresh-pair-1",
+  "preSeals": [
+    "fb2bd60a27d5363792b53a37c1f973c4332c73715ddd195c8a0c1bfb8b83519a",
+    "3677c9fc17f11ab8e3b0e2f1338406c673083c49548ebfc6eac604d08ee1f7f2"
+  ]
+}

@@ -1,0 +1,11 @@
+{
+  "started": "2026-11-16T12:07:24.219Z",
+  "finished": "2026-11-16T12:07:24.570Z",
+  "command": [
+    "node",
+    "scripts/verify-lockfile.mjs"
+  ],
+  "exitCode": 0,
+  "signal": null,
+  "error": null
+}

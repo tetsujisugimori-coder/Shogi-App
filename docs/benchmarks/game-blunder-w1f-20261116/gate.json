@@ -1,0 +1,38 @@
+{
+  "status": "NOT_READY",
+  "outcome": "B",
+  "comparison": "NOT_TESTED",
+  "comparisonSpawns": {
+    "old": 0,
+    "new": 0
+  },
+  "S4": "NOT_TESTED",
+  "S5": "NOT_TESTED",
+  "checks": {
+    "cacheConfiguration": {
+      "status": "PASS",
+      "scope": "configuration identity only; result semantics UNKNOWN"
+    },
+    "settingsEqual": true,
+    "normalizedFullConfigEqual": false,
+    "source": true,
+    "lock": true,
+    "initialDependencies": true,
+    "inventoryEqual": true,
+    "unusedOutput": true
+  },
+  "blocking": [
+    "exclusive writer and native lifecycle UNKNOWN",
+    "complete effective config equivalence UNKNOWN",
+    "result cache semantic safety NOT_ESTABLISHED",
+    "real admission independent review not established"
+  ],
+  "R8": "UNKNOWN",
+  "H1": "UNKNOWN",
+  "H2": "UNKNOWN",
+  "H3": "UNKNOWN",
+  "H4": "UNKNOWN",
+  "merge": "NO",
+  "draft": true,
+  "scope": "no real comparison spawn API; OS-wide process absence not asserted"
+}

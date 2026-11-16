@@ -1,0 +1,17 @@
+{
+  "command": [
+    "C:\\Program Files\\nodejs\\node.exe",
+    "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\repo\\scripts\\stage-w1b-runner.mjs",
+    "prepare",
+    "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\repo\\docs\\benchmarks\\game-blunder-w1f-20261116\\runtime-retry\\assertion-failure\\plan.json",
+    "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\repo\\docs\\benchmarks\\game-blunder-w1f-20261116\\runtime-retry\\assertion-failure\\record"
+  ],
+  "exitCode": 0,
+  "signal": null,
+  "stdout": "{\"status\":\"READY\",\"runId\":\"1198e818-04d5-4285-84f8-90d6330ef919\"}\n",
+  "stderr": "",
+  "result": {
+    "status": "READY",
+    "runId": "1198e818-04d5-4285-84f8-90d6330ef919"
+  }
+}

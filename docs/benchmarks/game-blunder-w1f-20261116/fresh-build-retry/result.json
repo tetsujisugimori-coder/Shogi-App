@@ -1,0 +1,13 @@
+{
+  "started": "2026-11-16T12:07:13.739Z",
+  "finished": "2026-11-16T12:11:38.183Z",
+  "command": [
+    "node",
+    "scripts/stage-w1e-snapshots.mjs",
+    "../stage-w1f-20261116/pair-retry",
+    "docs/benchmarks/game-blunder-w1f-20261116/build-retry"
+  ],
+  "exitCode": 0,
+  "signal": null,
+  "error": null
+}

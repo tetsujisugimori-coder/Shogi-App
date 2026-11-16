@@ -1,0 +1,1 @@
+{"headRefName":"codex/game-blunder-diagnostics","headRefOid":"53f913804b1bcd91c88decd0870b26a796d1f32b","isDraft":true,"number":218,"state":"OPEN","url":"https://github.com/tetsujisugimori-coder/Shogi-App/pull/218"}

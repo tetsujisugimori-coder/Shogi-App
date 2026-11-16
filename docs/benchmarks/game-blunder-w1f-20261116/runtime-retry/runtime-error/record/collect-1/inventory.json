@@ -1,0 +1,16 @@
+{
+  "tests": [
+    {
+      "file": "C:/Users/tetsu/Documents/ChatGPT/将棋アプリ/stage-w1f-20261116/runtime-retry/runtime-error/b/tiny.test.js",
+      "name": "pass with runtime error",
+      "mode": "run"
+    }
+  ],
+  "suites": [
+    {
+      "id": "-270551241",
+      "file": "C:/Users/tetsu/Documents/ChatGPT/将棋アプリ/stage-w1f-20261116/runtime-retry/runtime-error/b/tiny.test.js",
+      "mode": "run"
+    }
+  ]
+}

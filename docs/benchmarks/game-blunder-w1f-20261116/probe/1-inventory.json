@@ -1,0 +1,31 @@
+{
+  "tests": [
+    {
+      "id": "260848957_0_0",
+      "name": "uses next-ply capture as a trigger, not any unrelated move or drop",
+      "file": "C:/Users/tetsu/Documents/ChatGPT/将棋アプリ/stage-w1f-20261116/pair-retry/new/src/test/game-blunder-pilot.test.ts",
+      "mode": "run"
+    },
+    {
+      "id": "260848957_0_1",
+      "name": "excludes incomplete and corrupt journals",
+      "file": "C:/Users/tetsu/Documents/ChatGPT/将棋アプリ/stage-w1f-20261116/pair-retry/new/src/test/game-blunder-pilot.test.ts",
+      "mode": "run"
+    }
+  ],
+  "suites": [
+    {
+      "id": "260848957",
+      "name": "src/test/game-blunder-pilot.test.ts",
+      "file": "C:/Users/tetsu/Documents/ChatGPT/将棋アプリ/stage-w1f-20261116/pair-retry/new/src/test/game-blunder-pilot.test.ts",
+      "mode": "run"
+    },
+    {
+      "id": "260848957_0",
+      "name": "game blunder pilot",
+      "file": "C:/Users/tetsu/Documents/ChatGPT/将棋アプリ/stage-w1f-20261116/pair-retry/new/src/test/game-blunder-pilot.test.ts",
+      "mode": "run"
+    }
+  ],
+  "unhandledErrors": []
+}

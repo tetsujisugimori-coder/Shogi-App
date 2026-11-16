@@ -3,6 +3,7 @@
 import fs from 'node:fs';
 import {resolve,join,relative,isAbsolute} from 'node:path';
 import {digest,hash,physical} from './stage-w1b-preflight.mjs';
+import {cacheIdentity} from './stage-w1f-cache.mjs';
 export const CONTRACT=Object.freeze({version:1,path:'node_modules/.vite-temp',type:'directory',from:'S1',to:'S2',operation:'mkdir',content:'empty',actor:'instrumented-node-api',residue:'empty-directory-at-close',reuse:false,asymmetry:false,filesAllowed:0});
 export const CONTRACT_SHA=digest(CONTRACT);
 export function actor() {return {node:process.version,executable:fs.realpathSync(process.execPath),executableSha256:hash(fs.readFileSync(process.execPath)),cwd:fs.realpathSync(process.cwd())};}
@@ -49,7 +50,10 @@ export function identity(expected,current,{fixture=false}={}) {
     same(physical(t.root).replaceAll('\\','/'),t.physical,'PHYSICAL_CHANGED');same(physical(join(t.root,'node_modules')).replaceAll('\\','/'),t.dependencyPhysical,'PHYSICAL_CHANGED');
   }
   same(expected.bindings,current.bindings,'ENVIRONMENT_CHANGED');
-  const s=current.bindings.settings;if(s.maxWorkers!==2||s.testTimeout!==5000||s.environment!=='jsdom'||s.cache!==true||!s.setupFiles?.length)fail('SETTINGS');
+  const s=current.bindings.settings;if(s.maxWorkers!==2||s.testTimeout!==5000||s.environment!=='jsdom'||!s.setupFiles?.length)fail('SETTINGS');
+  // Boolean true is retained only for legacy synthetic fixtures. A live resolved
+  // cache must provide its directory and be checked against the physical snapshot.
+  if(!(fixture&&s.cache===true))cacheIdentity(s,a.root,{fixture});
   if(current.outputExists)fail('OUTPUT_REUSE');
   return {status:'PASS',fixture};
 }

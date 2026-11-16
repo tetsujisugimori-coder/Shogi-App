@@ -1,0 +1,23 @@
+{
+  "runId": "358c9bda-a312-4d83-989d-6e54d18117be",
+  "trialId": "be072e49-b7ef-4031-9579-dc4efed42e50",
+  "preflightSha256": "889d33920d339533132ca2a3b2b88ed0545a6ab828f8ed08da4d2a96cabe70d9",
+  "inventorySha256": "65ac9b708f4fce784e43930370545a394894bf444b1a8dbae1ceca9098cc8139",
+  "reason": "passed",
+  "unhandledErrors": [
+    {
+      "name": "Error",
+      "message": "W1d intentional runtime error",
+      "type": "Uncaught Exception"
+    }
+  ],
+  "suites": [
+    {
+      "id": "-270551241",
+      "file": "C:/Users/tetsu/Documents/ChatGPT/将棋アプリ/stage-w1f-20261116/runtime-retry/runtime-error/a/tiny.test.js",
+      "root": true,
+      "mode": "run",
+      "state": "pass"
+    }
+  ]
+}

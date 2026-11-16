@@ -1,0 +1,96 @@
+{
+  "baselineHead": "53f913804b1bcd91c88decd0870b26a796d1f32b",
+  "baselineGitBlob": "515640f9c18f87015eb2a0e647cbf1550b92fcbc",
+  "baselineRawSha256": "ff903a66ebf6b6180b5a15744f3701459f5dec1cd6109d17e94ddcb5889234b4",
+  "executionCopy": "only dependency import URL substituted; original bytes retained separately",
+  "results": [
+    {
+      "scope": "same Windows resolved settings and same physical inputs",
+      "input": {
+        "actor": {
+          "node": "v24.20.0",
+          "executable": "C:\\Program Files\\nodejs\\node.exe",
+          "executableSha256": "5c976096e04e5c2c1f091938926234cc9fbebfe9787ddd149351b3b0ecc707b5",
+          "cwd": "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\repo"
+        },
+        "targets": [
+          {
+            "head": "e1ccb1a2412e7faa86c2c1f60fdad1dca154023a",
+            "root": "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\stage-w1f-20261116\\pair-retry\\old",
+            "physical": "C:/Users/tetsu/Documents/ChatGPT/将棋アプリ/stage-w1f-20261116/pair-retry/old",
+            "dependencyPhysical": "C:/Users/tetsu/Documents/ChatGPT/将棋アプリ/stage-w1f-20261116/pair-retry/old/node_modules"
+          },
+          {
+            "head": "2a8a57b6ff207831c77ce62d27d3151eba7c1dc3",
+            "root": "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\stage-w1f-20261116\\pair-retry\\new",
+            "physical": "C:/Users/tetsu/Documents/ChatGPT/将棋アプリ/stage-w1f-20261116/pair-retry/new",
+            "dependencyPhysical": "C:/Users/tetsu/Documents/ChatGPT/将棋アプリ/stage-w1f-20261116/pair-retry/new/node_modules"
+          }
+        ],
+        "bindings": {
+          "settings": {
+            "pool": "forks",
+            "maxWorkers": 2,
+            "testTimeout": 5000,
+            "environment": "jsdom",
+            "setupFiles": [
+              "C:/Users/tetsu/Documents/ChatGPT/将棋アプリ/stage-w1f-20261116/pair-retry/old/src/test/setup.ts"
+            ],
+            "cache": {
+              "dir": "C:/Users/tetsu/Documents/ChatGPT/将棋アプリ/stage-w1f-20261116/pair-retry/old/node_modules/.vite/vitest/da39a3ee5e6b4b0d3255bfef95601890afd80709"
+            },
+            "cacheDir": "C:/Users/tetsu/Documents/ChatGPT/将棋アプリ/stage-w1f-20261116/pair-retry/old/node_modules/.vite/vitest/da39a3ee5e6b4b0d3255bfef95601890afd80709"
+          }
+        },
+        "outputExists": false
+      },
+      "red": "SETTINGS",
+      "green": "PASS",
+      "comparisonSpawns": 0
+    },
+    {
+      "scope": "same Windows resolved settings and same physical inputs",
+      "input": {
+        "actor": {
+          "node": "v24.20.0",
+          "executable": "C:\\Program Files\\nodejs\\node.exe",
+          "executableSha256": "5c976096e04e5c2c1f091938926234cc9fbebfe9787ddd149351b3b0ecc707b5",
+          "cwd": "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\repo"
+        },
+        "targets": [
+          {
+            "head": "2a8a57b6ff207831c77ce62d27d3151eba7c1dc3",
+            "root": "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\stage-w1f-20261116\\pair-retry\\new",
+            "physical": "C:/Users/tetsu/Documents/ChatGPT/将棋アプリ/stage-w1f-20261116/pair-retry/new",
+            "dependencyPhysical": "C:/Users/tetsu/Documents/ChatGPT/将棋アプリ/stage-w1f-20261116/pair-retry/new/node_modules"
+          },
+          {
+            "head": "e1ccb1a2412e7faa86c2c1f60fdad1dca154023a",
+            "root": "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\stage-w1f-20261116\\pair-retry\\old",
+            "physical": "C:/Users/tetsu/Documents/ChatGPT/将棋アプリ/stage-w1f-20261116/pair-retry/old",
+            "dependencyPhysical": "C:/Users/tetsu/Documents/ChatGPT/将棋アプリ/stage-w1f-20261116/pair-retry/old/node_modules"
+          }
+        ],
+        "bindings": {
+          "settings": {
+            "pool": "forks",
+            "maxWorkers": 2,
+            "testTimeout": 5000,
+            "environment": "jsdom",
+            "setupFiles": [
+              "C:/Users/tetsu/Documents/ChatGPT/将棋アプリ/stage-w1f-20261116/pair-retry/new/src/test/setup.ts"
+            ],
+            "cache": {
+              "dir": "C:/Users/tetsu/Documents/ChatGPT/将棋アプリ/stage-w1f-20261116/pair-retry/new/node_modules/.vite/vitest/da39a3ee5e6b4b0d3255bfef95601890afd80709"
+            },
+            "cacheDir": "C:/Users/tetsu/Documents/ChatGPT/将棋アプリ/stage-w1f-20261116/pair-retry/new/node_modules/.vite/vitest/da39a3ee5e6b4b0d3255bfef95601890afd80709"
+          }
+        },
+        "outputExists": false
+      },
+      "red": "SETTINGS",
+      "green": "PASS",
+      "comparisonSpawns": 0
+    }
+  ]
+}

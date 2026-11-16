@@ -1,0 +1,13 @@
+{
+  "started": "2026-11-16T12:14:33.316Z",
+  "finished": "2026-11-16T12:14:34.485Z",
+  "command": [
+    "node",
+    "scripts/stage-w1d-runtime-controls.mjs",
+    "docs/benchmarks/game-blunder-w1f-20261116/runtime",
+    "../stage-w1f-20261116/runtime"
+  ],
+  "exitCode": 1,
+  "signal": null,
+  "error": null
+}

@@ -1,0 +1,101 @@
+{
+  "status": "UNKNOWN",
+  "rule": "snapshot-prefix only; diagnostic diff, no new allowance",
+  "differences": [
+    {
+      "path": "config.vite.cacheDir",
+      "old": "C:/Users/tetsu/Documents/ChatGPT/将棋アプリ/stage-w1f-20261116/pair-retry/old/node_modules/.vite/vitest/da39a3ee5e6b4b0d3255bfef95601890afd80709",
+      "new": "C:/Users/tetsu/Documents/ChatGPT/将棋アプリ/stage-w1f-20261116/pair-retry/new/node_modules/.vite/vitest/da39a3ee5e6b4b0d3255bfef95601890afd80709"
+    },
+    {
+      "path": "config.vite.configFile",
+      "old": "C:/Users/tetsu/Documents/ChatGPT/将棋アプリ/stage-w1f-20261116/pair-retry/old/vite.config.ts",
+      "new": "C:/Users/tetsu/Documents/ChatGPT/将棋アプリ/stage-w1f-20261116/pair-retry/new/vite.config.ts"
+    },
+    {
+      "path": "config.vite.configFileDependencies.0",
+      "old": "C:/Users/tetsu/Documents/ChatGPT/将棋アプリ/stage-w1f-20261116/pair-retry/old/vite.config.ts",
+      "new": "C:/Users/tetsu/Documents/ChatGPT/将棋アプリ/stage-w1f-20261116/pair-retry/new/vite.config.ts"
+    },
+    {
+      "path": "config.vite.envDir",
+      "old": "C:/Users/tetsu/Documents/ChatGPT/将棋アプリ/stage-w1f-20261116/pair-retry/old",
+      "new": "C:/Users/tetsu/Documents/ChatGPT/将棋アプリ/stage-w1f-20261116/pair-retry/new"
+    },
+    {
+      "path": "config.vite.environments.__vitest__.resolve.alias.1.replacement",
+      "old": "/@fs/C:/Users/tetsu/Documents/ChatGPT/将棋アプリ/stage-w1f-20261116/pair-retry/old/node_modules/vite/dist/client/env.mjs",
+      "new": "/@fs/C:/Users/tetsu/Documents/ChatGPT/将棋アプリ/stage-w1f-20261116/pair-retry/new/node_modules/vite/dist/client/env.mjs"
+    },
+    {
+      "path": "config.vite.environments.__vitest__.resolve.alias.2.replacement",
+      "old": "/@fs/C:/Users/tetsu/Documents/ChatGPT/将棋アプリ/stage-w1f-20261116/pair-retry/old/node_modules/vite/dist/client/client.mjs",
+      "new": "/@fs/C:/Users/tetsu/Documents/ChatGPT/将棋アプリ/stage-w1f-20261116/pair-retry/new/node_modules/vite/dist/client/client.mjs"
+    },
+    {
+      "path": "config.vite.publicDir",
+      "old": "C:/Users/tetsu/Documents/ChatGPT/将棋アプリ/stage-w1f-20261116/pair-retry/old/public",
+      "new": "C:/Users/tetsu/Documents/ChatGPT/将棋アプリ/stage-w1f-20261116/pair-retry/new/public"
+    },
+    {
+      "path": "config.vite.root",
+      "old": "C:/Users/tetsu/Documents/ChatGPT/将棋アプリ/stage-w1f-20261116/pair-retry/old",
+      "new": "C:/Users/tetsu/Documents/ChatGPT/将棋アプリ/stage-w1f-20261116/pair-retry/new"
+    },
+    {
+      "path": "config.vite.server.fs.allow.0",
+      "old": "C:/Users/tetsu/Documents/ChatGPT/将棋アプリ/stage-w1f-20261116/pair-retry/old",
+      "new": "C:/Users/tetsu/Documents/ChatGPT/将棋アプリ/stage-w1f-20261116/pair-retry/new"
+    },
+    {
+      "path": "config.vite.server.fs.allow.1",
+      "old": "C:/Users/tetsu/Documents/ChatGPT/将棋アプリ/stage-w1f-20261116/pair-retry/old",
+      "new": "C:/Users/tetsu/Documents/ChatGPT/将棋アプリ/stage-w1f-20261116/pair-retry/new"
+    },
+    {
+      "path": "config.vite.server.fs.allow.2",
+      "old": "C:/Users/tetsu/Documents/ChatGPT/将棋アプリ/stage-w1f-20261116/pair-retry/old/node_modules/vitest",
+      "new": "C:/Users/tetsu/Documents/ChatGPT/将棋アプリ/stage-w1f-20261116/pair-retry/new/node_modules/vitest"
+    },
+    {
+      "path": "config.vite.webSocketToken",
+      "old": "eDBB8wfIw1md",
+      "new": "CbcZKOlkzPaj"
+    },
+    {
+      "path": "config.vitest.api.token",
+      "old": "67c941e4-5a7c-4b59-b538-3b33b017db6c",
+      "new": "d513ab66-0852-4092-abc7-d0929486826b"
+    },
+    {
+      "path": "config.vitest.attachmentsDir",
+      "old": "C:/Users/tetsu/Documents/ChatGPT/将棋アプリ/stage-w1f-20261116/pair-retry/old/.vitest-attachments",
+      "new": "C:/Users/tetsu/Documents/ChatGPT/将棋アプリ/stage-w1f-20261116/pair-retry/new/.vitest-attachments"
+    },
+    {
+      "path": "config.vitest.cache.dir",
+      "old": "C:/Users/tetsu/Documents/ChatGPT/将棋アプリ/stage-w1f-20261116/pair-retry/old/node_modules/.vite/vitest/da39a3ee5e6b4b0d3255bfef95601890afd80709",
+      "new": "C:/Users/tetsu/Documents/ChatGPT/将棋アプリ/stage-w1f-20261116/pair-retry/new/node_modules/.vite/vitest/da39a3ee5e6b4b0d3255bfef95601890afd80709"
+    },
+    {
+      "path": "config.vitest.coverage.exclude.2",
+      "old": "C:/Users/tetsu/Documents/ChatGPT/将棋アプリ/stage-w1f-20261116/pair-retry/old/vite.config.ts",
+      "new": "C:/Users/tetsu/Documents/ChatGPT/将棋アプリ/stage-w1f-20261116/pair-retry/new/vite.config.ts"
+    },
+    {
+      "path": "config.vitest.forceRerunTriggers.2",
+      "old": "C:/Users/tetsu/Documents/ChatGPT/将棋アプリ/stage-w1f-20261116/pair-retry/old/src/test/setup.ts",
+      "new": "C:/Users/tetsu/Documents/ChatGPT/将棋アプリ/stage-w1f-20261116/pair-retry/new/src/test/setup.ts"
+    },
+    {
+      "path": "config.vitest.root",
+      "old": "C:/Users/tetsu/Documents/ChatGPT/将棋アプリ/stage-w1f-20261116/pair-retry/old",
+      "new": "C:/Users/tetsu/Documents/ChatGPT/将棋アプリ/stage-w1f-20261116/pair-retry/new"
+    },
+    {
+      "path": "config.vitest.setupFiles.0",
+      "old": "C:/Users/tetsu/Documents/ChatGPT/将棋アプリ/stage-w1f-20261116/pair-retry/old/src/test/setup.ts",
+      "new": "C:/Users/tetsu/Documents/ChatGPT/将棋アプリ/stage-w1f-20261116/pair-retry/new/src/test/setup.ts"
+    }
+  ]
+}

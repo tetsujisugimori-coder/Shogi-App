@@ -1,0 +1,9 @@
+
+ RUN  v4.1.11 C:/Users/tetsu/Documents/ChatGPT/将棋アプリ/repo
+
+
+ Test Files  1 passed (1)
+      Tests  2 passed (2)
+   Start at  21:16:02
+   Duration  2.13s (transform 458ms, setup 162ms, import 594ms, tests 29ms, environment 891ms)
+

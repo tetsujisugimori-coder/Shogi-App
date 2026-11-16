@@ -1,0 +1,42 @@
+{
+  "sameInput": {
+    "actor": {
+      "node": "v24.20.0",
+      "executable": "/node",
+      "executableSha256": "hash",
+      "cwd": "/work"
+    },
+    "targets": [
+      {
+        "root": "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\fixture\\old",
+        "physical": "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\fixture\\old",
+        "dependencyPhysical": "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\fixture\\old\\node_modules",
+        "head": "old"
+      },
+      {
+        "root": "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\fixture\\new",
+        "physical": "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\fixture\\new",
+        "dependencyPhysical": "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\fixture\\new\\node_modules",
+        "head": "new"
+      }
+    ],
+    "bindings": {
+      "settings": {
+        "maxWorkers": 2,
+        "testTimeout": 5000,
+        "environment": "jsdom",
+        "setupFiles": [
+          "setup.ts"
+        ],
+        "cache": {
+          "dir": "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\fixture\\old\\node_modules\\.vite\\vitest"
+        },
+        "cacheDir": "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\fixture\\old\\node_modules\\.vite\\vitest"
+      }
+    }
+  },
+  "result": {
+    "status": "PASS",
+    "fixture": true
+  }
+}

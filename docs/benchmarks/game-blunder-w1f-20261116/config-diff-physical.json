@@ -1,0 +1,16 @@
+{
+  "status": "UNKNOWN",
+  "rule": "only snapshot prefix normalized; no difference is permitted by this diagnostic",
+  "differences": [
+    {
+      "path": "config.vite.webSocketToken",
+      "old": "eDBB8wfIw1md",
+      "new": "CbcZKOlkzPaj"
+    },
+    {
+      "path": "config.vitest.api.token",
+      "old": "67c941e4-5a7c-4b59-b538-3b33b017db6c",
+      "new": "d513ab66-0852-4092-abc7-d0929486826b"
+    }
+  ]
+}

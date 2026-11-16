@@ -1,0 +1,1 @@
+{"root":"C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\stage-w1f-20261116\\pair-retry","out":"C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\repo\\docs\\benchmarks\\game-blunder-w1f-20261116\\build-retry","equality":{"status":"PASS"},"sourceCounts":[2104,2211]}

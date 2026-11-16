@@ -1,0 +1,11 @@
+file:///C:/Users/tetsu/Documents/ChatGPT/%E5%B0%86%E6%A3%8B%E3%82%A2%E3%83%97%E3%83%AA/repo/scripts/stage-w1e-snapshots.mjs:16
+if(process.version!=='v24.20.0'||execFileSync(process.execPath,[npm,'--version'],{encoding:'utf8'}).trim()!=='11.17.0')throw Error('W1c Windows build requires Node v24.20.0 / npm 11.17.0; supply W1C_NPM_CLI');
+                                                                                                                             ^
+
+Error: W1c Windows build requires Node v24.20.0 / npm 11.17.0; supply W1C_NPM_CLI
+    at file:///C:/Users/tetsu/Documents/ChatGPT/%E5%B0%86%E6%A3%8B%E3%82%A2%E3%83%97%E3%83%AA/repo/scripts/stage-w1e-snapshots.mjs:16:126
+    at ModuleJob.run (node:internal/modules/esm/module_job:561:25)
+    at async node:internal/modules/esm/loader:647:26
+    at async asyncRunEntryPointWithESMLoader (node:internal/modules/run_main:101:5)
+
+Node.js v24.20.0

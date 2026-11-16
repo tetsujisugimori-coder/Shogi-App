@@ -1,0 +1,11 @@
+✔ real sync callback promise FileHandle APIs and raw-event mutation reasons (29.0323ms)
+✔ live cache directory substitution and type (1.8718ms)
+✔ live junction including dangling target (4.2518ms)
+ℹ tests 3
+ℹ suites 0
+ℹ pass 3
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 395.2011

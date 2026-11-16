@@ -1,0 +1,12 @@
+{
+  "started": "2026-11-16T12:05:09.623Z",
+  "finished": "2026-11-16T12:05:10.322Z",
+  "command": [
+    "node",
+    "--test",
+    "scripts/stage-w1f-check.mjs"
+  ],
+  "exitCode": 0,
+  "signal": null,
+  "error": null
+}
