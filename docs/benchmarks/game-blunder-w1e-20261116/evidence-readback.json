@@ -1,0 +1,10 @@
+{
+  "at": "2026-11-16T10:54:58.831Z",
+  "method": "filesystem raw readback",
+  "head": "27b83e8300460de992060d439ac77c8680ed32ba",
+  "tree": "9ce0b2e05dce4222425761225b1900194891f514",
+  "files": 97,
+  "bodies": 3824,
+  "mismatches": 0,
+  "manifestSha256": "0b6cc1e456d77a8a7da0ec2cd17cc8a906c3186a1317d8617d7e81ec2f5db98a"
+}

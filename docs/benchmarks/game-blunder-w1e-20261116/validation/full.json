@@ -1,0 +1,14 @@
+{
+  "name": "full",
+  "command": [
+    "C:\\Program Files\\nodejs\\node.exe",
+    "node_modules/vitest/vitest.mjs",
+    "run"
+  ],
+  "cwd": "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\repo",
+  "started": "2026-11-16T10:45:34.128Z",
+  "finished": "2026-11-16T10:48:25.997Z",
+  "exitCode": 1,
+  "signal": null,
+  "error": null
+}

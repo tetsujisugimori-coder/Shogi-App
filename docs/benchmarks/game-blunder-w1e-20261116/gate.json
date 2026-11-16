@@ -1,0 +1,40 @@
+{
+  "at": "2026-11-16T10:47:30.361Z",
+  "status": "NOT_READY",
+  "outcome": "B",
+  "comparison": "NOT_TESTED",
+  "comparisonSpawns": {
+    "old": 0,
+    "new": 0
+  },
+  "eventMeaning": "W1e observer and gate have no comparison spawn API; does not assert absence of OS-wide processes",
+  "S4": "NOT_TESTED",
+  "S5": "NOT_TESTED",
+  "checks": {
+    "actorUnchanged": true,
+    "probeNodeMatches": true,
+    "differentHeads": true,
+    "independentPhysical": true,
+    "source": true,
+    "initialDependencies": true,
+    "lock": true,
+    "vitest": true,
+    "settings": false,
+    "settingsEqual": true,
+    "inventoryEqual": true,
+    "unusedComparisonOutput": true,
+    "isolation": true
+  },
+  "blocking": [
+    "TEMP transformed source semantics and all producer/lifecycle constraints not established",
+    "default Vitest results cache carries duration and success/failure; no allowance",
+    "complete effective config including function closure/native state not proven",
+    "candidate endpoint-directory acceptance is synthetic, not a production allowance"
+  ],
+  "strictProductionSeals": "UNCHANGED",
+  "R8": "UNKNOWN",
+  "H1": "UNKNOWN",
+  "H2": "UNKNOWN",
+  "H3": "UNKNOWN",
+  "H4": "UNKNOWN"
+}

@@ -1,0 +1,1963 @@
+{
+  "scope": "synthetic controls, not Windows runtime provenance",
+  "outcomes": [
+    {
+      "name": "normal",
+      "input": {
+        "contract": {
+          "version": 1,
+          "path": "node_modules/.vite-temp",
+          "type": "directory",
+          "from": "S1",
+          "to": "S2",
+          "operation": "mkdir",
+          "content": "empty",
+          "actor": "instrumented-node-api",
+          "residue": "empty-directory-at-close",
+          "reuse": false,
+          "asymmetry": false,
+          "filesAllowed": 0
+        },
+        "request": {
+          "trialId": "fixture-1"
+        },
+        "assessment": {
+          "status": "CANDIDATE"
+        },
+        "usedTrialIds": [],
+        "interrupted": false,
+        "targets": [
+          {
+            "root": "C:\\fixture\\old",
+            "pid": 100,
+            "started": "2026-11-16T00:00:00Z",
+            "finished": "2026-11-16T00:01:00Z",
+            "transitions": [
+              {
+                "path": "node_modules/.vite-temp",
+                "absolute": "C:\\fixture\\old\\node_modules\\.vite-temp",
+                "before": null,
+                "after": {
+                  "type": "directory",
+                  "entries": []
+                },
+                "from": "S1",
+                "to": "S2",
+                "trialId": "fixture-1",
+                "actor": "instrumented-node-api",
+                "pid": 100,
+                "at": "2026-11-16T00:00:30Z",
+                "residue": {
+                  "type": "directory",
+                  "entries": []
+                }
+              }
+            ]
+          },
+          {
+            "root": "C:\\fixture\\new",
+            "pid": 101,
+            "started": "2026-11-16T00:00:00Z",
+            "finished": "2026-11-16T00:01:00Z",
+            "transitions": [
+              {
+                "path": "node_modules/.vite-temp",
+                "absolute": "C:\\fixture\\new\\node_modules\\.vite-temp",
+                "before": null,
+                "after": {
+                  "type": "directory",
+                  "entries": []
+                },
+                "from": "S1",
+                "to": "S2",
+                "trialId": "fixture-1",
+                "actor": "instrumented-node-api",
+                "pid": 101,
+                "at": "2026-11-16T00:00:30Z",
+                "residue": {
+                  "type": "directory",
+                  "entries": []
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "seals": {
+        "request": "3ce28e38b72c83f8804c963272e159be863b94d174d3e7892f02377c13d999c0",
+        "assessment": "b67a28a167bea32aa50e4c0df1cce1daf102507c105d1dd60da70173e5c375a7"
+      },
+      "red": "STRICT_SEAL",
+      "green": "PASS",
+      "comparisonSpawns": 0
+    },
+    {
+      "name": "outside-new-file",
+      "reason": "OUTSIDE_ALLOWANCE",
+      "input": {
+        "contract": {
+          "version": 1,
+          "path": "node_modules/.vite-temp",
+          "type": "directory",
+          "from": "S1",
+          "to": "S2",
+          "operation": "mkdir",
+          "content": "empty",
+          "actor": "instrumented-node-api",
+          "residue": "empty-directory-at-close",
+          "reuse": false,
+          "asymmetry": false,
+          "filesAllowed": 0
+        },
+        "request": {
+          "trialId": "fixture-1"
+        },
+        "assessment": {
+          "status": "CANDIDATE"
+        },
+        "usedTrialIds": [],
+        "interrupted": false,
+        "targets": [
+          {
+            "root": "C:\\fixture\\old",
+            "pid": 100,
+            "started": "2026-11-16T00:00:00Z",
+            "finished": "2026-11-16T00:01:00Z",
+            "transitions": [
+              {
+                "path": "node_modules/unknown",
+                "absolute": "C:\\fixture\\old\\node_modules\\.vite-temp",
+                "before": null,
+                "after": {
+                  "type": "file"
+                },
+                "from": "S1",
+                "to": "S2",
+                "trialId": "fixture-1",
+                "actor": "instrumented-node-api",
+                "pid": 100,
+                "at": "2026-11-16T00:00:30Z",
+                "residue": {
+                  "type": "directory",
+                  "entries": []
+                }
+              }
+            ]
+          },
+          {
+            "root": "C:\\fixture\\new",
+            "pid": 101,
+            "started": "2026-11-16T00:00:00Z",
+            "finished": "2026-11-16T00:01:00Z",
+            "transitions": [
+              {
+                "path": "node_modules/unknown",
+                "absolute": "C:\\fixture\\new\\node_modules\\.vite-temp",
+                "before": null,
+                "after": {
+                  "type": "file"
+                },
+                "from": "S1",
+                "to": "S2",
+                "trialId": "fixture-1",
+                "actor": "instrumented-node-api",
+                "pid": 101,
+                "at": "2026-11-16T00:00:30Z",
+                "residue": {
+                  "type": "directory",
+                  "entries": []
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "comparisonSpawns": 0,
+      "scope": "pure-validator; no child process API"
+    },
+    {
+      "name": "unknown-empty-directory",
+      "reason": "OUTSIDE_ALLOWANCE",
+      "input": {
+        "contract": {
+          "version": 1,
+          "path": "node_modules/.vite-temp",
+          "type": "directory",
+          "from": "S1",
+          "to": "S2",
+          "operation": "mkdir",
+          "content": "empty",
+          "actor": "instrumented-node-api",
+          "residue": "empty-directory-at-close",
+          "reuse": false,
+          "asymmetry": false,
+          "filesAllowed": 0
+        },
+        "request": {
+          "trialId": "fixture-1"
+        },
+        "assessment": {
+          "status": "CANDIDATE"
+        },
+        "usedTrialIds": [],
+        "interrupted": false,
+        "targets": [
+          {
+            "root": "C:\\fixture\\old",
+            "pid": 100,
+            "started": "2026-11-16T00:00:00Z",
+            "finished": "2026-11-16T00:01:00Z",
+            "transitions": [
+              {
+                "path": "node_modules/unknown",
+                "absolute": "C:\\fixture\\old\\node_modules\\.vite-temp",
+                "before": null,
+                "after": {
+                  "type": "directory",
+                  "entries": []
+                },
+                "from": "S1",
+                "to": "S2",
+                "trialId": "fixture-1",
+                "actor": "instrumented-node-api",
+                "pid": 100,
+                "at": "2026-11-16T00:00:30Z",
+                "residue": {
+                  "type": "directory",
+                  "entries": []
+                }
+              }
+            ]
+          },
+          {
+            "root": "C:\\fixture\\new",
+            "pid": 101,
+            "started": "2026-11-16T00:00:00Z",
+            "finished": "2026-11-16T00:01:00Z",
+            "transitions": [
+              {
+                "path": "node_modules/unknown",
+                "absolute": "C:\\fixture\\new\\node_modules\\.vite-temp",
+                "before": null,
+                "after": {
+                  "type": "directory",
+                  "entries": []
+                },
+                "from": "S1",
+                "to": "S2",
+                "trialId": "fixture-1",
+                "actor": "instrumented-node-api",
+                "pid": 101,
+                "at": "2026-11-16T00:00:30Z",
+                "residue": {
+                  "type": "directory",
+                  "entries": []
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "comparisonSpawns": 0,
+      "scope": "pure-validator; no child process API"
+    },
+    {
+      "name": "existing-content",
+      "reason": "EXISTING_MODIFIED",
+      "input": {
+        "contract": {
+          "version": 1,
+          "path": "node_modules/.vite-temp",
+          "type": "directory",
+          "from": "S1",
+          "to": "S2",
+          "operation": "mkdir",
+          "content": "empty",
+          "actor": "instrumented-node-api",
+          "residue": "empty-directory-at-close",
+          "reuse": false,
+          "asymmetry": false,
+          "filesAllowed": 0
+        },
+        "request": {
+          "trialId": "fixture-1"
+        },
+        "assessment": {
+          "status": "CANDIDATE"
+        },
+        "usedTrialIds": [],
+        "interrupted": false,
+        "targets": [
+          {
+            "root": "C:\\fixture\\old",
+            "pid": 100,
+            "started": "2026-11-16T00:00:00Z",
+            "finished": "2026-11-16T00:01:00Z",
+            "transitions": [
+              {
+                "path": "node_modules/.vite-temp",
+                "absolute": "C:\\fixture\\old\\node_modules\\.vite-temp",
+                "before": {
+                  "type": "file"
+                },
+                "after": {
+                  "type": "file",
+                  "sha256": "bad"
+                },
+                "from": "S1",
+                "to": "S2",
+                "trialId": "fixture-1",
+                "actor": "instrumented-node-api",
+                "pid": 100,
+                "at": "2026-11-16T00:00:30Z",
+                "residue": {
+                  "type": "directory",
+                  "entries": []
+                }
+              }
+            ]
+          },
+          {
+            "root": "C:\\fixture\\new",
+            "pid": 101,
+            "started": "2026-11-16T00:00:00Z",
+            "finished": "2026-11-16T00:01:00Z",
+            "transitions": [
+              {
+                "path": "node_modules/.vite-temp",
+                "absolute": "C:\\fixture\\new\\node_modules\\.vite-temp",
+                "before": {
+                  "type": "file"
+                },
+                "after": {
+                  "type": "file",
+                  "sha256": "bad"
+                },
+                "from": "S1",
+                "to": "S2",
+                "trialId": "fixture-1",
+                "actor": "instrumented-node-api",
+                "pid": 101,
+                "at": "2026-11-16T00:00:30Z",
+                "residue": {
+                  "type": "directory",
+                  "entries": []
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "comparisonSpawns": 0,
+      "scope": "pure-validator; no child process API"
+    },
+    {
+      "name": "directory-to-file",
+      "reason": "TYPE_CHANGE",
+      "input": {
+        "contract": {
+          "version": 1,
+          "path": "node_modules/.vite-temp",
+          "type": "directory",
+          "from": "S1",
+          "to": "S2",
+          "operation": "mkdir",
+          "content": "empty",
+          "actor": "instrumented-node-api",
+          "residue": "empty-directory-at-close",
+          "reuse": false,
+          "asymmetry": false,
+          "filesAllowed": 0
+        },
+        "request": {
+          "trialId": "fixture-1"
+        },
+        "assessment": {
+          "status": "CANDIDATE"
+        },
+        "usedTrialIds": [],
+        "interrupted": false,
+        "targets": [
+          {
+            "root": "C:\\fixture\\old",
+            "pid": 100,
+            "started": "2026-11-16T00:00:00Z",
+            "finished": "2026-11-16T00:01:00Z",
+            "transitions": [
+              {
+                "path": "node_modules/.vite-temp",
+                "absolute": "C:\\fixture\\old\\node_modules\\.vite-temp",
+                "before": {
+                  "type": "directory"
+                },
+                "after": {
+                  "type": "file"
+                },
+                "from": "S1",
+                "to": "S2",
+                "trialId": "fixture-1",
+                "actor": "instrumented-node-api",
+                "pid": 100,
+                "at": "2026-11-16T00:00:30Z",
+                "residue": {
+                  "type": "directory",
+                  "entries": []
+                }
+              }
+            ]
+          },
+          {
+            "root": "C:\\fixture\\new",
+            "pid": 101,
+            "started": "2026-11-16T00:00:00Z",
+            "finished": "2026-11-16T00:01:00Z",
+            "transitions": [
+              {
+                "path": "node_modules/.vite-temp",
+                "absolute": "C:\\fixture\\new\\node_modules\\.vite-temp",
+                "before": {
+                  "type": "directory"
+                },
+                "after": {
+                  "type": "file"
+                },
+                "from": "S1",
+                "to": "S2",
+                "trialId": "fixture-1",
+                "actor": "instrumented-node-api",
+                "pid": 101,
+                "at": "2026-11-16T00:00:30Z",
+                "residue": {
+                  "type": "directory",
+                  "entries": []
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "comparisonSpawns": 0,
+      "scope": "pure-validator; no child process API"
+    },
+    {
+      "name": "symlink-junction-cycle",
+      "reason": "LINK",
+      "input": {
+        "contract": {
+          "version": 1,
+          "path": "node_modules/.vite-temp",
+          "type": "directory",
+          "from": "S1",
+          "to": "S2",
+          "operation": "mkdir",
+          "content": "empty",
+          "actor": "instrumented-node-api",
+          "residue": "empty-directory-at-close",
+          "reuse": false,
+          "asymmetry": false,
+          "filesAllowed": 0
+        },
+        "request": {
+          "trialId": "fixture-1"
+        },
+        "assessment": {
+          "status": "CANDIDATE"
+        },
+        "usedTrialIds": [],
+        "interrupted": false,
+        "targets": [
+          {
+            "root": "C:\\fixture\\old",
+            "pid": 100,
+            "started": "2026-11-16T00:00:00Z",
+            "finished": "2026-11-16T00:01:00Z",
+            "transitions": [
+              {
+                "path": "node_modules/.vite-temp",
+                "absolute": "C:\\fixture\\old\\node_modules\\.vite-temp",
+                "before": null,
+                "after": {
+                  "type": "link",
+                  "target": "."
+                },
+                "from": "S1",
+                "to": "S2",
+                "trialId": "fixture-1",
+                "actor": "instrumented-node-api",
+                "pid": 100,
+                "at": "2026-11-16T00:00:30Z",
+                "residue": {
+                  "type": "directory",
+                  "entries": []
+                }
+              }
+            ]
+          },
+          {
+            "root": "C:\\fixture\\new",
+            "pid": 101,
+            "started": "2026-11-16T00:00:00Z",
+            "finished": "2026-11-16T00:01:00Z",
+            "transitions": [
+              {
+                "path": "node_modules/.vite-temp",
+                "absolute": "C:\\fixture\\new\\node_modules\\.vite-temp",
+                "before": null,
+                "after": {
+                  "type": "link",
+                  "target": "."
+                },
+                "from": "S1",
+                "to": "S2",
+                "trialId": "fixture-1",
+                "actor": "instrumented-node-api",
+                "pid": 101,
+                "at": "2026-11-16T00:00:30Z",
+                "residue": {
+                  "type": "directory",
+                  "entries": []
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "comparisonSpawns": 0,
+      "scope": "pure-validator; no child process API"
+    },
+    {
+      "name": "asymmetric",
+      "reason": "ASYMMETRIC",
+      "input": {
+        "contract": {
+          "version": 1,
+          "path": "node_modules/.vite-temp",
+          "type": "directory",
+          "from": "S1",
+          "to": "S2",
+          "operation": "mkdir",
+          "content": "empty",
+          "actor": "instrumented-node-api",
+          "residue": "empty-directory-at-close",
+          "reuse": false,
+          "asymmetry": false,
+          "filesAllowed": 0
+        },
+        "request": {
+          "trialId": "fixture-1"
+        },
+        "assessment": {
+          "status": "CANDIDATE"
+        },
+        "usedTrialIds": [],
+        "interrupted": false,
+        "targets": [
+          {
+            "root": "C:\\fixture\\old",
+            "pid": 100,
+            "started": "2026-11-16T00:00:00Z",
+            "finished": "2026-11-16T00:01:00Z",
+            "transitions": [
+              {
+                "path": "node_modules/.vite-temp",
+                "absolute": "C:\\fixture\\old\\node_modules\\.vite-temp",
+                "before": null,
+                "after": {
+                  "type": "directory",
+                  "entries": []
+                },
+                "from": "S1",
+                "to": "S2",
+                "trialId": "fixture-1",
+                "actor": "instrumented-node-api",
+                "pid": 100,
+                "at": "2026-11-16T00:00:30Z",
+                "residue": {
+                  "type": "directory",
+                  "entries": []
+                }
+              }
+            ]
+          },
+          {
+            "root": "C:\\fixture\\new",
+            "pid": 101,
+            "started": "2026-11-16T00:00:00Z",
+            "finished": "2026-11-16T00:01:00Z",
+            "transitions": []
+          }
+        ]
+      },
+      "comparisonSpawns": 0,
+      "scope": "pure-validator; no child process API"
+    },
+    {
+      "name": "wrong-phase",
+      "reason": "PHASE",
+      "input": {
+        "contract": {
+          "version": 1,
+          "path": "node_modules/.vite-temp",
+          "type": "directory",
+          "from": "S1",
+          "to": "S2",
+          "operation": "mkdir",
+          "content": "empty",
+          "actor": "instrumented-node-api",
+          "residue": "empty-directory-at-close",
+          "reuse": false,
+          "asymmetry": false,
+          "filesAllowed": 0
+        },
+        "request": {
+          "trialId": "fixture-1"
+        },
+        "assessment": {
+          "status": "CANDIDATE"
+        },
+        "usedTrialIds": [],
+        "interrupted": false,
+        "targets": [
+          {
+            "root": "C:\\fixture\\old",
+            "pid": 100,
+            "started": "2026-11-16T00:00:00Z",
+            "finished": "2026-11-16T00:01:00Z",
+            "transitions": [
+              {
+                "path": "node_modules/.vite-temp",
+                "absolute": "C:\\fixture\\old\\node_modules\\.vite-temp",
+                "before": null,
+                "after": {
+                  "type": "directory",
+                  "entries": []
+                },
+                "from": "S1",
+                "to": "S3",
+                "trialId": "fixture-1",
+                "actor": "instrumented-node-api",
+                "pid": 100,
+                "at": "2026-11-16T00:00:30Z",
+                "residue": {
+                  "type": "directory",
+                  "entries": []
+                }
+              }
+            ]
+          },
+          {
+            "root": "C:\\fixture\\new",
+            "pid": 101,
+            "started": "2026-11-16T00:00:00Z",
+            "finished": "2026-11-16T00:01:00Z",
+            "transitions": [
+              {
+                "path": "node_modules/.vite-temp",
+                "absolute": "C:\\fixture\\new\\node_modules\\.vite-temp",
+                "before": null,
+                "after": {
+                  "type": "directory",
+                  "entries": []
+                },
+                "from": "S1",
+                "to": "S3",
+                "trialId": "fixture-1",
+                "actor": "instrumented-node-api",
+                "pid": 101,
+                "at": "2026-11-16T00:00:30Z",
+                "residue": {
+                  "type": "directory",
+                  "entries": []
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "comparisonSpawns": 0,
+      "scope": "pure-validator; no child process API"
+    },
+    {
+      "name": "residue",
+      "reason": "RESIDUE",
+      "input": {
+        "contract": {
+          "version": 1,
+          "path": "node_modules/.vite-temp",
+          "type": "directory",
+          "from": "S1",
+          "to": "S2",
+          "operation": "mkdir",
+          "content": "empty",
+          "actor": "instrumented-node-api",
+          "residue": "empty-directory-at-close",
+          "reuse": false,
+          "asymmetry": false,
+          "filesAllowed": 0
+        },
+        "request": {
+          "trialId": "fixture-1"
+        },
+        "assessment": {
+          "status": "CANDIDATE"
+        },
+        "usedTrialIds": [],
+        "interrupted": false,
+        "targets": [
+          {
+            "root": "C:\\fixture\\old",
+            "pid": 100,
+            "started": "2026-11-16T00:00:00Z",
+            "finished": "2026-11-16T00:01:00Z",
+            "transitions": [
+              {
+                "path": "node_modules/.vite-temp",
+                "absolute": "C:\\fixture\\old\\node_modules\\.vite-temp",
+                "before": null,
+                "after": {
+                  "type": "directory",
+                  "entries": []
+                },
+                "from": "S1",
+                "to": "S2",
+                "trialId": "fixture-1",
+                "actor": "instrumented-node-api",
+                "pid": 100,
+                "at": "2026-11-16T00:00:30Z",
+                "residue": {
+                  "type": "directory",
+                  "entries": [
+                    "unexpected"
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "root": "C:\\fixture\\new",
+            "pid": 101,
+            "started": "2026-11-16T00:00:00Z",
+            "finished": "2026-11-16T00:01:00Z",
+            "transitions": [
+              {
+                "path": "node_modules/.vite-temp",
+                "absolute": "C:\\fixture\\new\\node_modules\\.vite-temp",
+                "before": null,
+                "after": {
+                  "type": "directory",
+                  "entries": []
+                },
+                "from": "S1",
+                "to": "S2",
+                "trialId": "fixture-1",
+                "actor": "instrumented-node-api",
+                "pid": 101,
+                "at": "2026-11-16T00:00:30Z",
+                "residue": {
+                  "type": "directory",
+                  "entries": [
+                    "unexpected"
+                  ]
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "comparisonSpawns": 0,
+      "scope": "pure-validator; no child process API"
+    },
+    {
+      "name": "outside-temp-cache",
+      "reason": "OUTSIDE_SCOPE",
+      "input": {
+        "contract": {
+          "version": 1,
+          "path": "node_modules/.vite-temp",
+          "type": "directory",
+          "from": "S1",
+          "to": "S2",
+          "operation": "mkdir",
+          "content": "empty",
+          "actor": "instrumented-node-api",
+          "residue": "empty-directory-at-close",
+          "reuse": false,
+          "asymmetry": false,
+          "filesAllowed": 0
+        },
+        "request": {
+          "trialId": "fixture-1"
+        },
+        "assessment": {
+          "status": "CANDIDATE"
+        },
+        "usedTrialIds": [],
+        "interrupted": false,
+        "targets": [
+          {
+            "root": "C:\\fixture\\old",
+            "pid": 100,
+            "started": "2026-11-16T00:00:00Z",
+            "finished": "2026-11-16T00:01:00Z",
+            "transitions": [
+              {
+                "path": "src/engine.ts",
+                "absolute": "C:\\fixture\\old\\node_modules\\.vite-temp",
+                "before": null,
+                "after": {
+                  "type": "directory",
+                  "entries": []
+                },
+                "from": "S1",
+                "to": "S2",
+                "trialId": "fixture-1",
+                "actor": "instrumented-node-api",
+                "pid": 100,
+                "at": "2026-11-16T00:00:30Z",
+                "residue": {
+                  "type": "directory",
+                  "entries": []
+                }
+              }
+            ]
+          },
+          {
+            "root": "C:\\fixture\\new",
+            "pid": 101,
+            "started": "2026-11-16T00:00:00Z",
+            "finished": "2026-11-16T00:01:00Z",
+            "transitions": [
+              {
+                "path": "src/engine.ts",
+                "absolute": "C:\\fixture\\new\\node_modules\\.vite-temp",
+                "before": null,
+                "after": {
+                  "type": "directory",
+                  "entries": []
+                },
+                "from": "S1",
+                "to": "S2",
+                "trialId": "fixture-1",
+                "actor": "instrumented-node-api",
+                "pid": 101,
+                "at": "2026-11-16T00:00:30Z",
+                "residue": {
+                  "type": "directory",
+                  "entries": []
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "comparisonSpawns": 0,
+      "scope": "pure-validator; no child process API"
+    },
+    {
+      "name": "other-trial-reuse",
+      "reason": "ARTIFACT_REUSE",
+      "input": {
+        "contract": {
+          "version": 1,
+          "path": "node_modules/.vite-temp",
+          "type": "directory",
+          "from": "S1",
+          "to": "S2",
+          "operation": "mkdir",
+          "content": "empty",
+          "actor": "instrumented-node-api",
+          "residue": "empty-directory-at-close",
+          "reuse": false,
+          "asymmetry": false,
+          "filesAllowed": 0
+        },
+        "request": {
+          "trialId": "fixture-1"
+        },
+        "assessment": {
+          "status": "CANDIDATE"
+        },
+        "usedTrialIds": [],
+        "interrupted": false,
+        "targets": [
+          {
+            "root": "C:\\fixture\\old",
+            "pid": 100,
+            "started": "2026-11-16T00:00:00Z",
+            "finished": "2026-11-16T00:01:00Z",
+            "transitions": [
+              {
+                "path": "node_modules/.vite-temp",
+                "absolute": "C:\\fixture\\old\\node_modules\\.vite-temp",
+                "before": null,
+                "after": {
+                  "type": "directory",
+                  "entries": []
+                },
+                "from": "S1",
+                "to": "S2",
+                "trialId": "previous",
+                "actor": "instrumented-node-api",
+                "pid": 100,
+                "at": "2026-11-16T00:00:30Z",
+                "residue": {
+                  "type": "directory",
+                  "entries": []
+                }
+              }
+            ]
+          },
+          {
+            "root": "C:\\fixture\\new",
+            "pid": 101,
+            "started": "2026-11-16T00:00:00Z",
+            "finished": "2026-11-16T00:01:00Z",
+            "transitions": [
+              {
+                "path": "node_modules/.vite-temp",
+                "absolute": "C:\\fixture\\new\\node_modules\\.vite-temp",
+                "before": null,
+                "after": {
+                  "type": "directory",
+                  "entries": []
+                },
+                "from": "S1",
+                "to": "S2",
+                "trialId": "previous",
+                "actor": "instrumented-node-api",
+                "pid": 101,
+                "at": "2026-11-16T00:00:30Z",
+                "residue": {
+                  "type": "directory",
+                  "entries": []
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "comparisonSpawns": 0,
+      "scope": "pure-validator; no child process API"
+    },
+    {
+      "name": "contract-edit",
+      "reason": "CONTRACT_MODIFIED",
+      "input": {
+        "contract": {
+          "version": 1,
+          "path": "node_modules/.vite-temp",
+          "type": "directory",
+          "from": "S1",
+          "to": "S2",
+          "operation": "mkdir",
+          "content": "empty",
+          "actor": "instrumented-node-api",
+          "residue": "empty-directory-at-close",
+          "reuse": false,
+          "asymmetry": false,
+          "filesAllowed": 1
+        },
+        "request": {
+          "trialId": "fixture-1"
+        },
+        "assessment": {
+          "status": "CANDIDATE"
+        },
+        "usedTrialIds": [],
+        "interrupted": false,
+        "targets": [
+          {
+            "root": "C:\\fixture\\old",
+            "pid": 100,
+            "started": "2026-11-16T00:00:00Z",
+            "finished": "2026-11-16T00:01:00Z",
+            "transitions": [
+              {
+                "path": "node_modules/.vite-temp",
+                "absolute": "C:\\fixture\\old\\node_modules\\.vite-temp",
+                "before": null,
+                "after": {
+                  "type": "directory",
+                  "entries": []
+                },
+                "from": "S1",
+                "to": "S2",
+                "trialId": "fixture-1",
+                "actor": "instrumented-node-api",
+                "pid": 100,
+                "at": "2026-11-16T00:00:30Z",
+                "residue": {
+                  "type": "directory",
+                  "entries": []
+                }
+              }
+            ]
+          },
+          {
+            "root": "C:\\fixture\\new",
+            "pid": 101,
+            "started": "2026-11-16T00:00:00Z",
+            "finished": "2026-11-16T00:01:00Z",
+            "transitions": [
+              {
+                "path": "node_modules/.vite-temp",
+                "absolute": "C:\\fixture\\new\\node_modules\\.vite-temp",
+                "before": null,
+                "after": {
+                  "type": "directory",
+                  "entries": []
+                },
+                "from": "S1",
+                "to": "S2",
+                "trialId": "fixture-1",
+                "actor": "instrumented-node-api",
+                "pid": 101,
+                "at": "2026-11-16T00:00:30Z",
+                "residue": {
+                  "type": "directory",
+                  "entries": []
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "comparisonSpawns": 0,
+      "scope": "pure-validator; no child process API"
+    },
+    {
+      "name": "request-edit",
+      "reason": "REQUEST_MODIFIED",
+      "input": {
+        "contract": {
+          "version": 1,
+          "path": "node_modules/.vite-temp",
+          "type": "directory",
+          "from": "S1",
+          "to": "S2",
+          "operation": "mkdir",
+          "content": "empty",
+          "actor": "instrumented-node-api",
+          "residue": "empty-directory-at-close",
+          "reuse": false,
+          "asymmetry": false,
+          "filesAllowed": 0
+        },
+        "request": {
+          "trialId": "edited"
+        },
+        "assessment": {
+          "status": "CANDIDATE"
+        },
+        "usedTrialIds": [],
+        "interrupted": false,
+        "targets": [
+          {
+            "root": "C:\\fixture\\old",
+            "pid": 100,
+            "started": "2026-11-16T00:00:00Z",
+            "finished": "2026-11-16T00:01:00Z",
+            "transitions": [
+              {
+                "path": "node_modules/.vite-temp",
+                "absolute": "C:\\fixture\\old\\node_modules\\.vite-temp",
+                "before": null,
+                "after": {
+                  "type": "directory",
+                  "entries": []
+                },
+                "from": "S1",
+                "to": "S2",
+                "trialId": "fixture-1",
+                "actor": "instrumented-node-api",
+                "pid": 100,
+                "at": "2026-11-16T00:00:30Z",
+                "residue": {
+                  "type": "directory",
+                  "entries": []
+                }
+              }
+            ]
+          },
+          {
+            "root": "C:\\fixture\\new",
+            "pid": 101,
+            "started": "2026-11-16T00:00:00Z",
+            "finished": "2026-11-16T00:01:00Z",
+            "transitions": [
+              {
+                "path": "node_modules/.vite-temp",
+                "absolute": "C:\\fixture\\new\\node_modules\\.vite-temp",
+                "before": null,
+                "after": {
+                  "type": "directory",
+                  "entries": []
+                },
+                "from": "S1",
+                "to": "S2",
+                "trialId": "fixture-1",
+                "actor": "instrumented-node-api",
+                "pid": 101,
+                "at": "2026-11-16T00:00:30Z",
+                "residue": {
+                  "type": "directory",
+                  "entries": []
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "comparisonSpawns": 0,
+      "scope": "pure-validator; no child process API"
+    },
+    {
+      "name": "assessment-edit",
+      "reason": "ASSESSMENT_MODIFIED",
+      "input": {
+        "contract": {
+          "version": 1,
+          "path": "node_modules/.vite-temp",
+          "type": "directory",
+          "from": "S1",
+          "to": "S2",
+          "operation": "mkdir",
+          "content": "empty",
+          "actor": "instrumented-node-api",
+          "residue": "empty-directory-at-close",
+          "reuse": false,
+          "asymmetry": false,
+          "filesAllowed": 0
+        },
+        "request": {
+          "trialId": "fixture-1"
+        },
+        "assessment": {
+          "status": "PASS"
+        },
+        "usedTrialIds": [],
+        "interrupted": false,
+        "targets": [
+          {
+            "root": "C:\\fixture\\old",
+            "pid": 100,
+            "started": "2026-11-16T00:00:00Z",
+            "finished": "2026-11-16T00:01:00Z",
+            "transitions": [
+              {
+                "path": "node_modules/.vite-temp",
+                "absolute": "C:\\fixture\\old\\node_modules\\.vite-temp",
+                "before": null,
+                "after": {
+                  "type": "directory",
+                  "entries": []
+                },
+                "from": "S1",
+                "to": "S2",
+                "trialId": "fixture-1",
+                "actor": "instrumented-node-api",
+                "pid": 100,
+                "at": "2026-11-16T00:00:30Z",
+                "residue": {
+                  "type": "directory",
+                  "entries": []
+                }
+              }
+            ]
+          },
+          {
+            "root": "C:\\fixture\\new",
+            "pid": 101,
+            "started": "2026-11-16T00:00:00Z",
+            "finished": "2026-11-16T00:01:00Z",
+            "transitions": [
+              {
+                "path": "node_modules/.vite-temp",
+                "absolute": "C:\\fixture\\new\\node_modules\\.vite-temp",
+                "before": null,
+                "after": {
+                  "type": "directory",
+                  "entries": []
+                },
+                "from": "S1",
+                "to": "S2",
+                "trialId": "fixture-1",
+                "actor": "instrumented-node-api",
+                "pid": 101,
+                "at": "2026-11-16T00:00:30Z",
+                "residue": {
+                  "type": "directory",
+                  "entries": []
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "comparisonSpawns": 0,
+      "scope": "pure-validator; no child process API"
+    },
+    {
+      "name": "content-substitution",
+      "reason": "CONTENT",
+      "input": {
+        "contract": {
+          "version": 1,
+          "path": "node_modules/.vite-temp",
+          "type": "directory",
+          "from": "S1",
+          "to": "S2",
+          "operation": "mkdir",
+          "content": "empty",
+          "actor": "instrumented-node-api",
+          "residue": "empty-directory-at-close",
+          "reuse": false,
+          "asymmetry": false,
+          "filesAllowed": 0
+        },
+        "request": {
+          "trialId": "fixture-1"
+        },
+        "assessment": {
+          "status": "CANDIDATE"
+        },
+        "usedTrialIds": [],
+        "interrupted": false,
+        "targets": [
+          {
+            "root": "C:\\fixture\\old",
+            "pid": 100,
+            "started": "2026-11-16T00:00:00Z",
+            "finished": "2026-11-16T00:01:00Z",
+            "transitions": [
+              {
+                "path": "node_modules/.vite-temp",
+                "absolute": "C:\\fixture\\old\\node_modules\\.vite-temp",
+                "before": null,
+                "after": {
+                  "type": "directory",
+                  "entries": [
+                    "malicious.mjs"
+                  ]
+                },
+                "from": "S1",
+                "to": "S2",
+                "trialId": "fixture-1",
+                "actor": "instrumented-node-api",
+                "pid": 100,
+                "at": "2026-11-16T00:00:30Z",
+                "residue": {
+                  "type": "directory",
+                  "entries": []
+                }
+              }
+            ]
+          },
+          {
+            "root": "C:\\fixture\\new",
+            "pid": 101,
+            "started": "2026-11-16T00:00:00Z",
+            "finished": "2026-11-16T00:01:00Z",
+            "transitions": [
+              {
+                "path": "node_modules/.vite-temp",
+                "absolute": "C:\\fixture\\new\\node_modules\\.vite-temp",
+                "before": null,
+                "after": {
+                  "type": "directory",
+                  "entries": [
+                    "malicious.mjs"
+                  ]
+                },
+                "from": "S1",
+                "to": "S2",
+                "trialId": "fixture-1",
+                "actor": "instrumented-node-api",
+                "pid": 101,
+                "at": "2026-11-16T00:00:30Z",
+                "residue": {
+                  "type": "directory",
+                  "entries": []
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "comparisonSpawns": 0,
+      "scope": "pure-validator; no child process API"
+    },
+    {
+      "name": "wrong-producer",
+      "reason": "ACTOR",
+      "input": {
+        "contract": {
+          "version": 1,
+          "path": "node_modules/.vite-temp",
+          "type": "directory",
+          "from": "S1",
+          "to": "S2",
+          "operation": "mkdir",
+          "content": "empty",
+          "actor": "instrumented-node-api",
+          "residue": "empty-directory-at-close",
+          "reuse": false,
+          "asymmetry": false,
+          "filesAllowed": 0
+        },
+        "request": {
+          "trialId": "fixture-1"
+        },
+        "assessment": {
+          "status": "CANDIDATE"
+        },
+        "usedTrialIds": [],
+        "interrupted": false,
+        "targets": [
+          {
+            "root": "C:\\fixture\\old",
+            "pid": 100,
+            "started": "2026-11-16T00:00:00Z",
+            "finished": "2026-11-16T00:01:00Z",
+            "transitions": [
+              {
+                "path": "node_modules/.vite-temp",
+                "absolute": "C:\\fixture\\old\\node_modules\\.vite-temp",
+                "before": null,
+                "after": {
+                  "type": "directory",
+                  "entries": []
+                },
+                "from": "S1",
+                "to": "S2",
+                "trialId": "fixture-1",
+                "actor": "unknown-worker",
+                "pid": 100,
+                "at": "2026-11-16T00:00:30Z",
+                "residue": {
+                  "type": "directory",
+                  "entries": []
+                }
+              }
+            ]
+          },
+          {
+            "root": "C:\\fixture\\new",
+            "pid": 101,
+            "started": "2026-11-16T00:00:00Z",
+            "finished": "2026-11-16T00:01:00Z",
+            "transitions": [
+              {
+                "path": "node_modules/.vite-temp",
+                "absolute": "C:\\fixture\\new\\node_modules\\.vite-temp",
+                "before": null,
+                "after": {
+                  "type": "directory",
+                  "entries": []
+                },
+                "from": "S1",
+                "to": "S2",
+                "trialId": "fixture-1",
+                "actor": "unknown-worker",
+                "pid": 101,
+                "at": "2026-11-16T00:00:30Z",
+                "residue": {
+                  "type": "directory",
+                  "entries": []
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "comparisonSpawns": 0,
+      "scope": "pure-validator; no child process API"
+    },
+    {
+      "name": "wrong-pid",
+      "reason": "ACTOR",
+      "input": {
+        "contract": {
+          "version": 1,
+          "path": "node_modules/.vite-temp",
+          "type": "directory",
+          "from": "S1",
+          "to": "S2",
+          "operation": "mkdir",
+          "content": "empty",
+          "actor": "instrumented-node-api",
+          "residue": "empty-directory-at-close",
+          "reuse": false,
+          "asymmetry": false,
+          "filesAllowed": 0
+        },
+        "request": {
+          "trialId": "fixture-1"
+        },
+        "assessment": {
+          "status": "CANDIDATE"
+        },
+        "usedTrialIds": [],
+        "interrupted": false,
+        "targets": [
+          {
+            "root": "C:\\fixture\\old",
+            "pid": 100,
+            "started": "2026-11-16T00:00:00Z",
+            "finished": "2026-11-16T00:01:00Z",
+            "transitions": [
+              {
+                "path": "node_modules/.vite-temp",
+                "absolute": "C:\\fixture\\old\\node_modules\\.vite-temp",
+                "before": null,
+                "after": {
+                  "type": "directory",
+                  "entries": []
+                },
+                "from": "S1",
+                "to": "S2",
+                "trialId": "fixture-1",
+                "actor": "instrumented-node-api",
+                "pid": 999,
+                "at": "2026-11-16T00:00:30Z",
+                "residue": {
+                  "type": "directory",
+                  "entries": []
+                }
+              }
+            ]
+          },
+          {
+            "root": "C:\\fixture\\new",
+            "pid": 101,
+            "started": "2026-11-16T00:00:00Z",
+            "finished": "2026-11-16T00:01:00Z",
+            "transitions": [
+              {
+                "path": "node_modules/.vite-temp",
+                "absolute": "C:\\fixture\\new\\node_modules\\.vite-temp",
+                "before": null,
+                "after": {
+                  "type": "directory",
+                  "entries": []
+                },
+                "from": "S1",
+                "to": "S2",
+                "trialId": "fixture-1",
+                "actor": "instrumented-node-api",
+                "pid": 999,
+                "at": "2026-11-16T00:00:30Z",
+                "residue": {
+                  "type": "directory",
+                  "entries": []
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "comparisonSpawns": 0,
+      "scope": "pure-validator; no child process API"
+    },
+    {
+      "name": "interrupted-cleanup",
+      "reason": "INTERRUPTED_CLEANUP",
+      "input": {
+        "contract": {
+          "version": 1,
+          "path": "node_modules/.vite-temp",
+          "type": "directory",
+          "from": "S1",
+          "to": "S2",
+          "operation": "mkdir",
+          "content": "empty",
+          "actor": "instrumented-node-api",
+          "residue": "empty-directory-at-close",
+          "reuse": false,
+          "asymmetry": false,
+          "filesAllowed": 0
+        },
+        "request": {
+          "trialId": "fixture-1"
+        },
+        "assessment": {
+          "status": "CANDIDATE"
+        },
+        "usedTrialIds": [],
+        "interrupted": true,
+        "targets": [
+          {
+            "root": "C:\\fixture\\old",
+            "pid": 100,
+            "started": "2026-11-16T00:00:00Z",
+            "finished": "2026-11-16T00:01:00Z",
+            "transitions": [
+              {
+                "path": "node_modules/.vite-temp",
+                "absolute": "C:\\fixture\\old\\node_modules\\.vite-temp",
+                "before": null,
+                "after": {
+                  "type": "directory",
+                  "entries": []
+                },
+                "from": "S1",
+                "to": "S2",
+                "trialId": "fixture-1",
+                "actor": "instrumented-node-api",
+                "pid": 100,
+                "at": "2026-11-16T00:00:30Z",
+                "residue": {
+                  "type": "directory",
+                  "entries": []
+                }
+              }
+            ]
+          },
+          {
+            "root": "C:\\fixture\\new",
+            "pid": 101,
+            "started": "2026-11-16T00:00:00Z",
+            "finished": "2026-11-16T00:01:00Z",
+            "transitions": [
+              {
+                "path": "node_modules/.vite-temp",
+                "absolute": "C:\\fixture\\new\\node_modules\\.vite-temp",
+                "before": null,
+                "after": {
+                  "type": "directory",
+                  "entries": []
+                },
+                "from": "S1",
+                "to": "S2",
+                "trialId": "fixture-1",
+                "actor": "instrumented-node-api",
+                "pid": 101,
+                "at": "2026-11-16T00:00:30Z",
+                "residue": {
+                  "type": "directory",
+                  "entries": []
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "comparisonSpawns": 0,
+      "scope": "pure-validator; no child process API"
+    },
+    {
+      "name": "output-trial-reuse",
+      "reason": "TRIAL_REUSE",
+      "input": {
+        "contract": {
+          "version": 1,
+          "path": "node_modules/.vite-temp",
+          "type": "directory",
+          "from": "S1",
+          "to": "S2",
+          "operation": "mkdir",
+          "content": "empty",
+          "actor": "instrumented-node-api",
+          "residue": "empty-directory-at-close",
+          "reuse": false,
+          "asymmetry": false,
+          "filesAllowed": 0
+        },
+        "request": {
+          "trialId": "fixture-1"
+        },
+        "assessment": {
+          "status": "CANDIDATE"
+        },
+        "usedTrialIds": [
+          "fixture-1"
+        ],
+        "interrupted": false,
+        "targets": [
+          {
+            "root": "C:\\fixture\\old",
+            "pid": 100,
+            "started": "2026-11-16T00:00:00Z",
+            "finished": "2026-11-16T00:01:00Z",
+            "transitions": [
+              {
+                "path": "node_modules/.vite-temp",
+                "absolute": "C:\\fixture\\old\\node_modules\\.vite-temp",
+                "before": null,
+                "after": {
+                  "type": "directory",
+                  "entries": []
+                },
+                "from": "S1",
+                "to": "S2",
+                "trialId": "fixture-1",
+                "actor": "instrumented-node-api",
+                "pid": 100,
+                "at": "2026-11-16T00:00:30Z",
+                "residue": {
+                  "type": "directory",
+                  "entries": []
+                }
+              }
+            ]
+          },
+          {
+            "root": "C:\\fixture\\new",
+            "pid": 101,
+            "started": "2026-11-16T00:00:00Z",
+            "finished": "2026-11-16T00:01:00Z",
+            "transitions": [
+              {
+                "path": "node_modules/.vite-temp",
+                "absolute": "C:\\fixture\\new\\node_modules\\.vite-temp",
+                "before": null,
+                "after": {
+                  "type": "directory",
+                  "entries": []
+                },
+                "from": "S1",
+                "to": "S2",
+                "trialId": "fixture-1",
+                "actor": "instrumented-node-api",
+                "pid": 101,
+                "at": "2026-11-16T00:00:30Z",
+                "residue": {
+                  "type": "directory",
+                  "entries": []
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "comparisonSpawns": 0,
+      "scope": "pure-validator; no child process API"
+    },
+    {
+      "name": "time-outside-window",
+      "reason": "TIME",
+      "input": {
+        "contract": {
+          "version": 1,
+          "path": "node_modules/.vite-temp",
+          "type": "directory",
+          "from": "S1",
+          "to": "S2",
+          "operation": "mkdir",
+          "content": "empty",
+          "actor": "instrumented-node-api",
+          "residue": "empty-directory-at-close",
+          "reuse": false,
+          "asymmetry": false,
+          "filesAllowed": 0
+        },
+        "request": {
+          "trialId": "fixture-1"
+        },
+        "assessment": {
+          "status": "CANDIDATE"
+        },
+        "usedTrialIds": [],
+        "interrupted": false,
+        "targets": [
+          {
+            "root": "C:\\fixture\\old",
+            "pid": 100,
+            "started": "2026-11-16T00:00:00Z",
+            "finished": "2026-11-16T00:01:00Z",
+            "transitions": [
+              {
+                "path": "node_modules/.vite-temp",
+                "absolute": "C:\\fixture\\old\\node_modules\\.vite-temp",
+                "before": null,
+                "after": {
+                  "type": "directory",
+                  "entries": []
+                },
+                "from": "S1",
+                "to": "S2",
+                "trialId": "fixture-1",
+                "actor": "instrumented-node-api",
+                "pid": 100,
+                "at": "2026-11-17T00:00:00Z",
+                "residue": {
+                  "type": "directory",
+                  "entries": []
+                }
+              }
+            ]
+          },
+          {
+            "root": "C:\\fixture\\new",
+            "pid": 101,
+            "started": "2026-11-16T00:00:00Z",
+            "finished": "2026-11-16T00:01:00Z",
+            "transitions": [
+              {
+                "path": "node_modules/.vite-temp",
+                "absolute": "C:\\fixture\\new\\node_modules\\.vite-temp",
+                "before": null,
+                "after": {
+                  "type": "directory",
+                  "entries": []
+                },
+                "from": "S1",
+                "to": "S2",
+                "trialId": "fixture-1",
+                "actor": "instrumented-node-api",
+                "pid": 101,
+                "at": "2026-11-17T00:00:00Z",
+                "residue": {
+                  "type": "directory",
+                  "entries": []
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "comparisonSpawns": 0,
+      "scope": "pure-validator; no child process API"
+    },
+    {
+      "name": "absolute-path-escape",
+      "reason": "ABSOLUTE_PATH",
+      "input": {
+        "contract": {
+          "version": 1,
+          "path": "node_modules/.vite-temp",
+          "type": "directory",
+          "from": "S1",
+          "to": "S2",
+          "operation": "mkdir",
+          "content": "empty",
+          "actor": "instrumented-node-api",
+          "residue": "empty-directory-at-close",
+          "reuse": false,
+          "asymmetry": false,
+          "filesAllowed": 0
+        },
+        "request": {
+          "trialId": "fixture-1"
+        },
+        "assessment": {
+          "status": "CANDIDATE"
+        },
+        "usedTrialIds": [],
+        "interrupted": false,
+        "targets": [
+          {
+            "root": "C:\\fixture\\old",
+            "pid": 100,
+            "started": "2026-11-16T00:00:00Z",
+            "finished": "2026-11-16T00:01:00Z",
+            "transitions": [
+              {
+                "path": "node_modules/.vite-temp",
+                "absolute": "C:\\elsewhere",
+                "before": null,
+                "after": {
+                  "type": "directory",
+                  "entries": []
+                },
+                "from": "S1",
+                "to": "S2",
+                "trialId": "fixture-1",
+                "actor": "instrumented-node-api",
+                "pid": 100,
+                "at": "2026-11-16T00:00:30Z",
+                "residue": {
+                  "type": "directory",
+                  "entries": []
+                }
+              }
+            ]
+          },
+          {
+            "root": "C:\\fixture\\new",
+            "pid": 101,
+            "started": "2026-11-16T00:00:00Z",
+            "finished": "2026-11-16T00:01:00Z",
+            "transitions": [
+              {
+                "path": "node_modules/.vite-temp",
+                "absolute": "C:\\elsewhere",
+                "before": null,
+                "after": {
+                  "type": "directory",
+                  "entries": []
+                },
+                "from": "S1",
+                "to": "S2",
+                "trialId": "fixture-1",
+                "actor": "instrumented-node-api",
+                "pid": 101,
+                "at": "2026-11-16T00:00:30Z",
+                "residue": {
+                  "type": "directory",
+                  "entries": []
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "comparisonSpawns": 0,
+      "scope": "pure-validator; no child process API"
+    },
+    {
+      "name": "unknown-content-field",
+      "reason": "CONTENT",
+      "input": {
+        "contract": {
+          "version": 1,
+          "path": "node_modules/.vite-temp",
+          "type": "directory",
+          "from": "S1",
+          "to": "S2",
+          "operation": "mkdir",
+          "content": "empty",
+          "actor": "instrumented-node-api",
+          "residue": "empty-directory-at-close",
+          "reuse": false,
+          "asymmetry": false,
+          "filesAllowed": 0
+        },
+        "request": {
+          "trialId": "fixture-1"
+        },
+        "assessment": {
+          "status": "CANDIDATE"
+        },
+        "usedTrialIds": [],
+        "interrupted": false,
+        "targets": [
+          {
+            "root": "C:\\fixture\\old",
+            "pid": 100,
+            "started": "2026-11-16T00:00:00Z",
+            "finished": "2026-11-16T00:01:00Z",
+            "transitions": [
+              {
+                "path": "node_modules/.vite-temp",
+                "absolute": "C:\\fixture\\old\\node_modules\\.vite-temp",
+                "before": null,
+                "after": {
+                  "type": "directory",
+                  "entries": [],
+                  "extra": true
+                },
+                "from": "S1",
+                "to": "S2",
+                "trialId": "fixture-1",
+                "actor": "instrumented-node-api",
+                "pid": 100,
+                "at": "2026-11-16T00:00:30Z",
+                "residue": {
+                  "type": "directory",
+                  "entries": []
+                }
+              }
+            ]
+          },
+          {
+            "root": "C:\\fixture\\new",
+            "pid": 101,
+            "started": "2026-11-16T00:00:00Z",
+            "finished": "2026-11-16T00:01:00Z",
+            "transitions": [
+              {
+                "path": "node_modules/.vite-temp",
+                "absolute": "C:\\fixture\\new\\node_modules\\.vite-temp",
+                "before": null,
+                "after": {
+                  "type": "directory",
+                  "entries": [],
+                  "extra": true
+                },
+                "from": "S1",
+                "to": "S2",
+                "trialId": "fixture-1",
+                "actor": "instrumented-node-api",
+                "pid": 101,
+                "at": "2026-11-16T00:00:30Z",
+                "residue": {
+                  "type": "directory",
+                  "entries": []
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "comparisonSpawns": 0,
+      "scope": "pure-validator; no child process API"
+    },
+    {
+      "name": "node-body",
+      "reason": "IDENTITY_executableSha256",
+      "comparisonSpawns": 0
+    },
+    {
+      "name": "node-version",
+      "reason": "IDENTITY_node",
+      "comparisonSpawns": 0
+    },
+    {
+      "name": "node-path",
+      "reason": "IDENTITY_executable",
+      "comparisonSpawns": 0
+    },
+    {
+      "name": "cwd",
+      "reason": "IDENTITY_cwd",
+      "comparisonSpawns": 0
+    },
+    {
+      "name": "target-order",
+      "reason": "TARGET_ORDER_OR_HEAD",
+      "comparisonSpawns": 0
+    },
+    {
+      "name": "target-head",
+      "reason": "TARGET_ORDER_OR_HEAD",
+      "comparisonSpawns": 0
+    },
+    {
+      "name": "config",
+      "reason": "ENVIRONMENT_CHANGED",
+      "comparisonSpawns": 0
+    },
+    {
+      "name": "used-output",
+      "reason": "OUTPUT_REUSE",
+      "comparisonSpawns": 0
+    },
+    {
+      "name": "same-head",
+      "reason": "SAME_HEAD",
+      "fixture": "PASS",
+      "comparisonSpawns": 0
+    },
+    {
+      "name": "same-physical",
+      "reason": "SHARED_SNAPSHOT",
+      "comparisonSpawns": 0
+    },
+    {
+      "name": "gate",
+      "result": {
+        "status": "NOT_READY",
+        "comparison": "NOT_TESTED",
+        "comparisonSpawns": 0,
+        "S4": "NOT_TESTED",
+        "S5": "NOT_TESTED",
+        "blocking": [
+          "TEMP producer attribution/lifecycle completeness UNKNOWN",
+          "Vitest duration/result cache allowance NOT_ESTABLISHED",
+          "independent real admission validation required"
+        ]
+      }
+    }
+  ]
+}
