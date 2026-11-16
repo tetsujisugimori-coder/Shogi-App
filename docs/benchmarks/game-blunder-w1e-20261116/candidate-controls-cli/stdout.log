@@ -1,0 +1,41 @@
+✔ same normal input strict RED then candidate GREEN (1.629ms)
+✔ outside-new-file (0.3687ms)
+✔ unknown-empty-directory (0.2015ms)
+✔ existing-content (0.181ms)
+✔ directory-to-file (0.2106ms)
+✔ symlink-junction-cycle (0.1643ms)
+✔ asymmetric (0.1677ms)
+✔ wrong-phase (0.1808ms)
+✔ residue (0.2111ms)
+✔ outside-temp-cache (0.3421ms)
+✔ other-trial-reuse (0.2131ms)
+✔ contract-edit (0.113ms)
+✔ request-edit (0.1048ms)
+✔ assessment-edit (0.121ms)
+✔ content-substitution (0.1653ms)
+✔ wrong-producer (0.1493ms)
+✔ wrong-pid (0.1326ms)
+✔ interrupted-cleanup (0.1016ms)
+✔ output-trial-reuse (0.1414ms)
+✔ time-outside-window (0.138ms)
+✔ absolute-path-escape (0.1692ms)
+✔ unknown-content-field (0.1263ms)
+✔ node-body (0.2965ms)
+✔ node-version (0.0994ms)
+✔ node-path (0.0798ms)
+✔ cwd (0.1038ms)
+✔ target-order (0.1191ms)
+✔ target-head (0.1434ms)
+✔ config (0.1093ms)
+✔ used-output (0.1088ms)
+✔ real same HEAD rejected; explicit fixture retained (0.2021ms)
+✔ same physical snapshot rejected (0.1422ms)
+✔ even complete candidate controls cannot open real admission (0.2447ms)
+ℹ tests 33
+ℹ suites 0
+ℹ pass 33
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 393.7712
