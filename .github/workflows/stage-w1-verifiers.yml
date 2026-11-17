@@ -15,7 +15,7 @@ jobs:
           node-version: '24.19.0'
       # No product/dependency installation or Windows junction assumptions required.
       - name: Aggregation and fail-closed admission controls
-        run: node --test scripts/stage-w1-summary-check.mjs scripts/stage-w1b-summary-check.mjs scripts/stage-w1c-check.mjs scripts/stage-w1d-check.mjs scripts/stage-w1e-check.mjs scripts/stage-w1f-check.mjs
+        run: node --test scripts/stage-w1-summary-check.mjs scripts/stage-w1b-summary-check.mjs scripts/stage-w1c-check.mjs scripts/stage-w1d-check.mjs scripts/stage-w1e-check.mjs scripts/stage-w1f-check.mjs scripts/stage-w1g-check.mjs
       - name: Prove false PASS mutation is detected
         run: node scripts/stage-w1c-mutation-check.mjs
       - name: Node API lifecycle and cache physical identity controls

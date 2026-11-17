@@ -6,10 +6,14 @@ import { join, resolve } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import { inspect, requirePair, requireUnchanged, read, hash, digest, contains, environment, physical } from './stage-w1b-preflight.mjs';
 import { assess } from './stage-w1b-summary.mjs';
+import { requireNonFixedTargets, requireNonFixedTargetTrees } from './stage-w1g-gate.mjs';
 const worker=fileURLToPath(new URL('./stage-w1b-worker.mjs',import.meta.url));
 const write=(p,o)=>writeFileSync(p,JSON.stringify(o,null,2)+'\n',{flag:'wx'});
 const fileHash=p=>hash(readFileSync(p));
-const tooling=()=>Object.fromEntries(['runner','worker','preflight','summary'].map(n=>[n,fileHash(fileURLToPath(new URL('./stage-w1b-'+n+'.mjs',import.meta.url)))]));
+const tooling=()=>({
+  ...Object.fromEntries(['runner','worker','preflight','summary'].map(n=>[n,fileHash(fileURLToPath(new URL('./stage-w1b-'+n+'.mjs',import.meta.url)))])),
+  w1gGate:fileHash(fileURLToPath(new URL('./stage-w1g-gate.mjs',import.meta.url))),
+});
 function event(out,e) {write(join(out,`event-${randomUUID()}.json`),{at:new Date().toISOString(),...e});}
 function validatePlan(plan,out) {
   if(!plan || !Array.isArray(plan.targets)||plan.targets.length!==2||!Array.isArray(plan.filters)||!plan.filters.every(s=>typeof s==='string')) throw Error('invalid comparison plan');
@@ -69,6 +73,7 @@ export function launch(out) {
     const ready=read(join(out,'ready.json')),preflight=read(join(out,'preflight.json'));
     if(ready.preflightSha256!==fileHash(join(out,'preflight.json'))||preflight.runId!==ready.runId) throw Error('preflight binding mismatch');
     validatePlan(preflight.plan,out);
+    requireNonFixedTargets(preflight.plan.targets.map(t=>t.head));
     if(preflight.output!==out) throw Error('execution output binding mismatch');
     if(digest(preflight.tooling)!==digest(tooling())) throw Error('execution tooling changed');
     if(digest(preflight.observations)!==digest(preflight.sealed.observations)) throw Error('preflight observation binding mismatch');
@@ -81,6 +86,7 @@ export function launch(out) {
     }
     // Refuse ANY planned result directory before spawning the first comparison.
     for(let i=0;i<ready.trials.length;i++) if(existsSync(join(out,`trial-${i}`))) throw Error(`reused trial output: trial-${i}`);
+    requireNonFixedTargetTrees(preflight.plan.targets);
     requireUnchanged(preflight.sealed,state(preflight.plan));
     if(existsSync(join(out,'launched.json'))) throw Error('run already launched');
     write(join(out,'launched.json'),{runId:ready.runId});
