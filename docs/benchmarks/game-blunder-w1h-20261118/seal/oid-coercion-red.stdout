@@ -38,7 +38,7 @@
 test at scripts/stage-w1h-seal-check.mjs:46:1
 ✖ target OID arrays must not coerce to valid string hashes (1.88482ms)
   AssertionError [ERR_ASSERTION]: Missing expected exception.
-      at TestContext.<anonymous> (file:///workspace/scratch/e622c1e9421e/shogi-w1h-20261118/repo/scripts/stage-w1h-seal-check.mjs:49:12)
+      at TestContext.<anonymous> (file://<CASE_REPO>/scripts/stage-w1h-seal-check.mjs:49:12)
       at Test.runInAsyncScope (node:async_hooks:227:14)
       at Test.run (node:internal/test_runner/test:1402:25)
       at Test.processPendingSubtests (node:internal/test_runner/test:974:18)

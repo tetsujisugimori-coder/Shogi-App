@@ -37,8 +37,8 @@
 test at scripts/stage-w1h-seal-check.mjs:16:1
 ✖ generated source seal roundtrip uses shared raw-byte contract (2.418421ms)
   TypeError [Error]: gate.createSourceSeal is not a function
-      at fixture (file:///workspace/scratch/e622c1e9421e/shogi-w1h-20261118/repo/scripts/stage-w1h-seal-check.mjs:9:18)
-      at TestContext.<anonymous> (file:///workspace/scratch/e622c1e9421e/shogi-w1h-20261118/repo/scripts/stage-w1h-seal-check.mjs:16:83)
+      at fixture (file://<CASE_REPO>/scripts/stage-w1h-seal-check.mjs:9:18)
+      at TestContext.<anonymous> (file://<CASE_REPO>/scripts/stage-w1h-seal-check.mjs:16:83)
       at Test.runInAsyncScope (node:async_hooks:227:14)
       at Test.run (node:internal/test_runner/test:1402:25)
       at Test.start (node:internal/test_runner/test:1262:17)
@@ -47,8 +47,8 @@ test at scripts/stage-w1h-seal-check.mjs:16:1
 test at scripts/stage-w1h-seal-check.mjs:43:40
 ✖ JSON changed (0.438395ms)
   TypeError [Error]: gate.createSourceSeal is not a function
-      at fixture (file:///workspace/scratch/e622c1e9421e/shogi-w1h-20261118/repo/scripts/stage-w1h-seal-check.mjs:9:18)
-      at TestContext.<anonymous> (file:///workspace/scratch/e622c1e9421e/shogi-w1h-20261118/repo/scripts/stage-w1h-seal-check.mjs:43:63)
+      at fixture (file://<CASE_REPO>/scripts/stage-w1h-seal-check.mjs:9:18)
+      at TestContext.<anonymous> (file://<CASE_REPO>/scripts/stage-w1h-seal-check.mjs:43:63)
       at Test.runInAsyncScope (node:async_hooks:227:14)
       at Test.run (node:internal/test_runner/test:1402:25)
       at Test.processPendingSubtests (node:internal/test_runner/test:974:18)
@@ -59,8 +59,8 @@ test at scripts/stage-w1h-seal-check.mjs:43:40
 test at scripts/stage-w1h-seal-check.mjs:43:40
 ✖ raw whitespace changed (0.289769ms)
   TypeError [Error]: gate.createSourceSeal is not a function
-      at fixture (file:///workspace/scratch/e622c1e9421e/shogi-w1h-20261118/repo/scripts/stage-w1h-seal-check.mjs:9:18)
-      at TestContext.<anonymous> (file:///workspace/scratch/e622c1e9421e/shogi-w1h-20261118/repo/scripts/stage-w1h-seal-check.mjs:43:63)
+      at fixture (file://<CASE_REPO>/scripts/stage-w1h-seal-check.mjs:9:18)
+      at TestContext.<anonymous> (file://<CASE_REPO>/scripts/stage-w1h-seal-check.mjs:43:63)
       at Test.runInAsyncScope (node:async_hooks:227:14)
       at Test.run (node:internal/test_runner/test:1402:25)
       at Test.processPendingSubtests (node:internal/test_runner/test:974:18)
@@ -71,8 +71,8 @@ test at scripts/stage-w1h-seal-check.mjs:43:40
 test at scripts/stage-w1h-seal-check.mjs:43:40
 ✖ schema mismatch (0.2627ms)
   TypeError [Error]: gate.createSourceSeal is not a function
-      at fixture (file:///workspace/scratch/e622c1e9421e/shogi-w1h-20261118/repo/scripts/stage-w1h-seal-check.mjs:9:18)
-      at TestContext.<anonymous> (file:///workspace/scratch/e622c1e9421e/shogi-w1h-20261118/repo/scripts/stage-w1h-seal-check.mjs:43:63)
+      at fixture (file://<CASE_REPO>/scripts/stage-w1h-seal-check.mjs:9:18)
+      at TestContext.<anonymous> (file://<CASE_REPO>/scripts/stage-w1h-seal-check.mjs:43:63)
       at Test.runInAsyncScope (node:async_hooks:227:14)
       at Test.run (node:internal/test_runner/test:1402:25)
       at Test.processPendingSubtests (node:internal/test_runner/test:974:18)
@@ -83,8 +83,8 @@ test at scripts/stage-w1h-seal-check.mjs:43:40
 test at scripts/stage-w1h-seal-check.mjs:43:40
 ✖ missing field (0.192679ms)
   TypeError [Error]: gate.createSourceSeal is not a function
-      at fixture (file:///workspace/scratch/e622c1e9421e/shogi-w1h-20261118/repo/scripts/stage-w1h-seal-check.mjs:9:18)
-      at TestContext.<anonymous> (file:///workspace/scratch/e622c1e9421e/shogi-w1h-20261118/repo/scripts/stage-w1h-seal-check.mjs:43:63)
+      at fixture (file://<CASE_REPO>/scripts/stage-w1h-seal-check.mjs:9:18)
+      at TestContext.<anonymous> (file://<CASE_REPO>/scripts/stage-w1h-seal-check.mjs:43:63)
       at Test.runInAsyncScope (node:async_hooks:227:14)
       at Test.run (node:internal/test_runner/test:1402:25)
       at Test.processPendingSubtests (node:internal/test_runner/test:974:18)
@@ -95,8 +95,8 @@ test at scripts/stage-w1h-seal-check.mjs:43:40
 test at scripts/stage-w1h-seal-check.mjs:43:40
 ✖ null field (0.198899ms)
   TypeError [Error]: gate.createSourceSeal is not a function
-      at fixture (file:///workspace/scratch/e622c1e9421e/shogi-w1h-20261118/repo/scripts/stage-w1h-seal-check.mjs:9:18)
-      at TestContext.<anonymous> (file:///workspace/scratch/e622c1e9421e/shogi-w1h-20261118/repo/scripts/stage-w1h-seal-check.mjs:43:63)
+      at fixture (file://<CASE_REPO>/scripts/stage-w1h-seal-check.mjs:9:18)
+      at TestContext.<anonymous> (file://<CASE_REPO>/scripts/stage-w1h-seal-check.mjs:43:63)
       at Test.runInAsyncScope (node:async_hooks:227:14)
       at Test.run (node:internal/test_runner/test:1402:25)
       at Test.processPendingSubtests (node:internal/test_runner/test:974:18)
@@ -107,8 +107,8 @@ test at scripts/stage-w1h-seal-check.mjs:43:40
 test at scripts/stage-w1h-seal-check.mjs:43:40
 ✖ wrong type (0.184791ms)
   TypeError [Error]: gate.createSourceSeal is not a function
-      at fixture (file:///workspace/scratch/e622c1e9421e/shogi-w1h-20261118/repo/scripts/stage-w1h-seal-check.mjs:9:18)
-      at TestContext.<anonymous> (file:///workspace/scratch/e622c1e9421e/shogi-w1h-20261118/repo/scripts/stage-w1h-seal-check.mjs:43:63)
+      at fixture (file://<CASE_REPO>/scripts/stage-w1h-seal-check.mjs:9:18)
+      at TestContext.<anonymous> (file://<CASE_REPO>/scripts/stage-w1h-seal-check.mjs:43:63)
       at Test.runInAsyncScope (node:async_hooks:227:14)
       at Test.run (node:internal/test_runner/test:1402:25)
       at Test.processPendingSubtests (node:internal/test_runner/test:974:18)
@@ -119,8 +119,8 @@ test at scripts/stage-w1h-seal-check.mjs:43:40
 test at scripts/stage-w1h-seal-check.mjs:43:40
 ✖ source rebind (0.192825ms)
   TypeError [Error]: gate.createSourceSeal is not a function
-      at fixture (file:///workspace/scratch/e622c1e9421e/shogi-w1h-20261118/repo/scripts/stage-w1h-seal-check.mjs:9:18)
-      at TestContext.<anonymous> (file:///workspace/scratch/e622c1e9421e/shogi-w1h-20261118/repo/scripts/stage-w1h-seal-check.mjs:43:63)
+      at fixture (file://<CASE_REPO>/scripts/stage-w1h-seal-check.mjs:9:18)
+      at TestContext.<anonymous> (file://<CASE_REPO>/scripts/stage-w1h-seal-check.mjs:43:63)
       at Test.runInAsyncScope (node:async_hooks:227:14)
       at Test.run (node:internal/test_runner/test:1402:25)
       at Test.processPendingSubtests (node:internal/test_runner/test:974:18)
@@ -131,8 +131,8 @@ test at scripts/stage-w1h-seal-check.mjs:43:40
 test at scripts/stage-w1h-seal-check.mjs:43:40
 ✖ dependency rebind (1.307961ms)
   TypeError [Error]: gate.createSourceSeal is not a function
-      at fixture (file:///workspace/scratch/e622c1e9421e/shogi-w1h-20261118/repo/scripts/stage-w1h-seal-check.mjs:9:18)
-      at TestContext.<anonymous> (file:///workspace/scratch/e622c1e9421e/shogi-w1h-20261118/repo/scripts/stage-w1h-seal-check.mjs:43:63)
+      at fixture (file://<CASE_REPO>/scripts/stage-w1h-seal-check.mjs:9:18)
+      at TestContext.<anonymous> (file://<CASE_REPO>/scripts/stage-w1h-seal-check.mjs:43:63)
       at Test.runInAsyncScope (node:async_hooks:227:14)
       at Test.run (node:internal/test_runner/test:1402:25)
       at Test.processPendingSubtests (node:internal/test_runner/test:974:18)
@@ -143,8 +143,8 @@ test at scripts/stage-w1h-seal-check.mjs:43:40
 test at scripts/stage-w1h-seal-check.mjs:43:40
 ✖ environment rebind (0.769814ms)
   TypeError [Error]: gate.createSourceSeal is not a function
-      at fixture (file:///workspace/scratch/e622c1e9421e/shogi-w1h-20261118/repo/scripts/stage-w1h-seal-check.mjs:9:18)
-      at TestContext.<anonymous> (file:///workspace/scratch/e622c1e9421e/shogi-w1h-20261118/repo/scripts/stage-w1h-seal-check.mjs:43:63)
+      at fixture (file://<CASE_REPO>/scripts/stage-w1h-seal-check.mjs:9:18)
+      at TestContext.<anonymous> (file://<CASE_REPO>/scripts/stage-w1h-seal-check.mjs:43:63)
       at Test.runInAsyncScope (node:async_hooks:227:14)
       at Test.run (node:internal/test_runner/test:1402:25)
       at Test.processPendingSubtests (node:internal/test_runner/test:974:18)
@@ -155,8 +155,8 @@ test at scripts/stage-w1h-seal-check.mjs:43:40
 test at scripts/stage-w1h-seal-check.mjs:43:40
 ✖ HEAD rebind (0.33787ms)
   TypeError [Error]: gate.createSourceSeal is not a function
-      at fixture (file:///workspace/scratch/e622c1e9421e/shogi-w1h-20261118/repo/scripts/stage-w1h-seal-check.mjs:9:18)
-      at TestContext.<anonymous> (file:///workspace/scratch/e622c1e9421e/shogi-w1h-20261118/repo/scripts/stage-w1h-seal-check.mjs:43:63)
+      at fixture (file://<CASE_REPO>/scripts/stage-w1h-seal-check.mjs:9:18)
+      at TestContext.<anonymous> (file://<CASE_REPO>/scripts/stage-w1h-seal-check.mjs:43:63)
       at Test.runInAsyncScope (node:async_hooks:227:14)
       at Test.run (node:internal/test_runner/test:1402:25)
       at Test.processPendingSubtests (node:internal/test_runner/test:974:18)
@@ -167,8 +167,8 @@ test at scripts/stage-w1h-seal-check.mjs:43:40
 test at scripts/stage-w1h-seal-check.mjs:43:40
 ✖ tree rebind (0.485724ms)
   TypeError [Error]: gate.createSourceSeal is not a function
-      at fixture (file:///workspace/scratch/e622c1e9421e/shogi-w1h-20261118/repo/scripts/stage-w1h-seal-check.mjs:9:18)
-      at TestContext.<anonymous> (file:///workspace/scratch/e622c1e9421e/shogi-w1h-20261118/repo/scripts/stage-w1h-seal-check.mjs:43:63)
+      at fixture (file://<CASE_REPO>/scripts/stage-w1h-seal-check.mjs:9:18)
+      at TestContext.<anonymous> (file://<CASE_REPO>/scripts/stage-w1h-seal-check.mjs:43:63)
       at Test.runInAsyncScope (node:async_hooks:227:14)
       at Test.run (node:internal/test_runner/test:1402:25)
       at Test.processPendingSubtests (node:internal/test_runner/test:974:18)
@@ -179,8 +179,8 @@ test at scripts/stage-w1h-seal-check.mjs:43:40
 test at scripts/stage-w1h-seal-check.mjs:43:40
 ✖ challenge reuse (0.187714ms)
   TypeError [Error]: gate.createSourceSeal is not a function
-      at fixture (file:///workspace/scratch/e622c1e9421e/shogi-w1h-20261118/repo/scripts/stage-w1h-seal-check.mjs:9:18)
-      at TestContext.<anonymous> (file:///workspace/scratch/e622c1e9421e/shogi-w1h-20261118/repo/scripts/stage-w1h-seal-check.mjs:43:63)
+      at fixture (file://<CASE_REPO>/scripts/stage-w1h-seal-check.mjs:9:18)
+      at TestContext.<anonymous> (file://<CASE_REPO>/scripts/stage-w1h-seal-check.mjs:43:63)
       at Test.runInAsyncScope (node:async_hooks:227:14)
       at Test.run (node:internal/test_runner/test:1402:25)
       at Test.processPendingSubtests (node:internal/test_runner/test:974:18)
@@ -191,8 +191,8 @@ test at scripts/stage-w1h-seal-check.mjs:43:40
 test at scripts/stage-w1h-seal-check.mjs:43:40
 ✖ stale seal (1.466189ms)
   TypeError [Error]: gate.createSourceSeal is not a function
-      at fixture (file:///workspace/scratch/e622c1e9421e/shogi-w1h-20261118/repo/scripts/stage-w1h-seal-check.mjs:9:18)
-      at TestContext.<anonymous> (file:///workspace/scratch/e622c1e9421e/shogi-w1h-20261118/repo/scripts/stage-w1h-seal-check.mjs:43:63)
+      at fixture (file://<CASE_REPO>/scripts/stage-w1h-seal-check.mjs:9:18)
+      at TestContext.<anonymous> (file://<CASE_REPO>/scripts/stage-w1h-seal-check.mjs:43:63)
       at Test.runInAsyncScope (node:async_hooks:227:14)
       at Test.run (node:internal/test_runner/test:1402:25)
       at Test.processPendingSubtests (node:internal/test_runner/test:974:18)
@@ -203,8 +203,8 @@ test at scripts/stage-w1h-seal-check.mjs:43:40
 test at scripts/stage-w1h-seal-check.mjs:43:40
 ✖ actor rebind (0.100553ms)
   TypeError [Error]: gate.createSourceSeal is not a function
-      at fixture (file:///workspace/scratch/e622c1e9421e/shogi-w1h-20261118/repo/scripts/stage-w1h-seal-check.mjs:9:18)
-      at TestContext.<anonymous> (file:///workspace/scratch/e622c1e9421e/shogi-w1h-20261118/repo/scripts/stage-w1h-seal-check.mjs:43:63)
+      at fixture (file://<CASE_REPO>/scripts/stage-w1h-seal-check.mjs:9:18)
+      at TestContext.<anonymous> (file://<CASE_REPO>/scripts/stage-w1h-seal-check.mjs:43:63)
       at Test.runInAsyncScope (node:async_hooks:227:14)
       at Test.run (node:internal/test_runner/test:1402:25)
       at Test.processPendingSubtests (node:internal/test_runner/test:974:18)
@@ -215,8 +215,8 @@ test at scripts/stage-w1h-seal-check.mjs:43:40
 test at scripts/stage-w1h-seal-check.mjs:43:40
 ✖ time order (0.206021ms)
   TypeError [Error]: gate.createSourceSeal is not a function
-      at fixture (file:///workspace/scratch/e622c1e9421e/shogi-w1h-20261118/repo/scripts/stage-w1h-seal-check.mjs:9:18)
-      at TestContext.<anonymous> (file:///workspace/scratch/e622c1e9421e/shogi-w1h-20261118/repo/scripts/stage-w1h-seal-check.mjs:43:63)
+      at fixture (file://<CASE_REPO>/scripts/stage-w1h-seal-check.mjs:9:18)
+      at TestContext.<anonymous> (file://<CASE_REPO>/scripts/stage-w1h-seal-check.mjs:43:63)
       at Test.runInAsyncScope (node:async_hooks:227:14)
       at Test.run (node:internal/test_runner/test:1402:25)
       at Test.processPendingSubtests (node:internal/test_runner/test:974:18)
@@ -227,8 +227,8 @@ test at scripts/stage-w1h-seal-check.mjs:43:40
 test at scripts/stage-w1h-seal-check.mjs:43:40
 ✖ incomplete close (0.404915ms)
   TypeError [Error]: gate.createSourceSeal is not a function
-      at fixture (file:///workspace/scratch/e622c1e9421e/shogi-w1h-20261118/repo/scripts/stage-w1h-seal-check.mjs:9:18)
-      at TestContext.<anonymous> (file:///workspace/scratch/e622c1e9421e/shogi-w1h-20261118/repo/scripts/stage-w1h-seal-check.mjs:43:63)
+      at fixture (file://<CASE_REPO>/scripts/stage-w1h-seal-check.mjs:9:18)
+      at TestContext.<anonymous> (file://<CASE_REPO>/scripts/stage-w1h-seal-check.mjs:43:63)
       at Test.runInAsyncScope (node:async_hooks:227:14)
       at Test.run (node:internal/test_runner/test:1402:25)
       at Test.processPendingSubtests (node:internal/test_runner/test:974:18)
@@ -239,8 +239,8 @@ test at scripts/stage-w1h-seal-check.mjs:43:40
 test at scripts/stage-w1h-seal-check.mjs:43:40
 ✖ synthetic carried to live (0.12297ms)
   TypeError [Error]: gate.createSourceSeal is not a function
-      at fixture (file:///workspace/scratch/e622c1e9421e/shogi-w1h-20261118/repo/scripts/stage-w1h-seal-check.mjs:9:18)
-      at TestContext.<anonymous> (file:///workspace/scratch/e622c1e9421e/shogi-w1h-20261118/repo/scripts/stage-w1h-seal-check.mjs:43:63)
+      at fixture (file://<CASE_REPO>/scripts/stage-w1h-seal-check.mjs:9:18)
+      at TestContext.<anonymous> (file://<CASE_REPO>/scripts/stage-w1h-seal-check.mjs:43:63)
       at Test.runInAsyncScope (node:async_hooks:227:14)
       at Test.run (node:internal/test_runner/test:1402:25)
       at Test.processPendingSubtests (node:internal/test_runner/test:974:18)
@@ -251,8 +251,8 @@ test at scripts/stage-w1h-seal-check.mjs:43:40
 test at scripts/stage-w1h-seal-check.mjs:43:40
 ✖ digest confused with raw hash (0.068946ms)
   TypeError [Error]: gate.createSourceSeal is not a function
-      at fixture (file:///workspace/scratch/e622c1e9421e/shogi-w1h-20261118/repo/scripts/stage-w1h-seal-check.mjs:9:18)
-      at TestContext.<anonymous> (file:///workspace/scratch/e622c1e9421e/shogi-w1h-20261118/repo/scripts/stage-w1h-seal-check.mjs:43:63)
+      at fixture (file://<CASE_REPO>/scripts/stage-w1h-seal-check.mjs:9:18)
+      at TestContext.<anonymous> (file://<CASE_REPO>/scripts/stage-w1h-seal-check.mjs:43:63)
       at Test.runInAsyncScope (node:async_hooks:227:14)
       at Test.run (node:internal/test_runner/test:1402:25)
       at Test.processPendingSubtests (node:internal/test_runner/test:974:18)
@@ -263,8 +263,8 @@ test at scripts/stage-w1h-seal-check.mjs:43:40
 test at scripts/stage-w1h-seal-check.mjs:43:40
 ✖ start rebound (0.178857ms)
   TypeError [Error]: gate.createSourceSeal is not a function
-      at fixture (file:///workspace/scratch/e622c1e9421e/shogi-w1h-20261118/repo/scripts/stage-w1h-seal-check.mjs:9:18)
-      at TestContext.<anonymous> (file:///workspace/scratch/e622c1e9421e/shogi-w1h-20261118/repo/scripts/stage-w1h-seal-check.mjs:43:63)
+      at fixture (file://<CASE_REPO>/scripts/stage-w1h-seal-check.mjs:9:18)
+      at TestContext.<anonymous> (file://<CASE_REPO>/scripts/stage-w1h-seal-check.mjs:43:63)
       at Test.runInAsyncScope (node:async_hooks:227:14)
       at Test.run (node:internal/test_runner/test:1402:25)
       at Test.processPendingSubtests (node:internal/test_runner/test:974:18)
@@ -275,8 +275,8 @@ test at scripts/stage-w1h-seal-check.mjs:43:40
 test at scripts/stage-w1h-seal-check.mjs:43:40
 ✖ finish actor rebound (0.075996ms)
   TypeError [Error]: gate.createSourceSeal is not a function
-      at fixture (file:///workspace/scratch/e622c1e9421e/shogi-w1h-20261118/repo/scripts/stage-w1h-seal-check.mjs:9:18)
-      at TestContext.<anonymous> (file:///workspace/scratch/e622c1e9421e/shogi-w1h-20261118/repo/scripts/stage-w1h-seal-check.mjs:43:63)
+      at fixture (file://<CASE_REPO>/scripts/stage-w1h-seal-check.mjs:9:18)
+      at TestContext.<anonymous> (file://<CASE_REPO>/scripts/stage-w1h-seal-check.mjs:43:63)
       at Test.runInAsyncScope (node:async_hooks:227:14)
       at Test.run (node:internal/test_runner/test:1402:25)
       at Test.processPendingSubtests (node:internal/test_runner/test:974:18)
@@ -287,8 +287,8 @@ test at scripts/stage-w1h-seal-check.mjs:43:40
 test at scripts/stage-w1h-seal-check.mjs:43:40
 ✖ output reused (0.169586ms)
   TypeError [Error]: gate.createSourceSeal is not a function
-      at fixture (file:///workspace/scratch/e622c1e9421e/shogi-w1h-20261118/repo/scripts/stage-w1h-seal-check.mjs:9:18)
-      at TestContext.<anonymous> (file:///workspace/scratch/e622c1e9421e/shogi-w1h-20261118/repo/scripts/stage-w1h-seal-check.mjs:43:63)
+      at fixture (file://<CASE_REPO>/scripts/stage-w1h-seal-check.mjs:9:18)
+      at TestContext.<anonymous> (file://<CASE_REPO>/scripts/stage-w1h-seal-check.mjs:43:63)
       at Test.runInAsyncScope (node:async_hooks:227:14)
       at Test.run (node:internal/test_runner/test:1402:25)
       at Test.processPendingSubtests (node:internal/test_runner/test:974:18)
@@ -299,8 +299,8 @@ test at scripts/stage-w1h-seal-check.mjs:43:40
 test at scripts/stage-w1h-seal-check.mjs:43:40
 ✖ expected missing (0.143657ms)
   TypeError [Error]: gate.createSourceSeal is not a function
-      at fixture (file:///workspace/scratch/e622c1e9421e/shogi-w1h-20261118/repo/scripts/stage-w1h-seal-check.mjs:9:18)
-      at TestContext.<anonymous> (file:///workspace/scratch/e622c1e9421e/shogi-w1h-20261118/repo/scripts/stage-w1h-seal-check.mjs:43:63)
+      at fixture (file://<CASE_REPO>/scripts/stage-w1h-seal-check.mjs:9:18)
+      at TestContext.<anonymous> (file://<CASE_REPO>/scripts/stage-w1h-seal-check.mjs:43:63)
       at Test.runInAsyncScope (node:async_hooks:227:14)
       at Test.run (node:internal/test_runner/test:1402:25)
       at Test.processPendingSubtests (node:internal/test_runner/test:974:18)
@@ -311,8 +311,8 @@ test at scripts/stage-w1h-seal-check.mjs:43:40
 test at scripts/stage-w1h-seal-check.mjs:43:40
 ✖ bytes missing (0.126982ms)
   TypeError [Error]: gate.createSourceSeal is not a function
-      at fixture (file:///workspace/scratch/e622c1e9421e/shogi-w1h-20261118/repo/scripts/stage-w1h-seal-check.mjs:9:18)
-      at TestContext.<anonymous> (file:///workspace/scratch/e622c1e9421e/shogi-w1h-20261118/repo/scripts/stage-w1h-seal-check.mjs:43:63)
+      at fixture (file://<CASE_REPO>/scripts/stage-w1h-seal-check.mjs:9:18)
+      at TestContext.<anonymous> (file://<CASE_REPO>/scripts/stage-w1h-seal-check.mjs:43:63)
       at Test.runInAsyncScope (node:async_hooks:227:14)
       at Test.run (node:internal/test_runner/test:1402:25)
       at Test.processPendingSubtests (node:internal/test_runner/test:974:18)
@@ -323,8 +323,8 @@ test at scripts/stage-w1h-seal-check.mjs:43:40
 test at scripts/stage-w1h-seal-check.mjs:44:1
 ✖ production gate remains blocked after synthetic success (0.303225ms)
   TypeError [Error]: gate.createSourceSeal is not a function
-      at fixture (file:///workspace/scratch/e622c1e9421e/shogi-w1h-20261118/repo/scripts/stage-w1h-seal-check.mjs:9:18)
-      at TestContext.<anonymous> (file:///workspace/scratch/e622c1e9421e/shogi-w1h-20261118/repo/scripts/stage-w1h-seal-check.mjs:44:91)
+      at fixture (file://<CASE_REPO>/scripts/stage-w1h-seal-check.mjs:9:18)
+      at TestContext.<anonymous> (file://<CASE_REPO>/scripts/stage-w1h-seal-check.mjs:44:91)
       at Test.runInAsyncScope (node:async_hooks:227:14)
       at Test.run (node:internal/test_runner/test:1402:25)
       at Test.processPendingSubtests (node:internal/test_runner/test:974:18)

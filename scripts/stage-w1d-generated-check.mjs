@@ -31,6 +31,7 @@ for(const [name,mutate] of cases) {
  const temp=join(root,'temp'),cache=join(root,'cache');mkdirSync(temp);mkdirSync(cache);
  const plan={targets:[a,b].map(dir=>({dir,repo,head})),filters:[],expected:{pool:'forks',maxWorkers:2,testTimeout:5000,cache:true},environment:{TEMP:temp,TMP:temp,npm_config_cache:cache}},observations=plan.targets.map(t=>inspect(repo,t.dir,head)),sealed={observations,environment:environment(plan)},runId=randomUUID();
  const tooling=Object.fromEntries(['runner','worker','preflight','summary'].map(n=>[n,sha(resolve(`scripts/stage-w1b-${n}.mjs`))]));
+ tooling.w1hTarget=sha(resolve('scripts/stage-w1h-target.mjs'));
  tooling.w1gGate=sha(resolve('scripts/stage-w1g-gate.mjs'));
  write(join(record,'preflight.json'),{runId,output:record,plan,observations,sealed,tooling});const preflightSha256=sha(join(record,'preflight.json'));
  const trials=plan.targets.map((target,i)=>{const output=join(record,`collect-${i}`);mkdirSync(output);write(join(output,'inventory.json'),{tests:[],suites:[]});const settings={cacheDir:join(target.dir,'node_modules/.vite')};write(join(output,'settings.json'),settings);const trialId=randomUUID(),request={target,dir:target.dir,output,observation:observations[i],environment:plan.environment,runId,trialId,preflightSha256};return {trialId,request,settings,inventorySha256:sha(join(output,'inventory.json')),settingsSha256:sha(join(output,'settings.json'))};});

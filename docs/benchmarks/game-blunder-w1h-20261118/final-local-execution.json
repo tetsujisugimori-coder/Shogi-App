@@ -1,0 +1,40 @@
+[
+  {
+    "command": [
+      "node",
+      "--test",
+      "scripts/stage-w1-summary-check.mjs",
+      "scripts/stage-w1b-summary-check.mjs",
+      "scripts/stage-w1c-check.mjs",
+      "scripts/stage-w1d-check.mjs",
+      "scripts/stage-w1e-check.mjs",
+      "scripts/stage-w1f-check.mjs",
+      "scripts/stage-w1g-check.mjs",
+      "scripts/stage-w1h-entry-check.mjs",
+      "scripts/stage-w1h-seal-check.mjs",
+      "scripts/stage-w1f-observer-check.mjs"
+    ],
+    "start_utc": "2026-11-18T14:31:54.651535+00:00",
+    "end_utc": "2026-11-18T14:32:00.003975+00:00",
+    "exit_code": 0,
+    "timeout_seconds": 90,
+    "retry_count": 0,
+    "actor": "W1h implementing coordinator",
+    "environment": "Linux-6.18.57-x86_64-with-glibc2.41",
+    "node": "v24.22.3",
+    "stdout": "final-local.stdout",
+    "stderr": "final-local.stderr",
+    "code_sha256": {
+      "scripts/stage-w1-summary-check.mjs": "926e7af36ebfe77c87cb95961601a0fa0cb5d6b3d6f42efcd944a8b135d3c30b",
+      "scripts/stage-w1b-summary-check.mjs": "886a0e84623a2a6e456c362c45415a86b4b65de00d98788568bbc6dfe2106e99",
+      "scripts/stage-w1c-check.mjs": "bbb12e378bbd22a7c1884b91842e0e01d181a956d3fb0ba5a6e597b4de5fc9f4",
+      "scripts/stage-w1d-check.mjs": "5f8a3e674a5eb042038bf0f3c9eb8e3d8c21b0605aaad1ffd6335bad7459c972",
+      "scripts/stage-w1e-check.mjs": "69c296505783009bdaf67378257de05ca5cc160126d98c0519c8f2eb2d96094c",
+      "scripts/stage-w1f-check.mjs": "0e848a18f255ae1c71488b9cac98aa04304dce10d56e7e7af643e6394dae311d",
+      "scripts/stage-w1g-check.mjs": "32d11a755cfae7485f62bd39c54d4d80689bb669df8804f0a545733b614ad043",
+      "scripts/stage-w1h-entry-check.mjs": "192ede46a8c3878edb98cd30c39a65fc94e221c812542d6725dbc9bf6e96e50a",
+      "scripts/stage-w1h-seal-check.mjs": "1c2515501b51f2aeedd2ab1e708158be72af4d7f2d854debeca031d60ddcb7fa",
+      "scripts/stage-w1f-observer-check.mjs": "7baf69d648ecc2e9795995278c0ed8f12995c8691ac1e4c7207fa5c15be19364"
+    }
+  }
+]

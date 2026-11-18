@@ -1,3 +1,4 @@
+import { admitTargets } from './stage-w1h-target.mjs';
 // Observation only. No admission exception, cache override, or comparison start.
 import fs, { promises as fsp } from 'node:fs';
 import { join, resolve } from 'node:path';
@@ -7,6 +8,8 @@ import { gzipSync } from 'node:zlib';
 import { spawnSync } from 'node:child_process';
 import { tree, inspect, hash, read } from './stage-w1b-preflight.mjs';
 const [mode,planArg,outArg,indexArg]=process.argv.slice(2),plan=read(resolve(planArg)),out=resolve(outArg);
+// Historical collection entry: reject fixed identities before any output or target import.
+admitTargets(plan.targets);
 const write=(p,o)=>fs.writeFileSync(p,JSON.stringify(o,null,2)+'\n',{flag:'wx'});
 if(mode==='parent') {
   fs.mkdirSync(out);write(join(out,'plan.json'),plan);

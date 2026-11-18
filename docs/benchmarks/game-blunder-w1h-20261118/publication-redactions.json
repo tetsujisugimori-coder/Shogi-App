@@ -1,0 +1,20 @@
+[
+  {
+    "path": "generated.stdout",
+    "raw_sha256": "3c8b9cbbad6ad1ea20863cfcce0e7c54a9eb5edecd01019555197eb1ed1e1d25",
+    "public_sha256": "aaf892a5e6b7d6444f65c67630160503b4738f01fe67648c6196657bb270a1c1",
+    "scope": "path-redacted public representation; unmodified original retained privately"
+  },
+  {
+    "path": "seal/red.stdout",
+    "raw_sha256": "c345e8b79a5c7d714f3b58348aba82dacde0b9755af2b3195a513d6f7e5d9f61",
+    "public_sha256": "6509c00fac4a8b14cc1e2b922c8237897363936f7781c8b6b9e2ebaaad6c4e8f",
+    "scope": "path-redacted public representation; unmodified original retained privately"
+  },
+  {
+    "path": "seal/oid-coercion-red.stdout",
+    "raw_sha256": "4eed80256f4c247b06fa001589ac62c955105ab358b9b8fcad7e94ab09b5422a",
+    "public_sha256": "1e184049e049e78a764aab37bd6079fc6b6215358711374d685f543090a2c0f9",
+    "scope": "path-redacted public representation; unmodified original retained privately"
+  }
+]

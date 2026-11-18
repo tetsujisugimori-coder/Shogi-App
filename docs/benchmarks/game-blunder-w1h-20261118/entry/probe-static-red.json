@@ -1,0 +1,20 @@
+[
+  {
+    "path": "scripts/stage-w1d-probe.mjs",
+    "before_sha256": "926c38f5c1390a8f9a2d2a0e7c9d58887afe1a91ea390833e982714cd705c9e2",
+    "guard_absent": true,
+    "evidence": "static only; fixed probe not executed"
+  },
+  {
+    "path": "scripts/stage-w1e-probe.mjs",
+    "before_sha256": "e01664da88c44953a2a38d668e472c9d3e4fe223a3bc242b3a09c5d3a8876e5f",
+    "guard_absent": true,
+    "evidence": "static only; fixed probe not executed"
+  },
+  {
+    "path": "scripts/stage-w1f-probe.mjs",
+    "before_sha256": "b97d9afcb7a371f5adc063b516e96fa7c97bab335e1ba91f4510b7f76edaab45",
+    "guard_absent": true,
+    "evidence": "static only; fixed probe not executed"
+  }
+]

@@ -1,3 +1,4 @@
+import { admitTargets } from './stage-w1h-target.mjs';
 import fs,{promises as fsp} from 'node:fs';
 import {join,resolve} from 'node:path';
 import {createRequire} from 'node:module';
@@ -7,6 +8,8 @@ import {performance} from 'node:perf_hooks';
 import {hash,read,inspect} from './stage-w1b-preflight.mjs';
 import {inventory,saveState} from './stage-w1e-observation.mjs';
 const [mode,planArg,outArg,indexArg]=process.argv.slice(2),plan=read(resolve(planArg)),out=resolve(outArg);
+// Historical collection entry: reject fixed identities before any output or target import.
+admitTargets(plan.targets);
 const write=(p,v)=>fs.writeFileSync(p,JSON.stringify(v,null,2)+'\n',{flag:'wx'});
 if(mode==='parent') {
   fs.mkdirSync(out);write(join(out,'plan.json'),plan);

@@ -36,3 +36,5 @@ for(const [i,tree] of ['5ced08e0036f955833ca2e12722bfbd595a00afd','3d06ccd81473b
 }
 
 test('malformed saved READY cannot write before identity admission',()=>{const out=join(root,'malformed');mkdirSync(out);writeFileSync(join(out,'ready.json'),'{}');writeFileSync(join(out,'ready.sha256.json'),'{');const prior=readdirSync(out);assert.equal(launch(out).status,'UNKNOWN');assert.deepEqual(readdirSync(out),prior);});
+
+for(const generation of ['d','e','f']) for(const mode of ['parent','child']) test(`historical ${generation} probe ${mode} fixed collection denied`,()=>{const out=join(root,`probe-${generation}-${mode}`),p=join(root,`probe-${generation}-${mode}.json`);writeFileSync(p,JSON.stringify({targets:[target(FIXED_HEADS[0]),target(FIXED_HEADS[1])]}));const r=spawnSync(process.execPath,[resolve(`scripts/stage-w1${generation}-probe.mjs`),mode,p,out,'0'],{encoding:'utf8',timeout:10000});assert.equal(r.status,1);assert.match(r.stderr,/W1G_FIXED_COMPARISON_BLOCKED/);assert.equal(existsSync(out),false);assert.deepEqual(snapshot(),before);});
