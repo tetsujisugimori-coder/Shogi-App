@@ -1,0 +1,13 @@
+{
+  "scope": "A self-check of packaged originals only, not independent Library retrieval",
+  "result": {
+    "integrity": "PASS",
+    "entries": 118,
+    "files": 117,
+    "bytes": 209585,
+    "sha256": "cbc2393e96e12c4ea5e46a9a7501fec4cdbbefb1337cbec3dc1c063b52ef6b4f",
+    "all_byte": "PASS",
+    "permanent_retention": "UNKNOWN",
+    "permit": false
+  }
+}

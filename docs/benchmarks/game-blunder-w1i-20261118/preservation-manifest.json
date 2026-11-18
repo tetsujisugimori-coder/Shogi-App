@@ -1,0 +1,38 @@
+{
+  "schema": "w1i-preservation-manifest/1",
+  "purpose": "package inventory and receipt summary; source originals are inside owner-only packages, not public",
+  "packages": [
+    {
+      "id": "cloud117",
+      "filename": "shogi-w1i-w1h-cloud-originals-20261118.zip",
+      "version": 0,
+      "size": 209585,
+      "sha256": "cbc2393e96e12c4ea5e46a9a7501fec4cdbbefb1337cbec3dc1c063b52ef6b4f",
+      "entries": 118,
+      "payload_files": 117,
+      "payload_bytes": 641330,
+      "manifest": "AUDIT-MANIFEST.json",
+      "save": "PASS",
+      "destination": "owner-only Library"
+    },
+    {
+      "id": "windows185",
+      "filename": "shogi-w1h-windows185-originals.zip",
+      "version": 0,
+      "size": 98796,
+      "sha256": "093eeedf2243de7d6c7d81153e522681669b30c12bd41dc26d8a7d088ba4ceb8",
+      "entries": 187,
+      "payload_files": 185,
+      "payload_bytes": 142620,
+      "manifest_sha256": "69cfa11128b10b0ceba16ccef04ec411fd951eb8d399ba41dd93a789b4ab310c",
+      "manifest_size": 36882,
+      "save": "PASS",
+      "destination": "owner-only Library"
+    }
+  ],
+  "retention": {
+    "requested": "one year from save; no deletion/move/overwrite without separate approval",
+    "service_enforcement": "UNKNOWN",
+    "acl_entire_account": "UNKNOWN"
+  }
+}

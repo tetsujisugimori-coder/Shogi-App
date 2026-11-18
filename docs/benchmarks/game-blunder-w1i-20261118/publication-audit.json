@@ -1,0 +1,242 @@
+{
+  "head": "1b4b17d90ff58db576585cc0151f5c53354a9d36",
+  "manifest_sha256": "24a541313bd882c59a1fcf6db309631141efabb391d9b96e18d0f9de99c93cf4",
+  "time_utc": "2026-11-18T15:28:14.076983+00:00",
+  "scope": "4 manifest-declared public representations and corresponding retained private originals only",
+  "source": "public bytes independently fetched from GitHub fixed commits via Git; private originals read directly without mutation",
+  "rows": [
+    {
+      "path": "generated.stdout",
+      "raw_size": 2321,
+      "raw_sha256": "3c8b9cbbad6ad1ea20863cfcce0e7c54a9eb5edecd01019555197eb1ed1e1d25",
+      "raw_registered_sha_match": true,
+      "public_size": 2287,
+      "public_sha256": "aaf892a5e6b7d6444f65c67630160503b4738f01fe67648c6196657bb270a1c1",
+      "public_registered_sha_match": true,
+      "public_equals_only_declared_path_substitution": true,
+      "raw_public_all_bytes_equal": false,
+      "current_cloud_workspace_path_present": false,
+      "sensitive_token_pattern_counts_raw": {
+        "private_key_header": 0,
+        "bearer_credential": 0,
+        "github_pat": 0,
+        "openai_key": 0,
+        "signed_query": 0
+      },
+      "sensitive_token_pattern_counts_public": {
+        "private_key_header": 0,
+        "bearer_credential": 0,
+        "github_pat": 0,
+        "openai_key": 0,
+        "signed_query": 0
+      },
+      "history": [
+        {
+          "head": "fdf40185ea91e9c50beaed02f7bc1c4f2bcafae4",
+          "present": false,
+          "size": null,
+          "sha256": null,
+          "matches_current_private_raw": false,
+          "matches_current_public": false,
+          "contains_cloud_workspace_path": false
+        },
+        {
+          "head": "ec8fc6fbdcf8f23a74081be7c90feccb17184f0d",
+          "present": true,
+          "size": 2287,
+          "sha256": "aaf892a5e6b7d6444f65c67630160503b4738f01fe67648c6196657bb270a1c1",
+          "matches_current_private_raw": false,
+          "matches_current_public": true,
+          "contains_cloud_workspace_path": false
+        },
+        {
+          "head": "cd8811983222039681cad20ff026a940c5948f1a",
+          "present": true,
+          "size": 2287,
+          "sha256": "aaf892a5e6b7d6444f65c67630160503b4738f01fe67648c6196657bb270a1c1",
+          "matches_current_private_raw": false,
+          "matches_current_public": true,
+          "contains_cloud_workspace_path": false
+        }
+      ]
+    },
+    {
+      "path": "seal/red.stdout",
+      "raw_size": 20858,
+      "raw_sha256": "c345e8b79a5c7d714f3b58348aba82dacde0b9755af2b3195a513d6f7e5d9f61",
+      "raw_registered_sha_match": true,
+      "public_size": 18658,
+      "public_sha256": "6509c00fac4a8b14cc1e2b922c8237897363936f7781c8b6b9e2ebaaad6c4e8f",
+      "public_registered_sha_match": true,
+      "public_equals_only_declared_path_substitution": true,
+      "raw_public_all_bytes_equal": false,
+      "current_cloud_workspace_path_present": false,
+      "sensitive_token_pattern_counts_raw": {
+        "private_key_header": 0,
+        "bearer_credential": 0,
+        "github_pat": 0,
+        "openai_key": 0,
+        "signed_query": 0
+      },
+      "sensitive_token_pattern_counts_public": {
+        "private_key_header": 0,
+        "bearer_credential": 0,
+        "github_pat": 0,
+        "openai_key": 0,
+        "signed_query": 0
+      },
+      "history": [
+        {
+          "head": "fdf40185ea91e9c50beaed02f7bc1c4f2bcafae4",
+          "present": true,
+          "size": 20858,
+          "sha256": "c345e8b79a5c7d714f3b58348aba82dacde0b9755af2b3195a513d6f7e5d9f61",
+          "matches_current_private_raw": true,
+          "matches_current_public": false,
+          "contains_cloud_workspace_path": true
+        },
+        {
+          "head": "ec8fc6fbdcf8f23a74081be7c90feccb17184f0d",
+          "present": true,
+          "size": 18658,
+          "sha256": "6509c00fac4a8b14cc1e2b922c8237897363936f7781c8b6b9e2ebaaad6c4e8f",
+          "matches_current_private_raw": false,
+          "matches_current_public": true,
+          "contains_cloud_workspace_path": false
+        },
+        {
+          "head": "cd8811983222039681cad20ff026a940c5948f1a",
+          "present": true,
+          "size": 18658,
+          "sha256": "6509c00fac4a8b14cc1e2b922c8237897363936f7781c8b6b9e2ebaaad6c4e8f",
+          "matches_current_private_raw": false,
+          "matches_current_public": true,
+          "contains_cloud_workspace_path": false
+        }
+      ]
+    },
+    {
+      "path": "seal/oid-coercion-red.stdout",
+      "raw_size": 1997,
+      "raw_sha256": "4eed80256f4c247b06fa001589ac62c955105ab358b9b8fcad7e94ab09b5422a",
+      "raw_registered_sha_match": true,
+      "public_size": 1953,
+      "public_sha256": "1e184049e049e78a764aab37bd6079fc6b6215358711374d685f543090a2c0f9",
+      "public_registered_sha_match": true,
+      "public_equals_only_declared_path_substitution": true,
+      "raw_public_all_bytes_equal": false,
+      "current_cloud_workspace_path_present": false,
+      "sensitive_token_pattern_counts_raw": {
+        "private_key_header": 0,
+        "bearer_credential": 0,
+        "github_pat": 0,
+        "openai_key": 0,
+        "signed_query": 0
+      },
+      "sensitive_token_pattern_counts_public": {
+        "private_key_header": 0,
+        "bearer_credential": 0,
+        "github_pat": 0,
+        "openai_key": 0,
+        "signed_query": 0
+      },
+      "history": [
+        {
+          "head": "fdf40185ea91e9c50beaed02f7bc1c4f2bcafae4",
+          "present": true,
+          "size": 1997,
+          "sha256": "4eed80256f4c247b06fa001589ac62c955105ab358b9b8fcad7e94ab09b5422a",
+          "matches_current_private_raw": true,
+          "matches_current_public": false,
+          "contains_cloud_workspace_path": true
+        },
+        {
+          "head": "ec8fc6fbdcf8f23a74081be7c90feccb17184f0d",
+          "present": true,
+          "size": 1953,
+          "sha256": "1e184049e049e78a764aab37bd6079fc6b6215358711374d685f543090a2c0f9",
+          "matches_current_private_raw": false,
+          "matches_current_public": true,
+          "contains_cloud_workspace_path": false
+        },
+        {
+          "head": "cd8811983222039681cad20ff026a940c5948f1a",
+          "present": true,
+          "size": 1953,
+          "sha256": "1e184049e049e78a764aab37bd6079fc6b6215358711374d685f543090a2c0f9",
+          "matches_current_private_raw": false,
+          "matches_current_public": true,
+          "contains_cloud_workspace_path": false
+        }
+      ]
+    },
+    {
+      "path": "post-admission.stdout",
+      "raw_size": 14771,
+      "raw_sha256": "e9159d84ff1bfc2bd2fa3d11a94d219cb8331ea39280e06c1c6f4f35d44e0add",
+      "raw_registered_sha_match": true,
+      "public_size": 14595,
+      "public_sha256": "cf22855261e91d44d7c85d149d759a57f8fc847559b0ba99cde2e378f3bf6040",
+      "public_registered_sha_match": true,
+      "public_equals_only_declared_path_substitution": true,
+      "raw_public_all_bytes_equal": false,
+      "current_cloud_workspace_path_present": false,
+      "sensitive_token_pattern_counts_raw": {
+        "private_key_header": 0,
+        "bearer_credential": 0,
+        "github_pat": 0,
+        "openai_key": 0,
+        "signed_query": 0
+      },
+      "sensitive_token_pattern_counts_public": {
+        "private_key_header": 0,
+        "bearer_credential": 0,
+        "github_pat": 0,
+        "openai_key": 0,
+        "signed_query": 0
+      },
+      "history": [
+        {
+          "head": "fdf40185ea91e9c50beaed02f7bc1c4f2bcafae4",
+          "present": false,
+          "size": null,
+          "sha256": null,
+          "matches_current_private_raw": false,
+          "matches_current_public": false,
+          "contains_cloud_workspace_path": false
+        },
+        {
+          "head": "ec8fc6fbdcf8f23a74081be7c90feccb17184f0d",
+          "present": false,
+          "size": null,
+          "sha256": null,
+          "matches_current_private_raw": false,
+          "matches_current_public": false,
+          "contains_cloud_workspace_path": false
+        },
+        {
+          "head": "cd8811983222039681cad20ff026a940c5948f1a",
+          "present": true,
+          "size": 14595,
+          "sha256": "cf22855261e91d44d7c85d149d759a57f8fc847559b0ba99cde2e378f3bf6040",
+          "matches_current_private_raw": false,
+          "matches_current_public": true,
+          "contains_cloud_workspace_path": false
+        }
+      ]
+    }
+  ],
+  "facts": {
+    "current_redaction_integrity": "PASS",
+    "raw_public_equality_expected": false,
+    "historical_public_path_remains": true
+  },
+  "limits": [
+    "Credential-pattern scan is bounded and heuristic, not proof of universal secret absence.",
+    "Cloud filesystem paths alone are not authentication credentials or usable remote download links.",
+    "No evidence of actual unauthorized access or exploitation was observed in this audit.",
+    "Historical public objects are not removed by redacting current files.",
+    "No original bytes, old log, Git history or external state modified.",
+    "Preservation/long-term storage approvals are a separate pending gate."
+  ]
+}

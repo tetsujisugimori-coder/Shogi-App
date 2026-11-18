@@ -1,0 +1,56 @@
+{
+  "schema": "w1i-acceptance/1",
+  "overall": "PARTIAL",
+  "result": "B",
+  "CUSTODY_STATUS": "PARTIAL",
+  "VERIFICATION_STATUS": "PARTIAL",
+  "INDEPENDENCE_STATUS": "LIMITED_SHARED_OWNER",
+  "ACCEPTANCE_STATUS": "PARTIAL",
+  "enumerated_saved_cloud": 117,
+  "enumerated_saved_windows": 185,
+  "save_packages": 2,
+  "scope_limit": "29 additional legacy Windows records outside approved185 not newly saved; nested synthetic fixtures not exhaustive",
+  "publication_current": "PASS",
+  "publication_history": "RESIDUAL_PATHS_PRESENT",
+  "publication_P3": "OPEN",
+  "new_functional_P1": 0,
+  "new_functional_P2": 0,
+  "helper_path_P3": "CLOSED",
+  "local_python_tests": {
+    "pass": 23,
+    "fail": 0,
+    "skip": 0,
+    "exit": 0
+  },
+  "local_regression": {
+    "pass": 225,
+    "fail": 0,
+    "skip": 0,
+    "exit": 0
+  },
+  "new_head_formal_CI": "PENDING_POST_SUBMISSION",
+  "original_comparison": {
+    "old": 0,
+    "new": 0,
+    "gate": "BLOCKED"
+  },
+  "S4": "NOT_TESTED",
+  "S5": "NOT_TESTED",
+  "R8": "UNKNOWN",
+  "H1-H4": "UNKNOWN",
+  "merge_recommendation": "NO",
+  "draft": true,
+  "service_retention": "UNKNOWN",
+  "acl_entirety": "UNKNOWN",
+  "historical_authenticity": "UNKNOWN",
+  "independent_helper_cases": {
+    "total": 12,
+    "expected_matches": 12,
+    "initial_expected_matches": 10,
+    "same_inputs": true
+  },
+  "approved_enumerated_scope_custody": "PASS",
+  "approved_enumerated_scope_verification": "PASS",
+  "unverified_additional_legacy_files": 29,
+  "enumerated_missing": 0
+}

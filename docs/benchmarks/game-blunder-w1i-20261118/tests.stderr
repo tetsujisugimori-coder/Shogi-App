@@ -1,0 +1,26 @@
+test_byte_mismatch (__main__.Tests.test_byte_mismatch) ... ok
+test_crc (__main__.Tests.test_crc) ... ok
+test_dangerous_path (__main__.Tests.test_dangerous_path) ... ok
+test_manifest_content (__main__.Tests.test_manifest_content) ... ok
+test_manifest_duplicate (__main__.Tests.test_manifest_duplicate) ... ok
+test_manifest_empty (__main__.Tests.test_manifest_empty) ... ok
+test_manifest_missing (__main__.Tests.test_manifest_missing) ... ok
+test_manifest_set (__main__.Tests.test_manifest_set) ... ok
+test_normal (__main__.Tests.test_normal) ... ok
+test_permission_blocked (__main__.Tests.test_permission_blocked) ... ok
+test_public_normal (__main__.Tests.test_public_normal) ... ok
+test_public_secret (__main__.Tests.test_public_secret) ... ok
+test_public_windows (__main__.Tests.test_public_windows) ... ok
+test_public_workspace (__main__.Tests.test_public_workspace) ... ok
+test_receipt_normal (__main__.Tests.test_receipt_normal) ... ok
+test_retrieval_missing (__main__.Tests.test_retrieval_missing) ... ok
+test_retrieval_not_tested (__main__.Tests.test_retrieval_not_tested) ... ok
+test_save_failure (__main__.Tests.test_save_failure) ... ok
+test_sha (__main__.Tests.test_sha) ... ok
+test_size (__main__.Tests.test_size) ... ok
+test_unknown_not_promoted (__main__.Tests.test_unknown_not_promoted) ... ok
+
+----------------------------------------------------------------------
+Ran 21 tests in 0.012s
+
+OK

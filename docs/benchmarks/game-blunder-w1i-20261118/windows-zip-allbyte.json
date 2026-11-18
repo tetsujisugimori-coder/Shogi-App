@@ -1,0 +1,12 @@
+{
+  "utc": "2026-11-18T15:35:27.857155+00:00",
+  "source": "B read Windows original ZIP bytes via Python base64 stdout; decoded without truncation",
+  "library": "B direct Library materialization on cloud",
+  "source_size": 98796,
+  "reacquired_size": 98796,
+  "source_sha256": "093eeedf2243de7d6c7d81153e522681669b30c12bd41dc26d8a7d088ba4ceb8",
+  "all_byte_equal": true,
+  "windows_materialize_attempt": "exit1 os.setxattr AttributeError; not counted as success",
+  "source_185_live_allbyte": "NOT_TESTED",
+  "fixed_comparison_executed": false
+}

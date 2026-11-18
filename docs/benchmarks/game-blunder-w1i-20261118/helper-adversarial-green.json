@@ -1,0 +1,114 @@
+{
+  "at": "2026-11-18T15:34:45.561102+00:00",
+  "code_sha256": "01101f32a111835fa64a205b762f2c794796e4c232e717ccd6238337a01e9664",
+  "rows": [
+    {
+      "case": "normal",
+      "expected": "PASS",
+      "actual": "PASS",
+      "reason": null,
+      "pass": true,
+      "input_sha256": "1644df0a739a8d6a4191b18ea08f8bc41e7e0f08a25bdfd2fd0c2d91ca594b33",
+      "pass_": true
+    },
+    {
+      "case": "duplicate",
+      "expected": "REJECT",
+      "actual": "REJECT",
+      "reason": "DUPLICATE_ENTRY",
+      "pass": true,
+      "input_sha256": "73c1103ffb2e0bd530759a0842f3bac670442f8e27b523d89b48b2a6891aaba7",
+      "pass_": true
+    },
+    {
+      "case": "symlink",
+      "expected": "REJECT",
+      "actual": "REJECT",
+      "reason": "SYMLINK_ENTRY",
+      "pass": true,
+      "input_sha256": "b56cb86ced02af4c7bfb0df3ba32ba784902ee9ef4952bc673140b86e593e520",
+      "pass_": true
+    },
+    {
+      "case": "root",
+      "expected": "REJECT",
+      "actual": "REJECT",
+      "reason": "UNSAFE_ENTRY",
+      "pass": true,
+      "input_sha256": "779d9a561d1089811682f16e263e42e259805289106435a1cc2f703b3c626d3b",
+      "pass_": true
+    },
+    {
+      "case": "drive",
+      "expected": "REJECT",
+      "actual": "REJECT",
+      "reason": "UNSAFE_ENTRY",
+      "pass": true,
+      "input_sha256": "a6f88900cf02a803eb3176f44a20de9ef97405b82d3803047bf5ea9d61981076",
+      "pass_": true
+    },
+    {
+      "case": "backslash",
+      "expected": "REJECT",
+      "actual": "REJECT",
+      "reason": "UNSAFE_ENTRY",
+      "pass": true,
+      "input_sha256": "f533f44ca88ab7c73c797fd419ef197875de626a04719eb917a167ea0fbc8da2",
+      "pass_": true
+    },
+    {
+      "case": "parent",
+      "expected": "REJECT",
+      "actual": "REJECT",
+      "reason": "UNSAFE_ENTRY",
+      "pass": true,
+      "input_sha256": "ed68ff222515beddcc3836955857c499d17543a16e09b8578fdf015dd349312a",
+      "pass_": true
+    },
+    {
+      "case": "dot-relative",
+      "expected": "REJECT",
+      "actual": "REJECT",
+      "reason": "UNSAFE_ENTRY",
+      "pass": false,
+      "input_sha256": "f2e1ce3a1d40879890d3e4597d13ccee6f228e70dca6bdd854d99f79cbc9827c",
+      "pass_": true
+    },
+    {
+      "case": "repeat-separator",
+      "expected": "REJECT",
+      "actual": "REJECT",
+      "reason": "UNSAFE_ENTRY",
+      "pass": false,
+      "input_sha256": "efb73d6f52e4ad05aceb7a738c8307c976c4e386528dba8b2f150f13d686fc5d",
+      "pass_": true
+    },
+    {
+      "case": "manifest-bool-size",
+      "expected": "REJECT",
+      "actual": "REJECT",
+      "reason": "MANIFEST_INVALID",
+      "pass": true,
+      "input_sha256": "c55cb6fe453bae1d2cf139fe9a011c682078fc4a23e45913462bdf2b0a41fcf1",
+      "pass_": true
+    },
+    {
+      "case": "manifest-sha-null",
+      "expected": "REJECT",
+      "actual": "REJECT",
+      "reason": "MANIFEST_INVALID",
+      "pass": true,
+      "input_sha256": "991bb77dfefa8c875dcfec83173aaa9dec05add0b9e1d2b88c50a339990c4f3a",
+      "pass_": true
+    },
+    {
+      "case": "manifest-extra-row",
+      "expected": "REJECT",
+      "actual": "REJECT",
+      "reason": "MANIFEST_SET",
+      "pass": true,
+      "input_sha256": "7d12ae60de45b3d533fbe87ae3cf07161708e16e0ff5205fee9c7facb0544273",
+      "pass_": true
+    }
+  ]
+}
