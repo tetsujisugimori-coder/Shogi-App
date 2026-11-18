@@ -1,3 +1,4 @@
+import { admitTargets } from './stage-w1h-target.mjs';
 // Run from the actual snapshot dependency tree; retain full suite states and errors.
 import { createRequire } from 'node:module';
 import { pathToFileURL } from 'node:url';
@@ -8,11 +9,15 @@ import { read, digest, inspect, requireUnchanged, environment } from './stage-w1
 import { requireNonFixedTargets, requireNonFixedTargetTrees } from './stage-w1g-gate.mjs';
 const [requestPath]=process.argv.slice(2), req=read(requestPath);
 if (!['collect','run'].includes(req.mode)) throw Error('INVALID_WORKER_MODE');
-if (req.mode==='run') {
+admitTargets([req.target]);
+{
   requireNonFixedTargets([req.target?.head]);
   requireNonFixedTargetTrees([req.target]);
   if (realpathSync(req.dir)!==realpathSync(process.cwd()) || resolve(req.dir)!==resolve(req.target.dir)) throw Error('WORKER_TARGET_MISMATCH');
 }
+// Validate actual source/dependency bytes before importing executable target code.
+requireUnchanged(req.observation,inspect(req.target.repo,req.dir,req.target.head));
+requireUnchanged(req.environmentTrees,environment(req.isolationPlan).trees);
 const require=createRequire(join(req.dir,'package.json'));
 const {createVitest}=await import(pathToFileURL(require.resolve('vitest/node')).href);
 const {getSuites,getTests}=await import(pathToFileURL(require.resolve('@vitest/runner/utils')).href);

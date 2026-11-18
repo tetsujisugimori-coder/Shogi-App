@@ -1,3 +1,4 @@
+import { admitTargets, rejection } from './stage-w1h-target.mjs';
 import { mkdirSync, writeFileSync, readFileSync, existsSync } from 'node:fs';
 import { spawnSync } from 'node:child_process';
 import { randomUUID } from 'node:crypto';
@@ -12,6 +13,7 @@ const write=(p,o)=>writeFileSync(p,JSON.stringify(o,null,2)+'\n',{flag:'wx'});
 const fileHash=p=>hash(readFileSync(p));
 const tooling=()=>({
   ...Object.fromEntries(['runner','worker','preflight','summary'].map(n=>[n,fileHash(fileURLToPath(new URL('./stage-w1b-'+n+'.mjs',import.meta.url)))])),
+  w1hTarget:fileHash(fileURLToPath(new URL('./stage-w1h-target.mjs',import.meta.url))),
   w1gGate:fileHash(fileURLToPath(new URL('./stage-w1g-gate.mjs',import.meta.url))),
 });
 function event(out,e) {write(join(out,`event-${randomUUID()}.json`),{at:new Date().toISOString(),...e});}
@@ -36,6 +38,7 @@ function child(out,request) {
   return r;
 }
 export function prepare(plan,out) {
+  try { admitTargets(plan?.targets); } catch(e) { return rejection(e); }
   out=resolve(out);mkdirSync(out);const runId=randomUUID();
   try {
     validatePlan(plan,out);
@@ -72,6 +75,7 @@ export function launch(out) {
     if(fileHash(join(out,'ready.json'))!==read(join(out,'ready.sha256.json')).sha256) throw Error('ready record changed');
     const ready=read(join(out,'ready.json')),preflight=read(join(out,'preflight.json'));
     if(ready.preflightSha256!==fileHash(join(out,'preflight.json'))||preflight.runId!==ready.runId) throw Error('preflight binding mismatch');
+    admitTargets(preflight.plan?.targets);
     validatePlan(preflight.plan,out);
     requireNonFixedTargets(preflight.plan.targets.map(t=>t.head));
     if(preflight.output!==out) throw Error('execution output binding mismatch');
@@ -109,7 +113,7 @@ export function launch(out) {
     }
     write(join(out,'comparison.json'),{runId:ready.runId,results,status:results.every(r=>r.status==='PASS')?'PASS':'NONPASS'});
     return read(join(out,'comparison.json'));
-  } catch(e) {event(out,{action:'blocked',phase:'launch',reason:String(e)});return {status:'UNKNOWN',reason:String(e)};}
+  } catch(e) { return rejection(e); }
 }
 // Offline integrity check of an already recorded execution, not a historical preflight.
 export function verify(out) {

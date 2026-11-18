@@ -25,6 +25,60 @@ const maxAgeMs = 5 * 60_000;
 export const sha = bytes => createHash('sha256').update(bytes).digest('hex');
 export const digest = value => sha(JSON.stringify(value));
 
+// W1h shared producer/readback contract. No caller-provided evidence grants execution.
+export const SOURCE_SEAL_SCHEMA = 'stage-w1h-source-seal/1';
+const object = x => x !== null && typeof x === 'object' && !Array.isArray(x);
+const actorValid = x => object(x) && nonempty(x.id) && nonempty(x.instance);
+const targetValid = x => Array.isArray(x) && x.length > 0 && x.every(t => object(t)
+  && typeof t.head === 'string' && /^[0-9a-f]{40}$/.test(t.head)
+  && typeof t.tree === 'string' && /^[0-9a-f]{40}$/.test(t.tree));
+function validSeal(s) {
+  return object(s) && s.schema === SOURCE_SEAL_SCHEMA && ['synthetic','inspection'].includes(s.scope)
+    && nonempty(s.challenge) && Number.isSafeInteger(s.at) && s.at >= 0 && actorValid(s.actor)
+    && targetValid(s.targets) && ['source','dependency','environment'].every(k => sha256(s[k]));
+}
+export function createSourceSeal(input) {
+  const seal = { ...input, schema: SOURCE_SEAL_SCHEMA };
+  if (!validSeal(seal)) throw Error('SEAL_SCHEMA_INVALID');
+  return seal;
+}
+export function validateSourceSeal(bytes, expected, now) {
+  const reasons = [];
+  const check = (ok, reason) => { if (!ok) reasons.push(reason); };
+  if (!Buffer.isBuffer(bytes) || bytes.length === 0) return {status:'INVALID',reasons:['SOURCE_SEAL_MISSING'],permit:false};
+  if (!object(expected)) return {status:'INVALID',reasons:['EXPECTED_CONTRACT_INVALID'],permit:false};
+  let seal;
+  try { seal = JSON.parse(bytes.toString('utf8')); } catch { return {status:'INVALID',reasons:['SEAL_SCHEMA_INVALID'],permit:false}; }
+  check(sha256(expected.rawSha256) && sha(bytes) === expected.rawSha256, 'SOURCE_SEAL_CHANGED');
+  check(sha256(expected.structuredDigest) && digest(seal) === expected.structuredDigest, 'STRUCTURED_DIGEST_CHANGED');
+  if (!validSeal(seal)) return {status:'INVALID',reasons:[...reasons,'SEAL_SCHEMA_INVALID'],permit:false};
+  check(seal.scope === expected.scope, 'SCOPE_CHANGED');
+  check(nonempty(expected.challenge) && seal.challenge === expected.challenge && expected.usedChallenge === false, 'PRESEAL_REUSED');
+  check(Number.isSafeInteger(now) && now >= seal.at && now-seal.at <= maxAgeMs && seal.at === expected.at, 'ATTESTATION_STALE');
+  check(actorValid(expected.actor) && digest(seal.actor) === digest(expected.actor), 'PROCESS_IDENTITY_MISMATCH');
+  check(targetValid(expected.targets) && digest(seal.targets) === digest(expected.targets), 'TARGET_CHANGED');
+  for(const [key,reason] of [['source','SOURCE_READBACK_CHANGED'],['dependency','DEPENDENCY_CHANGED'],['environment','ENVIRONMENT_CHANGED']])
+    check(sha256(expected[key]) && seal[key] === expected[key],reason);
+  check(expected.freshOutput === true,'OUTPUT_REUSED');
+  return {status:reasons.length?'INVALID':'PASS',reasons,permit:false,seal};
+}
+export function assessSealed({bytes,expected,transcript,now} = {}) {
+  const result=validateSourceSeal(bytes,expected,now);
+  if (!result.seal) return result;
+  const {seal}=result;
+  const reasons=[...result.reasons];
+  const start=transcript?.start, finish=transcript?.finish;
+  const actorMatches = x => actorValid(x) && digest(x) === digest(seal.actor);
+  if (!(object(start) && start.stage==='start' && start.seal===expected.rawSha256 && start.challenge===seal.challenge
+    && Number.isSafeInteger(start.at) && start.at>=seal.at && start.at<=now)) reasons.push('SEAL_EVENT_ORDER');
+  if (!(actorMatches(start?.actor) && actorMatches(finish?.actor))) reasons.push('PROCESS_IDENTITY_MISMATCH');
+  if (!(object(start) && object(finish) && finish.stage==='close' && finish.seal===expected.rawSha256
+    && finish.challenge===seal.challenge && Number.isSafeInteger(finish.at) && finish.at>=start.at
+    && finish.at<=now && finish.status==='PASS' && finish.cleanExit===true)) reasons.push('INCOMPLETE_CLOSE');
+  return {status:reasons.length?'INVALID':'PASS',reasons,permit:false,scope:seal.scope,
+    authentication:'UNKNOWN',proof:'raw-byte and structured-contract integrity only'};
+}
+
 export function requireNonFixedTargets(heads) {
   for (const head of heads) {
     if (typeof head !== 'string' || !/^[a-f0-9]{40}$/.test(head)) throw Error('INVALID_TARGET_HEAD');
@@ -40,6 +94,8 @@ const chain = Object.freeze([
   'final-identity', 'read', 'use', 'end-state',
 ]);
 
+// Legacy W1g synthetic-only contract, retained for regression and old evidence.
+// New producer/readback records must use assessSealed; this function is not admission.
 // Pure contract used by the synthetic controls. Its inputs are verdicts from
 // trusted verifiers, not claims a caller can supply to the operational gate.
 export function assess({ seal, expected, transcript, checks, now }) {

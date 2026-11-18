@@ -1,0 +1,54 @@
+✔ generated source seal roundtrip uses shared raw-byte contract (4.313557ms)
+✔ JSON changed (0.693738ms)
+✔ raw whitespace changed (0.392702ms)
+✔ schema mismatch (0.637957ms)
+✔ missing field (0.459671ms)
+✔ null field (1.851129ms)
+✔ wrong type (0.592084ms)
+✔ source rebind (1.722528ms)
+✔ dependency rebind (0.925793ms)
+✔ environment rebind (0.720717ms)
+✔ HEAD rebind (0.452959ms)
+✔ tree rebind (0.559834ms)
+✔ challenge reuse (0.320919ms)
+✔ stale seal (0.52111ms)
+✔ actor rebind (1.708613ms)
+✔ time order (0.426939ms)
+✔ incomplete close (0.438485ms)
+✔ synthetic carried to live (0.39617ms)
+✔ digest confused with raw hash (0.265091ms)
+✔ start rebound (0.495143ms)
+✔ finish actor rebound (0.340397ms)
+✔ output reused (0.284915ms)
+✔ expected missing (0.165968ms)
+✔ bytes missing (0.15921ms)
+✔ production gate remains blocked after synthetic success (1.423761ms)
+✖ target OID arrays must not coerce to valid string hashes (1.88482ms)
+ℹ tests 26
+ℹ suites 0
+ℹ pass 25
+ℹ fail 1
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 267.320652
+
+✖ failing tests:
+
+test at scripts/stage-w1h-seal-check.mjs:46:1
+✖ target OID arrays must not coerce to valid string hashes (1.88482ms)
+  AssertionError [ERR_ASSERTION]: Missing expected exception.
+      at TestContext.<anonymous> (file:///workspace/scratch/e622c1e9421e/shogi-w1h-20261118/repo/scripts/stage-w1h-seal-check.mjs:49:12)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+      at Test.postRun (node:internal/test_runner/test:1542:19)
+      at Test.run (node:internal/test_runner/test:1467:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: undefined,
+    expected: /SEAL_SCHEMA_INVALID/,
+    operator: 'throws',
+    diff: 'simple'
+  }

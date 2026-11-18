@@ -1,0 +1,17 @@
+{
+  "scripts/stage-w1b-runner.mjs": {
+    "sha256": "0eaf54405443b84f1c079865d7a041f5c41d008ba6a854cb6f89ccaf4f0dd285",
+    "size": 16334
+  },
+  "scripts/stage-w1b-worker.mjs": {
+    "sha256": "c26f4d4acecee927367fce633db6f23c2a49569ffe5743d4df6b9da4a01ae2b7",
+    "size": 4695
+  },
+  "static_red": {
+    "prepare_guard_absent": true,
+    "worker_guard_run_only": true,
+    "fixed_targets_executed": 0,
+    "method": "static baseline source check, no collection or fixed code execution",
+    "observed_at": "2026-11-18T14:24:51.337420+00:00"
+  }
+}

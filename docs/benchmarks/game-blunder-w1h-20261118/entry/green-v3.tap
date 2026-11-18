@@ -1,0 +1,39 @@
+hint: Using 'master' as the name for the initial branch. This default branch name
+hint: will change to "main" in Git 3.0. To configure the initial branch name
+hint: to use in all of your new repositories, which will suppress this warning,
+hint: call:
+hint:
+hint: 	git config --global init.defaultBranch <name>
+hint:
+hint: Names commonly chosen instead of 'master' are 'main', 'trunk' and
+hint: 'development'. The just-created branch can be renamed via this command:
+hint:
+hint: 	git branch -m <name>
+hint:
+hint: Disable this message with "git config set advice.defaultBranchName false"
+✔ fixed 0 prepare rejected before output creation (5.510122ms)
+✔ fixed 0 direct worker collect rejected before import (101.654812ms)
+✔ fixed 0 direct worker run rejected before import (99.664976ms)
+✔ fixed 0 saved READY launch refused (1.762554ms)
+✔ fixed 1 prepare rejected before output creation (0.290353ms)
+✔ fixed 1 direct worker collect rejected before import (114.249342ms)
+✔ fixed 1 direct worker run rejected before import (107.451718ms)
+✔ fixed 1 saved READY launch refused (0.685467ms)
+✔ non-fixed synthetic Git identity accepted (22.833119ms)
+✔ unknown/ref HEAD refused (0.668709ms)
+✔ unknown/ref --bad refused (0.148575ms)
+✔ unknown/ref 0000000000000000000000000000000000000000 refused (4.518796ms)
+✔ unknown/ref null refused (0.093524ms)
+✔ legacy PowerShell entry stops unconditionally (0.309835ms)
+✔ prepare static regression guard precedes mkdir and collection (0.296176ms)
+✔ same fixed tree 0 alternate commit blocked (31.423716ms)
+✔ same fixed tree 1 alternate commit blocked (23.858976ms)
+✔ malformed saved READY cannot write before identity admission (0.842657ms)
+ℹ tests 18
+ℹ suites 0
+ℹ pass 18
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 724.179306

@@ -5,7 +5,7 @@ import { join, resolve } from 'node:path';
 import { createHash, randomUUID } from 'node:crypto';
 import { performance } from 'node:perf_hooks';
 import { isDeepStrictEqual } from 'node:util';
-import { FIXED_HEADS, sha, digest } from './stage-w1g-gate.mjs';
+import { FIXED_HEADS, sha, digest, createSourceSeal, validateSourceSeal, assessSealed } from './stage-w1g-gate.mjs';
 import { contains, inspect, physical } from './stage-w1b-preflight.mjs';
 
 export const artifact = (path, value) => writeFileSync(path, JSON.stringify(value, null, 2) + '\n', { flag: 'wx' });
@@ -60,12 +60,21 @@ export function inspectFixed(repo, snapshots, output) {
   const context = { plan, files, node: file(process.execPath), version: process.version,
     environment: envDigest(process.env), actor: actor() };
   const before = FIXED_HEADS.map((head, i) => snapshot(repo, join(snapshots, i ? 'new' : 'old'), head));
-  const seal = { context, before, challenge: randomUUID(), at: Date.now() };
+  const processActor = { id: digest(actor()), instance: String(performance.timeOrigin) };
+  const seal = createSourceSeal({ scope: 'inspection', context, before,
+    challenge: randomUUID(), at: Date.now(), actor: processActor,
+    targets: before.map((view, i) => ({ head: FIXED_HEADS[i], tree: view.tree })),
+    source: digest(before.map(view => view.source)),
+    dependency: digest(before.map(view => ({ physical: view.dependencies, content: view.dependenciesSha256, lock: view.lockSha256 }))), environment: digest(context.environment) });
   const sealPath = join(output, 'pre-seal.json');
   artifact(sealPath, seal);
   const sealedHash = file(sealPath).sha256;
   if (sealedHash !== sha(JSON.stringify(seal, null, 2) + '\n')) throw Error('SOURCE_SEAL_CHANGED');
-  const events = [{ stage: 'start', actor: actor(), at: Date.now(), seal: sealedHash, challenge: seal.challenge }];
+  const expected = { ...seal, rawSha256: sealedHash, structuredDigest: digest(seal),
+    usedChallenge: false, freshOutput: true };
+  const initial = validateSourceSeal(readFileSync(sealPath), expected, Date.now());
+  if (initial.status !== 'PASS') throw Error(initial.reasons.join(','));
+  const events = [{ stage: 'start', actor: processActor, at: Date.now(), seal: sealedHash, challenge: seal.challenge }];
   artifact(join(output, 'start.json'), events[0]);
   const after = FIXED_HEADS.map((head, i) => snapshot(repo, join(snapshots, i ? 'new' : 'old'), head));
   const reasons = [];
@@ -74,10 +83,17 @@ export function inspectFixed(repo, snapshots, output) {
   if (!isDeepStrictEqual(context.environment, envDigest(process.env))) reasons.push('ENVIRONMENT_CHANGED');
   if (!isDeepStrictEqual(context.files, files.map(({ path }) => file(path)))
       || !isDeepStrictEqual(context.node, file(process.execPath))) reasons.push('OBSERVER_CHANGED');
-  const result = { status: reasons.length ? 'INVALID' : 'PASS', reasons, seal: sealedHash,
+  const finish = { stage: 'close', actor: processActor, at: Date.now(), seal: sealedHash,
+    challenge: seal.challenge, status: reasons.length ? 'INVALID' : 'PASS', cleanExit: reasons.length === 0 };
+  const contract = assessSealed({ bytes: readFileSync(sealPath), expected,
+    transcript: { start: events[0], finish }, now: Date.now() });
+  reasons.push(...contract.reasons);
+  const result = { ...finish, status: reasons.length ? 'INVALID' : 'PASS', reasons, seal: sealedHash,
+    schema: seal.schema, rawSha256: sealedHash, structuredDigest: expected.structuredDigest, contract,
+    permit: false,
     proof: 'point-in-time raw byte equality; same principal and process holds seal and read access',
     historicalAuthenticity: 'UNKNOWN', independentAuthentication: 'BLOCKED',
-    afterDigest: digest(after), actor: actor(), challenge: seal.challenge, stage: 'close', at: Date.now() };
+    afterDigest: digest(after), actor: processActor, challenge: seal.challenge, stage: 'close', at: finish.at };
   artifact(join(output, 'finish.json'), result);
   return result;
 }
