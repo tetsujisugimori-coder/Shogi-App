@@ -16,5 +16,11 @@
     "raw_sha256": "4eed80256f4c247b06fa001589ac62c955105ab358b9b8fcad7e94ab09b5422a",
     "public_sha256": "1e184049e049e78a764aab37bd6079fc6b6215358711374d685f543090a2c0f9",
     "scope": "path-redacted public representation; unmodified original retained privately"
+  },
+  {
+    "path": "post-admission.stdout",
+    "raw_sha256": "e9159d84ff1bfc2bd2fa3d11a94d219cb8331ea39280e06c1c6f4f35d44e0add",
+    "public_sha256": "cf22855261e91d44d7c85d149d759a57f8fc847559b0ba99cde2e378f3bf6040",
+    "scope": "path-redacted public representation; unmodified original retained privately"
   }
 ]

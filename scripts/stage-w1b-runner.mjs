@@ -38,11 +38,12 @@ function child(out,request) {
   return r;
 }
 export function prepare(plan,out) {
-  try { admitTargets(plan?.targets); } catch(e) { return rejection(e); }
-  out=resolve(out);mkdirSync(out);const runId=randomUUID();
+  let sealed;
+  try { admitTargets(plan?.targets); out=resolve(out); validatePlan(plan,out); sealed=state(plan); }
+  catch(e) { return rejection(e); }
+  mkdirSync(out);const runId=randomUUID();
   try {
-    validatePlan(plan,out);
-    const sealed=state(plan),observations=sealed.observations;
+    const observations=sealed.observations;
     write(join(out,'preflight.json'),{runId,at:new Date().toISOString(),output:out,plan,observations,sealed,tooling:tooling(),execution:{node:process.version,nodePath:process.execPath,cwd:process.cwd()},status:'SOURCE_DEPENDENCIES_VERIFIED',limitations:['Point-in-time raw bytes; hashes do not prove authenticity or historical execution.','Selected cache/TEMP trees are sealed; arbitrary external writes and concurrent adversarial changes are not OS-sandboxed.']});
     const preflightSha256=fileHash(join(out,'preflight.json')),trials=[];
     for(let i=0;i<2;i++) {

@@ -1,7 +1,7 @@
 // Portable admission regressions. Fixtures are retained, never recursively deleted.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { mkdtempSync, mkdirSync, writeFileSync, readFileSync, readdirSync, symlinkSync, renameSync } from 'node:fs';
+import { mkdtempSync, mkdirSync, writeFileSync, readFileSync, readdirSync, existsSync, symlinkSync, renameSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join, resolve } from 'node:path';
 import { execFileSync, spawnSync } from 'node:child_process';
@@ -32,7 +32,8 @@ for(const [name,mutate] of [
   const plan={targets:[t,t],filters:[],expected:{pool:'forks',maxWorkers:2,testTimeout:5000,cache:true}};
   const input=join(t.dir,'..',`${t.dir.split(/[\\/]/).at(-1)}-plan.json`),out=input+'-output';writeFileSync(input,JSON.stringify(plan));
   const r=spawnSync(process.execPath,[runner,'prepare',input,out],{encoding:'utf8'});
-  const starts=readdirSync(out).filter(f=>f.startsWith('event-')).map(f=>JSON.parse(readFileSync(join(out,f)))).filter(e=>e.phase==='run'&&e.action==='spawn').length;
+  assert.equal(existsSync(out),false,'W1h rejects invalid source before output creation');
+  const starts=(existsSync(out)?readdirSync(out):[]).filter(f=>f.startsWith('event-')).map(f=>JSON.parse(readFileSync(join(out,f)))).filter(e=>e.phase==='run'&&e.action==='spawn').length;
   writeFileSync(input+'-outcome.json',JSON.stringify({name,expected:'UNKNOWN, exit 1, comparison starts 0',stdout:r.stdout,stderr:r.stderr,exitCode:r.status,comparisonStarts:starts}));
   assert.equal(r.status,1);const result=JSON.parse(r.stdout);assert.equal(result.status,'UNKNOWN');assert.match(result.reason,/blob mismatch|untracked snapshot|not regular source/);assert.equal(starts,0);
 });

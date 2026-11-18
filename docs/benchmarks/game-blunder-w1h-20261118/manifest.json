@@ -1,5 +1,5 @@
 {
-  "scope": "W1h changed files excluding this manifest; original historical evidence unchanged",
+  "scope": "W1h changed files excluding manifest; original historical evidence unchanged",
   "base": "9486ae06f1cf5bfae289abfe1ec727b4594a1773",
   "files": [
     {
@@ -16,9 +16,9 @@
     },
     {
       "path": "docs/benchmarks/game-blunder-w1h-20261118/README.md",
-      "size": 3848,
-      "sha256": "f2e9d752960bdb8dbe1524c17352d09c9707c0be66e4904c325ec3798b7fefff",
-      "git_blob": "37939bf89a378fd1a382bc69785a5801161d1f8e"
+      "size": 4940,
+      "sha256": "47997943d73be8f1a3afe1f83b8318b1c5886b41f064d3ee3eae96a51751f9b3",
+      "git_blob": "74c4a97b97a5a172d8bcef79eace3a9dfecce731"
     },
     {
       "path": "docs/benchmarks/game-blunder-w1h-20261118/entry/baseline-red.json",
@@ -61,6 +61,18 @@
       "size": 2231,
       "sha256": "a6b9691335f46dd8a9e99646596ca0379be54519d0446f07a2cfafdf9ae43f54",
       "git_blob": "c4f56f63e6d59939e05b32c56fb7bd94a5272748"
+    },
+    {
+      "path": "docs/benchmarks/game-blunder-w1h-20261118/entry/green-v5.stderr",
+      "size": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "git_blob": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
+    },
+    {
+      "path": "docs/benchmarks/game-blunder-w1h-20261118/entry/green-v5.tap",
+      "size": 2308,
+      "sha256": "53fca25a9df9052caf0545058efe4127b049dbc66d017117b9426a65e45bbcdc",
+      "git_blob": "6138786f7f677ee3fe05b830f0d1cccfb410e7af"
     },
     {
       "path": "docs/benchmarks/game-blunder-w1h-20261118/entry/green.stderr",
@@ -111,10 +123,34 @@
       "git_blob": "a32c7ad4ab9deacff4ad38c16293b39c90ac2fbc"
     },
     {
+      "path": "docs/benchmarks/game-blunder-w1h-20261118/post-admission-green.stderr",
+      "size": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "git_blob": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
+    },
+    {
+      "path": "docs/benchmarks/game-blunder-w1h-20261118/post-admission-green.stdout",
+      "size": 11195,
+      "sha256": "764117ef8c685140d504dbddc4aabf8e08b8b55b6cbfdd6f32b07bf29d1038f5",
+      "git_blob": "2afa80528f85a6d4d62f91ed1b7f8751055d7e4c"
+    },
+    {
+      "path": "docs/benchmarks/game-blunder-w1h-20261118/post-admission.stderr",
+      "size": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "git_blob": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
+    },
+    {
+      "path": "docs/benchmarks/game-blunder-w1h-20261118/post-admission.stdout",
+      "size": 14595,
+      "sha256": "cf22855261e91d44d7c85d149d759a57f8fc847559b0ba99cde2e378f3bf6040",
+      "git_blob": "216bd638d8140911e7818608920563052573ff4d"
+    },
+    {
       "path": "docs/benchmarks/game-blunder-w1h-20261118/publication-redactions.json",
-      "size": 935,
-      "sha256": "637d6833b17d639a2290c42eabb134a895b88f71e9428670d0f54cfc0b6513c7",
-      "git_blob": "3e064dc38c7ca79ca1bc9c9a693f3335330e9153"
+      "size": 1247,
+      "sha256": "24a541313bd882c59a1fcf6db309631141efabb391d9b96e18d0f9de99c93cf4",
+      "git_blob": "0edd6a9ffd05c247a294b43abfc0bbab585f67bf"
     },
     {
       "path": "docs/benchmarks/game-blunder-w1h-20261118/regression.stderr",
@@ -316,15 +352,21 @@
     },
     {
       "path": "scripts/stage-w1b-runner.mjs",
-      "size": 16521,
-      "sha256": "f28e6a592c161b8d14d8756b9e7e47540fa726242330ce7a5a9665a6ab47b401",
-      "git_blob": "0937c081206e6c978fdae868f532429759c9c001"
+      "size": 16535,
+      "sha256": "50658c988efea481c8ad2c6c46c0e72cf488589130d594186e518a45a923955c",
+      "git_blob": "6059b33253558d858a9219c01b55a84789617262"
     },
     {
       "path": "scripts/stage-w1b-worker.mjs",
       "size": 5001,
       "sha256": "7e7a8dba9980f33a45d142d4852764962e188adccd7bac7ffecf93ec6a9a1c8d",
       "git_blob": "8a11456c0a7f1ff8228cae5affbc539427cad905"
+    },
+    {
+      "path": "scripts/stage-w1c-check.mjs",
+      "size": 4218,
+      "sha256": "fe71289b9fd311039f84e46709d674ad5071d6a7a6adb2d33d456aa176616a8f",
+      "git_blob": "6270e0501bb19f129daa04d5339d55353d68ef95"
     },
     {
       "path": "scripts/stage-w1d-generated-check.mjs",
@@ -334,21 +376,21 @@
     },
     {
       "path": "scripts/stage-w1d-probe.mjs",
-      "size": 4692,
-      "sha256": "c1fad18de32493ff49b0784546bc1dcdcec88fb43c16883c4a22aa82a4fa30a0",
-      "git_blob": "003b68f7b9beb52cb140e14a9c2db893474a1d65"
+      "size": 4706,
+      "sha256": "640daa58d07301ded3f8622a4442338c153d1cc0080b7828bdc0d51c6ddf2b08",
+      "git_blob": "d84e6f24fe91e4e1a06ed5aeb26e583ad042f497"
     },
     {
       "path": "scripts/stage-w1e-probe.mjs",
-      "size": 5974,
-      "sha256": "0dd308730e0c7e9e3223ddc4447811a17b44a996a587ee0338c0612f26d8bd40",
-      "git_blob": "50949c627d5c45ec37170d1bc3c3826d842ecb10"
+      "size": 5988,
+      "sha256": "43386168eb58bb7b2d460a0b5dc6b428d156f93736cdb30c97f306240f0ca6fd",
+      "git_blob": "3a3c2a2a93809e3abe2458162fb13e0428df78ef"
     },
     {
       "path": "scripts/stage-w1f-probe.mjs",
-      "size": 4730,
-      "sha256": "fcf6a6e6fc4f03f6c1172b987814f970b5f2345cc528d9e94591978532527d35",
-      "git_blob": "658cde96a0db59ac0d4c3cc7ccfdcceae9b2dcdd"
+      "size": 4744,
+      "sha256": "520ba6766761a2bcc6f30fbcbbd7820d384cd7451a4888b3a69389ebfd09c840",
+      "git_blob": "efba3ab2a82173510665dd72fdbf8e196345fde2"
     },
     {
       "path": "scripts/stage-w1g-gate.mjs",
@@ -364,9 +406,9 @@
     },
     {
       "path": "scripts/stage-w1h-entry-check.mjs",
-      "size": 5654,
-      "sha256": "192ede46a8c3878edb98cd30c39a65fc94e221c812542d6725dbc9bf6e96e50a",
-      "git_blob": "b55ab43f388e9e5ade3386a335488744f590e942"
+      "size": 6627,
+      "sha256": "85691cc793e264f7603900881398ce28587b882f5a2b8ba97acdbfdfbe826a17",
+      "git_blob": "84a6a38a0a7e389a77290a10373ff35a05767bf5"
     },
     {
       "path": "scripts/stage-w1h-seal-check.mjs",
@@ -376,9 +418,9 @@
     },
     {
       "path": "scripts/stage-w1h-target.mjs",
-      "size": 1542,
-      "sha256": "d2676503087158225aad0d1a8c89d0355e03f4b1b482ed35bf22963fd642d779",
-      "git_blob": "bb74e0fc60f3b15e658e76a7fc2a1ed56ac55767"
+      "size": 2006,
+      "sha256": "44ef1ccc4bdd53ffc94ea7f5118d4668f7f533c493287847d080db519c445f2c",
+      "git_blob": "8df1f11931739d564a1bc095e57be1fb1f4d694e"
     }
   ]
 }

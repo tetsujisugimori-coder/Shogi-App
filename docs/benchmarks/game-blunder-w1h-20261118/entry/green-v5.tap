@@ -1,0 +1,46 @@
+hint: Using 'master' as the name for the initial branch. This default branch name
+hint: will change to "main" in Git 3.0. To configure the initial branch name
+hint: to use in all of your new repositories, which will suppress this warning,
+hint: call:
+hint:
+hint: 	git config --global init.defaultBranch <name>
+hint:
+hint: Names commonly chosen instead of 'master' are 'main', 'trunk' and
+hint: 'development'. The just-created branch can be renamed via this command:
+hint:
+hint: 	git branch -m <name>
+hint:
+hint: Disable this message with "git config set advice.defaultBranchName false"
+✔ fixed 0 prepare rejected before output creation (2.760435ms)
+✔ fixed 0 direct worker collect rejected before import (121.473736ms)
+✔ fixed 0 direct worker run rejected before import (100.244929ms)
+✔ fixed 0 saved READY launch refused (2.528051ms)
+✔ fixed 1 prepare rejected before output creation (0.640806ms)
+✔ fixed 1 direct worker collect rejected before import (103.133205ms)
+✔ fixed 1 direct worker run rejected before import (103.510238ms)
+✔ fixed 1 saved READY launch refused (0.849191ms)
+✔ non-fixed synthetic Git identity accepted (19.092424ms)
+✔ unknown/ref HEAD refused (0.799302ms)
+✔ unknown/ref --bad refused (0.154929ms)
+✔ unknown/ref 0000000000000000000000000000000000000000 refused (3.703549ms)
+✔ unknown/ref null refused (0.151765ms)
+✔ legacy PowerShell entry stops unconditionally (0.322385ms)
+✔ prepare static regression guard precedes mkdir and collection (0.263608ms)
+✔ same fixed tree 0 alternate commit blocked (24.0201ms)
+✔ same fixed tree 1 alternate commit blocked (22.950344ms)
+✔ malformed saved READY cannot write before identity admission (0.710374ms)
+✔ historical d probe parent fixed collection denied (100.977489ms)
+✔ historical d probe child fixed collection denied (106.226501ms)
+✔ historical e probe parent fixed collection denied (92.502526ms)
+✔ historical e probe child fixed collection denied (85.527969ms)
+✔ historical f probe parent fixed collection denied (99.307985ms)
+✔ historical f probe child fixed collection denied (88.420788ms)
+✔ safe claimed identity cannot mkdir inside unverified target (42.556194ms)
+ℹ tests 25
+ℹ suites 0
+ℹ pass 25
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 1352.856658

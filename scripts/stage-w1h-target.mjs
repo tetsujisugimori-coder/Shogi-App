@@ -1,5 +1,7 @@
 // Read-only identity admission; no caller-provided READY or approval bypass.
+import { join } from 'node:path';
 import { execFileSync } from 'node:child_process';
+import { inspect, contains, physical } from './stage-w1b-preflight.mjs';
 import { FIXED_HEADS } from './stage-w1g-gate.mjs';
 const trees = ['5ced08e0036f955833ca2e12722bfbd595a00afd','3d06ccd81473b78bc3eb721c516693042ae2c118'];
 function stop(code) { const e = Error(code); e.code = code; throw e; }
@@ -22,3 +24,11 @@ export function admitTargets(targets) {
   }
 }
 export const rejection = e => ({status:'UNKNOWN', code:e.code ?? 'W1H_ADMISSION_REJECTED', reason:String(e)});
+
+export function admitProbeTargets(targets, output) {
+  admitTargets(targets);
+  for (const t of targets) {
+    if ([t.dir,join(t.dir,'node_modules')].some(root=>contains(physical(root),physical(output)))) stop('W1H_OUTPUT_IN_PROTECTED_TARGET');
+    inspect(t.repo,t.dir,t.head); // actual snapshot bytes, before parent output writes or child imports
+  }
+}
