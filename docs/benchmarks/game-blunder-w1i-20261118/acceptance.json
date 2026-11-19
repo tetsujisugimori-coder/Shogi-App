@@ -28,7 +28,6 @@
     "skip": 0,
     "exit": 0
   },
-  "new_head_formal_CI": "FAILURE",
   "original_comparison": {
     "old": 0,
     "new": 0,
@@ -54,24 +53,44 @@
   "unverified_additional_legacy_files": 29,
   "enumerated_missing": 0,
   "new_head_formal_CI_at_submission": "PENDING_POST_SUBMISSION",
-  "latest_observed_ci": {
-    "evaluated_head": "b1132523fbd82e603877e153846d6ff20e8fcc3f",
-    "product_run_id": 44337930402,
-    "product_status": "completed",
-    "product_conclusion": "failure",
-    "ubuntu": "success",
-    "ubuntu_test_pass": 2587,
-    "macos": "cancelled",
-    "macos_job_id": 134919598366,
-    "macos_steps": 0,
-    "macos_runner_assigned": "NOT_OBSERVED",
-    "macos_test_result": "NOT_TESTED",
-    "macos_root_cause": "UNKNOWN",
-    "suspected_layer": "hosted-runner acquisition or startup, unconfirmed",
-    "dedicated_verifier_run_id": 44337935698,
-    "dedicated_verifier": "success",
-    "review_source": "https://github.com/tetsujisugimori-coder/Shogi-App/pull/218#issuecomment-6983971007",
-    "status_basis": "GitHub run/jobs and check-runs metadata (old submission head)"
+  "excluded_legacy_windows_29": "OUT_OF_SCOPE_NOT_A_REQUIRED_PRESERVATION_FAILURE",
+  "ci_observations_by_fixed_head": {
+    "b1132523fbd82e603877e153846d6ff20e8fcc3f": {
+      "evaluated_head": "b1132523fbd82e603877e153846d6ff20e8fcc3f",
+      "product_run_id": 44337930402,
+      "product_status": "completed",
+      "product_conclusion": "failure",
+      "ubuntu": "success",
+      "ubuntu_test_pass": 2587,
+      "macos": "cancelled",
+      "macos_job_id": 134919598366,
+      "macos_steps": 0,
+      "macos_runner_assigned": "NOT_OBSERVED",
+      "macos_test_result": "NOT_TESTED",
+      "macos_root_cause": "UNKNOWN",
+      "suspected_layer": "hosted-runner acquisition or startup, unconfirmed",
+      "dedicated_verifier_run_id": 44337935698,
+      "dedicated_verifier": "success",
+      "review_source": "https://github.com/tetsujisugimori-coder/Shogi-App/pull/218#issuecomment-6983971007",
+      "status_basis": "GitHub run/jobs and check-runs metadata (old submission head)",
+      "record_role": "W1i original submitted HEAD historical CI"
+    },
+    "d471fe3d8d88efbe0f8ea61c620718b6cb897ac5": {
+      "evaluated_head": "d471fe3d8d88efbe0f8ea61c620718b6cb897ac5",
+      "record_role": "W1i reviewed follow-up HEAD",
+      "product_run_id": 44537048487,
+      "product_status": "completed",
+      "product_conclusion": "success",
+      "ubuntu": "success",
+      "ubuntu_test_pass": 2587,
+      "macos": "success",
+      "macos_test_pass": 2585,
+      "macos_test_skip": 2,
+      "dedicated_verifier_run_id": 44537048476,
+      "dedicated_verifier": "success",
+      "source": "https://github.com/tetsujisugimori-coder/Shogi-App/pull/218#pullrequestreview-5978038005"
+    }
   },
-  "excluded_legacy_windows_29": "OUT_OF_SCOPE_NOT_A_REQUIRED_PRESERVATION_FAILURE"
+  "ci_status_semantics": "CI verdicts apply only to their fixed HEAD. Later HEADs must be verified separately using PR Actions; no unqualified latest verdict.",
+  "post_correction_head_ci": "NOT_ASSERTED_BY_THIS_HISTORICAL_RECORD"
 }

@@ -36,6 +36,31 @@ class PublicGateTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, "PUBLIC_EVIDENCE_UNREDACTED"):
             gate.verify_public_outputs(self.root)
 
+
+    def test_home_user_with_s_character_rejected(self):
+        path = self.root / gate.PUBLIC_PATHS[2]
+        path.write_text("stack at /home/satoshi/project/run", encoding="utf-8")
+        with self.assertRaisesRegex(ValueError, "PUBLIC_EVIDENCE_UNREDACTED"):
+            gate.verify_public_outputs(self.root)
+
+    def test_home_whitespace_does_not_trigger(self):
+        path = self.root / gate.PUBLIC_PATHS[2]
+        path.write_text("synthetic /home/name with spaces/ is not a full path", encoding="utf-8")
+        self.assertEqual(gate.verify_public_outputs(self.root)["status"], "PASS")
+
+    def test_windows_lowercase_users_rejected(self):
+        path = self.root / gate.PUBLIC_PATHS[3]
+        sample = "C:" + chr(92) + "users" + chr(92) + "synthetic" + chr(92) + "run"
+        path.write_text("stack at " + sample, encoding="utf-8")
+        with self.assertRaisesRegex(ValueError, "PUBLIC_EVIDENCE_UNREDACTED"):
+            gate.verify_public_outputs(self.root)
+
+    def test_windows_uppercase_users_forward_slash_rejected(self):
+        path = self.root / gate.PUBLIC_PATHS[3]
+        path.write_text("stack at c:/USERS/synthetic/run", encoding="utf-8")
+        with self.assertRaisesRegex(ValueError, "PUBLIC_EVIDENCE_UNREDACTED"):
+            gate.verify_public_outputs(self.root)
+
     def test_missing_public_record_refused(self):
         (self.root / gate.PUBLIC_PATHS[0]).unlink()
         with self.assertRaisesRegex(ValueError, "PUBLIC_EVIDENCE_MISSING_OR_LINK"):

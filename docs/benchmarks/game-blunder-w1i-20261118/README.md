@@ -1,6 +1,13 @@
 # Stage W1i 原票救済・公開記録整理
 
-## 2026-11-19 最終CI・公開ログ運用追補（現行判定）
+## HEAD別の確認済みCI判定（2026-11-20追補）
+**総合B／PARTIAL。指定302件の保全は限定PASS。旧Windows29件はOUT_OF_SCOPE、追加調査・保存は不要。比較開始BLOCKED、正式旧0／新0、Draft維持・マージ推奨NO。**
+- **当初W1i固定HEAD `b1132523fbd82e603877e153846d6ff20e8fcc3f`：** [製品CI #44337930402](https://github.com/tetsujisugimori-coder/Shogi-App/actions/runs/44337930402) FAILURE（Ubuntu成功、macOSはhosted runner取得前にキャンセル・テスト未実行）。[専用CI #44337935698](https://github.com/tetsujisugimori-coder/Shogi-App/actions/runs/44337935698) SUCCESS。これは当時の記録。
+- **独立再審査済み固定HEAD `d471fe3d8d88efbe0f8ea61c620718b6cb897ac5`：** [製品CI #44537048487](https://github.com/tetsujisugimori-coder/Shogi-App/actions/runs/44537048487) SUCCESS（Ubuntu 2,587 PASS、macOS 2,585 PASS＋2 SKIP）。[専用CI #44537048476](https://github.com/tetsujisugimori-coder/Shogi-App/actions/runs/44537048476) SUCCESS。[限定独立レビュー #5978038005](https://github.com/tetsujisugimori-coder/Shogi-App/pull/218#pullrequestreview-5978038005)。
+- **以後の修正HEAD：** この文書は将来のCI成功を先取りしない。実際の最新HEADのCIは[PR Checks](https://github.com/tetsujisugimori-coder/Shogi-App/pull/218/checks)と新たな結果報告で確認する。下記の「現行」「最新」は**それぞれの作成当時における判定記録**であり、この版別記録に優先しない。
+- 現行公開ログ4件の訂正は維持。歴史的公開ログ2件はGit履歴に残り、公開pathの既存P3はOPEN。原本保存・歴史コミットは変更しない。
+
+## 2026-11-19 旧固定HEADのCI・公開ログ記録（当時の判定）
 **Stage W1i：結果B／PARTIAL。承認済み302件のLevel 2原票保存と独立再取得は限定PASS、比較開始BLOCKED、正式旧0／新0、Draft維持・マージNO。** 旧Windows29件は承認対象外（OUT_OF_SCOPE）であり、本件の追加保存・調査は要求しない。
 最終提出HEAD `b1132523fbd82e603877e153846d6ff20e8fcc3f` の[正式CI #44337930402](https://github.com/tetsujisugimori-coder/Shogi-App/actions/runs/44337930402)は **completed/failure**。UbuntuはSUCCESS（2,587 PASS）、macOSはジョブ `134919598366` が **cancelled、0 steps、runner_name空欄**。当該macOSのテスト結果はNOT_TESTED、根本原因はUNKNOWN。[専用CI #44337935698](https://github.com/tetsujisugimori-coder/Shogi-App/actions/runs/44337935698)はSUCCESS。GitHub当該runの開始/終了は2026-11-18 15:38:15〜15:53:19 UTC。約15分後に割当ランナー・ステップがなく終了したため、runner割当/起動段階の問題を強く示すが、診断annotation本文を取得できておらず断定しない。[調査記録](macos-ci-cancel-investigation.md)を参照。過去の「CI確認待ち」は提出当時の履歴であり現行状態ではない。
 現在公開されるW1hの4ログはpath置換済み、原本は承認済み保存領域に保持。現在の4ログへの作業path再混入を専用CIの読取専用 `stage-w1i-public-log-gate.py` で拒否する。過去commit `fdf40185` の2ログは、後続commitだけでは変更できない不変のGit履歴に残る。**歴史的2件は消去できたと主張せず公開path P3 OPENを維持**し、force-push・歴史書換え・原本削除を行わない。[対応範囲](publication-audit.md)を参照。
@@ -34,4 +41,4 @@ Linux既存225合成回帰PASS/FAIL0/skip0/exit0。製品テストは今回再�
 ## 保持する制約
 W1g P2/P3の限定CLOSEDとW1h文書指摘の修正を維持し、本工程によって比較開始を許可しない。製品探索/評価/規則、timeout5000ms、worker2、package/依存/workflow、旧原票は変更しない。保存PASSはACL全体・長期保持・歴史的真正性PASSではない。
 
-次の最小工程は、対象外29件等の必要性を判断し必要なものだけ保存範囲を拡張すること。公開pathの履歴残存を受け入れるかは独立した情報取扱判断であり、比較起動とは別。追加の再実測は今回不要。
+【当時の提案・現行の対象外29件には適用しない】次の最小工程は、対象外29件等の必要性を判断し必要なものだけ保存範囲を拡張すること。公開pathの履歴残存を受け入れるかは独立した情報取扱判断であり、比較起動とは別。追加の再実測は今回不要。

@@ -14,8 +14,8 @@ PUBLIC_PATHS = (
 )
 FORBIDDEN = {
     "cloud-workspace": re.compile(r"/workspace/"),
-    "home-user": re.compile(r"/home/[^/\\s]+/"),
-    "windows-user": re.compile(r"[A-Za-z]:[\\\\/]Users[\\\\/]"),
+    "home-user": re.compile(r"/home/[^/\s]+/"),
+    "windows-user": re.compile(r"[A-Za-z]:[\\/]users[\\/]", re.IGNORECASE),
     "private-key": re.compile(r"-----BEGIN (?:RSA |EC |OPENSSH )?PRIVATE KEY"),
     "github-token": re.compile(r"gh[pousr]_[A-Za-z0-9]{30,}"),
 }
