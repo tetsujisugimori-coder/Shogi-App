@@ -1,5 +1,11 @@
 # Stage W1i 原票救済・公開記録整理
 
+## 2026-11-19 最終CI・公開ログ運用追補（現行判定）
+**Stage W1i：結果B／PARTIAL。承認済み302件のLevel 2原票保存と独立再取得は限定PASS、比較開始BLOCKED、正式旧0／新0、Draft維持・マージNO。** 旧Windows29件は承認対象外（OUT_OF_SCOPE）であり、本件の追加保存・調査は要求しない。
+最終提出HEAD `b1132523fbd82e603877e153846d6ff20e8fcc3f` の[正式CI #44337930402](https://github.com/tetsujisugimori-coder/Shogi-App/actions/runs/44337930402)は **completed/failure**。UbuntuはSUCCESS（2,587 PASS）、macOSはジョブ `134919598366` が **cancelled、0 steps、runner_name空欄**。当該macOSのテスト結果はNOT_TESTED、根本原因はUNKNOWN。[専用CI #44337935698](https://github.com/tetsujisugimori-coder/Shogi-App/actions/runs/44337935698)はSUCCESS。GitHub当該runの開始/終了は2026-11-18 15:38:15〜15:53:19 UTC。約15分後に割当ランナー・ステップがなく終了したため、runner割当/起動段階の問題を強く示すが、診断annotation本文を取得できておらず断定しない。[調査記録](macos-ci-cancel-investigation.md)を参照。過去の「CI確認待ち」は提出当時の履歴であり現行状態ではない。
+現在公開されるW1hの4ログはpath置換済み、原本は承認済み保存領域に保持。現在の4ログへの作業path再混入を専用CIの読取専用 `stage-w1i-public-log-gate.py` で拒否する。過去commit `fdf40185` の2ログは、後続commitだけでは変更できない不変のGit履歴に残る。**歴史的2件は消去できたと主張せず公開path P3 OPENを維持**し、force-push・歴史書換え・原本削除を行わない。[対応範囲](publication-audit.md)を参照。
+この追補を含む新HEADのCI結果は別途確認すること。旧HEADの正式CI失敗が新HEADのCI実測成功に置換されたわけではない。
+
 **総合結果B / PARTIAL、比較開始BLOCKED、正式旧0／新0、S4/S5 NOT_TESTED、R8/H1～H4 UNKNOWN、マージ推奨NO、Draft維持。**
 
 開始HEAD `1b4b17d90ff58db576585cc0151f5c53354a9d36`、tree `6261aba336d09a0a1e8087f4dbbdf85d70979075`、base `85d856b9bc6b7939977cdb2867f2cff3a84a9025`。指定と一致。PR #218 OPEN/Draft。W1h最終コードからの差分は文書2件へ計11行追加のみ。開始HEADの正式CI/専用CIはsuccess。新提出HEADのCIは投稿後に別途確認する。

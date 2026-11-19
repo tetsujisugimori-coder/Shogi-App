@@ -28,7 +28,7 @@
     "skip": 0,
     "exit": 0
   },
-  "new_head_formal_CI": "PENDING_POST_SUBMISSION",
+  "new_head_formal_CI": "FAILURE",
   "original_comparison": {
     "old": 0,
     "new": 0,
@@ -52,5 +52,26 @@
   "approved_enumerated_scope_custody": "PASS",
   "approved_enumerated_scope_verification": "PASS",
   "unverified_additional_legacy_files": 29,
-  "enumerated_missing": 0
+  "enumerated_missing": 0,
+  "new_head_formal_CI_at_submission": "PENDING_POST_SUBMISSION",
+  "latest_observed_ci": {
+    "evaluated_head": "b1132523fbd82e603877e153846d6ff20e8fcc3f",
+    "product_run_id": 44337930402,
+    "product_status": "completed",
+    "product_conclusion": "failure",
+    "ubuntu": "success",
+    "ubuntu_test_pass": 2587,
+    "macos": "cancelled",
+    "macos_job_id": 134919598366,
+    "macos_steps": 0,
+    "macos_runner_assigned": "NOT_OBSERVED",
+    "macos_test_result": "NOT_TESTED",
+    "macos_root_cause": "UNKNOWN",
+    "suspected_layer": "hosted-runner acquisition or startup, unconfirmed",
+    "dedicated_verifier_run_id": 44337935698,
+    "dedicated_verifier": "success",
+    "review_source": "https://github.com/tetsujisugimori-coder/Shogi-App/pull/218#issuecomment-6983971007",
+    "status_basis": "GitHub run/jobs and check-runs metadata (old submission head)"
+  },
+  "excluded_legacy_windows_29": "OUT_OF_SCOPE_NOT_A_REQUIRED_PRESERVATION_FAILURE"
 }
