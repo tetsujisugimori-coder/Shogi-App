@@ -23,6 +23,6 @@ jobs:
       - name: Guard currently published W1h logs against raw workspace paths
         run: python3 scripts/stage-w1i-public-log-gate.py .
       - name: Verify synthetic publication guard counterexamples
-        run: python3 -m unittest discover -s scripts -p 'stage-w1i-public-log-test.py' -v
+        run: python3 scripts/stage-w1i-public-log-test.py
       - name: Strict generated-directory and cache controls (portable links)
         run: node scripts/stage-w1d-generated-check.mjs "${{ runner.temp }}/w1d-generated-controls"
