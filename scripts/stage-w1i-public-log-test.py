@@ -31,7 +31,8 @@ class PublicGateTests(unittest.TestCase):
             gate.verify_public_outputs(self.root)
 
     def test_windows_workspace_rejected(self):
-        (self.root / gate.PUBLIC_PATHS[3]).write_text("stack at C:\\\\Users\\\\synthetic\\\\test", encoding="utf-8")
+        sample = "C:" + chr(92) + "Users" + chr(92) + "synthetic" + chr(92) + "test"
+        (self.root / gate.PUBLIC_PATHS[3]).write_text("stack at " + sample, encoding="utf-8")
         with self.assertRaisesRegex(ValueError, "PUBLIC_EVIDENCE_UNREDACTED"):
             gate.verify_public_outputs(self.root)
 
@@ -41,7 +42,7 @@ class PublicGateTests(unittest.TestCase):
             gate.verify_public_outputs(self.root)
 
     def test_binary_record_refused(self):
-        (self.root / gate.PUBLIC_PATHS[1]).write_bytes(b"\\xff\\xfe")
+        (self.root / gate.PUBLIC_PATHS[1]).write_bytes(bytes((255, 254)))
         with self.assertRaisesRegex(ValueError, "PUBLIC_EVIDENCE_NOT_UTF8"):
             gate.verify_public_outputs(self.root)
 
