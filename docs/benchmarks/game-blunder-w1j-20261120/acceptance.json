@@ -1,0 +1,33 @@
+{
+  "schema": "stage-w1j-feasibility/1",
+  "starting_head": "7baa4c64ee53530161f81029c7e0c978396c6213",
+  "overall": "PARTIAL",
+  "result": "B",
+  "accepted_scope": "offline synthetic signature/nonce/byte-binding contract only",
+  "synthetic_test_count_expected": 22,
+  "synthetic_contract": "LOCAL_STUB_PASS_REAL_GATE_CI_PENDING",
+  "independent_issuer_provisioned": false,
+  "independent_observer_provisioned": false,
+  "durable_trusted_nonce_ledger": false,
+  "real_source_use_authenticated": false,
+  "historical_authenticity": "UNKNOWN",
+  "live_authentication": "BLOCKED",
+  "operational_comparison_gate": "BLOCKED",
+  "comparison": {
+    "old": 0,
+    "new": 0
+  },
+  "S4": "NOT_TESTED",
+  "S5": "NOT_TESTED",
+  "R8": "UNKNOWN",
+  "H1-H4": "UNKNOWN",
+  "approved_preservation_files": 302,
+  "approved_preservation_scope": "LIMITED_PASS_UNCHANGED",
+  "legacy_windows_29": "OUT_OF_SCOPE_NO_NEW_WORK",
+  "historical_public_path_p3": "OPEN_UNCHANGED",
+  "merge_recommendation": "NO",
+  "draft": true,
+  "production_code_changed": false,
+  "fixed_comparison_executed": false,
+  "independent_re_review": "PENDING_AFTER_FINAL_HEAD"
+}
