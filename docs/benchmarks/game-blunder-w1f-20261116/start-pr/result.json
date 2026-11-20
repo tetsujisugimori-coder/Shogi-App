@@ -1,0 +1,17 @@
+{
+  "started": "2026-11-16T12:23:14.792Z",
+  "finished": "2026-11-16T12:23:15.496Z",
+  "command": [
+    "gh",
+    "pr",
+    "view",
+    "218",
+    "--repo",
+    "tetsujisugimori-coder/Shogi-App",
+    "--json",
+    "number,state,isDraft,headRefName,headRefOid,url"
+  ],
+  "exitCode": 0,
+  "signal": null,
+  "error": null
+}

@@ -236,8 +236,13 @@ export interface Audit {
   hash: string; status: 'complete' | 'incomplete' | 'corrupt'; error: string | null; partialTailBytes: number;
   start: StartRecord | null; moves: MoveRecord[]; end: EndRecord | null; finalHash: string | null;
 }
-export function auditJournal(path: string): Audit {
+/** Optional benchmark timings; omitted by production/journal callers. */
+export interface JournalAuditTiming { readMs: number; auditMs: number }
+export function auditJournal(path: string, timing?: JournalAuditTiming): Audit {
+  const began = timing ? performance.now() : 0;
   const read = readJournal(path);
+  const readAt = timing ? performance.now() : 0;
+  if (timing) timing.readMs = readAt - began;
   const audit: Audit = { hash: read.hash, status: 'incomplete', error: read.error, partialTailBytes: read.partialTailBytes,
     start: null, moves: [], end: null, finalHash: null };
   try {
@@ -295,6 +300,7 @@ export function auditJournal(path: string): Audit {
     if (read.error) throw Error(read.error);
     audit.status = !read.partialTailBytes && audit.end && ['rule','max_plies'].includes(audit.end.reason) ? 'complete' : 'incomplete';
   } catch (error) { audit.status = 'corrupt'; audit.error = error instanceof Error ? error.message : String(error); }
+  if (timing) timing.auditMs = performance.now() - readAt;
   return audit;
 }
 

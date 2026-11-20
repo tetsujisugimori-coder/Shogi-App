@@ -1,0 +1,40 @@
+{
+  "sourceHead": "1edc169cc9ff27b7c77e825e95b893e5b0252ed1",
+  "overall": "PARTIAL",
+  "mergeRecommendation": "NO",
+  "P2-01": "PASS_IMPLEMENTATION_AND_FIXED_HEAD_CONTROLS",
+  "P2-02": "PASS_IMPLEMENTATION_AND_FIXED_HEAD_CONTROLS",
+  "P3-01": "PASS_IMPLEMENTATION_AND_FIXED_HEAD_CONTROLS",
+  "R8": "PARTIAL",
+  "normalControls": 1,
+  "negativeControls": 29,
+  "oldFalseAcceptancesNowProtected": 21,
+  "alreadyProtectedAtBaseline": 8,
+  "fixedInvalidObservations": 0,
+  "rootReproducibleGroups": 24,
+  "pairReproducibleGroups": 32,
+  "originalsMatched": 48,
+  "rawOldLogsVerifiedAgainstFixedHeadGzip": 11,
+  "beforeHashCoverageLimitation": "Ignored raw log hashes were not acquired at start. Their current bytes match 11 gzip blobs from the fixed baseline.",
+  "sourceHashesMatchedToFixedGitBlobs": 99,
+  "confirmed": 0,
+  "finalSuspectedPositionVerdict": "INDETERMINATE",
+  "priority": "NOT_READY",
+  "windowsCause": "UNKNOWN",
+  "ci": "PENDING_FINAL_EVIDENCE_HEAD",
+  "independentReview": "PARTIAL_OVERALL_ALL_THREE_FINDINGS_CLOSABLE",
+  "logs": [
+    "test-runs.json",
+    "host-test-runs.json",
+    "host-15s-run.json",
+    "experiment-environment-fixed.json",
+    "old-timing.json",
+    "final-target-timing.json"
+  ],
+  "independentCases": {
+    "normal": 1,
+    "negative": 14,
+    "expectedOutcomes": 15,
+    "newUnresolvedFindings": 0
+  }
+}

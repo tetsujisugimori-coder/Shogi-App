@@ -1,0 +1,7 @@
+# Independent review
+
+An independent agent reviewed the collection and aggregation methods and then compared all eight raw Vitest JSON files, run metadata and stdout counts. Each run had exit 0, 98 successful files, no failed or pending tests, and 2,586 old / 2,587 new passing assertions. The agent independently compared names and duplicates across all trials: 2,554 shared unique file/name pairs, two old-only and three new-only. Raw stdout/stderr searches found no timeout, UI-query failure, AbortError, unhandled rejection or worker crash in the completed runs; each stderr includes one jsdom navigation-not-implemented message.
+
+Review identified and the implementation addressed incomplete-run handling, refusal to overwrite derived output, raw-log signals, test name differences and changed files. Remaining limitations: log patterns require manual interpretation, external process samples are not worker-attributed, individual test timing and cleanup are unmeasured, and sampling is confounded with order. The initial eight aborted processes are not completed test trials. A diagnostic unit test was run concurrently during this investigation and is a possible minor background-load confounder; its exact overlap is unknown.
+
+The reviewer considers measurement PARTIAL and cause isolation, H1–H4 and R8 UNKNOWN. Eight successful runs cannot prove no regression. This local review does not replace an independent GitHub PR review.

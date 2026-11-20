@@ -1,0 +1,157 @@
+{
+  "stage": "W1c",
+  "at": "2026-11-15T12:11:26.046Z",
+  "overall": "PARTIAL",
+  "mergeRecommended": false,
+  "startHead": "879f11617402d38f69271ace6f057931bb751f40",
+  "finalHead": "See final PR section and commit containing this file; no self-referential commit SHA",
+  "findings": {
+    "W1b-P2-01": "PASS / code-review closed",
+    "W1b-P2-02": "PASS / code-review closed",
+    "P3-01": "PARTIAL",
+    "P3-02": "implemented; local positive/negative controls PASS; independent review pending",
+    "P3-03": "dedicated CI configured; final-head execution pending at commit"
+  },
+  "assessments": {
+    "foundation": "PARTIAL / final normal fixture PASS; real comparison NOT_READY",
+    "freshSourceIdentity": "PASS",
+    "initialDependencyPair": "PASS",
+    "postConfigSourceIdentity": "PASS",
+    "postConfigDependencyPair": "DIFFERENT / UNKNOWN for execution equivalence",
+    "realLimitedLaunch": "NOT_READY / NOT_TESTED / zero comparison children",
+    "windowsCauseIsolation": "UNKNOWN",
+    "R8": "UNKNOWN",
+    "H1": "UNKNOWN",
+    "H2": "UNKNOWN",
+    "H3": "UNKNOWN",
+    "H4": "UNKNOWN",
+    "largeABBA": "NOT_TESTED",
+    "cpuRssGc": "NOT_TESTED",
+    "merge": "NO / Draft retained"
+  },
+  "snapshots": {
+    "counts": [
+      2104,
+      2211
+    ],
+    "rawBlobMismatches": [
+      0,
+      0
+    ],
+    "sourceReproducibility": "PASS",
+    "initial": {
+      "equality": {
+        "status": "PASS"
+      },
+      "observations": [
+        {
+          "dir": "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\stage-w1c-20261115-03\\old",
+          "head": "e1ccb1a2412e7faa86c2c1f60fdad1dca154023a",
+          "sourceSha256": "6bdac0695b0184ce9b32a18c3d6fe63431bfb4c6096a53bb73ebd3db386d9c64",
+          "dependencyRoot": "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\stage-w1c-20261115-03\\old\\node_modules",
+          "dependencyCount": 13642,
+          "dependenciesSha256": "4b858468678a4cb0b86319a291c48f4c4ebd7921df91797944644d9e6225f947",
+          "lockSha256": "5118d0c609db7c079c5ffa9f9a8c54cf81f04bec314d930a9ad29764551e473b",
+          "vitest": "4.1.11"
+        },
+        {
+          "dir": "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\stage-w1c-20261115-03\\new",
+          "head": "2a8a57b6ff207831c77ce62d27d3151eba7c1dc3",
+          "sourceSha256": "ac9b0c369bff296d53a60d3af3a5c97d8cb00d3eed8a8b6962b54b6612220191",
+          "dependencyRoot": "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\stage-w1c-20261115-03\\new\\node_modules",
+          "dependencyCount": 13642,
+          "dependenciesSha256": "4b858468678a4cb0b86319a291c48f4c4ebd7921df91797944644d9e6225f947",
+          "lockSha256": "5118d0c609db7c079c5ffa9f9a8c54cf81f04bec314d930a9ad29764551e473b",
+          "vitest": "4.1.11"
+        }
+      ]
+    },
+    "postConfig": "real-post-collection-diff.json",
+    "installedLockInventory": "lock-inventory/*-exit.json",
+    "node": "v24.20.0",
+    "npm": "11.17.0",
+    "vitest": "4.1.11"
+  },
+  "normal": {
+    "status": "PASS",
+    "runId": "492ef3a0-1da5-48a3-a51e-1c04b59ed26e",
+    "comparisonChildren": 2,
+    "readback": "PASS",
+    "finalCoreToolHashes": {
+      "runner": "8281920294cebc5e0efed789df91ab1d25eab0be50b4dfb9eaa906733ebb809e",
+      "worker": "d4152fb4914288f3d5a4328a26a79e5c5f4447c98c4e7d7ea26beb104a761804",
+      "preflight": "188da001dffa69561bdbab45072a638a278d980308c849553eb3368c1e3e71e1",
+      "summary": "4143527f40a363855a91613e34f280cf1a8b1c18717ab22cbe8230d8ef0066cb"
+    },
+    "evidence": "accepted-final"
+  },
+  "negative": {
+    "retainedOriginalCount": 10,
+    "finalBatchCount": 12,
+    "allActualCliExit1": true,
+    "prelaunchComparisonStarts": 0,
+    "evidence": "negative-final-02/outcomes.json",
+    "extraPortable": "portable-final-case-outcomes",
+    "windowsJunction": "verifiers-final.txt",
+    "setup": "collection-final-02/outcome.json",
+    "secondOutput": "reused-second-output/outcome.json",
+    "offline": "offline-final/outcomes.json",
+    "falsePassMutationDetected": true
+  },
+  "validation": {
+    "verifierChecks": 29,
+    "verifierFailures": 0,
+    "relatedProduct": {
+      "files": 8,
+      "passed": 154,
+      "exitCode": 0
+    },
+    "fullProduct": {
+      "files": 98,
+      "passed": 2587,
+      "exitCode": 0
+    },
+    "lock": "PASS",
+    "typecheck": "PASS",
+    "build": "PASS",
+    "productConfiguration": "existing maxWorkers=2 / testTimeout=5000ms",
+    "driverNpm": "11.19.0 bundled npm used by unchanged W1b validation script, separate from snapshot execution"
+  },
+  "preservation": {
+    "protected": 103,
+    "beforeAfterMismatches": 0,
+    "priorManifestMismatches": 0,
+    "oldSnapshotsUnchanged": true,
+    "previousObservations": {
+      "rawDifferences": [
+        624,
+        625
+      ],
+      "extras": [
+        220,
+        224
+      ],
+      "resultCacheFileDifferences": 1
+    },
+    "finalEvidence": "preservation-final.json",
+    "finalAudit": "PASS / 103 unchanged, old snapshot trees unchanged"
+  },
+  "ci": {
+    "status": "PENDING_AT_COMMIT",
+    "authoritative": "Final PR completion section links the exact final head SHA and workflow runs. Final-head CI JSON/logs are retained outside this committed directory; prior-head CI is not promoted."
+  },
+  "limitations": [
+    "Real initial admission passed, but Vite configuration loading adds an empty node_modules/.vite-temp directory before inventory; no harmlessness exclusion is assumed.",
+    "Real complete effective-setting equality and old/new limited execution remain unestablished.",
+    "Selected directory consistency is not an OS sandbox or a process-authenticity proof.",
+    "Zero comparison spawn events refer to this runner, not all Windows processes.",
+    "Normal accepted fixture uses cache:false/environment:node; real product uses its default enabled cache/jsdom and was not executed.",
+    "Some development controls overlapped read-only audits/installation; they are not performance comparisons. Final normal is after installs; final diagnostic controls were rerun after product validation.",
+    "No large ABBA, cause conclusion, independent self-approval, Draft release, merge, branch deletion, force push or main update."
+  ],
+  "next": [
+    "Independent review of W1c",
+    "Design justified Vite generated-directory/cache transition policy with new independent snapshots and negative controls",
+    "Establish real settings/inventory and both limited product launches before larger comparisons"
+  ]
+}

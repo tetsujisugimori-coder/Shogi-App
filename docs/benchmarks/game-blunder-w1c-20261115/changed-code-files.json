@@ -1,0 +1,80 @@
+[
+  {
+    "path": ".github/workflows/stage-w1-verifiers.yml",
+    "workingRawSha256": "670e41263e2a0c93aa4d363e4afdcd265acd3f6c6353dc6db05467e961560b0c",
+    "indexBlob": "d23c26b9c76d7c18cfc25995eb558374780a0b14",
+    "indexRawSha256": "670e41263e2a0c93aa4d363e4afdcd265acd3f6c6353dc6db05467e961560b0c"
+  },
+  {
+    "path": "scripts/stage-w1b-collection-control.mjs",
+    "workingRawSha256": "ab53043b0d42ebdfea24edbb7828ca3e4bd8b26580035047fe9c7bd6802e134f",
+    "indexBlob": "f5732348ad0eb1dfcf43c9bc2c1b7e52dfdde641",
+    "indexRawSha256": "ab53043b0d42ebdfea24edbb7828ca3e4bd8b26580035047fe9c7bd6802e134f"
+  },
+  {
+    "path": "scripts/stage-w1b-negative-controls.mjs",
+    "workingRawSha256": "c27f5af66ab1a842943167cbf0cd5b7770995971f6f6220b1a7b9ce3c1c6dda2",
+    "indexBlob": "2cae27103f7fb253378d446fd3d5b5c67fccc445",
+    "indexRawSha256": "c27f5af66ab1a842943167cbf0cd5b7770995971f6f6220b1a7b9ce3c1c6dda2"
+  },
+  {
+    "path": "scripts/stage-w1b-preflight.mjs",
+    "workingRawSha256": "188da001dffa69561bdbab45072a638a278d980308c849553eb3368c1e3e71e1",
+    "indexBlob": "c990e6dcdd4f50a1ddfb2425dca7f79d049888bc",
+    "indexRawSha256": "188da001dffa69561bdbab45072a638a278d980308c849553eb3368c1e3e71e1"
+  },
+  {
+    "path": "scripts/stage-w1b-review-controls.mjs",
+    "workingRawSha256": "09eda3e26c2b04105222d86f8fe45b80962c423d9404392ef62777a52a6b0d63",
+    "indexBlob": "7b3cedd7028681a790b2f6ab0a1f6631d38a7c64",
+    "indexRawSha256": "09eda3e26c2b04105222d86f8fe45b80962c423d9404392ef62777a52a6b0d63"
+  },
+  {
+    "path": "scripts/stage-w1b-runner.mjs",
+    "workingRawSha256": "8281920294cebc5e0efed789df91ab1d25eab0be50b4dfb9eaa906733ebb809e",
+    "indexBlob": "34bf4b26d3ba392b77851b0eee362cc098f001ce",
+    "indexRawSha256": "8281920294cebc5e0efed789df91ab1d25eab0be50b4dfb9eaa906733ebb809e"
+  },
+  {
+    "path": "scripts/stage-w1b-worker.mjs",
+    "workingRawSha256": "d4152fb4914288f3d5a4328a26a79e5c5f4447c98c4e7d7ea26beb104a761804",
+    "indexBlob": "446633819c1086c1c9ac94d3b242004948cf3b25",
+    "indexRawSha256": "d4152fb4914288f3d5a4328a26a79e5c5f4447c98c4e7d7ea26beb104a761804"
+  },
+  {
+    "path": "scripts/stage-w1c-check.mjs",
+    "workingRawSha256": "bbb12e378bbd22a7c1884b91842e0e01d181a956d3fb0ba5a6e597b4de5fc9f4",
+    "indexBlob": "4e9effc12610ae67f6004eba249824629c3c6cc5",
+    "indexRawSha256": "bbb12e378bbd22a7c1884b91842e0e01d181a956d3fb0ba5a6e597b4de5fc9f4"
+  },
+  {
+    "path": "scripts/stage-w1c-mutation-check.mjs",
+    "workingRawSha256": "7486b0400c098bbcd1a2056efb58db912eff1ea668e2f9c0ef1bdbc325bc52e6",
+    "indexBlob": "f32bab5d97d19075a4359837bde7d4e8ba695846",
+    "indexRawSha256": "7486b0400c098bbcd1a2056efb58db912eff1ea668e2f9c0ef1bdbc325bc52e6"
+  },
+  {
+    "path": "scripts/stage-w1c-offline-controls.mjs",
+    "workingRawSha256": "78dac46311d1cdecc32cee8438cafa7115dd00b5b9565b32b1bd0d75e664f43a",
+    "indexBlob": "31d8af65adb0ecdb50725b247fe737f57d31d8cb",
+    "indexRawSha256": "78dac46311d1cdecc32cee8438cafa7115dd00b5b9565b32b1bd0d75e664f43a"
+  },
+  {
+    "path": "scripts/stage-w1c-output-control.mjs",
+    "workingRawSha256": "cb7caa7fd238402467360433bccfd3745225b0b829a699ca809b0d286ebd445e",
+    "indexBlob": "26d8d407e67f72abdee31d6e3aa1c95abc48ddf5",
+    "indexRawSha256": "cb7caa7fd238402467360433bccfd3745225b0b829a699ca809b0d286ebd445e"
+  },
+  {
+    "path": "scripts/stage-w1c-preservation.mjs",
+    "workingRawSha256": "8829462f5abc8a280c725f83b6fcc6fe0f80daddd374d9898d4003fe9991f7c3",
+    "indexBlob": "aad11bf84b5ca7618ef532b64d2e81f4c0f55cf7",
+    "indexRawSha256": "8829462f5abc8a280c725f83b6fcc6fe0f80daddd374d9898d4003fe9991f7c3"
+  },
+  {
+    "path": "scripts/stage-w1c-snapshots.mjs",
+    "workingRawSha256": "10fe060cb37cb0e8721a6634283063ed4f8c7acfce8070feecc9a13811a324b3",
+    "indexBlob": "dbba040593e170b1cb7686f4695b8fd3449da9ea",
+    "indexRawSha256": "10fe060cb37cb0e8721a6634283063ed4f8c7acfce8070feecc9a13811a324b3"
+  }
+]

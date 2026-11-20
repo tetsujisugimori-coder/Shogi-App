@@ -1,0 +1,180 @@
+{
+  "runId": "6f8ce0c1-8389-4475-bf5a-b07cf08e42ce",
+  "at": "2026-11-15T11:49:40.530Z",
+  "output": "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\repo\\docs\\benchmarks\\game-blunder-w1c-20261115\\controls-host-02\\connected-normal",
+  "plan": {
+    "targets": [
+      {
+        "repo": "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\repo\\.tmp-tests\\w1c-controls-02\\git-source",
+        "dir": "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\repo\\.tmp-tests\\w1c-controls-02\\a",
+        "head": "1aca45193ca5111b81a4ddb5ebb31a0577f5a598"
+      },
+      {
+        "repo": "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\repo\\.tmp-tests\\w1c-controls-02\\git-source",
+        "dir": "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\repo\\.tmp-tests\\w1c-controls-02\\b",
+        "head": "1aca45193ca5111b81a4ddb5ebb31a0577f5a598"
+      }
+    ],
+    "filters": [],
+    "expected": {
+      "pool": "forks",
+      "maxWorkers": 2,
+      "testTimeout": 5000,
+      "cache": false
+    },
+    "environment": {
+      "TEMP": "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\repo\\.tmp-tests\\w1c-controls-02\\temp",
+      "TMP": "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\repo\\.tmp-tests\\w1c-controls-02\\temp",
+      "npm_config_cache": "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\repo\\.tmp-tests\\w1c-controls-02\\npm-cache"
+    },
+    "isolationPaths": [
+      "C:/Users/tetsu/Documents/ChatGPT/将棋アプリ/repo/.tmp-tests/w1c-controls-02/cache"
+    ]
+  },
+  "observations": [
+    {
+      "dir": "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\repo\\.tmp-tests\\w1c-controls-02\\a",
+      "head": "1aca45193ca5111b81a4ddb5ebb31a0577f5a598",
+      "source": [
+        {
+          "path": "package-lock.json",
+          "sha256": "5118d0c609db7c079c5ffa9f9a8c54cf81f04bec314d930a9ad29764551e473b"
+        },
+        {
+          "path": "package.json",
+          "sha256": "3ca9d4afd21425087cf31893b8f9f63c81b0b8408db5e343ca76e5f8aa26ab9a"
+        },
+        {
+          "path": "tiny.test.js",
+          "sha256": "b723bbb1399834f56fab8a657e44772310f674b3ec93373ce2570aee88584071"
+        },
+        {
+          "path": "vitest.config.mjs",
+          "sha256": "3b052d63eac0e2fd8485e5c95ad36dec607cc3e23d48f7d91b9165c72c711e41"
+        }
+      ],
+      "sourceSha256": "cae56559182f3355f95a0bb164e65a9481f8667b2575e22a4e3d81e039094cd0",
+      "dependencyRoot": "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\repo\\node_modules",
+      "dependencyCount": 14934,
+      "dependenciesSha256": "8eab3bf6afa4da912bef649d0cc10948f4baf599953c585d79c7838688bdab91",
+      "lockSha256": "5118d0c609db7c079c5ffa9f9a8c54cf81f04bec314d930a9ad29764551e473b",
+      "vitest": "4.1.11"
+    },
+    {
+      "dir": "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\repo\\.tmp-tests\\w1c-controls-02\\b",
+      "head": "1aca45193ca5111b81a4ddb5ebb31a0577f5a598",
+      "source": [
+        {
+          "path": "package-lock.json",
+          "sha256": "5118d0c609db7c079c5ffa9f9a8c54cf81f04bec314d930a9ad29764551e473b"
+        },
+        {
+          "path": "package.json",
+          "sha256": "3ca9d4afd21425087cf31893b8f9f63c81b0b8408db5e343ca76e5f8aa26ab9a"
+        },
+        {
+          "path": "tiny.test.js",
+          "sha256": "b723bbb1399834f56fab8a657e44772310f674b3ec93373ce2570aee88584071"
+        },
+        {
+          "path": "vitest.config.mjs",
+          "sha256": "3b052d63eac0e2fd8485e5c95ad36dec607cc3e23d48f7d91b9165c72c711e41"
+        }
+      ],
+      "sourceSha256": "cae56559182f3355f95a0bb164e65a9481f8667b2575e22a4e3d81e039094cd0",
+      "dependencyRoot": "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\repo\\node_modules",
+      "dependencyCount": 14934,
+      "dependenciesSha256": "8eab3bf6afa4da912bef649d0cc10948f4baf599953c585d79c7838688bdab91",
+      "lockSha256": "5118d0c609db7c079c5ffa9f9a8c54cf81f04bec314d930a9ad29764551e473b",
+      "vitest": "4.1.11"
+    }
+  ],
+  "sealed": {
+    "observations": [
+      {
+        "dir": "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\repo\\.tmp-tests\\w1c-controls-02\\a",
+        "head": "1aca45193ca5111b81a4ddb5ebb31a0577f5a598",
+        "source": [
+          {
+            "path": "package-lock.json",
+            "sha256": "5118d0c609db7c079c5ffa9f9a8c54cf81f04bec314d930a9ad29764551e473b"
+          },
+          {
+            "path": "package.json",
+            "sha256": "3ca9d4afd21425087cf31893b8f9f63c81b0b8408db5e343ca76e5f8aa26ab9a"
+          },
+          {
+            "path": "tiny.test.js",
+            "sha256": "b723bbb1399834f56fab8a657e44772310f674b3ec93373ce2570aee88584071"
+          },
+          {
+            "path": "vitest.config.mjs",
+            "sha256": "3b052d63eac0e2fd8485e5c95ad36dec607cc3e23d48f7d91b9165c72c711e41"
+          }
+        ],
+        "sourceSha256": "cae56559182f3355f95a0bb164e65a9481f8667b2575e22a4e3d81e039094cd0",
+        "dependencyRoot": "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\repo\\node_modules",
+        "dependencyCount": 14934,
+        "dependenciesSha256": "8eab3bf6afa4da912bef649d0cc10948f4baf599953c585d79c7838688bdab91",
+        "lockSha256": "5118d0c609db7c079c5ffa9f9a8c54cf81f04bec314d930a9ad29764551e473b",
+        "vitest": "4.1.11"
+      },
+      {
+        "dir": "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\repo\\.tmp-tests\\w1c-controls-02\\b",
+        "head": "1aca45193ca5111b81a4ddb5ebb31a0577f5a598",
+        "source": [
+          {
+            "path": "package-lock.json",
+            "sha256": "5118d0c609db7c079c5ffa9f9a8c54cf81f04bec314d930a9ad29764551e473b"
+          },
+          {
+            "path": "package.json",
+            "sha256": "3ca9d4afd21425087cf31893b8f9f63c81b0b8408db5e343ca76e5f8aa26ab9a"
+          },
+          {
+            "path": "tiny.test.js",
+            "sha256": "b723bbb1399834f56fab8a657e44772310f674b3ec93373ce2570aee88584071"
+          },
+          {
+            "path": "vitest.config.mjs",
+            "sha256": "3b052d63eac0e2fd8485e5c95ad36dec607cc3e23d48f7d91b9165c72c711e41"
+          }
+        ],
+        "sourceSha256": "cae56559182f3355f95a0bb164e65a9481f8667b2575e22a4e3d81e039094cd0",
+        "dependencyRoot": "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\repo\\node_modules",
+        "dependencyCount": 14934,
+        "dependenciesSha256": "8eab3bf6afa4da912bef649d0cc10948f4baf599953c585d79c7838688bdab91",
+        "lockSha256": "5118d0c609db7c079c5ffa9f9a8c54cf81f04bec314d930a9ad29764551e473b",
+        "vitest": "4.1.11"
+      }
+    ],
+    "environment": {
+      "values": {
+        "TEMP": "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\repo\\.tmp-tests\\w1c-controls-02\\temp",
+        "TMP": "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\repo\\.tmp-tests\\w1c-controls-02\\temp",
+        "npm_config_cache": "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\repo\\.tmp-tests\\w1c-controls-02\\npm-cache"
+      },
+      "trees": {
+        "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\repo\\.tmp-tests\\w1c-controls-02\\cache": [],
+        "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\repo\\.tmp-tests\\w1c-controls-02\\npm-cache": [],
+        "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\repo\\.tmp-tests\\w1c-controls-02\\temp": []
+      }
+    }
+  },
+  "tooling": {
+    "runner": "8421064ae97afa0fe204ac03d473c2178c8cabd3f834c7a66b753d651817edba",
+    "worker": "14068b7457f1e5cee778a11b44f6c9c8a136b989d0eac099436c722e1518edf4",
+    "preflight": "41c88ddd93288042043f500f129c2cb34d530186b2dd063d7d330ef50065228e",
+    "summary": "4143527f40a363855a91613e34f280cf1a8b1c18717ab22cbe8230d8ef0066cb"
+  },
+  "execution": {
+    "node": "v24.20.0",
+    "nodePath": "C:\\Program Files\\nodejs\\node.exe",
+    "cwd": "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\repo"
+  },
+  "status": "SOURCE_DEPENDENCIES_VERIFIED",
+  "limitations": [
+    "Point-in-time raw bytes; hashes do not prove authenticity or historical execution.",
+    "Selected cache/TEMP trees are sealed; arbitrary external writes and concurrent adversarial changes are not OS-sandboxed."
+  ]
+}

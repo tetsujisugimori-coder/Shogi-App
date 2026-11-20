@@ -1,0 +1,37 @@
+{
+  "generatedAt": "2026-11-12T01:41:13.718Z",
+  "runs": [
+    {
+      "sequence": 1,
+      "head": "old",
+      "exitCode": 0,
+      "passed": 0,
+      "failed": 0,
+      "skipped": 0,
+      "todo": 0,
+      "logSignals": [],
+      "status": "PASS",
+      "failureCount": 0,
+      "commonNameFailures": 0,
+      "unchangedFileNameFailures": 0
+    }
+  ],
+  "observedNames": {
+    "common": 0,
+    "commonInUnchangedFiles": 0,
+    "onlyOld": [],
+    "onlyNew": [],
+    "changedFiles": [
+      "src/test/game-blunder-investigation-v4.test.ts",
+      "src/test/game-blunder-v4-journal-integration.test.ts"
+    ]
+  },
+  "limitations": [
+    "Observed names are not proof of additions or removals when collection is incomplete",
+    "Name sets collapse duplicate names; per-test timing preserves occurrences",
+    "Log string matches require manual verification and do not establish order or causality",
+    "Individual start/end and worker ID are NOT_MEASURED",
+    "Unchanged file does not prove identical runtime context",
+    "Sampling assignment is confounded with order"
+  ]
+}

@@ -1,0 +1,902 @@
+{
+  "source": "docs/benchmarks/game-blunder-investigation-v4-20261105/observations.jsonl",
+  "baseline": "e1ccb1a2412e7faa86c2c1f60fdad1dca154023a",
+  "currentParent": "1edc169cc9ff27b7c77e825e95b893e5b0252ed1",
+  "cases": [
+    {
+      "finding": "control",
+      "name": "normal",
+      "change": "Untouched schema 2 observations",
+      "inputSha256": "66cb941288aeca77ee41c3d66c853d420004e3c4b474ada5c612c24017d4afa6",
+      "old": {
+        "exitCode": 0,
+        "decision": "accepted",
+        "reproducible": 24,
+        "reason": "reproducible",
+        "rootScore": 0,
+        "invalid": []
+      },
+      "current": {
+        "exitCode": 0,
+        "decision": "accepted",
+        "reproducible": 24,
+        "reason": "reproducible",
+        "rootScore": 0,
+        "invalid": []
+      }
+    },
+    {
+      "finding": "P2-01",
+      "name": "foreign-hash",
+      "change": "Add hash of a different selected journal position to rep 1",
+      "inputSha256": "15a234292d969292a922269a1c64703c6b7756296a8caf1efff7362e7e3e4dd3",
+      "old": {
+        "exitCode": 0,
+        "decision": "accepted",
+        "reproducible": 24,
+        "reason": "reproducible",
+        "rootScore": 0,
+        "invalid": []
+      },
+      "current": {
+        "exitCode": 1,
+        "decision": "rejected",
+        "reason": "fixed position hash: 7ee4b05fb4030e72e782e158706312fcd0e336fcd5dfa6f2092bbfde33a2df4a/{\"from\":{\"col\":1,\"row\":7},\"kind\":\"move\",\"pieceType\":\"bishop\",\"player\":\"sente\",\"promotion\":\"decline\",\"to\":{\"col\":7,\"row\":1}}/legacy/1000\n+ actual - expected\n\n+ '21ea84a772abaf6503b9d00d10f56d06dccce58fd824342c900fea70518d4ef6'\n- '7ee4b05fb4030e72e782e158706312fcd0e336fcd5dfa6f2092bbfde33a2df4a'\n"
+      }
+    },
+    {
+      "finding": "P2-01",
+      "name": "foreign-mode",
+      "change": "Change mode of rep 1 only, keeping identical repeatKey",
+      "inputSha256": "84df16490dabc1e733a7685d45b3a6dcd11378d9a183b6f46d6ef9e5ea95f692",
+      "old": {
+        "exitCode": 0,
+        "decision": "accepted",
+        "reproducible": 24,
+        "reason": "reproducible",
+        "rootScore": 0,
+        "invalid": []
+      },
+      "current": {
+        "exitCode": 1,
+        "decision": "rejected",
+        "reason": "fixed mode: 7ee4b05fb4030e72e782e158706312fcd0e336fcd5dfa6f2092bbfde33a2df4a/{\"from\":{\"col\":1,\"row\":7},\"kind\":\"move\",\"pieceType\":\"bishop\",\"player\":\"sente\",\"promotion\":\"decline\",\"to\":{\"col\":7,\"row\":1}}/legacy/1000\n+ actual - expected\n\n+ 'experimental'\n- 'legacy'\n"
+      }
+    },
+    {
+      "finding": "P2-01",
+      "name": "foreign-settings",
+      "change": "Enable killerMoves for rep 1 only",
+      "inputSha256": "9d064882d1383da72d14ff590d2a7d99c666764692c391cb94969f85222c4add",
+      "old": {
+        "exitCode": 0,
+        "decision": "accepted",
+        "reproducible": 24,
+        "reason": "reproducible",
+        "rootScore": 0,
+        "invalid": []
+      },
+      "current": {
+        "exitCode": 1,
+        "decision": "rejected",
+        "reason": "fixed condition: 7ee4b05fb4030e72e782e158706312fcd0e336fcd5dfa6f2092bbfde33a2df4a/{\"from\":{\"col\":1,\"row\":7},\"kind\":\"move\",\"pieceType\":\"bishop\",\"player\":\"sente\",\"promotion\":\"decline\",\"to\":{\"col\":7,\"row\":1}}/legacy/1000\n+ actual - expected\n\n  {\n    depth: 1,\n    name: 'root-depth1',\n    options: {\n+     killerMoves: true,\n-     killerMoves: false,\n      moveOrdering: 'standard',\n      quiescence: {\n        includeQuietPromotions: false,\n        maxCheckEvasionExtensions: 0,\n        maxTacticalDepth: 1,\n"
+      }
+    },
+    {
+      "finding": "P2-01",
+      "name": "foreign-depth",
+      "change": "Claim requested and completed depth 2 on both root-depth1 rows",
+      "inputSha256": "4e58ddb9616514c4f1bb58afc239b462522043095456dc11fd3141eb8863cd09",
+      "old": {
+        "exitCode": 0,
+        "decision": "accepted",
+        "reproducible": 24,
+        "reason": "reproducible",
+        "rootScore": 0,
+        "invalid": []
+      },
+      "current": {
+        "exitCode": 0,
+        "decision": "excluded",
+        "reproducible": 23,
+        "reason": [
+          "depth-mismatch",
+          "depth-mismatch"
+        ],
+        "rootScore": null,
+        "invalid": [
+          {
+            "type": "root-fixed",
+            "id": "7ee4b05fb4030e72e782e158706312fcd0e336fcd5dfa6f2092bbfde33a2df4a/{\"from\":{\"col\":1,\"row\":7},\"kind\":\"move\",\"pieceType\":\"bishop\",\"player\":\"sente\",\"promotion\":\"decline\",\"to\":{\"col\":7,\"row\":1}}/legacy/1000",
+            "rep": 0,
+            "condition": "root-depth1",
+            "reason": "depth-mismatch"
+          },
+          {
+            "type": "root-fixed",
+            "id": "7ee4b05fb4030e72e782e158706312fcd0e336fcd5dfa6f2092bbfde33a2df4a/{\"from\":{\"col\":1,\"row\":7},\"kind\":\"move\",\"pieceType\":\"bishop\",\"player\":\"sente\",\"promotion\":\"decline\",\"to\":{\"col\":7,\"row\":1}}/legacy/1000",
+            "rep": 1,
+            "condition": "root-depth1",
+            "reason": "depth-mismatch"
+          }
+        ]
+      }
+    },
+    {
+      "finding": "P2-01",
+      "name": "foreign-budget",
+      "change": "Change only root rep 1 budget to 1499 nodes",
+      "inputSha256": "81e32824a83700e17be6580198e3fb10839844f53767f4a8e8510559bc25586c",
+      "old": {
+        "exitCode": 1,
+        "decision": "rejected",
+        "reason": "Expected values to be strictly deep-equal:\n+ actual - expected\n\n  {\n    ms: 3000,\n+   nodes: 1499\n-   nodes: 1500\n  }\n"
+      },
+      "current": {
+        "exitCode": 1,
+        "decision": "rejected",
+        "reason": "fixed budget: 7ee4b05fb4030e72e782e158706312fcd0e336fcd5dfa6f2092bbfde33a2df4a/{\"from\":{\"col\":1,\"row\":7},\"kind\":\"move\",\"pieceType\":\"bishop\",\"player\":\"sente\",\"promotion\":\"decline\",\"to\":{\"col\":7,\"row\":1}}/legacy/1000\n+ actual - expected\n\n  {\n    ms: 3000,\n+   nodes: 1499\n-   nodes: 1500\n  }\n"
+      }
+    },
+    {
+      "finding": "P2-01",
+      "name": "coherent-budget",
+      "change": "Change plan and every recorded budget together to 1499 nodes",
+      "inputSha256": "ac04acddd9a056637eb7b3bf97f5b4970e8d85982f09c4681f43706ccb22bef6",
+      "old": {
+        "exitCode": 0,
+        "decision": "accepted",
+        "reproducible": 24,
+        "reason": "reproducible",
+        "rootScore": 0,
+        "invalid": []
+      },
+      "current": {
+        "exitCode": 1,
+        "decision": "rejected",
+        "reason": "plan budget contract\n+ actual - expected\n\n  {\n    ms: 3000,\n+   nodes: 1499\n-   nodes: 1500\n  }\n"
+      }
+    },
+    {
+      "finding": "P2-01",
+      "name": "duplicate-rep",
+      "change": "Duplicate root rep 0 as rep 1 index",
+      "inputSha256": "356695e84a08dd75f9c373edbfd59e090c37272f914811b425ce2964ed3eb13e",
+      "old": {
+        "exitCode": 1,
+        "decision": "rejected",
+        "reason": "Expected values to be strictly equal:\n\n1 !== 2\n"
+      },
+      "current": {
+        "exitCode": 1,
+        "decision": "rejected",
+        "reason": "duplicate root repetition: 7ee4b05fb4030e72e782e158706312fcd0e336fcd5dfa6f2092bbfde33a2df4a/{\"from\":{\"col\":1,\"row\":7},\"kind\":\"move\",\"pieceType\":\"bishop\",\"player\":\"sente\",\"promotion\":\"decline\",\"to\":{\"col\":7,\"row\":1}}/legacy/1000\n\n1 !== 2\n"
+      }
+    },
+    {
+      "finding": "P2-01",
+      "name": "missing-rep",
+      "change": "Remove rep 1 and update I/O coverage",
+      "inputSha256": "b38cb359258ce61781a3d19e774181ef77d254ed8a09be8f38324054f6afcfe2",
+      "old": {
+        "exitCode": 1,
+        "decision": "rejected",
+        "reason": "Expected values to be strictly equal:\n\n47 !== 48\n"
+      },
+      "current": {
+        "exitCode": 1,
+        "decision": "rejected",
+        "reason": "root repetition count\n\n47 !== 48\n"
+      }
+    },
+    {
+      "finding": "P2-01",
+      "name": "candidate-replies",
+      "change": "Erase legal candidate replies in the saved metadata",
+      "inputSha256": "7fe74a76252b245d80f18cd5ec9910c5c614e96b2f6f4efd116fb47dc998a128",
+      "old": {
+        "exitCode": 0,
+        "decision": "accepted",
+        "reproducible": 24,
+        "reason": "reproducible",
+        "rootScore": 0,
+        "invalid": []
+      },
+      "current": {
+        "exitCode": 1,
+        "decision": "rejected",
+        "reason": "candidate reply or exchange metadata mismatch: af1984db62af0f44b80c676627e2a7879d3af226d65288f0f4863ff554f049e3/{\"from\":{\"col\":1,\"row\":6},\"kind\":\"move\",\"pieceType\":\"pawn\",\"player\":\"sente\",\"promotion\":\"none\",\"to\":{\"col\":1,\"row\":5}}/legacy/1000 actual\n+ actual - expected\n... Skipped lines\n\n  {\n    action: {\n      from: {\n        col: 1,\n        row: 6\n...\n    exchangeScope: 'First legal same-square capture at each step, at most 4 captures. All immediate captures and legal recaptures listed separately; no minimax exchange or compensation proof.',\n+   replies: []\n-   replies: [\n-     {\n-       from: {\n-         col: 0,\n-         row: 0\n-       },\n-       kind: 'move',\n-       pieceType: 'lance',\n-       player: 'gote',\n-       promotion: 'none',\n-       to: {\n-         col: 0,\n-         row: 1\n-       }\n-     },\n-     {\n-       from: {\n-         col: 2,\n-         row: 0\n-       },\n-       kind: 'move',\n-       pieceType: 'silver',\n-       player: 'gote',\n-       promotion: 'none',\n-       to: {\n-         col: 2,\n-         row: 1\n-       }\n-     },\n-     {\n-       from: {\n-         col: 2,\n-         row: 0\n-       },\n-       kind: 'move',\n-       pieceType: 'silver',\n-       player: 'gote',\n-       promotion: 'none',\n-       to: {\n-         col: 3,\n-         row: 1\n-       }\n-     },\n-     {\n-       from: {\n-         col: 3,\n-         row: 0\n-       },\n-       kind: 'move',\n-       pieceType: 'gold',\n-       player: 'gote',\n-       promotion: 'none',\n-       to: {\n-         col: 2,\n-         row: 1\n-       }\n-     },\n-     {\n-       from: {\n-         col: 3,\n-         row: 0\n-       },\n-       kind: 'move',\n-       pieceType: 'gold',\n-       player: 'gote',\n-       promotion: 'none',\n-       to: {\n-         col: 3,\n-         row: 1\n-       }\n-     },\n-     {\n-       from: {\n-         col: 3,\n-         row: 0\n-       },\n-       kind: 'move',\n-       pieceType: 'gold',\n-       player: 'gote',\n-       promotion: 'none',\n-       to: {\n-         col: 4,\n-         row: 1\n-       }\n-     },\n-     {\n-       from: {\n-         col: 4,\n-         row: 0\n-       },\n-       kind: 'move',\n-       pieceType: 'king',\n-       player: 'gote',\n-       promotion: 'none',\n-       to: {\n-         col: 3,\n-         row: 1\n-       }\n-     },\n-     {\n-       from: {\n-         col: 4,\n-         row: 0\n-       },\n-       kind: 'move',\n-       pieceType: 'king',\n-       player: 'gote',\n-       promotion: 'none',\n-       to: {\n-         col: 4,\n-         row: 1\n-       }\n-     },\n-     {\n-       from: {\n-         col: 4,\n-         row: 0\n-       },\n-       kind: 'move',\n-       pieceType: 'king',\n-       player: 'gote',\n-       promotion: 'none',\n-       to: {\n-         col: 5,\n-         row: 1\n-       }\n-     },\n-     {\n-       from: {\n-         col: 5,\n-         row: 0\n-       },\n-       kind: 'move',\n-       pieceType: 'gold',\n-       player: 'gote',\n-       promotion: 'none',\n-       to: {\n-         col: 6,\n-         row: 0\n-       }\n-     },\n-     {\n-       from: {\n-         col: 5,\n-         row: 0\n-       },\n-       kind: 'move',\n-       pieceType: 'gold',\n-       player: 'gote',\n-       promotion: 'none',\n-       to: {\n-         col: 4,\n-         row: 1\n-       }\n-     },\n-     {\n-       from: {\n-         col: 5,\n-         row: 0\n-       },\n-       kind: 'move',\n-       pieceType: 'gold',\n-       player: 'gote',\n-       promotion: 'none',\n-       to: {\n-         col: 5,\n-         row: 1\n-       }\n-     },\n-     {\n-       from: {\n-         col: 5,\n-         row: 0\n-       },\n-       kind: 'move',\n-       pieceType: 'gold',\n-       player: 'gote',\n-       promotion: 'none',\n-       to: {\n-         col: 6,\n-         row: 1\n-       }\n-     },\n-     {\n-       from: {\n-         col: 7,\n-         row: 0\n-       },\n-       kind: 'move',\n-       pieceType: 'knight',\n-       player: 'gote',\n-       promotion: 'none',\n-       to: {\n-         col: 6,\n-         row: 2\n-       }\n-     },\n-     {\n-       from: {\n-         col: 8,\n-         row: 0\n-       },\n-       kind: 'move',\n-       pieceType: 'lance',\n-       player: 'gote',\n-       promotion: 'none',\n-       to: {\n-         col: 8,\n-         row: 1\n-       }\n-     },\n-     {\n-       from: {\n-         col: 1,\n-         row: 1\n-       },\n-       kind: 'move',\n-       pieceType: 'rook',\n-       player: 'gote',\n-       promotion: 'none',\n-       to: {\n-         col: 0,\n-         row: 1\n-       }\n-     },\n-     {\n-       from: {\n-         col: 1,\n-         row: 1\n-       },\n-       kind: 'move',\n-       pieceType: 'rook',\n-       player: 'gote',\n-       promotion: 'none',\n-       to: {\n-         col: 2,\n-         row: 1\n-       }\n-     },\n-     {\n-       from: {\n-         col: 1,\n-         row: 1\n-       },\n-       kind: 'move',\n-       pieceType: 'rook',\n-       player: 'gote',\n-       promotion: 'none',\n-       to: {\n-         col: 3,\n-         row: 1\n-       }\n-     },\n-     {\n-       from: {\n-         col: 1,\n-         row: 1\n-       },\n-       kind: 'move',\n-       pieceType: 'rook',\n-       player: 'gote',\n-       promotion: 'none',\n-       to: {\n-         col: 4,\n-         row: 1\n-       }\n-     },\n-     {\n-       from: {\n-         col: 1,\n-         row: 1\n-       },\n-       kind: 'move',\n-       pieceType: 'rook',\n-       player: 'gote',\n-       promotion: 'none',\n-       to: {\n-         col: 5,\n-         row: 1\n-       }\n-     },\n-     {\n-       from: {\n-         col: 1,\n-         row: 1\n-       },\n-       kind: 'move',\n-       pieceType: 'rook',\n-       player: 'gote',\n-       promotion: 'none',\n-       to: {\n-         col: 6,\n-         row: 1\n-       }\n-     },\n-     {\n-       from: {\n-         col: 7,\n-         row: 1\n-       },\n-       kind: 'move',\n-       pieceType: 'silver',\n-       player: 'gote',\n-       promotion: 'none',\n-       to: {\n-         col: 6,\n-         row: 0\n-       }\n-     },\n-     {\n-       from: {\n-         col: 7,\n-         row: 1\n-       },\n-       kind: 'move',\n-       pieceType: 'silver',\n-       player: 'gote',\n-       promotion: 'none',\n-       to: {\n-         col: 6,\n-         row: 2\n-       }\n-     },\n-     {\n-       from: {\n-         col: 0,\n-         row: 2\n-       },\n-       kind: 'move',\n-       pieceType: 'pawn',\n-       player: 'gote',\n-       promotion: 'none',\n-       to: {\n-         col: 0,\n-         row: 3\n-       }\n-     },\n-     {\n-       from: {\n-         col: 1,\n-         row: 2\n-       },\n-       kind: 'move',\n-       pieceType: 'pawn',\n-       player: 'gote',\n-       promotion: 'none',\n-       to: {\n-         col: 1,\n-         row: 3\n-       }\n-     },\n-     {\n-       from: {\n-         col: 2,\n-         row: 2\n-       },\n-       kind: 'move',\n-       pieceType: 'pawn',\n-       player: 'gote',\n-       promotion: 'none',\n-       to: {\n-         col: 2,\n-         row: 3\n-       }\n-     },\n-     {\n-       from: {\n-         col: 3,\n-         row: 2\n-       },\n-       kind: 'move',\n-       pieceType: 'pawn',\n-       player: 'gote',\n-       promotion: 'none',\n-       to: {\n-         col: 3,\n-         row: 3\n-       }\n-     },\n-     {\n-       from: {\n-         col: 5,\n-         row: 2\n-       },\n-       kind: 'move',\n-       pieceType: 'pawn',\n-       player: 'gote',\n-       promotion: 'none',\n-       to: {\n-         col: 5,\n-         row: 3\n-       }\n-     },\n-     {\n-       from: {\n-         col: 7,\n-         row: 2\n-       },\n-       kind: 'move',\n-       pieceType: 'pawn',\n-       player: 'gote',\n-       promotion: 'none',\n-       to: {\n-         col: 7,\n-         row: 3\n-       }\n-     },\n-     {\n-       from: {\n-         col: 8,\n-         row: 2\n-       },\n-       kind: 'move',\n-       pieceType: 'pawn',\n-       player: 'gote',\n-       promotion: 'none',\n-       to: {\n-         col: 8,\n-         row: 3\n-       }\n-     },\n-     {\n-       from: {\n-         col: 4,\n-         row: 3\n-       },\n-       kind: 'move',\n-       pieceType: 'pawn',\n-       player: 'gote',\n-       promotion: 'none',\n-       to: {\n-         col: 4,\n-         row: 4\n-       }\n-     },\n-     {\n-       from: {\n-         col: 6,\n-         row: 3\n-       },\n-       kind: 'move',\n-       pieceType: 'pawn',\n-       player: 'gote',\n-       promotion: 'none',\n-       to: {\n-         col: 6,\n-         row: 4\n-       }\n-     },\n-     {\n-       from: {\n-         col: 0,\n-         row: 4\n-       },\n-       kind: 'move',\n-       pieceType: 'bishop',\n-       player: 'gote',\n-       promotion: 'none',\n-       to: {\n-         col: 1,\n-         row: 3\n-       }\n-     },\n-     {\n-       from: {\n-         col: 0,\n-         row: 4\n-       },\n-       kind: 'move',\n-       pieceType: 'bishop',\n-       player: 'gote',\n-       promotion: 'none',\n-       to: {\n-         col: 1,\n-         row: 5\n-       }\n-     }\n-   ]\n  }\n"
+      }
+    },
+    {
+      "finding": "P2-01",
+      "name": "foreign-id",
+      "change": "Replace one root ID with a different existing selected position ID",
+      "inputSha256": "9758c7a9ecdd681b45f142b32d8b1ab7943771e73ed9c8f0083c5b5ac8aea60e",
+      "old": {
+        "exitCode": 1,
+        "decision": "rejected",
+        "reason": "Expected values to be strictly equal:\n\n1 !== 2\n"
+      },
+      "current": {
+        "exitCode": 1,
+        "decision": "rejected",
+        "reason": "missing or extra root repetition: 7ee4b05fb4030e72e782e158706312fcd0e336fcd5dfa6f2092bbfde33a2df4a/{\"from\":{\"col\":1,\"row\":7},\"kind\":\"move\",\"pieceType\":\"bishop\",\"player\":\"sente\",\"promotion\":\"decline\",\"to\":{\"col\":7,\"row\":1}}/legacy/1000\n\n1 !== 2\n"
+      }
+    },
+    {
+      "finding": "P2-02",
+      "name": "q0-killer",
+      "change": "In plan and rows, replace q0 depth change with killerMoves=true",
+      "inputSha256": "6603b1571de9a9798c3f9bccd757e0c41d4298af351e8cf8ed454f991437ca39",
+      "old": {
+        "exitCode": 0,
+        "decision": "accepted",
+        "reproducible": 24,
+        "reason": "reproducible",
+        "rootScore": 0,
+        "invalid": []
+      },
+      "current": {
+        "exitCode": 1,
+        "decision": "rejected",
+        "reason": "plan condition contract\n+ actual - expected\n... Skipped lines\n\n  [\n    {\n      depth: 2,\n      name: 'baseline',\n      options: {\n...\n      options: {\n+       killerMoves: true,\n-       killerMoves: false,\n        moveOrdering: 'standard',\n        quiescence: {\n          includeQuietPromotions: false,\n          maxCheckEvasionExtensions: 0,\n+         maxTacticalDepth: 1,\n-         maxTacticalDepth: 0,\n          moveOrdering: 'original'\n        },\n        usePreviousIterationPv: false,\n        useTranspositionTable: false\n      }\n"
+      }
+    },
+    {
+      "finding": "P2-02",
+      "name": "depth1-mislabeled",
+      "change": "In plan and rows, relabel depth1 as wrong-depth",
+      "inputSha256": "e6ead59453dae980b288a68b7c3f40b8044d5df693fd4415f2b7e318b62bff8a",
+      "old": {
+        "exitCode": 0,
+        "decision": "accepted",
+        "reproducible": 24,
+        "reason": "reproducible",
+        "rootScore": 0,
+        "invalid": []
+      },
+      "current": {
+        "exitCode": 1,
+        "decision": "rejected",
+        "reason": "plan condition contract\n+ actual - expected\n... Skipped lines\n\n  [\n    {\n      depth: 2,\n      name: 'baseline',\n      options: {\n...\n      depth: 1,\n+     name: 'wrong-depth',\n-     name: 'depth1',\n      options: {\n        killerMoves: false,\n        moveOrdering: 'standard',\n        quiescence: {\n          includeQuietPromotions: false,\n"
+      }
+    },
+    {
+      "finding": "P2-02",
+      "name": "see-order-wrong-value",
+      "change": "In plan and rows, replace static-exchange with an invented ordering",
+      "inputSha256": "000bb2f60298911c6e48435cd6afee10cb2c52bf491476bcd0e43b5d7aee713f",
+      "old": {
+        "exitCode": 0,
+        "decision": "accepted",
+        "reproducible": 24,
+        "reason": "reproducible",
+        "rootScore": 0,
+        "invalid": []
+      },
+      "current": {
+        "exitCode": 1,
+        "decision": "rejected",
+        "reason": "plan condition contract\n+ actual - expected\n... Skipped lines\n\n  [\n    {\n      depth: 2,\n      name: 'baseline',\n      options: {\n...\n        killerMoves: false,\n+       moveOrdering: 'unknown-policy',\n-       moveOrdering: 'static-exchange',\n        quiescence: {\n          includeQuietPromotions: false,\n          maxCheckEvasionExtensions: 0,\n          maxTacticalDepth: 1,\n          moveOrdering: 'original'\n"
+      }
+    },
+    {
+      "finding": "P2-02",
+      "name": "baseline-and-variants",
+      "change": "Change TT from false to true in the plan and all pair rows for every condition",
+      "inputSha256": "77886ed3d3e91719c7cc2dd3aa7728bf97cc6cf1d954cf0c76fd4b592ed18da1",
+      "old": {
+        "exitCode": 0,
+        "decision": "accepted",
+        "reproducible": 24,
+        "reason": "reproducible",
+        "rootScore": 0,
+        "invalid": []
+      },
+      "current": {
+        "exitCode": 1,
+        "decision": "rejected",
+        "reason": "plan condition contract\n+ actual - expected\n... Skipped lines\n\n  [\n    {\n      depth: 2,\n      name: 'baseline',\n      options: {\n...\n        usePreviousIterationPv: false,\n+       useTranspositionTable: true\n-       useTranspositionTable: false\n      }\n    },\n    {\n      depth: 2,\n      name: 'q0',\n...\n        usePreviousIterationPv: false,\n+       useTranspositionTable: true\n-       useTranspositionTable: false\n      }\n    },\n    {\n      depth: 1,\n      name: 'depth1',\n...\n        usePreviousIterationPv: false,\n+       useTranspositionTable: true\n-       useTranspositionTable: false\n      }\n    },\n    {\n      depth: 2,\n      name: 'see-order',\n...\n        usePreviousIterationPv: false,\n+       useTranspositionTable: true\n-       useTranspositionTable: false\n      }\n    }\n  ]\n"
+      }
+    },
+    {
+      "finding": "P3-01",
+      "name": "null-score",
+      "change": "Both roots claim completed with null scores and updated keys",
+      "inputSha256": "f8a6dbc79feb8c61792541165589691ee98157347abe3b1a0628c3256b0b4382",
+      "old": {
+        "exitCode": 0,
+        "decision": "accepted",
+        "reproducible": 24,
+        "reason": "reproducible",
+        "rootScore": null,
+        "invalid": []
+      },
+      "current": {
+        "exitCode": 0,
+        "decision": "excluded",
+        "reproducible": 23,
+        "reason": [
+          "non-finite-evaluation",
+          "non-finite-evaluation"
+        ],
+        "rootScore": null,
+        "invalid": [
+          {
+            "type": "root-fixed",
+            "id": "7ee4b05fb4030e72e782e158706312fcd0e336fcd5dfa6f2092bbfde33a2df4a/{\"from\":{\"col\":1,\"row\":7},\"kind\":\"move\",\"pieceType\":\"bishop\",\"player\":\"sente\",\"promotion\":\"decline\",\"to\":{\"col\":7,\"row\":1}}/legacy/1000",
+            "rep": 0,
+            "condition": "root-depth1",
+            "reason": "non-finite-evaluation"
+          },
+          {
+            "type": "root-fixed",
+            "id": "7ee4b05fb4030e72e782e158706312fcd0e336fcd5dfa6f2092bbfde33a2df4a/{\"from\":{\"col\":1,\"row\":7},\"kind\":\"move\",\"pieceType\":\"bishop\",\"player\":\"sente\",\"promotion\":\"decline\",\"to\":{\"col\":7,\"row\":1}}/legacy/1000",
+            "rep": 1,
+            "condition": "root-depth1",
+            "reason": "non-finite-evaluation"
+          }
+        ]
+      }
+    },
+    {
+      "finding": "P3-01",
+      "name": "nan-tag",
+      "change": "Both roots claim completed with NaN, serialized by the production JSON encoder",
+      "inputSha256": "ba4d3e6d689b6ecd9e90dee910068a218c280a2f0abb25d31489a022a0ea7623",
+      "old": {
+        "exitCode": 0,
+        "decision": "accepted",
+        "reproducible": 24,
+        "reason": "reproducible",
+        "rootScore": {
+          "nonfinite": "NaN"
+        },
+        "invalid": []
+      },
+      "current": {
+        "exitCode": 0,
+        "decision": "excluded",
+        "reproducible": 23,
+        "reason": [
+          "non-finite-evaluation",
+          "non-finite-evaluation"
+        ],
+        "rootScore": null,
+        "invalid": [
+          {
+            "type": "root-fixed",
+            "id": "7ee4b05fb4030e72e782e158706312fcd0e336fcd5dfa6f2092bbfde33a2df4a/{\"from\":{\"col\":1,\"row\":7},\"kind\":\"move\",\"pieceType\":\"bishop\",\"player\":\"sente\",\"promotion\":\"decline\",\"to\":{\"col\":7,\"row\":1}}/legacy/1000",
+            "rep": 0,
+            "condition": "root-depth1",
+            "reason": "non-finite-evaluation"
+          },
+          {
+            "type": "root-fixed",
+            "id": "7ee4b05fb4030e72e782e158706312fcd0e336fcd5dfa6f2092bbfde33a2df4a/{\"from\":{\"col\":1,\"row\":7},\"kind\":\"move\",\"pieceType\":\"bishop\",\"player\":\"sente\",\"promotion\":\"decline\",\"to\":{\"col\":7,\"row\":1}}/legacy/1000",
+            "rep": 1,
+            "condition": "root-depth1",
+            "reason": "non-finite-evaluation"
+          }
+        ]
+      }
+    },
+    {
+      "finding": "P3-01",
+      "name": "infinity-tag",
+      "change": "Both roots claim completed with Infinity, serialized by the production JSON encoder",
+      "inputSha256": "b09357bf6293a0a829d88d8b1ac72ffc5ea9ea2af59ebba298b499b21d4e81d8",
+      "old": {
+        "exitCode": 0,
+        "decision": "accepted",
+        "reproducible": 24,
+        "reason": "reproducible",
+        "rootScore": {
+          "nonfinite": "Infinity"
+        },
+        "invalid": []
+      },
+      "current": {
+        "exitCode": 0,
+        "decision": "excluded",
+        "reproducible": 23,
+        "reason": [
+          "non-finite-evaluation",
+          "non-finite-evaluation"
+        ],
+        "rootScore": null,
+        "invalid": [
+          {
+            "type": "root-fixed",
+            "id": "7ee4b05fb4030e72e782e158706312fcd0e336fcd5dfa6f2092bbfde33a2df4a/{\"from\":{\"col\":1,\"row\":7},\"kind\":\"move\",\"pieceType\":\"bishop\",\"player\":\"sente\",\"promotion\":\"decline\",\"to\":{\"col\":7,\"row\":1}}/legacy/1000",
+            "rep": 0,
+            "condition": "root-depth1",
+            "reason": "non-finite-evaluation"
+          },
+          {
+            "type": "root-fixed",
+            "id": "7ee4b05fb4030e72e782e158706312fcd0e336fcd5dfa6f2092bbfde33a2df4a/{\"from\":{\"col\":1,\"row\":7},\"kind\":\"move\",\"pieceType\":\"bishop\",\"player\":\"sente\",\"promotion\":\"decline\",\"to\":{\"col\":7,\"row\":1}}/legacy/1000",
+            "rep": 1,
+            "condition": "root-depth1",
+            "reason": "non-finite-evaluation"
+          }
+        ]
+      }
+    },
+    {
+      "finding": "P3-01",
+      "name": "infinity-number",
+      "change": "Both roots contain a legal JSON exponent that parses to numeric Infinity",
+      "inputSha256": "142d2b28625a7c41ee87d2f3bab9d721fad9e5f350cece849a18f3bbe81e637a",
+      "old": {
+        "exitCode": 0,
+        "decision": "accepted",
+        "reproducible": 24,
+        "reason": "reproducible",
+        "rootScore": null,
+        "invalid": []
+      },
+      "current": {
+        "exitCode": 0,
+        "decision": "excluded",
+        "reproducible": 23,
+        "reason": [
+          "non-finite-evaluation",
+          "non-finite-evaluation"
+        ],
+        "rootScore": null,
+        "invalid": [
+          {
+            "type": "root-fixed",
+            "id": "7ee4b05fb4030e72e782e158706312fcd0e336fcd5dfa6f2092bbfde33a2df4a/{\"from\":{\"col\":1,\"row\":7},\"kind\":\"move\",\"pieceType\":\"bishop\",\"player\":\"sente\",\"promotion\":\"decline\",\"to\":{\"col\":7,\"row\":1}}/legacy/1000",
+            "rep": 0,
+            "condition": "root-depth1",
+            "reason": "non-finite-evaluation"
+          },
+          {
+            "type": "root-fixed",
+            "id": "7ee4b05fb4030e72e782e158706312fcd0e336fcd5dfa6f2092bbfde33a2df4a/{\"from\":{\"col\":1,\"row\":7},\"kind\":\"move\",\"pieceType\":\"bishop\",\"player\":\"sente\",\"promotion\":\"decline\",\"to\":{\"col\":7,\"row\":1}}/legacy/1000",
+            "rep": 1,
+            "condition": "root-depth1",
+            "reason": "non-finite-evaluation"
+          }
+        ]
+      }
+    },
+    {
+      "finding": "P3-01",
+      "name": "partial",
+      "change": "Both roots report partial status, with regenerated keys",
+      "inputSha256": "9d6a5ae18084194c6220f05b4e69343a8113ffe8b03a7a160d827c99bbc4b838",
+      "old": {
+        "exitCode": 1,
+        "decision": "rejected",
+        "reason": "The expression evaluated to a falsy value:\n\n  assert.ok(['completed','interrupted','error','not-run'].includes(r.status))\n"
+      },
+      "current": {
+        "exitCode": 0,
+        "decision": "excluded",
+        "reproducible": 23,
+        "reason": [
+          "partial",
+          "partial"
+        ],
+        "rootScore": null,
+        "invalid": [
+          {
+            "type": "root-fixed",
+            "id": "7ee4b05fb4030e72e782e158706312fcd0e336fcd5dfa6f2092bbfde33a2df4a/{\"from\":{\"col\":1,\"row\":7},\"kind\":\"move\",\"pieceType\":\"bishop\",\"player\":\"sente\",\"promotion\":\"decline\",\"to\":{\"col\":7,\"row\":1}}/legacy/1000",
+            "rep": 0,
+            "condition": "root-depth1",
+            "reason": "partial"
+          },
+          {
+            "type": "root-fixed",
+            "id": "7ee4b05fb4030e72e782e158706312fcd0e336fcd5dfa6f2092bbfde33a2df4a/{\"from\":{\"col\":1,\"row\":7},\"kind\":\"move\",\"pieceType\":\"bishop\",\"player\":\"sente\",\"promotion\":\"decline\",\"to\":{\"col\":7,\"row\":1}}/legacy/1000",
+            "rep": 1,
+            "condition": "root-depth1",
+            "reason": "partial"
+          }
+        ]
+      }
+    },
+    {
+      "finding": "P3-01",
+      "name": "interrupted",
+      "change": "Both roots record interrupted with no result",
+      "inputSha256": "afbf93ab11b83a471ce4f45feba9c3e7bd13fc9af90b3dfbb840daebff417c81",
+      "old": {
+        "exitCode": 0,
+        "decision": "excluded",
+        "reproducible": 23,
+        "reason": "not reproducible",
+        "rootScore": null,
+        "invalid": []
+      },
+      "current": {
+        "exitCode": 0,
+        "decision": "excluded",
+        "reproducible": 23,
+        "reason": [
+          "interrupted: fixture",
+          "interrupted: fixture"
+        ],
+        "rootScore": null,
+        "invalid": [
+          {
+            "type": "root-fixed",
+            "id": "7ee4b05fb4030e72e782e158706312fcd0e336fcd5dfa6f2092bbfde33a2df4a/{\"from\":{\"col\":1,\"row\":7},\"kind\":\"move\",\"pieceType\":\"bishop\",\"player\":\"sente\",\"promotion\":\"decline\",\"to\":{\"col\":7,\"row\":1}}/legacy/1000",
+            "rep": 0,
+            "condition": "root-depth1",
+            "reason": "interrupted: fixture"
+          },
+          {
+            "type": "root-fixed",
+            "id": "7ee4b05fb4030e72e782e158706312fcd0e336fcd5dfa6f2092bbfde33a2df4a/{\"from\":{\"col\":1,\"row\":7},\"kind\":\"move\",\"pieceType\":\"bishop\",\"player\":\"sente\",\"promotion\":\"decline\",\"to\":{\"col\":7,\"row\":1}}/legacy/1000",
+            "rep": 1,
+            "condition": "root-depth1",
+            "reason": "interrupted: fixture"
+          }
+        ]
+      }
+    },
+    {
+      "finding": "P3-01",
+      "name": "error",
+      "change": "Both roots record error with no result",
+      "inputSha256": "0969daaff1c25a28a265031e21f67b6482e71134c8e8e5fbe18229ad8886946b",
+      "old": {
+        "exitCode": 0,
+        "decision": "excluded",
+        "reproducible": 23,
+        "reason": "not reproducible",
+        "rootScore": null,
+        "invalid": []
+      },
+      "current": {
+        "exitCode": 0,
+        "decision": "excluded",
+        "reproducible": 23,
+        "reason": [
+          "error: fixture",
+          "error: fixture"
+        ],
+        "rootScore": null,
+        "invalid": [
+          {
+            "type": "root-fixed",
+            "id": "7ee4b05fb4030e72e782e158706312fcd0e336fcd5dfa6f2092bbfde33a2df4a/{\"from\":{\"col\":1,\"row\":7},\"kind\":\"move\",\"pieceType\":\"bishop\",\"player\":\"sente\",\"promotion\":\"decline\",\"to\":{\"col\":7,\"row\":1}}/legacy/1000",
+            "rep": 0,
+            "condition": "root-depth1",
+            "reason": "error: fixture"
+          },
+          {
+            "type": "root-fixed",
+            "id": "7ee4b05fb4030e72e782e158706312fcd0e336fcd5dfa6f2092bbfde33a2df4a/{\"from\":{\"col\":1,\"row\":7},\"kind\":\"move\",\"pieceType\":\"bishop\",\"player\":\"sente\",\"promotion\":\"decline\",\"to\":{\"col\":7,\"row\":1}}/legacy/1000",
+            "rep": 1,
+            "condition": "root-depth1",
+            "reason": "error: fixture"
+          }
+        ]
+      }
+    },
+    {
+      "finding": "P3-01",
+      "name": "depth-mismatch",
+      "change": "Both roots report completedDepth 0 with regenerated keys",
+      "inputSha256": "7a8da1643410bbdd7f7db70fe3b409065d801ce6289caae82068795fb632bfb7",
+      "old": {
+        "exitCode": 1,
+        "decision": "rejected",
+        "reason": "Expected values to be strictly equal:\n\n0 !== 1\n"
+      },
+      "current": {
+        "exitCode": 0,
+        "decision": "excluded",
+        "reproducible": 23,
+        "reason": [
+          "depth-mismatch",
+          "depth-mismatch"
+        ],
+        "rootScore": null,
+        "invalid": [
+          {
+            "type": "root-fixed",
+            "id": "7ee4b05fb4030e72e782e158706312fcd0e336fcd5dfa6f2092bbfde33a2df4a/{\"from\":{\"col\":1,\"row\":7},\"kind\":\"move\",\"pieceType\":\"bishop\",\"player\":\"sente\",\"promotion\":\"decline\",\"to\":{\"col\":7,\"row\":1}}/legacy/1000",
+            "rep": 0,
+            "condition": "root-depth1",
+            "reason": "depth-mismatch"
+          },
+          {
+            "type": "root-fixed",
+            "id": "7ee4b05fb4030e72e782e158706312fcd0e336fcd5dfa6f2092bbfde33a2df4a/{\"from\":{\"col\":1,\"row\":7},\"kind\":\"move\",\"pieceType\":\"bishop\",\"player\":\"sente\",\"promotion\":\"decline\",\"to\":{\"col\":7,\"row\":1}}/legacy/1000",
+            "rep": 1,
+            "condition": "root-depth1",
+            "reason": "depth-mismatch"
+          }
+        ]
+      }
+    },
+    {
+      "finding": "P3-01",
+      "name": "invalid-validity",
+      "change": "Both roots claim unusable with otherwise finite consistent results",
+      "inputSha256": "aa597f218c779cd7ac3769afdb3e393107d82b15a0ae1c90537f281ebbb02da9",
+      "old": {
+        "exitCode": 0,
+        "decision": "accepted",
+        "reproducible": 24,
+        "reason": "reproducible",
+        "rootScore": 0,
+        "invalid": []
+      },
+      "current": {
+        "exitCode": 0,
+        "decision": "excluded",
+        "reproducible": 23,
+        "reason": [
+          "invalid-completion",
+          "invalid-completion"
+        ],
+        "rootScore": null,
+        "invalid": [
+          {
+            "type": "root-fixed",
+            "id": "7ee4b05fb4030e72e782e158706312fcd0e336fcd5dfa6f2092bbfde33a2df4a/{\"from\":{\"col\":1,\"row\":7},\"kind\":\"move\",\"pieceType\":\"bishop\",\"player\":\"sente\",\"promotion\":\"decline\",\"to\":{\"col\":7,\"row\":1}}/legacy/1000",
+            "rep": 0,
+            "condition": "root-depth1",
+            "reason": "invalid-completion"
+          },
+          {
+            "type": "root-fixed",
+            "id": "7ee4b05fb4030e72e782e158706312fcd0e336fcd5dfa6f2092bbfde33a2df4a/{\"from\":{\"col\":1,\"row\":7},\"kind\":\"move\",\"pieceType\":\"bishop\",\"player\":\"sente\",\"promotion\":\"decline\",\"to\":{\"col\":7,\"row\":1}}/legacy/1000",
+            "rep": 1,
+            "condition": "root-depth1",
+            "reason": "invalid-completion"
+          }
+        ]
+      }
+    },
+    {
+      "finding": "P3-01",
+      "name": "forged-finite-score",
+      "change": "Change both finite totals and regenerate keys while keeping the original legal PV",
+      "inputSha256": "4c1ce298478fbe81fff101af8e62bd82588e492ad38699b37047336d299c5cd1",
+      "old": {
+        "exitCode": 0,
+        "decision": "accepted",
+        "reproducible": 24,
+        "reason": "reproducible",
+        "rootScore": 999999,
+        "invalid": []
+      },
+      "current": {
+        "exitCode": 0,
+        "decision": "excluded",
+        "reproducible": 23,
+        "reason": [
+          "pv-evaluation-mismatch",
+          "pv-evaluation-mismatch"
+        ],
+        "rootScore": null,
+        "invalid": [
+          {
+            "type": "root-fixed",
+            "id": "7ee4b05fb4030e72e782e158706312fcd0e336fcd5dfa6f2092bbfde33a2df4a/{\"from\":{\"col\":1,\"row\":7},\"kind\":\"move\",\"pieceType\":\"bishop\",\"player\":\"sente\",\"promotion\":\"decline\",\"to\":{\"col\":7,\"row\":1}}/legacy/1000",
+            "rep": 0,
+            "condition": "root-depth1",
+            "reason": "pv-evaluation-mismatch"
+          },
+          {
+            "type": "root-fixed",
+            "id": "7ee4b05fb4030e72e782e158706312fcd0e336fcd5dfa6f2092bbfde33a2df4a/{\"from\":{\"col\":1,\"row\":7},\"kind\":\"move\",\"pieceType\":\"bishop\",\"player\":\"sente\",\"promotion\":\"decline\",\"to\":{\"col\":7,\"row\":1}}/legacy/1000",
+            "rep": 1,
+            "condition": "root-depth1",
+            "reason": "pv-evaluation-mismatch"
+          }
+        ]
+      }
+    },
+    {
+      "finding": "P3-01",
+      "name": "score-breakdown",
+      "change": "Both roots retain finite score with inconsistent evaluation breakdown",
+      "inputSha256": "e7c9575da6fa554877e4427e8b939fbdd363c9a3acc86be8de43b983678dcbc3",
+      "old": {
+        "exitCode": 0,
+        "decision": "accepted",
+        "reproducible": 24,
+        "reason": "reproducible",
+        "rootScore": 0,
+        "invalid": []
+      },
+      "current": {
+        "exitCode": 0,
+        "decision": "excluded",
+        "reproducible": 23,
+        "reason": [
+          "inconsistent-result",
+          "inconsistent-result"
+        ],
+        "rootScore": null,
+        "invalid": [
+          {
+            "type": "root-fixed",
+            "id": "7ee4b05fb4030e72e782e158706312fcd0e336fcd5dfa6f2092bbfde33a2df4a/{\"from\":{\"col\":1,\"row\":7},\"kind\":\"move\",\"pieceType\":\"bishop\",\"player\":\"sente\",\"promotion\":\"decline\",\"to\":{\"col\":7,\"row\":1}}/legacy/1000",
+            "rep": 0,
+            "condition": "root-depth1",
+            "reason": "inconsistent-result"
+          },
+          {
+            "type": "root-fixed",
+            "id": "7ee4b05fb4030e72e782e158706312fcd0e336fcd5dfa6f2092bbfde33a2df4a/{\"from\":{\"col\":1,\"row\":7},\"kind\":\"move\",\"pieceType\":\"bishop\",\"player\":\"sente\",\"promotion\":\"decline\",\"to\":{\"col\":7,\"row\":1}}/legacy/1000",
+            "rep": 1,
+            "condition": "root-depth1",
+            "reason": "inconsistent-result"
+          }
+        ]
+      }
+    },
+    {
+      "finding": "P3-01",
+      "name": "inconsistent-nodes",
+      "change": "Change both observed normal node counts without changing result counters",
+      "inputSha256": "7b4eed9d1c5c7c02f00a2f0c23161b51a84e0038e6000edbf76c7dd419719f03",
+      "old": {
+        "exitCode": 0,
+        "decision": "accepted",
+        "reproducible": 24,
+        "reason": "reproducible",
+        "rootScore": 0,
+        "invalid": []
+      },
+      "current": {
+        "exitCode": 0,
+        "decision": "excluded",
+        "reproducible": 23,
+        "reason": [
+          "inconsistent-node-counts",
+          "inconsistent-node-counts"
+        ],
+        "rootScore": null,
+        "invalid": [
+          {
+            "type": "root-fixed",
+            "id": "7ee4b05fb4030e72e782e158706312fcd0e336fcd5dfa6f2092bbfde33a2df4a/{\"from\":{\"col\":1,\"row\":7},\"kind\":\"move\",\"pieceType\":\"bishop\",\"player\":\"sente\",\"promotion\":\"decline\",\"to\":{\"col\":7,\"row\":1}}/legacy/1000",
+            "rep": 0,
+            "condition": "root-depth1",
+            "reason": "inconsistent-node-counts"
+          },
+          {
+            "type": "root-fixed",
+            "id": "7ee4b05fb4030e72e782e158706312fcd0e336fcd5dfa6f2092bbfde33a2df4a/{\"from\":{\"col\":1,\"row\":7},\"kind\":\"move\",\"pieceType\":\"bishop\",\"player\":\"sente\",\"promotion\":\"decline\",\"to\":{\"col\":7,\"row\":1}}/legacy/1000",
+            "rep": 1,
+            "condition": "root-depth1",
+            "reason": "inconsistent-node-counts"
+          }
+        ]
+      }
+    },
+    {
+      "finding": "P3-01",
+      "name": "invalid-result-counter",
+      "change": "Both roots have a negative result cutoff count with otherwise identical valid output",
+      "inputSha256": "aaef059e533e33f814d25451862f5d84d03ffb5aa6342c731e59f882f56a617f",
+      "old": {
+        "exitCode": 0,
+        "decision": "accepted",
+        "reproducible": 24,
+        "reason": "reproducible",
+        "rootScore": 0,
+        "invalid": []
+      },
+      "current": {
+        "exitCode": 0,
+        "decision": "excluded",
+        "reproducible": 23,
+        "reason": [
+          "invalid-result-statistics",
+          "invalid-result-statistics"
+        ],
+        "rootScore": null,
+        "invalid": [
+          {
+            "type": "root-fixed",
+            "id": "7ee4b05fb4030e72e782e158706312fcd0e336fcd5dfa6f2092bbfde33a2df4a/{\"from\":{\"col\":1,\"row\":7},\"kind\":\"move\",\"pieceType\":\"bishop\",\"player\":\"sente\",\"promotion\":\"decline\",\"to\":{\"col\":7,\"row\":1}}/legacy/1000",
+            "rep": 0,
+            "condition": "root-depth1",
+            "reason": "invalid-result-statistics"
+          },
+          {
+            "type": "root-fixed",
+            "id": "7ee4b05fb4030e72e782e158706312fcd0e336fcd5dfa6f2092bbfde33a2df4a/{\"from\":{\"col\":1,\"row\":7},\"kind\":\"move\",\"pieceType\":\"bishop\",\"player\":\"sente\",\"promotion\":\"decline\",\"to\":{\"col\":7,\"row\":1}}/legacy/1000",
+            "rep": 1,
+            "condition": "root-depth1",
+            "reason": "invalid-result-statistics"
+          }
+        ]
+      }
+    },
+    {
+      "finding": "P3-01",
+      "name": "nonfinite-result-timing",
+      "change": "Both roots have a tagged infinite result duration with otherwise valid output",
+      "inputSha256": "7780814cc29f699facd98656c12decd2711cdd193142161b9af3f23bcc662cf7",
+      "old": {
+        "exitCode": 0,
+        "decision": "accepted",
+        "reproducible": 24,
+        "reason": "reproducible",
+        "rootScore": 0,
+        "invalid": []
+      },
+      "current": {
+        "exitCode": 0,
+        "decision": "excluded",
+        "reproducible": 23,
+        "reason": [
+          "invalid-result-statistics",
+          "invalid-result-statistics"
+        ],
+        "rootScore": null,
+        "invalid": [
+          {
+            "type": "root-fixed",
+            "id": "7ee4b05fb4030e72e782e158706312fcd0e336fcd5dfa6f2092bbfde33a2df4a/{\"from\":{\"col\":1,\"row\":7},\"kind\":\"move\",\"pieceType\":\"bishop\",\"player\":\"sente\",\"promotion\":\"decline\",\"to\":{\"col\":7,\"row\":1}}/legacy/1000",
+            "rep": 0,
+            "condition": "root-depth1",
+            "reason": "invalid-result-statistics"
+          },
+          {
+            "type": "root-fixed",
+            "id": "7ee4b05fb4030e72e782e158706312fcd0e336fcd5dfa6f2092bbfde33a2df4a/{\"from\":{\"col\":1,\"row\":7},\"kind\":\"move\",\"pieceType\":\"bishop\",\"player\":\"sente\",\"promotion\":\"decline\",\"to\":{\"col\":7,\"row\":1}}/legacy/1000",
+            "rep": 1,
+            "condition": "root-depth1",
+            "reason": "invalid-result-statistics"
+          }
+        ]
+      }
+    },
+    {
+      "finding": "P3-01",
+      "name": "illegal-pv",
+      "change": "Both roots have the same illegal selected action and matching PV start",
+      "inputSha256": "f2a05d7d67e8f107e4a0c204bba6c862befd3e34cae6a442b895d0458dffecd8",
+      "old": {
+        "exitCode": 0,
+        "decision": "accepted",
+        "reproducible": 24,
+        "reason": "reproducible",
+        "rootScore": 0,
+        "invalid": []
+      },
+      "current": {
+        "exitCode": 0,
+        "decision": "excluded",
+        "reproducible": 23,
+        "reason": [
+          "illegal-pv",
+          "illegal-pv"
+        ],
+        "rootScore": null,
+        "invalid": [
+          {
+            "type": "root-fixed",
+            "id": "7ee4b05fb4030e72e782e158706312fcd0e336fcd5dfa6f2092bbfde33a2df4a/{\"from\":{\"col\":1,\"row\":7},\"kind\":\"move\",\"pieceType\":\"bishop\",\"player\":\"sente\",\"promotion\":\"decline\",\"to\":{\"col\":7,\"row\":1}}/legacy/1000",
+            "rep": 0,
+            "condition": "root-depth1",
+            "reason": "illegal-pv"
+          },
+          {
+            "type": "root-fixed",
+            "id": "7ee4b05fb4030e72e782e158706312fcd0e336fcd5dfa6f2092bbfde33a2df4a/{\"from\":{\"col\":1,\"row\":7},\"kind\":\"move\",\"pieceType\":\"bishop\",\"player\":\"sente\",\"promotion\":\"decline\",\"to\":{\"col\":7,\"row\":1}}/legacy/1000",
+            "rep": 1,
+            "condition": "root-depth1",
+            "reason": "illegal-pv"
+          }
+        ]
+      }
+    }
+  ]
+}

@@ -1,0 +1,65 @@
+{
+  "at": "2026-11-16T12:20:15.881Z",
+  "reviewer": "independent_review agent; separate from implementation agent",
+  "head": "53f913804b1bcd91c88decd0870b26a796d1f32b",
+  "tree": "4ec00e6c7d95290711ba3f8bfdedbbc59bc0bbdb",
+  "scope": "working-tree raw bytes at review time; final Git blob/CI correspondence must be checked after commit",
+  "files": [
+    {
+      "path": "scripts/stage-w1f-audit.mjs",
+      "sha256": "f65f0f0ceae6554a9da46e442a5b865731ce1bd554a8b1d31e70a0a124adae01"
+    },
+    {
+      "path": "scripts/stage-w1f-cache-semantics.mjs",
+      "sha256": "9e734fe0ec61e2a70d20832b3dba4de2c5877e06af7d58dba92a97d7dc46f8cb"
+    },
+    {
+      "path": "scripts/stage-w1f-cache.mjs",
+      "sha256": "bb6c7dfe90f8624c3e437f3b782966214b877496ed0c763cb48929a9a15d1d3c"
+    },
+    {
+      "path": "scripts/stage-w1f-check.mjs",
+      "sha256": "0e848a18f255ae1c71488b9cac98aa04304dce10d56e7e7af643e6394dae311d"
+    },
+    {
+      "path": "scripts/stage-w1f-contract.mjs",
+      "sha256": "93405f9b488b0e7bf34eba128d8ac2195a4347e88a74c977f2c4f4d2e3abaffc"
+    },
+    {
+      "path": "scripts/stage-w1f-events.mjs",
+      "sha256": "f0be3b7afbbfc5bb986011d4074a65b439197e97f5202a0b6ac34aea4d04c1a7"
+    },
+    {
+      "path": "scripts/stage-w1f-observer-check.mjs",
+      "sha256": "7baf69d648ecc2e9795995278c0ed8f12995c8691ac1e4c7207fa5c15be19364"
+    },
+    {
+      "path": "scripts/stage-w1f-observer.mjs",
+      "sha256": "e3f8fb31c6c0ab13b50b4e536453c756c742eb10fb04de5e78aa9e785755373c"
+    },
+    {
+      "path": "scripts/stage-w1f-probe.mjs",
+      "sha256": "b97d9afcb7a371f5adc063b516e96fa7c97bab335e1ba91f4510b7f76edaab45"
+    },
+    {
+      "path": "scripts/stage-w1f-real-cache-check.mjs",
+      "sha256": "2dcb68173243dbb7e9071a2a12da50dd6d9d2d5e752ae96242d715fabbd64345"
+    },
+    {
+      "path": "scripts/stage-w1f-run.mjs",
+      "sha256": "2ca220a4556ef6b098f9cdfb135121f3a69454918eb63ebbe4011153bc166272"
+    },
+    {
+      "path": "scripts/stage-w1f-tools.mjs",
+      "sha256": "a9af984f2c7ada81a094db3158b85c4fe6e9ae21f415dfed6099b83cf199745b"
+    },
+    {
+      "path": "scripts/stage-w1e-contract.mjs",
+      "sha256": "24d05400f71768ae5a2c1550ae0dafd0174820a1c5a9572114237cdb70ee8e1a"
+    },
+    {
+      "path": ".github/workflows/stage-w1-verifiers.yml",
+      "sha256": "ee656c2b4fac15a6ecc2488865c4db286c9f3948d71e75e2691a0c3d7c224b07"
+    }
+  ]
+}

@@ -1,0 +1,6 @@
+{
+  "at": "2026-11-15T11:02:37.773Z",
+  "action": "blocked",
+  "phase": "launch",
+  "reason": "Error: settings.json changed"
+}

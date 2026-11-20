@@ -1,0 +1,231 @@
+
+ RUN  v4.1.11 C:/Users/tetsu/Documents/ChatGPT/将棋アプリ/stage-w1-snapshots/old
+
+ ✓ src/test/shogi-time-limited-worker-ai-ui.test.tsx (28 tests) 8382ms
+     ✓ Worker handlerのpartial-rootをcloneして表示し、合法な1手だけを適用する  414ms
+     ✓ 静止探索は初期状態で無効、選択値を固定してWorkerへ渡し、変更時に古い結果を消去する  381ms
+     ✓ 設定を開始時に固定し、変更後の次回探索と結果表示へ反映する  592ms
+     ✓ 中止後の古い設定付き応答は新しい結果のプリセットを巻き戻さない  435ms
+     ✓ 別局面の新探索が完了してから届く旧内訳で表示や符号が巻き戻らない  444ms
+     ✓ 新探索開始とcancel後に前局面の内訳を残さない  331ms
+     ✓ 新探索開始とerror後に前局面の内訳を残さない  342ms
+     ✓ 通常着手と棋譜再生でも前局面の内訳を破棄する  558ms
+     ✓ 先頭不一致、途中不正手、完了深さ超過のWorker PVは盤面と成功表示を変えず拒否する  450ms
+     ✓ KIF読込確定と棋譜再生位置への移動で探索を中止する  413ms
+     ✓ 分岐開始・本譜復帰・保存済み分岐への切替は探索を中止し、遅延結果を反映しない  702ms
+ ✓ src/test/shogi-evaluation-preset-comparison-ui.test.tsx (24 tests) 9033ms
+     ✓ 不変局面と深さ3で開始し、競合AIを止め、全結果を固定順で表示する  877ms
+     ✓ 単独AIの判断・統計・選択プリセットを上書きせず後手基準を先手表示へ変換する  688ms
+     ✓ 再開始時に結果を消し、中止後の旧世代成功・失敗を無視する  412ms
+     ✓ 通常着手で中止し、遅延した結果を表示しない  328ms
+     ✓ KIFで中止し、遅延した結果を表示しない  323ms
+     ✓ 成り選択でも比較を中止する  305ms
+     ✓ 完成済みの比較結果も新規対局で破棄する  501ms
+     ✓ 完成済みの比較結果も着手で破棄する  564ms
+     ✓ 完成済みの比較結果も再生で破棄する  514ms
+     ✓ 完成済みの比較結果もJSONで破棄する  575ms
+     ✓ 完成済みの比較結果もKIFで破棄する  568ms
+     ✓ 分岐作成・本譜復帰・分岐切替で結果と進行中ジョブを破棄する  704ms
+ ✓ src/test/shogi-time-limited-quiescence-comparison-ui.test.tsx (25 tests) 7032ms
+     ✓ 異なる完了深さ・時間切れと4群の統計を表示し、局面・保存・既存比較を保持する  908ms
+     ✓ 再開始時に結果を消し、中止後の旧世代成功・失敗を無視する  358ms
+     ✓ 完成済みの比較結果も着手で破棄する  314ms
+     ✓ 分岐作成・本譜復帰・分岐切替で結果と進行中ジョブを破棄する  788ms
+ ✓ src/test/shogi-quiescence-comparison-ui.test.tsx (27 tests) 7667ms
+     ✓ 4手の主変化と固定深さ3を区別して表示する  435ms
+     ✓ 評価比較結果・保存データを開始/中止/完了で維持し、3種類のWorkerを排他制御する  743ms
+     ✓ 不変局面と深さ3で開始し、競合AIを止め、全結果を固定順で表示する  426ms
+     ✓ 単独AIの判断・統計・選択プリセットを上書きせず後手基準を先手表示へ変換する  401ms
+     ✓ 再開始時に結果を消し、中止後の旧世代成功・失敗を無視する  356ms
+     ✓ 成り選択でも比較を中止する  329ms
+     ✓ 完成済みの比較結果も着手で破棄する  313ms
+     ✓ 分岐作成・本譜復帰・分岐切替で結果と進行中ジョブを破棄する  737ms
+ ✓ src/test/shogi-branch-replay.test.ts (18 tests) 5003ms
+     ✓ 確認、キャンセル、Escape、背景クリックでは本譜と閲覧位置を変更しない  531ms
+     ✓ 途中局面から通常手を指し、本譜へ戻ると元の棋譜を正確に復元する  611ms
+     ✓ 検討手順中の過去局面は閲覧できるが、二重の指し直しで本譜バックアップを上書きしない  736ms
+     ✓ 再読み込みした分岐JSONでは本譜へ戻れず、過去局面からの指し直しも開始できない  347ms
+     ✓ JSON読み込みは確定時だけセッション内の検討手順を破棄する  823ms
+     ✓ KIF読み込みは確定時だけセッション内の検討手順を破棄する  796ms
+     ✓ 初期局面からも開始でき、新しい対局の確定時だけセッション内の検討手順を破棄する  481ms
+     ✓ 分岐元ごとの表示名を保持し、別の手数では連番を1から開始する  634ms
+ ✓ src/test/shogi-new-game.test.tsx (26 tests) 6120ms
+     ✓ active状態で新しい対局を開始できる  310ms
+     ✓ 1手進んだ局面から確定すると平手初期局面へ戻り、盤・駒台・キーボード操作を再開する  313ms
+     ✓ 任意initialStateではなく標準局面へ戻し、複数回でも駒IDと履歴を重複させない  431ms
+     ✓ 投了・入玉宣言・持将棋の確認中は新しい対局を開始しない  335ms
+     ✓ 成り選択中は新しい対局を開始せず、確定時には盤上選択と候補を消す  411ms
+     ✓ 持ち駒選択はキャンセル時に維持し、確定時に持ち駒と選択を消す  406ms
+stdout | src/test/shogi.test.tsx > 6. macOS 検証スクリプトの公開API・内部処理・本番cleanup経路の単体テスト > 公開検証関数 (verifyMacOsFsevents) > 非macOS環境では platform が実OSと一致し、isDarwin: false, nativeVerified: false を返すこと
+[verify:macos-fsevents] Running on platform: win32 (Windows_NT 10.0.26300)
+[verify:macos-fsevents] Current platform is not darwin (macOS).
+[verify:macos-fsevents] Static inspection note: macOS native watching was NOT executed on this platform.
+[verify:macos-fsevents] Static inspection note: Vite watcher macOS native path was NOT executed on this platform.
+[verify:macos-fsevents] Inspecting package-lock.json for fsevents metadata:
+ - fsevents version: 2.3.3
+ - fsevents optional: true
+ - fsevents os constraint: ["darwin"]
+ - fsevents hasInstallScript: true
+[verify:macos-fsevents] Non-darwin platform static check passed (native macOS watch skipped).
+
+stdout | src/test/shogi.test.tsx > 6. macOS 検証スクリプトの公開API・内部処理・本番cleanup経路の単体テスト > 公開検証関数 (verifyMacOsFsevents) > 非macOS環境では引数を渡しても内部で無視され、macOSの成功結果（nativeVerified: true）を偽装できないこと
+[verify:macos-fsevents] Running on platform: win32 (Windows_NT 10.0.26300)
+[verify:macos-fsevents] Current platform is not darwin (macOS).
+[verify:macos-fsevents] Static inspection note: macOS native watching was NOT executed on this platform.
+[verify:macos-fsevents] Static inspection note: Vite watcher macOS native path was NOT executed on this platform.
+[verify:macos-fsevents] Inspecting package-lock.json for fsevents metadata:
+ - fsevents version: 2.3.3
+ - fsevents optional: true
+ - fsevents os constraint: ["darwin"]
+ - fsevents hasInstallScript: true
+[verify:macos-fsevents] Non-darwin platform static check passed (native macOS watch skipped).
+
+ ✓ src/test/match-journal.test.ts (125 tests) 4664ms
+     ✓ accepts terminal PV shorter than completed depth and measured deadline overrun  729ms
+     ✓ kills a real writer process after fsync and replays its prefix without an end record  713ms
+ ✓ src/test/shogi.test.tsx (152 tests) 3724ms
+         ✓ 任意成り先でARIA付きダイアログを開き、ダイアログ内へフォーカスすること  425ms
+         ✓ 「成る」で成駒、「不成」で未成駒として着手すること  417ms
+     ✓ ロックファイル検証スクリプト verify-lockfile.mjs が存在し正常終了すること  377ms
+ ✓ src/test/shogi-move-history.test.tsx (39 tests) 3486ms
+     ✓ 2手指した現在局面から前の手を1回押すと1手目終了局面へ戻る  375ms
+     ✓ 棋譜行、初期局面、前後移動、現在局面復帰を読み取り専用で切り替える  560ms
+     ✓ 確認を開く・キャンセルでは維持し、確定時だけ棋譜と前局結果を消す  451ms
+     ✓ 空の初期局面でもキャンセルは開閉を維持し、確定だけ棋譜を閉じる  453ms
+ ✓ src/test/shogi-agreed-jishogi.test.tsx (65 tests) 4724ms
+     ✓ 双方24点未満では提案不可理由を表示して提案を無効化する  328ms
+     ✓ 承諾が拒否された後も理由と提案を維持し、buttonで閉じて再表示時にエラーを残さない  407ms
+     ✓ 承諾が拒否された後も理由と提案を維持し、escapeで閉じて再表示時にエラーを残さない  373ms
+     ✓ 承諾が拒否された後も理由と提案を維持し、backdropで閉じて再表示時にエラーを残さない  345ms
+     ✓ buttonで拒否し、選択を維持して提案ボタンへ戻る  387ms
+     ✓ escapeで拒否し、選択を維持して提案ボタンへ戻る  356ms
+     ✓ backdropで拒否し、選択を維持して提案ボタンへ戻る  334ms
+     ✓ 両段階でTabとShift+Tabを循環し、承諾を初期選択にしない  331ms
+ ✓ src/test/shogi-resignation.test.tsx (34 tests) 3147ms
+     ✓ 対局中に投了ボタンを表示し、確認前には終局しない  302ms
+     ✓ TabとShift+Tabでフォーカスをダイアログ内に循環させる  305ms
+ ✓ src/test/shogi-branch-session-ui.test.tsx (2 tests) 2882ms
+     ✓ 同じ本譜から作った兄弟分岐をセッション内に保持し、独立した続きへ切り替えられる  1909ms
+     ✓ JSONでは本譜と兄弟分岐をセッション全体で、KIFでは選択中の一本道だけを書き出す  971ms
+ ✓ src/test/outcome-proof.test.ts (35 tests) 2396ms
+     ✓ roundtrips saved proofs and exposes CLI success/rejection/usage exit codes  1393ms
+ ✓ src/test/shogi-entering-king.test.tsx (82 tests) 2349ms
+     ✓ 入玉宣言ボタンと条件不足の評価を表示し、確定を無効化する  303ms
+ ✓ src/test/shogi-two-ply-minimax-ai.test.ts (72 tests) 2578ms
+     ✓ 深さ3では並べ替えなしαβより少ない局面を生成し、選択手と評価値を保つ  413ms
+     ✓ 深さ3は最大化→最小化→最大化で3 ply先を評価し、枝刈りなし参照探索と選択・評価が一致する  383ms
+     ✓ 深さ3の途中で詰みへ到達した枝は、それ以上の子局面を生成せず既存の終局評価を返す  705ms
+ ✓ src/test/shogi-game-record-import.test.tsx (61 tests) 2203ms
+     ✓ JSON入力と読み込みボタンを関連付け、正常ファイルは確定まで現在局面を変えない  470ms
+     ✓ 研究セッションJSONは全分岐と選択中の分岐を復元し、本譜・分岐を切り替えられる  471ms
+     ✓ Escape、背景クリック、キャンセルでは現在局面を維持し、同じファイルを再選択できる  502ms
+ ✓ src/test/quiescence-ordering-repeated.test.ts (37 tests) 1586ms
+     ✓ runs 3+8 per setting on six unchanged positions, both modes, with independent frozen snapshots  1114ms
+ ✓ src/test/shogi-repetition.test.tsx (30 tests) 1960ms
+     ✓ 通常の千日手を勝者なし・無勝負と文字表示し、終局後操作を停止する  1813ms
+ ✓ src/test/shogi-drop.test.tsx (67 tests) 1425ms
+     ✓ クリックで選択・再クリックで解除・別IDへ切り替えできる  367ms
+ ✓ src/test/shogi-evaluation-preset-comparison.test.ts (7 tests) 1288ms
+     ✓ 固定順・同一の不変スナップショット・深さ3だけを使い、各既存探索と一致する  809ms
+ ✓ src/test/shogi-action-revalidation-regression.test.ts (3 tests) 1383ms
+     ✓ preserves both board/drop detailed checks with all four diagnostic combinations  687ms
+     ✓ counts internal generation at depth two without adding to root or quiescence aggregates  606ms
+ ✓ src/test/shogi-no-legal-review.test.tsx (15 tests) 1489ms
+     ✓ sente two-ply ends only an independently confirmed empty position  454ms
+ ✓ src/test/shogi-checkmate.test.tsx (30 tests) 1194ms
+     ✓ 通常移動の詰みをUIへ反映し、選択・候補・成りダイアログを消して盤を無効化する  308ms
+ ✓ src/test/shogi-move-ordering-modes.test.ts (34 tests) 1157ms
+ ✓ src/test/shogi-kif-import-ui.test.tsx (4 tests) 1121ms
+     ✓ File.arrayBufferでShift_JISを読み込み、確認ダイアログに文字コードを表示する  369ms
+     ✓ 確認・キャンセル・Escape・同じファイルの再選択で現在局面とフォーカスを維持する  451ms
+ ✓ src/test/shogi-quiescence-comparison.test.ts (11 tests) 1095ms
+     ✓ 固定順・深さ3・既定評価・standardを使用し、無効ではquiescenceを渡さない  340ms
+     ✓ 持ち駒・履歴を含む凍結局面を変更せず、PV末端の評価内訳を返す  414ms
+ ✓ src/test/shogi-game-record.test.tsx (46 tests) 1138ms
+     ✓ 対局開始直後に明確なラベルの保存ボタンを利用できる  335ms
+ ✓ src/test/shogi-ai-search-metrics-ui.test.tsx (1 test) 946ms
+     ✓ AI着手後に計測値と上位候補を表示し、新規対局とKIF読込で古い結果を消す  945ms
+ ✓ src/test/evasion-boundary.test.ts (19 tests) 890ms
+ ✓ src/test/shogi-ai-judgment-ui.test.tsx (15 tests) 962ms
+ ✓ src/test/quiescence-benchmark.test.ts (38 tests) 792ms
+     ✓ 持ち駒・棋譜・局面履歴のある入力を両モードで保持する  540ms
+ ✓ src/test/quiescence-ordering-self-play.test.ts (26 tests) 928ms
+ ✓ src/test/shogi-see-move-ordering.test.ts (28 tests) 817ms
+ ✓ src/test/shogi-previous-pv.test.ts (22 tests) 853ms
+ ✓ src/test/quiescence-ordering-suite-comparison.test.ts (15 tests) 788ms
+     ✓ calls both named settings on every suite position under identical mode and balanced retained order  639ms
+ ✓ src/test/evasion-run-budget.test.ts (19 tests) 627ms
+     ✓ records parent timeouts separately and can kill synchronous child work  505ms
+ ✓ src/test/shogi-timed-depth-one-diagnostics.test.ts (6 tests) 683ms
+ ✓ src/test/shogi-no-legal-actions.test.tsx (12 tests) 613ms
+     ✓ Worker no-action response ends a custom active position instead of displaying an error  386ms
+ ✓ src/test/evaluation-preset-comparison-worker.test.ts (29 tests) 619ms
+     ✓ 1要求で3探索を直列実行し、全フィールドを構造化クローンで保持する  307ms
+ ✓ src/test/tactical-quality-review.test.ts (11 tests) 574ms
+ ✓ src/test/quiescence-comparison-worker.test.ts (40 tests) 599ms
+ ✓ src/test/shogi-move-limit-jishogi.test.tsx (27 tests) 505ms
+ ✓ src/test/shogi-transposition-table.test.ts (25 tests) 527ms
+ ✓ src/test/shogi-fallback-quality.test.ts (8 tests) 494ms
+     ✓ saves a legally replayable material witness and an alternative, without claiming a free capture  411ms
+ ✓ src/test/shogi-evaluation-presets.test.ts (19 tests) 497ms
+     ✓ 標準は選択手・PV・同点順・全探索統計を変えない  479ms
+ ✓ src/test/shogi-terminal-distance.test.ts (23 tests) 366ms
+ ✓ src/test/shogi-check-evasion.test.ts (40 tests) 287ms
+ ✓ src/test/shogi-repeated-paired-self-play-matches.test.ts (37 tests) 331ms
+ ✓ src/test/shogi-quiescence-ordering.test.ts (30 tests) 318ms
+ ✓ src/test/shogi-see-deadline.test.ts (17 tests) 280ms
+ ✓ src/test/game-blunder-v4-journal-integration.test.ts (3 tests) 315ms
+ ✓ src/test/shogi-numeric-coordinates.test.ts (65 tests) 298ms
+ ✓ src/test/tactical-diagnostics.test.ts (10 tests) 275ms
+ ✓ src/test/shogi-selective-promotions.test.ts (25 tests) 212ms
+ ✓ src/test/time-limited-quiescence-comparison-worker.test.ts (62 tests) 193ms
+ ✓ src/test/shogi-time-limit-stress.test.ts (4 tests) 229ms
+ ✓ src/test/shogi-action-revalidation.test.ts (4 tests) 188ms
+ ✓ src/test/quiescence-ordering-benchmark.test.ts (11 tests) 212ms
+ ✓ src/test/quiescence-ordering-self-play-suite.test.ts (7 tests) 146ms
+ ✓ src/test/shogi-piece-safety-experiment.test.ts (35 tests) 169ms
+ ✓ src/test/time-limited-iterative-alpha-beta-worker.test.ts (44 tests) 188ms
+ ✓ src/test/shogi-game-record-session.test.ts (8 tests) 170ms
+ ✓ src/test/shogi-partial-root.test.ts (42 tests) 154ms
+ ✓ src/test/tactical-quality.test.ts (17 tests) 225ms
+ ✓ src/test/shogi-partial-root-matches.test.ts (8 tests) 184ms
+ ✓ src/test/shogi-kif-import.test.ts (45 tests) 164ms
+ ✓ src/test/shogi-paired-self-play-match.test.ts (23 tests) 213ms
+ ✓ src/test/shogi-static-exchange-evaluation.test.ts (105 tests) 220ms
+ ✓ src/test/shogi-quiet-promotions.test.ts (19 tests) 162ms
+ ✓ src/test/shogi-killer-moves.test.ts (4 tests) 110ms
+ ✓ src/test/shogi-quiescence-search.test.ts (32 tests) 106ms
+ ✓ src/test/shogi-self-play-game.test.ts (52 tests) 111ms
+ ✓ src/test/shogi-json-exchange-contract.test.ts (12 tests) 108ms
+ ✓ src/test/shogi-selective-review.test.ts (124 tests) 91ms
+ ✓ src/test/tactical-classification.test.ts (6 tests) 73ms
+ ✓ src/test/shogi-time-limit-overrun.test.ts (1 test) 51ms
+ ✓ src/test/shogi-selective-promotion-contracts.test.ts (4 tests) 44ms
+ ✓ src/test/shogi-legal-actions.test.ts (20 tests) 47ms
+ ✓ src/test/shogi-search-value-nan.test.ts (30 tests) 38ms
+ ✓ src/test/shogi-timed-fallback-self-play.test.ts (3 tests) 38ms
+ ✓ src/test/game-blunder-investigation-v4.test.ts (7 tests) 35ms
+ ✓ src/test/shogi-search-evaluation-breakdown.test.ts (6 tests) 36ms
+ ✓ src/test/game-blunder-pilot.test.ts (2 tests) 31ms
+ ✓ src/test/shogi-material-ai.test.ts (7 tests) 25ms
+ ✓ src/test/shogi-attacks.test.ts (10 tests) 24ms
+ ✓ src/test/game-blunder-diagnosis.test.ts (8 tests) 21ms
+ ✓ src/test/shogi-kif-export.test.ts (17 tests) 19ms
+ ✓ src/test/shogi-time-limited-quiescence-comparison.test.ts (8 tests) 15ms
+ ✓ src/test/game-blunder-fixed.test.ts (4 tests) 15ms
+ ✓ src/test/tt-bottleneck-audit.test.ts (5 tests) 15ms
+ ✓ src/test/shogi-branch-session.test.ts (6 tests) 13ms
+ ✓ src/test/game-blunder-investigation-integration.test.ts (2 tests) 13ms
+ ✓ src/test/shogi-random-ai.test.ts (8 tests) 12ms
+ ✓ src/test/shogi-king-safety-evaluation.test.ts (12 tests) 8ms
+ ✓ src/test/shogi-piece-square-evaluation.test.ts (11 tests) 7ms
+ ✓ src/test/shogi-material-evaluation.test.ts (31 tests) 7ms
+ ✓ src/test/shogi-undefended-piece-safety-evaluation.test.ts (9 tests) 6ms
+ ✓ src/test/game-blunder-timeout-integration.test.ts (2 tests) 2ms
+
+ Test Files  98 passed (98)
+      Tests  2586 passed (2586)
+   Start at  09:48:39
+   Duration  106.90s (transform 2.63s, setup 7.19s, import 9.57s, tests 109.56s, environment 51.97s)
+
+JSON report written to C:/Users/tetsu/Documents/ChatGPT/将棋アプリ/repo/docs/benchmarks/game-blunder-windows-stage-w1-20261112/abba/run-06/vitest.json

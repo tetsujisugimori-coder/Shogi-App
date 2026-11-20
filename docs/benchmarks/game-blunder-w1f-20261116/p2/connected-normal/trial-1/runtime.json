@@ -1,0 +1,31 @@
+{
+  "runId": "0542181b-8569-4f8f-9927-a25e02baacd0",
+  "trialId": "f25bc061-d086-48a9-be81-f371b6e737f3",
+  "preflightSha256": "ff1cfc3fbb156cd64cb6f2284291057bb05ce61e698a2bf8818586d8efd07028",
+  "inventorySha256": "324121dd161442c3c98e038e1accd4ed9415809ab535d4d42b203c33951045cd",
+  "reason": "passed",
+  "unhandledErrors": [],
+  "suites": [
+    {
+      "id": "-270551241",
+      "file": "C:/Users/tetsu/Documents/ChatGPT/将棋アプリ/stage-w1f-20261116/p2/b/tiny.test.js",
+      "root": true,
+      "mode": "run",
+      "state": "pass"
+    },
+    {
+      "id": "-270551241_0",
+      "file": "C:/Users/tetsu/Documents/ChatGPT/将棋アプリ/stage-w1f-20261116/p2/b/tiny.test.js",
+      "root": false,
+      "mode": "run",
+      "state": "pass"
+    },
+    {
+      "id": "-270551241_0_0",
+      "file": "C:/Users/tetsu/Documents/ChatGPT/将棋アプリ/stage-w1f-20261116/p2/b/tiny.test.js",
+      "root": false,
+      "mode": "run",
+      "state": "pass"
+    }
+  ]
+}

@@ -1,0 +1,9 @@
+file:///C:/Users/tetsu/Documents/ChatGPT/%E5%B0%86%E6%A3%8B%E3%82%A2%E3%83%97%E3%83%AA/repo/scripts/stage-w1b-preflight.mjs:76
+  if(digest(before)!==digest(after)) throw Error('snapshot changed after collection or execution');
+                                           ^
+
+Error: snapshot changed after collection or execution
+    at requireUnchanged (file:///C:/Users/tetsu/Documents/ChatGPT/%E5%B0%86%E6%A3%8B%E3%82%A2%E3%83%97%E3%83%AA/repo/scripts/stage-w1b-preflight.mjs:76:44)
+    at file:///C:/Users/tetsu/Documents/ChatGPT/%E5%B0%86%E6%A3%8B%E3%82%A2%E3%83%97%E3%83%AA/repo/scripts/stage-w1b-worker.mjs:31:3
+
+Node.js v24.20.0

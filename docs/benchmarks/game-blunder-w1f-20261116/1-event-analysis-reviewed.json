@@ -1,0 +1,1527 @@
+{
+  "status": "UNKNOWN",
+  "scope": "instrumented PID public-API consistency only",
+  "reasons": [
+    "OPERATION_FAILED",
+    "LIFECYCLE_INCOMPLETE"
+  ],
+  "calls": 454,
+  "events": 909,
+  "renames": [
+    {
+      "callId": 19,
+      "from": "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\stage-w1f-20261116\\pair-retry\\1-temp\\PCFaQSyy3oxurOeUQ_vx7\\client\\.tmp-1794831301501-b1f36giaz8n",
+      "to": "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\stage-w1f-20261116\\pair-retry\\1-temp\\PCFaQSyy3oxurOeUQ_vx7\\client\\3ce07600bbd7f09d2b2bd51a4e35282fe8068568",
+      "invokeSeq": 19,
+      "completeSeq": 20,
+      "writeCalls": [
+        17
+      ],
+      "readCalls": [
+        {
+          "callId": 373,
+          "origin": "evidence-sampler"
+        }
+      ],
+      "deleteCalls": [
+        791
+      ],
+      "bytesBound": true,
+      "observedChain": false,
+      "readMeaning": "API and stack only; semantic consumption not proven",
+      "atomicOSRename": "UNKNOWN",
+      "exclusiveWriter": "UNKNOWN"
+    },
+    {
+      "callId": 23,
+      "from": "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\stage-w1f-20261116\\pair-retry\\1-temp\\PCFaQSyy3oxurOeUQ_vx7\\client\\.tmp-1794831301703-0iqft27kgf1w",
+      "to": "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\stage-w1f-20261116\\pair-retry\\1-temp\\PCFaQSyy3oxurOeUQ_vx7\\client\\9bcccdaa9d377effde278b52b61ec33ea805340a",
+      "invokeSeq": 23,
+      "completeSeq": 24,
+      "writeCalls": [
+        21
+      ],
+      "readCalls": [
+        {
+          "callId": 589,
+          "origin": "evidence-sampler"
+        }
+      ],
+      "deleteCalls": [
+        818
+      ],
+      "bytesBound": true,
+      "observedChain": false,
+      "readMeaning": "API and stack only; semantic consumption not proven",
+      "atomicOSRename": "UNKNOWN",
+      "exclusiveWriter": "UNKNOWN"
+    },
+    {
+      "callId": 27,
+      "from": "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\stage-w1f-20261116\\pair-retry\\1-temp\\PCFaQSyy3oxurOeUQ_vx7\\client\\.tmp-1794831301737-1vn94owbkxb",
+      "to": "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\stage-w1f-20261116\\pair-retry\\1-temp\\PCFaQSyy3oxurOeUQ_vx7\\client\\572a63f7fe81d64c6dad91c0fff0f76a6682a871",
+      "invokeSeq": 27,
+      "completeSeq": 28,
+      "writeCalls": [
+        25
+      ],
+      "readCalls": [
+        {
+          "callId": 429,
+          "origin": "evidence-sampler"
+        }
+      ],
+      "deleteCalls": [
+        798
+      ],
+      "bytesBound": true,
+      "observedChain": false,
+      "readMeaning": "API and stack only; semantic consumption not proven",
+      "atomicOSRename": "UNKNOWN",
+      "exclusiveWriter": "UNKNOWN"
+    },
+    {
+      "callId": 31,
+      "from": "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\stage-w1f-20261116\\pair-retry\\1-temp\\PCFaQSyy3oxurOeUQ_vx7\\client\\.tmp-1794831301757-q1rowo4o1y",
+      "to": "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\stage-w1f-20261116\\pair-retry\\1-temp\\PCFaQSyy3oxurOeUQ_vx7\\client\\8e4b64b6d1a84904d674ab133305f610e90b3d84",
+      "invokeSeq": 31,
+      "completeSeq": 32,
+      "writeCalls": [
+        29
+      ],
+      "readCalls": [
+        {
+          "callId": 549,
+          "origin": "evidence-sampler"
+        }
+      ],
+      "deleteCalls": [
+        812
+      ],
+      "bytesBound": true,
+      "observedChain": false,
+      "readMeaning": "API and stack only; semantic consumption not proven",
+      "atomicOSRename": "UNKNOWN",
+      "exclusiveWriter": "UNKNOWN"
+    },
+    {
+      "callId": 35,
+      "from": "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\stage-w1f-20261116\\pair-retry\\1-temp\\PCFaQSyy3oxurOeUQ_vx7\\client\\.tmp-1794831301767-6lcd939pw9",
+      "to": "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\stage-w1f-20261116\\pair-retry\\1-temp\\PCFaQSyy3oxurOeUQ_vx7\\client\\64fbc0237520acc7a118038adcdc851612a21039",
+      "invokeSeq": 35,
+      "completeSeq": 36,
+      "writeCalls": [
+        33
+      ],
+      "readCalls": [
+        {
+          "callId": 469,
+          "origin": "evidence-sampler"
+        }
+      ],
+      "deleteCalls": [
+        803
+      ],
+      "bytesBound": true,
+      "observedChain": false,
+      "readMeaning": "API and stack only; semantic consumption not proven",
+      "atomicOSRename": "UNKNOWN",
+      "exclusiveWriter": "UNKNOWN"
+    },
+    {
+      "callId": 39,
+      "from": "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\stage-w1f-20261116\\pair-retry\\1-temp\\PCFaQSyy3oxurOeUQ_vx7\\client\\.tmp-1794831301781-vkhsc7j6ejh",
+      "to": "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\stage-w1f-20261116\\pair-retry\\1-temp\\PCFaQSyy3oxurOeUQ_vx7\\client\\4edf82f40b1e5c81b9287367109d55c90aa00b60",
+      "invokeSeq": 39,
+      "completeSeq": 40,
+      "writeCalls": [
+        37
+      ],
+      "readCalls": [
+        {
+          "callId": 413,
+          "origin": "evidence-sampler"
+        }
+      ],
+      "deleteCalls": [
+        796
+      ],
+      "bytesBound": true,
+      "observedChain": false,
+      "readMeaning": "API and stack only; semantic consumption not proven",
+      "atomicOSRename": "UNKNOWN",
+      "exclusiveWriter": "UNKNOWN"
+    },
+    {
+      "callId": 43,
+      "from": "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\stage-w1f-20261116\\pair-retry\\1-temp\\PCFaQSyy3oxurOeUQ_vx7\\client\\.tmp-1794831301801-267ph95b51g",
+      "to": "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\stage-w1f-20261116\\pair-retry\\1-temp\\PCFaQSyy3oxurOeUQ_vx7\\client\\91151fd4446e0bb7a1e4de094ed764037d018d45",
+      "invokeSeq": 43,
+      "completeSeq": 44,
+      "writeCalls": [
+        41
+      ],
+      "readCalls": [
+        {
+          "callId": 557,
+          "origin": "evidence-sampler"
+        }
+      ],
+      "deleteCalls": [
+        814
+      ],
+      "bytesBound": true,
+      "observedChain": false,
+      "readMeaning": "API and stack only; semantic consumption not proven",
+      "atomicOSRename": "UNKNOWN",
+      "exclusiveWriter": "UNKNOWN"
+    },
+    {
+      "callId": 47,
+      "from": "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\stage-w1f-20261116\\pair-retry\\1-temp\\PCFaQSyy3oxurOeUQ_vx7\\client\\.tmp-1794831301823-e05ynvcg8aq",
+      "to": "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\stage-w1f-20261116\\pair-retry\\1-temp\\PCFaQSyy3oxurOeUQ_vx7\\client\\18e0b4cc1541b2ec09e0b8a6a1dd28845ba39bb6",
+      "invokeSeq": 47,
+      "completeSeq": 48,
+      "writeCalls": [
+        45
+      ],
+      "readCalls": [
+        {
+          "callId": 293,
+          "origin": "evidence-sampler"
+        }
+      ],
+      "deleteCalls": [
+        779
+      ],
+      "bytesBound": true,
+      "observedChain": false,
+      "readMeaning": "API and stack only; semantic consumption not proven",
+      "atomicOSRename": "UNKNOWN",
+      "exclusiveWriter": "UNKNOWN"
+    },
+    {
+      "callId": 51,
+      "from": "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\stage-w1f-20261116\\pair-retry\\1-temp\\PCFaQSyy3oxurOeUQ_vx7\\client\\.tmp-1794831301846-xs94crkwlp7",
+      "to": "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\stage-w1f-20261116\\pair-retry\\1-temp\\PCFaQSyy3oxurOeUQ_vx7\\client\\663502e46fa9ea0ff4592147a3816b5379959c76",
+      "invokeSeq": 51,
+      "completeSeq": 52,
+      "writeCalls": [
+        49
+      ],
+      "readCalls": [
+        {
+          "callId": 477,
+          "origin": "evidence-sampler"
+        }
+      ],
+      "deleteCalls": [
+        805
+      ],
+      "bytesBound": true,
+      "observedChain": false,
+      "readMeaning": "API and stack only; semantic consumption not proven",
+      "atomicOSRename": "UNKNOWN",
+      "exclusiveWriter": "UNKNOWN"
+    },
+    {
+      "callId": 55,
+      "from": "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\stage-w1f-20261116\\pair-retry\\1-temp\\PCFaQSyy3oxurOeUQ_vx7\\client\\.tmp-1794831301866-g34gaq4thic",
+      "to": "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\stage-w1f-20261116\\pair-retry\\1-temp\\PCFaQSyy3oxurOeUQ_vx7\\client\\4d85e5dec684d3c5f691f0705c933a4bf69af4d9",
+      "invokeSeq": 55,
+      "completeSeq": 56,
+      "writeCalls": [
+        53
+      ],
+      "readCalls": [
+        {
+          "callId": 405,
+          "origin": "evidence-sampler"
+        }
+      ],
+      "deleteCalls": [
+        795
+      ],
+      "bytesBound": true,
+      "observedChain": false,
+      "readMeaning": "API and stack only; semantic consumption not proven",
+      "atomicOSRename": "UNKNOWN",
+      "exclusiveWriter": "UNKNOWN"
+    },
+    {
+      "callId": 59,
+      "from": "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\stage-w1f-20261116\\pair-retry\\1-temp\\PCFaQSyy3oxurOeUQ_vx7\\client\\.tmp-1794831301886-xnd1yv00e8l",
+      "to": "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\stage-w1f-20261116\\pair-retry\\1-temp\\PCFaQSyy3oxurOeUQ_vx7\\client\\ee21f8f597d16a3d69edd6e0373c54d2f3d31cb7",
+      "invokeSeq": 59,
+      "completeSeq": 60,
+      "writeCalls": [
+        57
+      ],
+      "readCalls": [
+        {
+          "callId": 733,
+          "origin": "evidence-sampler"
+        }
+      ],
+      "deleteCalls": [
+        836
+      ],
+      "bytesBound": true,
+      "observedChain": false,
+      "readMeaning": "API and stack only; semantic consumption not proven",
+      "atomicOSRename": "UNKNOWN",
+      "exclusiveWriter": "UNKNOWN"
+    },
+    {
+      "callId": 63,
+      "from": "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\stage-w1f-20261116\\pair-retry\\1-temp\\PCFaQSyy3oxurOeUQ_vx7\\client\\.tmp-1794831301898-dc19u1fzryr",
+      "to": "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\stage-w1f-20261116\\pair-retry\\1-temp\\PCFaQSyy3oxurOeUQ_vx7\\client\\abea70e40c4acc6f4afd497dbe3cf600e38eaf95",
+      "invokeSeq": 63,
+      "completeSeq": 64,
+      "writeCalls": [
+        61
+      ],
+      "readCalls": [
+        {
+          "callId": 621,
+          "origin": "evidence-sampler"
+        }
+      ],
+      "deleteCalls": [
+        822
+      ],
+      "bytesBound": true,
+      "observedChain": false,
+      "readMeaning": "API and stack only; semantic consumption not proven",
+      "atomicOSRename": "UNKNOWN",
+      "exclusiveWriter": "UNKNOWN"
+    },
+    {
+      "callId": 67,
+      "from": "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\stage-w1f-20261116\\pair-retry\\1-temp\\PCFaQSyy3oxurOeUQ_vx7\\client\\.tmp-1794831301911-2utmmn11svs",
+      "to": "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\stage-w1f-20261116\\pair-retry\\1-temp\\PCFaQSyy3oxurOeUQ_vx7\\client\\619eb286039327df85d61febf1fe7e6cb9eafeee",
+      "invokeSeq": 67,
+      "completeSeq": 68,
+      "writeCalls": [
+        65
+      ],
+      "readCalls": [
+        {
+          "callId": 453,
+          "origin": "evidence-sampler"
+        }
+      ],
+      "deleteCalls": [
+        801
+      ],
+      "bytesBound": true,
+      "observedChain": false,
+      "readMeaning": "API and stack only; semantic consumption not proven",
+      "atomicOSRename": "UNKNOWN",
+      "exclusiveWriter": "UNKNOWN"
+    },
+    {
+      "callId": 71,
+      "from": "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\stage-w1f-20261116\\pair-retry\\1-temp\\PCFaQSyy3oxurOeUQ_vx7\\client\\.tmp-1794831301924-pm2h0etcrp",
+      "to": "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\stage-w1f-20261116\\pair-retry\\1-temp\\PCFaQSyy3oxurOeUQ_vx7\\client\\3060d5b02aeedf2e7079819086b6ce21226b0838",
+      "invokeSeq": 71,
+      "completeSeq": 72,
+      "writeCalls": [
+        69
+      ],
+      "readCalls": [
+        {
+          "callId": 341,
+          "origin": "evidence-sampler"
+        }
+      ],
+      "deleteCalls": [
+        787
+      ],
+      "bytesBound": true,
+      "observedChain": false,
+      "readMeaning": "API and stack only; semantic consumption not proven",
+      "atomicOSRename": "UNKNOWN",
+      "exclusiveWriter": "UNKNOWN"
+    },
+    {
+      "callId": 75,
+      "from": "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\stage-w1f-20261116\\pair-retry\\1-temp\\PCFaQSyy3oxurOeUQ_vx7\\client\\.tmp-1794831301938-7rncoqfxwqm",
+      "to": "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\stage-w1f-20261116\\pair-retry\\1-temp\\PCFaQSyy3oxurOeUQ_vx7\\client\\71c4f05540ea9e281696de9ae0b431c2e6cdbc7f",
+      "invokeSeq": 75,
+      "completeSeq": 76,
+      "writeCalls": [
+        73
+      ],
+      "readCalls": [
+        {
+          "callId": 485,
+          "origin": "evidence-sampler"
+        }
+      ],
+      "deleteCalls": [
+        804
+      ],
+      "bytesBound": true,
+      "observedChain": false,
+      "readMeaning": "API and stack only; semantic consumption not proven",
+      "atomicOSRename": "UNKNOWN",
+      "exclusiveWriter": "UNKNOWN"
+    },
+    {
+      "callId": 79,
+      "from": "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\stage-w1f-20261116\\pair-retry\\1-temp\\PCFaQSyy3oxurOeUQ_vx7\\client\\.tmp-1794831301957-0711z405ns2s",
+      "to": "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\stage-w1f-20261116\\pair-retry\\1-temp\\PCFaQSyy3oxurOeUQ_vx7\\client\\58928224604203a9df3a7833643f0afacd2f98fa",
+      "invokeSeq": 79,
+      "completeSeq": 80,
+      "writeCalls": [
+        77
+      ],
+      "readCalls": [
+        {
+          "callId": 445,
+          "origin": "evidence-sampler"
+        }
+      ],
+      "deleteCalls": [
+        800
+      ],
+      "bytesBound": true,
+      "observedChain": false,
+      "readMeaning": "API and stack only; semantic consumption not proven",
+      "atomicOSRename": "UNKNOWN",
+      "exclusiveWriter": "UNKNOWN"
+    },
+    {
+      "callId": 83,
+      "from": "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\stage-w1f-20261116\\pair-retry\\1-temp\\PCFaQSyy3oxurOeUQ_vx7\\client\\.tmp-1794831301970-nqr3xv2t2u",
+      "to": "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\stage-w1f-20261116\\pair-retry\\1-temp\\PCFaQSyy3oxurOeUQ_vx7\\client\\aa426013288eefa1c35f87a861729b156c32bc88",
+      "invokeSeq": 83,
+      "completeSeq": 84,
+      "writeCalls": [
+        81
+      ],
+      "readCalls": [
+        {
+          "callId": 613,
+          "origin": "evidence-sampler"
+        }
+      ],
+      "deleteCalls": [
+        820
+      ],
+      "bytesBound": true,
+      "observedChain": false,
+      "readMeaning": "API and stack only; semantic consumption not proven",
+      "atomicOSRename": "UNKNOWN",
+      "exclusiveWriter": "UNKNOWN"
+    },
+    {
+      "callId": 87,
+      "from": "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\stage-w1f-20261116\\pair-retry\\1-temp\\PCFaQSyy3oxurOeUQ_vx7\\client\\.tmp-1794831301988-td8v3nqptq",
+      "to": "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\stage-w1f-20261116\\pair-retry\\1-temp\\PCFaQSyy3oxurOeUQ_vx7\\client\\84293a4102e55b421535f80809a6d1ecfc89db0f",
+      "invokeSeq": 87,
+      "completeSeq": 88,
+      "writeCalls": [
+        85
+      ],
+      "readCalls": [
+        {
+          "callId": 509,
+          "origin": "evidence-sampler"
+        }
+      ],
+      "deleteCalls": [
+        808
+      ],
+      "bytesBound": true,
+      "observedChain": false,
+      "readMeaning": "API and stack only; semantic consumption not proven",
+      "atomicOSRename": "UNKNOWN",
+      "exclusiveWriter": "UNKNOWN"
+    },
+    {
+      "callId": 91,
+      "from": "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\stage-w1f-20261116\\pair-retry\\1-temp\\PCFaQSyy3oxurOeUQ_vx7\\client\\.tmp-1794831302004-f7y1d2ucmzs",
+      "to": "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\stage-w1f-20261116\\pair-retry\\1-temp\\PCFaQSyy3oxurOeUQ_vx7\\client\\9e87a972a2c9b3cbba34104312fcc0d6639a0053",
+      "invokeSeq": 91,
+      "completeSeq": 92,
+      "writeCalls": [
+        89
+      ],
+      "readCalls": [
+        {
+          "callId": 597,
+          "origin": "evidence-sampler"
+        }
+      ],
+      "deleteCalls": [
+        821
+      ],
+      "bytesBound": true,
+      "observedChain": false,
+      "readMeaning": "API and stack only; semantic consumption not proven",
+      "atomicOSRename": "UNKNOWN",
+      "exclusiveWriter": "UNKNOWN"
+    },
+    {
+      "callId": 95,
+      "from": "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\stage-w1f-20261116\\pair-retry\\1-temp\\PCFaQSyy3oxurOeUQ_vx7\\client\\.tmp-1794831302020-suneb9lvots",
+      "to": "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\stage-w1f-20261116\\pair-retry\\1-temp\\PCFaQSyy3oxurOeUQ_vx7\\client\\81a098c705339432f6e41370c82d847c55574541",
+      "invokeSeq": 95,
+      "completeSeq": 96,
+      "writeCalls": [
+        93
+      ],
+      "readCalls": [
+        {
+          "callId": 501,
+          "origin": "evidence-sampler"
+        }
+      ],
+      "deleteCalls": [
+        806
+      ],
+      "bytesBound": true,
+      "observedChain": false,
+      "readMeaning": "API and stack only; semantic consumption not proven",
+      "atomicOSRename": "UNKNOWN",
+      "exclusiveWriter": "UNKNOWN"
+    },
+    {
+      "callId": 99,
+      "from": "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\stage-w1f-20261116\\pair-retry\\1-temp\\PCFaQSyy3oxurOeUQ_vx7\\client\\.tmp-1794831302034-n8060jgc70m",
+      "to": "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\stage-w1f-20261116\\pair-retry\\1-temp\\PCFaQSyy3oxurOeUQ_vx7\\client\\27857de956c235b6ab6506443371de4ae7198326",
+      "invokeSeq": 99,
+      "completeSeq": 100,
+      "writeCalls": [
+        97
+      ],
+      "readCalls": [
+        {
+          "callId": 317,
+          "origin": "evidence-sampler"
+        }
+      ],
+      "deleteCalls": [
+        785
+      ],
+      "bytesBound": true,
+      "observedChain": false,
+      "readMeaning": "API and stack only; semantic consumption not proven",
+      "atomicOSRename": "UNKNOWN",
+      "exclusiveWriter": "UNKNOWN"
+    },
+    {
+      "callId": 103,
+      "from": "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\stage-w1f-20261116\\pair-retry\\1-temp\\PCFaQSyy3oxurOeUQ_vx7\\client\\.tmp-1794831302055-vf748wc6igh",
+      "to": "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\stage-w1f-20261116\\pair-retry\\1-temp\\PCFaQSyy3oxurOeUQ_vx7\\client\\30d86ad0e5caede9f58a8f9ef3584c325ee26491",
+      "invokeSeq": 103,
+      "completeSeq": 104,
+      "writeCalls": [
+        101
+      ],
+      "readCalls": [
+        {
+          "callId": 349,
+          "origin": "evidence-sampler"
+        }
+      ],
+      "deleteCalls": [
+        788
+      ],
+      "bytesBound": true,
+      "observedChain": false,
+      "readMeaning": "API and stack only; semantic consumption not proven",
+      "atomicOSRename": "UNKNOWN",
+      "exclusiveWriter": "UNKNOWN"
+    },
+    {
+      "callId": 107,
+      "from": "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\stage-w1f-20261116\\pair-retry\\1-temp\\PCFaQSyy3oxurOeUQ_vx7\\client\\.tmp-1794831302068-5flvsqgcsa4",
+      "to": "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\stage-w1f-20261116\\pair-retry\\1-temp\\PCFaQSyy3oxurOeUQ_vx7\\client\\85c57370914ae37118b6fe46df83fa90f628355e",
+      "invokeSeq": 107,
+      "completeSeq": 108,
+      "writeCalls": [
+        105
+      ],
+      "readCalls": [
+        {
+          "callId": 525,
+          "origin": "evidence-sampler"
+        }
+      ],
+      "deleteCalls": [
+        809
+      ],
+      "bytesBound": true,
+      "observedChain": false,
+      "readMeaning": "API and stack only; semantic consumption not proven",
+      "atomicOSRename": "UNKNOWN",
+      "exclusiveWriter": "UNKNOWN"
+    },
+    {
+      "callId": 111,
+      "from": "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\stage-w1f-20261116\\pair-retry\\1-temp\\PCFaQSyy3oxurOeUQ_vx7\\client\\.tmp-1794831302081-qtm2bi713nk",
+      "to": "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\stage-w1f-20261116\\pair-retry\\1-temp\\PCFaQSyy3oxurOeUQ_vx7\\client\\e36b59e6866bd4b4989deb0f5b9e0a4d5f07d688",
+      "invokeSeq": 111,
+      "completeSeq": 112,
+      "writeCalls": [
+        109
+      ],
+      "readCalls": [
+        {
+          "callId": 709,
+          "origin": "evidence-sampler"
+        }
+      ],
+      "deleteCalls": [
+        834
+      ],
+      "bytesBound": true,
+      "observedChain": false,
+      "readMeaning": "API and stack only; semantic consumption not proven",
+      "atomicOSRename": "UNKNOWN",
+      "exclusiveWriter": "UNKNOWN"
+    },
+    {
+      "callId": 115,
+      "from": "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\stage-w1f-20261116\\pair-retry\\1-temp\\PCFaQSyy3oxurOeUQ_vx7\\client\\.tmp-1794831302114-l3fop6xekkb",
+      "to": "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\stage-w1f-20261116\\pair-retry\\1-temp\\PCFaQSyy3oxurOeUQ_vx7\\client\\3be034de03c82d958040010f1ec0f35af0aa18c3",
+      "invokeSeq": 115,
+      "completeSeq": 116,
+      "writeCalls": [
+        113
+      ],
+      "readCalls": [
+        {
+          "callId": 357,
+          "origin": "evidence-sampler"
+        }
+      ],
+      "deleteCalls": [
+        789
+      ],
+      "bytesBound": true,
+      "observedChain": false,
+      "readMeaning": "API and stack only; semantic consumption not proven",
+      "atomicOSRename": "UNKNOWN",
+      "exclusiveWriter": "UNKNOWN"
+    },
+    {
+      "callId": 119,
+      "from": "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\stage-w1f-20261116\\pair-retry\\1-temp\\PCFaQSyy3oxurOeUQ_vx7\\client\\.tmp-1794831302136-npjyd4lj7vp",
+      "to": "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\stage-w1f-20261116\\pair-retry\\1-temp\\PCFaQSyy3oxurOeUQ_vx7\\client\\b92de95089fb6ca4c0efa1f33ee7ff0bd86c710c",
+      "invokeSeq": 119,
+      "completeSeq": 120,
+      "writeCalls": [
+        117
+      ],
+      "readCalls": [
+        {
+          "callId": 637,
+          "origin": "evidence-sampler"
+        }
+      ],
+      "deleteCalls": [
+        824
+      ],
+      "bytesBound": true,
+      "observedChain": false,
+      "readMeaning": "API and stack only; semantic consumption not proven",
+      "atomicOSRename": "UNKNOWN",
+      "exclusiveWriter": "UNKNOWN"
+    },
+    {
+      "callId": 123,
+      "from": "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\stage-w1f-20261116\\pair-retry\\1-temp\\PCFaQSyy3oxurOeUQ_vx7\\client\\.tmp-1794831302149-mebejj6qt59",
+      "to": "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\stage-w1f-20261116\\pair-retry\\1-temp\\PCFaQSyy3oxurOeUQ_vx7\\client\\fd8e7d5dba0940edc8f7bc72c008ab64301c32a8",
+      "invokeSeq": 123,
+      "completeSeq": 124,
+      "writeCalls": [
+        121
+      ],
+      "readCalls": [
+        {
+          "callId": 757,
+          "origin": "evidence-sampler"
+        }
+      ],
+      "deleteCalls": [
+        839
+      ],
+      "bytesBound": true,
+      "observedChain": false,
+      "readMeaning": "API and stack only; semantic consumption not proven",
+      "atomicOSRename": "UNKNOWN",
+      "exclusiveWriter": "UNKNOWN"
+    },
+    {
+      "callId": 127,
+      "from": "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\stage-w1f-20261116\\pair-retry\\1-temp\\PCFaQSyy3oxurOeUQ_vx7\\client\\.tmp-1794831302163-3cblpbvmmu",
+      "to": "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\stage-w1f-20261116\\pair-retry\\1-temp\\PCFaQSyy3oxurOeUQ_vx7\\client\\5862977cd2511673bdd53c7c2a5aa67952c272d9",
+      "invokeSeq": 127,
+      "completeSeq": 128,
+      "writeCalls": [
+        125
+      ],
+      "readCalls": [
+        {
+          "callId": 437,
+          "origin": "evidence-sampler"
+        }
+      ],
+      "deleteCalls": [
+        799
+      ],
+      "bytesBound": true,
+      "observedChain": false,
+      "readMeaning": "API and stack only; semantic consumption not proven",
+      "atomicOSRename": "UNKNOWN",
+      "exclusiveWriter": "UNKNOWN"
+    },
+    {
+      "callId": 131,
+      "from": "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\stage-w1f-20261116\\pair-retry\\1-temp\\PCFaQSyy3oxurOeUQ_vx7\\client\\.tmp-1794831302177-mrmhi16vvo",
+      "to": "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\stage-w1f-20261116\\pair-retry\\1-temp\\PCFaQSyy3oxurOeUQ_vx7\\client\\26987fc968af4eb2eeec2f1f05eadd7cf5b44101",
+      "invokeSeq": 131,
+      "completeSeq": 132,
+      "writeCalls": [
+        129
+      ],
+      "readCalls": [
+        {
+          "callId": 309,
+          "origin": "evidence-sampler"
+        }
+      ],
+      "deleteCalls": [
+        782
+      ],
+      "bytesBound": true,
+      "observedChain": false,
+      "readMeaning": "API and stack only; semantic consumption not proven",
+      "atomicOSRename": "UNKNOWN",
+      "exclusiveWriter": "UNKNOWN"
+    },
+    {
+      "callId": 135,
+      "from": "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\stage-w1f-20261116\\pair-retry\\1-temp\\PCFaQSyy3oxurOeUQ_vx7\\client\\.tmp-1794831302203-2bs3e75aowy",
+      "to": "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\stage-w1f-20261116\\pair-retry\\1-temp\\PCFaQSyy3oxurOeUQ_vx7\\client\\974894de2d4c1e6c708503c8b3068871e3900545",
+      "invokeSeq": 135,
+      "completeSeq": 136,
+      "writeCalls": [
+        133
+      ],
+      "readCalls": [
+        {
+          "callId": 573,
+          "origin": "evidence-sampler"
+        }
+      ],
+      "deleteCalls": [
+        815
+      ],
+      "bytesBound": true,
+      "observedChain": false,
+      "readMeaning": "API and stack only; semantic consumption not proven",
+      "atomicOSRename": "UNKNOWN",
+      "exclusiveWriter": "UNKNOWN"
+    },
+    {
+      "callId": 139,
+      "from": "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\stage-w1f-20261116\\pair-retry\\1-temp\\PCFaQSyy3oxurOeUQ_vx7\\client\\.tmp-1794831302222-lqnx2rynd7",
+      "to": "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\stage-w1f-20261116\\pair-retry\\1-temp\\PCFaQSyy3oxurOeUQ_vx7\\client\\86486730b7849cd64471af91293f4645c361e887",
+      "invokeSeq": 139,
+      "completeSeq": 140,
+      "writeCalls": [
+        137
+      ],
+      "readCalls": [
+        {
+          "callId": 533,
+          "origin": "evidence-sampler"
+        }
+      ],
+      "deleteCalls": [
+        810
+      ],
+      "bytesBound": true,
+      "observedChain": false,
+      "readMeaning": "API and stack only; semantic consumption not proven",
+      "atomicOSRename": "UNKNOWN",
+      "exclusiveWriter": "UNKNOWN"
+    },
+    {
+      "callId": 143,
+      "from": "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\stage-w1f-20261116\\pair-retry\\1-temp\\PCFaQSyy3oxurOeUQ_vx7\\client\\.tmp-1794831302244-ok0xmu5snxq",
+      "to": "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\stage-w1f-20261116\\pair-retry\\1-temp\\PCFaQSyy3oxurOeUQ_vx7\\client\\7a155a1016b6c617e6f445fef078131f4ff080a6",
+      "invokeSeq": 143,
+      "completeSeq": 144,
+      "writeCalls": [
+        141
+      ],
+      "readCalls": [
+        {
+          "callId": 493,
+          "origin": "evidence-sampler"
+        }
+      ],
+      "deleteCalls": [
+        807
+      ],
+      "bytesBound": true,
+      "observedChain": false,
+      "readMeaning": "API and stack only; semantic consumption not proven",
+      "atomicOSRename": "UNKNOWN",
+      "exclusiveWriter": "UNKNOWN"
+    },
+    {
+      "callId": 147,
+      "from": "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\stage-w1f-20261116\\pair-retry\\1-temp\\PCFaQSyy3oxurOeUQ_vx7\\client\\.tmp-1794831302259-awlwdqnxbss",
+      "to": "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\stage-w1f-20261116\\pair-retry\\1-temp\\PCFaQSyy3oxurOeUQ_vx7\\client\\3c3dea887368238de95493e67e56a89333f98e58",
+      "invokeSeq": 147,
+      "completeSeq": 148,
+      "writeCalls": [
+        145
+      ],
+      "readCalls": [
+        {
+          "callId": 365,
+          "origin": "evidence-sampler"
+        }
+      ],
+      "deleteCalls": [
+        790
+      ],
+      "bytesBound": true,
+      "observedChain": false,
+      "readMeaning": "API and stack only; semantic consumption not proven",
+      "atomicOSRename": "UNKNOWN",
+      "exclusiveWriter": "UNKNOWN"
+    },
+    {
+      "callId": 151,
+      "from": "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\stage-w1f-20261116\\pair-retry\\1-temp\\PCFaQSyy3oxurOeUQ_vx7\\client\\.tmp-1794831302274-5skkms26e42",
+      "to": "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\stage-w1f-20261116\\pair-retry\\1-temp\\PCFaQSyy3oxurOeUQ_vx7\\client\\f6f9afe0d72cd80ce7b481ad6a8a09821e925d66",
+      "invokeSeq": 151,
+      "completeSeq": 152,
+      "writeCalls": [
+        149
+      ],
+      "readCalls": [
+        {
+          "callId": 741,
+          "origin": "evidence-sampler"
+        }
+      ],
+      "deleteCalls": [
+        837
+      ],
+      "bytesBound": true,
+      "observedChain": false,
+      "readMeaning": "API and stack only; semantic consumption not proven",
+      "atomicOSRename": "UNKNOWN",
+      "exclusiveWriter": "UNKNOWN"
+    },
+    {
+      "callId": 155,
+      "from": "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\stage-w1f-20261116\\pair-retry\\1-temp\\PCFaQSyy3oxurOeUQ_vx7\\client\\.tmp-1794831302288-uoagis6heh",
+      "to": "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\stage-w1f-20261116\\pair-retry\\1-temp\\PCFaQSyy3oxurOeUQ_vx7\\client\\8493773671cfb1b93e7144780b576d43b4d68482",
+      "invokeSeq": 155,
+      "completeSeq": 156,
+      "writeCalls": [
+        153
+      ],
+      "readCalls": [
+        {
+          "callId": 517,
+          "origin": "evidence-sampler"
+        }
+      ],
+      "deleteCalls": [
+        811
+      ],
+      "bytesBound": true,
+      "observedChain": false,
+      "readMeaning": "API and stack only; semantic consumption not proven",
+      "atomicOSRename": "UNKNOWN",
+      "exclusiveWriter": "UNKNOWN"
+    },
+    {
+      "callId": 159,
+      "from": "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\stage-w1f-20261116\\pair-retry\\1-temp\\PCFaQSyy3oxurOeUQ_vx7\\client\\.tmp-1794831302297-i5op781pmo9",
+      "to": "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\stage-w1f-20261116\\pair-retry\\1-temp\\PCFaQSyy3oxurOeUQ_vx7\\client\\ba2573c7cfa5c893d5b8b7e227265f7fb65a2a08",
+      "invokeSeq": 159,
+      "completeSeq": 160,
+      "writeCalls": [
+        157
+      ],
+      "readCalls": [
+        {
+          "callId": 653,
+          "origin": "evidence-sampler"
+        }
+      ],
+      "deleteCalls": [
+        826
+      ],
+      "bytesBound": true,
+      "observedChain": false,
+      "readMeaning": "API and stack only; semantic consumption not proven",
+      "atomicOSRename": "UNKNOWN",
+      "exclusiveWriter": "UNKNOWN"
+    },
+    {
+      "callId": 163,
+      "from": "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\stage-w1f-20261116\\pair-retry\\1-temp\\PCFaQSyy3oxurOeUQ_vx7\\client\\.tmp-1794831302311-ygalwt02bvb",
+      "to": "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\stage-w1f-20261116\\pair-retry\\1-temp\\PCFaQSyy3oxurOeUQ_vx7\\client\\fb1c008cf4fc0aae4d0e418039855e7b1e67f70e",
+      "invokeSeq": 163,
+      "completeSeq": 164,
+      "writeCalls": [
+        161
+      ],
+      "readCalls": [
+        {
+          "callId": 749,
+          "origin": "evidence-sampler"
+        }
+      ],
+      "deleteCalls": [
+        838
+      ],
+      "bytesBound": true,
+      "observedChain": false,
+      "readMeaning": "API and stack only; semantic consumption not proven",
+      "atomicOSRename": "UNKNOWN",
+      "exclusiveWriter": "UNKNOWN"
+    },
+    {
+      "callId": 167,
+      "from": "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\stage-w1f-20261116\\pair-retry\\1-temp\\PCFaQSyy3oxurOeUQ_vx7\\client\\.tmp-1794831302339-vksterpflxd",
+      "to": "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\stage-w1f-20261116\\pair-retry\\1-temp\\PCFaQSyy3oxurOeUQ_vx7\\client\\d21c48ff50e0b6db150ed2ad0a520ccb4b44e041",
+      "invokeSeq": 167,
+      "completeSeq": 168,
+      "writeCalls": [
+        165
+      ],
+      "readCalls": [
+        {
+          "callId": 677,
+          "origin": "evidence-sampler"
+        }
+      ],
+      "deleteCalls": [
+        829
+      ],
+      "bytesBound": true,
+      "observedChain": false,
+      "readMeaning": "API and stack only; semantic consumption not proven",
+      "atomicOSRename": "UNKNOWN",
+      "exclusiveWriter": "UNKNOWN"
+    },
+    {
+      "callId": 171,
+      "from": "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\stage-w1f-20261116\\pair-retry\\1-temp\\PCFaQSyy3oxurOeUQ_vx7\\client\\.tmp-1794831302365-ou6xhztyhld",
+      "to": "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\stage-w1f-20261116\\pair-retry\\1-temp\\PCFaQSyy3oxurOeUQ_vx7\\client\\922f7e774acfae11a637022914fdda0efcbdf4d1",
+      "invokeSeq": 171,
+      "completeSeq": 172,
+      "writeCalls": [
+        169
+      ],
+      "readCalls": [
+        {
+          "callId": 565,
+          "origin": "evidence-sampler"
+        }
+      ],
+      "deleteCalls": [
+        817
+      ],
+      "bytesBound": true,
+      "observedChain": false,
+      "readMeaning": "API and stack only; semantic consumption not proven",
+      "atomicOSRename": "UNKNOWN",
+      "exclusiveWriter": "UNKNOWN"
+    },
+    {
+      "callId": 175,
+      "from": "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\stage-w1f-20261116\\pair-retry\\1-temp\\PCFaQSyy3oxurOeUQ_vx7\\client\\.tmp-1794831302384-klmq3pe8jcg",
+      "to": "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\stage-w1f-20261116\\pair-retry\\1-temp\\PCFaQSyy3oxurOeUQ_vx7\\client\\b7da315dbfbc8443d36a43382f1a533608a9ac57",
+      "invokeSeq": 175,
+      "completeSeq": 176,
+      "writeCalls": [
+        173
+      ],
+      "readCalls": [
+        {
+          "callId": 629,
+          "origin": "evidence-sampler"
+        }
+      ],
+      "deleteCalls": [
+        823
+      ],
+      "bytesBound": true,
+      "observedChain": false,
+      "readMeaning": "API and stack only; semantic consumption not proven",
+      "atomicOSRename": "UNKNOWN",
+      "exclusiveWriter": "UNKNOWN"
+    },
+    {
+      "callId": 179,
+      "from": "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\stage-w1f-20261116\\pair-retry\\1-temp\\PCFaQSyy3oxurOeUQ_vx7\\client\\.tmp-1794831302399-j1w4481ffj",
+      "to": "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\stage-w1f-20261116\\pair-retry\\1-temp\\PCFaQSyy3oxurOeUQ_vx7\\client\\89b30b3ada5c1290c8698d549f94685141e7b188",
+      "invokeSeq": 179,
+      "completeSeq": 180,
+      "writeCalls": [
+        177
+      ],
+      "readCalls": [
+        {
+          "callId": 541,
+          "origin": "evidence-sampler"
+        }
+      ],
+      "deleteCalls": [
+        813
+      ],
+      "bytesBound": true,
+      "observedChain": false,
+      "readMeaning": "API and stack only; semantic consumption not proven",
+      "atomicOSRename": "UNKNOWN",
+      "exclusiveWriter": "UNKNOWN"
+    },
+    {
+      "callId": 183,
+      "from": "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\stage-w1f-20261116\\pair-retry\\1-temp\\PCFaQSyy3oxurOeUQ_vx7\\client\\.tmp-1794831302415-e308e6ttozv",
+      "to": "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\stage-w1f-20261116\\pair-retry\\1-temp\\PCFaQSyy3oxurOeUQ_vx7\\client\\ec84b89033fcd746b2013ceca4180c04f22b588d",
+      "invokeSeq": 183,
+      "completeSeq": 184,
+      "writeCalls": [
+        181
+      ],
+      "readCalls": [
+        {
+          "callId": 725,
+          "origin": "evidence-sampler"
+        }
+      ],
+      "deleteCalls": [
+        835
+      ],
+      "bytesBound": true,
+      "observedChain": false,
+      "readMeaning": "API and stack only; semantic consumption not proven",
+      "atomicOSRename": "UNKNOWN",
+      "exclusiveWriter": "UNKNOWN"
+    },
+    {
+      "callId": 187,
+      "from": "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\stage-w1f-20261116\\pair-retry\\1-temp\\PCFaQSyy3oxurOeUQ_vx7\\client\\.tmp-1794831302458-xped2ij9obq",
+      "to": "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\stage-w1f-20261116\\pair-retry\\1-temp\\PCFaQSyy3oxurOeUQ_vx7\\client\\1183bf9775f321bb0c0cb963b747bf74523fac9f",
+      "invokeSeq": 187,
+      "completeSeq": 188,
+      "writeCalls": [
+        185
+      ],
+      "readCalls": [
+        {
+          "callId": 277,
+          "origin": "evidence-sampler"
+        }
+      ],
+      "deleteCalls": [
+        783
+      ],
+      "bytesBound": true,
+      "observedChain": false,
+      "readMeaning": "API and stack only; semantic consumption not proven",
+      "atomicOSRename": "UNKNOWN",
+      "exclusiveWriter": "UNKNOWN"
+    },
+    {
+      "callId": 191,
+      "from": "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\stage-w1f-20261116\\pair-retry\\1-temp\\PCFaQSyy3oxurOeUQ_vx7\\client\\.tmp-1794831302472-istpjnduii",
+      "to": "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\stage-w1f-20261116\\pair-retry\\1-temp\\PCFaQSyy3oxurOeUQ_vx7\\client\\c5c1b31faf9535c70b652b14966ca7fb5d76bf22",
+      "invokeSeq": 191,
+      "completeSeq": 192,
+      "writeCalls": [
+        189
+      ],
+      "readCalls": [
+        {
+          "callId": 661,
+          "origin": "evidence-sampler"
+        }
+      ],
+      "deleteCalls": [
+        827
+      ],
+      "bytesBound": true,
+      "observedChain": false,
+      "readMeaning": "API and stack only; semantic consumption not proven",
+      "atomicOSRename": "UNKNOWN",
+      "exclusiveWriter": "UNKNOWN"
+    },
+    {
+      "callId": 195,
+      "from": "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\stage-w1f-20261116\\pair-retry\\1-temp\\PCFaQSyy3oxurOeUQ_vx7\\client\\.tmp-1794831302487-5hyqfikiamp",
+      "to": "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\stage-w1f-20261116\\pair-retry\\1-temp\\PCFaQSyy3oxurOeUQ_vx7\\client\\1a29a77979cc1bfb01aed7cf8344c0e958ff0384",
+      "invokeSeq": 195,
+      "completeSeq": 196,
+      "writeCalls": [
+        193
+      ],
+      "readCalls": [
+        {
+          "callId": 301,
+          "origin": "evidence-sampler"
+        }
+      ],
+      "deleteCalls": [
+        781
+      ],
+      "bytesBound": true,
+      "observedChain": false,
+      "readMeaning": "API and stack only; semantic consumption not proven",
+      "atomicOSRename": "UNKNOWN",
+      "exclusiveWriter": "UNKNOWN"
+    },
+    {
+      "callId": 199,
+      "from": "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\stage-w1f-20261116\\pair-retry\\1-temp\\PCFaQSyy3oxurOeUQ_vx7\\client\\.tmp-1794831302503-xvnqvih6xyd",
+      "to": "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\stage-w1f-20261116\\pair-retry\\1-temp\\PCFaQSyy3oxurOeUQ_vx7\\client\\9a30630d415e867ec13dfb3b6496d1f6a246d920",
+      "invokeSeq": 199,
+      "completeSeq": 200,
+      "writeCalls": [
+        197
+      ],
+      "readCalls": [
+        {
+          "callId": 581,
+          "origin": "evidence-sampler"
+        }
+      ],
+      "deleteCalls": [
+        816
+      ],
+      "bytesBound": true,
+      "observedChain": false,
+      "readMeaning": "API and stack only; semantic consumption not proven",
+      "atomicOSRename": "UNKNOWN",
+      "exclusiveWriter": "UNKNOWN"
+    },
+    {
+      "callId": 203,
+      "from": "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\stage-w1f-20261116\\pair-retry\\1-temp\\PCFaQSyy3oxurOeUQ_vx7\\client\\.tmp-1794831302518-116i3zvjj78",
+      "to": "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\stage-w1f-20261116\\pair-retry\\1-temp\\PCFaQSyy3oxurOeUQ_vx7\\client\\4807607d79328c2fd3f2b1a5a6e86af142f59c97",
+      "invokeSeq": 203,
+      "completeSeq": 204,
+      "writeCalls": [
+        201
+      ],
+      "readCalls": [
+        {
+          "callId": 389,
+          "origin": "evidence-sampler"
+        }
+      ],
+      "deleteCalls": [
+        793
+      ],
+      "bytesBound": true,
+      "observedChain": false,
+      "readMeaning": "API and stack only; semantic consumption not proven",
+      "atomicOSRename": "UNKNOWN",
+      "exclusiveWriter": "UNKNOWN"
+    },
+    {
+      "callId": 207,
+      "from": "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\stage-w1f-20261116\\pair-retry\\1-temp\\PCFaQSyy3oxurOeUQ_vx7\\client\\.tmp-1794831302532-xlt98jjx1pa",
+      "to": "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\stage-w1f-20261116\\pair-retry\\1-temp\\PCFaQSyy3oxurOeUQ_vx7\\client\\2979e4804ba70ef2d596e9b9e637c39252b194e5",
+      "invokeSeq": 207,
+      "completeSeq": 208,
+      "writeCalls": [
+        205
+      ],
+      "readCalls": [
+        {
+          "callId": 325,
+          "origin": "evidence-sampler"
+        }
+      ],
+      "deleteCalls": [
+        784
+      ],
+      "bytesBound": true,
+      "observedChain": false,
+      "readMeaning": "API and stack only; semantic consumption not proven",
+      "atomicOSRename": "UNKNOWN",
+      "exclusiveWriter": "UNKNOWN"
+    },
+    {
+      "callId": 211,
+      "from": "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\stage-w1f-20261116\\pair-retry\\1-temp\\PCFaQSyy3oxurOeUQ_vx7\\client\\.tmp-1794831302550-46u4vggm99u",
+      "to": "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\stage-w1f-20261116\\pair-retry\\1-temp\\PCFaQSyy3oxurOeUQ_vx7\\client\\dc8ec23284d5da810aafda499189c67e9e679745",
+      "invokeSeq": 211,
+      "completeSeq": 212,
+      "writeCalls": [
+        209
+      ],
+      "readCalls": [
+        {
+          "callId": 685,
+          "origin": "evidence-sampler"
+        }
+      ],
+      "deleteCalls": [
+        830
+      ],
+      "bytesBound": true,
+      "observedChain": false,
+      "readMeaning": "API and stack only; semantic consumption not proven",
+      "atomicOSRename": "UNKNOWN",
+      "exclusiveWriter": "UNKNOWN"
+    },
+    {
+      "callId": 215,
+      "from": "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\stage-w1f-20261116\\pair-retry\\1-temp\\PCFaQSyy3oxurOeUQ_vx7\\client\\.tmp-1794831302562-bnj3kds6wdo",
+      "to": "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\stage-w1f-20261116\\pair-retry\\1-temp\\PCFaQSyy3oxurOeUQ_vx7\\client\\566c04722a52bdeaf0eb37571ee11e10ac2c3768",
+      "invokeSeq": 215,
+      "completeSeq": 216,
+      "writeCalls": [
+        213
+      ],
+      "readCalls": [
+        {
+          "callId": 421,
+          "origin": "evidence-sampler"
+        }
+      ],
+      "deleteCalls": [
+        797
+      ],
+      "bytesBound": true,
+      "observedChain": false,
+      "readMeaning": "API and stack only; semantic consumption not proven",
+      "atomicOSRename": "UNKNOWN",
+      "exclusiveWriter": "UNKNOWN"
+    },
+    {
+      "callId": 219,
+      "from": "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\stage-w1f-20261116\\pair-retry\\1-temp\\PCFaQSyy3oxurOeUQ_vx7\\client\\.tmp-1794831302578-sk7v2up3j4",
+      "to": "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\stage-w1f-20261116\\pair-retry\\1-temp\\PCFaQSyy3oxurOeUQ_vx7\\client\\a87bfdcc41b0c7fc602a2076e7c4ebabefb11c61",
+      "invokeSeq": 219,
+      "completeSeq": 220,
+      "writeCalls": [
+        217
+      ],
+      "readCalls": [
+        {
+          "callId": 605,
+          "origin": "evidence-sampler"
+        }
+      ],
+      "deleteCalls": [
+        819
+      ],
+      "bytesBound": true,
+      "observedChain": false,
+      "readMeaning": "API and stack only; semantic consumption not proven",
+      "atomicOSRename": "UNKNOWN",
+      "exclusiveWriter": "UNKNOWN"
+    },
+    {
+      "callId": 223,
+      "from": "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\stage-w1f-20261116\\pair-retry\\1-temp\\PCFaQSyy3oxurOeUQ_vx7\\client\\.tmp-1794831302595-qikoyhvtl1",
+      "to": "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\stage-w1f-20261116\\pair-retry\\1-temp\\PCFaQSyy3oxurOeUQ_vx7\\client\\c87b5eb7d512748ba179fc17f4a34e1a05482f31",
+      "invokeSeq": 223,
+      "completeSeq": 224,
+      "writeCalls": [
+        221
+      ],
+      "readCalls": [
+        {
+          "callId": 669,
+          "origin": "evidence-sampler"
+        }
+      ],
+      "deleteCalls": [
+        828
+      ],
+      "bytesBound": true,
+      "observedChain": false,
+      "readMeaning": "API and stack only; semantic consumption not proven",
+      "atomicOSRename": "UNKNOWN",
+      "exclusiveWriter": "UNKNOWN"
+    },
+    {
+      "callId": 227,
+      "from": "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\stage-w1f-20261116\\pair-retry\\1-temp\\PCFaQSyy3oxurOeUQ_vx7\\client\\.tmp-1794831302613-4ipfi1fdpha",
+      "to": "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\stage-w1f-20261116\\pair-retry\\1-temp\\PCFaQSyy3oxurOeUQ_vx7\\client\\4c80b129407b75d77a968024e952e3a91c70338c",
+      "invokeSeq": 227,
+      "completeSeq": 228,
+      "writeCalls": [
+        225
+      ],
+      "readCalls": [
+        {
+          "callId": 397,
+          "origin": "evidence-sampler"
+        }
+      ],
+      "deleteCalls": [
+        794
+      ],
+      "bytesBound": true,
+      "observedChain": false,
+      "readMeaning": "API and stack only; semantic consumption not proven",
+      "atomicOSRename": "UNKNOWN",
+      "exclusiveWriter": "UNKNOWN"
+    },
+    {
+      "callId": 231,
+      "from": "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\stage-w1f-20261116\\pair-retry\\1-temp\\PCFaQSyy3oxurOeUQ_vx7\\client\\.tmp-1794831302632-aoew9yna22n",
+      "to": "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\stage-w1f-20261116\\pair-retry\\1-temp\\PCFaQSyy3oxurOeUQ_vx7\\client\\183d52a8745adb7daf4d9a167205c4a821cecb75",
+      "invokeSeq": 231,
+      "completeSeq": 232,
+      "writeCalls": [
+        229
+      ],
+      "readCalls": [
+        {
+          "callId": 285,
+          "origin": "evidence-sampler"
+        }
+      ],
+      "deleteCalls": [
+        780
+      ],
+      "bytesBound": true,
+      "observedChain": false,
+      "readMeaning": "API and stack only; semantic consumption not proven",
+      "atomicOSRename": "UNKNOWN",
+      "exclusiveWriter": "UNKNOWN"
+    },
+    {
+      "callId": 235,
+      "from": "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\stage-w1f-20261116\\pair-retry\\1-temp\\PCFaQSyy3oxurOeUQ_vx7\\client\\.tmp-1794831302673-t9n5abimi4",
+      "to": "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\stage-w1f-20261116\\pair-retry\\1-temp\\PCFaQSyy3oxurOeUQ_vx7\\client\\fe5bb945aa7abc71cf936072d7aa0a0662084301",
+      "invokeSeq": 235,
+      "completeSeq": 236,
+      "writeCalls": [
+        233
+      ],
+      "readCalls": [
+        {
+          "callId": 765,
+          "origin": "evidence-sampler"
+        }
+      ],
+      "deleteCalls": [
+        840
+      ],
+      "bytesBound": true,
+      "observedChain": false,
+      "readMeaning": "API and stack only; semantic consumption not proven",
+      "atomicOSRename": "UNKNOWN",
+      "exclusiveWriter": "UNKNOWN"
+    },
+    {
+      "callId": 239,
+      "from": "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\stage-w1f-20261116\\pair-retry\\1-temp\\PCFaQSyy3oxurOeUQ_vx7\\client\\.tmp-1794831302704-65hswhheeei",
+      "to": "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\stage-w1f-20261116\\pair-retry\\1-temp\\PCFaQSyy3oxurOeUQ_vx7\\client\\64b3bca3b7f7500bfaec2b7ff682144442981223",
+      "invokeSeq": 239,
+      "completeSeq": 240,
+      "writeCalls": [
+        237
+      ],
+      "readCalls": [
+        {
+          "callId": 461,
+          "origin": "evidence-sampler"
+        }
+      ],
+      "deleteCalls": [
+        802
+      ],
+      "bytesBound": true,
+      "observedChain": false,
+      "readMeaning": "API and stack only; semantic consumption not proven",
+      "atomicOSRename": "UNKNOWN",
+      "exclusiveWriter": "UNKNOWN"
+    },
+    {
+      "callId": 243,
+      "from": "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\stage-w1f-20261116\\pair-retry\\1-temp\\PCFaQSyy3oxurOeUQ_vx7\\client\\.tmp-1794831302724-fjebsz27qd7",
+      "to": "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\stage-w1f-20261116\\pair-retry\\1-temp\\PCFaQSyy3oxurOeUQ_vx7\\client\\47ebe2a78a0533f8933c5da44c0691c9541d5a96",
+      "invokeSeq": 243,
+      "completeSeq": 244,
+      "writeCalls": [
+        241
+      ],
+      "readCalls": [
+        {
+          "callId": 381,
+          "origin": "evidence-sampler"
+        }
+      ],
+      "deleteCalls": [
+        792
+      ],
+      "bytesBound": true,
+      "observedChain": false,
+      "readMeaning": "API and stack only; semantic consumption not proven",
+      "atomicOSRename": "UNKNOWN",
+      "exclusiveWriter": "UNKNOWN"
+    },
+    {
+      "callId": 247,
+      "from": "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\stage-w1f-20261116\\pair-retry\\1-temp\\PCFaQSyy3oxurOeUQ_vx7\\client\\.tmp-1794831302744-vtok7gwwl9l",
+      "to": "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\stage-w1f-20261116\\pair-retry\\1-temp\\PCFaQSyy3oxurOeUQ_vx7\\client\\e98cc84326add8784cd961cc22aaea8437040505",
+      "invokeSeq": 247,
+      "completeSeq": 248,
+      "writeCalls": [
+        245
+      ],
+      "readCalls": [
+        {
+          "callId": 717,
+          "origin": "evidence-sampler"
+        }
+      ],
+      "deleteCalls": [
+        833
+      ],
+      "bytesBound": true,
+      "observedChain": false,
+      "readMeaning": "API and stack only; semantic consumption not proven",
+      "atomicOSRename": "UNKNOWN",
+      "exclusiveWriter": "UNKNOWN"
+    },
+    {
+      "callId": 251,
+      "from": "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\stage-w1f-20261116\\pair-retry\\1-temp\\PCFaQSyy3oxurOeUQ_vx7\\client\\.tmp-1794831302759-9yvb4mifd6p",
+      "to": "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\stage-w1f-20261116\\pair-retry\\1-temp\\PCFaQSyy3oxurOeUQ_vx7\\client\\def258cccaca2ca04993671fc0726f62a8f1d32b",
+      "invokeSeq": 251,
+      "completeSeq": 252,
+      "writeCalls": [
+        249
+      ],
+      "readCalls": [
+        {
+          "callId": 693,
+          "origin": "evidence-sampler"
+        }
+      ],
+      "deleteCalls": [
+        831
+      ],
+      "bytesBound": true,
+      "observedChain": false,
+      "readMeaning": "API and stack only; semantic consumption not proven",
+      "atomicOSRename": "UNKNOWN",
+      "exclusiveWriter": "UNKNOWN"
+    },
+    {
+      "callId": 255,
+      "from": "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\stage-w1f-20261116\\pair-retry\\1-temp\\PCFaQSyy3oxurOeUQ_vx7\\client\\.tmp-1794831302788-v8atin80jd",
+      "to": "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\stage-w1f-20261116\\pair-retry\\1-temp\\PCFaQSyy3oxurOeUQ_vx7\\client\\ba0984802e5e772482effe541222ed7ec5508785",
+      "invokeSeq": 255,
+      "completeSeq": 256,
+      "writeCalls": [
+        253
+      ],
+      "readCalls": [
+        {
+          "callId": 645,
+          "origin": "evidence-sampler"
+        }
+      ],
+      "deleteCalls": [
+        825
+      ],
+      "bytesBound": true,
+      "observedChain": false,
+      "readMeaning": "API and stack only; semantic consumption not proven",
+      "atomicOSRename": "UNKNOWN",
+      "exclusiveWriter": "UNKNOWN"
+    },
+    {
+      "callId": 259,
+      "from": "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\stage-w1f-20261116\\pair-retry\\1-temp\\PCFaQSyy3oxurOeUQ_vx7\\client\\.tmp-1794831302812-4ddxyowpzg",
+      "to": "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\stage-w1f-20261116\\pair-retry\\1-temp\\PCFaQSyy3oxurOeUQ_vx7\\client\\df121438947c931144fc2f90525d2f6dd8bde524",
+      "invokeSeq": 259,
+      "completeSeq": 260,
+      "writeCalls": [
+        257
+      ],
+      "readCalls": [
+        {
+          "callId": 701,
+          "origin": "evidence-sampler"
+        }
+      ],
+      "deleteCalls": [
+        832
+      ],
+      "bytesBound": true,
+      "observedChain": false,
+      "readMeaning": "API and stack only; semantic consumption not proven",
+      "atomicOSRename": "UNKNOWN",
+      "exclusiveWriter": "UNKNOWN"
+    },
+    {
+      "callId": 263,
+      "from": "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\stage-w1f-20261116\\pair-retry\\1-temp\\PCFaQSyy3oxurOeUQ_vx7\\client\\.tmp-1794831302835-6xnrx8uwc5",
+      "to": "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\stage-w1f-20261116\\pair-retry\\1-temp\\PCFaQSyy3oxurOeUQ_vx7\\client\\2c3262ca78064f9be9bd2e3e5f136f3cad95ae72",
+      "invokeSeq": 263,
+      "completeSeq": 264,
+      "writeCalls": [
+        261
+      ],
+      "readCalls": [
+        {
+          "callId": 333,
+          "origin": "evidence-sampler"
+        }
+      ],
+      "deleteCalls": [
+        786
+      ],
+      "bytesBound": true,
+      "observedChain": false,
+      "readMeaning": "API and stack only; semantic consumption not proven",
+      "atomicOSRename": "UNKNOWN",
+      "exclusiveWriter": "UNKNOWN"
+    },
+    {
+      "callId": 267,
+      "from": "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\stage-w1f-20261116\\pair-retry\\1-temp\\PCFaQSyy3oxurOeUQ_vx7\\client\\.tmp-1794831302857-b7c4g146s3f",
+      "to": "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\stage-w1f-20261116\\pair-retry\\1-temp\\PCFaQSyy3oxurOeUQ_vx7\\client\\07e6a769551bf425d505516c08e145310d21f369",
+      "invokeSeq": 267,
+      "completeSeq": 268,
+      "writeCalls": [
+        265
+      ],
+      "readCalls": [
+        {
+          "callId": 269,
+          "origin": "evidence-sampler"
+        }
+      ],
+      "deleteCalls": [
+        778
+      ],
+      "bytesBound": true,
+      "observedChain": false,
+      "readMeaning": "API and stack only; semantic consumption not proven",
+      "atomicOSRename": "UNKNOWN",
+      "exclusiveWriter": "UNKNOWN"
+    }
+  ],
+  "exclusiveWriter": "UNKNOWN",
+  "atomicOSRename": "UNKNOWN",
+  "comparisonSpawns": 0
+}

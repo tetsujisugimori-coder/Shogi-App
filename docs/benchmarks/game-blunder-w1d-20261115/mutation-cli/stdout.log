@@ -1,0 +1,1 @@
+{"mutation":"force final aggregate status PASS","expected":"regression process exit 1","exitCode":1,"detected":true,"retained":"C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\stage-w1d-20261115-offline\\shogi-w1c-mutant-lHAkUv"}

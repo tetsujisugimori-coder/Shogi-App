@@ -1,0 +1,9 @@
+{
+  "start": "2026-11-18T15:27:24.734705+00:00",
+  "end": "2026-11-18T15:27:24.889266+00:00",
+  "command": "python scripts/stage-w1i-custody-test.py",
+  "exit": 0,
+  "timeout_seconds": 60,
+  "retries": 0,
+  "preliminary_invocation_error": "wrong cwd, exit2, no tests executed"
+}

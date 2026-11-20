@@ -1,0 +1,27 @@
+{
+  "equality": {
+    "status": "PASS"
+  },
+  "observations": [
+    {
+      "dir": "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\stage-w1e-20261116\\pair\\old",
+      "head": "e1ccb1a2412e7faa86c2c1f60fdad1dca154023a",
+      "sourceSha256": "6bdac0695b0184ce9b32a18c3d6fe63431bfb4c6096a53bb73ebd3db386d9c64",
+      "dependencyRoot": "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\stage-w1e-20261116\\pair\\old\\node_modules",
+      "dependencyCount": 13642,
+      "dependenciesSha256": "4b858468678a4cb0b86319a291c48f4c4ebd7921df91797944644d9e6225f947",
+      "lockSha256": "5118d0c609db7c079c5ffa9f9a8c54cf81f04bec314d930a9ad29764551e473b",
+      "vitest": "4.1.11"
+    },
+    {
+      "dir": "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\stage-w1e-20261116\\pair\\new",
+      "head": "2a8a57b6ff207831c77ce62d27d3151eba7c1dc3",
+      "sourceSha256": "ac9b0c369bff296d53a60d3af3a5c97d8cb00d3eed8a8b6962b54b6612220191",
+      "dependencyRoot": "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\stage-w1e-20261116\\pair\\new\\node_modules",
+      "dependencyCount": 13642,
+      "dependenciesSha256": "4b858468678a4cb0b86319a291c48f4c4ebd7921df91797944644d9e6225f947",
+      "lockSha256": "5118d0c609db7c079c5ffa9f9a8c54cf81f04bec314d930a9ad29764551e473b",
+      "vitest": "4.1.11"
+    }
+  ]
+}

@@ -1,0 +1,16 @@
+{
+  "tests": [
+    {
+      "file": "C:/Users/tetsu/Documents/ChatGPT/将棋アプリ/stage-w1f-20261116/runtime-retry/assertion-failure/a/tiny.test.js",
+      "name": "fails",
+      "mode": "run"
+    }
+  ],
+  "suites": [
+    {
+      "id": "-270551241",
+      "file": "C:/Users/tetsu/Documents/ChatGPT/将棋アプリ/stage-w1f-20261116/runtime-retry/assertion-failure/a/tiny.test.js",
+      "mode": "run"
+    }
+  ]
+}

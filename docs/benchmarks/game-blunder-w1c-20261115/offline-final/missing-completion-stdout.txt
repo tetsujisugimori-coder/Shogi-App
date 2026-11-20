@@ -1,0 +1,1 @@
+{"status":"INVALID","reason":"Error: ENOENT: no such file or directory, open 'C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\repo\\docs\\benchmarks\\game-blunder-w1c-20261115\\offline-final\\missing-completion\\comparison.json'"}

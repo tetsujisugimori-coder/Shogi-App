@@ -1,0 +1,16 @@
+{
+  "command": [
+    "C:\\Program Files\\nodejs\\node.exe",
+    "scripts/stage-w1d-controls.mjs",
+    "final",
+    "docs/benchmarks/game-blunder-w1c-20261115/accepted-final",
+    "../stage-w1d-20261115-offline",
+    "docs/benchmarks/game-blunder-w1d-20261115/offline"
+  ],
+  "cwd": "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\repo",
+  "started": "2026-11-15T14:38:20.197Z",
+  "finished": "2026-11-15T14:38:34.426Z",
+  "exitCode": 0,
+  "signal": null,
+  "error": null
+}

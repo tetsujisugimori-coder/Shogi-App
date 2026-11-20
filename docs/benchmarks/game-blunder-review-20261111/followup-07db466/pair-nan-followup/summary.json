@@ -1,0 +1,3987 @@
+{
+  "schema": 3,
+  "baseHead": "1edc169cc9ff27b7c77e825e95b893e5b0252ed1",
+  "journals": [
+    "docs/benchmarks/match-journal-20261026/run1/hirate-1.jsonl",
+    "docs/benchmarks/match-journal-20261026/run1/hirate-2.jsonl",
+    "docs/benchmarks/match-journal-20261026/run1/replay-1.jsonl",
+    "docs/benchmarks/match-journal-20261026/run1/replay-2.jsonl"
+  ],
+  "hashBefore": [
+    "25fb004b362046c9f5af978825f4a66f1578b6ab7d17e633ac773f693556422b",
+    "c1ee4522e95c6fe95fa69be3969137656155b8835b1a59a526e43480196d2c6f",
+    "64df4641977cb4955013371283179ad1097c92669d0ff55dd831ed1b3e0cabb3",
+    "9f6e932e75a023c925cafd64bf2c52b53d5fcbe3b562b13cf52feaed7000270b"
+  ],
+  "hashAfter": [
+    "25fb004b362046c9f5af978825f4a66f1578b6ab7d17e633ac773f693556422b",
+    "c1ee4522e95c6fe95fa69be3969137656155b8835b1a59a526e43480196d2c6f",
+    "64df4641977cb4955013371283179ad1097c92669d0ff55dd831ed1b3e0cabb3",
+    "9f6e932e75a023c925cafd64bf2c52b53d5fcbe3b562b13cf52feaed7000270b"
+  ],
+  "counts": {
+    "total": 56,
+    "features": {
+      "A": 21,
+      "B": 1,
+      "C": 3,
+      "D": 1,
+      "E": 0,
+      "F": 11
+    },
+    "overlap": 11,
+    "noFeature": 30,
+    "noFeatureMeaning": "UNKNOWN",
+    "indeterminate": 24,
+    "notRun": 32
+  },
+  "plies": 394,
+  "setup": {
+    "journals": {
+      "docs/benchmarks/match-journal-20261026/run1/hirate-1.jsonl": {
+        "readMs": 22.590300000000013,
+        "auditMs": 1779.7081999999998,
+        "replayMs": 532.8744000000006
+      },
+      "docs/benchmarks/match-journal-20261026/run1/hirate-2.jsonl": {
+        "readMs": 11.968499999999949,
+        "auditMs": 2078.407,
+        "replayMs": 272.34389999999985
+      },
+      "docs/benchmarks/match-journal-20261026/run1/replay-1.jsonl": {
+        "readMs": 114.47010000000046,
+        "auditMs": 9867.7637,
+        "replayMs": 1381.1555999999982
+      },
+      "docs/benchmarks/match-journal-20261026/run1/replay-2.jsonl": {
+        "readMs": 25.628200000001016,
+        "auditMs": 1373.6538,
+        "replayMs": 150.42120000000068
+      }
+    },
+    "positions": {
+      "7ee4b05fb4030e72e782e158706312fcd0e336fcd5dfa6f2092bbfde33a2df4a/{\"from\":{\"col\":1,\"row\":7},\"kind\":\"move\",\"pieceType\":\"bishop\",\"player\":\"sente\",\"promotion\":\"decline\",\"to\":{\"col\":7,\"row\":1}}/legacy/1000": {
+        "replayPrefixMs": 2.103499999999258,
+        "snapshotMs": 0.06010000000060245
+      },
+      "af1984db62af0f44b80c676627e2a7879d3af226d65288f0f4863ff554f049e3/{\"from\":{\"col\":1,\"row\":6},\"kind\":\"move\",\"pieceType\":\"pawn\",\"player\":\"sente\",\"promotion\":\"none\",\"to\":{\"col\":1,\"row\":5}}/legacy/1000": {
+        "replayPrefixMs": 5.806800000000294,
+        "snapshotMs": 0.08330000000023574
+      },
+      "dfc5e5c678a7714fe1fbb88f1277bdf9fc32597f05831ab99c25857a8874ebc5/{\"kind\":\"drop\",\"pieceId\":\"sente-pawn-8\",\"pieceType\":\"pawn\",\"player\":\"gote\",\"promotion\":\"none\",\"to\":{\"col\":4,\"row\":7}}/experimental/1000": {
+        "replayPrefixMs": 11.157800000000861,
+        "snapshotMs": 0.18059999999968568
+      },
+      "76b90464a7633a735fd2aafbae9105c89ef732ff1c214b8830ad73e11e12d363/{\"from\":{\"col\":7,\"row\":4},\"kind\":\"move\",\"pieceType\":\"knight\",\"player\":\"gote\",\"promotion\":\"decline\",\"to\":{\"col\":6,\"row\":6}}/experimental/1000": {
+        "replayPrefixMs": 19.09770000000026,
+        "snapshotMs": 0.18989999999939755
+      },
+      "43f2404eb27ab9b49dd0482d21348eb0b75b2d9a2e3afe6719b7ada57ffced1b/{\"kind\":\"drop\",\"pieceId\":\"gote-knight-2\",\"pieceType\":\"knight\",\"player\":\"sente\",\"promotion\":\"none\",\"to\":{\"col\":5,\"row\":3}}/legacy/1000": {
+        "replayPrefixMs": 28.417699999999968,
+        "snapshotMs": 0.297099999999773
+      },
+      "f72ea77f558f6d633e828fcf39e3d02a128c7a622656b470b716c8eb813ebf06/{\"kind\":\"drop\",\"pieceId\":\"sente-pawn-3\",\"pieceType\":\"pawn\",\"player\":\"gote\",\"promotion\":\"none\",\"to\":{\"col\":4,\"row\":2}}/experimental/1000": {
+        "replayPrefixMs": 41.063500000000204,
+        "snapshotMs": 0.30719999999928405
+      },
+      "b18e7cb2dce7930ba48d783ce9b224a329797e606a3e41fbe0570f677178b19a/{\"from\":{\"col\":4,\"row\":5},\"kind\":\"move\",\"pieceType\":\"lance\",\"player\":\"sente\",\"promotion\":\"decline\",\"to\":{\"col\":4,\"row\":2}}/legacy/1000": {
+        "replayPrefixMs": 53.10599999999977,
+        "snapshotMs": 0.3206000000009226
+      },
+      "c869eb4fea1640e6d72c8d988d2c1584421576742bbab897ecee10857f16c006/{\"from\":{\"col\":7,\"row\":6},\"kind\":\"move\",\"pieceType\":\"knight\",\"player\":\"gote\",\"promotion\":\"promote\",\"to\":{\"col\":8,\"row\":8}}/experimental/1000": {
+        "replayPrefixMs": 69.86299999999937,
+        "snapshotMs": 0.30969999999979336
+      },
+      "cb24dc2d8fe364366f01d688b2cd2b7c18b229707605a1143e0204172776dd74/{\"kind\":\"drop\",\"pieceId\":\"gote-knight-2\",\"pieceType\":\"knight\",\"player\":\"sente\",\"promotion\":\"none\",\"to\":{\"col\":3,\"row\":3}}/legacy/1000": {
+        "replayPrefixMs": 86.14919999999984,
+        "snapshotMs": 0.36449999999967986
+      },
+      "bbbcacc21e11e44f21bb5fa59d89482cb517971c5c338b3da6bad3a7af3d8814/{\"kind\":\"drop\",\"pieceId\":\"gote-pawn-2\",\"pieceType\":\"pawn\",\"player\":\"sente\",\"promotion\":\"none\",\"to\":{\"col\":6,\"row\":6}}/legacy/1000": {
+        "replayPrefixMs": 113.75660000000062,
+        "snapshotMs": 0.5091999999986001
+      },
+      "ce40543e7b7d18569ba9b020e8f53a9a190d4eba9a6c5ddb0d18edf8946f1f27/{\"kind\":\"drop\",\"pieceId\":\"gote-pawn-3\",\"pieceType\":\"pawn\",\"player\":\"sente\",\"promotion\":\"none\",\"to\":{\"col\":7,\"row\":6}}/legacy/1000": {
+        "replayPrefixMs": 133.6926999999996,
+        "snapshotMs": 0.4757000000008702
+      },
+      "c6722a8aff5cc9fd4977b8c1aceaeb610d69c7f4552ec09d2a0534afd126ce77/{\"from\":{\"col\":7,\"row\":6},\"kind\":\"move\",\"pieceType\":\"bishop\",\"player\":\"gote\",\"promotion\":\"none\",\"to\":{\"col\":8,\"row\":7}}/experimental/1000": {
+        "replayPrefixMs": 155.53219999999965,
+        "snapshotMs": 0.4651000000012573
+      },
+      "05715a8ef86714967b7429cbedc98457ab8737b5154ccd7d3a555e0f5181594b/{\"from\":{\"col\":6,\"row\":6},\"kind\":\"move\",\"pieceType\":\"lance\",\"player\":\"gote\",\"promotion\":\"none\",\"to\":{\"col\":5,\"row\":7}}/experimental/1000": {
+        "replayPrefixMs": 176.4375,
+        "snapshotMs": 0.4830999999994674
+      },
+      "1d2a502b1a10af6e1005620f67911dbd14b0f649e4b329aec0d8f3845c401fa0/{\"from\":{\"col\":2,\"row\":2},\"kind\":\"move\",\"pieceType\":\"pawn\",\"player\":\"gote\",\"promotion\":\"none\",\"to\":{\"col\":2,\"row\":3}}/experimental/1000": {
+        "replayPrefixMs": 203.3173000000006,
+        "snapshotMs": 0.5306999999993423
+      },
+      "99afc12f7b11725833b090d44230cbb620d928ce84e599b1603aa6737eb971b3/{\"kind\":\"drop\",\"pieceId\":\"gote-pawn-7\",\"pieceType\":\"pawn\",\"player\":\"sente\",\"promotion\":\"none\",\"to\":{\"col\":1,\"row\":7}}/legacy/1000": {
+        "replayPrefixMs": 227.26699999999983,
+        "snapshotMs": 0.567800000000716
+      },
+      "22da8d2f38c608d842c81b0585337ddbd8591cdf92d11d74c68cc198cde784ed/{\"from\":{\"col\":6,\"row\":2},\"kind\":\"move\",\"pieceType\":\"pawn\",\"player\":\"sente\",\"promotion\":\"promote\",\"to\":{\"col\":6,\"row\":1}}/legacy/1000": {
+        "replayPrefixMs": 258.70340000000033,
+        "snapshotMs": 0.6222999999990861
+      },
+      "090e6aa9db3d40d7acc360c833b55a59193b201a50c7e30839f2dadfc7543167/{\"kind\":\"drop\",\"pieceId\":\"sente-knight-2\",\"pieceType\":\"knight\",\"player\":\"gote\",\"promotion\":\"none\",\"to\":{\"col\":4,\"row\":5}}/experimental/1000": {
+        "replayPrefixMs": 285.8114999999998,
+        "snapshotMs": 0.6545999999998457
+      },
+      "650d74a841f5efff11a3ea80520ff71ba6fe6064e42c86432ad5420aad4dd3d5/{\"kind\":\"drop\",\"pieceId\":\"sente-lance-9\",\"pieceType\":\"lance\",\"player\":\"gote\",\"promotion\":\"none\",\"to\":{\"col\":5,\"row\":6}}/experimental/1000": {
+        "replayPrefixMs": 313.7435999999998,
+        "snapshotMs": 0.8117999999994936
+      },
+      "b32b3593027f8ea54dcc33a910ffb534918357e39bef1460d059fb45c0cce9b8/{\"from\":{\"col\":1,\"row\":4},\"kind\":\"move\",\"pieceType\":\"knight\",\"player\":\"sente\",\"promotion\":\"decline\",\"to\":{\"col\":0,\"row\":2}}/legacy/1000": {
+        "replayPrefixMs": 346.40179999999964,
+        "snapshotMs": 0.8365000000012515
+      },
+      "ef14b87a0828ba4dcc6693e8c0cdbf5d4139000bd64c35ad307d6e51ec86591e/{\"kind\":\"drop\",\"pieceId\":\"sente-knight-8\",\"pieceType\":\"knight\",\"player\":\"gote\",\"promotion\":\"none\",\"to\":{\"col\":6,\"row\":5}}/experimental/1000": {
+        "replayPrefixMs": 376.97789999999986,
+        "snapshotMs": 0.8170000000009168
+      },
+      "15978b6a94dce3e32f7aaf3fb8ce5f9530140b018be644c1cf2b1216b904f969/{\"kind\":\"drop\",\"pieceId\":\"gote-pawn-9\",\"pieceType\":\"pawn\",\"player\":\"sente\",\"promotion\":\"none\",\"to\":{\"col\":0,\"row\":2}}/legacy/1000": {
+        "replayPrefixMs": 415.16439999999966,
+        "snapshotMs": 0.9156999999995605
+      },
+      "1613fb4be2e07133d1f3aedca71c819698b850c5d966c6c721fa4fb064c67574/{\"kind\":\"drop\",\"pieceId\":\"gote-pawn-1\",\"pieceType\":\"pawn\",\"player\":\"gote\",\"promotion\":\"none\",\"to\":{\"col\":6,\"row\":4}}/experimental/1000": {
+        "replayPrefixMs": 448.09560000000056,
+        "snapshotMs": 0.683999999999287
+      },
+      "4a4f59f6d1b12d120ceae4b7f81d626314e935a836a9d9de2c0930e751ef4579/{\"kind\":\"drop\",\"pieceId\":\"gote-pawn-1\",\"pieceType\":\"pawn\",\"player\":\"sente\",\"promotion\":\"none\",\"to\":{\"col\":5,\"row\":5}}/legacy/1000": {
+        "replayPrefixMs": 485.72619999999915,
+        "snapshotMs": 0.9634000000005472
+      },
+      "f487e6ffd5e190022810e8f9d40fdabcb1643e8dc07e1b96bc63d9b296488191/{\"from\":{\"col\":2,\"row\":1},\"kind\":\"move\",\"pieceType\":\"knight\",\"player\":\"sente\",\"promotion\":\"none\",\"to\":{\"col\":3,\"row\":0}}/legacy/1000": {
+        "replayPrefixMs": 531.2690000000002,
+        "snapshotMs": 0.7922999999991589
+      },
+      "7ee4b05fb4030e72e782e158706312fcd0e336fcd5dfa6f2092bbfde33a2df4a/{\"from\":{\"col\":1,\"row\":7},\"kind\":\"move\",\"pieceType\":\"bishop\",\"player\":\"sente\",\"promotion\":\"decline\",\"to\":{\"col\":7,\"row\":1}}/experimental/1000": {
+        "replayPrefixMs": 1.3786999999992986,
+        "snapshotMs": 0.02780000000166183
+      },
+      "c0975f6e93b41cf47d1586349f276f938220b6d216e2cd15f1ff16b7f4f984b0/{\"from\":{\"col\":5,\"row\":2},\"kind\":\"move\",\"pieceType\":\"pawn\",\"player\":\"gote\",\"promotion\":\"none\",\"to\":{\"col\":5,\"row\":3}}/legacy/1000": {
+        "replayPrefixMs": 4.363199999999779,
+        "snapshotMs": 0.06179999999949359
+      },
+      "6e703ffd4bdfd2d4b2878dd6bc98e00bd15845f45db09f3574d8c394619d1afd/{\"from\":{\"col\":2,\"row\":5},\"kind\":\"move\",\"pieceType\":\"pawn\",\"player\":\"sente\",\"promotion\":\"none\",\"to\":{\"col\":2,\"row\":4}}/experimental/1000": {
+        "replayPrefixMs": 9.257499999999709,
+        "snapshotMs": 0.10289999999986321
+      },
+      "e53a261c1976524fb2e6a4a8924464f16b87e61f97469cd82751b884ac5fc1a5/{\"from\":{\"col\":1,\"row\":4},\"kind\":\"move\",\"pieceType\":\"bishop\",\"player\":\"gote\",\"promotion\":\"promote\",\"to\":{\"col\":5,\"row\":8}}/legacy/1000": {
+        "replayPrefixMs": 22.860200000000987,
+        "snapshotMs": 0.2789999999986321
+      },
+      "8a68cfce5de859b30dac207815fee98ea21cddde057ef6a5c49033f4c12bbebd/{\"kind\":\"drop\",\"pieceId\":\"gote-pawn-6\",\"pieceType\":\"pawn\",\"player\":\"sente\",\"promotion\":\"none\",\"to\":{\"col\":4,\"row\":1}}/experimental/1000": {
+        "replayPrefixMs": 37.673899999999776,
+        "snapshotMs": 0.32450000000062573
+      },
+      "19e7fc1ae18ed62e860e336945d7ac3b4e642e112442ed04a1c6a49bd8f90ee4/{\"from\":{\"col\":4,\"row\":5},\"kind\":\"move\",\"pieceType\":\"pawn\",\"player\":\"gote\",\"promotion\":\"promote\",\"to\":{\"col\":4,\"row\":6}}/legacy/1000": {
+        "replayPrefixMs": 59.45499999999993,
+        "snapshotMs": 0.4783999999999651
+      },
+      "ca7db5fea0059c651988ac4305a93ada33c37960b3a5ff661be68e98311e9fec/{\"kind\":\"drop\",\"pieceId\":\"gote-pawn-6\",\"pieceType\":\"pawn\",\"player\":\"gote\",\"promotion\":\"none\",\"to\":{\"col\":1,\"row\":3}}/legacy/1000": {
+        "replayPrefixMs": 77.45780000000013,
+        "snapshotMs": 0.5174000000006345
+      },
+      "7d613279ae93d3d30d7cfb980587b552cb7b11274d0f2bd13989578d60a840cd/{\"kind\":\"drop\",\"pieceId\":\"sente-lance-9\",\"pieceType\":\"lance\",\"player\":\"gote\",\"promotion\":\"none\",\"to\":{\"col\":5,\"row\":7}}/legacy/1000": {
+        "replayPrefixMs": 95.43219999999928,
+        "snapshotMs": 0.42989999999917927
+      },
+      "9ee5b07a8763ae2a9fb60c8f05d38c32e2e0bdd2546bebbbbf40560e595bcaca/{\"kind\":\"drop\",\"pieceId\":\"sente-pawn-5\",\"pieceType\":\"pawn\",\"player\":\"gote\",\"promotion\":\"none\",\"to\":{\"col\":3,\"row\":7}}/legacy/1000": {
+        "replayPrefixMs": 119.11839999999938,
+        "snapshotMs": 0.43140000000130385
+      },
+      "b72eb189f236c5d654dd2453a75271e928ab119619043e86643d70423d208d12/{\"from\":{\"col\":4,\"row\":3},\"kind\":\"move\",\"pieceType\":\"bishop\",\"player\":\"sente\",\"promotion\":\"none\",\"to\":{\"col\":5,\"row\":2}}/experimental/1000": {
+        "replayPrefixMs": 186.21289999999863,
+        "snapshotMs": 1.5426000000006752
+      },
+      "58bf3dc8271188c2e71b1c8e48cadc491e7389c8834e83cf8848d88500c2d7f5/{\"from\":{\"col\":0,\"row\":2},\"kind\":\"move\",\"pieceType\":\"bishop\",\"player\":\"sente\",\"promotion\":\"none\",\"to\":{\"col\":2,\"row\":0}}/experimental/1000": {
+        "replayPrefixMs": 263.54379999999946,
+        "snapshotMs": 1.5822000000007392
+      },
+      "21ea84a772abaf6503b9d00d10f56d06dccce58fd824342c900fea70518d4ef6/{\"from\":{\"col\":0,\"row\":0},\"kind\":\"move\",\"pieceType\":\"lance\",\"player\":\"sente\",\"promotion\":\"none\",\"to\":{\"col\":1,\"row\":0}}/legacy/1000": {
+        "replayPrefixMs": 24.019799999998213,
+        "snapshotMs": 0.28770000000076834
+      },
+      "c6b4c1e99c34fdd287b5ca674efc8c561be9e98e8f734524f7f6386739e6c54c/{\"kind\":\"drop\",\"pieceId\":\"gote-lance-9\",\"pieceType\":\"lance\",\"player\":\"sente\",\"promotion\":\"none\",\"to\":{\"col\":4,\"row\":1}}/legacy/1000": {
+        "replayPrefixMs": 44.154999999998836,
+        "snapshotMs": 2.42870000000039
+      },
+      "08dedb19167293cfbaedeaa7179f137a232cdf101d452fb2285b4c73b3bb98b4/{\"from\":{\"col\":3,\"row\":2},\"kind\":\"move\",\"pieceType\":\"pawn\",\"player\":\"gote\",\"promotion\":\"none\",\"to\":{\"col\":3,\"row\":3}}/experimental/1000": {
+        "replayPrefixMs": 83.99859999999899,
+        "snapshotMs": 0.6722999999983585
+      },
+      "e2bab53d57575355cabf42183fc75cc521fe16afaaefa14d84c88ac1957f28c0/{\"from\":{\"col\":2,\"row\":2},\"kind\":\"move\",\"pieceType\":\"pawn\",\"player\":\"sente\",\"promotion\":\"none\",\"to\":{\"col\":3,\"row\":1}}/legacy/1000": {
+        "replayPrefixMs": 145.5565999999999,
+        "snapshotMs": 1.225399999999354
+      },
+      "e727daf8c3df03ba509798e01936f473df993db99ba0267c5b115dcaf8128bca/{\"from\":{\"col\":3,\"row\":5},\"kind\":\"move\",\"pieceType\":\"knight\",\"player\":\"gote\",\"promotion\":\"promote\",\"to\":{\"col\":2,\"row\":7}}/experimental/1000": {
+        "replayPrefixMs": 200.24919999999838,
+        "snapshotMs": 1.2282000000013795
+      },
+      "37859471c3dbb1753af75bf0e4f8ef53070a3207569fd3636e19e38c6b44a9dc/{\"from\":{\"col\":3,\"row\":8},\"kind\":\"move\",\"pieceType\":\"gold\",\"player\":\"sente\",\"promotion\":\"none\",\"to\":{\"col\":2,\"row\":7}}/legacy/1000": {
+        "replayPrefixMs": 262.14760000000024,
+        "snapshotMs": 1.0352999999995518
+      },
+      "fad86614a04618ef62e69dfad971da74fa9ae4c0d6e656c33e0e8c311d75cdc4/{\"kind\":\"drop\",\"pieceId\":\"gote-pawn-6\",\"pieceType\":\"pawn\",\"player\":\"sente\",\"promotion\":\"none\",\"to\":{\"col\":0,\"row\":7}}/legacy/1000": {
+        "replayPrefixMs": 326.9297000000006,
+        "snapshotMs": 1.497799999997369
+      },
+      "2d31913607311a85c154bde6ad8f8614d9153ec0fea3a7a9dd0c9195b8e4d405/{\"kind\":\"drop\",\"pieceId\":\"gote-pawn-7\",\"pieceType\":\"pawn\",\"player\":\"sente\",\"promotion\":\"none\",\"to\":{\"col\":2,\"row\":4}}/legacy/1000": {
+        "replayPrefixMs": 391.0707999999977,
+        "snapshotMs": 1.8456000000005588
+      },
+      "df3ef7591f3e0bf049ba992c9f2b741d83da4532ea07786bbea71b12a754d78e/{\"from\":{\"col\":6,\"row\":4},\"kind\":\"move\",\"pieceType\":\"knight\",\"player\":\"gote\",\"promotion\":\"decline\",\"to\":{\"col\":7,\"row\":6}}/experimental/1000": {
+        "replayPrefixMs": 473.71700000000055,
+        "snapshotMs": 1.3904999999977008
+      },
+      "37007814a7911494a321069b11f22953672df320601c846d1d19caddb07fa6d4/{\"from\":{\"col\":6,\"row\":4},\"kind\":\"move\",\"pieceType\":\"knight\",\"player\":\"gote\",\"promotion\":\"decline\",\"to\":{\"col\":5,\"row\":6}}/experimental/1000": {
+        "replayPrefixMs": 548.4471999999987,
+        "snapshotMs": 1.4838999999992666
+      },
+      "ce74cdf12a475d5d77668dcb4a3d87f47f6e65f50b6d48a7a07519e57c893c6b/{\"kind\":\"drop\",\"pieceId\":\"sente-knight-8\",\"pieceType\":\"knight\",\"player\":\"sente\",\"promotion\":\"none\",\"to\":{\"col\":1,\"row\":8}}/legacy/1000": {
+        "replayPrefixMs": 662.2200999999986,
+        "snapshotMs": 2.2379000000000815
+      },
+      "e4972a6a49aefa12f041426f0f99c19e85033ff99f5d3e1f41d70854c9eb4d79/{\"from\":{\"col\":7,\"row\":6},\"kind\":\"move\",\"pieceType\":\"knight\",\"player\":\"gote\",\"promotion\":\"promote\",\"to\":{\"col\":8,\"row\":8}}/experimental/1000": {
+        "replayPrefixMs": 763.4444999999978,
+        "snapshotMs": 1.9214000000029046
+      },
+      "506b713ab7db61addf571df04f447192dddfcbd83a14e3af1e29e092489cf26c/{\"from\":{\"col\":6,\"row\":3},\"kind\":\"move\",\"pieceType\":\"knight\",\"player\":\"sente\",\"promotion\":\"promote\",\"to\":{\"col\":5,\"row\":1}}/legacy/1000": {
+        "replayPrefixMs": 879.4005999999972,
+        "snapshotMs": 4.119900000001508
+      },
+      "5f2d01a5d7b9c36a97a1565d4cc444e800100a094debf564a8d897baac65c5ae/{\"kind\":\"drop\",\"pieceId\":\"sente-knight-8\",\"pieceType\":\"knight\",\"player\":\"sente\",\"promotion\":\"none\",\"to\":{\"col\":4,\"row\":3}}/legacy/1000": {
+        "replayPrefixMs": 985.641599999999,
+        "snapshotMs": 1.9196000000010827
+      },
+      "f0ca2fbb012c11a5e41b0659df31642129f042a89b7b82b08000020917636008/{\"from\":{\"col\":4,\"row\":8},\"kind\":\"move\",\"pieceType\":\"gold\",\"player\":\"sente\",\"promotion\":\"none\",\"to\":{\"col\":3,\"row\":8}}/legacy/1000": {
+        "replayPrefixMs": 1104.1483000000007,
+        "snapshotMs": 2.318299999998999
+      },
+      "d7cbd43499d0fd96eb5e5d519c5218e5a19ff951acc32bcac56ace09152d5323/{\"kind\":\"drop\",\"pieceId\":\"sente-knight-8\",\"pieceType\":\"knight\",\"player\":\"sente\",\"promotion\":\"none\",\"to\":{\"col\":7,\"row\":3}}/legacy/1000": {
+        "replayPrefixMs": 1251.9107000000004,
+        "snapshotMs": 2.704599999997299
+      },
+      "11eb4c9afd42c53f1051fd8a917a364ff7fcf4dada437a8c49ab16d6c6aba1d0/{\"from\":{\"col\":4,\"row\":8},\"kind\":\"move\",\"pieceType\":\"knight\",\"player\":\"sente\",\"promotion\":\"none\",\"to\":{\"col\":3,\"row\":6}}/legacy/1000": {
+        "replayPrefixMs": 1376.4406999999992,
+        "snapshotMs": 2.406200000001263
+      },
+      "b592c58c72408e220a5f3e955084489af721a1cd3762094679407d3ff645e033/{\"from\":{\"col\":0,\"row\":0},\"kind\":\"move\",\"pieceType\":\"lance\",\"player\":\"sente\",\"promotion\":\"none\",\"to\":{\"col\":1,\"row\":0}}/experimental/1000": {
+        "replayPrefixMs": 12.803400000000693,
+        "snapshotMs": 0.28839999999763677
+      },
+      "bc873c16c8a4a6eb18f036ca3216014bea827e438451accd9522b900975fe6c3/{\"kind\":\"drop\",\"pieceId\":\"gote-lance-9\",\"pieceType\":\"lance\",\"player\":\"sente\",\"promotion\":\"none\",\"to\":{\"col\":4,\"row\":1}}/experimental/1000": {
+        "replayPrefixMs": 42.796800000000076,
+        "snapshotMs": 0.4091000000007625
+      },
+      "113755e292634969c670feeb2955bf093347709f506b8fa62dd833aa5210484c/{\"from\":{\"col\":3,\"row\":2},\"kind\":\"move\",\"pieceType\":\"pawn\",\"player\":\"gote\",\"promotion\":\"none\",\"to\":{\"col\":3,\"row\":3}}/legacy/1000": {
+        "replayPrefixMs": 78.0080999999991,
+        "snapshotMs": 0.6735000000007858
+      },
+      "d50f694545db2e6846aebe20180a34c306e304b24c57232c99ea98f1c885c00e/{\"kind\":\"drop\",\"pieceId\":\"gote-pawn-1\",\"pieceType\":\"pawn\",\"player\":\"sente\",\"promotion\":\"none\",\"to\":{\"col\":0,\"row\":4}}/experimental/1000": {
+        "replayPrefixMs": 143.8328999999976,
+        "snapshotMs": 1.180500000002212
+      }
+    }
+  },
+  "elapsedMs": 70187.817,
+  "timed": {
+    "count": 24,
+    "status": {
+      "deadline": 24
+    },
+    "completedDepth": {
+      "1": 15,
+      "2": 9
+    },
+    "interruptedPhase": {
+      "normal-other": 10,
+      "quiescence": 14
+    },
+    "interruptedStage": {
+      "after-quiescence-action": 6,
+      "before-quiescence-candidate": 8,
+      "normal-node-entry": 4,
+      "quiescence-entry": 6
+    },
+    "crossedDeadlinePhase": {
+      "normal-execute": 3,
+      "normal-legal": 1,
+      "q-board-moves": 3,
+      "q-board-own-check": 4,
+      "q-drop-board-setup": 1,
+      "q-drop-own-check": 2,
+      "q-evaluate": 1,
+      "q-execute": 6,
+      "q-hand-drops": 3
+    },
+    "phaseTotals": {
+      "rootLegal": 19.39570000000458,
+      "normal": 3464.351500000197,
+      "quiescence": 20535.028399999806,
+      "apiOther": 9.343900000003487
+    },
+    "searchMs": 24034.762100000014,
+    "legalMs": 21.11760000002323,
+    "candidateMs": 2.3233000000000175,
+    "preparationMs": 3.863999999997759,
+    "normalizationMs": 3.321800000001531
+  },
+  "io": {
+    "serializationMs": 33.98750000000007,
+    "saveMs": 193.81590000000313,
+    "scope": "Serialization and append timings for preceding rows; footer and fsync excluded."
+  },
+  "fixed": {
+    "rootCalls": 48,
+    "pairCalls": 64,
+    "rootReproducibility": [
+      {
+        "id": "7ee4b05fb4030e72e782e158706312fcd0e336fcd5dfa6f2092bbfde33a2df4a/{\"from\":{\"col\":1,\"row\":7},\"kind\":\"move\",\"pieceType\":\"bishop\",\"player\":\"sente\",\"promotion\":\"decline\",\"to\":{\"col\":7,\"row\":1}}/legacy/1000",
+        "reproducible": true,
+        "status": [
+          "completed",
+          "completed"
+        ],
+        "nodes": [
+          {
+            "normal": 39,
+            "quiescence": 72
+          },
+          {
+            "normal": 39,
+            "quiescence": 72
+          }
+        ],
+        "selectedAction": {
+          "kind": "move",
+          "player": "sente",
+          "from": {
+            "row": 7,
+            "col": 1
+          },
+          "to": {
+            "row": 1,
+            "col": 7
+          },
+          "pieceType": "bishop",
+          "promotion": "decline"
+        },
+        "score": 0,
+        "pv": [
+          {
+            "kind": "move",
+            "player": "sente",
+            "from": {
+              "row": 7,
+              "col": 1
+            },
+            "to": {
+              "row": 1,
+              "col": 7
+            },
+            "pieceType": "bishop",
+            "promotion": "decline"
+          },
+          {
+            "kind": "move",
+            "player": "gote",
+            "from": {
+              "row": 0,
+              "col": 6
+            },
+            "to": {
+              "row": 1,
+              "col": 7
+            },
+            "pieceType": "silver",
+            "promotion": "none"
+          }
+        ]
+      },
+      {
+        "id": "7ee4b05fb4030e72e782e158706312fcd0e336fcd5dfa6f2092bbfde33a2df4a/{\"from\":{\"col\":1,\"row\":7},\"kind\":\"move\",\"pieceType\":\"bishop\",\"player\":\"sente\",\"promotion\":\"decline\",\"to\":{\"col\":7,\"row\":1}}/experimental/1000",
+        "reproducible": true,
+        "status": [
+          "completed",
+          "completed"
+        ],
+        "nodes": [
+          {
+            "normal": 39,
+            "quiescence": 67
+          },
+          {
+            "normal": 39,
+            "quiescence": 67
+          }
+        ],
+        "selectedAction": {
+          "kind": "move",
+          "player": "sente",
+          "from": {
+            "row": 7,
+            "col": 1
+          },
+          "to": {
+            "row": 1,
+            "col": 7
+          },
+          "pieceType": "bishop",
+          "promotion": "decline"
+        },
+        "score": 0,
+        "pv": [
+          {
+            "kind": "move",
+            "player": "sente",
+            "from": {
+              "row": 7,
+              "col": 1
+            },
+            "to": {
+              "row": 1,
+              "col": 7
+            },
+            "pieceType": "bishop",
+            "promotion": "decline"
+          },
+          {
+            "kind": "move",
+            "player": "gote",
+            "from": {
+              "row": 0,
+              "col": 6
+            },
+            "to": {
+              "row": 1,
+              "col": 7
+            },
+            "pieceType": "silver",
+            "promotion": "none"
+          }
+        ]
+      },
+      {
+        "id": "21ea84a772abaf6503b9d00d10f56d06dccce58fd824342c900fea70518d4ef6/{\"from\":{\"col\":0,\"row\":0},\"kind\":\"move\",\"pieceType\":\"lance\",\"player\":\"sente\",\"promotion\":\"none\",\"to\":{\"col\":1,\"row\":0}}/legacy/1000",
+        "reproducible": true,
+        "status": [
+          "completed",
+          "completed"
+        ],
+        "nodes": [
+          {
+            "normal": 78,
+            "quiescence": 216
+          },
+          {
+            "normal": 78,
+            "quiescence": 216
+          }
+        ],
+        "selectedAction": {
+          "kind": "move",
+          "player": "sente",
+          "from": {
+            "row": 0,
+            "col": 0
+          },
+          "to": {
+            "row": 0,
+            "col": 1
+          },
+          "pieceType": "lance",
+          "promotion": "none"
+        },
+        "score": 600,
+        "pv": [
+          {
+            "kind": "move",
+            "player": "sente",
+            "from": {
+              "row": 0,
+              "col": 0
+            },
+            "to": {
+              "row": 0,
+              "col": 1
+            },
+            "pieceType": "lance",
+            "promotion": "none"
+          },
+          {
+            "kind": "move",
+            "player": "gote",
+            "from": {
+              "row": 2,
+              "col": 1
+            },
+            "to": {
+              "row": 0,
+              "col": 1
+            },
+            "pieceType": "rook",
+            "promotion": "none"
+          }
+        ]
+      },
+      {
+        "id": "b592c58c72408e220a5f3e955084489af721a1cd3762094679407d3ff645e033/{\"from\":{\"col\":0,\"row\":0},\"kind\":\"move\",\"pieceType\":\"lance\",\"player\":\"sente\",\"promotion\":\"none\",\"to\":{\"col\":1,\"row\":0}}/experimental/1000",
+        "reproducible": true,
+        "status": [
+          "completed",
+          "completed"
+        ],
+        "nodes": [
+          {
+            "normal": 78,
+            "quiescence": 215
+          },
+          {
+            "normal": 78,
+            "quiescence": 215
+          }
+        ],
+        "selectedAction": {
+          "kind": "move",
+          "player": "sente",
+          "from": {
+            "row": 0,
+            "col": 0
+          },
+          "to": {
+            "row": 0,
+            "col": 1
+          },
+          "pieceType": "lance",
+          "promotion": "none"
+        },
+        "score": 588.6666666666666,
+        "pv": [
+          {
+            "kind": "move",
+            "player": "sente",
+            "from": {
+              "row": 0,
+              "col": 0
+            },
+            "to": {
+              "row": 0,
+              "col": 1
+            },
+            "pieceType": "lance",
+            "promotion": "none"
+          },
+          {
+            "kind": "move",
+            "player": "gote",
+            "from": {
+              "row": 1,
+              "col": 1
+            },
+            "to": {
+              "row": 0,
+              "col": 1
+            },
+            "pieceType": "rook",
+            "promotion": "none"
+          }
+        ]
+      },
+      {
+        "id": "af1984db62af0f44b80c676627e2a7879d3af226d65288f0f4863ff554f049e3/{\"from\":{\"col\":1,\"row\":6},\"kind\":\"move\",\"pieceType\":\"pawn\",\"player\":\"sente\",\"promotion\":\"none\",\"to\":{\"col\":1,\"row\":5}}/legacy/1000",
+        "reproducible": true,
+        "status": [
+          "completed",
+          "completed"
+        ],
+        "nodes": [
+          {
+            "normal": 31,
+            "quiescence": 64
+          },
+          {
+            "normal": 31,
+            "quiescence": 64
+          }
+        ],
+        "selectedAction": {
+          "kind": "move",
+          "player": "sente",
+          "from": {
+            "row": 6,
+            "col": 1
+          },
+          "to": {
+            "row": 5,
+            "col": 1
+          },
+          "pieceType": "pawn",
+          "promotion": "none"
+        },
+        "score": -178,
+        "pv": [
+          {
+            "kind": "move",
+            "player": "sente",
+            "from": {
+              "row": 6,
+              "col": 1
+            },
+            "to": {
+              "row": 5,
+              "col": 1
+            },
+            "pieceType": "pawn",
+            "promotion": "none"
+          },
+          {
+            "kind": "move",
+            "player": "gote",
+            "from": {
+              "row": 4,
+              "col": 0
+            },
+            "to": {
+              "row": 5,
+              "col": 1
+            },
+            "pieceType": "bishop",
+            "promotion": "none"
+          }
+        ]
+      },
+      {
+        "id": "c0975f6e93b41cf47d1586349f276f938220b6d216e2cd15f1ff16b7f4f984b0/{\"from\":{\"col\":5,\"row\":2},\"kind\":\"move\",\"pieceType\":\"pawn\",\"player\":\"gote\",\"promotion\":\"none\",\"to\":{\"col\":5,\"row\":3}}/legacy/1000",
+        "reproducible": true,
+        "status": [
+          "completed",
+          "completed"
+        ],
+        "nodes": [
+          {
+            "normal": 40,
+            "quiescence": 106
+          },
+          {
+            "normal": 40,
+            "quiescence": 106
+          }
+        ],
+        "selectedAction": {
+          "kind": "move",
+          "player": "gote",
+          "from": {
+            "row": 2,
+            "col": 5
+          },
+          "to": {
+            "row": 3,
+            "col": 5
+          },
+          "pieceType": "pawn",
+          "promotion": "none"
+        },
+        "score": -400,
+        "pv": [
+          {
+            "kind": "move",
+            "player": "gote",
+            "from": {
+              "row": 2,
+              "col": 5
+            },
+            "to": {
+              "row": 3,
+              "col": 5
+            },
+            "pieceType": "pawn",
+            "promotion": "none"
+          },
+          {
+            "kind": "move",
+            "player": "sente",
+            "from": {
+              "row": 4,
+              "col": 4
+            },
+            "to": {
+              "row": 2,
+              "col": 2
+            },
+            "pieceType": "bishop",
+            "promotion": "promote"
+          }
+        ]
+      },
+      {
+        "id": "c6b4c1e99c34fdd287b5ca674efc8c561be9e98e8f734524f7f6386739e6c54c/{\"kind\":\"drop\",\"pieceId\":\"gote-lance-9\",\"pieceType\":\"lance\",\"player\":\"sente\",\"promotion\":\"none\",\"to\":{\"col\":4,\"row\":1}}/legacy/1000",
+        "reproducible": true,
+        "status": [
+          "completed",
+          "completed"
+        ],
+        "nodes": [
+          {
+            "normal": 115,
+            "quiescence": 573
+          },
+          {
+            "normal": 115,
+            "quiescence": 573
+          }
+        ],
+        "selectedAction": {
+          "kind": "drop",
+          "player": "sente",
+          "pieceId": "gote-lance-9",
+          "pieceType": "lance",
+          "to": {
+            "row": 1,
+            "col": 4
+          },
+          "promotion": "none"
+        },
+        "score": 178,
+        "pv": [
+          {
+            "kind": "drop",
+            "player": "sente",
+            "pieceId": "gote-lance-9",
+            "pieceType": "lance",
+            "to": {
+              "row": 1,
+              "col": 4
+            },
+            "promotion": "none"
+          },
+          {
+            "kind": "move",
+            "player": "gote",
+            "from": {
+              "row": 0,
+              "col": 3
+            },
+            "to": {
+              "row": 1,
+              "col": 4
+            },
+            "pieceType": "gold",
+            "promotion": "none"
+          }
+        ]
+      },
+      {
+        "id": "bc873c16c8a4a6eb18f036ca3216014bea827e438451accd9522b900975fe6c3/{\"kind\":\"drop\",\"pieceId\":\"gote-lance-9\",\"pieceType\":\"lance\",\"player\":\"sente\",\"promotion\":\"none\",\"to\":{\"col\":4,\"row\":1}}/experimental/1000",
+        "reproducible": true,
+        "status": [
+          "completed",
+          "completed"
+        ],
+        "nodes": [
+          {
+            "normal": 114,
+            "quiescence": 765
+          },
+          {
+            "normal": 114,
+            "quiescence": 765
+          }
+        ],
+        "selectedAction": {
+          "kind": "drop",
+          "player": "sente",
+          "pieceId": "gote-lance-9",
+          "pieceType": "lance",
+          "to": {
+            "row": 1,
+            "col": 4
+          },
+          "promotion": "none"
+        },
+        "score": 135,
+        "pv": [
+          {
+            "kind": "drop",
+            "player": "sente",
+            "pieceId": "gote-lance-9",
+            "pieceType": "lance",
+            "to": {
+              "row": 1,
+              "col": 4
+            },
+            "promotion": "none"
+          },
+          {
+            "kind": "move",
+            "player": "gote",
+            "from": {
+              "row": 0,
+              "col": 3
+            },
+            "to": {
+              "row": 1,
+              "col": 4
+            },
+            "pieceType": "gold",
+            "promotion": "none"
+          }
+        ]
+      },
+      {
+        "id": "dfc5e5c678a7714fe1fbb88f1277bdf9fc32597f05831ab99c25857a8874ebc5/{\"kind\":\"drop\",\"pieceId\":\"sente-pawn-8\",\"pieceType\":\"pawn\",\"player\":\"gote\",\"promotion\":\"none\",\"to\":{\"col\":4,\"row\":7}}/experimental/1000",
+        "reproducible": true,
+        "status": [
+          "completed",
+          "completed"
+        ],
+        "nodes": [
+          {
+            "normal": 48,
+            "quiescence": 167
+          },
+          {
+            "normal": 48,
+            "quiescence": 167
+          }
+        ],
+        "selectedAction": {
+          "kind": "drop",
+          "player": "gote",
+          "pieceId": "sente-pawn-8",
+          "pieceType": "pawn",
+          "to": {
+            "row": 7,
+            "col": 4
+          },
+          "promotion": "none"
+        },
+        "score": -210.66666666666666,
+        "pv": [
+          {
+            "kind": "drop",
+            "player": "gote",
+            "pieceId": "sente-pawn-8",
+            "pieceType": "pawn",
+            "to": {
+              "row": 7,
+              "col": 4
+            },
+            "promotion": "none"
+          },
+          {
+            "kind": "move",
+            "player": "sente",
+            "from": {
+              "row": 7,
+              "col": 7
+            },
+            "to": {
+              "row": 7,
+              "col": 4
+            },
+            "pieceType": "rook",
+            "promotion": "none"
+          }
+        ]
+      },
+      {
+        "id": "6e703ffd4bdfd2d4b2878dd6bc98e00bd15845f45db09f3574d8c394619d1afd/{\"from\":{\"col\":2,\"row\":5},\"kind\":\"move\",\"pieceType\":\"pawn\",\"player\":\"sente\",\"promotion\":\"none\",\"to\":{\"col\":2,\"row\":4}}/experimental/1000",
+        "reproducible": true,
+        "status": [
+          "completed",
+          "completed"
+        ],
+        "nodes": [
+          {
+            "normal": 43,
+            "quiescence": 125
+          },
+          {
+            "normal": 43,
+            "quiescence": 125
+          }
+        ],
+        "selectedAction": {
+          "kind": "move",
+          "player": "sente",
+          "from": {
+            "row": 5,
+            "col": 2
+          },
+          "to": {
+            "row": 4,
+            "col": 2
+          },
+          "pieceType": "pawn",
+          "promotion": "none"
+        },
+        "score": 15.333333333333332,
+        "pv": [
+          {
+            "kind": "move",
+            "player": "sente",
+            "from": {
+              "row": 5,
+              "col": 2
+            },
+            "to": {
+              "row": 4,
+              "col": 2
+            },
+            "pieceType": "pawn",
+            "promotion": "none"
+          },
+          {
+            "kind": "move",
+            "player": "gote",
+            "from": {
+              "row": 3,
+              "col": 1
+            },
+            "to": {
+              "row": 4,
+              "col": 2
+            },
+            "pieceType": "bishop",
+            "promotion": "none"
+          }
+        ]
+      },
+      {
+        "id": "08dedb19167293cfbaedeaa7179f137a232cdf101d452fb2285b4c73b3bb98b4/{\"from\":{\"col\":3,\"row\":2},\"kind\":\"move\",\"pieceType\":\"pawn\",\"player\":\"gote\",\"promotion\":\"none\",\"to\":{\"col\":3,\"row\":3}}/experimental/1000",
+        "reproducible": true,
+        "status": [
+          "completed",
+          "completed"
+        ],
+        "nodes": [
+          {
+            "normal": 185,
+            "quiescence": 633
+          },
+          {
+            "normal": 185,
+            "quiescence": 633
+          }
+        ],
+        "selectedAction": {
+          "kind": "move",
+          "player": "gote",
+          "from": {
+            "row": 2,
+            "col": 3
+          },
+          "to": {
+            "row": 3,
+            "col": 3
+          },
+          "pieceType": "pawn",
+          "promotion": "none"
+        },
+        "score": 1389.6666666666667,
+        "pv": [
+          {
+            "kind": "move",
+            "player": "gote",
+            "from": {
+              "row": 2,
+              "col": 3
+            },
+            "to": {
+              "row": 3,
+              "col": 3
+            },
+            "pieceType": "pawn",
+            "promotion": "none"
+          },
+          {
+            "kind": "move",
+            "player": "sente",
+            "from": {
+              "row": 4,
+              "col": 2
+            },
+            "to": {
+              "row": 3,
+              "col": 3
+            },
+            "pieceType": "bishop",
+            "promotion": "none"
+          }
+        ]
+      },
+      {
+        "id": "113755e292634969c670feeb2955bf093347709f506b8fa62dd833aa5210484c/{\"from\":{\"col\":3,\"row\":2},\"kind\":\"move\",\"pieceType\":\"pawn\",\"player\":\"gote\",\"promotion\":\"none\",\"to\":{\"col\":3,\"row\":3}}/legacy/1000",
+        "reproducible": true,
+        "status": [
+          "completed",
+          "completed"
+        ],
+        "nodes": [
+          {
+            "normal": 149,
+            "quiescence": 537
+          },
+          {
+            "normal": 149,
+            "quiescence": 537
+          }
+        ],
+        "selectedAction": {
+          "kind": "move",
+          "player": "gote",
+          "from": {
+            "row": 2,
+            "col": 3
+          },
+          "to": {
+            "row": 3,
+            "col": 3
+          },
+          "pieceType": "pawn",
+          "promotion": "none"
+        },
+        "score": 789,
+        "pv": [
+          {
+            "kind": "move",
+            "player": "gote",
+            "from": {
+              "row": 2,
+              "col": 3
+            },
+            "to": {
+              "row": 3,
+              "col": 3
+            },
+            "pieceType": "pawn",
+            "promotion": "none"
+          },
+          {
+            "kind": "move",
+            "player": "sente",
+            "from": {
+              "row": 3,
+              "col": 1
+            },
+            "to": {
+              "row": 2,
+              "col": 2
+            },
+            "pieceType": "pawn",
+            "promotion": "none"
+          }
+        ]
+      },
+      {
+        "id": "76b90464a7633a735fd2aafbae9105c89ef732ff1c214b8830ad73e11e12d363/{\"from\":{\"col\":7,\"row\":4},\"kind\":\"move\",\"pieceType\":\"knight\",\"player\":\"gote\",\"promotion\":\"decline\",\"to\":{\"col\":6,\"row\":6}}/experimental/1000",
+        "reproducible": true,
+        "status": [
+          "completed",
+          "completed"
+        ],
+        "nodes": [
+          {
+            "normal": 42,
+            "quiescence": 243
+          },
+          {
+            "normal": 42,
+            "quiescence": 243
+          }
+        ],
+        "selectedAction": {
+          "kind": "move",
+          "player": "gote",
+          "from": {
+            "row": 4,
+            "col": 7
+          },
+          "to": {
+            "row": 6,
+            "col": 6
+          },
+          "pieceType": "knight",
+          "promotion": "decline"
+        },
+        "score": -600,
+        "pv": [
+          {
+            "kind": "move",
+            "player": "gote",
+            "from": {
+              "row": 4,
+              "col": 7
+            },
+            "to": {
+              "row": 6,
+              "col": 6
+            },
+            "pieceType": "knight",
+            "promotion": "decline"
+          },
+          {
+            "kind": "move",
+            "player": "sente",
+            "from": {
+              "row": 8,
+              "col": 7
+            },
+            "to": {
+              "row": 6,
+              "col": 6
+            },
+            "pieceType": "knight",
+            "promotion": "none"
+          }
+        ]
+      },
+      {
+        "id": "e53a261c1976524fb2e6a4a8924464f16b87e61f97469cd82751b884ac5fc1a5/{\"from\":{\"col\":1,\"row\":4},\"kind\":\"move\",\"pieceType\":\"bishop\",\"player\":\"gote\",\"promotion\":\"promote\",\"to\":{\"col\":5,\"row\":8}}/legacy/1000",
+        "reproducible": true,
+        "status": [
+          "completed",
+          "completed"
+        ],
+        "nodes": [
+          {
+            "normal": 46,
+            "quiescence": 181
+          },
+          {
+            "normal": 46,
+            "quiescence": 181
+          }
+        ],
+        "selectedAction": {
+          "kind": "move",
+          "player": "gote",
+          "from": {
+            "row": 4,
+            "col": 1
+          },
+          "to": {
+            "row": 8,
+            "col": 5
+          },
+          "pieceType": "bishop",
+          "promotion": "promote"
+        },
+        "score": -610,
+        "pv": [
+          {
+            "kind": "move",
+            "player": "gote",
+            "from": {
+              "row": 4,
+              "col": 1
+            },
+            "to": {
+              "row": 8,
+              "col": 5
+            },
+            "pieceType": "bishop",
+            "promotion": "promote"
+          },
+          {
+            "kind": "move",
+            "player": "sente",
+            "from": {
+              "row": 8,
+              "col": 4
+            },
+            "to": {
+              "row": 8,
+              "col": 5
+            },
+            "pieceType": "king",
+            "promotion": "none"
+          }
+        ]
+      },
+      {
+        "id": "e2bab53d57575355cabf42183fc75cc521fe16afaaefa14d84c88ac1957f28c0/{\"from\":{\"col\":2,\"row\":2},\"kind\":\"move\",\"pieceType\":\"pawn\",\"player\":\"sente\",\"promotion\":\"none\",\"to\":{\"col\":3,\"row\":1}}/legacy/1000",
+        "reproducible": true,
+        "status": [
+          "completed",
+          "completed"
+        ],
+        "nodes": [
+          {
+            "normal": 48,
+            "quiescence": 59
+          },
+          {
+            "normal": 48,
+            "quiescence": 59
+          }
+        ],
+        "selectedAction": {
+          "kind": "move",
+          "player": "sente",
+          "from": {
+            "row": 2,
+            "col": 2
+          },
+          "to": {
+            "row": 1,
+            "col": 3
+          },
+          "pieceType": "pawn",
+          "promotion": "none"
+        },
+        "score": -1616,
+        "pv": [
+          {
+            "kind": "move",
+            "player": "sente",
+            "from": {
+              "row": 2,
+              "col": 2
+            },
+            "to": {
+              "row": 1,
+              "col": 3
+            },
+            "pieceType": "pawn",
+            "promotion": "none"
+          },
+          {
+            "kind": "move",
+            "player": "gote",
+            "from": {
+              "row": 0,
+              "col": 2
+            },
+            "to": {
+              "row": 1,
+              "col": 3
+            },
+            "pieceType": "silver",
+            "promotion": "none"
+          }
+        ]
+      },
+      {
+        "id": "d50f694545db2e6846aebe20180a34c306e304b24c57232c99ea98f1c885c00e/{\"kind\":\"drop\",\"pieceId\":\"gote-pawn-1\",\"pieceType\":\"pawn\",\"player\":\"sente\",\"promotion\":\"none\",\"to\":{\"col\":0,\"row\":4}}/experimental/1000",
+        "reproducible": true,
+        "status": [
+          "completed",
+          "completed"
+        ],
+        "nodes": [
+          {
+            "normal": 97,
+            "quiescence": 228
+          },
+          {
+            "normal": 97,
+            "quiescence": 228
+          }
+        ],
+        "selectedAction": {
+          "kind": "drop",
+          "player": "sente",
+          "pieceId": "gote-pawn-1",
+          "pieceType": "pawn",
+          "to": {
+            "row": 4,
+            "col": 0
+          },
+          "promotion": "none"
+        },
+        "score": -909.6666666666666,
+        "pv": [
+          {
+            "kind": "drop",
+            "player": "sente",
+            "pieceId": "gote-pawn-1",
+            "pieceType": "pawn",
+            "to": {
+              "row": 4,
+              "col": 0
+            },
+            "promotion": "none"
+          },
+          {
+            "kind": "move",
+            "player": "gote",
+            "from": {
+              "row": 6,
+              "col": 3
+            },
+            "to": {
+              "row": 7,
+              "col": 4
+            },
+            "pieceType": "bishop",
+            "promotion": "none"
+          }
+        ]
+      },
+      {
+        "id": "43f2404eb27ab9b49dd0482d21348eb0b75b2d9a2e3afe6719b7ada57ffced1b/{\"kind\":\"drop\",\"pieceId\":\"gote-knight-2\",\"pieceType\":\"knight\",\"player\":\"sente\",\"promotion\":\"none\",\"to\":{\"col\":5,\"row\":3}}/legacy/1000",
+        "reproducible": true,
+        "status": [
+          "completed",
+          "completed"
+        ],
+        "nodes": [
+          {
+            "normal": 80,
+            "quiescence": 398
+          },
+          {
+            "normal": 80,
+            "quiescence": 398
+          }
+        ],
+        "selectedAction": {
+          "kind": "drop",
+          "player": "sente",
+          "pieceId": "gote-knight-2",
+          "pieceType": "knight",
+          "to": {
+            "row": 3,
+            "col": 5
+          },
+          "promotion": "none"
+        },
+        "score": 7,
+        "pv": [
+          {
+            "kind": "drop",
+            "player": "sente",
+            "pieceId": "gote-knight-2",
+            "pieceType": "knight",
+            "to": {
+              "row": 3,
+              "col": 5
+            },
+            "promotion": "none"
+          },
+          {
+            "kind": "move",
+            "player": "gote",
+            "from": {
+              "row": 2,
+              "col": 5
+            },
+            "to": {
+              "row": 3,
+              "col": 5
+            },
+            "pieceType": "pawn",
+            "promotion": "none"
+          }
+        ]
+      },
+      {
+        "id": "8a68cfce5de859b30dac207815fee98ea21cddde057ef6a5c49033f4c12bbebd/{\"kind\":\"drop\",\"pieceId\":\"gote-pawn-6\",\"pieceType\":\"pawn\",\"player\":\"sente\",\"promotion\":\"none\",\"to\":{\"col\":4,\"row\":1}}/experimental/1000",
+        "reproducible": true,
+        "status": [
+          "completed",
+          "completed"
+        ],
+        "nodes": [
+          {
+            "normal": 54,
+            "quiescence": 160
+          },
+          {
+            "normal": 54,
+            "quiescence": 160
+          }
+        ],
+        "selectedAction": {
+          "kind": "drop",
+          "player": "sente",
+          "pieceId": "gote-pawn-6",
+          "pieceType": "pawn",
+          "to": {
+            "row": 1,
+            "col": 4
+          },
+          "promotion": "none"
+        },
+        "score": 743,
+        "pv": [
+          {
+            "kind": "drop",
+            "player": "sente",
+            "pieceId": "gote-pawn-6",
+            "pieceType": "pawn",
+            "to": {
+              "row": 1,
+              "col": 4
+            },
+            "promotion": "none"
+          },
+          {
+            "kind": "move",
+            "player": "gote",
+            "from": {
+              "row": 0,
+              "col": 5
+            },
+            "to": {
+              "row": 1,
+              "col": 4
+            },
+            "pieceType": "gold",
+            "promotion": "none"
+          }
+        ]
+      },
+      {
+        "id": "e727daf8c3df03ba509798e01936f473df993db99ba0267c5b115dcaf8128bca/{\"from\":{\"col\":3,\"row\":5},\"kind\":\"move\",\"pieceType\":\"knight\",\"player\":\"gote\",\"promotion\":\"promote\",\"to\":{\"col\":2,\"row\":7}}/experimental/1000",
+        "reproducible": true,
+        "status": [
+          "completed",
+          "completed"
+        ],
+        "nodes": [
+          {
+            "normal": 163,
+            "quiescence": 334
+          },
+          {
+            "normal": 163,
+            "quiescence": 334
+          }
+        ],
+        "selectedAction": {
+          "kind": "move",
+          "player": "gote",
+          "from": {
+            "row": 5,
+            "col": 3
+          },
+          "to": {
+            "row": 7,
+            "col": 2
+          },
+          "pieceType": "knight",
+          "promotion": "promote"
+        },
+        "score": 1129,
+        "pv": [
+          {
+            "kind": "move",
+            "player": "gote",
+            "from": {
+              "row": 5,
+              "col": 3
+            },
+            "to": {
+              "row": 7,
+              "col": 2
+            },
+            "pieceType": "knight",
+            "promotion": "promote"
+          },
+          {
+            "kind": "move",
+            "player": "sente",
+            "from": {
+              "row": 8,
+              "col": 3
+            },
+            "to": {
+              "row": 7,
+              "col": 2
+            },
+            "pieceType": "gold",
+            "promotion": "none"
+          }
+        ]
+      },
+      {
+        "id": "f72ea77f558f6d633e828fcf39e3d02a128c7a622656b470b716c8eb813ebf06/{\"kind\":\"drop\",\"pieceId\":\"sente-pawn-3\",\"pieceType\":\"pawn\",\"player\":\"gote\",\"promotion\":\"none\",\"to\":{\"col\":4,\"row\":2}}/experimental/1000",
+        "reproducible": true,
+        "status": [
+          "completed",
+          "completed"
+        ],
+        "nodes": [
+          {
+            "normal": 10,
+            "quiescence": 20
+          },
+          {
+            "normal": 10,
+            "quiescence": 20
+          }
+        ],
+        "selectedAction": {
+          "kind": "move",
+          "player": "gote",
+          "from": {
+            "row": 1,
+            "col": 4
+          },
+          "to": {
+            "row": 2,
+            "col": 5
+          },
+          "pieceType": "king",
+          "promotion": "none"
+        },
+        "score": -910,
+        "pv": [
+          {
+            "kind": "move",
+            "player": "gote",
+            "from": {
+              "row": 1,
+              "col": 4
+            },
+            "to": {
+              "row": 2,
+              "col": 5
+            },
+            "pieceType": "king",
+            "promotion": "none"
+          },
+          {
+            "kind": "move",
+            "player": "sente",
+            "from": {
+              "row": 0,
+              "col": 8
+            },
+            "to": {
+              "row": 3,
+              "col": 5
+            },
+            "pieceType": "bishop",
+            "promotion": "none"
+          }
+        ]
+      },
+      {
+        "id": "19e7fc1ae18ed62e860e336945d7ac3b4e642e112442ed04a1c6a49bd8f90ee4/{\"from\":{\"col\":4,\"row\":5},\"kind\":\"move\",\"pieceType\":\"pawn\",\"player\":\"gote\",\"promotion\":\"promote\",\"to\":{\"col\":4,\"row\":6}}/legacy/1000",
+        "reproducible": true,
+        "status": [
+          "completed",
+          "completed"
+        ],
+        "nodes": [
+          {
+            "normal": 89,
+            "quiescence": 308
+          },
+          {
+            "normal": 89,
+            "quiescence": 308
+          }
+        ],
+        "selectedAction": {
+          "kind": "move",
+          "player": "gote",
+          "from": {
+            "row": 5,
+            "col": 4
+          },
+          "to": {
+            "row": 6,
+            "col": 4
+          },
+          "pieceType": "pawn",
+          "promotion": "promote"
+        },
+        "score": -1872,
+        "pv": [
+          {
+            "kind": "move",
+            "player": "gote",
+            "from": {
+              "row": 5,
+              "col": 4
+            },
+            "to": {
+              "row": 6,
+              "col": 4
+            },
+            "pieceType": "pawn",
+            "promotion": "promote"
+          },
+          {
+            "kind": "move",
+            "player": "sente",
+            "from": {
+              "row": 4,
+              "col": 0
+            },
+            "to": {
+              "row": 2,
+              "col": 2
+            },
+            "pieceType": "bishop",
+            "promotion": "promote"
+          }
+        ]
+      },
+      {
+        "id": "37859471c3dbb1753af75bf0e4f8ef53070a3207569fd3636e19e38c6b44a9dc/{\"from\":{\"col\":3,\"row\":8},\"kind\":\"move\",\"pieceType\":\"gold\",\"player\":\"sente\",\"promotion\":\"none\",\"to\":{\"col\":2,\"row\":7}}/legacy/1000",
+        "reproducible": true,
+        "status": [
+          "completed",
+          "completed"
+        ],
+        "nodes": [
+          {
+            "normal": 114,
+            "quiescence": 299
+          },
+          {
+            "normal": 114,
+            "quiescence": 299
+          }
+        ],
+        "selectedAction": {
+          "kind": "move",
+          "player": "sente",
+          "from": {
+            "row": 8,
+            "col": 3
+          },
+          "to": {
+            "row": 7,
+            "col": 2
+          },
+          "pieceType": "gold",
+          "promotion": "none"
+        },
+        "score": -2173,
+        "pv": [
+          {
+            "kind": "move",
+            "player": "sente",
+            "from": {
+              "row": 8,
+              "col": 3
+            },
+            "to": {
+              "row": 7,
+              "col": 2
+            },
+            "pieceType": "gold",
+            "promotion": "none"
+          },
+          {
+            "kind": "move",
+            "player": "gote",
+            "from": {
+              "row": 6,
+              "col": 3
+            },
+            "to": {
+              "row": 7,
+              "col": 2
+            },
+            "pieceType": "bishop",
+            "promotion": "none"
+          }
+        ]
+      },
+      {
+        "id": "b18e7cb2dce7930ba48d783ce9b224a329797e606a3e41fbe0570f677178b19a/{\"from\":{\"col\":4,\"row\":5},\"kind\":\"move\",\"pieceType\":\"lance\",\"player\":\"sente\",\"promotion\":\"decline\",\"to\":{\"col\":4,\"row\":2}}/legacy/1000",
+        "reproducible": true,
+        "status": [
+          "completed",
+          "completed"
+        ],
+        "nodes": [
+          {
+            "normal": 43,
+            "quiescence": 176
+          },
+          {
+            "normal": 43,
+            "quiescence": 176
+          }
+        ],
+        "selectedAction": {
+          "kind": "move",
+          "player": "sente",
+          "from": {
+            "row": 5,
+            "col": 4
+          },
+          "to": {
+            "row": 2,
+            "col": 4
+          },
+          "pieceType": "lance",
+          "promotion": "decline"
+        },
+        "score": 401,
+        "pv": [
+          {
+            "kind": "move",
+            "player": "sente",
+            "from": {
+              "row": 5,
+              "col": 4
+            },
+            "to": {
+              "row": 2,
+              "col": 4
+            },
+            "pieceType": "lance",
+            "promotion": "decline"
+          },
+          {
+            "kind": "move",
+            "player": "gote",
+            "from": {
+              "row": 1,
+              "col": 5
+            },
+            "to": {
+              "row": 2,
+              "col": 4
+            },
+            "pieceType": "silver",
+            "promotion": "none"
+          }
+        ]
+      },
+      {
+        "id": "ca7db5fea0059c651988ac4305a93ada33c37960b3a5ff661be68e98311e9fec/{\"kind\":\"drop\",\"pieceId\":\"gote-pawn-6\",\"pieceType\":\"pawn\",\"player\":\"gote\",\"promotion\":\"none\",\"to\":{\"col\":1,\"row\":3}}/legacy/1000",
+        "reproducible": true,
+        "status": [
+          "completed",
+          "completed"
+        ],
+        "nodes": [
+          {
+            "normal": 94,
+            "quiescence": 372
+          },
+          {
+            "normal": 94,
+            "quiescence": 372
+          }
+        ],
+        "selectedAction": {
+          "kind": "drop",
+          "player": "gote",
+          "pieceId": "gote-pawn-6",
+          "pieceType": "pawn",
+          "to": {
+            "row": 3,
+            "col": 1
+          },
+          "promotion": "none"
+        },
+        "score": -2135,
+        "pv": [
+          {
+            "kind": "drop",
+            "player": "gote",
+            "pieceId": "gote-pawn-6",
+            "pieceType": "pawn",
+            "to": {
+              "row": 3,
+              "col": 1
+            },
+            "promotion": "none"
+          },
+          {
+            "kind": "move",
+            "player": "sente",
+            "from": {
+              "row": 3,
+              "col": 3
+            },
+            "to": {
+              "row": 2,
+              "col": 2
+            },
+            "pieceType": "bishop",
+            "promotion": "none"
+          }
+        ]
+      }
+    ],
+    "groups": [
+      {
+        "id": "af1984db62af0f44b80c676627e2a7879d3af226d65288f0f4863ff554f049e3/{\"from\":{\"col\":1,\"row\":6},\"kind\":\"move\",\"pieceType\":\"pawn\",\"player\":\"sente\",\"promotion\":\"none\",\"to\":{\"col\":1,\"row\":5}}/legacy/1000",
+        "journal": "docs/benchmarks/match-journal-20261026/run1/hirate-1.jsonl",
+        "ply": 9,
+        "player": "sente",
+        "mode": "legacy",
+        "conditions": [
+          {
+            "name": "baseline",
+            "reproducible": false,
+            "judgment": {
+              "verdict": "INDETERMINATE",
+              "delta": null,
+              "reason": "Repetition incomplete or inconsistent."
+            },
+            "actual": null,
+            "alternative": null,
+            "pvActual": null,
+            "pvAlternative": null,
+            "nodes": [
+              {
+                "normal": 35,
+                "quiescence": 68
+              },
+              {
+                "normal": 35,
+                "quiescence": 68
+              },
+              {
+                "normal": 38,
+                "quiescence": 131
+              },
+              {
+                "normal": 38,
+                "quiescence": 131
+              }
+            ],
+            "status": [
+              "completed",
+              "completed",
+              "completed",
+              "completed"
+            ],
+            "reason": [
+              null,
+              null,
+              null,
+              null
+            ]
+          },
+          {
+            "name": "q0",
+            "reproducible": true,
+            "judgment": {
+              "verdict": "NOT_CONFIRMED",
+              "delta": -532,
+              "reason": "Finite bounded preference from original mover perspective; no proof of a blunder."
+            },
+            "actual": -178,
+            "alternative": -710,
+            "pvActual": [
+              {
+                "kind": "move",
+                "player": "sente",
+                "from": {
+                  "row": 6,
+                  "col": 1
+                },
+                "to": {
+                  "row": 5,
+                  "col": 1
+                },
+                "pieceType": "pawn",
+                "promotion": "none"
+              },
+              {
+                "kind": "move",
+                "player": "gote",
+                "from": {
+                  "row": 4,
+                  "col": 0
+                },
+                "to": {
+                  "row": 5,
+                  "col": 1
+                },
+                "pieceType": "bishop",
+                "promotion": "none"
+              }
+            ],
+            "pvAlternative": [
+              {
+                "kind": "move",
+                "player": "sente",
+                "from": {
+                  "row": 4,
+                  "col": 5
+                },
+                "to": {
+                  "row": 3,
+                  "col": 4
+                },
+                "pieceType": "bishop",
+                "promotion": "none"
+              },
+              {
+                "kind": "move",
+                "player": "gote",
+                "from": {
+                  "row": 4,
+                  "col": 0
+                },
+                "to": {
+                  "row": 7,
+                  "col": 3
+                },
+                "pieceType": "bishop",
+                "promotion": "promote"
+              }
+            ],
+            "nodes": [
+              {
+                "normal": 35,
+                "quiescence": 34
+              },
+              {
+                "normal": 35,
+                "quiescence": 34
+              },
+              {
+                "normal": 38,
+                "quiescence": 37
+              },
+              {
+                "normal": 38,
+                "quiescence": 37
+              }
+            ],
+            "status": [
+              "completed",
+              "completed",
+              "completed",
+              "completed"
+            ],
+            "reason": [
+              null,
+              null,
+              null,
+              null
+            ]
+          },
+          {
+            "name": "depth1",
+            "reproducible": true,
+            "judgment": {
+              "verdict": "NOT_CONFIRMED",
+              "delta": -532,
+              "reason": "Finite bounded preference from original mover perspective; no proof of a blunder."
+            },
+            "actual": -178,
+            "alternative": -710,
+            "pvActual": [
+              {
+                "kind": "move",
+                "player": "sente",
+                "from": {
+                  "row": 6,
+                  "col": 1
+                },
+                "to": {
+                  "row": 5,
+                  "col": 1
+                },
+                "pieceType": "pawn",
+                "promotion": "none"
+              },
+              {
+                "kind": "move",
+                "player": "gote",
+                "from": {
+                  "row": 4,
+                  "col": 0
+                },
+                "to": {
+                  "row": 5,
+                  "col": 1
+                },
+                "pieceType": "bishop",
+                "promotion": "none"
+              }
+            ],
+            "pvAlternative": [
+              {
+                "kind": "move",
+                "player": "sente",
+                "from": {
+                  "row": 4,
+                  "col": 5
+                },
+                "to": {
+                  "row": 3,
+                  "col": 4
+                },
+                "pieceType": "bishop",
+                "promotion": "none"
+              },
+              {
+                "kind": "move",
+                "player": "gote",
+                "from": {
+                  "row": 4,
+                  "col": 0
+                },
+                "to": {
+                  "row": 7,
+                  "col": 3
+                },
+                "pieceType": "bishop",
+                "promotion": "promote"
+              }
+            ],
+            "nodes": [
+              {
+                "normal": 1,
+                "quiescence": 2
+              },
+              {
+                "normal": 1,
+                "quiescence": 2
+              },
+              {
+                "normal": 1,
+                "quiescence": 3
+              },
+              {
+                "normal": 1,
+                "quiescence": 3
+              }
+            ],
+            "status": [
+              "completed",
+              "completed",
+              "completed",
+              "completed"
+            ],
+            "reason": [
+              null,
+              null,
+              null,
+              null
+            ]
+          },
+          {
+            "name": "see-order",
+            "reproducible": true,
+            "judgment": {
+              "verdict": "SUSPECTED",
+              "delta": 520,
+              "reason": "Finite bounded preference from original mover perspective; no proof of a blunder."
+            },
+            "actual": 23,
+            "alternative": 543,
+            "pvActual": [
+              {
+                "kind": "move",
+                "player": "sente",
+                "from": {
+                  "row": 6,
+                  "col": 1
+                },
+                "to": {
+                  "row": 5,
+                  "col": 1
+                },
+                "pieceType": "pawn",
+                "promotion": "none"
+              },
+              {
+                "kind": "move",
+                "player": "gote",
+                "from": {
+                  "row": 4,
+                  "col": 0
+                },
+                "to": {
+                  "row": 5,
+                  "col": 1
+                },
+                "pieceType": "bishop",
+                "promotion": "none"
+              },
+              {
+                "kind": "move",
+                "player": "sente",
+                "from": {
+                  "row": 4,
+                  "col": 5
+                },
+                "to": {
+                  "row": 3,
+                  "col": 4
+                },
+                "pieceType": "bishop",
+                "promotion": "none"
+              }
+            ],
+            "pvAlternative": [
+              {
+                "kind": "move",
+                "player": "sente",
+                "from": {
+                  "row": 4,
+                  "col": 5
+                },
+                "to": {
+                  "row": 3,
+                  "col": 4
+                },
+                "pieceType": "bishop",
+                "promotion": "none"
+              },
+              {
+                "kind": "move",
+                "player": "gote",
+                "from": {
+                  "row": 0,
+                  "col": 3
+                },
+                "to": {
+                  "row": 1,
+                  "col": 4
+                },
+                "pieceType": "gold",
+                "promotion": "none"
+              },
+              {
+                "kind": "move",
+                "player": "sente",
+                "from": {
+                  "row": 3,
+                  "col": 4
+                },
+                "to": {
+                  "row": 2,
+                  "col": 5
+                },
+                "pieceType": "bishop",
+                "promotion": "promote"
+              }
+            ],
+            "nodes": [
+              {
+                "normal": 35,
+                "quiescence": 68
+              },
+              {
+                "normal": 35,
+                "quiescence": 68
+              },
+              {
+                "normal": 38,
+                "quiescence": 132
+              },
+              {
+                "normal": 38,
+                "quiescence": 132
+              }
+            ],
+            "status": [
+              "completed",
+              "completed",
+              "completed",
+              "completed"
+            ],
+            "reason": [
+              null,
+              null,
+              null,
+              null
+            ]
+          }
+        ],
+        "factors": [
+          {
+            "condition": "q0",
+            "changedFields": [
+              "options.quiescence.maxTacticalDepth"
+            ],
+            "fixed": [
+              "position",
+              "candidate actions",
+              "perspective",
+              "mode",
+              "node/time caps",
+              "other settings"
+            ],
+            "status": "EXPERIMENT_INVALID",
+            "deltaChange": null,
+            "interpretation": "Effect within bounded search; cause of historical move UNKNOWN."
+          },
+          {
+            "condition": "depth1",
+            "changedFields": [
+              "depth"
+            ],
+            "fixed": [
+              "position",
+              "candidate actions",
+              "perspective",
+              "mode",
+              "node/time caps",
+              "other settings"
+            ],
+            "status": "EXPERIMENT_INVALID",
+            "deltaChange": null,
+            "interpretation": "Effect within bounded search; cause of historical move UNKNOWN."
+          },
+          {
+            "condition": "see-order",
+            "changedFields": [
+              "options.moveOrdering"
+            ],
+            "fixed": [
+              "position",
+              "candidate actions",
+              "perspective",
+              "mode",
+              "node/time caps",
+              "other settings"
+            ],
+            "status": "EXPERIMENT_INVALID",
+            "deltaChange": null,
+            "interpretation": "Existing ordering policy, not isolated SEE arithmetic; original standard ordering does not use SEE."
+          }
+        ],
+        "legalReplies": {
+          "actual": 34,
+          "alternative": 37
+        },
+        "legalCaptures": {
+          "actual": 1,
+          "alternative": 0
+        },
+        "exchangeScope": "First legal same-square capture at each step, at most 4 captures. All immediate captures and legal recaptures listed separately; no minimax exchange or compensation proof.",
+        "verdict": "INDETERMINATE",
+        "reason": "Direction may depend on depth/quiescence. Bounded evidence does not establish historical move error or component causality."
+      },
+      {
+        "id": "76b90464a7633a735fd2aafbae9105c89ef732ff1c214b8830ad73e11e12d363/{\"from\":{\"col\":7,\"row\":4},\"kind\":\"move\",\"pieceType\":\"knight\",\"player\":\"gote\",\"promotion\":\"decline\",\"to\":{\"col\":6,\"row\":6}}/experimental/1000",
+        "journal": "docs/benchmarks/match-journal-20261026/run1/hirate-1.jsonl",
+        "ply": 20,
+        "player": "gote",
+        "mode": "experimental",
+        "conditions": [
+          {
+            "name": "baseline",
+            "reproducible": true,
+            "judgment": {
+              "verdict": "SUSPECTED",
+              "delta": 378.66666666666663,
+              "reason": "Finite bounded preference from original mover perspective; no proof of a blunder."
+            },
+            "actual": 102,
+            "alternative": 480.66666666666663,
+            "pvActual": [
+              {
+                "kind": "move",
+                "player": "gote",
+                "from": {
+                  "row": 4,
+                  "col": 7
+                },
+                "to": {
+                  "row": 6,
+                  "col": 6
+                },
+                "pieceType": "knight",
+                "promotion": "decline"
+              },
+              {
+                "kind": "move",
+                "player": "sente",
+                "from": {
+                  "row": 8,
+                  "col": 7
+                },
+                "to": {
+                  "row": 6,
+                  "col": 6
+                },
+                "pieceType": "knight",
+                "promotion": "none"
+              },
+              {
+                "kind": "move",
+                "player": "gote",
+                "from": {
+                  "row": 5,
+                  "col": 1
+                },
+                "to": {
+                  "row": 6,
+                  "col": 2
+                },
+                "pieceType": "bishop",
+                "promotion": "promote"
+              }
+            ],
+            "pvAlternative": [
+              {
+                "kind": "move",
+                "player": "gote",
+                "from": {
+                  "row": 1,
+                  "col": 4
+                },
+                "to": {
+                  "row": 2,
+                  "col": 4
+                },
+                "pieceType": "king",
+                "promotion": "none"
+              },
+              {
+                "kind": "move",
+                "player": "sente",
+                "from": {
+                  "row": 3,
+                  "col": 4
+                },
+                "to": {
+                  "row": 4,
+                  "col": 5
+                },
+                "pieceType": "bishop",
+                "promotion": "none"
+              },
+              {
+                "kind": "move",
+                "player": "gote",
+                "from": {
+                  "row": 5,
+                  "col": 1
+                },
+                "to": {
+                  "row": 6,
+                  "col": 2
+                },
+                "pieceType": "bishop",
+                "promotion": "promote"
+              }
+            ],
+            "nodes": [
+              {
+                "normal": 44,
+                "quiescence": 100
+              },
+              {
+                "normal": 44,
+                "quiescence": 100
+              },
+              {
+                "normal": 39,
+                "quiescence": 123
+              },
+              {
+                "normal": 39,
+                "quiescence": 123
+              }
+            ],
+            "status": [
+              "completed",
+              "completed",
+              "completed",
+              "completed"
+            ],
+            "reason": [
+              null,
+              null,
+              null,
+              null
+            ]
+          },
+          {
+            "name": "q0",
+            "reproducible": true,
+            "judgment": {
+              "verdict": "NOT_CONFIRMED",
+              "delta": -120,
+              "reason": "Finite bounded preference from original mover perspective; no proof of a blunder."
+            },
+            "actual": -600,
+            "alternative": -720,
+            "pvActual": [
+              {
+                "kind": "move",
+                "player": "gote",
+                "from": {
+                  "row": 4,
+                  "col": 7
+                },
+                "to": {
+                  "row": 6,
+                  "col": 6
+                },
+                "pieceType": "knight",
+                "promotion": "decline"
+              },
+              {
+                "kind": "move",
+                "player": "sente",
+                "from": {
+                  "row": 8,
+                  "col": 7
+                },
+                "to": {
+                  "row": 6,
+                  "col": 6
+                },
+                "pieceType": "knight",
+                "promotion": "none"
+              }
+            ],
+            "pvAlternative": [
+              {
+                "kind": "move",
+                "player": "gote",
+                "from": {
+                  "row": 1,
+                  "col": 4
+                },
+                "to": {
+                  "row": 2,
+                  "col": 4
+                },
+                "pieceType": "king",
+                "promotion": "none"
+              },
+              {
+                "kind": "move",
+                "player": "sente",
+                "from": {
+                  "row": 5,
+                  "col": 7
+                },
+                "to": {
+                  "row": 4,
+                  "col": 7
+                },
+                "pieceType": "pawn",
+                "promotion": "none"
+              }
+            ],
+            "nodes": [
+              {
+                "normal": 44,
+                "quiescence": 43
+              },
+              {
+                "normal": 44,
+                "quiescence": 43
+              },
+              {
+                "normal": 39,
+                "quiescence": 38
+              },
+              {
+                "normal": 39,
+                "quiescence": 38
+              }
+            ],
+            "status": [
+              "completed",
+              "completed",
+              "completed",
+              "completed"
+            ],
+            "reason": [
+              null,
+              null,
+              null,
+              null
+            ]
+          },
+          {
+            "name": "depth1",
+            "reproducible": true,
+            "judgment": {
+              "verdict": "NOT_CONFIRMED",
+              "delta": -120,
+              "reason": "Finite bounded preference from original mover perspective; no proof of a blunder."
+            },
+            "actual": -600,
+            "alternative": -720,
+            "pvActual": [
+              {
+                "kind": "move",
+                "player": "gote",
+                "from": {
+                  "row": 4,
+                  "col": 7
+                },
+                "to": {
+                  "row": 6,
+                  "col": 6
+                },
+                "pieceType": "knight",
+                "promotion": "decline"
+              },
+              {
+                "kind": "move",
+                "player": "sente",
+                "from": {
+                  "row": 8,
+                  "col": 7
+                },
+                "to": {
+                  "row": 6,
+                  "col": 6
+                },
+                "pieceType": "knight",
+                "promotion": "none"
+              }
+            ],
+            "pvAlternative": [
+              {
+                "kind": "move",
+                "player": "gote",
+                "from": {
+                  "row": 1,
+                  "col": 4
+                },
+                "to": {
+                  "row": 2,
+                  "col": 4
+                },
+                "pieceType": "king",
+                "promotion": "none"
+              },
+              {
+                "kind": "move",
+                "player": "sente",
+                "from": {
+                  "row": 5,
+                  "col": 7
+                },
+                "to": {
+                  "row": 4,
+                  "col": 7
+                },
+                "pieceType": "pawn",
+                "promotion": "none"
+              }
+            ],
+            "nodes": [
+              {
+                "normal": 1,
+                "quiescence": 6
+              },
+              {
+                "normal": 1,
+                "quiescence": 6
+              },
+              {
+                "normal": 1,
+                "quiescence": 6
+              },
+              {
+                "normal": 1,
+                "quiescence": 6
+              }
+            ],
+            "status": [
+              "completed",
+              "completed",
+              "completed",
+              "completed"
+            ],
+            "reason": [
+              null,
+              null,
+              null,
+              null
+            ]
+          },
+          {
+            "name": "see-order",
+            "reproducible": true,
+            "judgment": {
+              "verdict": "SUSPECTED",
+              "delta": 378.66666666666663,
+              "reason": "Finite bounded preference from original mover perspective; no proof of a blunder."
+            },
+            "actual": 102,
+            "alternative": 480.66666666666663,
+            "pvActual": [
+              {
+                "kind": "move",
+                "player": "gote",
+                "from": {
+                  "row": 4,
+                  "col": 7
+                },
+                "to": {
+                  "row": 6,
+                  "col": 6
+                },
+                "pieceType": "knight",
+                "promotion": "decline"
+              },
+              {
+                "kind": "move",
+                "player": "sente",
+                "from": {
+                  "row": 8,
+                  "col": 7
+                },
+                "to": {
+                  "row": 6,
+                  "col": 6
+                },
+                "pieceType": "knight",
+                "promotion": "none"
+              },
+              {
+                "kind": "move",
+                "player": "gote",
+                "from": {
+                  "row": 5,
+                  "col": 1
+                },
+                "to": {
+                  "row": 6,
+                  "col": 2
+                },
+                "pieceType": "bishop",
+                "promotion": "promote"
+              }
+            ],
+            "pvAlternative": [
+              {
+                "kind": "move",
+                "player": "gote",
+                "from": {
+                  "row": 1,
+                  "col": 4
+                },
+                "to": {
+                  "row": 2,
+                  "col": 4
+                },
+                "pieceType": "king",
+                "promotion": "none"
+              },
+              {
+                "kind": "move",
+                "player": "sente",
+                "from": {
+                  "row": 3,
+                  "col": 4
+                },
+                "to": {
+                  "row": 4,
+                  "col": 5
+                },
+                "pieceType": "bishop",
+                "promotion": "none"
+              },
+              {
+                "kind": "move",
+                "player": "gote",
+                "from": {
+                  "row": 5,
+                  "col": 1
+                },
+                "to": {
+                  "row": 6,
+                  "col": 2
+                },
+                "pieceType": "bishop",
+                "promotion": "promote"
+              }
+            ],
+            "nodes": [
+              {
+                "normal": 44,
+                "quiescence": 100
+              },
+              {
+                "normal": 44,
+                "quiescence": 100
+              },
+              {
+                "normal": 39,
+                "quiescence": 122
+              },
+              {
+                "normal": 39,
+                "quiescence": 122
+              }
+            ],
+            "status": [
+              "completed",
+              "completed",
+              "completed",
+              "completed"
+            ],
+            "reason": [
+              null,
+              null,
+              null,
+              null
+            ]
+          }
+        ],
+        "factors": [
+          {
+            "condition": "q0",
+            "changedFields": [
+              "options.quiescence.maxTacticalDepth"
+            ],
+            "fixed": [
+              "position",
+              "candidate actions",
+              "perspective",
+              "mode",
+              "node/time caps",
+              "other settings"
+            ],
+            "status": "OBSERVED_EFFECT",
+            "deltaChange": -498.66666666666663,
+            "interpretation": "Effect within bounded search; cause of historical move UNKNOWN."
+          },
+          {
+            "condition": "depth1",
+            "changedFields": [
+              "depth"
+            ],
+            "fixed": [
+              "position",
+              "candidate actions",
+              "perspective",
+              "mode",
+              "node/time caps",
+              "other settings"
+            ],
+            "status": "OBSERVED_EFFECT",
+            "deltaChange": -498.66666666666663,
+            "interpretation": "Effect within bounded search; cause of historical move UNKNOWN."
+          },
+          {
+            "condition": "see-order",
+            "changedFields": [
+              "options.moveOrdering"
+            ],
+            "fixed": [
+              "position",
+              "candidate actions",
+              "perspective",
+              "mode",
+              "node/time caps",
+              "other settings"
+            ],
+            "status": "NO_OBSERVED_VALUE_OR_PV_CHANGE",
+            "deltaChange": 0,
+            "interpretation": "Existing ordering policy, not isolated SEE arithmetic; original standard ordering does not use SEE."
+          }
+        ],
+        "legalReplies": {
+          "actual": 43,
+          "alternative": 38
+        },
+        "legalCaptures": {
+          "actual": 1,
+          "alternative": 0
+        },
+        "exchangeScope": "First legal same-square capture at each step, at most 4 captures. All immediate captures and legal recaptures listed separately; no minimax exchange or compensation proof.",
+        "verdict": "INDETERMINATE",
+        "reason": "Direction may depend on depth/quiescence. Bounded evidence does not establish historical move error or component causality."
+      },
+      {
+        "id": "e53a261c1976524fb2e6a4a8924464f16b87e61f97469cd82751b884ac5fc1a5/{\"from\":{\"col\":1,\"row\":4},\"kind\":\"move\",\"pieceType\":\"bishop\",\"player\":\"gote\",\"promotion\":\"promote\",\"to\":{\"col\":5,\"row\":8}}/legacy/1000",
+        "journal": "docs/benchmarks/match-journal-20261026/run1/hirate-2.jsonl",
+        "ply": 36,
+        "player": "gote",
+        "mode": "legacy",
+        "conditions": [
+          {
+            "name": "baseline",
+            "reproducible": true,
+            "judgment": {
+              "verdict": "SUSPECTED",
+              "delta": 1309,
+              "reason": "Finite bounded preference from original mover perspective; no proof of a blunder."
+            },
+            "actual": -610,
+            "alternative": 699,
+            "pvActual": [
+              {
+                "kind": "move",
+                "player": "gote",
+                "from": {
+                  "row": 4,
+                  "col": 1
+                },
+                "to": {
+                  "row": 8,
+                  "col": 5
+                },
+                "pieceType": "bishop",
+                "promotion": "promote"
+              },
+              {
+                "kind": "move",
+                "player": "sente",
+                "from": {
+                  "row": 8,
+                  "col": 4
+                },
+                "to": {
+                  "row": 8,
+                  "col": 5
+                },
+                "pieceType": "king",
+                "promotion": "none"
+              }
+            ],
+            "pvAlternative": [
+              {
+                "kind": "move",
+                "player": "gote",
+                "from": {
+                  "row": 1,
+                  "col": 5
+                },
+                "to": {
+                  "row": 1,
+                  "col": 4
+                },
+                "pieceType": "rook",
+                "promotion": "none"
+              },
+              {
+                "kind": "move",
+                "player": "sente",
+                "from": {
+                  "row": 2,
+                  "col": 4
+                },
+                "to": {
+                  "row": 3,
+                  "col": 5
+                },
+                "pieceType": "bishop",
+                "promotion": "promote"
+              },
+              {
+                "kind": "move",
+                "player": "gote",
+                "from": {
+                  "row": 4,
+                  "col": 1
+                },
+                "to": {
+                  "row": 8,
+                  "col": 5
+                },
+                "pieceType": "bishop",
+                "promotion": "promote"
+              }
+            ],
+            "nodes": [
+              {
+                "normal": 3,
+                "quiescence": 2
+              },
+              {
+                "normal": 3,
+                "quiescence": 2
+              },
+              {
+                "normal": 42,
+                "quiescence": 100
+              },
+              {
+                "normal": 42,
+                "quiescence": 100
+              }
+            ],
+            "status": [
+              "completed",
+              "completed",
+              "completed",
+              "completed"
+            ],
+            "reason": [
+              null,
+              null,
+              null,
+              null
+            ]
+          },
+          {
+            "name": "q0",
+            "reproducible": true,
+            "judgment": {
+              "verdict": "NOT_CONFIRMED",
+              "delta": -318,
+              "reason": "Finite bounded preference from original mover perspective; no proof of a blunder."
+            },
+            "actual": -610,
+            "alternative": -928,
+            "pvActual": [
+              {
+                "kind": "move",
+                "player": "gote",
+                "from": {
+                  "row": 4,
+                  "col": 1
+                },
+                "to": {
+                  "row": 8,
+                  "col": 5
+                },
+                "pieceType": "bishop",
+                "promotion": "promote"
+              },
+              {
+                "kind": "move",
+                "player": "sente",
+                "from": {
+                  "row": 8,
+                  "col": 4
+                },
+                "to": {
+                  "row": 8,
+                  "col": 5
+                },
+                "pieceType": "king",
+                "promotion": "none"
+              }
+            ],
+            "pvAlternative": [
+              {
+                "kind": "move",
+                "player": "gote",
+                "from": {
+                  "row": 1,
+                  "col": 5
+                },
+                "to": {
+                  "row": 1,
+                  "col": 4
+                },
+                "pieceType": "rook",
+                "promotion": "none"
+              },
+              {
+                "kind": "move",
+                "player": "sente",
+                "from": {
+                  "row": 2,
+                  "col": 4
+                },
+                "to": {
+                  "row": 0,
+                  "col": 2
+                },
+                "pieceType": "bishop",
+                "promotion": "promote"
+              }
+            ],
+            "nodes": [
+              {
+                "normal": 3,
+                "quiescence": 2
+              },
+              {
+                "normal": 3,
+                "quiescence": 2
+              },
+              {
+                "normal": 42,
+                "quiescence": 41
+              },
+              {
+                "normal": 42,
+                "quiescence": 41
+              }
+            ],
+            "status": [
+              "completed",
+              "completed",
+              "completed",
+              "completed"
+            ],
+            "reason": [
+              null,
+              null,
+              null,
+              null
+            ]
+          },
+          {
+            "name": "depth1",
+            "reproducible": true,
+            "judgment": {
+              "verdict": "NOT_CONFIRMED",
+              "delta": -318,
+              "reason": "Finite bounded preference from original mover perspective; no proof of a blunder."
+            },
+            "actual": -610,
+            "alternative": -928,
+            "pvActual": [
+              {
+                "kind": "move",
+                "player": "gote",
+                "from": {
+                  "row": 4,
+                  "col": 1
+                },
+                "to": {
+                  "row": 8,
+                  "col": 5
+                },
+                "pieceType": "bishop",
+                "promotion": "promote"
+              },
+              {
+                "kind": "move",
+                "player": "sente",
+                "from": {
+                  "row": 8,
+                  "col": 4
+                },
+                "to": {
+                  "row": 8,
+                  "col": 5
+                },
+                "pieceType": "king",
+                "promotion": "none"
+              }
+            ],
+            "pvAlternative": [
+              {
+                "kind": "move",
+                "player": "gote",
+                "from": {
+                  "row": 1,
+                  "col": 5
+                },
+                "to": {
+                  "row": 1,
+                  "col": 4
+                },
+                "pieceType": "rook",
+                "promotion": "none"
+              },
+              {
+                "kind": "move",
+                "player": "sente",
+                "from": {
+                  "row": 2,
+                  "col": 4
+                },
+                "to": {
+                  "row": 0,
+                  "col": 2
+                },
+                "pieceType": "bishop",
+                "promotion": "promote"
+              }
+            ],
+            "nodes": [
+              {
+                "normal": 1,
+                "quiescence": 3
+              },
+              {
+                "normal": 1,
+                "quiescence": 3
+              },
+              {
+                "normal": 1,
+                "quiescence": 7
+              },
+              {
+                "normal": 1,
+                "quiescence": 7
+              }
+            ],
+            "status": [
+              "completed",
+              "completed",
+              "completed",
+              "completed"
+            ],
+            "reason": [
+              null,
+              null,
+              null,
+              null
+            ]
+          },
+          {
+            "name": "see-order",
+            "reproducible": true,
+            "judgment": {
+              "verdict": "SUSPECTED",
+              "delta": 1309,
+              "reason": "Finite bounded preference from original mover perspective; no proof of a blunder."
+            },
+            "actual": -610,
+            "alternative": 699,
+            "pvActual": [
+              {
+                "kind": "move",
+                "player": "gote",
+                "from": {
+                  "row": 4,
+                  "col": 1
+                },
+                "to": {
+                  "row": 8,
+                  "col": 5
+                },
+                "pieceType": "bishop",
+                "promotion": "promote"
+              },
+              {
+                "kind": "move",
+                "player": "sente",
+                "from": {
+                  "row": 8,
+                  "col": 4
+                },
+                "to": {
+                  "row": 8,
+                  "col": 5
+                },
+                "pieceType": "king",
+                "promotion": "none"
+              }
+            ],
+            "pvAlternative": [
+              {
+                "kind": "move",
+                "player": "gote",
+                "from": {
+                  "row": 1,
+                  "col": 5
+                },
+                "to": {
+                  "row": 1,
+                  "col": 4
+                },
+                "pieceType": "rook",
+                "promotion": "none"
+              },
+              {
+                "kind": "move",
+                "player": "sente",
+                "from": {
+                  "row": 2,
+                  "col": 4
+                },
+                "to": {
+                  "row": 3,
+                  "col": 5
+                },
+                "pieceType": "bishop",
+                "promotion": "promote"
+              },
+              {
+                "kind": "move",
+                "player": "gote",
+                "from": {
+                  "row": 4,
+                  "col": 1
+                },
+                "to": {
+                  "row": 8,
+                  "col": 5
+                },
+                "pieceType": "bishop",
+                "promotion": "promote"
+              }
+            ],
+            "nodes": [
+              {
+                "normal": 3,
+                "quiescence": 2
+              },
+              {
+                "normal": 3,
+                "quiescence": 2
+              },
+              {
+                "normal": 42,
+                "quiescence": 96
+              },
+              {
+                "normal": 42,
+                "quiescence": 96
+              }
+            ],
+            "status": [
+              "completed",
+              "completed",
+              "completed",
+              "completed"
+            ],
+            "reason": [
+              null,
+              null,
+              null,
+              null
+            ]
+          }
+        ],
+        "factors": [
+          {
+            "condition": "q0",
+            "changedFields": [
+              "options.quiescence.maxTacticalDepth"
+            ],
+            "fixed": [
+              "position",
+              "candidate actions",
+              "perspective",
+              "mode",
+              "node/time caps",
+              "other settings"
+            ],
+            "status": "OBSERVED_EFFECT",
+            "deltaChange": -1627,
+            "interpretation": "Effect within bounded search; cause of historical move UNKNOWN."
+          },
+          {
+            "condition": "depth1",
+            "changedFields": [
+              "depth"
+            ],
+            "fixed": [
+              "position",
+              "candidate actions",
+              "perspective",
+              "mode",
+              "node/time caps",
+              "other settings"
+            ],
+            "status": "OBSERVED_EFFECT",
+            "deltaChange": -1627,
+            "interpretation": "Effect within bounded search; cause of historical move UNKNOWN."
+          },
+          {
+            "condition": "see-order",
+            "changedFields": [
+              "options.moveOrdering"
+            ],
+            "fixed": [
+              "position",
+              "candidate actions",
+              "perspective",
+              "mode",
+              "node/time caps",
+              "other settings"
+            ],
+            "status": "NO_OBSERVED_VALUE_OR_PV_CHANGE",
+            "deltaChange": 0,
+            "interpretation": "Existing ordering policy, not isolated SEE arithmetic; original standard ordering does not use SEE."
+          }
+        ],
+        "legalReplies": {
+          "actual": 2,
+          "alternative": 41
+        },
+        "legalCaptures": {
+          "actual": 2,
+          "alternative": 0
+        },
+        "exchangeScope": "First legal same-square capture at each step, at most 4 captures. All immediate captures and legal recaptures listed separately; no minimax exchange or compensation proof.",
+        "verdict": "INDETERMINATE",
+        "reason": "Direction may depend on depth/quiescence. Bounded evidence does not establish historical move error or component causality."
+      },
+      {
+        "id": "b18e7cb2dce7930ba48d783ce9b224a329797e606a3e41fbe0570f677178b19a/{\"from\":{\"col\":4,\"row\":5},\"kind\":\"move\",\"pieceType\":\"lance\",\"player\":\"sente\",\"promotion\":\"decline\",\"to\":{\"col\":4,\"row\":2}}/legacy/1000",
+        "journal": "docs/benchmarks/match-journal-20261026/run1/hirate-1.jsonl",
+        "ply": 31,
+        "player": "sente",
+        "mode": "legacy",
+        "conditions": [
+          {
+            "name": "baseline",
+            "reproducible": true,
+            "judgment": {
+              "verdict": "SUSPECTED",
+              "delta": 721,
+              "reason": "Finite bounded preference from original mover perspective; no proof of a blunder."
+            },
+            "actual": 516,
+            "alternative": 1237,
+            "pvActual": [
+              {
+                "kind": "move",
+                "player": "sente",
+                "from": {
+                  "row": 5,
+                  "col": 4
+                },
+                "to": {
+                  "row": 2,
+                  "col": 4
+                },
+                "pieceType": "lance",
+                "promotion": "decline"
+              },
+              {
+                "kind": "move",
+                "player": "gote",
+                "from": {
+                  "row": 5,
+                  "col": 1
+                },
+                "to": {
+                  "row": 2,
+                  "col": 4
+                },
+                "pieceType": "bishop",
+                "promotion": "none"
+              },
+              {
+                "kind": "move",
+                "player": "sente",
+                "from": {
+                  "row": 0,
+                  "col": 8
+                },
+                "to": {
+                  "row": 3,
+                  "col": 5
+                },
+                "pieceType": "bishop",
+                "promotion": "none"
+              }
+            ],
+            "pvAlternative": [
+              {
+                "kind": "move",
+                "player": "sente",
+                "from": {
+                  "row": 0,
+                  "col": 8
+                },
+                "to": {
+                  "row": 3,
+                  "col": 5
+                },
+                "pieceType": "bishop",
+                "promotion": "none"
+              },
+              {
+                "kind": "move",
+                "player": "gote",
+                "from": {
+                  "row": 2,
+                  "col": 4
+                },
+                "to": {
+                  "row": 3,
+                  "col": 4
+                },
+                "pieceType": "pawn",
+                "promotion": "none"
+              },
+              {
+                "kind": "move",
+                "player": "sente",
+                "from": {
+                  "row": 3,
+                  "col": 5
+                },
+                "to": {
+                  "row": 3,
+                  "col": 6
+                },
+                "pieceType": "bishop",
+                "promotion": "none"
+              }
+            ],
+            "nodes": [
+              {
+                "normal": 6,
+                "quiescence": 8
+              },
+              {
+                "normal": 6,
+                "quiescence": 8
+              },
+              {
+                "normal": 65,
+                "quiescence": 217
+              },
+              {
+                "normal": 65,
+                "quiescence": 217
+              }
+            ],
+            "status": [
+              "completed",
+              "completed",
+              "completed",
+              "completed"
+            ],
+            "reason": [
+              null,
+              null,
+              null,
+              null
+            ]
+          },
+          {
+            "name": "q0",
+            "reproducible": true,
+            "judgment": {
+              "verdict": "NOT_CONFIRMED",
+              "delta": -196,
+              "reason": "Finite bounded preference from original mover perspective; no proof of a blunder."
+            },
+            "actual": 401,
+            "alternative": 205,
+            "pvActual": [
+              {
+                "kind": "move",
+                "player": "sente",
+                "from": {
+                  "row": 5,
+                  "col": 4
+                },
+                "to": {
+                  "row": 2,
+                  "col": 4
+                },
+                "pieceType": "lance",
+                "promotion": "decline"
+              },
+              {
+                "kind": "move",
+                "player": "gote",
+                "from": {
+                  "row": 1,
+                  "col": 5
+                },
+                "to": {
+                  "row": 2,
+                  "col": 4
+                },
+                "pieceType": "silver",
+                "promotion": "none"
+              }
+            ],
+            "pvAlternative": [
+              {
+                "kind": "move",
+                "player": "sente",
+                "from": {
+                  "row": 0,
+                  "col": 8
+                },
+                "to": {
+                  "row": 3,
+                  "col": 5
+                },
+                "pieceType": "bishop",
+                "promotion": "none"
+              },
+              {
+                "kind": "move",
+                "player": "gote",
+                "from": {
+                  "row": 5,
+                  "col": 1
+                },
+                "to": {
+                  "row": 6,
+                  "col": 2
+                },
+                "pieceType": "bishop",
+                "promotion": "promote"
+              }
+            ],
+            "nodes": [
+              {
+                "normal": 6,
+                "quiescence": 5
+              },
+              {
+                "normal": 6,
+                "quiescence": 5
+              },
+              {
+                "normal": 65,
+                "quiescence": 64
+              },
+              {
+                "normal": 65,
+                "quiescence": 64
+              }
+            ],
+            "status": [
+              "completed",
+              "completed",
+              "completed",
+              "completed"
+            ],
+            "reason": [
+              null,
+              null,
+              null,
+              null
+            ]
+          },
+          {
+            "name": "depth1",
+            "reproducible": true,
+            "judgment": {
+              "verdict": "NOT_CONFIRMED",
+              "delta": -196,
+              "reason": "Finite bounded preference from original mover perspective; no proof of a blunder."
+            },
+            "actual": 401,
+            "alternative": 205,
+            "pvActual": [
+              {
+                "kind": "move",
+                "player": "sente",
+                "from": {
+                  "row": 5,
+                  "col": 4
+                },
+                "to": {
+                  "row": 2,
+                  "col": 4
+                },
+                "pieceType": "lance",
+                "promotion": "decline"
+              },
+              {
+                "kind": "move",
+                "player": "gote",
+                "from": {
+                  "row": 1,
+                  "col": 5
+                },
+                "to": {
+                  "row": 2,
+                  "col": 4
+                },
+                "pieceType": "silver",
+                "promotion": "none"
+              }
+            ],
+            "pvAlternative": [
+              {
+                "kind": "move",
+                "player": "sente",
+                "from": {
+                  "row": 0,
+                  "col": 8
+                },
+                "to": {
+                  "row": 3,
+                  "col": 5
+                },
+                "pieceType": "bishop",
+                "promotion": "none"
+              },
+              {
+                "kind": "move",
+                "player": "gote",
+                "from": {
+                  "row": 5,
+                  "col": 1
+                },
+                "to": {
+                  "row": 6,
+                  "col": 2
+                },
+                "pieceType": "bishop",
+                "promotion": "promote"
+              }
+            ],
+            "nodes": [
+              {
+                "normal": 1,
+                "quiescence": 6
+              },
+              {
+                "normal": 1,
+                "quiescence": 6
+              },
+              {
+                "normal": 1,
+                "quiescence": 5
+              },
+              {
+                "normal": 1,
+                "quiescence": 5
+              }
+            ],
+            "status": [
+              "completed",
+              "completed",
+              "completed",
+              "completed"
+            ],
+            "reason": [
+              null,
+              null,
+              null,
+              null
+            ]
+          },
+          {
+            "name": "see-order",
+            "reproducible": true,
+            "judgment": {
+              "verdict": "SUSPECTED",
+              "delta": 721,
+              "reason": "Finite bounded preference from original mover perspective; no proof of a blunder."
+            },
+            "actual": 516,
+            "alternative": 1237,
+            "pvActual": [
+              {
+                "kind": "move",
+                "player": "sente",
+                "from": {
+                  "row": 5,
+                  "col": 4
+                },
+                "to": {
+                  "row": 2,
+                  "col": 4
+                },
+                "pieceType": "lance",
+                "promotion": "decline"
+              },
+              {
+                "kind": "move",
+                "player": "gote",
+                "from": {
+                  "row": 5,
+                  "col": 1
+                },
+                "to": {
+                  "row": 2,
+                  "col": 4
+                },
+                "pieceType": "bishop",
+                "promotion": "none"
+              },
+              {
+                "kind": "move",
+                "player": "sente",
+                "from": {
+                  "row": 0,
+                  "col": 8
+                },
+                "to": {
+                  "row": 3,
+                  "col": 5
+                },
+                "pieceType": "bishop",
+                "promotion": "none"
+              }
+            ],
+            "pvAlternative": [
+              {
+                "kind": "move",
+                "player": "sente",
+                "from": {
+                  "row": 0,
+                  "col": 8
+                },
+                "to": {
+                  "row": 3,
+                  "col": 5
+                },
+                "pieceType": "bishop",
+                "promotion": "none"
+              },
+              {
+                "kind": "move",
+                "player": "gote",
+                "from": {
+                  "row": 2,
+                  "col": 4
+                },
+                "to": {
+                  "row": 3,
+                  "col": 4
+                },
+                "pieceType": "pawn",
+                "promotion": "none"
+              },
+              {
+                "kind": "move",
+                "player": "sente",
+                "from": {
+                  "row": 3,
+                  "col": 5
+                },
+                "to": {
+                  "row": 3,
+                  "col": 6
+                },
+                "pieceType": "bishop",
+                "promotion": "none"
+              }
+            ],
+            "nodes": [
+              {
+                "normal": 6,
+                "quiescence": 8
+              },
+              {
+                "normal": 6,
+                "quiescence": 8
+              },
+              {
+                "normal": 65,
+                "quiescence": 217
+              },
+              {
+                "normal": 65,
+                "quiescence": 217
+              }
+            ],
+            "status": [
+              "completed",
+              "completed",
+              "completed",
+              "completed"
+            ],
+            "reason": [
+              null,
+              null,
+              null,
+              null
+            ]
+          }
+        ],
+        "factors": [
+          {
+            "condition": "q0",
+            "changedFields": [
+              "options.quiescence.maxTacticalDepth"
+            ],
+            "fixed": [
+              "position",
+              "candidate actions",
+              "perspective",
+              "mode",
+              "node/time caps",
+              "other settings"
+            ],
+            "status": "OBSERVED_EFFECT",
+            "deltaChange": -917,
+            "interpretation": "Effect within bounded search; cause of historical move UNKNOWN."
+          },
+          {
+            "condition": "depth1",
+            "changedFields": [
+              "depth"
+            ],
+            "fixed": [
+              "position",
+              "candidate actions",
+              "perspective",
+              "mode",
+              "node/time caps",
+              "other settings"
+            ],
+            "status": "OBSERVED_EFFECT",
+            "deltaChange": -917,
+            "interpretation": "Effect within bounded search; cause of historical move UNKNOWN."
+          },
+          {
+            "condition": "see-order",
+            "changedFields": [
+              "options.moveOrdering"
+            ],
+            "fixed": [
+              "position",
+              "candidate actions",
+              "perspective",
+              "mode",
+              "node/time caps",
+              "other settings"
+            ],
+            "status": "NO_OBSERVED_VALUE_OR_PV_CHANGE",
+            "deltaChange": 0,
+            "interpretation": "Existing ordering policy, not isolated SEE arithmetic; original standard ordering does not use SEE."
+          }
+        ],
+        "legalReplies": {
+          "actual": 5,
+          "alternative": 64
+        },
+        "legalCaptures": {
+          "actual": 3,
+          "alternative": 0
+        },
+        "exchangeScope": "First legal same-square capture at each step, at most 4 captures. All immediate captures and legal recaptures listed separately; no minimax exchange or compensation proof.",
+        "verdict": "INDETERMINATE",
+        "reason": "Direction may depend on depth/quiescence. Bounded evidence does not establish historical move error or component causality."
+      }
+    ],
+    "probeControls": [
+      {
+        "id": "af1984db62af0f44b80c676627e2a7879d3af226d65288f0f4863ff554f049e3/{\"from\":{\"col\":1,\"row\":6},\"kind\":\"move\",\"pieceType\":\"pawn\",\"player\":\"sente\",\"promotion\":\"none\",\"to\":{\"col\":1,\"row\":5}}/legacy/1000",
+        "sameResult": true,
+        "timings": [
+          {
+            "detailed": false,
+            "rep": 0,
+            "searchMs": 83.3101999999999
+          },
+          {
+            "detailed": false,
+            "rep": 1,
+            "searchMs": 81.12860000000364
+          },
+          {
+            "detailed": true,
+            "rep": 0,
+            "searchMs": 88.55059999999503
+          },
+          {
+            "detailed": true,
+            "rep": 1,
+            "searchMs": 89.84799999999814
+          }
+        ]
+      },
+      {
+        "id": "76b90464a7633a735fd2aafbae9105c89ef732ff1c214b8830ad73e11e12d363/{\"from\":{\"col\":7,\"row\":4},\"kind\":\"move\",\"pieceType\":\"knight\",\"player\":\"gote\",\"promotion\":\"decline\",\"to\":{\"col\":6,\"row\":6}}/experimental/1000",
+        "sameResult": true,
+        "timings": [
+          {
+            "detailed": false,
+            "rep": 0,
+            "searchMs": 106.65959999999905
+          },
+          {
+            "detailed": false,
+            "rep": 1,
+            "searchMs": 113.91489999999612
+          },
+          {
+            "detailed": true,
+            "rep": 0,
+            "searchMs": 129.96479999999428
+          },
+          {
+            "detailed": true,
+            "rep": 1,
+            "searchMs": 130.1342999999979
+          }
+        ]
+      },
+      {
+        "id": "e53a261c1976524fb2e6a4a8924464f16b87e61f97469cd82751b884ac5fc1a5/{\"from\":{\"col\":1,\"row\":4},\"kind\":\"move\",\"pieceType\":\"bishop\",\"player\":\"gote\",\"promotion\":\"promote\",\"to\":{\"col\":5,\"row\":8}}/legacy/1000",
+        "sameResult": true,
+        "timings": [
+          {
+            "detailed": false,
+            "rep": 0,
+            "searchMs": 45.98220000001311
+          },
+          {
+            "detailed": false,
+            "rep": 1,
+            "searchMs": 40.021999999997206
+          },
+          {
+            "detailed": true,
+            "rep": 0,
+            "searchMs": 45.34810000000289
+          },
+          {
+            "detailed": true,
+            "rep": 1,
+            "searchMs": 48.33879999999772
+          }
+        ]
+      },
+      {
+        "id": "b18e7cb2dce7930ba48d783ce9b224a329797e606a3e41fbe0570f677178b19a/{\"from\":{\"col\":4,\"row\":5},\"kind\":\"move\",\"pieceType\":\"lance\",\"player\":\"sente\",\"promotion\":\"decline\",\"to\":{\"col\":4,\"row\":2}}/legacy/1000",
+        "sameResult": true,
+        "timings": [
+          {
+            "detailed": false,
+            "rep": 0,
+            "searchMs": 40.58319999999367
+          },
+          {
+            "detailed": false,
+            "rep": 1,
+            "searchMs": 45.0732999999891
+          },
+          {
+            "detailed": true,
+            "rep": 0,
+            "searchMs": 44.2673000000068
+          },
+          {
+            "detailed": true,
+            "rep": 1,
+            "searchMs": 42.509799999999814
+          }
+        ]
+      }
+    ],
+    "rootPositionHashSource": "recorded-and-journal-verified",
+    "invalidObservations": {
+      "count": 2,
+      "byReason": {
+        "non-finite-evaluation": 2
+      },
+      "rows": [
+        {
+          "type": "pair-fixed",
+          "id": "af1984db62af0f44b80c676627e2a7879d3af226d65288f0f4863ff554f049e3/{\"from\":{\"col\":1,\"row\":6},\"kind\":\"move\",\"pieceType\":\"pawn\",\"player\":\"sente\",\"promotion\":\"none\",\"to\":{\"col\":1,\"row\":5}}/legacy/1000",
+          "rep": 0,
+          "condition": "baseline",
+          "kind": "actual",
+          "reason": "non-finite-evaluation"
+        },
+        {
+          "type": "pair-fixed",
+          "id": "af1984db62af0f44b80c676627e2a7879d3af226d65288f0f4863ff554f049e3/{\"from\":{\"col\":1,\"row\":6},\"kind\":\"move\",\"pieceType\":\"pawn\",\"player\":\"sente\",\"promotion\":\"none\",\"to\":{\"col\":1,\"row\":5}}/legacy/1000",
+          "rep": 1,
+          "condition": "baseline",
+          "kind": "actual",
+          "reason": "non-finite-evaluation"
+        }
+      ]
+    }
+  },
+  "priority": "NOT_READY",
+  "strengthImprovement": "UNKNOWN",
+  "hypotheses": [
+    {
+      "factor": "quiescence/depth/ordering",
+      "status": "See per-position factors; effects do not establish historical causality."
+    },
+    {
+      "factor": "pure SEE arithmetic",
+      "status": "UNKNOWN",
+      "reason": "Original standard path disables SEE; existing SEE policy changes ordering priorities too."
+    },
+    {
+      "factor": "time budget / evaluation weights",
+      "status": "UNKNOWN",
+      "reason": "No isolated counterfactual in this bounded experiment."
+    },
+    {
+      "factor": "legal generator defect",
+      "status": "UNKNOWN",
+      "reason": "No defect demonstrated; legal replies and recaptures recorded."
+    }
+  ]
+}

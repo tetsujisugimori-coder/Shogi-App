@@ -1,0 +1,26 @@
+{
+  "command": [
+    "C:\\Program Files\\nodejs\\node.exe",
+    "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\repo\\scripts\\stage-w1b-runner.mjs",
+    "launch",
+    "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\repo\\docs\\benchmarks\\game-blunder-w1f-20261116\\runtime-retry\\assertion-failure\\record"
+  ],
+  "exitCode": 1,
+  "signal": null,
+  "stdout": "{\"runId\":\"1198e818-04d5-4285-84f8-90d6330ef919\",\"results\":[{\"trialId\":\"e1ecfef9-f042-4d98-b0cf-0cc5f2a53780\",\"status\":\"FAIL\"},{\"trialId\":\"2cefed8e-5b10-4239-8f4c-1ef997e97e13\",\"status\":\"FAIL\"}],\"status\":\"NONPASS\"}\n",
+  "stderr": "",
+  "result": {
+    "runId": "1198e818-04d5-4285-84f8-90d6330ef919",
+    "results": [
+      {
+        "trialId": "e1ecfef9-f042-4d98-b0cf-0cc5f2a53780",
+        "status": "FAIL"
+      },
+      {
+        "trialId": "2cefed8e-5b10-4239-8f4c-1ef997e97e13",
+        "status": "FAIL"
+      }
+    ],
+    "status": "NONPASS"
+  }
+}

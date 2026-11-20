@@ -1,0 +1,45 @@
+hint: Using 'master' as the name for the initial branch. This default branch name
+hint: will change to "main" in Git 3.0. To configure the initial branch name
+hint: to use in all of your new repositories, which will suppress this warning,
+hint: call:
+hint:
+hint: 	git config --global init.defaultBranch <name>
+hint:
+hint: Names commonly chosen instead of 'master' are 'main', 'trunk' and
+hint: 'development'. The just-created branch can be renamed via this command:
+hint:
+hint: 	git branch -m <name>
+hint:
+hint: Disable this message with "git config set advice.defaultBranchName false"
+✔ fixed 0 prepare rejected before output creation (3.740408ms)
+✔ fixed 0 direct worker collect rejected before import (141.184644ms)
+✔ fixed 0 direct worker run rejected before import (149.620236ms)
+✔ fixed 0 saved READY launch refused (2.091751ms)
+✔ fixed 1 prepare rejected before output creation (0.652201ms)
+✔ fixed 1 direct worker collect rejected before import (105.215582ms)
+✔ fixed 1 direct worker run rejected before import (100.321383ms)
+✔ fixed 1 saved READY launch refused (0.938026ms)
+✔ non-fixed synthetic Git identity accepted (22.406918ms)
+✔ unknown/ref HEAD refused (0.673989ms)
+✔ unknown/ref --bad refused (0.150484ms)
+✔ unknown/ref 0000000000000000000000000000000000000000 refused (4.679238ms)
+✔ unknown/ref null refused (0.126243ms)
+✔ legacy PowerShell entry stops unconditionally (0.286595ms)
+✔ prepare static regression guard precedes mkdir and collection (0.289665ms)
+✔ same fixed tree 0 alternate commit blocked (22.350947ms)
+✔ same fixed tree 1 alternate commit blocked (20.279284ms)
+✔ malformed saved READY cannot write before identity admission (0.6869ms)
+✔ historical d probe parent fixed collection denied (149.107747ms)
+✔ historical d probe child fixed collection denied (102.376413ms)
+✔ historical e probe parent fixed collection denied (91.622333ms)
+✔ historical e probe child fixed collection denied (119.995586ms)
+✔ historical f probe parent fixed collection denied (94.292758ms)
+✔ historical f probe child fixed collection denied (116.91373ms)
+ℹ tests 24
+ℹ suites 0
+ℹ pass 24
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 1548.250732

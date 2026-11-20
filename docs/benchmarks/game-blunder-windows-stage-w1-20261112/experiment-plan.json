@@ -1,0 +1,21 @@
+{
+  "created": "2026-11-12T09:35:20.3460625+09:00",
+  "order": [
+    "old",
+    "new",
+    "new",
+    "old",
+    "new",
+    "old",
+    "old",
+    "new"
+  ],
+  "heads": {
+    "new": "2a8a57b6ff207831c77ce62d27d3151eba7c1dc3",
+    "old": "e1ccb1a2412e7faa86c2c1f60fdad1dca154023a"
+  },
+  "timeout": "Vitest default 5000ms, no override",
+  "maxWorkers": 2,
+  "measurementControl": "runs 1,2,5,6 sample all visible node processes every 2 s; runs 3,4,7,8 no sampling; each head has two sampled and two control runs",
+  "status": "PLANNED"
+}

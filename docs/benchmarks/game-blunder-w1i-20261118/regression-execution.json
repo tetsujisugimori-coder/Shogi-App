@@ -1,0 +1,22 @@
+{
+  "start": "2026-11-18T15:31:07.338803+00:00",
+  "end": "2026-11-18T15:31:12.620113+00:00",
+  "command": [
+    "node",
+    "--test",
+    "scripts/stage-w1-summary-check.mjs",
+    "scripts/stage-w1b-summary-check.mjs",
+    "scripts/stage-w1c-check.mjs",
+    "scripts/stage-w1d-check.mjs",
+    "scripts/stage-w1e-check.mjs",
+    "scripts/stage-w1f-check.mjs",
+    "scripts/stage-w1g-check.mjs",
+    "scripts/stage-w1h-entry-check.mjs",
+    "scripts/stage-w1h-seal-check.mjs",
+    "scripts/stage-w1f-observer-check.mjs"
+  ],
+  "exit": 0,
+  "timeout_seconds": 120,
+  "retry": 0,
+  "scope": "synthetic regression, no fixed comparison"
+}

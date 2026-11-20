@@ -1,0 +1,106 @@
+[
+  {
+    "name": "related-summary",
+    "command": [
+      "C:\\Program Files\\nodejs\\node.exe",
+      "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\repo\\scripts\\stage-w1b-summary-check.mjs"
+    ],
+    "cwd": "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\repo",
+    "started": "2026-11-15T14:34:45.962Z",
+    "finished": "2026-11-15T14:34:46.305Z",
+    "exitCode": 0,
+    "signal": null,
+    "error": null
+  },
+  {
+    "name": "related-w1",
+    "command": [
+      "C:\\Program Files\\nodejs\\node.exe",
+      "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\repo\\scripts\\stage-w1-summary-check.mjs"
+    ],
+    "cwd": "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\repo",
+    "started": "2026-11-15T14:34:46.305Z",
+    "finished": "2026-11-15T14:34:46.590Z",
+    "exitCode": 0,
+    "signal": null,
+    "error": null
+  },
+  {
+    "name": "related-product",
+    "command": [
+      "C:\\Program Files\\nodejs\\node.exe",
+      "C:\\Program Files\\nodejs\\node_modules\\npm\\bin\\npm-cli.js",
+      "test",
+      "--",
+      "game-blunder",
+      "match-journal"
+    ],
+    "cwd": "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\repo",
+    "started": "2026-11-15T14:34:46.590Z",
+    "finished": "2026-11-15T14:35:00.563Z",
+    "exitCode": 0,
+    "signal": null,
+    "error": null
+  },
+  {
+    "name": "lock",
+    "command": [
+      "C:\\Program Files\\nodejs\\node.exe",
+      "C:\\Program Files\\nodejs\\node_modules\\npm\\bin\\npm-cli.js",
+      "run",
+      "verify:lock"
+    ],
+    "cwd": "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\repo",
+    "started": "2026-11-15T14:35:00.563Z",
+    "finished": "2026-11-15T14:35:01.508Z",
+    "exitCode": 0,
+    "signal": null,
+    "error": null
+  },
+  {
+    "name": "typecheck",
+    "command": [
+      "C:\\Program Files\\nodejs\\node.exe",
+      "C:\\Program Files\\nodejs\\node_modules\\npm\\bin\\npm-cli.js",
+      "run",
+      "lint"
+    ],
+    "cwd": "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\repo",
+    "started": "2026-11-15T14:35:01.508Z",
+    "finished": "2026-11-15T14:35:15.941Z",
+    "exitCode": 0,
+    "signal": null,
+    "error": null
+  },
+  {
+    "name": "build",
+    "command": [
+      "C:\\Program Files\\nodejs\\node.exe",
+      "C:\\Program Files\\nodejs\\node_modules\\npm\\bin\\npm-cli.js",
+      "run",
+      "build"
+    ],
+    "cwd": "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\repo",
+    "started": "2026-11-15T14:35:15.941Z",
+    "finished": "2026-11-15T14:35:29.388Z",
+    "exitCode": 0,
+    "signal": null,
+    "error": null
+  },
+  {
+    "name": "full-product",
+    "command": [
+      "C:\\Program Files\\nodejs\\node.exe",
+      "C:\\Program Files\\nodejs\\node_modules\\npm\\bin\\npm-cli.js",
+      "test",
+      "--",
+      "src/test"
+    ],
+    "cwd": "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\repo",
+    "started": "2026-11-15T14:35:29.388Z",
+    "finished": "2026-11-15T14:37:42.586Z",
+    "exitCode": 0,
+    "signal": null,
+    "error": null
+  }
+]

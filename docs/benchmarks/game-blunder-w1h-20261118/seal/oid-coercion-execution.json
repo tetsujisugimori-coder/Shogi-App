@@ -1,0 +1,20 @@
+{
+  "command": [
+    "node",
+    "--test",
+    "scripts/stage-w1g-check.mjs",
+    "scripts/stage-w1h-seal-check.mjs"
+  ],
+  "started_at": "2026-11-18T14:27:58.546190+00:00",
+  "ended_at": "2026-11-18T14:27:59.546794+00:00",
+  "exit_code": 0,
+  "timeout_seconds": 60,
+  "retry_count": 0,
+  "actor": "seal_contract subagent",
+  "environment": "Linux-6.18.57-x86_64-with-glibc2.41",
+  "sha256": {
+    "scripts/stage-w1g-gate.mjs": "a9f969e3f47c8c92a8ccddb39d09bd3135545a640cb795ee55a2c30aea9c22f7",
+    "scripts/stage-w1g-seal.mjs": "54c7ee54e17461f9933291a37a6c8b64b0c2e5dee1f9b34e417b3ac752257fab",
+    "scripts/stage-w1h-seal-check.mjs": "1c2515501b51f2aeedd2ab1e708158be72af4d7f2d854debeca031d60ddcb7fa"
+  }
+}

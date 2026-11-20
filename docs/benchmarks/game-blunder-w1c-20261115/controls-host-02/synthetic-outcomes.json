@@ -1,0 +1,86 @@
+[
+  {
+    "name": "normal",
+    "inputSha256": "43a0da97453ff570b1ceac303139523c399b1511fa3c311064f5288644585c9c",
+    "before": "PASS",
+    "after": "INCOMPLETE"
+  },
+  {
+    "name": "duplicates",
+    "inputSha256": "3841f1f5cb992f4cf6793b6e4ce6bc4f4f42b9a163f17b63ac061e57c4cd26e1",
+    "before": "PASS",
+    "after": "INCOMPLETE"
+  },
+  {
+    "name": "zero-suites",
+    "inputSha256": "37e01e974a43c8e99d6747d80e398a9deb645b34370bc4e0dbcc8aca9472e718",
+    "before": "PASS",
+    "after": "INVALID"
+  },
+  {
+    "name": "false-failed-suite",
+    "inputSha256": "3e0d2e20d62fb598b0396f562a007aa25fef0c0db8631a24b30388169e1f249f",
+    "before": "PASS",
+    "after": "INVALID"
+  },
+  {
+    "name": "runtime-errors",
+    "inputSha256": "bf3fbc9b7982f7589b6212c40b04fdb334d191d3c309741382b5d03cfd4116e8",
+    "before": "PASS",
+    "after": "INVALID"
+  },
+  {
+    "name": "runtime-type",
+    "inputSha256": "e02c0661b4e4d5cc531b0ae88840d93a6fe73e823bf2b664cb8a7b6603483250",
+    "before": "PASS",
+    "after": "INVALID"
+  },
+  {
+    "name": "runtime-count-contradiction",
+    "inputSha256": "be09a2834a1edee9d64cd838d44092d383f9f8143be205b5dee00cda9f470923",
+    "before": "PASS",
+    "after": "INVALID"
+  },
+  {
+    "name": "zero",
+    "inputSha256": "48765a6a31cec87377b26700716d82bf68f4da54b2ce35109a27e4843e6ec76b",
+    "before": "INCOMPLETE",
+    "after": "INCOMPLETE"
+  },
+  {
+    "name": "missing-file",
+    "inputSha256": "a0557fea509eea9f5adfacf11ec0a9d2aac263926af001c2789b7df2202158e8",
+    "before": "INVALID",
+    "after": "INVALID"
+  },
+  {
+    "name": "unfinished-suite",
+    "inputSha256": "cbc32727b9e1a1efc05f1079a497395cb1a50f7c357e75476b02fc20f3c0bb3a",
+    "before": "INCOMPLETE",
+    "after": "INCOMPLETE"
+  },
+  {
+    "name": "malformed-json",
+    "inputSha256": "40b5cafe045b9c9e31a1c3fdcfbc89f934906ff06a6276b55c2a0e517be21655",
+    "before": "INVALID",
+    "after": "INVALID"
+  },
+  {
+    "name": "missing-log",
+    "inputSha256": "43a0da97453ff570b1ceac303139523c399b1511fa3c311064f5288644585c9c",
+    "before": "INCOMPLETE",
+    "after": "INCOMPLETE"
+  },
+  {
+    "name": "failure-zero-exit",
+    "inputSha256": "1b51c23650faa02630b8b3163ad5ad6cc2641ea5b7f6f51862d0b5363f0fd820",
+    "before": "FAIL",
+    "after": "FAIL"
+  },
+  {
+    "name": "success-nonzero-exit",
+    "inputSha256": "43a0da97453ff570b1ceac303139523c399b1511fa3c311064f5288644585c9c",
+    "before": "INVALID",
+    "after": "INVALID"
+  }
+]

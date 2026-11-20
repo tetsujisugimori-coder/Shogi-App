@@ -1,0 +1,26 @@
+{
+  "tests": [
+    {
+      "file": "C:/Users/tetsu/Documents/ChatGPT/将棋アプリ/stage-w1f-20261116/runtime-retry/normal-duplicates/a/tiny.test.js",
+      "name": "outer same",
+      "mode": "run"
+    },
+    {
+      "file": "C:/Users/tetsu/Documents/ChatGPT/将棋アプリ/stage-w1f-20261116/runtime-retry/normal-duplicates/a/tiny.test.js",
+      "name": "outer same",
+      "mode": "run"
+    }
+  ],
+  "suites": [
+    {
+      "id": "-270551241",
+      "file": "C:/Users/tetsu/Documents/ChatGPT/将棋アプリ/stage-w1f-20261116/runtime-retry/normal-duplicates/a/tiny.test.js",
+      "mode": "run"
+    },
+    {
+      "id": "-270551241_0",
+      "file": "C:/Users/tetsu/Documents/ChatGPT/将棋アプリ/stage-w1f-20261116/runtime-retry/normal-duplicates/a/tiny.test.js",
+      "mode": "run"
+    }
+  ]
+}

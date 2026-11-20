@@ -1,0 +1,21 @@
+{
+  "runs": [
+    {
+      "name": "run-01",
+      "head": "old",
+      "exitCode": 0,
+      "status": "PASS",
+      "invalid": [],
+      "incomplete": [],
+      "failures": [],
+      "counts": {
+        "total": 3,
+        "passed": 3,
+        "failed": 0,
+        "skipped": 0,
+        "todo": 0
+      },
+      "signals": []
+    }
+  ]
+}

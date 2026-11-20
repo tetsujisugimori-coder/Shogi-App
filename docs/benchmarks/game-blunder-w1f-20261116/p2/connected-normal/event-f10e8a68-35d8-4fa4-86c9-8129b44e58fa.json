@@ -1,0 +1,12 @@
+{
+  "at": "2026-11-16T12:21:52.907Z",
+  "phase": "run",
+  "trialId": "f25bc061-d086-48a9-be81-f371b6e737f3",
+  "action": "spawn",
+  "executable": "C:\\Program Files\\nodejs\\node.exe",
+  "args": [
+    "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\repo\\scripts\\stage-w1b-worker.mjs",
+    "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\repo\\docs\\benchmarks\\game-blunder-w1f-20261116\\p2\\connected-normal\\trial-1\\request.json"
+  ],
+  "cwd": "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\stage-w1f-20261116\\p2\\b"
+}

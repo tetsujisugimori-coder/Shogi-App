@@ -1,0 +1,34 @@
+{
+  "head": "1b4b17d90ff58db576585cc0151f5c53354a9d36",
+  "base": "85d856b9bc6b7939977cdb2867f2cff3a84a9025",
+  "branch": "codex/game-blunder-diagnostics",
+  "draft": true,
+  "state": "open",
+  "observed_at": "2026-11-18T15:28:35.947Z",
+  "tree": "6261aba336d09a0a1e8087f4dbbdf85d70979075",
+  "parent": "cd8811983222039681cad20ff026a940c5948f1a",
+  "ci": {
+    "workflow_runs": [
+      {
+        "id": 44333269297,
+        "name": "Stage W1 verifier regression",
+        "status": "completed",
+        "conclusion": "success",
+        "run_number": 10,
+        "jobs_url": "https://api.github.com/repos/tetsujisugimori-coder/Shogi-App/actions/runs/44333269297/jobs",
+        "logs_url": "https://api.github.com/repos/tetsujisugimori-coder/Shogi-App/actions/runs/44333269297/logs",
+        "workflow_id": 419115355
+      },
+      {
+        "id": 44333269727,
+        "name": "CI",
+        "status": "completed",
+        "conclusion": "success",
+        "run_number": 304,
+        "jobs_url": "https://api.github.com/repos/tetsujisugimori-coder/Shogi-App/actions/runs/44333269727/jobs",
+        "logs_url": "https://api.github.com/repos/tetsujisugimori-coder/Shogi-App/actions/runs/44333269727/logs",
+        "workflow_id": 342979839
+      }
+    ]
+  }
+}

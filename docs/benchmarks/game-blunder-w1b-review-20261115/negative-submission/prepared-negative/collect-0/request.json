@@ -1,0 +1,14 @@
+{
+  "mode": "collect",
+  "runId": "8b398dfd-d637-41f2-a6ed-661b9df43717",
+  "trialId": "3a75b78b-4426-48ed-855b-49379ee6c150",
+  "preflightSha256": "4e5123de878e4176044d1ab96713c757c4d3b1ed8643729db69c725ff697baf9",
+  "dir": "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\repo\\.tmp-tests\\w1b-review-20261115-submission\\a",
+  "output": "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\repo\\docs\\benchmarks\\game-blunder-w1b-review-20261115\\negative-submission\\prepared-negative\\collect-0",
+  "filters": [],
+  "command": [
+    "createVitest",
+    "test",
+    "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\repo\\.tmp-tests\\w1b-review-20261115-submission\\a"
+  ]
+}

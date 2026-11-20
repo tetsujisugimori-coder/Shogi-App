@@ -1,0 +1,91 @@
+[
+  {
+    "name": "missing effective setting",
+    "result": {
+      "status": "UNKNOWN",
+      "reason": "Error: UNKNOWN expected cache"
+    },
+    "comparisonChildrenBefore": 0,
+    "comparisonChildrenAfter": 0
+  },
+  {
+    "name": "dependency mismatch",
+    "result": {
+      "status": "UNKNOWN",
+      "reason": "Error: target mismatch: dependenciesSha256"
+    },
+    "comparisonChildrenBefore": 0,
+    "comparisonChildrenAfter": 0
+  },
+  {
+    "name": "source mismatch",
+    "result": {
+      "status": "UNKNOWN",
+      "reason": "Error: raw blob mismatch: tiny.test.js; no CRLF normalization permitted"
+    },
+    "comparisonChildrenBefore": 0,
+    "comparisonChildrenAfter": 0
+  },
+  {
+    "name": "preflight modified",
+    "result": {
+      "status": "UNKNOWN",
+      "reason": "Error: preflight binding mismatch"
+    },
+    "comparisonChildrenBefore": 0,
+    "comparisonChildrenAfter": 0
+  },
+  {
+    "name": "inventory modified",
+    "result": {
+      "status": "UNKNOWN",
+      "reason": "Error: inventory.json changed"
+    },
+    "comparisonChildrenBefore": 0,
+    "comparisonChildrenAfter": 0
+  },
+  {
+    "name": "settings modified",
+    "result": {
+      "status": "UNKNOWN",
+      "reason": "Error: settings.json changed"
+    },
+    "comparisonChildrenBefore": 0,
+    "comparisonChildrenAfter": 0
+  },
+  {
+    "name": "source changed after collection",
+    "result": {
+      "status": "UNKNOWN",
+      "reason": "Error: raw blob mismatch: tiny.test.js; no CRLF normalization permitted"
+    },
+    "comparisonChildrenBefore": 0,
+    "comparisonChildrenAfter": 0
+  },
+  {
+    "name": "another trial identity",
+    "result": {
+      "status": "UNKNOWN",
+      "reason": "Error: ready record changed"
+    },
+    "comparisonChildrenBefore": 0,
+    "comparisonChildrenAfter": 0
+  },
+  {
+    "name": "reused result before launch",
+    "result": {
+      "status": "UNKNOWN",
+      "reason": "Error: EEXIST: file already exists, mkdir 'C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\repo\\docs\\benchmarks\\game-blunder-w1b-review-20261115\\negative-controls-final\\prepared-negative\\trial-0'"
+    },
+    "comparisonChildrenBefore": 0,
+    "comparisonChildrenAfter": 0
+  },
+  {
+    "name": "another trial result offline",
+    "result": {
+      "status": "INVALID",
+      "reason": "Error: changed or missing runtime.json"
+    },
+    "comparisonChildrenStarted": 0
+  }
+]

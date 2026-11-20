@@ -4638,3 +4638,17 @@ PR #1のレビュー指摘を受け、簡易APIの`applyMove`と合法手候補�
 - 保存後audit2回で13観測/4候補/2証明とsummary hashが一致。旧原本/v2/v3等80追跡ファイルのSHA256前後一致。旧測定を書き換えず、新観測と過去の再評価を分離した。
 - 新規35回帰成功。全体checkは2187件中2185成功/既存2件timeoutで失敗。その後の関連188件は187成功/既存snapshot1件timeout、新規35件は成功。失敗した既存2ファイルは別の関連実行で成功、snapshot単独37件は全成功。停止サンプルがdepthだけで埋まる新規回帰の失敗を受け、最終node/time等の停止位置を優先して残す修正を実施。最終lint/型/build/lock/diff-check成功。既存assertion/timeoutは不変、全体check成功とは表記しない。
 - 製品/Worker/UI/設定/依存関係は差分なし。第三者ではない自己レビューで視点/全称/unknown/履歴/勝利vs詰み/距離/partial-rootを確認。仕様、詳細表、再現コマンド、制約、未検証、次の候補はdocs/benchmarks/outcome-proof-20261022/results.md、証拠はrun1とvalidation。最終HEADとCI対象SHAはPRで照合し、マージしない。
+
+## [2026-10-29 JST] 実戦悪手診断の試作（未完成）
+
+- `origin/main`のリモート参照が基準 `85d856b9bc6b7939977cdb2867f2cff3a84a9025` と一致、専用 `codex/game-blunder-diagnostics`。GitHub CLI認証無効、GitHub接続ツールは利用不可のためIssue/PR未作成。別作業の未追跡証拠は変更しない。
+- 既存監査で4局394手を検査し、直後に移動駒が取られる候補56を取得。均等抽出24で参照した結果は有限差による疑い4、判定不能20、確定0。試作の範囲・既知の欠落・先行試行の分類ラベル誤り・再現方法は `docs/benchmarks/game-blunder-pilot-balanced-20261029/README.md`。原因や改善順位は未確定。
+- 関連テストは初回TEMPのrename EPERMで未実行、workspace TEMPを指定し2ファイル127件成功。完全な診断機能、Issue本文保存、独立レビュー用PR、CI確認は未了。
+- `npm run check` はworkspace TEMPで終了0。lockfile検証、型検査、全92ファイル2560テスト、production build成功。既存jsdom navigation通知はテスト失敗ではない。元4 journalのSHA256は分析後も記録値と一致。
+
+## [2026-10-30 JST] 実戦悪手診断の引継ぎ・再診断（部分実装）
+
+- 既存未コミット作業を維持し、開始差分・試作・原本ハッシュをworkspaceの `handoff-20261030` に退避。remote mainは85d856bに一致。GitHub CLIは無効、接続ツールも利用不可。Issue/PR/CI未実施。
+- 既存監査と合法手・駒価値を再利用した同一マスの記録交換追跡、A〜Fの限定的な特徴分類、時間切れ・深さ不一致・非有限値を判定不能にする処理と56件出力を追加。既存pilotの契約・結果は変更しない。v1/v2の開発途中結果も保持し、v3を採用。
+- 56件の特徴 A/B/C/D/E/F=21/1/3/1/0/11（重複可）。元24局面を再探索、全24が候補選択時間切れでINDETERMINATE、残32はNOT_RUN。旧疑い4件も全て判定不能。4 journal hash前後一致。旧4件の実手/代替の限定証明8探索はいずれも時間切れunknownで、証明・原因確定0。初回証明の実手4件はJSONキー順による入力エラーだったため、合法手一覧から意味的に再取得したv2で再実行し、初回記録も保持。
+- 新旧関連4ファイル175件成功。`npm run check`はlock/型/93ファイル2568件/build成功。証明スクリプト追加後のlintも成功。タイムアウトでの数値比較と未検証の因果断定を禁止。詳細・条件・欠落・次工程は `docs/benchmarks/game-blunder-rediagnosis-v3-20261030/README.md` および `docs/benchmarks/game-blunder-proofs-v2-20261030/README.md`。証明器の本診断判定への統合、全交換枝、原因の比較実験は未完成で、改善優先順位はNOT_READY。

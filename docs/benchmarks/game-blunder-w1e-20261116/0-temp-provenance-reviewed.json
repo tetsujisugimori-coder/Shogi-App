@@ -1,0 +1,1451 @@
+[
+  {
+    "path": "GDHggiB7biZZ-GfHMKjwE/client/03354a7a19ad11dbe969cd8e2e2d070f03baebf4",
+    "absolute": "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\stage-w1e-20261116\\pair\\0-temp\\GDHggiB7biZZ-GfHMKjwE\\client\\03354a7a19ad11dbe969cd8e2e2d070f03baebf4",
+    "sha256": "440dad38dd302ce169b3bf48ec902a042c2f045ca62b54eee3490b906d756ca0",
+    "size": 39843,
+    "write": [],
+    "delete": [
+      {
+        "at": "2026-11-16T10:44:29.952Z",
+        "pid": 39804,
+        "stage": "close",
+        "stack": "Error: \n    at capture (file:///C:/Users/tetsu/Documents/ChatGPT/%E5%B0%86%E6%A3%8B%E3%82%A2%E3%83%97%E3%83%AA/repo/scripts/stage-w1e-probe.mjs:23:266)\n    at object.<computed> (file:///C:/Users/tetsu/Documents/ChatGPT/%E5%B0%86%E6%A3%8B%E3%82%A2%E3%83%97%E3%83%AA/repo/scripts/stage-w1e-probe.mjs:25:329)\n    at node:internal/fs/rimraf:73:5\n    at FSReqCallback.oncomplete (node:fs:200:5)"
+      }
+    ],
+    "removed": [
+      {
+        "at": "2026-11-16T10:44:29.971Z",
+        "pid": 39804
+      }
+    ],
+    "actor": "UNKNOWN",
+    "scope": "does not prove exclusive OS writer; no comparison equivalence inferred"
+  },
+  {
+    "path": "GDHggiB7biZZ-GfHMKjwE/client/035ef0800f0c9b368f1bec37c2078e2b573099bf",
+    "absolute": "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\stage-w1e-20261116\\pair\\0-temp\\GDHggiB7biZZ-GfHMKjwE\\client\\035ef0800f0c9b368f1bec37c2078e2b573099bf",
+    "sha256": "134fcafcdc5fdeba62637c478041e394c7b89b01cbafa40b4ffa4df44b4834ec",
+    "size": 4994,
+    "write": [],
+    "delete": [
+      {
+        "at": "2026-11-16T10:44:29.953Z",
+        "pid": 39804,
+        "stage": "close",
+        "stack": "Error: \n    at capture (file:///C:/Users/tetsu/Documents/ChatGPT/%E5%B0%86%E6%A3%8B%E3%82%A2%E3%83%97%E3%83%AA/repo/scripts/stage-w1e-probe.mjs:23:266)\n    at object.<computed> (file:///C:/Users/tetsu/Documents/ChatGPT/%E5%B0%86%E6%A3%8B%E3%82%A2%E3%83%97%E3%83%AA/repo/scripts/stage-w1e-probe.mjs:25:329)\n    at node:internal/fs/rimraf:73:5\n    at FSReqCallback.oncomplete (node:fs:200:5)"
+      }
+    ],
+    "removed": [
+      {
+        "at": "2026-11-16T10:44:29.972Z",
+        "pid": 39804
+      }
+    ],
+    "actor": "UNKNOWN",
+    "scope": "does not prove exclusive OS writer; no comparison equivalence inferred"
+  },
+  {
+    "path": "GDHggiB7biZZ-GfHMKjwE/client/063faf707f9d3f2f22a7542407f2c2c8b7d47ab1",
+    "absolute": "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\stage-w1e-20261116\\pair\\0-temp\\GDHggiB7biZZ-GfHMKjwE\\client\\063faf707f9d3f2f22a7542407f2c2c8b7d47ab1",
+    "sha256": "98ff3822c9dae51f132ff92106653e2cc62e2f2d000ce102c0f1217580ab0082",
+    "size": 15559,
+    "write": [],
+    "delete": [
+      {
+        "at": "2026-11-16T10:44:29.952Z",
+        "pid": 39804,
+        "stage": "close",
+        "stack": "Error: \n    at capture (file:///C:/Users/tetsu/Documents/ChatGPT/%E5%B0%86%E6%A3%8B%E3%82%A2%E3%83%97%E3%83%AA/repo/scripts/stage-w1e-probe.mjs:23:266)\n    at object.<computed> (file:///C:/Users/tetsu/Documents/ChatGPT/%E5%B0%86%E6%A3%8B%E3%82%A2%E3%83%97%E3%83%AA/repo/scripts/stage-w1e-probe.mjs:25:329)\n    at node:internal/fs/rimraf:73:5\n    at FSReqCallback.oncomplete (node:fs:200:5)"
+      }
+    ],
+    "removed": [
+      {
+        "at": "2026-11-16T10:44:29.972Z",
+        "pid": 39804
+      }
+    ],
+    "actor": "UNKNOWN",
+    "scope": "does not prove exclusive OS writer; no comparison equivalence inferred"
+  },
+  {
+    "path": "GDHggiB7biZZ-GfHMKjwE/client/0708374a830d3f89e8c3b914e0a53fc50e102b17",
+    "absolute": "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\stage-w1e-20261116\\pair\\0-temp\\GDHggiB7biZZ-GfHMKjwE\\client\\0708374a830d3f89e8c3b914e0a53fc50e102b17",
+    "sha256": "ff51ce037211f052a0305e857a0e3a33f0ab66f82212020a6b8e005f4414670d",
+    "size": 4652,
+    "write": [],
+    "delete": [
+      {
+        "at": "2026-11-16T10:44:29.953Z",
+        "pid": 39804,
+        "stage": "close",
+        "stack": "Error: \n    at capture (file:///C:/Users/tetsu/Documents/ChatGPT/%E5%B0%86%E6%A3%8B%E3%82%A2%E3%83%97%E3%83%AA/repo/scripts/stage-w1e-probe.mjs:23:266)\n    at object.<computed> (file:///C:/Users/tetsu/Documents/ChatGPT/%E5%B0%86%E6%A3%8B%E3%82%A2%E3%83%97%E3%83%AA/repo/scripts/stage-w1e-probe.mjs:25:329)\n    at node:internal/fs/rimraf:73:5\n    at FSReqCallback.oncomplete (node:fs:200:5)"
+      }
+    ],
+    "removed": [
+      {
+        "at": "2026-11-16T10:44:29.972Z",
+        "pid": 39804
+      }
+    ],
+    "actor": "UNKNOWN",
+    "scope": "does not prove exclusive OS writer; no comparison equivalence inferred"
+  },
+  {
+    "path": "GDHggiB7biZZ-GfHMKjwE/client/09188d992bd9df7e2b4bd754aae55a6e51ada5b8",
+    "absolute": "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\stage-w1e-20261116\\pair\\0-temp\\GDHggiB7biZZ-GfHMKjwE\\client\\09188d992bd9df7e2b4bd754aae55a6e51ada5b8",
+    "sha256": "fc6f916c81a50f223ac2c407a9b6ac60b82dd490fa1838b616e5694528599369",
+    "size": 13329,
+    "write": [],
+    "delete": [
+      {
+        "at": "2026-11-16T10:44:29.954Z",
+        "pid": 39804,
+        "stage": "close",
+        "stack": "Error: \n    at capture (file:///C:/Users/tetsu/Documents/ChatGPT/%E5%B0%86%E6%A3%8B%E3%82%A2%E3%83%97%E3%83%AA/repo/scripts/stage-w1e-probe.mjs:23:266)\n    at object.<computed> (file:///C:/Users/tetsu/Documents/ChatGPT/%E5%B0%86%E6%A3%8B%E3%82%A2%E3%83%97%E3%83%AA/repo/scripts/stage-w1e-probe.mjs:25:329)\n    at node:internal/fs/rimraf:73:5\n    at FSReqCallback.oncomplete (node:fs:200:5)"
+      }
+    ],
+    "removed": [
+      {
+        "at": "2026-11-16T10:44:29.972Z",
+        "pid": 39804
+      }
+    ],
+    "actor": "UNKNOWN",
+    "scope": "does not prove exclusive OS writer; no comparison equivalence inferred"
+  },
+  {
+    "path": "GDHggiB7biZZ-GfHMKjwE/client/095ca4b40375e6d5c8cff250798b25bc50a37b2c",
+    "absolute": "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\stage-w1e-20261116\\pair\\0-temp\\GDHggiB7biZZ-GfHMKjwE\\client\\095ca4b40375e6d5c8cff250798b25bc50a37b2c",
+    "sha256": "e29a2dc573bcb641a0cd80242fc6512140250141b95eb0de18e8b188d56101d7",
+    "size": 3083,
+    "write": [],
+    "delete": [
+      {
+        "at": "2026-11-16T10:44:29.954Z",
+        "pid": 39804,
+        "stage": "close",
+        "stack": "Error: \n    at capture (file:///C:/Users/tetsu/Documents/ChatGPT/%E5%B0%86%E6%A3%8B%E3%82%A2%E3%83%97%E3%83%AA/repo/scripts/stage-w1e-probe.mjs:23:266)\n    at object.<computed> (file:///C:/Users/tetsu/Documents/ChatGPT/%E5%B0%86%E6%A3%8B%E3%82%A2%E3%83%97%E3%83%AA/repo/scripts/stage-w1e-probe.mjs:25:329)\n    at node:internal/fs/rimraf:73:5\n    at FSReqCallback.oncomplete (node:fs:200:5)"
+      }
+    ],
+    "removed": [
+      {
+        "at": "2026-11-16T10:44:29.972Z",
+        "pid": 39804
+      }
+    ],
+    "actor": "UNKNOWN",
+    "scope": "does not prove exclusive OS writer; no comparison equivalence inferred"
+  },
+  {
+    "path": "GDHggiB7biZZ-GfHMKjwE/client/0c314490608f23a425196191f81e56ccc5fb81bd",
+    "absolute": "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\stage-w1e-20261116\\pair\\0-temp\\GDHggiB7biZZ-GfHMKjwE\\client\\0c314490608f23a425196191f81e56ccc5fb81bd",
+    "sha256": "452148aa5c0eb0c6a40d20b843a8c37c1b4bbef879364625111a7429755febe1",
+    "size": 10357,
+    "write": [],
+    "delete": [
+      {
+        "at": "2026-11-16T10:44:29.955Z",
+        "pid": 39804,
+        "stage": "close",
+        "stack": "Error: \n    at capture (file:///C:/Users/tetsu/Documents/ChatGPT/%E5%B0%86%E6%A3%8B%E3%82%A2%E3%83%97%E3%83%AA/repo/scripts/stage-w1e-probe.mjs:23:266)\n    at object.<computed> (file:///C:/Users/tetsu/Documents/ChatGPT/%E5%B0%86%E6%A3%8B%E3%82%A2%E3%83%97%E3%83%AA/repo/scripts/stage-w1e-probe.mjs:25:329)\n    at node:internal/fs/rimraf:73:5\n    at FSReqCallback.oncomplete (node:fs:200:5)"
+      }
+    ],
+    "removed": [
+      {
+        "at": "2026-11-16T10:44:29.972Z",
+        "pid": 39804
+      }
+    ],
+    "actor": "UNKNOWN",
+    "scope": "does not prove exclusive OS writer; no comparison equivalence inferred"
+  },
+  {
+    "path": "GDHggiB7biZZ-GfHMKjwE/client/0d652d77ab332cac269b6fe1f9ea8cfc9384f99e",
+    "absolute": "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\stage-w1e-20261116\\pair\\0-temp\\GDHggiB7biZZ-GfHMKjwE\\client\\0d652d77ab332cac269b6fe1f9ea8cfc9384f99e",
+    "sha256": "94e64398fe5033a61294b3d7cdec0bead1043c6e5be959b1c6aa55504d989d88",
+    "size": 8588,
+    "write": [],
+    "delete": [
+      {
+        "at": "2026-11-16T10:44:29.955Z",
+        "pid": 39804,
+        "stage": "close",
+        "stack": "Error: \n    at capture (file:///C:/Users/tetsu/Documents/ChatGPT/%E5%B0%86%E6%A3%8B%E3%82%A2%E3%83%97%E3%83%AA/repo/scripts/stage-w1e-probe.mjs:23:266)\n    at object.<computed> (file:///C:/Users/tetsu/Documents/ChatGPT/%E5%B0%86%E6%A3%8B%E3%82%A2%E3%83%97%E3%83%AA/repo/scripts/stage-w1e-probe.mjs:25:329)\n    at node:internal/fs/rimraf:73:5\n    at FSReqCallback.oncomplete (node:fs:200:5)"
+      }
+    ],
+    "removed": [
+      {
+        "at": "2026-11-16T10:44:29.973Z",
+        "pid": 39804
+      }
+    ],
+    "actor": "UNKNOWN",
+    "scope": "does not prove exclusive OS writer; no comparison equivalence inferred"
+  },
+  {
+    "path": "GDHggiB7biZZ-GfHMKjwE/client/12a0d01bcc966cd8541c178b6b9a09da725f1082",
+    "absolute": "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\stage-w1e-20261116\\pair\\0-temp\\GDHggiB7biZZ-GfHMKjwE\\client\\12a0d01bcc966cd8541c178b6b9a09da725f1082",
+    "sha256": "3137da035432d3624f56da7d1eecb63b087561e422e9f2e99471a7c63f29d72d",
+    "size": 10964,
+    "write": [],
+    "delete": [
+      {
+        "at": "2026-11-16T10:44:29.956Z",
+        "pid": 39804,
+        "stage": "close",
+        "stack": "Error: \n    at capture (file:///C:/Users/tetsu/Documents/ChatGPT/%E5%B0%86%E6%A3%8B%E3%82%A2%E3%83%97%E3%83%AA/repo/scripts/stage-w1e-probe.mjs:23:266)\n    at object.<computed> (file:///C:/Users/tetsu/Documents/ChatGPT/%E5%B0%86%E6%A3%8B%E3%82%A2%E3%83%97%E3%83%AA/repo/scripts/stage-w1e-probe.mjs:25:329)\n    at node:internal/fs/rimraf:73:5\n    at FSReqCallback.oncomplete (node:fs:200:5)"
+      }
+    ],
+    "removed": [
+      {
+        "at": "2026-11-16T10:44:29.973Z",
+        "pid": 39804
+      }
+    ],
+    "actor": "UNKNOWN",
+    "scope": "does not prove exclusive OS writer; no comparison equivalence inferred"
+  },
+  {
+    "path": "GDHggiB7biZZ-GfHMKjwE/client/17cc573336b2551b5fda3feaccd694d947ffccda",
+    "absolute": "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\stage-w1e-20261116\\pair\\0-temp\\GDHggiB7biZZ-GfHMKjwE\\client\\17cc573336b2551b5fda3feaccd694d947ffccda",
+    "sha256": "0e82335116b7dc2617072612f4a6294d2a3d7cb75cad38f655f913f1d04b9ece",
+    "size": 4114,
+    "write": [],
+    "delete": [
+      {
+        "at": "2026-11-16T10:44:29.957Z",
+        "pid": 39804,
+        "stage": "close",
+        "stack": "Error: \n    at capture (file:///C:/Users/tetsu/Documents/ChatGPT/%E5%B0%86%E6%A3%8B%E3%82%A2%E3%83%97%E3%83%AA/repo/scripts/stage-w1e-probe.mjs:23:266)\n    at object.<computed> (file:///C:/Users/tetsu/Documents/ChatGPT/%E5%B0%86%E6%A3%8B%E3%82%A2%E3%83%97%E3%83%AA/repo/scripts/stage-w1e-probe.mjs:25:329)\n    at node:internal/fs/rimraf:73:5\n    at FSReqCallback.oncomplete (node:fs:200:5)"
+      }
+    ],
+    "removed": [
+      {
+        "at": "2026-11-16T10:44:29.973Z",
+        "pid": 39804
+      }
+    ],
+    "actor": "UNKNOWN",
+    "scope": "does not prove exclusive OS writer; no comparison equivalence inferred"
+  },
+  {
+    "path": "GDHggiB7biZZ-GfHMKjwE/client/271b1c959a956abb79710f2bab521c7c10d3c2e3",
+    "absolute": "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\stage-w1e-20261116\\pair\\0-temp\\GDHggiB7biZZ-GfHMKjwE\\client\\271b1c959a956abb79710f2bab521c7c10d3c2e3",
+    "sha256": "802f87105cca6562dd755191b52aac750eb0e5e10da21ed8ccffed8725c60692",
+    "size": 1498,
+    "write": [],
+    "delete": [
+      {
+        "at": "2026-11-16T10:44:29.956Z",
+        "pid": 39804,
+        "stage": "close",
+        "stack": "Error: \n    at capture (file:///C:/Users/tetsu/Documents/ChatGPT/%E5%B0%86%E6%A3%8B%E3%82%A2%E3%83%97%E3%83%AA/repo/scripts/stage-w1e-probe.mjs:23:266)\n    at object.<computed> (file:///C:/Users/tetsu/Documents/ChatGPT/%E5%B0%86%E6%A3%8B%E3%82%A2%E3%83%97%E3%83%AA/repo/scripts/stage-w1e-probe.mjs:25:329)\n    at node:internal/fs/rimraf:73:5\n    at FSReqCallback.oncomplete (node:fs:200:5)"
+      }
+    ],
+    "removed": [
+      {
+        "at": "2026-11-16T10:44:29.973Z",
+        "pid": 39804
+      }
+    ],
+    "actor": "UNKNOWN",
+    "scope": "does not prove exclusive OS writer; no comparison equivalence inferred"
+  },
+  {
+    "path": "GDHggiB7biZZ-GfHMKjwE/client/2c1927456753315e9992ab464b02c083d1dc9c08",
+    "absolute": "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\stage-w1e-20261116\\pair\\0-temp\\GDHggiB7biZZ-GfHMKjwE\\client\\2c1927456753315e9992ab464b02c083d1dc9c08",
+    "sha256": "231e1c7b4d7f005474007bc44b1e7cd56a32b7f00f4a61f811670150f8b2304e",
+    "size": 8529,
+    "write": [],
+    "delete": [
+      {
+        "at": "2026-11-16T10:44:29.957Z",
+        "pid": 39804,
+        "stage": "close",
+        "stack": "Error: \n    at capture (file:///C:/Users/tetsu/Documents/ChatGPT/%E5%B0%86%E6%A3%8B%E3%82%A2%E3%83%97%E3%83%AA/repo/scripts/stage-w1e-probe.mjs:23:266)\n    at object.<computed> (file:///C:/Users/tetsu/Documents/ChatGPT/%E5%B0%86%E6%A3%8B%E3%82%A2%E3%83%97%E3%83%AA/repo/scripts/stage-w1e-probe.mjs:25:329)\n    at node:internal/fs/rimraf:73:5\n    at FSReqCallback.oncomplete (node:fs:200:5)"
+      }
+    ],
+    "removed": [
+      {
+        "at": "2026-11-16T10:44:29.973Z",
+        "pid": 39804
+      }
+    ],
+    "actor": "UNKNOWN",
+    "scope": "does not prove exclusive OS writer; no comparison equivalence inferred"
+  },
+  {
+    "path": "GDHggiB7biZZ-GfHMKjwE/client/2d281b174b8cb5535666cf2325ed034fd39226db",
+    "absolute": "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\stage-w1e-20261116\\pair\\0-temp\\GDHggiB7biZZ-GfHMKjwE\\client\\2d281b174b8cb5535666cf2325ed034fd39226db",
+    "sha256": "14438c70057819e9ccec22af50cef78cb186456def4318b57d3b1a01ba8b35ad",
+    "size": 35419,
+    "write": [],
+    "delete": [
+      {
+        "at": "2026-11-16T10:44:29.957Z",
+        "pid": 39804,
+        "stage": "close",
+        "stack": "Error: \n    at capture (file:///C:/Users/tetsu/Documents/ChatGPT/%E5%B0%86%E6%A3%8B%E3%82%A2%E3%83%97%E3%83%AA/repo/scripts/stage-w1e-probe.mjs:23:266)\n    at object.<computed> (file:///C:/Users/tetsu/Documents/ChatGPT/%E5%B0%86%E6%A3%8B%E3%82%A2%E3%83%97%E3%83%AA/repo/scripts/stage-w1e-probe.mjs:25:329)\n    at node:internal/fs/rimraf:73:5\n    at FSReqCallback.oncomplete (node:fs:200:5)"
+      }
+    ],
+    "removed": [
+      {
+        "at": "2026-11-16T10:44:29.973Z",
+        "pid": 39804
+      }
+    ],
+    "actor": "UNKNOWN",
+    "scope": "does not prove exclusive OS writer; no comparison equivalence inferred"
+  },
+  {
+    "path": "GDHggiB7biZZ-GfHMKjwE/client/3377b1fddd67d93c19988ceab7b5701df0c89864",
+    "absolute": "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\stage-w1e-20261116\\pair\\0-temp\\GDHggiB7biZZ-GfHMKjwE\\client\\3377b1fddd67d93c19988ceab7b5701df0c89864",
+    "sha256": "ab6437abd92f7a69266acbb1913544b5bda7792f69d780a40824c73d5022f93b",
+    "size": 15113,
+    "write": [],
+    "delete": [
+      {
+        "at": "2026-11-16T10:44:29.958Z",
+        "pid": 39804,
+        "stage": "close",
+        "stack": "Error: \n    at capture (file:///C:/Users/tetsu/Documents/ChatGPT/%E5%B0%86%E6%A3%8B%E3%82%A2%E3%83%97%E3%83%AA/repo/scripts/stage-w1e-probe.mjs:23:266)\n    at object.<computed> (file:///C:/Users/tetsu/Documents/ChatGPT/%E5%B0%86%E6%A3%8B%E3%82%A2%E3%83%97%E3%83%AA/repo/scripts/stage-w1e-probe.mjs:25:329)\n    at node:internal/fs/rimraf:73:5\n    at FSReqCallback.oncomplete (node:fs:200:5)"
+      }
+    ],
+    "removed": [
+      {
+        "at": "2026-11-16T10:44:29.973Z",
+        "pid": 39804
+      }
+    ],
+    "actor": "UNKNOWN",
+    "scope": "does not prove exclusive OS writer; no comparison equivalence inferred"
+  },
+  {
+    "path": "GDHggiB7biZZ-GfHMKjwE/client/3fd92bc4bb741387f3bed551b0ef0ea00d6274fc",
+    "absolute": "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\stage-w1e-20261116\\pair\\0-temp\\GDHggiB7biZZ-GfHMKjwE\\client\\3fd92bc4bb741387f3bed551b0ef0ea00d6274fc",
+    "sha256": "8492085d5c20e41aec26f7edaeda808cff6cfe1859ed9b8662287654af8c4c0b",
+    "size": 17120,
+    "write": [],
+    "delete": [
+      {
+        "at": "2026-11-16T10:44:29.958Z",
+        "pid": 39804,
+        "stage": "close",
+        "stack": "Error: \n    at capture (file:///C:/Users/tetsu/Documents/ChatGPT/%E5%B0%86%E6%A3%8B%E3%82%A2%E3%83%97%E3%83%AA/repo/scripts/stage-w1e-probe.mjs:23:266)\n    at object.<computed> (file:///C:/Users/tetsu/Documents/ChatGPT/%E5%B0%86%E6%A3%8B%E3%82%A2%E3%83%97%E3%83%AA/repo/scripts/stage-w1e-probe.mjs:25:329)\n    at node:internal/fs/rimraf:73:5\n    at FSReqCallback.oncomplete (node:fs:200:5)"
+      }
+    ],
+    "removed": [
+      {
+        "at": "2026-11-16T10:44:29.973Z",
+        "pid": 39804
+      }
+    ],
+    "actor": "UNKNOWN",
+    "scope": "does not prove exclusive OS writer; no comparison equivalence inferred"
+  },
+  {
+    "path": "GDHggiB7biZZ-GfHMKjwE/client/44f6a320c2b105356f86acac726522e5059e1176",
+    "absolute": "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\stage-w1e-20261116\\pair\\0-temp\\GDHggiB7biZZ-GfHMKjwE\\client\\44f6a320c2b105356f86acac726522e5059e1176",
+    "sha256": "76c8ad0c18b15fab3f7c55068a02a0357bba2c03b35fed75505ef896965be642",
+    "size": 7636,
+    "write": [],
+    "delete": [
+      {
+        "at": "2026-11-16T10:44:29.959Z",
+        "pid": 39804,
+        "stage": "close",
+        "stack": "Error: \n    at capture (file:///C:/Users/tetsu/Documents/ChatGPT/%E5%B0%86%E6%A3%8B%E3%82%A2%E3%83%97%E3%83%AA/repo/scripts/stage-w1e-probe.mjs:23:266)\n    at object.<computed> (file:///C:/Users/tetsu/Documents/ChatGPT/%E5%B0%86%E6%A3%8B%E3%82%A2%E3%83%97%E3%83%AA/repo/scripts/stage-w1e-probe.mjs:25:329)\n    at node:internal/fs/rimraf:73:5\n    at FSReqCallback.oncomplete (node:fs:200:5)"
+      }
+    ],
+    "removed": [
+      {
+        "at": "2026-11-16T10:44:29.973Z",
+        "pid": 39804
+      }
+    ],
+    "actor": "UNKNOWN",
+    "scope": "does not prove exclusive OS writer; no comparison equivalence inferred"
+  },
+  {
+    "path": "GDHggiB7biZZ-GfHMKjwE/client/4c54f2c874946e4894897260021881fd03216719",
+    "absolute": "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\stage-w1e-20261116\\pair\\0-temp\\GDHggiB7biZZ-GfHMKjwE\\client\\4c54f2c874946e4894897260021881fd03216719",
+    "sha256": "82b8d6870b6b290e7b6ce966329e3d196a1047165d9899f63c0a730212800a33",
+    "size": 4576,
+    "write": [],
+    "delete": [
+      {
+        "at": "2026-11-16T10:44:29.959Z",
+        "pid": 39804,
+        "stage": "close",
+        "stack": "Error: \n    at capture (file:///C:/Users/tetsu/Documents/ChatGPT/%E5%B0%86%E6%A3%8B%E3%82%A2%E3%83%97%E3%83%AA/repo/scripts/stage-w1e-probe.mjs:23:266)\n    at object.<computed> (file:///C:/Users/tetsu/Documents/ChatGPT/%E5%B0%86%E6%A3%8B%E3%82%A2%E3%83%97%E3%83%AA/repo/scripts/stage-w1e-probe.mjs:25:329)\n    at node:internal/fs/rimraf:73:5\n    at FSReqCallback.oncomplete (node:fs:200:5)"
+      }
+    ],
+    "removed": [
+      {
+        "at": "2026-11-16T10:44:29.973Z",
+        "pid": 39804
+      }
+    ],
+    "actor": "UNKNOWN",
+    "scope": "does not prove exclusive OS writer; no comparison equivalence inferred"
+  },
+  {
+    "path": "GDHggiB7biZZ-GfHMKjwE/client/52c657d581a29dfc6562a8e3a3c6d24a7b770f1f",
+    "absolute": "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\stage-w1e-20261116\\pair\\0-temp\\GDHggiB7biZZ-GfHMKjwE\\client\\52c657d581a29dfc6562a8e3a3c6d24a7b770f1f",
+    "sha256": "e845759938c35e9032f8eb69798d9b21f732555dc5e2d2e16eeee4ea9c1813cc",
+    "size": 56353,
+    "write": [],
+    "delete": [
+      {
+        "at": "2026-11-16T10:44:29.959Z",
+        "pid": 39804,
+        "stage": "close",
+        "stack": "Error: \n    at capture (file:///C:/Users/tetsu/Documents/ChatGPT/%E5%B0%86%E6%A3%8B%E3%82%A2%E3%83%97%E3%83%AA/repo/scripts/stage-w1e-probe.mjs:23:266)\n    at object.<computed> (file:///C:/Users/tetsu/Documents/ChatGPT/%E5%B0%86%E6%A3%8B%E3%82%A2%E3%83%97%E3%83%AA/repo/scripts/stage-w1e-probe.mjs:25:329)\n    at node:internal/fs/rimraf:73:5\n    at FSReqCallback.oncomplete (node:fs:200:5)"
+      }
+    ],
+    "removed": [
+      {
+        "at": "2026-11-16T10:44:29.973Z",
+        "pid": 39804
+      }
+    ],
+    "actor": "UNKNOWN",
+    "scope": "does not prove exclusive OS writer; no comparison equivalence inferred"
+  },
+  {
+    "path": "GDHggiB7biZZ-GfHMKjwE/client/595b5e4085a375d4f19ecdbfed0d1a271923780a",
+    "absolute": "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\stage-w1e-20261116\\pair\\0-temp\\GDHggiB7biZZ-GfHMKjwE\\client\\595b5e4085a375d4f19ecdbfed0d1a271923780a",
+    "sha256": "e1b757bb5fa97bc2fe8d23e7e2f0aec8447a393ee151b817a5fb4d2529b73e7a",
+    "size": 42489,
+    "write": [],
+    "delete": [
+      {
+        "at": "2026-11-16T10:44:29.959Z",
+        "pid": 39804,
+        "stage": "close",
+        "stack": "Error: \n    at capture (file:///C:/Users/tetsu/Documents/ChatGPT/%E5%B0%86%E6%A3%8B%E3%82%A2%E3%83%97%E3%83%AA/repo/scripts/stage-w1e-probe.mjs:23:266)\n    at object.<computed> (file:///C:/Users/tetsu/Documents/ChatGPT/%E5%B0%86%E6%A3%8B%E3%82%A2%E3%83%97%E3%83%AA/repo/scripts/stage-w1e-probe.mjs:25:329)\n    at node:internal/fs/rimraf:73:5\n    at FSReqCallback.oncomplete (node:fs:200:5)"
+      }
+    ],
+    "removed": [
+      {
+        "at": "2026-11-16T10:44:29.973Z",
+        "pid": 39804
+      }
+    ],
+    "actor": "UNKNOWN",
+    "scope": "does not prove exclusive OS writer; no comparison equivalence inferred"
+  },
+  {
+    "path": "GDHggiB7biZZ-GfHMKjwE/client/5c91f6779749d8048739c8d602a656bcff3e0bd9",
+    "absolute": "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\stage-w1e-20261116\\pair\\0-temp\\GDHggiB7biZZ-GfHMKjwE\\client\\5c91f6779749d8048739c8d602a656bcff3e0bd9",
+    "sha256": "cbeb093c09e5d2bebaa183f25ef7ac4d6cc541908cedc724873c05773fec5273",
+    "size": 4581,
+    "write": [],
+    "delete": [
+      {
+        "at": "2026-11-16T10:44:29.960Z",
+        "pid": 39804,
+        "stage": "close",
+        "stack": "Error: \n    at capture (file:///C:/Users/tetsu/Documents/ChatGPT/%E5%B0%86%E6%A3%8B%E3%82%A2%E3%83%97%E3%83%AA/repo/scripts/stage-w1e-probe.mjs:23:266)\n    at object.<computed> (file:///C:/Users/tetsu/Documents/ChatGPT/%E5%B0%86%E6%A3%8B%E3%82%A2%E3%83%97%E3%83%AA/repo/scripts/stage-w1e-probe.mjs:25:329)\n    at node:internal/fs/rimraf:73:5\n    at FSReqCallback.oncomplete (node:fs:200:5)"
+      }
+    ],
+    "removed": [
+      {
+        "at": "2026-11-16T10:44:29.973Z",
+        "pid": 39804
+      }
+    ],
+    "actor": "UNKNOWN",
+    "scope": "does not prove exclusive OS writer; no comparison equivalence inferred"
+  },
+  {
+    "path": "GDHggiB7biZZ-GfHMKjwE/client/5eaf37b845d44e33e48e37f61526a8c6295ebf65",
+    "absolute": "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\stage-w1e-20261116\\pair\\0-temp\\GDHggiB7biZZ-GfHMKjwE\\client\\5eaf37b845d44e33e48e37f61526a8c6295ebf65",
+    "sha256": "e29573ee71f10ee58c23a186bc4fc6377c741fee3fe0262df7eca6b021e23bad",
+    "size": 7020,
+    "write": [],
+    "delete": [
+      {
+        "at": "2026-11-16T10:44:29.959Z",
+        "pid": 39804,
+        "stage": "close",
+        "stack": "Error: \n    at capture (file:///C:/Users/tetsu/Documents/ChatGPT/%E5%B0%86%E6%A3%8B%E3%82%A2%E3%83%97%E3%83%AA/repo/scripts/stage-w1e-probe.mjs:23:266)\n    at object.<computed> (file:///C:/Users/tetsu/Documents/ChatGPT/%E5%B0%86%E6%A3%8B%E3%82%A2%E3%83%97%E3%83%AA/repo/scripts/stage-w1e-probe.mjs:25:329)\n    at node:internal/fs/rimraf:73:5\n    at FSReqCallback.oncomplete (node:fs:200:5)"
+      }
+    ],
+    "removed": [
+      {
+        "at": "2026-11-16T10:44:29.973Z",
+        "pid": 39804
+      }
+    ],
+    "actor": "UNKNOWN",
+    "scope": "does not prove exclusive OS writer; no comparison equivalence inferred"
+  },
+  {
+    "path": "GDHggiB7biZZ-GfHMKjwE/client/66196497716c05755f2091c73b9c122e3f5e40b4",
+    "absolute": "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\stage-w1e-20261116\\pair\\0-temp\\GDHggiB7biZZ-GfHMKjwE\\client\\66196497716c05755f2091c73b9c122e3f5e40b4",
+    "sha256": "6d0efcc56206a1dc2376ef2d31574a62fb4da8cd61ab1a1a5a8a61b61c3b5b6c",
+    "size": 7039,
+    "write": [],
+    "delete": [
+      {
+        "at": "2026-11-16T10:44:29.960Z",
+        "pid": 39804,
+        "stage": "close",
+        "stack": "Error: \n    at capture (file:///C:/Users/tetsu/Documents/ChatGPT/%E5%B0%86%E6%A3%8B%E3%82%A2%E3%83%97%E3%83%AA/repo/scripts/stage-w1e-probe.mjs:23:266)\n    at object.<computed> (file:///C:/Users/tetsu/Documents/ChatGPT/%E5%B0%86%E6%A3%8B%E3%82%A2%E3%83%97%E3%83%AA/repo/scripts/stage-w1e-probe.mjs:25:329)\n    at node:internal/fs/rimraf:73:5\n    at FSReqCallback.oncomplete (node:fs:200:5)"
+      }
+    ],
+    "removed": [
+      {
+        "at": "2026-11-16T10:44:29.973Z",
+        "pid": 39804
+      }
+    ],
+    "actor": "UNKNOWN",
+    "scope": "does not prove exclusive OS writer; no comparison equivalence inferred"
+  },
+  {
+    "path": "GDHggiB7biZZ-GfHMKjwE/client/6c0908f1a447793dca19419b4d8f798871a8f282",
+    "absolute": "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\stage-w1e-20261116\\pair\\0-temp\\GDHggiB7biZZ-GfHMKjwE\\client\\6c0908f1a447793dca19419b4d8f798871a8f282",
+    "sha256": "bb36c62eeeea779dd0343506d5b1d078695f6aa379e784b3d91191afc2af49fd",
+    "size": 144483,
+    "write": [],
+    "delete": [
+      {
+        "at": "2026-11-16T10:44:29.960Z",
+        "pid": 39804,
+        "stage": "close",
+        "stack": "Error: \n    at capture (file:///C:/Users/tetsu/Documents/ChatGPT/%E5%B0%86%E6%A3%8B%E3%82%A2%E3%83%97%E3%83%AA/repo/scripts/stage-w1e-probe.mjs:23:266)\n    at object.<computed> (file:///C:/Users/tetsu/Documents/ChatGPT/%E5%B0%86%E6%A3%8B%E3%82%A2%E3%83%97%E3%83%AA/repo/scripts/stage-w1e-probe.mjs:25:329)\n    at node:internal/fs/rimraf:73:5\n    at FSReqCallback.oncomplete (node:fs:200:5)"
+      }
+    ],
+    "removed": [
+      {
+        "at": "2026-11-16T10:44:29.973Z",
+        "pid": 39804
+      }
+    ],
+    "actor": "UNKNOWN",
+    "scope": "does not prove exclusive OS writer; no comparison equivalence inferred"
+  },
+  {
+    "path": "GDHggiB7biZZ-GfHMKjwE/client/6fe36675ef93b1b9dbbe48fc2c2752760734f2d9",
+    "absolute": "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\stage-w1e-20261116\\pair\\0-temp\\GDHggiB7biZZ-GfHMKjwE\\client\\6fe36675ef93b1b9dbbe48fc2c2752760734f2d9",
+    "sha256": "77eef2111fd22063cc44664cfbad4ad27c999e127e0413e09081c9454ae40aac",
+    "size": 22692,
+    "write": [],
+    "delete": [
+      {
+        "at": "2026-11-16T10:44:29.961Z",
+        "pid": 39804,
+        "stage": "close",
+        "stack": "Error: \n    at capture (file:///C:/Users/tetsu/Documents/ChatGPT/%E5%B0%86%E6%A3%8B%E3%82%A2%E3%83%97%E3%83%AA/repo/scripts/stage-w1e-probe.mjs:23:266)\n    at object.<computed> (file:///C:/Users/tetsu/Documents/ChatGPT/%E5%B0%86%E6%A3%8B%E3%82%A2%E3%83%97%E3%83%AA/repo/scripts/stage-w1e-probe.mjs:25:329)\n    at node:internal/fs/rimraf:73:5\n    at FSReqCallback.oncomplete (node:fs:200:5)"
+      }
+    ],
+    "removed": [
+      {
+        "at": "2026-11-16T10:44:29.973Z",
+        "pid": 39804
+      }
+    ],
+    "actor": "UNKNOWN",
+    "scope": "does not prove exclusive OS writer; no comparison equivalence inferred"
+  },
+  {
+    "path": "GDHggiB7biZZ-GfHMKjwE/client/73d617922627c0582391d05b5e6390bb7464f90e",
+    "absolute": "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\stage-w1e-20261116\\pair\\0-temp\\GDHggiB7biZZ-GfHMKjwE\\client\\73d617922627c0582391d05b5e6390bb7464f90e",
+    "sha256": "8067141a19d0f54ca5c07ab6ac2596252f78c6d252f5522baa18719dd0456a60",
+    "size": 9091,
+    "write": [],
+    "delete": [
+      {
+        "at": "2026-11-16T10:44:29.961Z",
+        "pid": 39804,
+        "stage": "close",
+        "stack": "Error: \n    at capture (file:///C:/Users/tetsu/Documents/ChatGPT/%E5%B0%86%E6%A3%8B%E3%82%A2%E3%83%97%E3%83%AA/repo/scripts/stage-w1e-probe.mjs:23:266)\n    at object.<computed> (file:///C:/Users/tetsu/Documents/ChatGPT/%E5%B0%86%E6%A3%8B%E3%82%A2%E3%83%97%E3%83%AA/repo/scripts/stage-w1e-probe.mjs:25:329)\n    at node:internal/fs/rimraf:73:5\n    at FSReqCallback.oncomplete (node:fs:200:5)"
+      }
+    ],
+    "removed": [
+      {
+        "at": "2026-11-16T10:44:29.973Z",
+        "pid": 39804
+      }
+    ],
+    "actor": "UNKNOWN",
+    "scope": "does not prove exclusive OS writer; no comparison equivalence inferred"
+  },
+  {
+    "path": "GDHggiB7biZZ-GfHMKjwE/client/76bbde5b7724973750327688b457e3a4e89654df",
+    "absolute": "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\stage-w1e-20261116\\pair\\0-temp\\GDHggiB7biZZ-GfHMKjwE\\client\\76bbde5b7724973750327688b457e3a4e89654df",
+    "sha256": "fa1b28471b35e34240ac0b06512d0159ae4ff6c280d696fc29bc57d1eff494e3",
+    "size": 33287,
+    "write": [],
+    "delete": [
+      {
+        "at": "2026-11-16T10:44:29.961Z",
+        "pid": 39804,
+        "stage": "close",
+        "stack": "Error: \n    at capture (file:///C:/Users/tetsu/Documents/ChatGPT/%E5%B0%86%E6%A3%8B%E3%82%A2%E3%83%97%E3%83%AA/repo/scripts/stage-w1e-probe.mjs:23:266)\n    at object.<computed> (file:///C:/Users/tetsu/Documents/ChatGPT/%E5%B0%86%E6%A3%8B%E3%82%A2%E3%83%97%E3%83%AA/repo/scripts/stage-w1e-probe.mjs:25:329)\n    at node:internal/fs/rimraf:73:5\n    at FSReqCallback.oncomplete (node:fs:200:5)"
+      }
+    ],
+    "removed": [
+      {
+        "at": "2026-11-16T10:44:29.973Z",
+        "pid": 39804
+      }
+    ],
+    "actor": "UNKNOWN",
+    "scope": "does not prove exclusive OS writer; no comparison equivalence inferred"
+  },
+  {
+    "path": "GDHggiB7biZZ-GfHMKjwE/client/7f66d1f438e6c015e1e4cada1af1b13b298e5f16",
+    "absolute": "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\stage-w1e-20261116\\pair\\0-temp\\GDHggiB7biZZ-GfHMKjwE\\client\\7f66d1f438e6c015e1e4cada1af1b13b298e5f16",
+    "sha256": "0ad8bcc70caa6150cc2776d5006d6a700477e9d617bb8ec0aceac9eae9416441",
+    "size": 31887,
+    "write": [],
+    "delete": [
+      {
+        "at": "2026-11-16T10:44:29.962Z",
+        "pid": 39804,
+        "stage": "close",
+        "stack": "Error: \n    at capture (file:///C:/Users/tetsu/Documents/ChatGPT/%E5%B0%86%E6%A3%8B%E3%82%A2%E3%83%97%E3%83%AA/repo/scripts/stage-w1e-probe.mjs:23:266)\n    at object.<computed> (file:///C:/Users/tetsu/Documents/ChatGPT/%E5%B0%86%E6%A3%8B%E3%82%A2%E3%83%97%E3%83%AA/repo/scripts/stage-w1e-probe.mjs:25:329)\n    at node:internal/fs/rimraf:73:5\n    at FSReqCallback.oncomplete (node:fs:200:5)"
+      }
+    ],
+    "removed": [
+      {
+        "at": "2026-11-16T10:44:29.973Z",
+        "pid": 39804
+      }
+    ],
+    "actor": "UNKNOWN",
+    "scope": "does not prove exclusive OS writer; no comparison equivalence inferred"
+  },
+  {
+    "path": "GDHggiB7biZZ-GfHMKjwE/client/844460b1e74fdc5f5dcd5265b2f5d1db3d05e5e4",
+    "absolute": "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\stage-w1e-20261116\\pair\\0-temp\\GDHggiB7biZZ-GfHMKjwE\\client\\844460b1e74fdc5f5dcd5265b2f5d1db3d05e5e4",
+    "sha256": "e542a0bc97e2bc41047d60e25ecc4b044b54901daaec28684e3a4a65e2f7214e",
+    "size": 12621,
+    "write": [],
+    "delete": [
+      {
+        "at": "2026-11-16T10:44:29.962Z",
+        "pid": 39804,
+        "stage": "close",
+        "stack": "Error: \n    at capture (file:///C:/Users/tetsu/Documents/ChatGPT/%E5%B0%86%E6%A3%8B%E3%82%A2%E3%83%97%E3%83%AA/repo/scripts/stage-w1e-probe.mjs:23:266)\n    at object.<computed> (file:///C:/Users/tetsu/Documents/ChatGPT/%E5%B0%86%E6%A3%8B%E3%82%A2%E3%83%97%E3%83%AA/repo/scripts/stage-w1e-probe.mjs:25:329)\n    at node:internal/fs/rimraf:73:5\n    at FSReqCallback.oncomplete (node:fs:200:5)"
+      }
+    ],
+    "removed": [
+      {
+        "at": "2026-11-16T10:44:29.973Z",
+        "pid": 39804
+      }
+    ],
+    "actor": "UNKNOWN",
+    "scope": "does not prove exclusive OS writer; no comparison equivalence inferred"
+  },
+  {
+    "path": "GDHggiB7biZZ-GfHMKjwE/client/888691d514aae3318f6a8104fb0aed7521380c28",
+    "absolute": "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\stage-w1e-20261116\\pair\\0-temp\\GDHggiB7biZZ-GfHMKjwE\\client\\888691d514aae3318f6a8104fb0aed7521380c28",
+    "sha256": "13201efe4f6a89879b501a2c0de26fff845576ae03a682162b49a04a6016298f",
+    "size": 2206,
+    "write": [],
+    "delete": [
+      {
+        "at": "2026-11-16T10:44:29.962Z",
+        "pid": 39804,
+        "stage": "close",
+        "stack": "Error: \n    at capture (file:///C:/Users/tetsu/Documents/ChatGPT/%E5%B0%86%E6%A3%8B%E3%82%A2%E3%83%97%E3%83%AA/repo/scripts/stage-w1e-probe.mjs:23:266)\n    at object.<computed> (file:///C:/Users/tetsu/Documents/ChatGPT/%E5%B0%86%E6%A3%8B%E3%82%A2%E3%83%97%E3%83%AA/repo/scripts/stage-w1e-probe.mjs:25:329)\n    at node:internal/fs/rimraf:73:5\n    at FSReqCallback.oncomplete (node:fs:200:5)"
+      }
+    ],
+    "removed": [
+      {
+        "at": "2026-11-16T10:44:29.973Z",
+        "pid": 39804
+      }
+    ],
+    "actor": "UNKNOWN",
+    "scope": "does not prove exclusive OS writer; no comparison equivalence inferred"
+  },
+  {
+    "path": "GDHggiB7biZZ-GfHMKjwE/client/891315eb70de23b0e925e328e9d8683628af09e4",
+    "absolute": "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\stage-w1e-20261116\\pair\\0-temp\\GDHggiB7biZZ-GfHMKjwE\\client\\891315eb70de23b0e925e328e9d8683628af09e4",
+    "sha256": "47cb5b583dd182070b95a601dab56171ae640a49de281f231ba3f1e7af4a47d0",
+    "size": 10742,
+    "write": [],
+    "delete": [
+      {
+        "at": "2026-11-16T10:44:29.962Z",
+        "pid": 39804,
+        "stage": "close",
+        "stack": "Error: \n    at capture (file:///C:/Users/tetsu/Documents/ChatGPT/%E5%B0%86%E6%A3%8B%E3%82%A2%E3%83%97%E3%83%AA/repo/scripts/stage-w1e-probe.mjs:23:266)\n    at object.<computed> (file:///C:/Users/tetsu/Documents/ChatGPT/%E5%B0%86%E6%A3%8B%E3%82%A2%E3%83%97%E3%83%AA/repo/scripts/stage-w1e-probe.mjs:25:329)\n    at node:internal/fs/rimraf:73:5\n    at FSReqCallback.oncomplete (node:fs:200:5)"
+      }
+    ],
+    "removed": [
+      {
+        "at": "2026-11-16T10:44:29.973Z",
+        "pid": 39804
+      }
+    ],
+    "actor": "UNKNOWN",
+    "scope": "does not prove exclusive OS writer; no comparison equivalence inferred"
+  },
+  {
+    "path": "GDHggiB7biZZ-GfHMKjwE/client/901bc860ecca1bb531e33fbc05ea32231afd450e",
+    "absolute": "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\stage-w1e-20261116\\pair\\0-temp\\GDHggiB7biZZ-GfHMKjwE\\client\\901bc860ecca1bb531e33fbc05ea32231afd450e",
+    "sha256": "0a48e9536d7b95608d5377ed9ec0aaf7d9313e585aa96fab561f3e4729b3fbf7",
+    "size": 5463,
+    "write": [],
+    "delete": [
+      {
+        "at": "2026-11-16T10:44:29.962Z",
+        "pid": 39804,
+        "stage": "close",
+        "stack": "Error: \n    at capture (file:///C:/Users/tetsu/Documents/ChatGPT/%E5%B0%86%E6%A3%8B%E3%82%A2%E3%83%97%E3%83%AA/repo/scripts/stage-w1e-probe.mjs:23:266)\n    at object.<computed> (file:///C:/Users/tetsu/Documents/ChatGPT/%E5%B0%86%E6%A3%8B%E3%82%A2%E3%83%97%E3%83%AA/repo/scripts/stage-w1e-probe.mjs:25:329)\n    at node:internal/fs/rimraf:73:5\n    at FSReqCallback.oncomplete (node:fs:200:5)"
+      }
+    ],
+    "removed": [
+      {
+        "at": "2026-11-16T10:44:29.973Z",
+        "pid": 39804
+      }
+    ],
+    "actor": "UNKNOWN",
+    "scope": "does not prove exclusive OS writer; no comparison equivalence inferred"
+  },
+  {
+    "path": "GDHggiB7biZZ-GfHMKjwE/client/9520445a64f24ce6debb3d76d63893b51ace8797",
+    "absolute": "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\stage-w1e-20261116\\pair\\0-temp\\GDHggiB7biZZ-GfHMKjwE\\client\\9520445a64f24ce6debb3d76d63893b51ace8797",
+    "sha256": "03c57aef18f2f5c1742758ffa11d739bbef5aa0ee5d1ad87f1563fd8aa53f97a",
+    "size": 14754,
+    "write": [],
+    "delete": [
+      {
+        "at": "2026-11-16T10:44:29.963Z",
+        "pid": 39804,
+        "stage": "close",
+        "stack": "Error: \n    at capture (file:///C:/Users/tetsu/Documents/ChatGPT/%E5%B0%86%E6%A3%8B%E3%82%A2%E3%83%97%E3%83%AA/repo/scripts/stage-w1e-probe.mjs:23:266)\n    at object.<computed> (file:///C:/Users/tetsu/Documents/ChatGPT/%E5%B0%86%E6%A3%8B%E3%82%A2%E3%83%97%E3%83%AA/repo/scripts/stage-w1e-probe.mjs:25:329)\n    at node:internal/fs/rimraf:73:5\n    at FSReqCallback.oncomplete (node:fs:200:5)"
+      }
+    ],
+    "removed": [
+      {
+        "at": "2026-11-16T10:44:29.973Z",
+        "pid": 39804
+      }
+    ],
+    "actor": "UNKNOWN",
+    "scope": "does not prove exclusive OS writer; no comparison equivalence inferred"
+  },
+  {
+    "path": "GDHggiB7biZZ-GfHMKjwE/client/9919149a733478bcd43b97bc7aaed1c3d1a61d88",
+    "absolute": "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\stage-w1e-20261116\\pair\\0-temp\\GDHggiB7biZZ-GfHMKjwE\\client\\9919149a733478bcd43b97bc7aaed1c3d1a61d88",
+    "sha256": "45ae2ab473707fea3e71e4389da5cfeffac76d9dea7790456eef67ef13e1d831",
+    "size": 154294,
+    "write": [],
+    "delete": [
+      {
+        "at": "2026-11-16T10:44:29.963Z",
+        "pid": 39804,
+        "stage": "close",
+        "stack": "Error: \n    at capture (file:///C:/Users/tetsu/Documents/ChatGPT/%E5%B0%86%E6%A3%8B%E3%82%A2%E3%83%97%E3%83%AA/repo/scripts/stage-w1e-probe.mjs:23:266)\n    at object.<computed> (file:///C:/Users/tetsu/Documents/ChatGPT/%E5%B0%86%E6%A3%8B%E3%82%A2%E3%83%97%E3%83%AA/repo/scripts/stage-w1e-probe.mjs:25:329)\n    at node:internal/fs/rimraf:73:5\n    at FSReqCallback.oncomplete (node:fs:200:5)"
+      }
+    ],
+    "removed": [
+      {
+        "at": "2026-11-16T10:44:29.973Z",
+        "pid": 39804
+      }
+    ],
+    "actor": "UNKNOWN",
+    "scope": "does not prove exclusive OS writer; no comparison equivalence inferred"
+  },
+  {
+    "path": "GDHggiB7biZZ-GfHMKjwE/client/9baf20db272fd8461ba1d9f9e7fe4f987d0da45a",
+    "absolute": "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\stage-w1e-20261116\\pair\\0-temp\\GDHggiB7biZZ-GfHMKjwE\\client\\9baf20db272fd8461ba1d9f9e7fe4f987d0da45a",
+    "sha256": "6781406a18cdb2eb0d01323d74f20aff2e1aa47da726c8f65fc7edf5547bde94",
+    "size": 1218,
+    "write": [],
+    "delete": [
+      {
+        "at": "2026-11-16T10:44:29.964Z",
+        "pid": 39804,
+        "stage": "close",
+        "stack": "Error: \n    at capture (file:///C:/Users/tetsu/Documents/ChatGPT/%E5%B0%86%E6%A3%8B%E3%82%A2%E3%83%97%E3%83%AA/repo/scripts/stage-w1e-probe.mjs:23:266)\n    at object.<computed> (file:///C:/Users/tetsu/Documents/ChatGPT/%E5%B0%86%E6%A3%8B%E3%82%A2%E3%83%97%E3%83%AA/repo/scripts/stage-w1e-probe.mjs:25:329)\n    at node:internal/fs/rimraf:73:5\n    at FSReqCallback.oncomplete (node:fs:200:5)"
+      }
+    ],
+    "removed": [
+      {
+        "at": "2026-11-16T10:44:29.973Z",
+        "pid": 39804
+      }
+    ],
+    "actor": "UNKNOWN",
+    "scope": "does not prove exclusive OS writer; no comparison equivalence inferred"
+  },
+  {
+    "path": "GDHggiB7biZZ-GfHMKjwE/client/9ef67f9496a6ff20fc5c1cede00c6f60f87da862",
+    "absolute": "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\stage-w1e-20261116\\pair\\0-temp\\GDHggiB7biZZ-GfHMKjwE\\client\\9ef67f9496a6ff20fc5c1cede00c6f60f87da862",
+    "sha256": "5497cfebf46e69416bff69f9799632820f0f9c20936cf01e23cd406e6e28af9e",
+    "size": 15992,
+    "write": [],
+    "delete": [
+      {
+        "at": "2026-11-16T10:44:29.964Z",
+        "pid": 39804,
+        "stage": "close",
+        "stack": "Error: \n    at capture (file:///C:/Users/tetsu/Documents/ChatGPT/%E5%B0%86%E6%A3%8B%E3%82%A2%E3%83%97%E3%83%AA/repo/scripts/stage-w1e-probe.mjs:23:266)\n    at object.<computed> (file:///C:/Users/tetsu/Documents/ChatGPT/%E5%B0%86%E6%A3%8B%E3%82%A2%E3%83%97%E3%83%AA/repo/scripts/stage-w1e-probe.mjs:25:329)\n    at node:internal/fs/rimraf:73:5\n    at FSReqCallback.oncomplete (node:fs:200:5)"
+      }
+    ],
+    "removed": [
+      {
+        "at": "2026-11-16T10:44:29.973Z",
+        "pid": 39804
+      }
+    ],
+    "actor": "UNKNOWN",
+    "scope": "does not prove exclusive OS writer; no comparison equivalence inferred"
+  },
+  {
+    "path": "GDHggiB7biZZ-GfHMKjwE/client/a097a9203b5dcd7176a30f3503507e9dce82e980",
+    "absolute": "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\stage-w1e-20261116\\pair\\0-temp\\GDHggiB7biZZ-GfHMKjwE\\client\\a097a9203b5dcd7176a30f3503507e9dce82e980",
+    "sha256": "d3549280aaf1766008688d3dadd4d062ed79c880a15304b7c7f04a21eb4d47e5",
+    "size": 19363,
+    "write": [],
+    "delete": [
+      {
+        "at": "2026-11-16T10:44:29.964Z",
+        "pid": 39804,
+        "stage": "close",
+        "stack": "Error: \n    at capture (file:///C:/Users/tetsu/Documents/ChatGPT/%E5%B0%86%E6%A3%8B%E3%82%A2%E3%83%97%E3%83%AA/repo/scripts/stage-w1e-probe.mjs:23:266)\n    at object.<computed> (file:///C:/Users/tetsu/Documents/ChatGPT/%E5%B0%86%E6%A3%8B%E3%82%A2%E3%83%97%E3%83%AA/repo/scripts/stage-w1e-probe.mjs:25:329)\n    at node:internal/fs/rimraf:73:5\n    at FSReqCallback.oncomplete (node:fs:200:5)"
+      }
+    ],
+    "removed": [
+      {
+        "at": "2026-11-16T10:44:29.973Z",
+        "pid": 39804
+      }
+    ],
+    "actor": "UNKNOWN",
+    "scope": "does not prove exclusive OS writer; no comparison equivalence inferred"
+  },
+  {
+    "path": "GDHggiB7biZZ-GfHMKjwE/client/a1ccc1686a01aeebcb04ee9bbd2a5dc6aa851fd6",
+    "absolute": "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\stage-w1e-20261116\\pair\\0-temp\\GDHggiB7biZZ-GfHMKjwE\\client\\a1ccc1686a01aeebcb04ee9bbd2a5dc6aa851fd6",
+    "sha256": "8a5c8db0632a574b611254ffabeb0e1f6e987eb8a870c140a54b96a9eabc283c",
+    "size": 40014,
+    "write": [],
+    "delete": [
+      {
+        "at": "2026-11-16T10:44:29.966Z",
+        "pid": 39804,
+        "stage": "close",
+        "stack": "Error: \n    at capture (file:///C:/Users/tetsu/Documents/ChatGPT/%E5%B0%86%E6%A3%8B%E3%82%A2%E3%83%97%E3%83%AA/repo/scripts/stage-w1e-probe.mjs:23:266)\n    at object.<computed> (file:///C:/Users/tetsu/Documents/ChatGPT/%E5%B0%86%E6%A3%8B%E3%82%A2%E3%83%97%E3%83%AA/repo/scripts/stage-w1e-probe.mjs:25:329)\n    at node:internal/fs/rimraf:73:5\n    at FSReqCallback.oncomplete (node:fs:200:5)"
+      }
+    ],
+    "removed": [
+      {
+        "at": "2026-11-16T10:44:29.974Z",
+        "pid": 39804
+      }
+    ],
+    "actor": "UNKNOWN",
+    "scope": "does not prove exclusive OS writer; no comparison equivalence inferred"
+  },
+  {
+    "path": "GDHggiB7biZZ-GfHMKjwE/client/aa57ff892a70ae00d530664c0abf4985fde4f9a5",
+    "absolute": "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\stage-w1e-20261116\\pair\\0-temp\\GDHggiB7biZZ-GfHMKjwE\\client\\aa57ff892a70ae00d530664c0abf4985fde4f9a5",
+    "sha256": "96733b40f72a2cdfe499f67b7456e1fa24b512d5949f4d4a6a65ebe1aacc94b7",
+    "size": 33151,
+    "write": [],
+    "delete": [
+      {
+        "at": "2026-11-16T10:44:29.964Z",
+        "pid": 39804,
+        "stage": "close",
+        "stack": "Error: \n    at capture (file:///C:/Users/tetsu/Documents/ChatGPT/%E5%B0%86%E6%A3%8B%E3%82%A2%E3%83%97%E3%83%AA/repo/scripts/stage-w1e-probe.mjs:23:266)\n    at object.<computed> (file:///C:/Users/tetsu/Documents/ChatGPT/%E5%B0%86%E6%A3%8B%E3%82%A2%E3%83%97%E3%83%AA/repo/scripts/stage-w1e-probe.mjs:25:329)\n    at node:internal/fs/rimraf:73:5\n    at FSReqCallback.oncomplete (node:fs:200:5)"
+      }
+    ],
+    "removed": [
+      {
+        "at": "2026-11-16T10:44:29.974Z",
+        "pid": 39804
+      }
+    ],
+    "actor": "UNKNOWN",
+    "scope": "does not prove exclusive OS writer; no comparison equivalence inferred"
+  },
+  {
+    "path": "GDHggiB7biZZ-GfHMKjwE/client/b386c5be967450c66afa0daa126d4412c719485f",
+    "absolute": "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\stage-w1e-20261116\\pair\\0-temp\\GDHggiB7biZZ-GfHMKjwE\\client\\b386c5be967450c66afa0daa126d4412c719485f",
+    "sha256": "66fd8390314ef2f0cb87f26d6b76f219af8c92bcec834913bc46db3187cec787",
+    "size": 47679,
+    "write": [],
+    "delete": [
+      {
+        "at": "2026-11-16T10:44:29.965Z",
+        "pid": 39804,
+        "stage": "close",
+        "stack": "Error: \n    at capture (file:///C:/Users/tetsu/Documents/ChatGPT/%E5%B0%86%E6%A3%8B%E3%82%A2%E3%83%97%E3%83%AA/repo/scripts/stage-w1e-probe.mjs:23:266)\n    at object.<computed> (file:///C:/Users/tetsu/Documents/ChatGPT/%E5%B0%86%E6%A3%8B%E3%82%A2%E3%83%97%E3%83%AA/repo/scripts/stage-w1e-probe.mjs:25:329)\n    at node:internal/fs/rimraf:73:5\n    at FSReqCallback.oncomplete (node:fs:200:5)"
+      }
+    ],
+    "removed": [
+      {
+        "at": "2026-11-16T10:44:29.974Z",
+        "pid": 39804
+      }
+    ],
+    "actor": "UNKNOWN",
+    "scope": "does not prove exclusive OS writer; no comparison equivalence inferred"
+  },
+  {
+    "path": "GDHggiB7biZZ-GfHMKjwE/client/b539cb16949e423fadb0f88d3984de256dc6dbc8",
+    "absolute": "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\stage-w1e-20261116\\pair\\0-temp\\GDHggiB7biZZ-GfHMKjwE\\client\\b539cb16949e423fadb0f88d3984de256dc6dbc8",
+    "sha256": "fa708c124b309a1faa81d66888862aa43e2a93b5c536063ea6cee4ca05cac496",
+    "size": 6625,
+    "write": [],
+    "delete": [
+      {
+        "at": "2026-11-16T10:44:29.965Z",
+        "pid": 39804,
+        "stage": "close",
+        "stack": "Error: \n    at capture (file:///C:/Users/tetsu/Documents/ChatGPT/%E5%B0%86%E6%A3%8B%E3%82%A2%E3%83%97%E3%83%AA/repo/scripts/stage-w1e-probe.mjs:23:266)\n    at object.<computed> (file:///C:/Users/tetsu/Documents/ChatGPT/%E5%B0%86%E6%A3%8B%E3%82%A2%E3%83%97%E3%83%AA/repo/scripts/stage-w1e-probe.mjs:25:329)\n    at node:internal/fs/rimraf:73:5\n    at FSReqCallback.oncomplete (node:fs:200:5)"
+      }
+    ],
+    "removed": [
+      {
+        "at": "2026-11-16T10:44:29.974Z",
+        "pid": 39804
+      }
+    ],
+    "actor": "UNKNOWN",
+    "scope": "does not prove exclusive OS writer; no comparison equivalence inferred"
+  },
+  {
+    "path": "GDHggiB7biZZ-GfHMKjwE/client/b5a75c6cc42b04204566b7d14bfd4177a0d1946e",
+    "absolute": "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\stage-w1e-20261116\\pair\\0-temp\\GDHggiB7biZZ-GfHMKjwE\\client\\b5a75c6cc42b04204566b7d14bfd4177a0d1946e",
+    "sha256": "d9971577703d6dfcdcfefbe2fbc24f2b76ae03e2eb5aeb71b02bca73a23a62aa",
+    "size": 31687,
+    "write": [],
+    "delete": [
+      {
+        "at": "2026-11-16T10:44:29.965Z",
+        "pid": 39804,
+        "stage": "close",
+        "stack": "Error: \n    at capture (file:///C:/Users/tetsu/Documents/ChatGPT/%E5%B0%86%E6%A3%8B%E3%82%A2%E3%83%97%E3%83%AA/repo/scripts/stage-w1e-probe.mjs:23:266)\n    at object.<computed> (file:///C:/Users/tetsu/Documents/ChatGPT/%E5%B0%86%E6%A3%8B%E3%82%A2%E3%83%97%E3%83%AA/repo/scripts/stage-w1e-probe.mjs:25:329)\n    at node:internal/fs/rimraf:73:5\n    at FSReqCallback.oncomplete (node:fs:200:5)"
+      }
+    ],
+    "removed": [
+      {
+        "at": "2026-11-16T10:44:29.974Z",
+        "pid": 39804
+      }
+    ],
+    "actor": "UNKNOWN",
+    "scope": "does not prove exclusive OS writer; no comparison equivalence inferred"
+  },
+  {
+    "path": "GDHggiB7biZZ-GfHMKjwE/client/bf92010e8dc2291f564d0493b0b022a9572ad254",
+    "absolute": "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\stage-w1e-20261116\\pair\\0-temp\\GDHggiB7biZZ-GfHMKjwE\\client\\bf92010e8dc2291f564d0493b0b022a9572ad254",
+    "sha256": "f0d47d4271dc07b3b220e1fd763e5ebac3f95af5fcc3bcf3a0065094c48add61",
+    "size": 35965,
+    "write": [],
+    "delete": [
+      {
+        "at": "2026-11-16T10:44:29.965Z",
+        "pid": 39804,
+        "stage": "close",
+        "stack": "Error: \n    at capture (file:///C:/Users/tetsu/Documents/ChatGPT/%E5%B0%86%E6%A3%8B%E3%82%A2%E3%83%97%E3%83%AA/repo/scripts/stage-w1e-probe.mjs:23:266)\n    at object.<computed> (file:///C:/Users/tetsu/Documents/ChatGPT/%E5%B0%86%E6%A3%8B%E3%82%A2%E3%83%97%E3%83%AA/repo/scripts/stage-w1e-probe.mjs:25:329)\n    at node:internal/fs/rimraf:73:5\n    at FSReqCallback.oncomplete (node:fs:200:5)"
+      }
+    ],
+    "removed": [
+      {
+        "at": "2026-11-16T10:44:29.974Z",
+        "pid": 39804
+      }
+    ],
+    "actor": "UNKNOWN",
+    "scope": "does not prove exclusive OS writer; no comparison equivalence inferred"
+  },
+  {
+    "path": "GDHggiB7biZZ-GfHMKjwE/client/c15a05e27e3b977d262b5805677696a24aa05ad4",
+    "absolute": "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\stage-w1e-20261116\\pair\\0-temp\\GDHggiB7biZZ-GfHMKjwE\\client\\c15a05e27e3b977d262b5805677696a24aa05ad4",
+    "sha256": "de9128ef75a32876ad2e0f3c6bc8f4afdff43bce752ee028212b9ae214ac7e10",
+    "size": 27317,
+    "write": [],
+    "delete": [
+      {
+        "at": "2026-11-16T10:44:29.966Z",
+        "pid": 39804,
+        "stage": "close",
+        "stack": "Error: \n    at capture (file:///C:/Users/tetsu/Documents/ChatGPT/%E5%B0%86%E6%A3%8B%E3%82%A2%E3%83%97%E3%83%AA/repo/scripts/stage-w1e-probe.mjs:23:266)\n    at object.<computed> (file:///C:/Users/tetsu/Documents/ChatGPT/%E5%B0%86%E6%A3%8B%E3%82%A2%E3%83%97%E3%83%AA/repo/scripts/stage-w1e-probe.mjs:25:329)\n    at node:internal/fs/rimraf:73:5\n    at FSReqCallback.oncomplete (node:fs:200:5)"
+      }
+    ],
+    "removed": [
+      {
+        "at": "2026-11-16T10:44:29.974Z",
+        "pid": 39804
+      }
+    ],
+    "actor": "UNKNOWN",
+    "scope": "does not prove exclusive OS writer; no comparison equivalence inferred"
+  },
+  {
+    "path": "GDHggiB7biZZ-GfHMKjwE/client/cad905c8ce5afc1d68c1889b17cb153f2583b528",
+    "absolute": "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\stage-w1e-20261116\\pair\\0-temp\\GDHggiB7biZZ-GfHMKjwE\\client\\cad905c8ce5afc1d68c1889b17cb153f2583b528",
+    "sha256": "875cae7c37ff6f1b1ecee026650a66f5b4458c851fe356d7d670d6ca711a1637",
+    "size": 14832,
+    "write": [],
+    "delete": [
+      {
+        "at": "2026-11-16T10:44:29.966Z",
+        "pid": 39804,
+        "stage": "close",
+        "stack": "Error: \n    at capture (file:///C:/Users/tetsu/Documents/ChatGPT/%E5%B0%86%E6%A3%8B%E3%82%A2%E3%83%97%E3%83%AA/repo/scripts/stage-w1e-probe.mjs:23:266)\n    at object.<computed> (file:///C:/Users/tetsu/Documents/ChatGPT/%E5%B0%86%E6%A3%8B%E3%82%A2%E3%83%97%E3%83%AA/repo/scripts/stage-w1e-probe.mjs:25:329)\n    at node:internal/fs/rimraf:73:5\n    at FSReqCallback.oncomplete (node:fs:200:5)"
+      }
+    ],
+    "removed": [
+      {
+        "at": "2026-11-16T10:44:29.974Z",
+        "pid": 39804
+      }
+    ],
+    "actor": "UNKNOWN",
+    "scope": "does not prove exclusive OS writer; no comparison equivalence inferred"
+  },
+  {
+    "path": "GDHggiB7biZZ-GfHMKjwE/client/cbfa92899e606bc005daff50db00582e75d87f3c",
+    "absolute": "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\stage-w1e-20261116\\pair\\0-temp\\GDHggiB7biZZ-GfHMKjwE\\client\\cbfa92899e606bc005daff50db00582e75d87f3c",
+    "sha256": "702f4b983c53f716e2c81ff1890fcdabeabc37b7c43487d133bd8ba366f4d7df",
+    "size": 6051,
+    "write": [],
+    "delete": [
+      {
+        "at": "2026-11-16T10:44:29.966Z",
+        "pid": 39804,
+        "stage": "close",
+        "stack": "Error: \n    at capture (file:///C:/Users/tetsu/Documents/ChatGPT/%E5%B0%86%E6%A3%8B%E3%82%A2%E3%83%97%E3%83%AA/repo/scripts/stage-w1e-probe.mjs:23:266)\n    at object.<computed> (file:///C:/Users/tetsu/Documents/ChatGPT/%E5%B0%86%E6%A3%8B%E3%82%A2%E3%83%97%E3%83%AA/repo/scripts/stage-w1e-probe.mjs:25:329)\n    at node:internal/fs/rimraf:73:5\n    at FSReqCallback.oncomplete (node:fs:200:5)"
+      }
+    ],
+    "removed": [
+      {
+        "at": "2026-11-16T10:44:29.974Z",
+        "pid": 39804
+      }
+    ],
+    "actor": "UNKNOWN",
+    "scope": "does not prove exclusive OS writer; no comparison equivalence inferred"
+  },
+  {
+    "path": "GDHggiB7biZZ-GfHMKjwE/client/ce3db23f68bc5b37c34a0992968eeb76b29ec33c",
+    "absolute": "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\stage-w1e-20261116\\pair\\0-temp\\GDHggiB7biZZ-GfHMKjwE\\client\\ce3db23f68bc5b37c34a0992968eeb76b29ec33c",
+    "sha256": "8cbe5f73e5dc022ef682469308d171f9ae54649c2a5950571becc46a75a8f679",
+    "size": 23962,
+    "write": [],
+    "delete": [
+      {
+        "at": "2026-11-16T10:44:29.967Z",
+        "pid": 39804,
+        "stage": "close",
+        "stack": "Error: \n    at capture (file:///C:/Users/tetsu/Documents/ChatGPT/%E5%B0%86%E6%A3%8B%E3%82%A2%E3%83%97%E3%83%AA/repo/scripts/stage-w1e-probe.mjs:23:266)\n    at object.<computed> (file:///C:/Users/tetsu/Documents/ChatGPT/%E5%B0%86%E6%A3%8B%E3%82%A2%E3%83%97%E3%83%AA/repo/scripts/stage-w1e-probe.mjs:25:329)\n    at node:internal/fs/rimraf:73:5\n    at FSReqCallback.oncomplete (node:fs:200:5)"
+      }
+    ],
+    "removed": [
+      {
+        "at": "2026-11-16T10:44:29.974Z",
+        "pid": 39804
+      }
+    ],
+    "actor": "UNKNOWN",
+    "scope": "does not prove exclusive OS writer; no comparison equivalence inferred"
+  },
+  {
+    "path": "GDHggiB7biZZ-GfHMKjwE/client/ce5215af31a258361669c5348c0cea372ace955c",
+    "absolute": "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\stage-w1e-20261116\\pair\\0-temp\\GDHggiB7biZZ-GfHMKjwE\\client\\ce5215af31a258361669c5348c0cea372ace955c",
+    "sha256": "41d1924542c09573197448b91f8b13f596197f13ca9d65aafb57dbd3dc3e9c93",
+    "size": 7228,
+    "write": [],
+    "delete": [
+      {
+        "at": "2026-11-16T10:44:29.966Z",
+        "pid": 39804,
+        "stage": "close",
+        "stack": "Error: \n    at capture (file:///C:/Users/tetsu/Documents/ChatGPT/%E5%B0%86%E6%A3%8B%E3%82%A2%E3%83%97%E3%83%AA/repo/scripts/stage-w1e-probe.mjs:23:266)\n    at object.<computed> (file:///C:/Users/tetsu/Documents/ChatGPT/%E5%B0%86%E6%A3%8B%E3%82%A2%E3%83%97%E3%83%AA/repo/scripts/stage-w1e-probe.mjs:25:329)\n    at node:internal/fs/rimraf:73:5\n    at FSReqCallback.oncomplete (node:fs:200:5)"
+      }
+    ],
+    "removed": [
+      {
+        "at": "2026-11-16T10:44:29.974Z",
+        "pid": 39804
+      }
+    ],
+    "actor": "UNKNOWN",
+    "scope": "does not prove exclusive OS writer; no comparison equivalence inferred"
+  },
+  {
+    "path": "GDHggiB7biZZ-GfHMKjwE/client/d119380fb2b35cd256049f55a7142afdb9b84f4c",
+    "absolute": "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\stage-w1e-20261116\\pair\\0-temp\\GDHggiB7biZZ-GfHMKjwE\\client\\d119380fb2b35cd256049f55a7142afdb9b84f4c",
+    "sha256": "08e6749c6bffd6c5267c54c21f01e51a8a189eff68cde8c2847a6b09152f4db6",
+    "size": 5823,
+    "write": [],
+    "delete": [
+      {
+        "at": "2026-11-16T10:44:29.967Z",
+        "pid": 39804,
+        "stage": "close",
+        "stack": "Error: \n    at capture (file:///C:/Users/tetsu/Documents/ChatGPT/%E5%B0%86%E6%A3%8B%E3%82%A2%E3%83%97%E3%83%AA/repo/scripts/stage-w1e-probe.mjs:23:266)\n    at object.<computed> (file:///C:/Users/tetsu/Documents/ChatGPT/%E5%B0%86%E6%A3%8B%E3%82%A2%E3%83%97%E3%83%AA/repo/scripts/stage-w1e-probe.mjs:25:329)\n    at node:internal/fs/rimraf:73:5\n    at FSReqCallback.oncomplete (node:fs:200:5)"
+      }
+    ],
+    "removed": [
+      {
+        "at": "2026-11-16T10:44:29.974Z",
+        "pid": 39804
+      }
+    ],
+    "actor": "UNKNOWN",
+    "scope": "does not prove exclusive OS writer; no comparison equivalence inferred"
+  },
+  {
+    "path": "GDHggiB7biZZ-GfHMKjwE/client/d31e017fc4b167458cd39df17a0a17cf17825cb8",
+    "absolute": "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\stage-w1e-20261116\\pair\\0-temp\\GDHggiB7biZZ-GfHMKjwE\\client\\d31e017fc4b167458cd39df17a0a17cf17825cb8",
+    "sha256": "ffff00f81db783c8929f27abdef151576b420c25e469a1738ba1a5c4fae9653c",
+    "size": 84777,
+    "write": [],
+    "delete": [
+      {
+        "at": "2026-11-16T10:44:29.967Z",
+        "pid": 39804,
+        "stage": "close",
+        "stack": "Error: \n    at capture (file:///C:/Users/tetsu/Documents/ChatGPT/%E5%B0%86%E6%A3%8B%E3%82%A2%E3%83%97%E3%83%AA/repo/scripts/stage-w1e-probe.mjs:23:266)\n    at object.<computed> (file:///C:/Users/tetsu/Documents/ChatGPT/%E5%B0%86%E6%A3%8B%E3%82%A2%E3%83%97%E3%83%AA/repo/scripts/stage-w1e-probe.mjs:25:329)\n    at node:internal/fs/rimraf:73:5\n    at FSReqCallback.oncomplete (node:fs:200:5)"
+      }
+    ],
+    "removed": [
+      {
+        "at": "2026-11-16T10:44:29.974Z",
+        "pid": 39804
+      }
+    ],
+    "actor": "UNKNOWN",
+    "scope": "does not prove exclusive OS writer; no comparison equivalence inferred"
+  },
+  {
+    "path": "GDHggiB7biZZ-GfHMKjwE/client/d360daa6b9e131742746ada0900263ea4f582848",
+    "absolute": "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\stage-w1e-20261116\\pair\\0-temp\\GDHggiB7biZZ-GfHMKjwE\\client\\d360daa6b9e131742746ada0900263ea4f582848",
+    "sha256": "5f933381f4f38294016b810f5f9a16faf984f82ed1c7915b300c257e08688cc4",
+    "size": 21160,
+    "write": [],
+    "delete": [
+      {
+        "at": "2026-11-16T10:44:29.968Z",
+        "pid": 39804,
+        "stage": "close",
+        "stack": "Error: \n    at capture (file:///C:/Users/tetsu/Documents/ChatGPT/%E5%B0%86%E6%A3%8B%E3%82%A2%E3%83%97%E3%83%AA/repo/scripts/stage-w1e-probe.mjs:23:266)\n    at object.<computed> (file:///C:/Users/tetsu/Documents/ChatGPT/%E5%B0%86%E6%A3%8B%E3%82%A2%E3%83%97%E3%83%AA/repo/scripts/stage-w1e-probe.mjs:25:329)\n    at node:internal/fs/rimraf:73:5\n    at FSReqCallback.oncomplete (node:fs:200:5)"
+      }
+    ],
+    "removed": [
+      {
+        "at": "2026-11-16T10:44:29.974Z",
+        "pid": 39804
+      }
+    ],
+    "actor": "UNKNOWN",
+    "scope": "does not prove exclusive OS writer; no comparison equivalence inferred"
+  },
+  {
+    "path": "GDHggiB7biZZ-GfHMKjwE/client/d469573a7f758b3f3c8208b2ad5b927fe1157309",
+    "absolute": "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\stage-w1e-20261116\\pair\\0-temp\\GDHggiB7biZZ-GfHMKjwE\\client\\d469573a7f758b3f3c8208b2ad5b927fe1157309",
+    "sha256": "dbb3a0631a1785aed4b78eb8c9ec2ad270ed4c7169d308cb129b93486f8220f6",
+    "size": 702,
+    "write": [],
+    "delete": [
+      {
+        "at": "2026-11-16T10:44:29.967Z",
+        "pid": 39804,
+        "stage": "close",
+        "stack": "Error: \n    at capture (file:///C:/Users/tetsu/Documents/ChatGPT/%E5%B0%86%E6%A3%8B%E3%82%A2%E3%83%97%E3%83%AA/repo/scripts/stage-w1e-probe.mjs:23:266)\n    at object.<computed> (file:///C:/Users/tetsu/Documents/ChatGPT/%E5%B0%86%E6%A3%8B%E3%82%A2%E3%83%97%E3%83%AA/repo/scripts/stage-w1e-probe.mjs:25:329)\n    at node:internal/fs/rimraf:73:5\n    at FSReqCallback.oncomplete (node:fs:200:5)"
+      }
+    ],
+    "removed": [
+      {
+        "at": "2026-11-16T10:44:29.974Z",
+        "pid": 39804
+      }
+    ],
+    "actor": "UNKNOWN",
+    "scope": "does not prove exclusive OS writer; no comparison equivalence inferred"
+  },
+  {
+    "path": "GDHggiB7biZZ-GfHMKjwE/client/d5dedd6388710bd3b3cc0fb23f64f1e6b706646e",
+    "absolute": "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\stage-w1e-20261116\\pair\\0-temp\\GDHggiB7biZZ-GfHMKjwE\\client\\d5dedd6388710bd3b3cc0fb23f64f1e6b706646e",
+    "sha256": "e5855eb74717d07abff2eabad202403ed2403733bccd1d57985589d66f50c24f",
+    "size": 63972,
+    "write": [],
+    "delete": [
+      {
+        "at": "2026-11-16T10:44:29.968Z",
+        "pid": 39804,
+        "stage": "close",
+        "stack": "Error: \n    at capture (file:///C:/Users/tetsu/Documents/ChatGPT/%E5%B0%86%E6%A3%8B%E3%82%A2%E3%83%97%E3%83%AA/repo/scripts/stage-w1e-probe.mjs:23:266)\n    at object.<computed> (file:///C:/Users/tetsu/Documents/ChatGPT/%E5%B0%86%E6%A3%8B%E3%82%A2%E3%83%97%E3%83%AA/repo/scripts/stage-w1e-probe.mjs:25:329)\n    at node:internal/fs/rimraf:73:5\n    at FSReqCallback.oncomplete (node:fs:200:5)"
+      }
+    ],
+    "removed": [
+      {
+        "at": "2026-11-16T10:44:29.974Z",
+        "pid": 39804
+      }
+    ],
+    "actor": "UNKNOWN",
+    "scope": "does not prove exclusive OS writer; no comparison equivalence inferred"
+  },
+  {
+    "path": "GDHggiB7biZZ-GfHMKjwE/client/dac78deeb13591c1d38df12c2715fb5db3225c37",
+    "absolute": "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\stage-w1e-20261116\\pair\\0-temp\\GDHggiB7biZZ-GfHMKjwE\\client\\dac78deeb13591c1d38df12c2715fb5db3225c37",
+    "sha256": "14f479bd60e0499fe0f4ab67941a8130b11abac626f3f9f27021dac72c50d663",
+    "size": 12471,
+    "write": [],
+    "delete": [
+      {
+        "at": "2026-11-16T10:44:29.968Z",
+        "pid": 39804,
+        "stage": "close",
+        "stack": "Error: \n    at capture (file:///C:/Users/tetsu/Documents/ChatGPT/%E5%B0%86%E6%A3%8B%E3%82%A2%E3%83%97%E3%83%AA/repo/scripts/stage-w1e-probe.mjs:23:266)\n    at object.<computed> (file:///C:/Users/tetsu/Documents/ChatGPT/%E5%B0%86%E6%A3%8B%E3%82%A2%E3%83%97%E3%83%AA/repo/scripts/stage-w1e-probe.mjs:25:329)\n    at node:internal/fs/rimraf:73:5\n    at FSReqCallback.oncomplete (node:fs:200:5)"
+      }
+    ],
+    "removed": [
+      {
+        "at": "2026-11-16T10:44:29.974Z",
+        "pid": 39804
+      }
+    ],
+    "actor": "UNKNOWN",
+    "scope": "does not prove exclusive OS writer; no comparison equivalence inferred"
+  },
+  {
+    "path": "GDHggiB7biZZ-GfHMKjwE/client/dd18d336dc3fdbb47ea9da289f1b4ad490e6edc8",
+    "absolute": "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\stage-w1e-20261116\\pair\\0-temp\\GDHggiB7biZZ-GfHMKjwE\\client\\dd18d336dc3fdbb47ea9da289f1b4ad490e6edc8",
+    "sha256": "12f866f44a4b3ed3fc65c93b20af9d55c28e13e684b3a0c3e92a352c258c18fb",
+    "size": 54181,
+    "write": [],
+    "delete": [
+      {
+        "at": "2026-11-16T10:44:29.969Z",
+        "pid": 39804,
+        "stage": "close",
+        "stack": "Error: \n    at capture (file:///C:/Users/tetsu/Documents/ChatGPT/%E5%B0%86%E6%A3%8B%E3%82%A2%E3%83%97%E3%83%AA/repo/scripts/stage-w1e-probe.mjs:23:266)\n    at object.<computed> (file:///C:/Users/tetsu/Documents/ChatGPT/%E5%B0%86%E6%A3%8B%E3%82%A2%E3%83%97%E3%83%AA/repo/scripts/stage-w1e-probe.mjs:25:329)\n    at node:internal/fs/rimraf:73:5\n    at FSReqCallback.oncomplete (node:fs:200:5)"
+      }
+    ],
+    "removed": [
+      {
+        "at": "2026-11-16T10:44:29.974Z",
+        "pid": 39804
+      }
+    ],
+    "actor": "UNKNOWN",
+    "scope": "does not prove exclusive OS writer; no comparison equivalence inferred"
+  },
+  {
+    "path": "GDHggiB7biZZ-GfHMKjwE/client/e10b17399b928b15b94a27b17228cd49262583a2",
+    "absolute": "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\stage-w1e-20261116\\pair\\0-temp\\GDHggiB7biZZ-GfHMKjwE\\client\\e10b17399b928b15b94a27b17228cd49262583a2",
+    "sha256": "5a991111f68b5d0d3f9e15e24e90f6f932450b69ae6c6fa89ddb2718aa31fb56",
+    "size": 6776,
+    "write": [],
+    "delete": [
+      {
+        "at": "2026-11-16T10:44:29.969Z",
+        "pid": 39804,
+        "stage": "close",
+        "stack": "Error: \n    at capture (file:///C:/Users/tetsu/Documents/ChatGPT/%E5%B0%86%E6%A3%8B%E3%82%A2%E3%83%97%E3%83%AA/repo/scripts/stage-w1e-probe.mjs:23:266)\n    at object.<computed> (file:///C:/Users/tetsu/Documents/ChatGPT/%E5%B0%86%E6%A3%8B%E3%82%A2%E3%83%97%E3%83%AA/repo/scripts/stage-w1e-probe.mjs:25:329)\n    at node:internal/fs/rimraf:73:5\n    at FSReqCallback.oncomplete (node:fs:200:5)"
+      }
+    ],
+    "removed": [
+      {
+        "at": "2026-11-16T10:44:29.974Z",
+        "pid": 39804
+      }
+    ],
+    "actor": "UNKNOWN",
+    "scope": "does not prove exclusive OS writer; no comparison equivalence inferred"
+  },
+  {
+    "path": "GDHggiB7biZZ-GfHMKjwE/client/e17e66dcc5853c75c0fafa549754bd7f0a2a93f9",
+    "absolute": "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\stage-w1e-20261116\\pair\\0-temp\\GDHggiB7biZZ-GfHMKjwE\\client\\e17e66dcc5853c75c0fafa549754bd7f0a2a93f9",
+    "sha256": "fd98389172a7c737645ceba6f84d972233cf2342f4d096cc9ead5729f4cffb2c",
+    "size": 9404,
+    "write": [],
+    "delete": [
+      {
+        "at": "2026-11-16T10:44:29.969Z",
+        "pid": 39804,
+        "stage": "close",
+        "stack": "Error: \n    at capture (file:///C:/Users/tetsu/Documents/ChatGPT/%E5%B0%86%E6%A3%8B%E3%82%A2%E3%83%97%E3%83%AA/repo/scripts/stage-w1e-probe.mjs:23:266)\n    at object.<computed> (file:///C:/Users/tetsu/Documents/ChatGPT/%E5%B0%86%E6%A3%8B%E3%82%A2%E3%83%97%E3%83%AA/repo/scripts/stage-w1e-probe.mjs:25:329)\n    at node:internal/fs/rimraf:73:5\n    at FSReqCallback.oncomplete (node:fs:200:5)"
+      }
+    ],
+    "removed": [
+      {
+        "at": "2026-11-16T10:44:29.974Z",
+        "pid": 39804
+      }
+    ],
+    "actor": "UNKNOWN",
+    "scope": "does not prove exclusive OS writer; no comparison equivalence inferred"
+  },
+  {
+    "path": "GDHggiB7biZZ-GfHMKjwE/client/f01230a7a477522b2d92763563dd00656333a21d",
+    "absolute": "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\stage-w1e-20261116\\pair\\0-temp\\GDHggiB7biZZ-GfHMKjwE\\client\\f01230a7a477522b2d92763563dd00656333a21d",
+    "sha256": "ab4f7804ca70044f958a4b5a2c05dcd4eb064d49d121698564dedf420401a240",
+    "size": 5493,
+    "write": [],
+    "delete": [
+      {
+        "at": "2026-11-16T10:44:29.970Z",
+        "pid": 39804,
+        "stage": "close",
+        "stack": "Error: \n    at capture (file:///C:/Users/tetsu/Documents/ChatGPT/%E5%B0%86%E6%A3%8B%E3%82%A2%E3%83%97%E3%83%AA/repo/scripts/stage-w1e-probe.mjs:23:266)\n    at object.<computed> (file:///C:/Users/tetsu/Documents/ChatGPT/%E5%B0%86%E6%A3%8B%E3%82%A2%E3%83%97%E3%83%AA/repo/scripts/stage-w1e-probe.mjs:25:329)\n    at node:internal/fs/rimraf:73:5\n    at FSReqCallback.oncomplete (node:fs:200:5)"
+      }
+    ],
+    "removed": [
+      {
+        "at": "2026-11-16T10:44:29.974Z",
+        "pid": 39804
+      }
+    ],
+    "actor": "UNKNOWN",
+    "scope": "does not prove exclusive OS writer; no comparison equivalence inferred"
+  },
+  {
+    "path": "GDHggiB7biZZ-GfHMKjwE/client/f093e7bab366f3c24a7add68493d789aee7ad17d",
+    "absolute": "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\stage-w1e-20261116\\pair\\0-temp\\GDHggiB7biZZ-GfHMKjwE\\client\\f093e7bab366f3c24a7add68493d789aee7ad17d",
+    "sha256": "045afe60f1904577a01590acca35a9e35520c2c6ddf160bea98fb5354a6f184c",
+    "size": 8283,
+    "write": [],
+    "delete": [
+      {
+        "at": "2026-11-16T10:44:29.970Z",
+        "pid": 39804,
+        "stage": "close",
+        "stack": "Error: \n    at capture (file:///C:/Users/tetsu/Documents/ChatGPT/%E5%B0%86%E6%A3%8B%E3%82%A2%E3%83%97%E3%83%AA/repo/scripts/stage-w1e-probe.mjs:23:266)\n    at object.<computed> (file:///C:/Users/tetsu/Documents/ChatGPT/%E5%B0%86%E6%A3%8B%E3%82%A2%E3%83%97%E3%83%AA/repo/scripts/stage-w1e-probe.mjs:25:329)\n    at node:internal/fs/rimraf:73:5\n    at FSReqCallback.oncomplete (node:fs:200:5)"
+      }
+    ],
+    "removed": [
+      {
+        "at": "2026-11-16T10:44:29.974Z",
+        "pid": 39804
+      }
+    ],
+    "actor": "UNKNOWN",
+    "scope": "does not prove exclusive OS writer; no comparison equivalence inferred"
+  },
+  {
+    "path": "GDHggiB7biZZ-GfHMKjwE/client/f2bd4a7c3b378b203a7f0c1a6221eadcc5933179",
+    "absolute": "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\stage-w1e-20261116\\pair\\0-temp\\GDHggiB7biZZ-GfHMKjwE\\client\\f2bd4a7c3b378b203a7f0c1a6221eadcc5933179",
+    "sha256": "ca437b7f1fa4fc0363f4ee92cbade2789ba64c3396908f23a5b4a77731a71bf0",
+    "size": 24554,
+    "write": [],
+    "delete": [
+      {
+        "at": "2026-11-16T10:44:29.970Z",
+        "pid": 39804,
+        "stage": "close",
+        "stack": "Error: \n    at capture (file:///C:/Users/tetsu/Documents/ChatGPT/%E5%B0%86%E6%A3%8B%E3%82%A2%E3%83%97%E3%83%AA/repo/scripts/stage-w1e-probe.mjs:23:266)\n    at object.<computed> (file:///C:/Users/tetsu/Documents/ChatGPT/%E5%B0%86%E6%A3%8B%E3%82%A2%E3%83%97%E3%83%AA/repo/scripts/stage-w1e-probe.mjs:25:329)\n    at node:internal/fs/rimraf:73:5\n    at FSReqCallback.oncomplete (node:fs:200:5)"
+      }
+    ],
+    "removed": [
+      {
+        "at": "2026-11-16T10:44:29.974Z",
+        "pid": 39804
+      }
+    ],
+    "actor": "UNKNOWN",
+    "scope": "does not prove exclusive OS writer; no comparison equivalence inferred"
+  },
+  {
+    "path": "GDHggiB7biZZ-GfHMKjwE/client/f86ea7bdeb0ff559c0218d68148884f87736bcc7",
+    "absolute": "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\stage-w1e-20261116\\pair\\0-temp\\GDHggiB7biZZ-GfHMKjwE\\client\\f86ea7bdeb0ff559c0218d68148884f87736bcc7",
+    "sha256": "881291bd1382541f45e25aa2b5ffc134a3785a5382c265694df5fc037a803ee5",
+    "size": 5083,
+    "write": [],
+    "delete": [
+      {
+        "at": "2026-11-16T10:44:29.970Z",
+        "pid": 39804,
+        "stage": "close",
+        "stack": "Error: \n    at capture (file:///C:/Users/tetsu/Documents/ChatGPT/%E5%B0%86%E6%A3%8B%E3%82%A2%E3%83%97%E3%83%AA/repo/scripts/stage-w1e-probe.mjs:23:266)\n    at object.<computed> (file:///C:/Users/tetsu/Documents/ChatGPT/%E5%B0%86%E6%A3%8B%E3%82%A2%E3%83%97%E3%83%AA/repo/scripts/stage-w1e-probe.mjs:25:329)\n    at node:internal/fs/rimraf:73:5\n    at FSReqCallback.oncomplete (node:fs:200:5)"
+      }
+    ],
+    "removed": [
+      {
+        "at": "2026-11-16T10:44:29.974Z",
+        "pid": 39804
+      }
+    ],
+    "actor": "UNKNOWN",
+    "scope": "does not prove exclusive OS writer; no comparison equivalence inferred"
+  },
+  {
+    "path": "GDHggiB7biZZ-GfHMKjwE/client/fe615778aa862b1cfe6c8ba72fb2ef243cafac5e",
+    "absolute": "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\stage-w1e-20261116\\pair\\0-temp\\GDHggiB7biZZ-GfHMKjwE\\client\\fe615778aa862b1cfe6c8ba72fb2ef243cafac5e",
+    "sha256": "a9e1cc096a077e41917ee611fb2cce79cac756cd86fa4eb9c7df07af145f03cb",
+    "size": 8123,
+    "write": [],
+    "delete": [
+      {
+        "at": "2026-11-16T10:44:29.971Z",
+        "pid": 39804,
+        "stage": "close",
+        "stack": "Error: \n    at capture (file:///C:/Users/tetsu/Documents/ChatGPT/%E5%B0%86%E6%A3%8B%E3%82%A2%E3%83%97%E3%83%AA/repo/scripts/stage-w1e-probe.mjs:23:266)\n    at object.<computed> (file:///C:/Users/tetsu/Documents/ChatGPT/%E5%B0%86%E6%A3%8B%E3%82%A2%E3%83%97%E3%83%AA/repo/scripts/stage-w1e-probe.mjs:25:329)\n    at node:internal/fs/rimraf:73:5\n    at FSReqCallback.oncomplete (node:fs:200:5)"
+      }
+    ],
+    "removed": [
+      {
+        "at": "2026-11-16T10:44:29.975Z",
+        "pid": 39804
+      }
+    ],
+    "actor": "UNKNOWN",
+    "scope": "does not prove exclusive OS writer; no comparison equivalence inferred"
+  },
+  {
+    "path": "GDHggiB7biZZ-GfHMKjwE/client/fe7282c15b35b12c341b8aff016276218ae224f3",
+    "absolute": "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\stage-w1e-20261116\\pair\\0-temp\\GDHggiB7biZZ-GfHMKjwE\\client\\fe7282c15b35b12c341b8aff016276218ae224f3",
+    "sha256": "71de91b3ad11ae524654193a7b48d48cd690cc2e2fcff87da35c68f0777e93ee",
+    "size": 44092,
+    "write": [],
+    "delete": [
+      {
+        "at": "2026-11-16T10:44:29.971Z",
+        "pid": 39804,
+        "stage": "close",
+        "stack": "Error: \n    at capture (file:///C:/Users/tetsu/Documents/ChatGPT/%E5%B0%86%E6%A3%8B%E3%82%A2%E3%83%97%E3%83%AA/repo/scripts/stage-w1e-probe.mjs:23:266)\n    at object.<computed> (file:///C:/Users/tetsu/Documents/ChatGPT/%E5%B0%86%E6%A3%8B%E3%82%A2%E3%83%97%E3%83%AA/repo/scripts/stage-w1e-probe.mjs:25:329)\n    at node:internal/fs/rimraf:73:5\n    at FSReqCallback.oncomplete (node:fs:200:5)"
+      }
+    ],
+    "removed": [
+      {
+        "at": "2026-11-16T10:44:29.975Z",
+        "pid": 39804
+      }
+    ],
+    "actor": "UNKNOWN",
+    "scope": "does not prove exclusive OS writer; no comparison equivalence inferred"
+  },
+  {
+    "path": "GDHggiB7biZZ-GfHMKjwE/client/ffd60d6ad2767e90b62ac051dda5fd222aadbb57",
+    "absolute": "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\stage-w1e-20261116\\pair\\0-temp\\GDHggiB7biZZ-GfHMKjwE\\client\\ffd60d6ad2767e90b62ac051dda5fd222aadbb57",
+    "sha256": "9e1b531e3652caaed5d4e56ad5a2667b993dc2da43ab4b81089f7a4d71f3da2a",
+    "size": 39646,
+    "write": [],
+    "delete": [
+      {
+        "at": "2026-11-16T10:44:29.971Z",
+        "pid": 39804,
+        "stage": "close",
+        "stack": "Error: \n    at capture (file:///C:/Users/tetsu/Documents/ChatGPT/%E5%B0%86%E6%A3%8B%E3%82%A2%E3%83%97%E3%83%AA/repo/scripts/stage-w1e-probe.mjs:23:266)\n    at object.<computed> (file:///C:/Users/tetsu/Documents/ChatGPT/%E5%B0%86%E6%A3%8B%E3%82%A2%E3%83%97%E3%83%AA/repo/scripts/stage-w1e-probe.mjs:25:329)\n    at node:internal/fs/rimraf:73:5\n    at FSReqCallback.oncomplete (node:fs:200:5)"
+      }
+    ],
+    "removed": [
+      {
+        "at": "2026-11-16T10:44:29.975Z",
+        "pid": 39804
+      }
+    ],
+    "actor": "UNKNOWN",
+    "scope": "does not prove exclusive OS writer; no comparison equivalence inferred"
+  }
+]

@@ -1,0 +1,322 @@
+{
+  "at": "2026-11-15T14:46:26.731Z",
+  "overall": "PARTIAL",
+  "merge": "NO",
+  "draft": true,
+  "startHead": "13a5b9f8eba355bd6dafd37fbdb23f00bb87e10f",
+  "startTree": "d87940f9004c28fbc104a6bf6f3436e9d69a2c09",
+  "finalHead": "reported in PR after normal commit/push",
+  "P2_W1c_01": {
+    "implementation": "FIXED_AND_TESTED",
+    "falseAcceptsRed": 8,
+    "rejectedGreen": 8,
+    "independentClosure": "PENDING_REVIEW"
+  },
+  "P2_W1c_02": {
+    "implementation": "FIXED_AND_TESTED",
+    "falseAcceptsRed": 13,
+    "alreadyProtected": 18,
+    "rejectedGreen": 31,
+    "independentClosure": "PENDING_REVIEW"
+  },
+  "normalControl": "PASS, two trials, exact retained input",
+  "sameInputInventories": true,
+  "comparison": {
+    "at": "2026-11-15T14:46:26.526Z",
+    "status": "NOT_READY",
+    "comparison": "NOT_TESTED",
+    "comparisonSpawns": {
+      "old": 0,
+      "new": 0
+    },
+    "S4": "NOT_TESTED",
+    "S5": "NOT_TESTED",
+    "blocking": [
+      "Observed TEMP lifecycle: 65 generated entries per target, differing random directories and hashes; full content/lifecycle constraints not established.",
+      "Default Vitest results cache writes duration/result state; no validated transition allowance."
+    ],
+    "allowance": "NONE; complete dependency/environment seals retained",
+    "notBlockedByAuthorization": true,
+    "meaning": "Safety/equivalence gate unmet, not missing user permission or inaccessible GitHub."
+  },
+  "generatedControls": [
+    {
+      "name": "unexpected-empty-directory",
+      "exitCode": 1,
+      "comparisonSpawns": 0,
+      "status": "UNKNOWN"
+    },
+    {
+      "name": "unknown-file-in-vite-temp",
+      "exitCode": 1,
+      "comparisonSpawns": 0,
+      "status": "UNKNOWN"
+    },
+    {
+      "name": "existing-file-content",
+      "exitCode": 1,
+      "comparisonSpawns": 0,
+      "status": "UNKNOWN"
+    },
+    {
+      "name": "directory-to-file",
+      "exitCode": 1,
+      "comparisonSpawns": 0,
+      "status": "UNKNOWN"
+    },
+    {
+      "name": "link-cycle",
+      "exitCode": 1,
+      "comparisonSpawns": 0,
+      "status": "UNKNOWN"
+    },
+    {
+      "name": "outside-vite-temp-cache",
+      "exitCode": 1,
+      "comparisonSpawns": 0,
+      "status": "UNKNOWN"
+    },
+    {
+      "name": "outside-vite-temp-TEMP",
+      "exitCode": 1,
+      "comparisonSpawns": 0,
+      "status": "UNKNOWN"
+    },
+    {
+      "name": "wrong-time-creation",
+      "exitCode": 1,
+      "comparisonSpawns": 0,
+      "status": "UNKNOWN"
+    },
+    {
+      "name": "different-target-generated-output",
+      "exitCode": 1,
+      "comparisonSpawns": 0,
+      "status": "UNKNOWN"
+    },
+    {
+      "name": "output-reuse",
+      "exitCode": 1,
+      "comparisonSpawns": 0,
+      "status": "UNKNOWN"
+    },
+    {
+      "name": "verification-record-tamper",
+      "exitCode": 1,
+      "comparisonSpawns": 0,
+      "status": "UNKNOWN"
+    },
+    {
+      "name": "allowance-condition-tamper",
+      "exitCode": 1,
+      "comparisonSpawns": 0,
+      "status": "UNKNOWN"
+    }
+  ],
+  "regression": {
+    "verifiers": 69,
+    "pass": 69,
+    "fullProductFiles": 98,
+    "fullProductTests": 2587,
+    "missing": 0,
+    "added": 0,
+    "skipped": 0,
+    "timeout": 0,
+    "relatedFiles": 8,
+    "relatedTests": 154,
+    "validation": [
+      {
+        "name": "related-summary",
+        "command": [
+          "C:\\Program Files\\nodejs\\node.exe",
+          "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\repo\\scripts\\stage-w1b-summary-check.mjs"
+        ],
+        "cwd": "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\repo",
+        "started": "2026-11-15T14:34:45.962Z",
+        "finished": "2026-11-15T14:34:46.305Z",
+        "exitCode": 0,
+        "signal": null,
+        "error": null
+      },
+      {
+        "name": "related-w1",
+        "command": [
+          "C:\\Program Files\\nodejs\\node.exe",
+          "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\repo\\scripts\\stage-w1-summary-check.mjs"
+        ],
+        "cwd": "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\repo",
+        "started": "2026-11-15T14:34:46.305Z",
+        "finished": "2026-11-15T14:34:46.590Z",
+        "exitCode": 0,
+        "signal": null,
+        "error": null
+      },
+      {
+        "name": "related-product",
+        "command": [
+          "C:\\Program Files\\nodejs\\node.exe",
+          "C:\\Program Files\\nodejs\\node_modules\\npm\\bin\\npm-cli.js",
+          "test",
+          "--",
+          "game-blunder",
+          "match-journal"
+        ],
+        "cwd": "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\repo",
+        "started": "2026-11-15T14:34:46.590Z",
+        "finished": "2026-11-15T14:35:00.563Z",
+        "exitCode": 0,
+        "signal": null,
+        "error": null
+      },
+      {
+        "name": "lock",
+        "command": [
+          "C:\\Program Files\\nodejs\\node.exe",
+          "C:\\Program Files\\nodejs\\node_modules\\npm\\bin\\npm-cli.js",
+          "run",
+          "verify:lock"
+        ],
+        "cwd": "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\repo",
+        "started": "2026-11-15T14:35:00.563Z",
+        "finished": "2026-11-15T14:35:01.508Z",
+        "exitCode": 0,
+        "signal": null,
+        "error": null
+      },
+      {
+        "name": "typecheck",
+        "command": [
+          "C:\\Program Files\\nodejs\\node.exe",
+          "C:\\Program Files\\nodejs\\node_modules\\npm\\bin\\npm-cli.js",
+          "run",
+          "lint"
+        ],
+        "cwd": "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\repo",
+        "started": "2026-11-15T14:35:01.508Z",
+        "finished": "2026-11-15T14:35:15.941Z",
+        "exitCode": 0,
+        "signal": null,
+        "error": null
+      },
+      {
+        "name": "build",
+        "command": [
+          "C:\\Program Files\\nodejs\\node.exe",
+          "C:\\Program Files\\nodejs\\node_modules\\npm\\bin\\npm-cli.js",
+          "run",
+          "build"
+        ],
+        "cwd": "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\repo",
+        "started": "2026-11-15T14:35:15.941Z",
+        "finished": "2026-11-15T14:35:29.388Z",
+        "exitCode": 0,
+        "signal": null,
+        "error": null
+      },
+      {
+        "name": "full-product",
+        "command": [
+          "C:\\Program Files\\nodejs\\node.exe",
+          "C:\\Program Files\\nodejs\\node_modules\\npm\\bin\\npm-cli.js",
+          "test",
+          "--",
+          "src/test"
+        ],
+        "cwd": "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\repo",
+        "started": "2026-11-15T14:35:29.388Z",
+        "finished": "2026-11-15T14:37:42.586Z",
+        "exitCode": 0,
+        "signal": null,
+        "error": null
+      }
+    ],
+    "runtime": [
+      {
+        "name": "normal-duplicates",
+        "expected": "PASS",
+        "verify": {
+          "status": "PASS",
+          "runId": "e95698e4-109a-4215-8de0-a082e471b835",
+          "results": [
+            {
+              "trialId": "ae7a672c-e3a8-4ef9-87f6-86f71375501f",
+              "status": "PASS"
+            },
+            {
+              "trialId": "742fb526-a1ab-4431-9494-eb44626d5c09",
+              "status": "PASS"
+            }
+          ]
+        },
+        "exitCode": 0
+      },
+      {
+        "name": "runtime-error",
+        "expected": "INVALID",
+        "verify": {
+          "status": "NONPASS",
+          "runId": "e67461d3-0eb7-4593-9680-cfc8a177d9e1",
+          "results": [
+            {
+              "trialId": "33631b08-c0b5-47ca-849f-7a0bf4bf266f",
+              "status": "INVALID"
+            },
+            {
+              "trialId": "0f901076-0c39-4e52-be24-4a88f522dbc2",
+              "status": "INVALID"
+            }
+          ]
+        },
+        "exitCode": 1
+      },
+      {
+        "name": "assertion-failure",
+        "expected": "FAIL",
+        "verify": {
+          "status": "NONPASS",
+          "runId": "eabca151-c742-4d78-98c6-d8c9d4961956",
+          "results": [
+            {
+              "trialId": "ef9728e3-c64b-4dcb-ba9b-d93f9c7bb924",
+              "status": "FAIL"
+            },
+            {
+              "trialId": "0bd9e9a2-e1f0-4c09-b99b-3dfe8bb59ab5",
+              "status": "FAIL"
+            }
+          ]
+        },
+        "exitCode": 1
+      }
+    ],
+    "interrupted": "INVALID / 1",
+    "collectionComparisonSpawns": 0
+  },
+  "preservation": {
+    "at": "2026-11-15T14:44:58.570Z",
+    "tmp": {
+      "entries": 6817,
+      "unchanged": true
+    },
+    "w1c": {
+      "entries": 1707,
+      "files": 1308,
+      "unchanged": true
+    }
+  },
+  "W1bP2Closures": "MAINTAINED",
+  "R8": "UNKNOWN",
+  "H1": "UNKNOWN",
+  "H2": "UNKNOWN",
+  "H3": "UNKNOWN",
+  "H4": "UNKNOWN",
+  "ABBA": "NOT_TESTED / OUT_OF_SCOPE",
+  "cpuRssGc": "NOT_TESTED / OUT_OF_SCOPE",
+  "CI": "PENDING_AT_COMMIT; exact final-head results and raw readback saved separately and linked in PR",
+  "tooling": {
+    "runner": "126f0ed829fb654eb41c161646f3e99db56b5ad873214b73b034ad9c4a527c71",
+    "worker": "d4152fb4914288f3d5a4328a26a79e5c5f4447c98c4e7d7ea26beb104a761804",
+    "preflight": "188da001dffa69561bdbab45072a638a278d980308c849553eb3368c1e3e71e1",
+    "summary": "4143527f40a363855a91613e34f280cf1a8b1c18717ab22cbe8230d8ef0066cb"
+  }
+}

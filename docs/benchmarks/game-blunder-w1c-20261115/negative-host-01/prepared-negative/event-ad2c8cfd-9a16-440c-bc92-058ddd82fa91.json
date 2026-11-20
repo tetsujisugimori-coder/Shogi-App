@@ -1,0 +1,6 @@
+{
+  "at": "2026-11-15T11:56:59.502Z",
+  "action": "blocked",
+  "phase": "launch",
+  "reason": "Error: raw blob mismatch: tiny.test.js; no CRLF normalization permitted"
+}

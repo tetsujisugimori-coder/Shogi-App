@@ -1,0 +1,248 @@
+{
+  "scope": "synthetic only, expected rejection reasons asserted",
+  "outcomes": [
+    {
+      "name": "normal",
+      "status": "PASS",
+      "gate": {
+        "status": "NOT_READY",
+        "outcome": "B",
+        "comparison": "NOT_TESTED",
+        "comparisonSpawns": {
+          "old": 0,
+          "new": 0
+        },
+        "blocking": [
+          "exclusive OS writer UNKNOWN",
+          "full effective config UNKNOWN",
+          "result cache semantic equivalence UNKNOWN",
+          "independent real admission NOT_ESTABLISHED"
+        ]
+      }
+    },
+    {
+      "name": "cache-type",
+      "expectedReason": "CACHE_SHAPE",
+      "actualReason": "CACHE_SHAPE",
+      "status": "PASS",
+      "comparisonSpawns": 0
+    },
+    {
+      "name": "cache-value",
+      "expectedReason": "SETTINGS",
+      "actualReason": "SETTINGS",
+      "status": "PASS",
+      "comparisonSpawns": 0
+    },
+    {
+      "name": "cache-physical",
+      "expectedReason": "CACHE_PHYSICAL",
+      "actualReason": "CACHE_PHYSICAL",
+      "status": "PASS",
+      "comparisonSpawns": 0
+    },
+    {
+      "name": "pid",
+      "expectedReason": "EVENT_PID",
+      "actualReason": "EVENT_PID",
+      "status": "PASS",
+      "comparisonSpawns": 0
+    },
+    {
+      "name": "operation",
+      "expectedReason": "EVENT_OPERATION",
+      "actualReason": "EVENT_OPERATION",
+      "status": "PASS",
+      "comparisonSpawns": 0
+    },
+    {
+      "name": "rename-source",
+      "expectedReason": "EVENT_BEFOREPATH",
+      "actualReason": "EVENT_BEFOREPATH",
+      "status": "PASS",
+      "comparisonSpawns": 0
+    },
+    {
+      "name": "rename-destination",
+      "expectedReason": "EVENT_AFTERPATH",
+      "actualReason": "EVENT_AFTERPATH",
+      "status": "PASS",
+      "comparisonSpawns": 0
+    },
+    {
+      "name": "bytes",
+      "expectedReason": "EVENT_BYTES_HASH",
+      "actualReason": "EVENT_BYTES_HASH",
+      "status": "PASS",
+      "comparisonSpawns": 0
+    },
+    {
+      "name": "hash",
+      "expectedReason": "EVENT_BYTES_HASH",
+      "actualReason": "EVENT_BYTES_HASH",
+      "status": "PASS",
+      "comparisonSpawns": 0
+    },
+    {
+      "name": "event-missing",
+      "expectedReason": "EVENT_MISSING",
+      "actualReason": "EVENT_MISSING",
+      "status": "PASS",
+      "comparisonSpawns": 0
+    },
+    {
+      "name": "event-order",
+      "expectedReason": "EVENT_ORDER",
+      "actualReason": "EVENT_ORDER",
+      "status": "PASS",
+      "comparisonSpawns": 0
+    },
+    {
+      "name": "event-window",
+      "expectedReason": "EVENT_WINDOW",
+      "actualReason": "EVENT_WINDOW",
+      "status": "PASS",
+      "comparisonSpawns": 0
+    },
+    {
+      "name": "trial",
+      "expectedReason": "EVENT_TRIAL",
+      "actualReason": "EVENT_TRIAL",
+      "status": "PASS",
+      "comparisonSpawns": 0
+    },
+    {
+      "name": "asymmetric",
+      "expectedReason": "EVENT_MISSING",
+      "actualReason": "EVENT_MISSING",
+      "status": "PASS",
+      "comparisonSpawns": 0
+    },
+    {
+      "name": "link-junction-cycle",
+      "expectedReason": "RESIDUE",
+      "actualReason": "RESIDUE",
+      "status": "PASS",
+      "comparisonSpawns": 0
+    },
+    {
+      "name": "unknown-file",
+      "expectedReason": "RESIDUE",
+      "actualReason": "RESIDUE",
+      "status": "PASS",
+      "comparisonSpawns": 0
+    },
+    {
+      "name": "directory-type",
+      "expectedReason": "RESIDUE",
+      "actualReason": "RESIDUE",
+      "status": "PASS",
+      "comparisonSpawns": 0
+    },
+    {
+      "name": "cache-failed",
+      "expectedReason": "CACHE_RESULT_CHANGED",
+      "actualReason": "CACHE_RESULT_CHANGED",
+      "status": "PASS",
+      "comparisonSpawns": 0
+    },
+    {
+      "name": "duration",
+      "expectedReason": "CACHE_RESULT_CHANGED",
+      "actualReason": "CACHE_RESULT_CHANGED",
+      "status": "PASS",
+      "comparisonSpawns": 0
+    },
+    {
+      "name": "output-reuse",
+      "expectedReason": "OUTPUT",
+      "actualReason": "OUTPUT",
+      "status": "PASS",
+      "comparisonSpawns": 0
+    },
+    {
+      "name": "seal",
+      "expectedReason": "EVENT_SEAL",
+      "actualReason": "EVENT_SEAL",
+      "status": "PASS",
+      "comparisonSpawns": 0
+    },
+    {
+      "name": "assessment",
+      "expectedReason": "ASSESSMENT",
+      "actualReason": "ASSESSMENT",
+      "status": "PASS",
+      "comparisonSpawns": 0
+    },
+    {
+      "name": "request",
+      "expectedReason": "REQUEST",
+      "actualReason": "REQUEST",
+      "status": "PASS",
+      "comparisonSpawns": 0
+    },
+    {
+      "name": "node",
+      "expectedReason": "IDENTITY",
+      "actualReason": "IDENTITY",
+      "status": "PASS",
+      "comparisonSpawns": 0
+    },
+    {
+      "name": "cwd",
+      "expectedReason": "IDENTITY",
+      "actualReason": "IDENTITY",
+      "status": "PASS",
+      "comparisonSpawns": 0
+    },
+    {
+      "name": "pair-order",
+      "expectedReason": "TARGET",
+      "actualReason": "TARGET",
+      "status": "PASS",
+      "comparisonSpawns": 0
+    },
+    {
+      "name": "head",
+      "expectedReason": "TARGET",
+      "actualReason": "TARGET",
+      "status": "PASS",
+      "comparisonSpawns": 0
+    },
+    {
+      "name": "close-failure",
+      "expectedReason": "CLOSE_FAILED",
+      "actualReason": "CLOSE_FAILED",
+      "status": "PASS",
+      "comparisonSpawns": 0
+    },
+    {
+      "name": "interrupted",
+      "expectedReason": "CLOSE_INTERRUPTED",
+      "actualReason": "CLOSE_INTERRUPTED",
+      "status": "PASS",
+      "comparisonSpawns": 0
+    },
+    {
+      "name": "unobserved-writer",
+      "expectedReason": "WRITER_COVERAGE",
+      "actualReason": "WRITER_COVERAGE",
+      "status": "PASS",
+      "comparisonSpawns": 0
+    },
+    {
+      "name": "monotonic-domain",
+      "expectedReason": "EVENT_CLOCK",
+      "actualReason": "EVENT_CLOCK",
+      "status": "PASS",
+      "comparisonSpawns": 0
+    },
+    {
+      "name": "coherent-bytes-edit",
+      "expectedReason": "EVENT_CONTENT",
+      "actualReason": "EVENT_CONTENT",
+      "status": "PASS",
+      "comparisonSpawns": 0
+    }
+  ]
+}

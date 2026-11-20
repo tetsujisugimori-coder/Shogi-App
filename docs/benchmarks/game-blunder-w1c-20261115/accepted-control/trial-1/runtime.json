@@ -1,0 +1,31 @@
+{
+  "runId": "a538ebf0-9b48-4432-830d-750db144d7c9",
+  "trialId": "6d596915-9c97-4a1c-b1e7-5fec69d1bbc7",
+  "preflightSha256": "17fa512b4b0f6755c667078ef03405959245af413f0d63bcf416a5582761f705",
+  "inventorySha256": "82aa015ff45aeaa01a0ef3b55ba38d6f29f670c56bb46213253acbe730cfd4d1",
+  "reason": "passed",
+  "unhandledErrors": [],
+  "suites": [
+    {
+      "id": "-270551241",
+      "file": "C:/Users/tetsu/Documents/ChatGPT/将棋アプリ/repo/.tmp-tests/w1c-controls-04/b/tiny.test.js",
+      "root": true,
+      "mode": "run",
+      "state": "pass"
+    },
+    {
+      "id": "-270551241_0",
+      "file": "C:/Users/tetsu/Documents/ChatGPT/将棋アプリ/repo/.tmp-tests/w1c-controls-04/b/tiny.test.js",
+      "root": false,
+      "mode": "run",
+      "state": "pass"
+    },
+    {
+      "id": "-270551241_0_0",
+      "file": "C:/Users/tetsu/Documents/ChatGPT/将棋アプリ/repo/.tmp-tests/w1c-controls-04/b/tiny.test.js",
+      "root": false,
+      "mode": "run",
+      "state": "pass"
+    }
+  ]
+}

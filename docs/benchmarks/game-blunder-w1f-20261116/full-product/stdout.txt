@@ -1,0 +1,21 @@
+
+ RUN  v4.1.11 C:/Users/tetsu/Documents/ChatGPT/将棋アプリ/repo
+
+ ❯ .tmp-tests/w1b-review-20261115-reporter-submission/assertion-failure/tiny.test.js (1 test | 1 failed) 9ms
+   × fails 7ms
+ ❯ .tmp-tests/w1b-review-20261115-reporter/assertion-failure/tiny.test.js (1 test | 1 failed) 11ms
+   × fails 9ms
+ ❯ .tmp-tests/w1b-review-20261115-host-01/b/tiny.test.js (2 tests) 3ms
+ ❯ .tmp-tests/w1b-review-20261115-01/a/tiny.test.js (2 tests) 4ms
+ ❯ .tmp-tests/w1b-review-20261115-reporter-submission/empty-describe/tiny.test.js (1 test) 3ms
+ ❯ .tmp-tests/w1b-review-20261115-host-01/a/tiny.test.js (2 tests) 4ms
+ ❯ .tmp-tests/w1b-review-20261115-reporter/empty-describe/tiny.test.js (1 test) 4ms
+ ❯ .tmp-tests/w1b-review-20261115-host-01/git-source/tiny.test.js (2 tests) 4ms
+ ❯ .tmp-tests/w1b-review-20261115-01/git-source/tiny.test.js (2 tests) 4ms
+
+ Test Files  9 failed | 150 passed (159)
+      Tests  2 failed | 2686 passed (2688)
+     Errors  2 errors
+   Start at  21:07:51
+   Duration  261.48s (transform 6.17s, setup 40.33s, import 23.61s, tests 154.72s, environment 224.98s)
+

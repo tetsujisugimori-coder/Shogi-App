@@ -1,0 +1,198 @@
+{
+  "schema": "w1i-submission/1",
+  "non_self_files": [
+    {
+      "path": "docs/benchmarks/game-blunder-w1i-20261118/README.md",
+      "size": 4811,
+      "sha256": "ebaae7bd00c80a603856000fd09164b44e45873839434a1906054f0669d52942",
+      "git_blob": "4835217c76db96d679d5729440b0cebf74c7f97f"
+    },
+    {
+      "path": "docs/benchmarks/game-blunder-w1i-20261118/acceptance.json",
+      "size": 1508,
+      "sha256": "550153677f610a976b886d071fbcd963c65006a18983f41af8a2270f7e25189f",
+      "git_blob": "18996cd3e30d8970364ed232453c7526c48bb528"
+    },
+    {
+      "path": "docs/benchmarks/game-blunder-w1i-20261118/authorization-scope.md",
+      "size": 1358,
+      "sha256": "3a76c0f145f021c66a7f4ff9912d10437729e718c6c9935936ee5789dfa73a26",
+      "git_blob": "a2e99097b295ab733aeebf011708e001b01fce50"
+    },
+    {
+      "path": "docs/benchmarks/game-blunder-w1i-20261118/b-helper23-execution.json",
+      "size": 473,
+      "sha256": "d02bb670e7677fe8850a04bb6895dab103ce46cb02c2c1f9b7afe1a56d418fde",
+      "git_blob": "c8fefefbc4737caef103bd7e1ad9a268d1810f68"
+    },
+    {
+      "path": "docs/benchmarks/game-blunder-w1i-20261118/b-helper23.stderr",
+      "size": 1535,
+      "sha256": "faf062456e91106c6aa4d782e9e52c62eb550802aeaefc638b6a21bae4c612ec",
+      "git_blob": "995f8329cf45fdcf8c6c8dcb2ff0ab9043a480ec"
+    },
+    {
+      "path": "docs/benchmarks/game-blunder-w1i-20261118/b-helper23.stdout",
+      "size": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "git_blob": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
+    },
+    {
+      "path": "docs/benchmarks/game-blunder-w1i-20261118/custody-inventory.json",
+      "size": 61614,
+      "sha256": "8ec6825d40976c5ffb40c059d1df5796466a033274038845d5f327b5db8165d7",
+      "git_blob": "4a591120f1454fc3e3aeba7147e4a6ad1782b8ff"
+    },
+    {
+      "path": "docs/benchmarks/game-blunder-w1i-20261118/environment.json",
+      "size": 252,
+      "sha256": "df395d7b0f28e935f696365ad37b47c3ab92885591d3b1ac50df2a546f43d197",
+      "git_blob": "5da9140956023d8fb2aabbd48fd558bf5fd854a3"
+    },
+    {
+      "path": "docs/benchmarks/game-blunder-w1i-20261118/helper-adversarial-green-corrected.json",
+      "size": 3492,
+      "sha256": "e6d34394e9b48d59100256a58ec441fe5bb8b6e0e37c4b2f3a6b57d2ec7c1439",
+      "git_blob": "63ade05dc00d00b584aee954120e61d631937851"
+    },
+    {
+      "path": "docs/benchmarks/game-blunder-w1i-20261118/helper-adversarial-green.json",
+      "size": 3238,
+      "sha256": "b8eb747791aa4d16b5be64bc5d2c41c13d3b1186737bb6d81b027bd66d4c4980",
+      "git_blob": "ec52075a364362e90cfbb515f09c2ed835d7d80e"
+    },
+    {
+      "path": "docs/benchmarks/game-blunder-w1i-20261118/helper-adversarial-results.json",
+      "size": 3044,
+      "sha256": "2127816da088849189feba1c6c6a6c20d944d0365d52f0060c299a333a8d177e",
+      "git_blob": "52c71827df00835cd7d560edeb2ec5c85ca2ba52"
+    },
+    {
+      "path": "docs/benchmarks/game-blunder-w1i-20261118/historical-github-relationship.json",
+      "size": 20637,
+      "sha256": "2d6bc073a5d519fb66f1e2f306bf1672928ab91b3feecbb6f3f5d9728c1c4169",
+      "git_blob": "7d59f3a87364a10f484816d1e0e50b486031a140"
+    },
+    {
+      "path": "docs/benchmarks/game-blunder-w1i-20261118/independent-review.md",
+      "size": 1655,
+      "sha256": "dbad8641d855293415249f684d6c758478c936a236e4a2fe3ec3ec6dbd12a3b7",
+      "git_blob": "2de208c80781928ece84842b02443910d3dbf806"
+    },
+    {
+      "path": "docs/benchmarks/game-blunder-w1i-20261118/package-self-check.json",
+      "size": 359,
+      "sha256": "c652e626e2b3b76b98ddfaddde835b65954ba174797c0c87e6c53d933ff41ef2",
+      "git_blob": "4edb11a881a6bd906481ecb78ba5bf53b0ccb202"
+    },
+    {
+      "path": "docs/benchmarks/game-blunder-w1i-20261118/preservation-manifest.json",
+      "size": 1271,
+      "sha256": "49240a992e6d8fa25e789c0b5d869acb7efb82be86b4d161b66ba88054ef03ff",
+      "git_blob": "c840da9d68cbc67dcce94f6578b1db8dc6bd2995"
+    },
+    {
+      "path": "docs/benchmarks/game-blunder-w1i-20261118/publication-audit.json",
+      "size": 9066,
+      "sha256": "76405df17015a2a30da5e310927974768ce1bdea7dd2d6288ab054d5fcea9d1c",
+      "git_blob": "b62cd485f6952de32a46259fc435cb727b9dd14f"
+    },
+    {
+      "path": "docs/benchmarks/game-blunder-w1i-20261118/publication-audit.md",
+      "size": 2150,
+      "sha256": "34ddd2736f1e2f94bfdb0ea5b0f518e24988f0463f685d3ff5833f5d23e7a588",
+      "git_blob": "dbe8a7deb29444df202f6684070336d7065dfc9e"
+    },
+    {
+      "path": "docs/benchmarks/game-blunder-w1i-20261118/regression-execution.json",
+      "size": 634,
+      "sha256": "857733640eebdfa98ac793d3cfa9d47e5a05d74c1213f90aa1fe5ecfcbe743d6",
+      "git_blob": "da3921ceaa65fc2726d29b875b45f9680631fb9f"
+    },
+    {
+      "path": "docs/benchmarks/game-blunder-w1i-20261118/regression.stderr",
+      "size": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "git_blob": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
+    },
+    {
+      "path": "docs/benchmarks/game-blunder-w1i-20261118/regression.stdout",
+      "size": 11196,
+      "sha256": "2bd4b7d5ae127f859a3cb52948b1ec0cddc242b4fb74d57fb4f1c91b95668d8b",
+      "git_blob": "3889bf0a7362c75fd15de186c19b73a44279e39f"
+    },
+    {
+      "path": "docs/benchmarks/game-blunder-w1i-20261118/retrieval-verification.json",
+      "size": 2262,
+      "sha256": "fc199f8b81cc04ca508fd2abceaf8ee3278d3be2ed16ac946030e7e024b198d5",
+      "git_blob": "09d468d9374952effed002c972211551b8509e7e"
+    },
+    {
+      "path": "docs/benchmarks/game-blunder-w1i-20261118/start-state.json",
+      "size": 1252,
+      "sha256": "0702a8b99e81af4221c9f43245ec319ab953ff26e683cc0d762ef98e408e463d",
+      "git_blob": "6f957c676c859cc9fc3d1d78b5a98aad0c8c7dcb"
+    },
+    {
+      "path": "docs/benchmarks/game-blunder-w1i-20261118/tests-execution.json",
+      "size": 278,
+      "sha256": "70cae09007e2a26513fc71e13ed7feac2dd7f17c1997d4f37bf40347fbb6b82d",
+      "git_blob": "2040a6a0242af7cb28c16d0074a425040794c04d"
+    },
+    {
+      "path": "docs/benchmarks/game-blunder-w1i-20261118/tests-v2-execution.json",
+      "size": 380,
+      "sha256": "494217225168b86925370211563b4dfe1eae5a1ca00146e41e9331774c8d755f",
+      "git_blob": "25ca77986f5f772f6d410ce4ec9848eff5109634"
+    },
+    {
+      "path": "docs/benchmarks/game-blunder-w1i-20261118/tests-v2.stderr",
+      "size": 1535,
+      "sha256": "ee070d7b6cf8ed0b9fb110a6d56b184e8c53d0a31cf1bf66be7ded8e2f96d07d",
+      "git_blob": "35bed2ffad3878f5686aaeb05db6b7d20f7fb299"
+    },
+    {
+      "path": "docs/benchmarks/game-blunder-w1i-20261118/tests-v2.stdout",
+      "size": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "git_blob": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
+    },
+    {
+      "path": "docs/benchmarks/game-blunder-w1i-20261118/tests.stderr",
+      "size": 1407,
+      "sha256": "72f58802e5ba0d34a2796baa7059e2d42b4d1e51ce5c6f46867d067a9cab7de1",
+      "git_blob": "1ffe362e42199161e3d81ca161af67e1cc1e0d7f"
+    },
+    {
+      "path": "docs/benchmarks/game-blunder-w1i-20261118/tests.stdout",
+      "size": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "git_blob": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
+    },
+    {
+      "path": "docs/benchmarks/game-blunder-w1i-20261118/windows-live-source185.json",
+      "size": 47084,
+      "sha256": "f3e72c469047edfb60213bd91a31f76bb16a44018de7d3f5467a59087096b655",
+      "git_blob": "ebc267ba9996e811c21d370ae46ba7d2c23edd59"
+    },
+    {
+      "path": "docs/benchmarks/game-blunder-w1i-20261118/windows-zip-allbyte.json",
+      "size": 547,
+      "sha256": "ad96acb274537fba7b0e66826aa6a14056baf51e8fd1f018f1b4dd573471ae84",
+      "git_blob": "a7ccc92204e38d67a9dbcc6242eade5bdc67fdc6"
+    },
+    {
+      "path": "scripts/stage-w1i-custody-check.py",
+      "size": 3641,
+      "sha256": "01101f32a111835fa64a205b762f2c794796e4c232e717ccd6238337a01e9664",
+      "git_blob": "30697105bd7e148ef71c5b0388e4c3bef2aa27e0"
+    },
+    {
+      "path": "scripts/stage-w1i-custody-test.py",
+      "size": 4265,
+      "sha256": "b8cdb5a57511f646eb0d3d3fc56253477685cb0478b3255b6a8473e610cfc8aa",
+      "git_blob": "274f09cca92f5c20053f4addc49b18d4f12d9988"
+    }
+  ],
+  "self_excluded": "docs/benchmarks/game-blunder-w1i-20261118/submission-manifest.json"
+}

@@ -1,0 +1,66 @@
+[
+  {
+    "root": "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\repo\\.tmp-tests",
+    "beforeEntries": 6817,
+    "afterEntries": 6817,
+    "beforeSha256": "6c5d3bc2627481fa3ccd2388e029ee303b0aab3962722f146da17371835560c1",
+    "afterSha256": "6c5d3bc2627481fa3ccd2388e029ee303b0aab3962722f146da17371835560c1",
+    "unchanged": true
+  },
+  {
+    "root": "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\repo\\docs\\benchmarks\\game-blunder-w1d-20261115",
+    "beforeEntries": 514,
+    "afterEntries": 514,
+    "beforeSha256": "4f612d01ed3ac637bc925ba1646957cc580f8b3300dfaf91a86fcc5d9264a0fd",
+    "afterSha256": "4f612d01ed3ac637bc925ba1646957cc580f8b3300dfaf91a86fcc5d9264a0fd",
+    "unchanged": true
+  },
+  {
+    "root": "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\repo\\docs\\benchmarks\\game-blunder-w1c-20261115",
+    "beforeEntries": 1707,
+    "afterEntries": 1707,
+    "beforeSha256": "ca58d15a837b75244d6fb6d22709363899ed54fe7df45ae4e63a7a94c41d2fb5",
+    "afterSha256": "ca58d15a837b75244d6fb6d22709363899ed54fe7df45ae4e63a7a94c41d2fb5",
+    "unchanged": true
+  },
+  {
+    "root": "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\stage-w1-snapshots",
+    "beforeEntries": 35054,
+    "afterEntries": 35054,
+    "beforeSha256": "a4ab5757df41d3e5da76e5a67dda8b0901ae2253385653ba463095ef08d3ebf3",
+    "afterSha256": "a4ab5757df41d3e5da76e5a67dda8b0901ae2253385653ba463095ef08d3ebf3",
+    "unchanged": true
+  },
+  {
+    "root": "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\stage-w1c-20261115-01",
+    "beforeEntries": 2795,
+    "afterEntries": 2795,
+    "beforeSha256": "29ecaf11f6a2ac50b174eb21525e4093a012c456655d55ea340e940c3cb394b0",
+    "afterSha256": "29ecaf11f6a2ac50b174eb21525e4093a012c456655d55ea340e940c3cb394b0",
+    "unchanged": true
+  },
+  {
+    "root": "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\stage-w1c-20261115-02",
+    "beforeEntries": 2794,
+    "afterEntries": 2794,
+    "beforeSha256": "66afabce1ec24816442697590744bddbc0805b07106d00fbc3e538a7e08f1995",
+    "afterSha256": "66afabce1ec24816442697590744bddbc0805b07106d00fbc3e538a7e08f1995",
+    "unchanged": true
+  },
+  {
+    "root": "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\stage-w1c-20261115-03",
+    "beforeEntries": 36070,
+    "afterEntries": 36070,
+    "beforeSha256": "b87edb9f840c5138793933173545735a4ebb2cdf7c3aa7a2f49fc1a6b8a7ddd0",
+    "afterSha256": "b87edb9f840c5138793933173545735a4ebb2cdf7c3aa7a2f49fc1a6b8a7ddd0",
+    "unchanged": true
+  },
+  {
+    "root": "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\stage-w1d-20261115-pair",
+    "beforeEntries": 36071,
+    "afterEntries": 36071,
+    "beforeSha256": "91336288e9c64e6050cb9fc3315e1a6c027be427a77b0bfb7b47ba139f824be7",
+    "afterSha256": "91336288e9c64e6050cb9fc3315e1a6c027be427a77b0bfb7b47ba139f824be7",
+    "unchanged": true
+  }
+]

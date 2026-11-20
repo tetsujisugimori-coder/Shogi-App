@@ -1,0 +1,41 @@
+{
+  "runId": "358c9bda-a312-4d83-989d-6e54d18117be",
+  "trialId": "fd15aee9-b75a-4b37-88b7-6629105853d0",
+  "exitCode": 1,
+  "provenanceVerified": true,
+  "assessment": {
+    "status": "INVALID",
+    "invalid": [
+      "runtime unhandled errors",
+      "nonzero exit without recorded test failure",
+      "success disagrees with exit code or failures"
+    ],
+    "incomplete": [],
+    "failures": [],
+    "counts": {
+      "total": 1,
+      "passed": 1,
+      "failed": 0,
+      "skipped": 0,
+      "todo": 0
+    },
+    "tests": [
+      {
+        "file": "C:/Users/tetsu/Documents/ChatGPT/将棋アプリ/stage-w1f-20261116/runtime-retry/runtime-error/b/tiny.test.js",
+        "name": "pass with runtime error",
+        "status": "passed"
+      }
+    ]
+  },
+  "bindings": {
+    "vitest.json": "278249395ef638cc7f6260dd3a2767b57f8a926a6e623af6b914f99f5d6b3935",
+    "runtime.json": "6147831b7789ed63f50ebae978a33e8652385507184f4329479dd3e5b0d66aca",
+    "settings.json": "2f484bbd91e5e694eaff5ec8652ed55a13cd23606927a3c5e37de86623d8159a",
+    "request.json": "163b1de4fa347a63cfebdb87180584af528c507d781c760f8bb0064b941da608",
+    "stdout.log": "7df8fabe33ecca3502628e60dfa9ef9263de6c40cc35fdb2df0f97e15afc2653",
+    "stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "exit.json": "87a5168a6c15ac183f4274005ffa09bd86abf6c237dd84dde645c2e5569731a5"
+  },
+  "preflightSha256": "889d33920d339533132ca2a3b2b88ed0545a6ab828f8ed08da4d2a96cabe70d9",
+  "inventorySha256": "0f904be1ba2acd7382b69c774f7b933f04b9d35dfa5edf1db2b0dc92e5d8ffec"
+}

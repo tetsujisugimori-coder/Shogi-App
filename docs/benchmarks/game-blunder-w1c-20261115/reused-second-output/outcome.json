@@ -1,0 +1,10 @@
+{
+  "input": "trial-1 already exists, trial-0 absent",
+  "expected": "UNKNOWN / exit 1 / comparison starts 0",
+  "actual": {
+    "status": "UNKNOWN",
+    "reason": "Error: reused trial output: trial-1"
+  },
+  "exitCode": 1,
+  "comparisonChildren": 0
+}

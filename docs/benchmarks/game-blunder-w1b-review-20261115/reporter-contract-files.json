@@ -1,0 +1,18 @@
+[
+  {
+    "path": "node_modules/vitest/package.json",
+    "sha256": "a28126d97bcaf567da5bed69443b7f3bcd9a7a8c38c8b66e554686b6bb2c10e0"
+  },
+  {
+    "path": "node_modules/vitest/dist/chunks/index.UpGiHP7g.js",
+    "sha256": "cdafaf8e508042dddba72f8c7bbae84e2836ddb6b06c7026520c35d91af4e798"
+  },
+  {
+    "path": "node_modules/vitest/dist/chunks/reporters.d.DtoKVV2s.d.ts",
+    "sha256": "7fa6fdc6eeeb3850e6b3166836f8c9199594c4f4bed3cee02cac0ca33d71894d"
+  },
+  {
+    "path": "node_modules/@vitest/runner/dist/chunk-artifact.js",
+    "sha256": "bf6af6d2f4469911879a67e83b8f9e7b20332cf42795032c53457b10ccc1c617"
+  }
+]

@@ -1,0 +1,389 @@
+{
+  "verdict": "PARTIAL",
+  "result": "B",
+  "gate": {
+    "status": "BLOCKED",
+    "rows": [
+      {
+        "condition": "source seal exists",
+        "status": "NOT_TESTED",
+        "reason": "SOURCE_SEAL_MISSING"
+      },
+      {
+        "condition": "completed log",
+        "status": "NOT_TESTED",
+        "reason": "TRANSCRIPT_MISSING"
+      },
+      {
+        "condition": "independent seal authentication",
+        "status": "BLOCKED",
+        "reason": "INDEPENDENT_SEAL_MISSING"
+      },
+      {
+        "condition": "kernel events complete",
+        "status": "BLOCKED",
+        "reason": "OS_EVENTS_MISSING"
+      },
+      {
+        "condition": "worker mapping",
+        "status": "UNKNOWN",
+        "reason": "WORKER_COVERAGE_UNKNOWN"
+      },
+      {
+        "condition": "writer exclusion",
+        "status": "UNKNOWN",
+        "reason": "WRITER_EXCLUSIVITY_UNKNOWN"
+      },
+      {
+        "condition": "atomic transition",
+        "status": "UNKNOWN",
+        "reason": "OS_ATOMIC_RENAME_UNKNOWN"
+      },
+      {
+        "condition": "operation sequence",
+        "status": "UNKNOWN",
+        "reason": "CONSUMER_CHAIN_INCOMPLETE"
+      },
+      {
+        "condition": "semantic use",
+        "status": "UNKNOWN",
+        "reason": "SEMANTIC_CONSUMER_MISSING"
+      },
+      {
+        "condition": "cache physically separate",
+        "status": "UNKNOWN",
+        "reason": "CACHE_PHYSICAL_SHARING"
+      },
+      {
+        "condition": "cache results invariant",
+        "status": "NOT_READY",
+        "reason": "CACHE_RESULT_CHANGED"
+      },
+      {
+        "condition": "tokens accepted",
+        "status": "UNKNOWN",
+        "reason": "CONFIG_TOKEN_CHANGED"
+      },
+      {
+        "condition": "opaque config verified",
+        "status": "UNKNOWN",
+        "reason": "CONFIG_CLOSURE_UNKNOWN"
+      },
+      {
+        "condition": "strict admission",
+        "status": "NOT_TESTED",
+        "reason": "STRICT_ADMISSION_MISSING"
+      },
+      {
+        "condition": "independent review of current inputs",
+        "status": "NOT_TESTED",
+        "reason": "INDEPENDENT_REVIEW_MISSING"
+      }
+    ],
+    "reasons": [
+      "SOURCE_SEAL_MISSING",
+      "TRANSCRIPT_MISSING",
+      "INDEPENDENT_SEAL_MISSING",
+      "OS_EVENTS_MISSING",
+      "WORKER_COVERAGE_UNKNOWN",
+      "WRITER_EXCLUSIVITY_UNKNOWN",
+      "OS_ATOMIC_RENAME_UNKNOWN",
+      "CONSUMER_CHAIN_INCOMPLETE",
+      "SEMANTIC_CONSUMER_MISSING",
+      "CACHE_PHYSICAL_SHARING",
+      "CACHE_RESULT_CHANGED",
+      "CONFIG_TOKEN_CHANGED",
+      "CONFIG_CLOSURE_UNKNOWN",
+      "STRICT_ADMISSION_MISSING",
+      "INDEPENDENT_REVIEW_MISSING"
+    ],
+    "version": "stage-w1g/1",
+    "targets": [
+      "e1ccb1a2412e7faa86c2c1f60fdad1dca154023a",
+      "2a8a57b6ff207831c77ce62d27d3151eba7c1dc3"
+    ],
+    "at": "2026-11-17T19:21:44.821Z",
+    "verifierSha256": "90a83982ad8d328fe00c5766cd888bcdb441a3262c77eb2342a47ac3886d01e3",
+    "preSeal": null,
+    "independentReview": "NOT_TESTED_FOR_ADMISSION",
+    "evidence": [
+      "docs/benchmarks/game-blunder-w1f-20261116/gate-physical.json",
+      "docs/benchmarks/game-blunder-w1g-20261118/README.md"
+    ],
+    "comparison": {
+      "approval": "REQUIRED_SEPARATELY",
+      "authorized": false,
+      "old": 0,
+      "new": 0
+    },
+    "s4": "NOT_TESTED",
+    "s5": "NOT_TESTED"
+  },
+  "sealReadback": {
+    "historicalAuthenticity": "UNKNOWN",
+    "status": "PASS_POINT_IN_TIME",
+    "snapshots": [
+      {
+        "head": "e1ccb1a2412e7faa86c2c1f60fdad1dca154023a",
+        "tree": "5ced08e0036f955833ca2e12722bfbd595a00afd",
+        "sources": 2104,
+        "dependencies": 13643,
+        "sourceSha256": "6bdac0695b0184ce9b32a18c3d6fe63431bfb4c6096a53bb73ebd3db386d9c64",
+        "dependencySha256": "4899982e90e61b01112564ba157dab971b52db001600a33fb2b7a6084d304b9f"
+      },
+      {
+        "head": "2a8a57b6ff207831c77ce62d27d3151eba7c1dc3",
+        "tree": "3d06ccd81473b78bc3eb721c516693042ae2c118",
+        "sources": 2211,
+        "dependencies": 13643,
+        "sourceSha256": "ac9b0c369bff296d53a60d3af3a5c97d8cb00d3eed8a8b6962b54b6612220191",
+        "dependencySha256": "4899982e90e61b01112564ba157dab971b52db001600a33fb2b7a6084d304b9f"
+      }
+    ],
+    "hash": "0c358095d839003e90e77faf0ace788c4c5273e1faa55cb942c1fc7163e286a4",
+    "authentication": "BLOCKED"
+  },
+  "windows": {
+    "npm": "11.17.0",
+    "vitest": "4.1.11",
+    "node": "24.20.0",
+    "testTimeout": 5000,
+    "maxWorkers": 2
+  },
+  "osProvenance": {
+    "eventCapture": "NOT_TESTED",
+    "status": "BLOCKED",
+    "atomicRename": "UNKNOWN",
+    "fileSystem": "NTFS",
+    "exclusiveWriter": "UNKNOWN"
+  },
+  "fixedConsumerChain": {
+    "apiRenameCandidates": [
+      63,
+      63
+    ],
+    "candidatesUnknown": [
+      63,
+      63
+    ],
+    "reference": "../game-blunder-w1f-20261116/README.md",
+    "freshFixedObservation": "NOT_TESTED",
+    "complete": [
+      0,
+      0
+    ]
+  },
+  "cache": {
+    "status": "PASS",
+    "scope": "actual isolated Vitest fixture",
+    "cacheSafety": "NOT_ESTABLISHED",
+    "directoryLink": {
+      "status": "PASS",
+      "reason": "CACHE_LINK"
+    },
+    "sharing": "CACHE_SHARED",
+    "orders": {
+      "first": [
+        "a.test.mjs",
+        "b.test.mjs"
+      ],
+      "reuse": [
+        "a.test.mjs",
+        "b.test.mjs"
+      ],
+      "seed-baseline": [
+        "b.test.mjs",
+        "a.test.mjs"
+      ],
+      "failed": [
+        "a.test.mjs",
+        "b.test.mjs"
+      ],
+      "duration": [
+        "a.test.mjs",
+        "b.test.mjs"
+      ],
+      "file-id": [
+        "a.test.mjs",
+        "b.test.mjs"
+      ],
+      "corrupt": [
+        "a.test.mjs",
+        "b.test.mjs"
+      ],
+      "old": [
+        "a.test.mjs",
+        "b.test.mjs"
+      ],
+      "interrupt": [
+        "b.test.mjs",
+        "a.test.mjs"
+      ],
+      "disabled": [
+        "a.test.mjs",
+        "b.test.mjs"
+      ],
+      "clear": [
+        "b.test.mjs",
+        "a.test.mjs"
+      ]
+    },
+    "runs": [
+      {
+        "label": "first",
+        "exitCode": 0,
+        "elapsedMs": 1617.9686000000002,
+        "workerStartsInJournalOrder": [
+          "a.test.mjs",
+          "b.test.mjs"
+        ],
+        "cacheUnchanged": false
+      },
+      {
+        "label": "reuse",
+        "exitCode": 0,
+        "elapsedMs": 1566.1553000000004,
+        "workerStartsInJournalOrder": [
+          "a.test.mjs",
+          "b.test.mjs"
+        ],
+        "cacheUnchanged": false
+      },
+      {
+        "label": "seed-baseline",
+        "exitCode": 0,
+        "elapsedMs": 1596.2452000000003,
+        "workerStartsInJournalOrder": [
+          "b.test.mjs",
+          "a.test.mjs"
+        ],
+        "cacheUnchanged": false
+      },
+      {
+        "label": "failed",
+        "exitCode": 0,
+        "elapsedMs": 1524.6491999999998,
+        "workerStartsInJournalOrder": [
+          "a.test.mjs",
+          "b.test.mjs"
+        ],
+        "cacheUnchanged": false
+      },
+      {
+        "label": "duration",
+        "exitCode": 0,
+        "elapsedMs": 1566.8184,
+        "workerStartsInJournalOrder": [
+          "a.test.mjs",
+          "b.test.mjs"
+        ],
+        "cacheUnchanged": false
+      },
+      {
+        "label": "file-id",
+        "exitCode": 0,
+        "elapsedMs": 1495.437600000001,
+        "workerStartsInJournalOrder": [
+          "a.test.mjs",
+          "b.test.mjs"
+        ],
+        "cacheUnchanged": false
+      },
+      {
+        "label": "corrupt",
+        "exitCode": 0,
+        "elapsedMs": 1552.833200000001,
+        "workerStartsInJournalOrder": [
+          "a.test.mjs",
+          "b.test.mjs"
+        ],
+        "cacheUnchanged": false
+      },
+      {
+        "label": "old",
+        "exitCode": 0,
+        "elapsedMs": 1471.6697999999997,
+        "workerStartsInJournalOrder": [
+          "a.test.mjs",
+          "b.test.mjs"
+        ],
+        "cacheUnchanged": false
+      },
+      {
+        "label": "interrupt",
+        "exitCode": 84,
+        "elapsedMs": 1047.3172000000013,
+        "workerStartsInJournalOrder": [],
+        "cacheUnchanged": true
+      },
+      {
+        "label": "disabled",
+        "exitCode": 0,
+        "elapsedMs": 2556.7367999999988,
+        "workerStartsInJournalOrder": [
+          "a.test.mjs",
+          "b.test.mjs"
+        ],
+        "cacheUnchanged": true
+      },
+      {
+        "label": "clear",
+        "exitCode": 0,
+        "elapsedMs": 1480.5506000000023,
+        "workerStartsInJournalOrder": [
+          "b.test.mjs",
+          "a.test.mjs"
+        ],
+        "cacheUnchanged": false
+      }
+    ],
+    "comparisonSpawns": {
+      "targets": [
+        "e1ccb1a2412e7faa86c2c1f60fdad1dca154023a",
+        "2a8a57b6ff207831c77ce62d27d3151eba7c1dc3"
+      ],
+      "old": 0,
+      "new": 0
+    }
+  },
+  "config": {
+    "closureAndNative": "UNKNOWN",
+    "status": "UNKNOWN",
+    "changedTokens": [
+      "vite.webSocketToken",
+      "vitest.api.token"
+    ]
+  },
+  "verifiers": {
+    "lock": "PASS",
+    "pass": 169,
+    "fail": 0,
+    "typecheck": "PASS",
+    "samplerMutation": "false READY detected",
+    "w1g": 32,
+    "generatedControls": 12,
+    "skip": 2,
+    "total": 171
+  },
+  "finalWindowsAndCI": "See exact-head PR submission and Windows archive",
+  "archive": "../stage-w1g-20261118/",
+  "residual": {
+    "S5": "NOT_TESTED",
+    "H1": "UNKNOWN",
+    "H3": "UNKNOWN",
+    "R8": "UNKNOWN",
+    "H4": "UNKNOWN",
+    "H2": "UNKNOWN",
+    "S4": "NOT_TESTED"
+  },
+  "regressionWindows": {
+    "product": {
+      "status": "PASS",
+      "exitCode": 0,
+      "tests": 2587,
+      "files": 98
+    },
+    "historical159FileRun": "separate W1f evidence",
+    "collection": "src/test/"
+  }
+}

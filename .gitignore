@@ -13,6 +13,9 @@ coverage/
 
 /.diagnostic-temp/
 
+# W1f original journals remain locally; lossless raw-byte gzip copies are submitted.
+/docs/benchmarks/game-blunder-w1f-20261116/probe/*-raw-events.jsonl
+
 !docs/benchmarks/selective-promotions-20261024/validation/*.log
 !docs/benchmarks/selective-promotions-review-20261025/validation/*.log
 !docs/benchmarks/piece-safety-20261025/validation/*.log

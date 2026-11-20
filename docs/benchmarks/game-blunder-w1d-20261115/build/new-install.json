@@ -1,0 +1,25 @@
+{
+  "head": "2a8a57b6ff207831c77ce62d27d3151eba7c1dc3",
+  "started": "2026-11-15T14:31:07.810Z",
+  "finished": "2026-11-15T14:31:27.831Z",
+  "command": [
+    "C:\\Program Files\\nodejs\\node.exe",
+    "--use-system-ca",
+    "C:\\Users\\tetsu\\AppData\\Roaming\\npm\\node_modules\\npm\\bin\\npm-cli.js",
+    "ci",
+    "--cache",
+    "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\stage-w1d-20261115-pair\\new-install-cache",
+    "--no-audit",
+    "--no-fund",
+    "--fetch-retries=0",
+    "--fetch-timeout=30000"
+  ],
+  "exitCode": 0,
+  "error": null,
+  "node": "v24.20.0",
+  "npm": "11.17.0",
+  "cache": "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\stage-w1d-20261115-pair\\new-install-cache",
+  "temp": "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\stage-w1d-20261115-pair\\new-install-temp",
+  "cacheSha256": "2d62dddee7f092c12f09783deb80ab260026abff0fbc6bc55542372ca833b607",
+  "tempSha256": "c245e6cb589a528cf25eee5b0d6eb669e14288015a1f7cb4f973198ff1276c3c"
+}

@@ -1,0 +1,1 @@
+{"root":"C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\stage-w1c-20261115-03","out":"C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\repo\\docs\\benchmarks\\game-blunder-w1c-20261115\\build-03","equality":{"status":"PASS"},"sourceCounts":[2104,2211]}

@@ -1,0 +1,165 @@
+{
+  "generatedAt": "2026-11-12T00:54:45.651Z",
+  "runs": [
+    {
+      "sequence": 1,
+      "head": "old",
+      "exitCode": 0,
+      "processSampling": true,
+      "passed": 2586,
+      "failed": 0,
+      "skipped": 0,
+      "todo": 0,
+      "logSignals": [],
+      "status": "PASS",
+      "failureCount": 0,
+      "commonNameFailures": 0,
+      "unchangedFileNameFailures": 0
+    },
+    {
+      "sequence": 2,
+      "head": "new",
+      "exitCode": 0,
+      "processSampling": true,
+      "passed": 2587,
+      "failed": 0,
+      "skipped": 0,
+      "todo": 0,
+      "logSignals": [],
+      "status": "PASS",
+      "failureCount": 0,
+      "commonNameFailures": 0,
+      "unchangedFileNameFailures": 0
+    },
+    {
+      "sequence": 3,
+      "head": "new",
+      "exitCode": 0,
+      "processSampling": false,
+      "passed": 2587,
+      "failed": 0,
+      "skipped": 0,
+      "todo": 0,
+      "logSignals": [],
+      "status": "PASS",
+      "failureCount": 0,
+      "commonNameFailures": 0,
+      "unchangedFileNameFailures": 0
+    },
+    {
+      "sequence": 4,
+      "head": "old",
+      "exitCode": 0,
+      "processSampling": false,
+      "passed": 2586,
+      "failed": 0,
+      "skipped": 0,
+      "todo": 0,
+      "logSignals": [],
+      "status": "PASS",
+      "failureCount": 0,
+      "commonNameFailures": 0,
+      "unchangedFileNameFailures": 0
+    },
+    {
+      "sequence": 5,
+      "head": "new",
+      "exitCode": 0,
+      "processSampling": true,
+      "passed": 2587,
+      "failed": 0,
+      "skipped": 0,
+      "todo": 0,
+      "logSignals": [],
+      "status": "PASS",
+      "failureCount": 0,
+      "commonNameFailures": 0,
+      "unchangedFileNameFailures": 0
+    },
+    {
+      "sequence": 6,
+      "head": "old",
+      "exitCode": 0,
+      "processSampling": true,
+      "passed": 2586,
+      "failed": 0,
+      "skipped": 0,
+      "todo": 0,
+      "logSignals": [],
+      "status": "PASS",
+      "failureCount": 0,
+      "commonNameFailures": 0,
+      "unchangedFileNameFailures": 0
+    },
+    {
+      "sequence": 7,
+      "head": "old",
+      "exitCode": 0,
+      "processSampling": false,
+      "passed": 2586,
+      "failed": 0,
+      "skipped": 0,
+      "todo": 0,
+      "logSignals": [],
+      "status": "PASS",
+      "failureCount": 0,
+      "commonNameFailures": 0,
+      "unchangedFileNameFailures": 0
+    },
+    {
+      "sequence": 8,
+      "head": "new",
+      "exitCode": 0,
+      "processSampling": false,
+      "passed": 2587,
+      "failed": 0,
+      "skipped": 0,
+      "todo": 0,
+      "logSignals": [],
+      "status": "PASS",
+      "failureCount": 0,
+      "commonNameFailures": 0,
+      "unchangedFileNameFailures": 0
+    }
+  ],
+  "observedNames": {
+    "common": 2554,
+    "commonInUnchangedFiles": 2546,
+    "onlyOld": [
+      [
+        "src/test/game-blunder-v4-journal-integration.test.ts",
+        "v4 real journal saved evidence integration reaggregates complete coverage and verifies four unchanged journal hashes and source/input provenance"
+      ],
+      [
+        "src/test/game-blunder-v4-journal-integration.test.ts",
+        "v4 real journal saved evidence integration replays the four historical positions, validates both candidates and all saved PVs, and reruns one fixed pair"
+      ]
+    ],
+    "onlyNew": [
+      [
+        "src/test/game-blunder-investigation-v4.test.ts",
+        "v4 constructed diagnostic controls excludes invalid result counters and elapsed times while accepting valid completed results"
+      ],
+      [
+        "src/test/game-blunder-v4-journal-integration.test.ts",
+        "v4 real journal saved evidence integration verifies four unchanged journal hashes and source/input provenance"
+      ],
+      [
+        "src/test/game-blunder-v4-journal-integration.test.ts",
+        "v4 real journal saved evidence integration reaggregates evidence, rejects invalid root results, and replays the historical pairs"
+      ]
+    ],
+    "changedFiles": [
+      "src/test/game-blunder-investigation-v4.test.ts",
+      "src/test/game-blunder-v4-journal-integration.test.ts"
+    ]
+  },
+  "limitations": [
+    "Observed names are not proof of additions or removals when collection is incomplete",
+    "Name sets collapse duplicate names; per-test timing preserves occurrences",
+    "Log string matches require manual verification and do not establish order or causality",
+    "Individual start/end and worker ID are NOT_MEASURED",
+    "Unchanged file does not prove identical runtime context",
+    "Sampling assignment is confounded with order"
+  ]
+}

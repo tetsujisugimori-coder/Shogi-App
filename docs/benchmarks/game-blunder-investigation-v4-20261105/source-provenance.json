@@ -1,0 +1,402 @@
+{
+  "schema": 1,
+  "derivation": "Derived after initial CI from source bytes verified identical to experiment plan raw hashes. LF canonicalization only; no code-content changes. Raw experiment evidence preserved.",
+  "sources": {
+    "scripts/benchmarks/checkEvasionPositions.ts": {
+      "experimentRawSha256": "1b04bd7adb46bcc3a1ff4554f070f8ae5b886878929b92e638995b688033056e",
+      "lfSha256": "2d0a5a79a16868890869b5f46b1ca4ec3a385d2a87967e1a173f6aef89dde7b7"
+    },
+    "scripts/benchmarks/checkEvasionReference.ts": {
+      "experimentRawSha256": "e32c2760f32f6ad5a413778fa4f89dec150a1e1f33d3796a8e8c97b3d680a8ad",
+      "lfSha256": "8ecc39414ec580b806205f99da8823e6988cffbd9904909a4b92df531bf2d49f"
+    },
+    "scripts/benchmarks/evasionBoundary.ts": {
+      "experimentRawSha256": "18d89af4e184aa3ae5792f7e5bae5277738cc17859e6a65dac3e2a1e0cbb0cc5",
+      "lfSha256": "2818f7962e8528ce688269f04aa81bf17e4b033a5aaafe68e47acf77d235785f"
+    },
+    "scripts/benchmarks/evasionBudgetRun.ts": {
+      "experimentRawSha256": "55e3f4e3b8404d44a14f9635fd9bdc6b9f4fc7463a2daa1240c3c1d0740fe113",
+      "lfSha256": "f19e47c587f9702bd2e4b1854b91f10e897c457597c50d84179995cf9e41fb65"
+    },
+    "scripts/benchmarks/evasionRunBudget.ts": {
+      "experimentRawSha256": "24b5a04b14ad76d65fe3241666f064426de7f3c967229cc0799063e9d3b8691e",
+      "lfSha256": "911dfe1084392e77b0936b564cfcc6701111468bb5c1edeb35c55e71715166a3"
+    },
+    "scripts/benchmarks/exchangePositions.ts": {
+      "experimentRawSha256": "af8d33a76890dc6d2fe3dc032a5fd3ed3e06d163bbb5ae96f77e8ed33d8d19b1",
+      "lfSha256": "1c4cc754d47ea47decad2a0a46070915024519a974fb4cb106b64538a1655b6d"
+    },
+    "scripts/benchmarks/fallbackQuality.ts": {
+      "experimentRawSha256": "e00a490b29d27871b8325ea0b6bed4ca96776a0fc7b74e5aa3918cfa2741f1e5",
+      "lfSha256": "25aa1c03b20978cbb8b45031f2355381a213f68d2baa733669c1190f012bc528"
+    },
+    "scripts/benchmarks/fixtures/self-play-99-actions.json": {
+      "experimentRawSha256": "70e9750695a615e8473ee7f304e4dea96694517ec73e5bcf050a570980bc1254",
+      "lfSha256": "49a48da6108811946090c1c0d01e5ae4b3078d0779da6177269d7164bffb0956"
+    },
+    "scripts/benchmarks/gameBlunderDiagnosis.ts": {
+      "experimentRawSha256": "14feb7d31a0c969809bd3ec301e1355d625df2f3370eb8efd4e23c1b4515c55f",
+      "lfSha256": "1ca078b4fa7e50e5615784367ba9d715ae03bc71afab064a4211f44be9f831e4"
+    },
+    "scripts/benchmarks/gameBlunderPilot.ts": {
+      "experimentRawSha256": "321bc62a67d8a03b909a294abb3e323662beb1bbc0da3744787bc13b3e1c317b",
+      "lfSha256": "1a7771cc31edbe5e288f16d9a26b01ce3f81df7eb8feec242376b2f2ba981b4f"
+    },
+    "scripts/benchmarks/journalFixtures.ts": {
+      "experimentRawSha256": "55f947350f4c64d91420e4c595dec1c2b20c97dab384900a4bfcc5f6fbc9a58b",
+      "lfSha256": "db8464acce931650a687881c22dafbe57dda04e1dcfa256a3f8d2dce457ec840"
+    },
+    "scripts/benchmarks/journalIO.ts": {
+      "experimentRawSha256": "f2e53d35a46735f3d284ee6964c63b3b794ce84a6e23f2d4ab0aa5d758849c51",
+      "lfSha256": "0284fe757e61420cd66aa601950fd0808d5da1cdfb7a36e890c26d5459da8cba"
+    },
+    "scripts/benchmarks/matchJournal.ts": {
+      "experimentRawSha256": "a268e4b0761d715abee45222d1b83d39b2a7fc9aeffe6286123793fb9f607be1",
+      "lfSha256": "517a3a338643d05bf9b8c9415c74decf9a853b5d98c031448d96e19edff458f8"
+    },
+    "scripts/benchmarks/outcomeProof.ts": {
+      "experimentRawSha256": "4ed25018ecceec579b3f66c220fbef57d8df6dd506da63313987d2c960ff3fb9",
+      "lfSha256": "6da1eef3c3f4b3bff54d91c0e847170b98e1f4768497c2708ad5110a1427e809"
+    },
+    "scripts/benchmarks/outcomeQuality.ts": {
+      "experimentRawSha256": "2407998cc62886df47b041b092350e3c2d2e2e60e6a69683764fb82fd7a15688",
+      "lfSha256": "d8ef83a33092e58d36aba0e29811ed8cf54ba815796172e8651ebe3112176e51"
+    },
+    "scripts/benchmarks/partialRootMatches.ts": {
+      "experimentRawSha256": "f1c05d7ce16795d5881492347f5b780517b821e35cfe4a46399d1bab1a2fed03",
+      "lfSha256": "818d7810a8a9ecd472eef1724a532a4f7337a44c402ddef47deda255e8ec2ed2"
+    },
+    "scripts/benchmarks/pieceSafetyPositions.ts": {
+      "experimentRawSha256": "31c6ddaa1407d7bed58b4c8c5ae2671b5f66df7751e5f74c2cc15097b5e1b967",
+      "lfSha256": "d3ec0c90a45c6671938a382b66c147eb45a6e1a3fb02381fe7014f77f3db342c"
+    },
+    "scripts/benchmarks/postRootDepthOne.ts": {
+      "experimentRawSha256": "d31ae4589e649c821af75fe7dc1c88a261252b0162f315d0816cdf144e84aca2",
+      "lfSha256": "ab679447e809445ae9195395ce50fe307effc6672233fe180440777f7dd4911d"
+    },
+    "scripts/benchmarks/qLegalBreakdown.ts": {
+      "experimentRawSha256": "2133b7efb1a24bc561b19335862b4c241fecc591b3a05ec64ebf3e7414c6fce8",
+      "lfSha256": "b8907ef649e19dccaf74ddb1804bf269a72ad7ab969740c98196c2f928b3e5bc"
+    },
+    "scripts/benchmarks/quiescenceOrderingRepeated.ts": {
+      "experimentRawSha256": "4ffb8eaf1ce84e59c9eb67a2378684d51b83c50a96861ffe9ee4415736d8462f",
+      "lfSha256": "ba4ef49d49327c57fc9b3aed41507d3e134f0d9f4628d5f9c7cfe4af77336951"
+    },
+    "scripts/benchmarks/quiescenceOrderingSelfPlay.ts": {
+      "experimentRawSha256": "5ebd53d6c4d4f50d3862b374800fc6d92ce3e2645325aa49c2bbb773c5ee2437",
+      "lfSha256": "c5fad3c5f278fef59d89d36d8b7609581f8b2df7bd036fff8b78d984d8bf3665"
+    },
+    "scripts/benchmarks/quiescenceOrderingSelfPlayScenarios.ts": {
+      "experimentRawSha256": "92ea88af59cebd1e32431f1d34c19281723a7450189cb118d631576df00936f8",
+      "lfSha256": "80cee90c2bc5c8d1fa6043e74e37dcd0491b81e8ecebb3c2c7214b00de20f340"
+    },
+    "scripts/benchmarks/quiescenceOrderingSelfPlaySuite.ts": {
+      "experimentRawSha256": "32d667a4b808abf47f331f1b91b060a762dae0856968a7be02c9c3ba0e6d9506",
+      "lfSha256": "46867e51aa58f33f95f535de763b7648c4e6f378edfadadcbffe2f9c07e8a613"
+    },
+    "scripts/benchmarks/quiescenceOrderingSuite.ts": {
+      "experimentRawSha256": "ae8bcbb1cede1acda9a973c7c707d8fa809a77421bede8525c6864dcc299ac31",
+      "lfSha256": "e3b0244146175b9c48f8f156e8ee93104fa08383cfbef75919216924a8b45c4d"
+    },
+    "scripts/benchmarks/quiescenceOrderingSuiteComparison.ts": {
+      "experimentRawSha256": "b028448728c8a7ce6d9ff911ce565c94085a016c501a0fb60d3a84bc87c04ce9",
+      "lfSha256": "062462066caa7b4510452f91224db55ccb67bc28beb80285e19dd359dff47ec7"
+    },
+    "scripts/benchmarks/quiescencePositions.ts": {
+      "experimentRawSha256": "3fa3345beb0ece576a1c27b522c37588448ec57546672430f3c4fd87233a06d4",
+      "lfSha256": "b649c27f3f4ede616af3c900f6b2488cb91d94739ba38b28d2dd3aa71e902771"
+    },
+    "scripts/benchmarks/quiescenceSuite.ts": {
+      "experimentRawSha256": "58f85300af52c101520f38b69566b3a292f64485f749d0fef0d659281e4244a3",
+      "lfSha256": "62dde923500d659dfd5b9c37d195c11fa04514167a1f8d1e7bd7194576cf046f"
+    },
+    "scripts/benchmarks/rootLegalTargets.ts": {
+      "experimentRawSha256": "146e87bc654748440fb2b22bd902ea81faa00970eff66cd144179121daaea623",
+      "lfSha256": "4f8a9b26947151db64cdfb32455cacb047901eac40f69def2e855caf57345795"
+    },
+    "scripts/benchmarks/seeDeadlinePosition.ts": {
+      "experimentRawSha256": "5d70b8e101248f41c8f9811f863d6ab233250d322889f7d7a06eaf7901812edf",
+      "lfSha256": "724bc9b4c57b1915e52bf4d42c68b0b0cf081e764edf5814544aff4fa3b07450"
+    },
+    "scripts/benchmarks/tacticalDiagnostics.ts": {
+      "experimentRawSha256": "995e9d2243d5e4d9ff5009a3cbe629dfd8e26fe10fd406d7d9fd2d43b65f402c",
+      "lfSha256": "cb79ab992b3dd5100f420f37866b7b6d83532e57c633196714db9c1c8a3bfd85"
+    },
+    "scripts/benchmarks/tacticalObservations.ts": {
+      "experimentRawSha256": "e31408ea3654ecebfc0d47a594a3f9cf50eda9f52c46c939d314af3a6e3f66e5",
+      "lfSha256": "16cdc743b20234922dffc82f1a0386e3702e7424fec24bac00b854b13aebdc0a"
+    },
+    "scripts/benchmarks/tacticalPositions.ts": {
+      "experimentRawSha256": "bb972bff27bff79191c3e8bf2166e13d0df6b9578b40a0fd7a11112eb652aa3f",
+      "lfSha256": "b9a4e3667fb80c11ec440d5098988bf133ae5eb0dd3c5af7aadfa7bcd8c8ba86"
+    },
+    "scripts/benchmarks/tacticalQuality.ts": {
+      "experimentRawSha256": "a4aa6600711b9d49fb3106b773532d9cfe558d8a501a253cf89cddab7540d3b0",
+      "lfSha256": "d46cf383e35343386ead6463a0044ff0043ac088ea2bc90bd9f2e95d6e3fb982"
+    },
+    "scripts/benchmarks/tacticalQualityAudit.ts": {
+      "experimentRawSha256": "c0b02d28d1fa6974b2dee18c38cd38bc473d217331f8690d4015e1f6525d2108",
+      "lfSha256": "6c9c302fd6177f1a187cc6d080b15d03d0644e540b8a4399c69014f6ccab8f4c"
+    },
+    "scripts/benchmarks/terminalDistanceReference.ts": {
+      "experimentRawSha256": "ad2bc7f704d587715913ec37e0dd59a9819d317e450f8ee383a62f3a2dcfcba9",
+      "lfSha256": "1c9e4f5616c29a696c6a878a6ce0a6785db4d9424e6eab194739abd2592685a1"
+    },
+    "scripts/benchmarks/timeLimitStressMeasurement.ts": {
+      "experimentRawSha256": "d2ab582d350f00911d3244d22b836231b7a12cd1cefa31e86110e8f8c39b5a58",
+      "lfSha256": "142e2449a12c948be074e8cfa0790eb030331b8c7f2bd4234ba73e93fd86607d"
+    },
+    "scripts/benchmarks/timeLimitStressPositions.ts": {
+      "experimentRawSha256": "604e8344bc0946a5592bba481d6eae919a4ade3b1bf7633c45c99a3b76320d69",
+      "lfSha256": "82bbf3914440a4e13d063198b598e9ab48933b580fa6eda7bd4174f0f5d8a9f5"
+    },
+    "scripts/benchmarks/timedDepthOneDiagnostics.ts": {
+      "experimentRawSha256": "cbc1175cd403d071f3fb4a5185e82d24ea35e2297bdd56c1840ef2b9c475eedc",
+      "lfSha256": "3f166a4cb37cf813b8080873974cbf379afddaa4051f7c6756c4de6ff1587702"
+    },
+    "scripts/benchmarks/timedFallbackSelfPlay.ts": {
+      "experimentRawSha256": "f789adb3144a3a8dd6551d0ab89c460dfbc5bc6a52676e2688627d5127157591",
+      "lfSha256": "d98714ec1dda486796c658911c61d81bb25a55a343fc44a44cf90f0b756c5b66"
+    },
+    "scripts/benchmarks/timedLongTail.ts": {
+      "experimentRawSha256": "9ebfc83339702ae6194842360955b855363eacccbc0be4d8816d6adca0ace477",
+      "lfSha256": "0695e83335b399c01aeb510fa144ec163c9765c9dd2af783c05537c2de456e29"
+    },
+    "scripts/benchmarks/verifyOutcomeProof.ts": {
+      "experimentRawSha256": "ee10cd988ab5e1a4de7dc1bf625767baee08f1ccf2617390a8ffccd8f2f76eba",
+      "lfSha256": "c40b3d63d4ca6a52b4e6937de904a8eb643d960555c799b66c30523740a263a9"
+    },
+    "src/domain/shogi/actionValidationDiagnostics.ts": {
+      "experimentRawSha256": "1b632e42428a4e236755f90b101207afd30927bee57bd535a0b5983c05600d25",
+      "lfSha256": "35f28cf2efd4fec2c92d20bf08287ea30fc0d1a702f0bed5dfbb0d8c9e1e7e33"
+    },
+    "src/domain/shogi/adjudication.ts": {
+      "experimentRawSha256": "192169b5a8dcc3f429e3b0c5e9295116fbdc4d3c5efd7c406834231d8315c29e",
+      "lfSha256": "849618a235490efc5fd93dd6608903c11a5b3fca0f436550eeb78e922f8d3ffd"
+    },
+    "src/domain/shogi/agreedJishogi.ts": {
+      "experimentRawSha256": "74444f1bc8212eac862623259e6a2522eb6b6bf70946c6a414798127cde0f3a7",
+      "lfSha256": "bee06908c253d924f28a307c44fc2593121b40450a25d6989d0d9af470ea6a32"
+    },
+    "src/domain/shogi/attacks.ts": {
+      "experimentRawSha256": "c326692a4d63007f293aa9adff64d109ae0389cf3bf111f5ca02c69abfd3ff7d",
+      "lfSha256": "55337c1fdbbe02a5c6a759301bc94a021f30bb57e055230302454df0fb897cdd"
+    },
+    "src/domain/shogi/boardStateUtils.ts": {
+      "experimentRawSha256": "a071f9f136c22557cbad98b95269f083faacb7a65297b6fe393c4c8bf2ec32c0",
+      "lfSha256": "45d90d1bf5958d0f7b9ec20799772c52b678b96584284904e99951cea88baa90"
+    },
+    "src/domain/shogi/branchReplay.ts": {
+      "experimentRawSha256": "abb6460f95d1b9b3dca25a302ca72525a755d6b74fda34cedee02d7ad3208fdb",
+      "lfSha256": "3e5ca4d07d31ebdaff5e4cfc37bd549e907c87fdc43c726fd3367d889b31f3b6"
+    },
+    "src/domain/shogi/branchSession.ts": {
+      "experimentRawSha256": "aa0835b93ac35913874e9640e770a2d721f1aa0abf6af76101c152a3b49a97c0",
+      "lfSha256": "81ba548800bd1e6756d87fd115d563f4dbb2e367c4bb68639e89c6eb64912ae0"
+    },
+    "src/domain/shogi/checkInternalsDiagnostics.ts": {
+      "experimentRawSha256": "43bbeed7eb6c2b26a584644bd84051c519a8e3f423bbc309d41904839d66cf3e",
+      "lfSha256": "5e1e77ba16056c864ae8e46721c5abb771d6b4b2f448e1c076ce7b6e7b737cb3"
+    },
+    "src/domain/shogi/checkmate.ts": {
+      "experimentRawSha256": "1f71ad187c5518fc3c94d35371765d03fc90485b62d3fcad4e47e8f919e619a4",
+      "lfSha256": "1a5bf992fb86c9a287abfebea96f6498803ee0dcb178ef6b1696eae7de886207"
+    },
+    "src/domain/shogi/coordinates.ts": {
+      "experimentRawSha256": "6aca638fb95e601ef0c05b37f006ac7d917ab712d2e12e1450c08b586d9b8f6a",
+      "lfSha256": "1b02455f819ec3a2708309f83bbc565a4fa1ce0d99707eb4fb852a3eaee0967b"
+    },
+    "src/domain/shogi/dropRules.ts": {
+      "experimentRawSha256": "2cf78769d4cf3e681f7241c344828a6743af430f22ffad30e08f055cbf71825a",
+      "lfSha256": "ef0ddaeef3ae3f032ee79986814cc95611060fa053a3a82283c480d13525e655"
+    },
+    "src/domain/shogi/drops.ts": {
+      "experimentRawSha256": "1b97bd59be77dcdd6ec77f1424ea57e7d416cb0ae563bfc4e4936edb81596646",
+      "lfSha256": "59cc4fba24ff88bfd77080542975c682be926e3b591f9dd33ca173937d2ea923"
+    },
+    "src/domain/shogi/enteringKing.ts": {
+      "experimentRawSha256": "b26174c7b21bc7494f7d574eff3c4592743b3a6decaecf52c3d108b77d830f90",
+      "lfSha256": "79185679741748bba0dbe0dd27b1fa744cb9332125e09d0f9525e72494efcd50"
+    },
+    "src/domain/shogi/evaluationPresetComparison.ts": {
+      "experimentRawSha256": "2149c2552e4812e382dad050d9ffbde1882f884153454e44aa0c4eeed236c914",
+      "lfSha256": "9b393feef6c39f2395fbace6f72e1faf6aecf770bff291c2b07d681d8333b430"
+    },
+    "src/domain/shogi/executionPolicy.ts": {
+      "experimentRawSha256": "f2dea35009660c1aea283a1059bb1d51f03066bbfac987ac953c2fd97a21e5e5",
+      "lfSha256": "5b3d10e56f9d7490af5207f7a329a8619fde286324249d0b6cb27bb383d0bdba"
+    },
+    "src/domain/shogi/gameRecord.ts": {
+      "experimentRawSha256": "d8fd372b375ac0c29083ec209425d1ffc36b5d7374b7f7c859a9acfc68241d17",
+      "lfSha256": "08969c250cd532bd0c096a71a33b3fb80821c32122983f97ac4fbb8c56db588b"
+    },
+    "src/domain/shogi/gameRecordImport.ts": {
+      "experimentRawSha256": "659b72c4e4949529b8cdeea3ca99f9f3475aa21d4e2dcad12584f76c63b0868b",
+      "lfSha256": "fc1e4477c284f9207efccda0a8f68b5441aa78427698c6581329fe449d859f1e"
+    },
+    "src/domain/shogi/gameRecordSession.ts": {
+      "experimentRawSha256": "2980f95d130d8cf28638dd636d0fecedd450640a40a4ba0cdbb990539829f5af",
+      "lfSha256": "28b041ae80736a9f1907181afd45ecccfa88c62ef5a430bdeb97c3e4929386ce"
+    },
+    "src/domain/shogi/gameState.ts": {
+      "experimentRawSha256": "5cf95c63f691b4d7a72612dc576db5af11837548036def883fd67802ab3760cf",
+      "lfSha256": "c1a3563b07a71b772ec972031e67d382dec71bf5e7a909a4b9d99c47f1c95bce"
+    },
+    "src/domain/shogi/index.ts": {
+      "experimentRawSha256": "539a436de1d85ba63c4f6a6802ab8903962488887fad909338399a1a37b468dc",
+      "lfSha256": "a68237138781565dd257311216948754ce119c25b40a78ceea8098e2923485ac"
+    },
+    "src/domain/shogi/jishogiPoints.ts": {
+      "experimentRawSha256": "228febcfa405583fc123d3b134e8acec0430f054b55e6bef62b7ae0fd13f6d1b",
+      "lfSha256": "9262f1995d39f8852360ea4da4a3fc769bef7ac355f59d4079f0fcda1aff688c"
+    },
+    "src/domain/shogi/kifExport.ts": {
+      "experimentRawSha256": "6e81e789a85d06ef112ddd06aa745c6ed2051e88f5ad0ba0c88df512556a3c48",
+      "lfSha256": "ac4a389c657dc2c31c7ad1b2af69c376d9ccf6b96d101a919f2e6e7016523551"
+    },
+    "src/domain/shogi/kifImport.ts": {
+      "experimentRawSha256": "d311586436dba4bb38805aeffffa9fbfa451e7ad50ccadf0fe3c9cd327199bd8",
+      "lfSha256": "902d1f5b280a813e08a7ed67096e6ab98e4eef21151db412a015b04121a0dc77"
+    },
+    "src/domain/shogi/kingSafetyEvaluation.ts": {
+      "experimentRawSha256": "d168714a9cf5c8853d2c9066b5b6133f492d18a3a6d5ab1d94978579c90534cc",
+      "lfSha256": "0dfca1647663509a9bba3597821f3d992f7026918e5aaa340703f3fa5dcca38e"
+    },
+    "src/domain/shogi/legalActions.ts": {
+      "experimentRawSha256": "f99fe0fde223dd53b2a822009a88e4d30df6b12ca3e21b2a35de682686f91e3d",
+      "lfSha256": "137425b09034e7337b5465290d5c1ac06845bf146054d8282e350880e059f611"
+    },
+    "src/domain/shogi/materialAi.ts": {
+      "experimentRawSha256": "ed80728554cbb58c9e3b7bf2b42d7ef90e1105f6adff23f2f229c9fbdb970596",
+      "lfSha256": "aba1e653887ce64dd7287a849d0d36818ab196bea94411dd5463044ed3a499f0"
+    },
+    "src/domain/shogi/materialEvaluation.ts": {
+      "experimentRawSha256": "d8576361445ee053abe54d3a480c01922226b2e4bc2b8f39d8907ac0c7793f55",
+      "lfSha256": "68c1015e3807937b509a1e13c0baef9b39a17e21a1711184ae37b8fc78857ddc"
+    },
+    "src/domain/shogi/moveLimitJishogi.ts": {
+      "experimentRawSha256": "107a44353531aa734f8892df3c1a77d96e9d7d393a8553b2bfebcc6701fab1c0",
+      "lfSha256": "4ae0fb495b6d7db0ebc9fa55507bf9e61f38dadcaf36f63aca16309c68ed4303"
+    },
+    "src/domain/shogi/moves.ts": {
+      "experimentRawSha256": "608f774438619b49b643f971ca0182859a47d40b7e383e143f9936feb1686d52",
+      "lfSha256": "edd6f2dc7d01f1f2a2b7da55684ea852298ae13a4150a2514e025468b1de1e90"
+    },
+    "src/domain/shogi/pairedSelfPlayMatch.ts": {
+      "experimentRawSha256": "878fd3494fd11ae887a3b1bbd4072352baa95537b5fea15e5160dbfe0f495592",
+      "lfSha256": "8a4189992eb583d2b2d3a713357d294851e13414f1469bfdf4716aea9c0f5d00"
+    },
+    "src/domain/shogi/pieceSquareEvaluation.ts": {
+      "experimentRawSha256": "368b90acb4fe85d2d672f129454cb401e6fd12f7044637b2de876475a5b74e7c",
+      "lfSha256": "bd43cf021aad3cf63c31a533c36fd6f71ba9316b71eeacba784f61f6732d4dd0"
+    },
+    "src/domain/shogi/promotion.ts": {
+      "experimentRawSha256": "a946b74b49ada931521c80f8a2d1deda49d5388fbe908b169afb797cb698e3dc",
+      "lfSha256": "4ef89b776c5c634892f18c1092df4ce3c52897f10448c3c3c2e2d1828a91b636"
+    },
+    "src/domain/shogi/quiescenceComparison.ts": {
+      "experimentRawSha256": "49a2aae532a9c995ae7e2b9c051445512d5eb29bded538dc55e7475c0607de0d",
+      "lfSha256": "23187ab4f317f858cd16d2a33220b9c814a1f7005d5eea6588332e93a5e59a27"
+    },
+    "src/domain/shogi/quiescenceOrdering.ts": {
+      "experimentRawSha256": "d0b4932977d0a225f1c68c47fbb18b61891bc420c82475aa69363e98c17589bb",
+      "lfSha256": "baa83136614ed852cea5c24fe7deae33947ac4aedf37e03d6913fce8d047deb2"
+    },
+    "src/domain/shogi/quiescenceSearch.ts": {
+      "experimentRawSha256": "a13d7115ee81223b565c5c3136805cdd83bff94647435428f63c637da3fe9b85",
+      "lfSha256": "9f91fdc5f675d1ad99dba5352adc7f7edb1fe6975ea607fce86c18086b52198f"
+    },
+    "src/domain/shogi/quietPromotionSelection.ts": {
+      "experimentRawSha256": "b6618a5645439f58821ed2d8f4e22ad2de95b70b8d0bec63dfaa4244ff6a9a04",
+      "lfSha256": "b38cba18895b226a580aabe0a3e8b5b2f85479ceaf6204b4d2dbd68fd105bba6"
+    },
+    "src/domain/shogi/randomAi.ts": {
+      "experimentRawSha256": "306121c524e5dcbfeb972dc7a00d04e8abe06b74fb8861b4d60d86653cc3b9e4",
+      "lfSha256": "d821dfbfd117f811e1c37da2d747c58256cc5e849e36eb270f30ac5227421dcc"
+    },
+    "src/domain/shogi/recordIdentity.ts": {
+      "experimentRawSha256": "55b0c51231298531bc3dfd79544e71486b492d1c4ecf350a7a2353d13f95ee2a",
+      "lfSha256": "1c728bb52ba19eee22ac3365f3bedb3e078073485f8bf0f968c1c10c0de8b6db"
+    },
+    "src/domain/shogi/repeatedPairedSelfPlayMatches.ts": {
+      "experimentRawSha256": "263e6222ba6d829c1a3bc16ae6ba74192e7373e88be62188cb121af14ee0bfe4",
+      "lfSha256": "4b8073e97c5251caafba26da630c5d87c31bedf2adcabc598f33f1d9f3fdf5cb"
+    },
+    "src/domain/shogi/repetition.ts": {
+      "experimentRawSha256": "3992234095eb1fc01bd79a0acc866be4186e72f52b870ae5e7a3e2e8ce9fa77b",
+      "lfSha256": "6adeb851ec16b5c31ccb4c09d94cd6bc6307aa54a0316a760dd8657f48c661a4"
+    },
+    "src/domain/shogi/replay.ts": {
+      "experimentRawSha256": "e45354c690690af11e033974fb5febe3a9d69e39062572d6450c1c5e46fb3a8e",
+      "lfSha256": "dd00e1b3293a8317f0830d605fbd9050c9c318c7306b4041487bb50b89332b0e"
+    },
+    "src/domain/shogi/resignation.ts": {
+      "experimentRawSha256": "65bddf44746e9fa854ade9570406639151df6525719a2a6500e4d5d7da30c20a",
+      "lfSha256": "b9378c2f98bcb920b7833ca92ca571fa3edc19aa41e713ec741c277492960f67"
+    },
+    "src/domain/shogi/searchDiagnostics.ts": {
+      "experimentRawSha256": "a146c1b49688da54c09391525a2d0b101a348a0c30473a73a6b43c9db5f17323",
+      "lfSha256": "e7cf732c02c0b9b22a7f9e06cf3fbf17a7221a90ee9eaffc19ba2f57147d1fee"
+    },
+    "src/domain/shogi/searchEvaluationPresets.ts": {
+      "experimentRawSha256": "16b0c81dd55ed29b515b42ed8f870e21e262a7272cadd942b3d32cf40dcf5a9d",
+      "lfSha256": "2f9397c63e68b8b3de469170dd05c7ce1e8a7695f8886bbfb032650a20c137a5"
+    },
+    "src/domain/shogi/searchValue.ts": {
+      "experimentRawSha256": "4a2c1918342fd61889e1c96ee88f71f7332427fa873f910e35f38c8a3af31399",
+      "lfSha256": "eac56bae21d3f24860a4aced453e2f5981387faa2f9d2df91f34653f16bd24f7"
+    },
+    "src/domain/shogi/selfPlayGame.ts": {
+      "experimentRawSha256": "c64e5093e98f508018a72b21c8adeba4896e19a29114a375b7a0c725f402ae27",
+      "lfSha256": "8a775267c0b17a960116ca51c2ccd378b5f82bbf575e5815f7aefad6490f396a"
+    },
+    "src/domain/shogi/staticExchangeEvaluation.ts": {
+      "experimentRawSha256": "be3d57d9ea6486aae0c2e8bd7e77b9a129728cb04b67796021a17564f928699b",
+      "lfSha256": "4d0f6da5ea93b13f2dfa17991c11e1b66247fbe30eb5c7adfb4539c9e4edebce"
+    },
+    "src/domain/shogi/timeLimitedQuiescenceComparison.ts": {
+      "experimentRawSha256": "2731ff98d6a2516bce43943626a2978054c353980ed5d526986823b8e512dc5a",
+      "lfSha256": "193a532c556816000be5f1f7bb9c0c0695e24178048599373e75dd53af317ff2"
+    },
+    "src/domain/shogi/transpositionTable.ts": {
+      "experimentRawSha256": "91afc90f546d3306a577c4eaf4f27dfb203342af0c7132a9a5863a40fec9540c",
+      "lfSha256": "23cdf01574be48c346329db61b61cccf41438fe9b3931576bb0cb5c879dc4a99"
+    },
+    "src/domain/shogi/twoPlyAlphaBetaAi.ts": {
+      "experimentRawSha256": "5079dec540db45e9195993bc0ccfc53515217cc517bda0cca35b0f0a10d36803",
+      "lfSha256": "19597324077a33cb3c2a976dc6f81c40d7444aa500b4ea091b65cf9cc87e1e31"
+    },
+    "src/domain/shogi/twoPlyMinimaxAi.ts": {
+      "experimentRawSha256": "a1cec498fcf168125ee14faeca8b7525ea229815f48f6ac1dc2f52bcab17ee46",
+      "lfSha256": "2d9d11c92c6674eb9626b25a598c275af6b252516d14c0cbe03b917354f1e474"
+    },
+    "src/domain/shogi/undefendedPieceSafetyEvaluation.ts": {
+      "experimentRawSha256": "e2e2536666c8169a0e8fedb71377f726cc6c405e4cc646be7690cb71bed7a6e9",
+      "lfSha256": "b86d8849b36fa288638b3cc4374ab0041c2256b357949132297ffe0d4c723d37"
+    },
+    "src/domain/shogi/validation.ts": {
+      "experimentRawSha256": "233fbcbf6759326058a0d17bb99896ed1ba0a0f880019dd9c43036cd937c29e7",
+      "lfSha256": "dd2a96cd1705aa0554f62af9f8234781e179a2a7558fb97d9afe3fff26c7d9ea"
+    },
+    "src/types/shogi.ts": {
+      "experimentRawSha256": "d51fb12298bd7b4e5dc7fbb502242d74b6238c08d3171454ed6e75939a95b188",
+      "lfSha256": "c25edf602a45678f38200ba892396fdd43d85a11378fc101c54a1a6ad6c38bae"
+    },
+    "scripts/benchmarks/gameBlunderFixed.ts": {
+      "experimentRawSha256": "1bf1fff6181155389cf902447f5e9abe8f0ac52a0c621597d8150d18c238fa3f",
+      "lfSha256": "1a6e56e86bebda19a828feacdb5de69a884876acd06e9eb6d0d0739fa38f9a3e"
+    },
+    "scripts/benchmarks/gameBlunderInvestigation.ts": {
+      "experimentRawSha256": "ad1e80a9a6e40e92629f5f4575ff523231d8a77fc93dcb2b417bdbff1104ef72",
+      "lfSha256": "ad1e80a9a6e40e92629f5f4575ff523231d8a77fc93dcb2b417bdbff1104ef72"
+    },
+    "scripts/investigate-game-blunders.ts": {
+      "experimentRawSha256": "4c667c22246d90fd0e1431b35d35e44f3c2321dac55bc3de6111e03a1982534a",
+      "lfSha256": "4c667c22246d90fd0e1431b35d35e44f3c2321dac55bc3de6111e03a1982534a"
+    },
+    "scripts/summarize-game-blunders.ts": {
+      "experimentRawSha256": "1c2d4ccdd3ba3182104f2da3eeffa592a7bbe28a847a83331a02378a47c7a702",
+      "lfSha256": "1c2d4ccdd3ba3182104f2da3eeffa592a7bbe28a847a83331a02378a47c7a702"
+    }
+  }
+}

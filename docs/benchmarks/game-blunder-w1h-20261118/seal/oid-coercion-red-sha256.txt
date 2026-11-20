@@ -1,0 +1,2 @@
+1c2515501b51f2aeedd2ab1e708158be72af4d7f2d854debeca031d60ddcb7fa  scripts/stage-w1h-seal-check.mjs
+3027b5491b68df72c8fdb5df6f72398ade030a9f7a250381842e1074bdd43651  scripts/stage-w1g-gate.mjs

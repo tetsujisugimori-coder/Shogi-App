@@ -1,0 +1,52 @@
+{
+  "mode": "collect",
+  "runId": "eded9e02-bbf6-4d21-a1dc-bafa9e45d034",
+  "trialId": "e2017d67-27fd-45e3-92fa-38c6a57aab76",
+  "preflightSha256": "a7d805132f6fba651eedad9cd472abba57715d10ab381643aea25871b2bb1976",
+  "target": {
+    "repo": "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\repo\\.tmp-tests\\w1c-controls-03\\git-source",
+    "dir": "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\repo\\.tmp-tests\\w1c-controls-03\\b",
+    "head": "988c417ffeb204887051725666aaf6998a1ec6af"
+  },
+  "observation": {
+    "dir": "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\repo\\.tmp-tests\\w1c-controls-03\\b",
+    "head": "988c417ffeb204887051725666aaf6998a1ec6af",
+    "source": [
+      {
+        "path": "package-lock.json",
+        "sha256": "5118d0c609db7c079c5ffa9f9a8c54cf81f04bec314d930a9ad29764551e473b"
+      },
+      {
+        "path": "package.json",
+        "sha256": "3ca9d4afd21425087cf31893b8f9f63c81b0b8408db5e343ca76e5f8aa26ab9a"
+      },
+      {
+        "path": "tiny.test.js",
+        "sha256": "b723bbb1399834f56fab8a657e44772310f674b3ec93373ce2570aee88584071"
+      },
+      {
+        "path": "vitest.config.mjs",
+        "sha256": "3316b3a727b21c2b7bc0482ee298971ce1d7c537857efeacbdf3ac4bb2886a0f"
+      }
+    ],
+    "sourceSha256": "04a374f72fec6ee43bfa266b3e18812acbad645bb587fd05bd0e7d7a85999ca9",
+    "dependencyRoot": "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\repo\\node_modules",
+    "dependencyCount": 14934,
+    "dependenciesSha256": "8eab3bf6afa4da912bef649d0cc10948f4baf599953c585d79c7838688bdab91",
+    "lockSha256": "5118d0c609db7c079c5ffa9f9a8c54cf81f04bec314d930a9ad29764551e473b",
+    "vitest": "4.1.11"
+  },
+  "environment": {
+    "TEMP": "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\repo\\.tmp-tests\\w1c-controls-03\\temp",
+    "TMP": "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\repo\\.tmp-tests\\w1c-controls-03\\temp",
+    "npm_config_cache": "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\repo\\.tmp-tests\\w1c-controls-03\\npm-cache"
+  },
+  "dir": "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\repo\\.tmp-tests\\w1c-controls-03\\b",
+  "output": "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\repo\\docs\\benchmarks\\game-blunder-w1c-20261115\\controls-host-03\\connected-normal\\collect-1",
+  "filters": [],
+  "command": [
+    "createVitest",
+    "test",
+    "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\repo\\.tmp-tests\\w1c-controls-03\\b"
+  ]
+}

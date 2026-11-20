@@ -1,0 +1,38 @@
+hint: Using 'master' as the name for the initial branch. This default branch name
+hint: will change to "main" in Git 3.0. To configure the initial branch name
+hint: to use in all of your new repositories, which will suppress this warning,
+hint: call:
+hint:
+hint: 	git config --global init.defaultBranch <name>
+hint:
+hint: Names commonly chosen instead of 'master' are 'main', 'trunk' and
+hint: 'development'. The just-created branch can be renamed via this command:
+hint:
+hint: 	git branch -m <name>
+hint:
+hint: Disable this message with "git config set advice.defaultBranchName false"
+✔ fixed 0 prepare rejected before output creation (2.776343ms)
+✔ fixed 0 direct worker collect rejected before import (144.092082ms)
+✔ fixed 0 direct worker run rejected before import (194.069014ms)
+✔ fixed 0 saved READY launch refused (2.384643ms)
+✔ fixed 1 prepare rejected before output creation (0.362185ms)
+✔ fixed 1 direct worker collect rejected before import (85.523316ms)
+✔ fixed 1 direct worker run rejected before import (82.605872ms)
+✔ fixed 1 saved READY launch refused (0.86328ms)
+✔ non-fixed synthetic Git identity accepted (20.57453ms)
+✔ unknown/ref HEAD refused (0.9106ms)
+✔ unknown/ref --bad refused (0.182042ms)
+✔ unknown/ref 0000000000000000000000000000000000000000 refused (4.484473ms)
+✔ unknown/ref null refused (1.848367ms)
+✔ legacy PowerShell entry stops unconditionally (0.318383ms)
+✔ prepare static regression guard precedes mkdir and collection (0.226822ms)
+✔ same fixed tree 0 alternate commit blocked (22.722284ms)
+✔ same fixed tree 1 alternate commit blocked (20.394511ms)
+ℹ tests 17
+ℹ suites 0
+ℹ pass 17
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 806.978939

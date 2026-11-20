@@ -1,0 +1,90 @@
+Not implemented: navigation to another Document
+
+⎯⎯⎯⎯⎯⎯ Failed Suites 7 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  .tmp-tests/w1b-review-20261115-01/a/tiny.test.js > outer > empty
+ FAIL  .tmp-tests/w1b-review-20261115-01/git-source/tiny.test.js > outer > empty
+ FAIL  .tmp-tests/w1b-review-20261115-host-01/a/tiny.test.js > outer > empty
+ FAIL  .tmp-tests/w1b-review-20261115-host-01/b/tiny.test.js > outer > empty
+ FAIL  .tmp-tests/w1b-review-20261115-host-01/git-source/tiny.test.js > outer > empty
+Error: No test found in suite empty
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/9]⎯
+
+ FAIL  .tmp-tests/w1b-review-20261115-reporter/empty-describe/tiny.test.js > empty
+ FAIL  .tmp-tests/w1b-review-20261115-reporter-submission/empty-describe/tiny.test.js > empty
+Error: No test found in suite empty
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/9]⎯
+
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 2 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  .tmp-tests/w1b-review-20261115-reporter/assertion-failure/tiny.test.js > fails
+AssertionError: expected 1 to be 2 // Object.is equality
+
+- Expected
++ Received
+
+- 2
++ 1
+
+ ❯ .tmp-tests/w1b-review-20261115-reporter/assertion-failure/tiny.test.js:2:26
+      1| import {it,describe,expect} from 'vitest';
+      2| it('fails',()=>expect(1).toBe(2));
+       |                          ^
+      3|
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/9]⎯
+
+ FAIL  .tmp-tests/w1b-review-20261115-reporter-submission/assertion-failure/tiny.test.js > fails
+AssertionError: expected 1 to be 2 // Object.is equality
+
+- Expected
++ Received
+
+- 2
++ 1
+
+ ❯ .tmp-tests/w1b-review-20261115-reporter-submission/assertion-failure/tiny.test.js:2:26
+      1| import {it,describe,expect} from 'vitest';
+      2| it('fails',()=>expect(1).toBe(2));
+       |                          ^
+      3|
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/9]⎯
+
+⎯⎯⎯⎯⎯⎯ Unhandled Errors ⎯⎯⎯⎯⎯⎯
+
+Vitest caught 2 unhandled errors during the test run.
+This might cause false positive tests. Resolve unhandled errors to make sure your tests are not affected.
+
+⎯⎯⎯⎯⎯ Uncaught Exception ⎯⎯⎯⎯⎯
+Error: W1b real unhandled fixture
+ ❯ Timeout._onTimeout .tmp-tests/w1b-review-20261115-reporter/unhandled/tiny.test.js:2:45
+      1| import {it,describe,expect} from 'vitest';
+      2| it('passes',async()=>{setTimeout(()=>{throw new Error('W1b real unhand…
+       |                                             ^
+      3|
+ ❯ listOnTimeout node:internal/timers:685:17
+ ❯ processTimers node:internal/timers:618:7
+
+This error originated in ".tmp-tests/w1b-review-20261115-reporter/unhandled/tiny.test.js" test file. It doesn't mean the error was thrown inside the file itself, but while it was running.
+The latest test that might've caused the error is "passes". It might mean one of the following:
+- The error was thrown, while Vitest was running this test.
+- If the error occurred after the test had been completed, this was the last documented test before it was thrown.
+
+⎯⎯⎯⎯⎯ Uncaught Exception ⎯⎯⎯⎯⎯
+Error: W1b real unhandled fixture
+ ❯ Timeout._onTimeout .tmp-tests/w1b-review-20261115-reporter-submission/unhandled/tiny.test.js:2:45
+      1| import {it,describe,expect} from 'vitest';
+      2| it('passes',async()=>{setTimeout(()=>{throw new Error('W1b real unhand…
+       |                                             ^
+      3|
+ ❯ listOnTimeout node:internal/timers:685:17
+ ❯ processTimers node:internal/timers:618:7
+
+This error originated in ".tmp-tests/w1b-review-20261115-reporter-submission/unhandled/tiny.test.js" test file. It doesn't mean the error was thrown inside the file itself, but while it was running.
+The latest test that might've caused the error is "passes". It might mean one of the following:
+- The error was thrown, while Vitest was running this test.
+- If the error occurred after the test had been completed, this was the last documented test before it was thrown.
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+

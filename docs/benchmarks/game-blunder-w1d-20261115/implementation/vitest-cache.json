@@ -1,0 +1,6 @@
+{
+  "path": "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\stage-w1d-20261115-pair\\old\\node_modules\\vitest\\dist\\chunks\\cli-api.CnMVyzaz.js",
+  "sha256": "a236001d048380e2c67d05423fc9ea3f26b07ee019ba8d6e622082f29d49102e",
+  "startLine": 582,
+  "excerpt": "\tasync writeToCache() {\n\t\tif (!this.cachePath) return;\n\t\tconst results = Array.from(this.cache.entries());\n\t\tconst cacheDirname = dirname(this.cachePath);\n\t\tif (!fs.existsSync(cacheDirname)) await fs.promises.mkdir(cacheDirname, { recursive: true });\n\t\tconst cache = JSON.stringify({\n\t\t\tversion: this.version,\n\t\t\tresults\n\t\t});\n\t\tawait fs.promises.writeFile(this.cachePath, cache);\n\t}\n}\n\nclass VitestCache {\n\tresults;\n\tstats = new FilesStatsCache();\n\tconstructor(logger) {\n\t\tthis.results = new ResultsCache(logger);"
+}

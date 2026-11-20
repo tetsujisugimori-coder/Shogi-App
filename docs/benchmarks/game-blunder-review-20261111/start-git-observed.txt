@@ -1,0 +1,25 @@
+## codex/game-blunder-diagnostics
+?? .tmp-tests/
+e1ccb1a2412e7faa86c2c1f60fdad1dca154023a
+origin	https://github.com/tetsujisugimori-coder/Shogi-App.git (fetch)
+origin	https://github.com/tetsujisugimori-coder/Shogi-App.git (push)
+e1ccb1a fix(test): verify mixed-ending source provenance across checkouts
+df80b71 feat(bench): add reproducible blunder timeout investigation
+b244f4c wip: add bounded game blunder diagnostic evidence
+85d856b feat(bench): 対局journalの逐次保存と1000ms 2ペアの完走検証 (#216)
+4009cd0 feat(shogi): add opt-in piece safety pressure experiment (#214)
+handoff-20261030
+piece-safety-diagnostics-20261025
+preservation-blunder-20261105
+repo
+see-legality-study
+
+game-blunder-investigation-20261030
+game-blunder-investigation-v4-20261105
+game-blunder-pilot-20261029
+game-blunder-pilot-balanced-20261029
+game-blunder-proofs-20261030
+game-blunder-proofs-v2-20261030
+game-blunder-rediagnosis-20261030
+game-blunder-rediagnosis-v2-20261030
+game-blunder-rediagnosis-v3-20261030

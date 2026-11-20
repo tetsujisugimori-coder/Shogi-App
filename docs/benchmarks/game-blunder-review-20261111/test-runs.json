@@ -1,0 +1,106 @@
+[
+  {
+    "exitCode": 0,
+    "cache": "shared dedicated cache, retained in execution order",
+    "name": "related-final",
+    "head": "4d626a46426ea5a5b88f357330897f919fd7b2bd",
+    "seconds": 18.0945177,
+    "workers": 2,
+    "temp": "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\repo\\.tmp-tests\\review-20261111",
+    "runnerTimeout": 5000,
+    "command": [
+      "node",
+      "node_modules/vitest/vitest.mjs",
+      "run",
+      "src/test/game-blunder-diagnosis.test.ts",
+      "src/test/game-blunder-fixed.test.ts",
+      "src/test/game-blunder-investigation-integration.test.ts",
+      "src/test/game-blunder-investigation-v4.test.ts",
+      "src/test/game-blunder-pilot.test.ts",
+      "src/test/game-blunder-timeout-integration.test.ts",
+      "src/test/game-blunder-v4-journal-integration.test.ts"
+    ]
+  },
+  {
+    "exitCode": 1,
+    "cache": "shared dedicated cache, retained in execution order",
+    "name": "full-default-1",
+    "head": "4d626a46426ea5a5b88f357330897f919fd7b2bd",
+    "seconds": 322.1383169,
+    "workers": 2,
+    "temp": "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\repo\\.tmp-tests\\review-20261111",
+    "runnerTimeout": 5000,
+    "command": [
+      "node",
+      "node_modules/vitest/vitest.mjs",
+      "run"
+    ]
+  },
+  {
+    "exitCode": 1,
+    "cache": "shared dedicated cache, retained in execution order",
+    "name": "full-default-2",
+    "head": "4d626a46426ea5a5b88f357330897f919fd7b2bd",
+    "seconds": 274.33732,
+    "workers": 2,
+    "temp": "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\repo\\.tmp-tests\\review-20261111",
+    "runnerTimeout": 5000,
+    "command": [
+      "node",
+      "node_modules/vitest/vitest.mjs",
+      "run"
+    ]
+  },
+  {
+    "exitCode": 0,
+    "cache": "shared dedicated cache, retained in execution order",
+    "name": "full-15s",
+    "head": "4d626a46426ea5a5b88f357330897f919fd7b2bd",
+    "seconds": 258.925693,
+    "workers": 2,
+    "temp": "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\repo\\.tmp-tests\\review-20261111",
+    "runnerTimeout": 15000,
+    "command": [
+      "node",
+      "node_modules/vitest/vitest.mjs",
+      "run",
+      "--testTimeout=15000"
+    ]
+  },
+  {
+    "name": "lint",
+    "exitCode": 0,
+    "temp": "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\repo\\.tmp-tests\\review-20261111",
+    "command": [
+      "npm",
+      "run",
+      "lint"
+    ],
+    "head": "4d626a46426ea5a5b88f357330897f919fd7b2bd",
+    "seconds": 29.0805326
+  },
+  {
+    "name": "build",
+    "exitCode": 0,
+    "temp": "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\repo\\.tmp-tests\\review-20261111",
+    "command": [
+      "npm",
+      "run",
+      "build"
+    ],
+    "head": "4d626a46426ea5a5b88f357330897f919fd7b2bd",
+    "seconds": 30.109693
+  },
+  {
+    "name": "verify-lock",
+    "exitCode": 0,
+    "temp": "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\repo\\.tmp-tests\\review-20261111",
+    "command": [
+      "npm",
+      "run",
+      "verify:lock"
+    ],
+    "head": "4d626a46426ea5a5b88f357330897f919fd7b2bd",
+    "seconds": 1.2112984
+  }
+]

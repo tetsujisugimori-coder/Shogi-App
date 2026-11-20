@@ -1,0 +1,9 @@
+{
+  "at": "2026-11-15T14:46:27.796Z",
+  "source": "independent filesystem read after manifest serialization",
+  "files": 463,
+  "gzipFiles": 174,
+  "archivedFiles": 2107,
+  "mismatches": 0,
+  "manifestSha256": "a3dc4e9269e78b9edbc883e97ddb358ac3a0f022e44ed553cbe33224d489ed27"
+}

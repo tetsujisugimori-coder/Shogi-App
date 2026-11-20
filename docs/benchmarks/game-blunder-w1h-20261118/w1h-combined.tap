@@ -1,0 +1,63 @@
+hint: Using 'master' as the name for the initial branch. This default branch name
+hint: will change to "main" in Git 3.0. To configure the initial branch name
+hint: to use in all of your new repositories, which will suppress this warning,
+hint: call:
+hint:
+hint: 	git config --global init.defaultBranch <name>
+hint:
+hint: Names commonly chosen instead of 'master' are 'main', 'trunk' and
+hint: 'development'. The just-created branch can be renamed via this command:
+hint:
+hint: 	git branch -m <name>
+hint:
+hint: Disable this message with "git config set advice.defaultBranchName false"
+✔ fixed 0 prepare rejected before output creation (3.576545ms)
+✔ fixed 0 direct worker collect rejected before import (156.538972ms)
+✔ fixed 0 direct worker run rejected before import (184.656275ms)
+✔ fixed 0 saved READY launch refused (3.489111ms)
+✔ fixed 1 prepare rejected before output creation (1.288204ms)
+✔ fixed 1 direct worker collect rejected before import (101.679702ms)
+✔ fixed 1 direct worker run rejected before import (131.984598ms)
+✔ fixed 1 saved READY launch refused (0.967455ms)
+✔ non-fixed synthetic Git identity accepted (23.578776ms)
+✔ unknown/ref HEAD refused (0.906211ms)
+✔ unknown/ref --bad refused (0.187472ms)
+✔ unknown/ref 0000000000000000000000000000000000000000 refused (4.925163ms)
+✔ unknown/ref null refused (0.090863ms)
+✔ legacy PowerShell entry stops unconditionally (0.297941ms)
+✔ prepare static regression guard precedes mkdir and collection (0.407707ms)
+✔ same fixed tree 0 alternate commit blocked (23.866104ms)
+✔ same fixed tree 1 alternate commit blocked (25.711082ms)
+✔ generated source seal roundtrip uses shared raw-byte contract (3.829418ms)
+✔ JSON changed (1.317724ms)
+✔ raw whitespace changed (0.49273ms)
+✔ schema mismatch (0.759475ms)
+✔ missing field (0.445425ms)
+✔ null field (0.520097ms)
+✔ wrong type (2.167751ms)
+✔ source rebind (0.3705ms)
+✔ dependency rebind (0.359108ms)
+✔ environment rebind (0.599421ms)
+✔ HEAD rebind (0.402492ms)
+✔ tree rebind (0.338425ms)
+✔ challenge reuse (0.459447ms)
+✔ stale seal (0.487856ms)
+✔ actor rebind (0.340034ms)
+✔ time order (0.45498ms)
+✔ incomplete close (0.507865ms)
+✔ synthetic carried to live (0.460299ms)
+✔ digest confused with raw hash (0.295206ms)
+✔ start rebound (0.482861ms)
+✔ finish actor rebound (0.335817ms)
+✔ output reused (0.315127ms)
+✔ expected missing (0.247608ms)
+✔ bytes missing (0.173673ms)
+✔ production gate remains blocked after synthetic success (1.622222ms)
+ℹ tests 42
+ℹ suites 0
+ℹ pass 42
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 913.526344

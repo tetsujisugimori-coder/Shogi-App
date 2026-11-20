@@ -1,0 +1,33 @@
+✔ generated source seal roundtrip uses shared raw-byte contract (3.506567ms)
+✔ JSON changed (0.584934ms)
+✔ raw whitespace changed (0.485452ms)
+✔ schema mismatch (0.531416ms)
+✔ missing field (0.682085ms)
+✔ null field (0.400471ms)
+✔ wrong type (0.376992ms)
+✔ source rebind (1.634497ms)
+✔ dependency rebind (0.436193ms)
+✔ environment rebind (0.66786ms)
+✔ HEAD rebind (0.537391ms)
+✔ tree rebind (0.335362ms)
+✔ challenge reuse (0.531157ms)
+✔ stale seal (0.993226ms)
+✔ actor rebind (0.3754ms)
+✔ time order (0.449257ms)
+✔ incomplete close (0.402735ms)
+✔ synthetic carried to live (0.33129ms)
+✔ digest confused with raw hash (0.253305ms)
+✔ start rebound (0.490253ms)
+✔ finish actor rebound (0.307619ms)
+✔ output reused (0.274245ms)
+✔ expected missing (0.193793ms)
+✔ bytes missing (0.160767ms)
+✔ production gate remains blocked after synthetic success (1.8828ms)
+ℹ tests 25
+ℹ suites 0
+ℹ pass 25
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 243.164304

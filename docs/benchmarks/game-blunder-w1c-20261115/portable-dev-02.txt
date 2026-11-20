@@ -1,0 +1,17 @@
+Retained portable fixtures: C:\Users\tetsu\Documents\ChatGPT\将棋アプリ\repo\.tmp-tests\shogi-w1c-tWM1dR
+✔ normal raw source accepted and manifests reproducible (719.1572ms)
+✔ path containment respects directory boundary (0.2756ms)
+✔ CRLF raw blob mismatch (814.3469ms)
+✔ untracked empty directory (845.271ms)
+✔ untracked regular file (819.7515ms)
+✔ tracked file becomes directory (816.3522ms)
+✔ dependency contents AND empty directories affect the seal (1103.4403ms)
+﹣ internal symlinks and cycles rejected (0.1967ms) # SKIP
+ℹ tests 8
+ℹ suites 0
+ℹ pass 7
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 1
+ℹ todo 0
+ℹ duration_ms 5425.589

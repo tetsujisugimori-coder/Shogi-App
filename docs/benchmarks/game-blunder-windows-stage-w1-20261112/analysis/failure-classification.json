@@ -1,0 +1,50 @@
+[
+  {
+    "sequence": 1,
+    "head": "old",
+    "failures": [],
+    "logSignals": []
+  },
+  {
+    "sequence": 2,
+    "head": "new",
+    "failures": [],
+    "logSignals": []
+  },
+  {
+    "sequence": 3,
+    "head": "new",
+    "failures": [],
+    "logSignals": []
+  },
+  {
+    "sequence": 4,
+    "head": "old",
+    "failures": [],
+    "logSignals": []
+  },
+  {
+    "sequence": 5,
+    "head": "new",
+    "failures": [],
+    "logSignals": []
+  },
+  {
+    "sequence": 6,
+    "head": "old",
+    "failures": [],
+    "logSignals": []
+  },
+  {
+    "sequence": 7,
+    "head": "old",
+    "failures": [],
+    "logSignals": []
+  },
+  {
+    "sequence": 8,
+    "head": "new",
+    "failures": [],
+    "logSignals": []
+  }
+]

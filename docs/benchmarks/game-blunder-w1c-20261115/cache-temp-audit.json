@@ -1,0 +1,100 @@
+{
+  "installations": [
+    {
+      "label": "old",
+      "head": "e1ccb1a2412e7faa86c2c1f60fdad1dca154023a",
+      "started": "2026-11-15T11:55:08.910Z",
+      "finished": "2026-11-15T11:55:30.542Z",
+      "command": [
+        "C:\\Program Files\\nodejs\\node.exe",
+        "--use-system-ca",
+        "C:\\Users\\tetsu\\AppData\\Roaming/npm/node_modules/npm/bin/npm-cli.js",
+        "ci",
+        "--cache",
+        "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\stage-w1c-20261115-03\\old-install-cache",
+        "--no-audit",
+        "--no-fund",
+        "--fetch-retries=0",
+        "--fetch-timeout=30000"
+      ],
+      "exitCode": 0,
+      "error": null,
+      "node": "v24.20.0",
+      "npm": "11.17.0",
+      "cache": "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\stage-w1c-20261115-03\\old-install-cache",
+      "temp": "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\stage-w1c-20261115-03\\old-install-temp",
+      "cacheSha256": "898fd63e592184604b05ff55604da702d8e0a2eb183ada79c915e866be10c0c5",
+      "tempSha256": "6224089bf474739236dd04256cd4d591a97410c1cbc8b25c48c7bf93ade72d27"
+    },
+    {
+      "label": "new",
+      "head": "2a8a57b6ff207831c77ce62d27d3151eba7c1dc3",
+      "started": "2026-11-15T11:56:15.199Z",
+      "finished": "2026-11-15T11:56:36.144Z",
+      "command": [
+        "C:\\Program Files\\nodejs\\node.exe",
+        "--use-system-ca",
+        "C:\\Users\\tetsu\\AppData\\Roaming/npm/node_modules/npm/bin/npm-cli.js",
+        "ci",
+        "--cache",
+        "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\stage-w1c-20261115-03\\new-install-cache",
+        "--no-audit",
+        "--no-fund",
+        "--fetch-retries=0",
+        "--fetch-timeout=30000"
+      ],
+      "exitCode": 0,
+      "error": null,
+      "node": "v24.20.0",
+      "npm": "11.17.0",
+      "cache": "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\stage-w1c-20261115-03\\new-install-cache",
+      "temp": "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\stage-w1c-20261115-03\\new-install-temp",
+      "cacheSha256": "b665133675a8aa147e9454b4738b48a88dbba47ce61a8336ca16fdb0b67df0b4",
+      "tempSha256": "dc7e27cc5fe9ce6f4e82947246ae583568a4009f14f108130ddcb55c9f2589c5"
+    }
+  ],
+  "execution": {
+    "before": {
+      "values": {
+        "TEMP": "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\stage-w1c-20261115-03\\execution-temp",
+        "TMP": "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\stage-w1c-20261115-03\\execution-temp",
+        "npm_config_cache": "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\stage-w1c-20261115-03\\execution-npm-cache"
+      },
+      "inherited": {
+        "NODE_OPTIONS": "a4d0f0eb87fed960b9f1819efda1cd7935b4f665fdd3872149260986d11e96da",
+        "NODE_COMPILE_CACHE": "a4d0f0eb87fed960b9f1819efda1cd7935b4f665fdd3872149260986d11e96da",
+        "NODE_DISABLE_COMPILE_CACHE": "a4d0f0eb87fed960b9f1819efda1cd7935b4f665fdd3872149260986d11e96da",
+        "NODE_ENV": "a4d0f0eb87fed960b9f1819efda1cd7935b4f665fdd3872149260986d11e96da",
+        "TZ": "a4d0f0eb87fed960b9f1819efda1cd7935b4f665fdd3872149260986d11e96da",
+        "CI": "a4d0f0eb87fed960b9f1819efda1cd7935b4f665fdd3872149260986d11e96da",
+        "DISABLE_HMR": "a4d0f0eb87fed960b9f1819efda1cd7935b4f665fdd3872149260986d11e96da"
+      },
+      "trees": {
+        "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\stage-w1c-20261115-03\\execution-npm-cache": [],
+        "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\stage-w1c-20261115-03\\execution-temp": []
+      }
+    },
+    "after": {
+      "values": {
+        "TEMP": "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\stage-w1c-20261115-03\\execution-temp",
+        "TMP": "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\stage-w1c-20261115-03\\execution-temp",
+        "npm_config_cache": "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\stage-w1c-20261115-03\\execution-npm-cache"
+      },
+      "inherited": {
+        "NODE_OPTIONS": "a4d0f0eb87fed960b9f1819efda1cd7935b4f665fdd3872149260986d11e96da",
+        "NODE_COMPILE_CACHE": "a4d0f0eb87fed960b9f1819efda1cd7935b4f665fdd3872149260986d11e96da",
+        "NODE_DISABLE_COMPILE_CACHE": "a4d0f0eb87fed960b9f1819efda1cd7935b4f665fdd3872149260986d11e96da",
+        "NODE_ENV": "a4d0f0eb87fed960b9f1819efda1cd7935b4f665fdd3872149260986d11e96da",
+        "TZ": "a4d0f0eb87fed960b9f1819efda1cd7935b4f665fdd3872149260986d11e96da",
+        "CI": "a4d0f0eb87fed960b9f1819efda1cd7935b4f665fdd3872149260986d11e96da",
+        "DISABLE_HMR": "a4d0f0eb87fed960b9f1819efda1cd7935b4f665fdd3872149260986d11e96da"
+      },
+      "trees": {
+        "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\stage-w1c-20261115-03\\execution-npm-cache": [],
+        "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\stage-w1c-20261115-03\\execution-temp": []
+      }
+    },
+    "unchanged": true
+  },
+  "policy": "Installation cache/TEMP differ and are not used to infer execution equality. Execution roots are sealed with no exclusions."
+}

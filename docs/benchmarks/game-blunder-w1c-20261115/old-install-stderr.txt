@@ -1,0 +1,38 @@
+npm warn cleanup Failed to remove some directories [
+npm warn cleanup   [
+npm warn cleanup     '\\\\?\\C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\stage-w1c-20261115-01\\old\\node_modules',
+npm warn cleanup     [Error: EPERM: operation not permitted, rmdir 'C:\Users\tetsu\Documents\ChatGPT\将棋アプリ\stage-w1c-20261115-01\old\node_modules\@asamuzakjp\css-color'] {
+npm warn cleanup       errno: -4048,
+npm warn cleanup       code: 'EPERM',
+npm warn cleanup       syscall: 'rmdir',
+npm warn cleanup       path: 'C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\stage-w1c-20261115-01\\old\\node_modules\\@asamuzakjp\\css-color'
+npm warn cleanup     }
+npm warn cleanup   ],
+npm warn cleanup   [
+npm warn cleanup     '\\\\?\\C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\stage-w1c-20261115-01\\old\\node_modules\\@types\\serve-static',
+npm warn cleanup     [Error: EPERM: operation not permitted, rmdir 'C:\Users\tetsu\Documents\ChatGPT\将棋アプリ\stage-w1c-20261115-01\old\node_modules\@types\serve-static\node_modules\@types'] {
+npm warn cleanup       errno: -4048,
+npm warn cleanup       code: 'EPERM',
+npm warn cleanup       syscall: 'rmdir',
+npm warn cleanup       path: 'C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\stage-w1c-20261115-01\\old\\node_modules\\@types\\serve-static\\node_modules\\@types'
+npm warn cleanup     }
+npm warn cleanup   ],
+npm warn cleanup   [
+npm warn cleanup     '\\\\?\\C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\stage-w1c-20261115-01\\old\\node_modules\\send',
+npm warn cleanup     [Error: EPERM: operation not permitted, rmdir 'C:\Users\tetsu\Documents\ChatGPT\将棋アプリ\stage-w1c-20261115-01\old\node_modules\send\node_modules\debug'] {
+npm warn cleanup       errno: -4048,
+npm warn cleanup       code: 'EPERM',
+npm warn cleanup       syscall: 'rmdir',
+npm warn cleanup       path: 'C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\stage-w1c-20261115-01\\old\\node_modules\\send\\node_modules\\debug'
+npm warn cleanup     }
+npm warn cleanup   ]
+npm warn cleanup ]
+npm error code ENOTFOUND
+npm error syscall getaddrinfo
+npm error errno ENOTFOUND
+npm error network request to https://registry.npmjs.org/yallist/-/yallist-3.1.1.tgz failed, reason: getaddrinfo ENOTFOUND registry.npmjs.org
+npm error network This is a problem related to network connectivity.
+npm error network In most cases you are behind a proxy or have bad network settings.
+npm error network
+npm error network If you are behind a proxy, please make sure that the 'proxy' config is set properly.  See: 'npm help config'
+npm error A complete log of this run can be found in: C:\Users\tetsu\Documents\ChatGPT\将棋アプリ\stage-w1c-20261115-01\old-install-cache\_logs\2026-11-15T11_48_19_440Z-debug-0.log

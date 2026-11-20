@@ -1,0 +1,13 @@
+{
+  "started": "2026-11-16T12:05:41.656Z",
+  "finished": "2026-11-16T12:05:52.770Z",
+  "command": [
+    "node",
+    "scripts/stage-w1e-snapshots.mjs",
+    "../stage-w1f-20261116/pair",
+    "docs/benchmarks/game-blunder-w1f-20261116/build"
+  ],
+  "exitCode": 1,
+  "signal": null,
+  "error": null
+}

@@ -1,0 +1,12 @@
+{
+  "started": "2026-11-16T12:07:49.802Z",
+  "finished": "2026-11-16T12:12:13.022Z",
+  "command": [
+    "node",
+    "node_modules/vitest/vitest.mjs",
+    "run"
+  ],
+  "exitCode": 1,
+  "signal": null,
+  "error": null
+}

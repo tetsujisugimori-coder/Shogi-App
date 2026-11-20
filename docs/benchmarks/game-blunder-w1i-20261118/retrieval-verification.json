@@ -1,0 +1,54 @@
+{
+  "schema": "w1i-retrieval/1",
+  "results": [
+    {
+      "name": "shogi-w1i-w1h-cloud-originals-20261118.zip",
+      "retrieved_size": 209585,
+      "size_match": true,
+      "sha256": "cbc2393e96e12c4ea5e46a9a7501fec4cdbbefb1337cbec3dc1c063b52ef6b4f",
+      "registered_sha_match": true,
+      "retrieval": "separate B Library prepare_materialize, version0, new destination",
+      "time_utc": "2026-11-18T15:29:54.618189+00:00",
+      "entries": 118,
+      "crc_all_pass": true,
+      "duplicate_names": 0,
+      "unsafe_paths": 0,
+      "symlinks": 0,
+      "manifest_files": 117,
+      "manifest_set_size_sha_pass": true,
+      "zip_allbyte_equal": true,
+      "source_files_allbyte_equal": true
+    },
+    {
+      "name": "shogi-w1h-windows185-originals.zip",
+      "retrieved_size": 98796,
+      "size_match": true,
+      "sha256": "093eeedf2243de7d6c7d81153e522681669b30c12bd41dc26d8a7d088ba4ceb8",
+      "registered_sha_match": true,
+      "retrieval": "separate B Library prepare_materialize, version0, new destination",
+      "time_utc": "2026-11-18T15:29:54.650060+00:00",
+      "entries": 187,
+      "crc_all_pass": true,
+      "duplicate_names": 0,
+      "unsafe_paths": 0,
+      "symlinks": 0,
+      "manifest_files": 185,
+      "original_bytes": 142620,
+      "manifest_set_size_sha_pass": true,
+      "source_manifest_sha_match": true,
+      "extra_audit_agrees": true,
+      "zip_allbyte_equal": true,
+      "source_files_allbyte_equal": true,
+      "zip_allbyte_evidence": "windows-zip-allbyte.json",
+      "source_byte_evidence": "windows-live-source185.json + zip whole-byte equality"
+    }
+  ],
+  "limits": [
+    "Same owner/account/platform; not third-party human independence.",
+    "Library ACL entirety and long-term retention mechanism UNKNOWN.",
+    "Successful integrity does not authenticate historical execution or recover old missing Git objects.",
+    "Windows source all-byte equality is separate from registered hash/manifest matches."
+  ],
+  "note": "Both package bytes match their originals; cloud117 and Windows185 live source payload bytes verified by B.",
+  "windows_materialize_attempt": "exit1 os.setxattr unavailable; alternative B read original ZIP bytes then compared whole-byte to cloud Library materialization"
+}

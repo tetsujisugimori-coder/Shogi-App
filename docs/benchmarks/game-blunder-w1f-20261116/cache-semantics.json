@@ -1,0 +1,106 @@
+{
+  "status": "PASS",
+  "scope": "source-backed synthetic semantic experiment, not historical execution proof",
+  "version": "4.1.11",
+  "cacheSource": "class ResultsCache {\n\tcache = /* @__PURE__ */ new Map();\n\tworkspacesKeyMap = /* @__PURE__ */ new Map();\n\tcachePath = null;\n\tversion;\n\troot = \"/\";\n\tconstructor(logger) {\n\t\tthis.logger = logger;\n\t\tthis.version = Vitest.version;\n\t}\n\tgetCachePath() {\n\t\treturn this.cachePath;\n\t}\n\tsetConfig(root, config) {\n\t\tthis.root = root;\n\t\tif (config) this.cachePath = resolve(config.dir, \"results.json\");\n\t}\n\tgetResults(key) {\n\t\treturn this.cache.get(key);\n\t}\n\tasync clearCache() {\n\t\tif (this.cachePath && existsSync(this.cachePath)) {\n\t\t\tawait rm(this.cachePath, {\n\t\t\t\tforce: true,\n\t\t\t\trecursive: true\n\t\t\t});\n\t\t\tthis.logger.log(\"[cache] cleared results cache at\", this.cachePath);\n\t\t}\n\t}\n\tasync readFromCache() {\n\t\tif (!this.cachePath) return;\n\t\tif (!fs.existsSync(this.cachePath)) return;\n\t\tconst resultsCache = await fs.promises.readFile(this.cachePath, \"utf8\");\n\t\tconst { results, version } = JSON.parse(resultsCache || \"[]\");\n\t\tconst [major, minor] = version.split(\".\");\n\t\t// handling changed in 0.30.0\n\t\tif (major > 0 || Number(minor) >= 30) {\n\t\t\tthis.cache = new Map(results);\n\t\t\tthis.version = version;\n\t\t\tresults.forEach(([spec]) => {\n\t\t\t\tconst [projectName, relativePath] = spec.split(\":\");\n\t\t\t\tconst keyMap = this.workspacesKeyMap.get(relativePath) || [];\n\t\t\t\tkeyMap.push(projectName);\n\t\t\t\tthis.workspacesKeyMap.set(relativePath, keyMap);\n\t\t\t});\n\t\t}\n\t}\n\tupdateResults(files) {\n\t\tfiles.forEach((file) => {\n\t\t\tconst result = file.result;\n\t\t\tif (!result) return;\n\t\t\tconst duration = result.duration || 0;\n\t\t\t// store as relative, so cache would be the same in CI and locally\n\t\t\tconst relativePath = relative(this.root, file.filepath);\n\t\t\tthis.cache.set(`${file.projectName || \"\"}:${relativePath}`, {\n\t\t\t\tduration: duration >= 0 ? duration : 0,\n\t\t\t\tfailed: result.state === \"fail\"\n\t\t\t});\n\t\t});\n\t}\n\tremoveFromCache(filepath) {\n\t\tthis.cache.forEach((_, key) => {\n\t\t\tif (key.endsWith(filepath)) this.cache.delete(key);\n\t\t});\n\t}\n\tasync writeToCache() {\n\t\tif (!this.cachePath) return;\n\t\tconst results = Array.from(this.cache.entries());\n\t\tconst cacheDirname = dirname(this.cachePath);\n\t\tif (!fs.existsSync(cacheDirname)) await fs.promises.mkdir(cacheDirname, { recursive: true });\n\t\tconst cache = JSON.stringify({\n\t\t\tversion: this.version,\n\t\t\tresults\n\t\t});\n\t\tawait fs.promises.writeFile(this.cachePath, cache);\n\t}\n}\n\n",
+  "sortSource": "\tasync sort(files) {\n\t\tconst cache = this.ctx.cache;\n\t\treturn [...files].sort((a, b) => {\n\t\t\t// \"sequence.groupOrder\" is higher priority\n\t\t\tconst groupOrderDiff = a.project.config.sequence.groupOrder - b.project.config.sequence.groupOrder;\n\t\t\tif (groupOrderDiff !== 0) return groupOrderDiff;\n\t\t\t// Projects run sequential\n\t\t\tif (a.project.name !== b.project.name) return a.project.name < b.project.name ? -1 : 1;\n\t\t\t// Isolated run first\n\t\t\tif (a.project.config.isolate && !b.project.config.isolate) return -1;\n\t\t\tif (!a.project.config.isolate && b.project.config.isolate) return 1;\n\t\t\tconst keyA = `${a.project.name}:${relative(this.ctx.config.root, a.moduleId)}`;\n\t\t\tconst keyB = `${b.project.name}:${relative(this.ctx.config.root, b.moduleId)}`;\n\t\t\tconst aState = cache.getFileTestResults(keyA);\n\t\t\tconst bState = cache.getFileTestResults(keyB);\n\t\t\tif (!aState || !bState) {\n\t\t\t\tconst statsA = cache.getFileStats(keyA);\n\t\t\t\tconst statsB = cache.getFileStats(keyB);\n\t\t\t\t// run unknown first\n\t\t\t\tif (!statsA || !statsB) return !statsA && statsB ? -1 : !statsB && statsA ? 1 : 0;\n\t\t\t\t// run larger files first\n\t\t\t\treturn statsB.size - statsA.size;\n\t\t\t}\n\t\t\t// run failed first\n\t\t\tif (aState.failed && !bState.failed) return -1;\n\t\t\tif (!aState.failed && bState.failed) return 1;\n\t\t\t// run longer first\n\t\t\treturn bState.duration - aState.duration;\n\t\t});\n\t}",
+  "snapshots": [
+    {
+      "name": "first",
+      "base64": "eyJ2ZXJzaW9uIjoiNC4xLjExIiwicmVzdWx0cyI6W1siOmEudGVzdC50cyIseyJkdXJhdGlvbiI6NSwiZmFpbGVkIjpmYWxzZX1dLFsiOmIudGVzdC50cyIseyJkdXJhdGlvbiI6MTAsImZhaWxlZCI6ZmFsc2V9XV19",
+      "sha256": "7c563c4089259238f2da73c3bd40de7acc2e2b8d9f46086eed7c355e5f634606",
+      "content": {
+        "version": "4.1.11",
+        "results": [
+          [
+            ":a.test.ts",
+            {
+              "duration": 5,
+              "failed": false
+            }
+          ],
+          [
+            ":b.test.ts",
+            {
+              "duration": 10,
+              "failed": false
+            }
+          ]
+        ]
+      }
+    },
+    {
+      "name": "failure-change",
+      "base64": "eyJ2ZXJzaW9uIjoiNC4xLjExIiwicmVzdWx0cyI6W1siOmEudGVzdC50cyIseyJkdXJhdGlvbiI6NSwiZmFpbGVkIjp0cnVlfV0sWyI6Yi50ZXN0LnRzIix7ImR1cmF0aW9uIjoxMCwiZmFpbGVkIjpmYWxzZX1dXX0=",
+      "sha256": "12c66ee97f154611e612a48ba7bb2833a88512e1a5a6e40450b31a4b61cc3785",
+      "content": {
+        "version": "4.1.11",
+        "results": [
+          [
+            ":a.test.ts",
+            {
+              "duration": 5,
+              "failed": true
+            }
+          ],
+          [
+            ":b.test.ts",
+            {
+              "duration": 10,
+              "failed": false
+            }
+          ]
+        ]
+      }
+    },
+    {
+      "name": "duration-change",
+      "base64": "eyJ2ZXJzaW9uIjoiNC4xLjExIiwicmVzdWx0cyI6W1siOmEudGVzdC50cyIseyJkdXJhdGlvbiI6MjAsImZhaWxlZCI6ZmFsc2V9XSxbIjpiLnRlc3QudHMiLHsiZHVyYXRpb24iOjEwLCJmYWlsZWQiOmZhbHNlfV1dfQ==",
+      "sha256": "26641945db546c72ab1a3ee13b622d6f329ad5130dbe156a4cc8265cf95e2e74",
+      "content": {
+        "version": "4.1.11",
+        "results": [
+          [
+            ":a.test.ts",
+            {
+              "duration": 20,
+              "failed": false
+            }
+          ],
+          [
+            ":b.test.ts",
+            {
+              "duration": 10,
+              "failed": false
+            }
+          ]
+        ]
+      }
+    }
+  ],
+  "orders": {
+    "first": [
+      "b.test.ts",
+      "a.test.ts"
+    ],
+    "failure": [
+      "a.test.ts",
+      "b.test.ts"
+    ],
+    "duration": [
+      "a.test.ts",
+      "b.test.ts"
+    ]
+  },
+  "readReuse": "PASS",
+  "fields": {
+    "id": "project name + root-relative file path (not individual assertion ID)",
+    "failed": "file.result.state === fail",
+    "duration": "file.result.duration || 0, negative clamped to zero",
+    "executionCount": "no explicit count field; duration/state are overwritten per latest file result; prior unselected keys persist"
+  },
+  "updatePhase": "runFiles after pool.runTests; collection evidence separately evaluated",
+  "resultImpact": "cached prior outcomes are not assertion substitutes in these methods; failure/duration change sequencing; downstream timing effect cannot be excluded",
+  "safeAllowance": "NOT_ESTABLISHED",
+  "comparisonSpawns": 0
+}

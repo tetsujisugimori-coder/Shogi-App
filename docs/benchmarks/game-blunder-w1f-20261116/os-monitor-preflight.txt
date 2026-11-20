@@ -1,0 +1,16 @@
+Read-only preflight; no trace started and no install or privilege change.
+Elevated administrator: False
+
+Name       Source
+----       ------
+wpr.exe    C:\Windows\system32\wpr.exe
+logman.exe C:\Windows\system32\logman.exe
+
+
+
+Microsoft Windows Performance Recorder Version 10.0.26100 (CoreSystem)
+Copyright (c) 2024 Microsoft Corporation. All rights reserved.
+
+WPR is not recording
+
+Evidence quality: no ETW capture obtained; external/native writer attribution UNKNOWN. No OS-wide process absence claim.

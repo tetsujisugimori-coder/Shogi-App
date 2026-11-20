@@ -1,0 +1,12 @@
+{
+  "started": "2026-11-16T12:06:50.696Z",
+  "finished": "2026-11-16T12:06:58.112Z",
+  "command": [
+    "node",
+    "scripts/stage-w1d-generated-check.mjs",
+    "../stage-w1f-20261116/generated"
+  ],
+  "exitCode": 1,
+  "signal": null,
+  "error": null
+}

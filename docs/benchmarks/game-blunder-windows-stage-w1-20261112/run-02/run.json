@@ -1,0 +1,26 @@
+{
+  "sequence": 2,
+  "head": "new",
+  "start": "2026-11-12T09:37:19.6093203+09:00",
+  "end": "2026-11-12T09:37:24.1254258+09:00",
+  "command": "node node_modules/vitest/vitest.mjs run --reporter=default --reporter=json --outputFile.json=<run>/vitest.json",
+  "exitCode": -1073741510,
+  "maxWorkers": 2,
+  "processSampling": true,
+  "before": {
+    "time": "2026-11-12T00:37:19.864Z",
+    "freeBytes": 3282112512,
+    "totalBytes": 16869351424,
+    "parallelism": 24
+  },
+  "after": {
+    "time": "2026-11-12T00:37:24.39Z",
+    "freeBytes": 3404931072,
+    "totalBytes": 16869351424,
+    "parallelism": 24
+  },
+  "gc": "NOT_MEASURED",
+  "workerAttribution": "NOT_MEASURED",
+  "paging": "NOT_MEASURED",
+  "cleanup": "NOT_MEASURED"
+}

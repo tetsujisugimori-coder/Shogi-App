@@ -1,0 +1,1 @@
+{"status":"PASS","windowsInputs":2,"red":"SETTINGS","green":"PASS","scope":"cache configuration only"}

@@ -1,0 +1,3 @@
+## codex/game-blunder-diagnostics
+?? .tmp-tests/
+?? docs/benchmarks/game-blunder-windows-stage-w1-20261112/

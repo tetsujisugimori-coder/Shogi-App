@@ -1,0 +1,24 @@
+{
+  "runs": [
+    {
+      "name": "run-01",
+      "head": "old",
+      "exitCode": 0,
+      "status": "INCOMPLETE",
+      "invalid": [],
+      "incomplete": [
+        "zero tests",
+        "missing 1 occurrence(s): [\"a.test.ts\",\"one\"]"
+      ],
+      "failures": [],
+      "counts": {
+        "total": 0,
+        "passed": 0,
+        "failed": 0,
+        "skipped": 0,
+        "todo": 0
+      },
+      "signals": []
+    }
+  ]
+}

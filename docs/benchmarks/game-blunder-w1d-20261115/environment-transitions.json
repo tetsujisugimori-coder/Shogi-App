@@ -1,0 +1,2488 @@
+[
+  {
+    "target": "old",
+    "from": "S1-before-config",
+    "to": "S2-config-loaded",
+    "environment": [
+      {
+        "path": "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\stage-w1d-20261115-pair\\execution-temp",
+        "changes": []
+      },
+      {
+        "path": "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\stage-w1d-20261115-pair\\execution-npm-cache",
+        "changes": []
+      }
+    ],
+    "installationEnvironment": [
+      {
+        "path": "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\stage-w1d-20261115-pair\\old-install-cache",
+        "changes": []
+      },
+      {
+        "path": "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\stage-w1d-20261115-pair\\old-install-temp",
+        "changes": []
+      }
+    ]
+  },
+  {
+    "target": "old",
+    "from": "S2-config-loaded",
+    "to": "S3-inventory-collected",
+    "environment": [
+      {
+        "path": "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\stage-w1d-20261115-pair\\execution-temp",
+        "changes": [
+          {
+            "path": "y7T93MtN2voy_4QjdBBJ2",
+            "before": null,
+            "after": {
+              "path": "y7T93MtN2voy_4QjdBBJ2",
+              "type": "directory"
+            }
+          },
+          {
+            "path": "y7T93MtN2voy_4QjdBBJ2/client",
+            "before": null,
+            "after": {
+              "path": "y7T93MtN2voy_4QjdBBJ2/client",
+              "type": "directory"
+            }
+          },
+          {
+            "path": "y7T93MtN2voy_4QjdBBJ2/client/042c3a3de9db8cda4a14e1cef362263a1ed44051",
+            "before": null,
+            "after": {
+              "path": "y7T93MtN2voy_4QjdBBJ2/client/042c3a3de9db8cda4a14e1cef362263a1ed44051",
+              "type": "file",
+              "sha256": "eb3881dbfd16b17e8e93c49ada252f02955ac68d9b9ef6a55f95f85f34199146"
+            }
+          },
+          {
+            "path": "y7T93MtN2voy_4QjdBBJ2/client/05e76d46373e106fb739566c98f60f6efa1ccf37",
+            "before": null,
+            "after": {
+              "path": "y7T93MtN2voy_4QjdBBJ2/client/05e76d46373e106fb739566c98f60f6efa1ccf37",
+              "type": "file",
+              "sha256": "75d5e6912ac9cd5dee14133bc5331f55c1038de63280f567e6cabb53d2b99fe4"
+            }
+          },
+          {
+            "path": "y7T93MtN2voy_4QjdBBJ2/client/141de06f356108fd062600fdc80a211b6d95b8b4",
+            "before": null,
+            "after": {
+              "path": "y7T93MtN2voy_4QjdBBJ2/client/141de06f356108fd062600fdc80a211b6d95b8b4",
+              "type": "file",
+              "sha256": "581ec245c521feca7f800d6eb7ed01003433298fa3db37ad112360dfb8f16ffd"
+            }
+          },
+          {
+            "path": "y7T93MtN2voy_4QjdBBJ2/client/188b912b63d1ddcee5774a1a9353013e393e40dc",
+            "before": null,
+            "after": {
+              "path": "y7T93MtN2voy_4QjdBBJ2/client/188b912b63d1ddcee5774a1a9353013e393e40dc",
+              "type": "file",
+              "sha256": "2f8d375f449c0fe489b7c68ebf4d1793ff0be6f6682c70b0dc5a103dfbb30c2b"
+            }
+          },
+          {
+            "path": "y7T93MtN2voy_4QjdBBJ2/client/18e4e1c7f2520a0075bb0780fab62db1fbe7660b",
+            "before": null,
+            "after": {
+              "path": "y7T93MtN2voy_4QjdBBJ2/client/18e4e1c7f2520a0075bb0780fab62db1fbe7660b",
+              "type": "file",
+              "sha256": "96999de375ed1be8f6748f9645b26b2deed2d84f5cfc8a8ab74f51156153e7a5"
+            }
+          },
+          {
+            "path": "y7T93MtN2voy_4QjdBBJ2/client/1cf654ef9f0b0159f9888d6ac04cc6b4a87d28cb",
+            "before": null,
+            "after": {
+              "path": "y7T93MtN2voy_4QjdBBJ2/client/1cf654ef9f0b0159f9888d6ac04cc6b4a87d28cb",
+              "type": "file",
+              "sha256": "13af876dcb64469a5dde6396263292a8df3af10d5acacef95c0fa0a5a1871dd5"
+            }
+          },
+          {
+            "path": "y7T93MtN2voy_4QjdBBJ2/client/25f20f3336f4a9396be732f34f69f945d08d09bd",
+            "before": null,
+            "after": {
+              "path": "y7T93MtN2voy_4QjdBBJ2/client/25f20f3336f4a9396be732f34f69f945d08d09bd",
+              "type": "file",
+              "sha256": "550c2acae807a83ac7bf4334336c7758569fbdff9eb8f6aef8bfa24df05c2d5f"
+            }
+          },
+          {
+            "path": "y7T93MtN2voy_4QjdBBJ2/client/2d687c8cd8f744b67abf6a9fa0c1307c2fc86580",
+            "before": null,
+            "after": {
+              "path": "y7T93MtN2voy_4QjdBBJ2/client/2d687c8cd8f744b67abf6a9fa0c1307c2fc86580",
+              "type": "file",
+              "sha256": "f93bbe4b55651bb355f55d753f8efa406df7ed18d5fbf1cca221b13e159a22cd"
+            }
+          },
+          {
+            "path": "y7T93MtN2voy_4QjdBBJ2/client/31ce7a99a61b82feb5762d0ce7f474c81ebf3156",
+            "before": null,
+            "after": {
+              "path": "y7T93MtN2voy_4QjdBBJ2/client/31ce7a99a61b82feb5762d0ce7f474c81ebf3156",
+              "type": "file",
+              "sha256": "4bc799cea96bb0a38e31298b8ed9c20592a4142127ec543601538d37b227d72c"
+            }
+          },
+          {
+            "path": "y7T93MtN2voy_4QjdBBJ2/client/326574526119d57eb541f4d52f792fbab41302d6",
+            "before": null,
+            "after": {
+              "path": "y7T93MtN2voy_4QjdBBJ2/client/326574526119d57eb541f4d52f792fbab41302d6",
+              "type": "file",
+              "sha256": "33afc243cae0ac9a617e8f6470d4087a33dbe7cb6d28abd2d348b8aaac46e864"
+            }
+          },
+          {
+            "path": "y7T93MtN2voy_4QjdBBJ2/client/3551eaf694c596d41e53eb0cff0a63c7087f03fb",
+            "before": null,
+            "after": {
+              "path": "y7T93MtN2voy_4QjdBBJ2/client/3551eaf694c596d41e53eb0cff0a63c7087f03fb",
+              "type": "file",
+              "sha256": "870840584dbf8a86b21ba6f8915e3b18e53e887fed346ce3913aedba4e32b7b3"
+            }
+          },
+          {
+            "path": "y7T93MtN2voy_4QjdBBJ2/client/3c434d352b8732ca28cfd8ab3d90fa7b09e783ea",
+            "before": null,
+            "after": {
+              "path": "y7T93MtN2voy_4QjdBBJ2/client/3c434d352b8732ca28cfd8ab3d90fa7b09e783ea",
+              "type": "file",
+              "sha256": "a258c3e2e43156cb4dfdae0b5227239ded07948c2450b3417e47561d5874f615"
+            }
+          },
+          {
+            "path": "y7T93MtN2voy_4QjdBBJ2/client/3da85cd04c275bcc86615e8e76d225f35c45ba5e",
+            "before": null,
+            "after": {
+              "path": "y7T93MtN2voy_4QjdBBJ2/client/3da85cd04c275bcc86615e8e76d225f35c45ba5e",
+              "type": "file",
+              "sha256": "2106aa445a660886b4d86cee815fdfc88517674018c8147759aab1b87e222b09"
+            }
+          },
+          {
+            "path": "y7T93MtN2voy_4QjdBBJ2/client/4532f4f5174ed3f6f3995894086aa6a4c3b29ce1",
+            "before": null,
+            "after": {
+              "path": "y7T93MtN2voy_4QjdBBJ2/client/4532f4f5174ed3f6f3995894086aa6a4c3b29ce1",
+              "type": "file",
+              "sha256": "4d3537ec9b7dcc6675eb434705da5097fbc48ae2d846e3dfccb991e434067aa4"
+            }
+          },
+          {
+            "path": "y7T93MtN2voy_4QjdBBJ2/client/488070fcc0789e84e1ccd525f2742a493c2d1fd4",
+            "before": null,
+            "after": {
+              "path": "y7T93MtN2voy_4QjdBBJ2/client/488070fcc0789e84e1ccd525f2742a493c2d1fd4",
+              "type": "file",
+              "sha256": "641ee36afe7c9ddfade70fe9d2ae910923995e8acd89c13111f31fb143093ae6"
+            }
+          },
+          {
+            "path": "y7T93MtN2voy_4QjdBBJ2/client/4c391d23c19f3cf517c39c2742f314e2c59c6a4f",
+            "before": null,
+            "after": {
+              "path": "y7T93MtN2voy_4QjdBBJ2/client/4c391d23c19f3cf517c39c2742f314e2c59c6a4f",
+              "type": "file",
+              "sha256": "b9f3a1fe32981d2777102a59ddf8389b9d6b0fdf2a49a1045c19897c7c8a5c24"
+            }
+          },
+          {
+            "path": "y7T93MtN2voy_4QjdBBJ2/client/4f61d32e252ad3e900345c2fbe8aaf64d5974a31",
+            "before": null,
+            "after": {
+              "path": "y7T93MtN2voy_4QjdBBJ2/client/4f61d32e252ad3e900345c2fbe8aaf64d5974a31",
+              "type": "file",
+              "sha256": "3f9284c28af68e031fc28e69e2626b0c2f5d867ad0ca07d53a9b14c715669ad3"
+            }
+          },
+          {
+            "path": "y7T93MtN2voy_4QjdBBJ2/client/4fa194738e37cc744212e0ce115880283afe326a",
+            "before": null,
+            "after": {
+              "path": "y7T93MtN2voy_4QjdBBJ2/client/4fa194738e37cc744212e0ce115880283afe326a",
+              "type": "file",
+              "sha256": "31f0332f316613b50e89c77ed46141287ddb553eb26a9e0f47188a94f4eb2e70"
+            }
+          },
+          {
+            "path": "y7T93MtN2voy_4QjdBBJ2/client/533f54c03134b8c2e1a9ceb7d7b359574515a215",
+            "before": null,
+            "after": {
+              "path": "y7T93MtN2voy_4QjdBBJ2/client/533f54c03134b8c2e1a9ceb7d7b359574515a215",
+              "type": "file",
+              "sha256": "feeed1b1a008094b5e8c0942271d4a1fa728721697b90e62ec548695e581efb3"
+            }
+          },
+          {
+            "path": "y7T93MtN2voy_4QjdBBJ2/client/56357eba146553616b4ca027b994d1caa16e626a",
+            "before": null,
+            "after": {
+              "path": "y7T93MtN2voy_4QjdBBJ2/client/56357eba146553616b4ca027b994d1caa16e626a",
+              "type": "file",
+              "sha256": "5bfe97bb485e695fe4de89bed023af497bcc8ad815676f7e2dcf1f94c181b415"
+            }
+          },
+          {
+            "path": "y7T93MtN2voy_4QjdBBJ2/client/60f96cfd21524fd7511bda21f2189dee0d1ee57d",
+            "before": null,
+            "after": {
+              "path": "y7T93MtN2voy_4QjdBBJ2/client/60f96cfd21524fd7511bda21f2189dee0d1ee57d",
+              "type": "file",
+              "sha256": "b17157eea4234907099f46f7ca4842582fa38af1445b3e37b50fcef42238ec90"
+            }
+          },
+          {
+            "path": "y7T93MtN2voy_4QjdBBJ2/client/6658542c86448b61a1b70d59e2a464351f1fee91",
+            "before": null,
+            "after": {
+              "path": "y7T93MtN2voy_4QjdBBJ2/client/6658542c86448b61a1b70d59e2a464351f1fee91",
+              "type": "file",
+              "sha256": "6a8e4e5c971dd4ffdb5d0f02bcda5e62b728419eaa5f3d9fdcd703eb7c14c4d3"
+            }
+          },
+          {
+            "path": "y7T93MtN2voy_4QjdBBJ2/client/72aafab918c2c6c28cb6fa86b0887eb403cda976",
+            "before": null,
+            "after": {
+              "path": "y7T93MtN2voy_4QjdBBJ2/client/72aafab918c2c6c28cb6fa86b0887eb403cda976",
+              "type": "file",
+              "sha256": "05d2ddd39d82d4f3d6bc3c0f44b5cd5b11b1be2da7a39ee203128674c51e7a87"
+            }
+          },
+          {
+            "path": "y7T93MtN2voy_4QjdBBJ2/client/750fa4325571673d26238e37eaa494b4e4bc5ffe",
+            "before": null,
+            "after": {
+              "path": "y7T93MtN2voy_4QjdBBJ2/client/750fa4325571673d26238e37eaa494b4e4bc5ffe",
+              "type": "file",
+              "sha256": "1b4a6f3964bea28c662bd44e5a02990a989952e8fcbea3e372ef955bb311e32a"
+            }
+          },
+          {
+            "path": "y7T93MtN2voy_4QjdBBJ2/client/78089717615dddb7afe5a29f5a7d73773c81a12d",
+            "before": null,
+            "after": {
+              "path": "y7T93MtN2voy_4QjdBBJ2/client/78089717615dddb7afe5a29f5a7d73773c81a12d",
+              "type": "file",
+              "sha256": "23926daeeab304e7fb53186e79401409c78ec543c9f467a2b8d567edbf43fc90"
+            }
+          },
+          {
+            "path": "y7T93MtN2voy_4QjdBBJ2/client/7d35dadec780a5220202a8163874d373f3d821dc",
+            "before": null,
+            "after": {
+              "path": "y7T93MtN2voy_4QjdBBJ2/client/7d35dadec780a5220202a8163874d373f3d821dc",
+              "type": "file",
+              "sha256": "396132c6d620c3854af65917370dc8dbf6984fc7b704721970b445f01447872e"
+            }
+          },
+          {
+            "path": "y7T93MtN2voy_4QjdBBJ2/client/8a97cba776031439ba4c23a1e64015a9cb1e41ac",
+            "before": null,
+            "after": {
+              "path": "y7T93MtN2voy_4QjdBBJ2/client/8a97cba776031439ba4c23a1e64015a9cb1e41ac",
+              "type": "file",
+              "sha256": "f12ea009a37759681d435967d1139e54da257dcfaf1cb68faad78c291daec920"
+            }
+          },
+          {
+            "path": "y7T93MtN2voy_4QjdBBJ2/client/909339ae4cba7ed3ee9130873e3f3846e4439342",
+            "before": null,
+            "after": {
+              "path": "y7T93MtN2voy_4QjdBBJ2/client/909339ae4cba7ed3ee9130873e3f3846e4439342",
+              "type": "file",
+              "sha256": "a742041166297e2ee36796b6988d6bffcc730ccf9b5ca18fb345c1ec85f0f2d4"
+            }
+          },
+          {
+            "path": "y7T93MtN2voy_4QjdBBJ2/client/9380ff2723bff006ede4fcee163015b152723c6d",
+            "before": null,
+            "after": {
+              "path": "y7T93MtN2voy_4QjdBBJ2/client/9380ff2723bff006ede4fcee163015b152723c6d",
+              "type": "file",
+              "sha256": "34152a241e560a56e51ce9ce181745a50e1f37e4aac4955aad1abb0b626f7f67"
+            }
+          },
+          {
+            "path": "y7T93MtN2voy_4QjdBBJ2/client/94e004b5702e65d90b23eb64c711b5004aff9c7d",
+            "before": null,
+            "after": {
+              "path": "y7T93MtN2voy_4QjdBBJ2/client/94e004b5702e65d90b23eb64c711b5004aff9c7d",
+              "type": "file",
+              "sha256": "032c6eff0992bf04ccd0008c26f4b36e11cd0581a042cd8019a4715caa74eaaf"
+            }
+          },
+          {
+            "path": "y7T93MtN2voy_4QjdBBJ2/client/9926a4c51e1d5b3d7593d513c0485a490ed03b86",
+            "before": null,
+            "after": {
+              "path": "y7T93MtN2voy_4QjdBBJ2/client/9926a4c51e1d5b3d7593d513c0485a490ed03b86",
+              "type": "file",
+              "sha256": "1cc9360e1108274656b732165ac4956a891866528b05f7e60dee3530ce1641bc"
+            }
+          },
+          {
+            "path": "y7T93MtN2voy_4QjdBBJ2/client/9d581c93646ae583b64de02ef03e0e5d672682c2",
+            "before": null,
+            "after": {
+              "path": "y7T93MtN2voy_4QjdBBJ2/client/9d581c93646ae583b64de02ef03e0e5d672682c2",
+              "type": "file",
+              "sha256": "bcb312ba14d9e4335dfbc3768dfd273d44c5330d840a0a9cf99b04ef0948c76e"
+            }
+          },
+          {
+            "path": "y7T93MtN2voy_4QjdBBJ2/client/a9e6ab57a96fa5c9a5787a9f1019b1c2b186ad67",
+            "before": null,
+            "after": {
+              "path": "y7T93MtN2voy_4QjdBBJ2/client/a9e6ab57a96fa5c9a5787a9f1019b1c2b186ad67",
+              "type": "file",
+              "sha256": "ed3663a949d474b93fb66a69738750f29c1b387f7c70e3fa36e55b05d8a5928e"
+            }
+          },
+          {
+            "path": "y7T93MtN2voy_4QjdBBJ2/client/affc033dd44908a3fa01235b7876d997ed0d1b2a",
+            "before": null,
+            "after": {
+              "path": "y7T93MtN2voy_4QjdBBJ2/client/affc033dd44908a3fa01235b7876d997ed0d1b2a",
+              "type": "file",
+              "sha256": "cc0351464f3d36857b05287ff1ecfa13214e317a8d729f02f53ea5c61d0107d7"
+            }
+          },
+          {
+            "path": "y7T93MtN2voy_4QjdBBJ2/client/b327324f4fa34f349a256349175e7ffc3f3b6419",
+            "before": null,
+            "after": {
+              "path": "y7T93MtN2voy_4QjdBBJ2/client/b327324f4fa34f349a256349175e7ffc3f3b6419",
+              "type": "file",
+              "sha256": "5c5b99b363b5bcaf647e399e2328aeac89368a190f76e3f7c540bbf29960c483"
+            }
+          },
+          {
+            "path": "y7T93MtN2voy_4QjdBBJ2/client/b3c8b3a5530a4c6d1b1c325183d2e3b6a2abb6af",
+            "before": null,
+            "after": {
+              "path": "y7T93MtN2voy_4QjdBBJ2/client/b3c8b3a5530a4c6d1b1c325183d2e3b6a2abb6af",
+              "type": "file",
+              "sha256": "8caa17b960be6c64b3d550966b5e73cf8b9f4cad44d359d93e1accfa9a35ebdf"
+            }
+          },
+          {
+            "path": "y7T93MtN2voy_4QjdBBJ2/client/b4bad267a6515257477557dae3aa8aba7998db5e",
+            "before": null,
+            "after": {
+              "path": "y7T93MtN2voy_4QjdBBJ2/client/b4bad267a6515257477557dae3aa8aba7998db5e",
+              "type": "file",
+              "sha256": "f255a8c1350bebdf862098491f52365a5aec8adf8f1fc646bfbb0c7d03f9f64f"
+            }
+          },
+          {
+            "path": "y7T93MtN2voy_4QjdBBJ2/client/b4fae0c5faf2e60a5f499a597de733cc6dd88e6b",
+            "before": null,
+            "after": {
+              "path": "y7T93MtN2voy_4QjdBBJ2/client/b4fae0c5faf2e60a5f499a597de733cc6dd88e6b",
+              "type": "file",
+              "sha256": "383f03dd27f0b96d29d0c5e8010b5eca88ab5f4dccc800e5bddc91e7ed873ea9"
+            }
+          },
+          {
+            "path": "y7T93MtN2voy_4QjdBBJ2/client/b50f3e0356c783694849f01a1feccd54fc2da7ee",
+            "before": null,
+            "after": {
+              "path": "y7T93MtN2voy_4QjdBBJ2/client/b50f3e0356c783694849f01a1feccd54fc2da7ee",
+              "type": "file",
+              "sha256": "86568985abbc19c149af89dbc68fe0d5bcf3758d62c57d18f0daa1c0b866f1a1"
+            }
+          },
+          {
+            "path": "y7T93MtN2voy_4QjdBBJ2/client/b535d92e7cece251febfd3a4a29affb193f1fb07",
+            "before": null,
+            "after": {
+              "path": "y7T93MtN2voy_4QjdBBJ2/client/b535d92e7cece251febfd3a4a29affb193f1fb07",
+              "type": "file",
+              "sha256": "efdb58e14b96401ac6adfb0c52c7d1df5d95985b05e3f7c3f830441ce99319a3"
+            }
+          },
+          {
+            "path": "y7T93MtN2voy_4QjdBBJ2/client/b63cf875c404f2822c2b4281fbcdf50128030b8f",
+            "before": null,
+            "after": {
+              "path": "y7T93MtN2voy_4QjdBBJ2/client/b63cf875c404f2822c2b4281fbcdf50128030b8f",
+              "type": "file",
+              "sha256": "d641fb476486f10109155c46e0feafb7312d732afe1594fb6c81889ae587c7e6"
+            }
+          },
+          {
+            "path": "y7T93MtN2voy_4QjdBBJ2/client/c06402cc6495357e827c36ef6833d161ad17ecba",
+            "before": null,
+            "after": {
+              "path": "y7T93MtN2voy_4QjdBBJ2/client/c06402cc6495357e827c36ef6833d161ad17ecba",
+              "type": "file",
+              "sha256": "fd31238d219292f4c02a37993f70bba206fb49bf095d04eea5df8dc1c34ee459"
+            }
+          },
+          {
+            "path": "y7T93MtN2voy_4QjdBBJ2/client/c90ad9ecfe6a939fa1537009163c896ff1eead80",
+            "before": null,
+            "after": {
+              "path": "y7T93MtN2voy_4QjdBBJ2/client/c90ad9ecfe6a939fa1537009163c896ff1eead80",
+              "type": "file",
+              "sha256": "82dec3bf9f5678bc2154ff3210f55befbf865a048de6ab1d822568a045906b1a"
+            }
+          },
+          {
+            "path": "y7T93MtN2voy_4QjdBBJ2/client/c9610ce027dc6bfab5c1b0c70de656dc5e87e89f",
+            "before": null,
+            "after": {
+              "path": "y7T93MtN2voy_4QjdBBJ2/client/c9610ce027dc6bfab5c1b0c70de656dc5e87e89f",
+              "type": "file",
+              "sha256": "5c044a70d8bc4dfb28b1a90de654094bb0df0b600036d7765bc13bc0c7046ded"
+            }
+          },
+          {
+            "path": "y7T93MtN2voy_4QjdBBJ2/client/cd9cf5baec1301c7f13316c7415b25def6b9e6cf",
+            "before": null,
+            "after": {
+              "path": "y7T93MtN2voy_4QjdBBJ2/client/cd9cf5baec1301c7f13316c7415b25def6b9e6cf",
+              "type": "file",
+              "sha256": "647d31d20fc3d7c6f3a3448d6785fdfaa5b52f81f0ffcc9bf8d9e04551853659"
+            }
+          },
+          {
+            "path": "y7T93MtN2voy_4QjdBBJ2/client/d40e4345979a90d4b45384e5856ce07c412728ce",
+            "before": null,
+            "after": {
+              "path": "y7T93MtN2voy_4QjdBBJ2/client/d40e4345979a90d4b45384e5856ce07c412728ce",
+              "type": "file",
+              "sha256": "9c48ecadfd7b6a1f18dc3f64ee7d0675544c5dc2479e9bd3d5d396792850848a"
+            }
+          },
+          {
+            "path": "y7T93MtN2voy_4QjdBBJ2/client/d6848563c60a17bdb4a20209d7bd2f1615ccae34",
+            "before": null,
+            "after": {
+              "path": "y7T93MtN2voy_4QjdBBJ2/client/d6848563c60a17bdb4a20209d7bd2f1615ccae34",
+              "type": "file",
+              "sha256": "9129cd3fa8a7ec0a73c95ff4cef28352d4af8348450d2df850dbee36616c8d04"
+            }
+          },
+          {
+            "path": "y7T93MtN2voy_4QjdBBJ2/client/d6d9a407ca1f9538eeb41c0f651f45209b26a9a2",
+            "before": null,
+            "after": {
+              "path": "y7T93MtN2voy_4QjdBBJ2/client/d6d9a407ca1f9538eeb41c0f651f45209b26a9a2",
+              "type": "file",
+              "sha256": "8e23835110ecd7791899aa8c981d3e86608d2323a30f7e27cc000b20f9b032c3"
+            }
+          },
+          {
+            "path": "y7T93MtN2voy_4QjdBBJ2/client/d74b8d346acec43fa7c5008211fb022cd2d25d09",
+            "before": null,
+            "after": {
+              "path": "y7T93MtN2voy_4QjdBBJ2/client/d74b8d346acec43fa7c5008211fb022cd2d25d09",
+              "type": "file",
+              "sha256": "a467eab537a4a425891ab572afa6e5ed8dc268d8234d9064d6873a9dc13f4c80"
+            }
+          },
+          {
+            "path": "y7T93MtN2voy_4QjdBBJ2/client/d99792dc70ce7a5ae934aa85e09baf7ecece6792",
+            "before": null,
+            "after": {
+              "path": "y7T93MtN2voy_4QjdBBJ2/client/d99792dc70ce7a5ae934aa85e09baf7ecece6792",
+              "type": "file",
+              "sha256": "19b12f065c1339c5fdbbae5399032b79133bca6bf01faf9769808cfcab0b4d78"
+            }
+          },
+          {
+            "path": "y7T93MtN2voy_4QjdBBJ2/client/d9c3cc2263e29b45cd8ccdb9f61f28501d4c674d",
+            "before": null,
+            "after": {
+              "path": "y7T93MtN2voy_4QjdBBJ2/client/d9c3cc2263e29b45cd8ccdb9f61f28501d4c674d",
+              "type": "file",
+              "sha256": "20e54d96f2fd26a6a01c9e577a1f5964f299cdd605c45b15b9e7660eb8b72838"
+            }
+          },
+          {
+            "path": "y7T93MtN2voy_4QjdBBJ2/client/da0bd604d28ae0a4eadf038e708579217d381d89",
+            "before": null,
+            "after": {
+              "path": "y7T93MtN2voy_4QjdBBJ2/client/da0bd604d28ae0a4eadf038e708579217d381d89",
+              "type": "file",
+              "sha256": "4154d9d04262b93307d1cf54f3571c69f10bc0abc5256e7e1bbb251d5114d3e3"
+            }
+          },
+          {
+            "path": "y7T93MtN2voy_4QjdBBJ2/client/df085288e83bcdaf6887d591cb51dc540def76d1",
+            "before": null,
+            "after": {
+              "path": "y7T93MtN2voy_4QjdBBJ2/client/df085288e83bcdaf6887d591cb51dc540def76d1",
+              "type": "file",
+              "sha256": "de7ccd1df595d2d96af5ed33295fbdc3394906f148e89e2e93a79d4758e3e283"
+            }
+          },
+          {
+            "path": "y7T93MtN2voy_4QjdBBJ2/client/e0221ff10b89649d57d8842bdf195dab0b521928",
+            "before": null,
+            "after": {
+              "path": "y7T93MtN2voy_4QjdBBJ2/client/e0221ff10b89649d57d8842bdf195dab0b521928",
+              "type": "file",
+              "sha256": "ad4d750d5d9667bb00b30f67e742c21af455a91b8c78a9bb3f5e926520fc5c6c"
+            }
+          },
+          {
+            "path": "y7T93MtN2voy_4QjdBBJ2/client/e2c6d4bf6c697d6c30529ee4bdb43800afeff6dd",
+            "before": null,
+            "after": {
+              "path": "y7T93MtN2voy_4QjdBBJ2/client/e2c6d4bf6c697d6c30529ee4bdb43800afeff6dd",
+              "type": "file",
+              "sha256": "942240d00e1fc441c41fe4479699c4e17f013d831e32326387b813e3520c671d"
+            }
+          },
+          {
+            "path": "y7T93MtN2voy_4QjdBBJ2/client/e36e55ef2df4a80e6a1bbc38692bdbbc4277687e",
+            "before": null,
+            "after": {
+              "path": "y7T93MtN2voy_4QjdBBJ2/client/e36e55ef2df4a80e6a1bbc38692bdbbc4277687e",
+              "type": "file",
+              "sha256": "be8dc63c6a770b01c0a89c19ba8cc9bfcd02e73bd75449bc92af97b7b6f2ab63"
+            }
+          },
+          {
+            "path": "y7T93MtN2voy_4QjdBBJ2/client/edbb501e3e5877d9f48cd595eddb3fa3e4433230",
+            "before": null,
+            "after": {
+              "path": "y7T93MtN2voy_4QjdBBJ2/client/edbb501e3e5877d9f48cd595eddb3fa3e4433230",
+              "type": "file",
+              "sha256": "645da4a26e1876973982fd4f5d7912100ad0cd5e0c169c6a2f43500207611e05"
+            }
+          },
+          {
+            "path": "y7T93MtN2voy_4QjdBBJ2/client/f06061f5ee7872b531ca09e29c0a0ae34ee26a65",
+            "before": null,
+            "after": {
+              "path": "y7T93MtN2voy_4QjdBBJ2/client/f06061f5ee7872b531ca09e29c0a0ae34ee26a65",
+              "type": "file",
+              "sha256": "20954c6777ab6fdc402fbeb836f71512685c43df3b99d9f8e14fdaf1ef1350df"
+            }
+          },
+          {
+            "path": "y7T93MtN2voy_4QjdBBJ2/client/f09a4693ba400d9eda4c7677dfa41eb2028c8840",
+            "before": null,
+            "after": {
+              "path": "y7T93MtN2voy_4QjdBBJ2/client/f09a4693ba400d9eda4c7677dfa41eb2028c8840",
+              "type": "file",
+              "sha256": "017b8fa39c04d066e3290ff120a3291c12b2d6b4809e991dbc304a086f71c727"
+            }
+          },
+          {
+            "path": "y7T93MtN2voy_4QjdBBJ2/client/f2841b5b3559f00cff99d39f8d2861aa20f6b37f",
+            "before": null,
+            "after": {
+              "path": "y7T93MtN2voy_4QjdBBJ2/client/f2841b5b3559f00cff99d39f8d2861aa20f6b37f",
+              "type": "file",
+              "sha256": "d86d10aed212a2b8ae8ce2fdf23d4e4b4095ac58b98bf3401a2149c4d075cd67"
+            }
+          },
+          {
+            "path": "y7T93MtN2voy_4QjdBBJ2/client/f41b4b6579eabae416e7beaa28023928a25b5f35",
+            "before": null,
+            "after": {
+              "path": "y7T93MtN2voy_4QjdBBJ2/client/f41b4b6579eabae416e7beaa28023928a25b5f35",
+              "type": "file",
+              "sha256": "3250ce600e2050e4fd90cc5c3559c6da54d9a87c77b763d97b26719ad2408798"
+            }
+          },
+          {
+            "path": "y7T93MtN2voy_4QjdBBJ2/client/f775b9264df673882ca451478971ef88c74bc066",
+            "before": null,
+            "after": {
+              "path": "y7T93MtN2voy_4QjdBBJ2/client/f775b9264df673882ca451478971ef88c74bc066",
+              "type": "file",
+              "sha256": "f3ffc04351b21a6c157e9a2e680488247f912fd429ea5b4453896be86f30c3f6"
+            }
+          },
+          {
+            "path": "y7T93MtN2voy_4QjdBBJ2/client/fc1ff2ebaae9058c0f7dd6327243927565607a58",
+            "before": null,
+            "after": {
+              "path": "y7T93MtN2voy_4QjdBBJ2/client/fc1ff2ebaae9058c0f7dd6327243927565607a58",
+              "type": "file",
+              "sha256": "0caef01e35b86a1f53877b386a712b720c29873979466c08b56ccc7e50835501"
+            }
+          }
+        ]
+      },
+      {
+        "path": "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\stage-w1d-20261115-pair\\execution-npm-cache",
+        "changes": []
+      }
+    ],
+    "installationEnvironment": [
+      {
+        "path": "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\stage-w1d-20261115-pair\\old-install-cache",
+        "changes": []
+      },
+      {
+        "path": "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\stage-w1d-20261115-pair\\old-install-temp",
+        "changes": []
+      }
+    ]
+  },
+  {
+    "target": "old",
+    "from": "S3-inventory-collected",
+    "to": "post-close",
+    "environment": [
+      {
+        "path": "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\stage-w1d-20261115-pair\\execution-temp",
+        "changes": [
+          {
+            "path": "y7T93MtN2voy_4QjdBBJ2",
+            "before": {
+              "path": "y7T93MtN2voy_4QjdBBJ2",
+              "type": "directory"
+            },
+            "after": null
+          },
+          {
+            "path": "y7T93MtN2voy_4QjdBBJ2/client",
+            "before": {
+              "path": "y7T93MtN2voy_4QjdBBJ2/client",
+              "type": "directory"
+            },
+            "after": null
+          },
+          {
+            "path": "y7T93MtN2voy_4QjdBBJ2/client/042c3a3de9db8cda4a14e1cef362263a1ed44051",
+            "before": {
+              "path": "y7T93MtN2voy_4QjdBBJ2/client/042c3a3de9db8cda4a14e1cef362263a1ed44051",
+              "type": "file",
+              "sha256": "eb3881dbfd16b17e8e93c49ada252f02955ac68d9b9ef6a55f95f85f34199146"
+            },
+            "after": null
+          },
+          {
+            "path": "y7T93MtN2voy_4QjdBBJ2/client/05e76d46373e106fb739566c98f60f6efa1ccf37",
+            "before": {
+              "path": "y7T93MtN2voy_4QjdBBJ2/client/05e76d46373e106fb739566c98f60f6efa1ccf37",
+              "type": "file",
+              "sha256": "75d5e6912ac9cd5dee14133bc5331f55c1038de63280f567e6cabb53d2b99fe4"
+            },
+            "after": null
+          },
+          {
+            "path": "y7T93MtN2voy_4QjdBBJ2/client/141de06f356108fd062600fdc80a211b6d95b8b4",
+            "before": {
+              "path": "y7T93MtN2voy_4QjdBBJ2/client/141de06f356108fd062600fdc80a211b6d95b8b4",
+              "type": "file",
+              "sha256": "581ec245c521feca7f800d6eb7ed01003433298fa3db37ad112360dfb8f16ffd"
+            },
+            "after": null
+          },
+          {
+            "path": "y7T93MtN2voy_4QjdBBJ2/client/188b912b63d1ddcee5774a1a9353013e393e40dc",
+            "before": {
+              "path": "y7T93MtN2voy_4QjdBBJ2/client/188b912b63d1ddcee5774a1a9353013e393e40dc",
+              "type": "file",
+              "sha256": "2f8d375f449c0fe489b7c68ebf4d1793ff0be6f6682c70b0dc5a103dfbb30c2b"
+            },
+            "after": null
+          },
+          {
+            "path": "y7T93MtN2voy_4QjdBBJ2/client/18e4e1c7f2520a0075bb0780fab62db1fbe7660b",
+            "before": {
+              "path": "y7T93MtN2voy_4QjdBBJ2/client/18e4e1c7f2520a0075bb0780fab62db1fbe7660b",
+              "type": "file",
+              "sha256": "96999de375ed1be8f6748f9645b26b2deed2d84f5cfc8a8ab74f51156153e7a5"
+            },
+            "after": null
+          },
+          {
+            "path": "y7T93MtN2voy_4QjdBBJ2/client/1cf654ef9f0b0159f9888d6ac04cc6b4a87d28cb",
+            "before": {
+              "path": "y7T93MtN2voy_4QjdBBJ2/client/1cf654ef9f0b0159f9888d6ac04cc6b4a87d28cb",
+              "type": "file",
+              "sha256": "13af876dcb64469a5dde6396263292a8df3af10d5acacef95c0fa0a5a1871dd5"
+            },
+            "after": null
+          },
+          {
+            "path": "y7T93MtN2voy_4QjdBBJ2/client/25f20f3336f4a9396be732f34f69f945d08d09bd",
+            "before": {
+              "path": "y7T93MtN2voy_4QjdBBJ2/client/25f20f3336f4a9396be732f34f69f945d08d09bd",
+              "type": "file",
+              "sha256": "550c2acae807a83ac7bf4334336c7758569fbdff9eb8f6aef8bfa24df05c2d5f"
+            },
+            "after": null
+          },
+          {
+            "path": "y7T93MtN2voy_4QjdBBJ2/client/2d687c8cd8f744b67abf6a9fa0c1307c2fc86580",
+            "before": {
+              "path": "y7T93MtN2voy_4QjdBBJ2/client/2d687c8cd8f744b67abf6a9fa0c1307c2fc86580",
+              "type": "file",
+              "sha256": "f93bbe4b55651bb355f55d753f8efa406df7ed18d5fbf1cca221b13e159a22cd"
+            },
+            "after": null
+          },
+          {
+            "path": "y7T93MtN2voy_4QjdBBJ2/client/31ce7a99a61b82feb5762d0ce7f474c81ebf3156",
+            "before": {
+              "path": "y7T93MtN2voy_4QjdBBJ2/client/31ce7a99a61b82feb5762d0ce7f474c81ebf3156",
+              "type": "file",
+              "sha256": "4bc799cea96bb0a38e31298b8ed9c20592a4142127ec543601538d37b227d72c"
+            },
+            "after": null
+          },
+          {
+            "path": "y7T93MtN2voy_4QjdBBJ2/client/326574526119d57eb541f4d52f792fbab41302d6",
+            "before": {
+              "path": "y7T93MtN2voy_4QjdBBJ2/client/326574526119d57eb541f4d52f792fbab41302d6",
+              "type": "file",
+              "sha256": "33afc243cae0ac9a617e8f6470d4087a33dbe7cb6d28abd2d348b8aaac46e864"
+            },
+            "after": null
+          },
+          {
+            "path": "y7T93MtN2voy_4QjdBBJ2/client/3551eaf694c596d41e53eb0cff0a63c7087f03fb",
+            "before": {
+              "path": "y7T93MtN2voy_4QjdBBJ2/client/3551eaf694c596d41e53eb0cff0a63c7087f03fb",
+              "type": "file",
+              "sha256": "870840584dbf8a86b21ba6f8915e3b18e53e887fed346ce3913aedba4e32b7b3"
+            },
+            "after": null
+          },
+          {
+            "path": "y7T93MtN2voy_4QjdBBJ2/client/3c434d352b8732ca28cfd8ab3d90fa7b09e783ea",
+            "before": {
+              "path": "y7T93MtN2voy_4QjdBBJ2/client/3c434d352b8732ca28cfd8ab3d90fa7b09e783ea",
+              "type": "file",
+              "sha256": "a258c3e2e43156cb4dfdae0b5227239ded07948c2450b3417e47561d5874f615"
+            },
+            "after": null
+          },
+          {
+            "path": "y7T93MtN2voy_4QjdBBJ2/client/3da85cd04c275bcc86615e8e76d225f35c45ba5e",
+            "before": {
+              "path": "y7T93MtN2voy_4QjdBBJ2/client/3da85cd04c275bcc86615e8e76d225f35c45ba5e",
+              "type": "file",
+              "sha256": "2106aa445a660886b4d86cee815fdfc88517674018c8147759aab1b87e222b09"
+            },
+            "after": null
+          },
+          {
+            "path": "y7T93MtN2voy_4QjdBBJ2/client/4532f4f5174ed3f6f3995894086aa6a4c3b29ce1",
+            "before": {
+              "path": "y7T93MtN2voy_4QjdBBJ2/client/4532f4f5174ed3f6f3995894086aa6a4c3b29ce1",
+              "type": "file",
+              "sha256": "4d3537ec9b7dcc6675eb434705da5097fbc48ae2d846e3dfccb991e434067aa4"
+            },
+            "after": null
+          },
+          {
+            "path": "y7T93MtN2voy_4QjdBBJ2/client/488070fcc0789e84e1ccd525f2742a493c2d1fd4",
+            "before": {
+              "path": "y7T93MtN2voy_4QjdBBJ2/client/488070fcc0789e84e1ccd525f2742a493c2d1fd4",
+              "type": "file",
+              "sha256": "641ee36afe7c9ddfade70fe9d2ae910923995e8acd89c13111f31fb143093ae6"
+            },
+            "after": null
+          },
+          {
+            "path": "y7T93MtN2voy_4QjdBBJ2/client/4c391d23c19f3cf517c39c2742f314e2c59c6a4f",
+            "before": {
+              "path": "y7T93MtN2voy_4QjdBBJ2/client/4c391d23c19f3cf517c39c2742f314e2c59c6a4f",
+              "type": "file",
+              "sha256": "b9f3a1fe32981d2777102a59ddf8389b9d6b0fdf2a49a1045c19897c7c8a5c24"
+            },
+            "after": null
+          },
+          {
+            "path": "y7T93MtN2voy_4QjdBBJ2/client/4f61d32e252ad3e900345c2fbe8aaf64d5974a31",
+            "before": {
+              "path": "y7T93MtN2voy_4QjdBBJ2/client/4f61d32e252ad3e900345c2fbe8aaf64d5974a31",
+              "type": "file",
+              "sha256": "3f9284c28af68e031fc28e69e2626b0c2f5d867ad0ca07d53a9b14c715669ad3"
+            },
+            "after": null
+          },
+          {
+            "path": "y7T93MtN2voy_4QjdBBJ2/client/4fa194738e37cc744212e0ce115880283afe326a",
+            "before": {
+              "path": "y7T93MtN2voy_4QjdBBJ2/client/4fa194738e37cc744212e0ce115880283afe326a",
+              "type": "file",
+              "sha256": "31f0332f316613b50e89c77ed46141287ddb553eb26a9e0f47188a94f4eb2e70"
+            },
+            "after": null
+          },
+          {
+            "path": "y7T93MtN2voy_4QjdBBJ2/client/533f54c03134b8c2e1a9ceb7d7b359574515a215",
+            "before": {
+              "path": "y7T93MtN2voy_4QjdBBJ2/client/533f54c03134b8c2e1a9ceb7d7b359574515a215",
+              "type": "file",
+              "sha256": "feeed1b1a008094b5e8c0942271d4a1fa728721697b90e62ec548695e581efb3"
+            },
+            "after": null
+          },
+          {
+            "path": "y7T93MtN2voy_4QjdBBJ2/client/56357eba146553616b4ca027b994d1caa16e626a",
+            "before": {
+              "path": "y7T93MtN2voy_4QjdBBJ2/client/56357eba146553616b4ca027b994d1caa16e626a",
+              "type": "file",
+              "sha256": "5bfe97bb485e695fe4de89bed023af497bcc8ad815676f7e2dcf1f94c181b415"
+            },
+            "after": null
+          },
+          {
+            "path": "y7T93MtN2voy_4QjdBBJ2/client/60f96cfd21524fd7511bda21f2189dee0d1ee57d",
+            "before": {
+              "path": "y7T93MtN2voy_4QjdBBJ2/client/60f96cfd21524fd7511bda21f2189dee0d1ee57d",
+              "type": "file",
+              "sha256": "b17157eea4234907099f46f7ca4842582fa38af1445b3e37b50fcef42238ec90"
+            },
+            "after": null
+          },
+          {
+            "path": "y7T93MtN2voy_4QjdBBJ2/client/6658542c86448b61a1b70d59e2a464351f1fee91",
+            "before": {
+              "path": "y7T93MtN2voy_4QjdBBJ2/client/6658542c86448b61a1b70d59e2a464351f1fee91",
+              "type": "file",
+              "sha256": "6a8e4e5c971dd4ffdb5d0f02bcda5e62b728419eaa5f3d9fdcd703eb7c14c4d3"
+            },
+            "after": null
+          },
+          {
+            "path": "y7T93MtN2voy_4QjdBBJ2/client/72aafab918c2c6c28cb6fa86b0887eb403cda976",
+            "before": {
+              "path": "y7T93MtN2voy_4QjdBBJ2/client/72aafab918c2c6c28cb6fa86b0887eb403cda976",
+              "type": "file",
+              "sha256": "05d2ddd39d82d4f3d6bc3c0f44b5cd5b11b1be2da7a39ee203128674c51e7a87"
+            },
+            "after": null
+          },
+          {
+            "path": "y7T93MtN2voy_4QjdBBJ2/client/750fa4325571673d26238e37eaa494b4e4bc5ffe",
+            "before": {
+              "path": "y7T93MtN2voy_4QjdBBJ2/client/750fa4325571673d26238e37eaa494b4e4bc5ffe",
+              "type": "file",
+              "sha256": "1b4a6f3964bea28c662bd44e5a02990a989952e8fcbea3e372ef955bb311e32a"
+            },
+            "after": null
+          },
+          {
+            "path": "y7T93MtN2voy_4QjdBBJ2/client/78089717615dddb7afe5a29f5a7d73773c81a12d",
+            "before": {
+              "path": "y7T93MtN2voy_4QjdBBJ2/client/78089717615dddb7afe5a29f5a7d73773c81a12d",
+              "type": "file",
+              "sha256": "23926daeeab304e7fb53186e79401409c78ec543c9f467a2b8d567edbf43fc90"
+            },
+            "after": null
+          },
+          {
+            "path": "y7T93MtN2voy_4QjdBBJ2/client/7d35dadec780a5220202a8163874d373f3d821dc",
+            "before": {
+              "path": "y7T93MtN2voy_4QjdBBJ2/client/7d35dadec780a5220202a8163874d373f3d821dc",
+              "type": "file",
+              "sha256": "396132c6d620c3854af65917370dc8dbf6984fc7b704721970b445f01447872e"
+            },
+            "after": null
+          },
+          {
+            "path": "y7T93MtN2voy_4QjdBBJ2/client/8a97cba776031439ba4c23a1e64015a9cb1e41ac",
+            "before": {
+              "path": "y7T93MtN2voy_4QjdBBJ2/client/8a97cba776031439ba4c23a1e64015a9cb1e41ac",
+              "type": "file",
+              "sha256": "f12ea009a37759681d435967d1139e54da257dcfaf1cb68faad78c291daec920"
+            },
+            "after": null
+          },
+          {
+            "path": "y7T93MtN2voy_4QjdBBJ2/client/909339ae4cba7ed3ee9130873e3f3846e4439342",
+            "before": {
+              "path": "y7T93MtN2voy_4QjdBBJ2/client/909339ae4cba7ed3ee9130873e3f3846e4439342",
+              "type": "file",
+              "sha256": "a742041166297e2ee36796b6988d6bffcc730ccf9b5ca18fb345c1ec85f0f2d4"
+            },
+            "after": null
+          },
+          {
+            "path": "y7T93MtN2voy_4QjdBBJ2/client/9380ff2723bff006ede4fcee163015b152723c6d",
+            "before": {
+              "path": "y7T93MtN2voy_4QjdBBJ2/client/9380ff2723bff006ede4fcee163015b152723c6d",
+              "type": "file",
+              "sha256": "34152a241e560a56e51ce9ce181745a50e1f37e4aac4955aad1abb0b626f7f67"
+            },
+            "after": null
+          },
+          {
+            "path": "y7T93MtN2voy_4QjdBBJ2/client/94e004b5702e65d90b23eb64c711b5004aff9c7d",
+            "before": {
+              "path": "y7T93MtN2voy_4QjdBBJ2/client/94e004b5702e65d90b23eb64c711b5004aff9c7d",
+              "type": "file",
+              "sha256": "032c6eff0992bf04ccd0008c26f4b36e11cd0581a042cd8019a4715caa74eaaf"
+            },
+            "after": null
+          },
+          {
+            "path": "y7T93MtN2voy_4QjdBBJ2/client/9926a4c51e1d5b3d7593d513c0485a490ed03b86",
+            "before": {
+              "path": "y7T93MtN2voy_4QjdBBJ2/client/9926a4c51e1d5b3d7593d513c0485a490ed03b86",
+              "type": "file",
+              "sha256": "1cc9360e1108274656b732165ac4956a891866528b05f7e60dee3530ce1641bc"
+            },
+            "after": null
+          },
+          {
+            "path": "y7T93MtN2voy_4QjdBBJ2/client/9d581c93646ae583b64de02ef03e0e5d672682c2",
+            "before": {
+              "path": "y7T93MtN2voy_4QjdBBJ2/client/9d581c93646ae583b64de02ef03e0e5d672682c2",
+              "type": "file",
+              "sha256": "bcb312ba14d9e4335dfbc3768dfd273d44c5330d840a0a9cf99b04ef0948c76e"
+            },
+            "after": null
+          },
+          {
+            "path": "y7T93MtN2voy_4QjdBBJ2/client/a9e6ab57a96fa5c9a5787a9f1019b1c2b186ad67",
+            "before": {
+              "path": "y7T93MtN2voy_4QjdBBJ2/client/a9e6ab57a96fa5c9a5787a9f1019b1c2b186ad67",
+              "type": "file",
+              "sha256": "ed3663a949d474b93fb66a69738750f29c1b387f7c70e3fa36e55b05d8a5928e"
+            },
+            "after": null
+          },
+          {
+            "path": "y7T93MtN2voy_4QjdBBJ2/client/affc033dd44908a3fa01235b7876d997ed0d1b2a",
+            "before": {
+              "path": "y7T93MtN2voy_4QjdBBJ2/client/affc033dd44908a3fa01235b7876d997ed0d1b2a",
+              "type": "file",
+              "sha256": "cc0351464f3d36857b05287ff1ecfa13214e317a8d729f02f53ea5c61d0107d7"
+            },
+            "after": null
+          },
+          {
+            "path": "y7T93MtN2voy_4QjdBBJ2/client/b327324f4fa34f349a256349175e7ffc3f3b6419",
+            "before": {
+              "path": "y7T93MtN2voy_4QjdBBJ2/client/b327324f4fa34f349a256349175e7ffc3f3b6419",
+              "type": "file",
+              "sha256": "5c5b99b363b5bcaf647e399e2328aeac89368a190f76e3f7c540bbf29960c483"
+            },
+            "after": null
+          },
+          {
+            "path": "y7T93MtN2voy_4QjdBBJ2/client/b3c8b3a5530a4c6d1b1c325183d2e3b6a2abb6af",
+            "before": {
+              "path": "y7T93MtN2voy_4QjdBBJ2/client/b3c8b3a5530a4c6d1b1c325183d2e3b6a2abb6af",
+              "type": "file",
+              "sha256": "8caa17b960be6c64b3d550966b5e73cf8b9f4cad44d359d93e1accfa9a35ebdf"
+            },
+            "after": null
+          },
+          {
+            "path": "y7T93MtN2voy_4QjdBBJ2/client/b4bad267a6515257477557dae3aa8aba7998db5e",
+            "before": {
+              "path": "y7T93MtN2voy_4QjdBBJ2/client/b4bad267a6515257477557dae3aa8aba7998db5e",
+              "type": "file",
+              "sha256": "f255a8c1350bebdf862098491f52365a5aec8adf8f1fc646bfbb0c7d03f9f64f"
+            },
+            "after": null
+          },
+          {
+            "path": "y7T93MtN2voy_4QjdBBJ2/client/b4fae0c5faf2e60a5f499a597de733cc6dd88e6b",
+            "before": {
+              "path": "y7T93MtN2voy_4QjdBBJ2/client/b4fae0c5faf2e60a5f499a597de733cc6dd88e6b",
+              "type": "file",
+              "sha256": "383f03dd27f0b96d29d0c5e8010b5eca88ab5f4dccc800e5bddc91e7ed873ea9"
+            },
+            "after": null
+          },
+          {
+            "path": "y7T93MtN2voy_4QjdBBJ2/client/b50f3e0356c783694849f01a1feccd54fc2da7ee",
+            "before": {
+              "path": "y7T93MtN2voy_4QjdBBJ2/client/b50f3e0356c783694849f01a1feccd54fc2da7ee",
+              "type": "file",
+              "sha256": "86568985abbc19c149af89dbc68fe0d5bcf3758d62c57d18f0daa1c0b866f1a1"
+            },
+            "after": null
+          },
+          {
+            "path": "y7T93MtN2voy_4QjdBBJ2/client/b535d92e7cece251febfd3a4a29affb193f1fb07",
+            "before": {
+              "path": "y7T93MtN2voy_4QjdBBJ2/client/b535d92e7cece251febfd3a4a29affb193f1fb07",
+              "type": "file",
+              "sha256": "efdb58e14b96401ac6adfb0c52c7d1df5d95985b05e3f7c3f830441ce99319a3"
+            },
+            "after": null
+          },
+          {
+            "path": "y7T93MtN2voy_4QjdBBJ2/client/b63cf875c404f2822c2b4281fbcdf50128030b8f",
+            "before": {
+              "path": "y7T93MtN2voy_4QjdBBJ2/client/b63cf875c404f2822c2b4281fbcdf50128030b8f",
+              "type": "file",
+              "sha256": "d641fb476486f10109155c46e0feafb7312d732afe1594fb6c81889ae587c7e6"
+            },
+            "after": null
+          },
+          {
+            "path": "y7T93MtN2voy_4QjdBBJ2/client/c06402cc6495357e827c36ef6833d161ad17ecba",
+            "before": {
+              "path": "y7T93MtN2voy_4QjdBBJ2/client/c06402cc6495357e827c36ef6833d161ad17ecba",
+              "type": "file",
+              "sha256": "fd31238d219292f4c02a37993f70bba206fb49bf095d04eea5df8dc1c34ee459"
+            },
+            "after": null
+          },
+          {
+            "path": "y7T93MtN2voy_4QjdBBJ2/client/c90ad9ecfe6a939fa1537009163c896ff1eead80",
+            "before": {
+              "path": "y7T93MtN2voy_4QjdBBJ2/client/c90ad9ecfe6a939fa1537009163c896ff1eead80",
+              "type": "file",
+              "sha256": "82dec3bf9f5678bc2154ff3210f55befbf865a048de6ab1d822568a045906b1a"
+            },
+            "after": null
+          },
+          {
+            "path": "y7T93MtN2voy_4QjdBBJ2/client/c9610ce027dc6bfab5c1b0c70de656dc5e87e89f",
+            "before": {
+              "path": "y7T93MtN2voy_4QjdBBJ2/client/c9610ce027dc6bfab5c1b0c70de656dc5e87e89f",
+              "type": "file",
+              "sha256": "5c044a70d8bc4dfb28b1a90de654094bb0df0b600036d7765bc13bc0c7046ded"
+            },
+            "after": null
+          },
+          {
+            "path": "y7T93MtN2voy_4QjdBBJ2/client/cd9cf5baec1301c7f13316c7415b25def6b9e6cf",
+            "before": {
+              "path": "y7T93MtN2voy_4QjdBBJ2/client/cd9cf5baec1301c7f13316c7415b25def6b9e6cf",
+              "type": "file",
+              "sha256": "647d31d20fc3d7c6f3a3448d6785fdfaa5b52f81f0ffcc9bf8d9e04551853659"
+            },
+            "after": null
+          },
+          {
+            "path": "y7T93MtN2voy_4QjdBBJ2/client/d40e4345979a90d4b45384e5856ce07c412728ce",
+            "before": {
+              "path": "y7T93MtN2voy_4QjdBBJ2/client/d40e4345979a90d4b45384e5856ce07c412728ce",
+              "type": "file",
+              "sha256": "9c48ecadfd7b6a1f18dc3f64ee7d0675544c5dc2479e9bd3d5d396792850848a"
+            },
+            "after": null
+          },
+          {
+            "path": "y7T93MtN2voy_4QjdBBJ2/client/d6848563c60a17bdb4a20209d7bd2f1615ccae34",
+            "before": {
+              "path": "y7T93MtN2voy_4QjdBBJ2/client/d6848563c60a17bdb4a20209d7bd2f1615ccae34",
+              "type": "file",
+              "sha256": "9129cd3fa8a7ec0a73c95ff4cef28352d4af8348450d2df850dbee36616c8d04"
+            },
+            "after": null
+          },
+          {
+            "path": "y7T93MtN2voy_4QjdBBJ2/client/d6d9a407ca1f9538eeb41c0f651f45209b26a9a2",
+            "before": {
+              "path": "y7T93MtN2voy_4QjdBBJ2/client/d6d9a407ca1f9538eeb41c0f651f45209b26a9a2",
+              "type": "file",
+              "sha256": "8e23835110ecd7791899aa8c981d3e86608d2323a30f7e27cc000b20f9b032c3"
+            },
+            "after": null
+          },
+          {
+            "path": "y7T93MtN2voy_4QjdBBJ2/client/d74b8d346acec43fa7c5008211fb022cd2d25d09",
+            "before": {
+              "path": "y7T93MtN2voy_4QjdBBJ2/client/d74b8d346acec43fa7c5008211fb022cd2d25d09",
+              "type": "file",
+              "sha256": "a467eab537a4a425891ab572afa6e5ed8dc268d8234d9064d6873a9dc13f4c80"
+            },
+            "after": null
+          },
+          {
+            "path": "y7T93MtN2voy_4QjdBBJ2/client/d99792dc70ce7a5ae934aa85e09baf7ecece6792",
+            "before": {
+              "path": "y7T93MtN2voy_4QjdBBJ2/client/d99792dc70ce7a5ae934aa85e09baf7ecece6792",
+              "type": "file",
+              "sha256": "19b12f065c1339c5fdbbae5399032b79133bca6bf01faf9769808cfcab0b4d78"
+            },
+            "after": null
+          },
+          {
+            "path": "y7T93MtN2voy_4QjdBBJ2/client/d9c3cc2263e29b45cd8ccdb9f61f28501d4c674d",
+            "before": {
+              "path": "y7T93MtN2voy_4QjdBBJ2/client/d9c3cc2263e29b45cd8ccdb9f61f28501d4c674d",
+              "type": "file",
+              "sha256": "20e54d96f2fd26a6a01c9e577a1f5964f299cdd605c45b15b9e7660eb8b72838"
+            },
+            "after": null
+          },
+          {
+            "path": "y7T93MtN2voy_4QjdBBJ2/client/da0bd604d28ae0a4eadf038e708579217d381d89",
+            "before": {
+              "path": "y7T93MtN2voy_4QjdBBJ2/client/da0bd604d28ae0a4eadf038e708579217d381d89",
+              "type": "file",
+              "sha256": "4154d9d04262b93307d1cf54f3571c69f10bc0abc5256e7e1bbb251d5114d3e3"
+            },
+            "after": null
+          },
+          {
+            "path": "y7T93MtN2voy_4QjdBBJ2/client/df085288e83bcdaf6887d591cb51dc540def76d1",
+            "before": {
+              "path": "y7T93MtN2voy_4QjdBBJ2/client/df085288e83bcdaf6887d591cb51dc540def76d1",
+              "type": "file",
+              "sha256": "de7ccd1df595d2d96af5ed33295fbdc3394906f148e89e2e93a79d4758e3e283"
+            },
+            "after": null
+          },
+          {
+            "path": "y7T93MtN2voy_4QjdBBJ2/client/e0221ff10b89649d57d8842bdf195dab0b521928",
+            "before": {
+              "path": "y7T93MtN2voy_4QjdBBJ2/client/e0221ff10b89649d57d8842bdf195dab0b521928",
+              "type": "file",
+              "sha256": "ad4d750d5d9667bb00b30f67e742c21af455a91b8c78a9bb3f5e926520fc5c6c"
+            },
+            "after": null
+          },
+          {
+            "path": "y7T93MtN2voy_4QjdBBJ2/client/e2c6d4bf6c697d6c30529ee4bdb43800afeff6dd",
+            "before": {
+              "path": "y7T93MtN2voy_4QjdBBJ2/client/e2c6d4bf6c697d6c30529ee4bdb43800afeff6dd",
+              "type": "file",
+              "sha256": "942240d00e1fc441c41fe4479699c4e17f013d831e32326387b813e3520c671d"
+            },
+            "after": null
+          },
+          {
+            "path": "y7T93MtN2voy_4QjdBBJ2/client/e36e55ef2df4a80e6a1bbc38692bdbbc4277687e",
+            "before": {
+              "path": "y7T93MtN2voy_4QjdBBJ2/client/e36e55ef2df4a80e6a1bbc38692bdbbc4277687e",
+              "type": "file",
+              "sha256": "be8dc63c6a770b01c0a89c19ba8cc9bfcd02e73bd75449bc92af97b7b6f2ab63"
+            },
+            "after": null
+          },
+          {
+            "path": "y7T93MtN2voy_4QjdBBJ2/client/edbb501e3e5877d9f48cd595eddb3fa3e4433230",
+            "before": {
+              "path": "y7T93MtN2voy_4QjdBBJ2/client/edbb501e3e5877d9f48cd595eddb3fa3e4433230",
+              "type": "file",
+              "sha256": "645da4a26e1876973982fd4f5d7912100ad0cd5e0c169c6a2f43500207611e05"
+            },
+            "after": null
+          },
+          {
+            "path": "y7T93MtN2voy_4QjdBBJ2/client/f06061f5ee7872b531ca09e29c0a0ae34ee26a65",
+            "before": {
+              "path": "y7T93MtN2voy_4QjdBBJ2/client/f06061f5ee7872b531ca09e29c0a0ae34ee26a65",
+              "type": "file",
+              "sha256": "20954c6777ab6fdc402fbeb836f71512685c43df3b99d9f8e14fdaf1ef1350df"
+            },
+            "after": null
+          },
+          {
+            "path": "y7T93MtN2voy_4QjdBBJ2/client/f09a4693ba400d9eda4c7677dfa41eb2028c8840",
+            "before": {
+              "path": "y7T93MtN2voy_4QjdBBJ2/client/f09a4693ba400d9eda4c7677dfa41eb2028c8840",
+              "type": "file",
+              "sha256": "017b8fa39c04d066e3290ff120a3291c12b2d6b4809e991dbc304a086f71c727"
+            },
+            "after": null
+          },
+          {
+            "path": "y7T93MtN2voy_4QjdBBJ2/client/f2841b5b3559f00cff99d39f8d2861aa20f6b37f",
+            "before": {
+              "path": "y7T93MtN2voy_4QjdBBJ2/client/f2841b5b3559f00cff99d39f8d2861aa20f6b37f",
+              "type": "file",
+              "sha256": "d86d10aed212a2b8ae8ce2fdf23d4e4b4095ac58b98bf3401a2149c4d075cd67"
+            },
+            "after": null
+          },
+          {
+            "path": "y7T93MtN2voy_4QjdBBJ2/client/f41b4b6579eabae416e7beaa28023928a25b5f35",
+            "before": {
+              "path": "y7T93MtN2voy_4QjdBBJ2/client/f41b4b6579eabae416e7beaa28023928a25b5f35",
+              "type": "file",
+              "sha256": "3250ce600e2050e4fd90cc5c3559c6da54d9a87c77b763d97b26719ad2408798"
+            },
+            "after": null
+          },
+          {
+            "path": "y7T93MtN2voy_4QjdBBJ2/client/f775b9264df673882ca451478971ef88c74bc066",
+            "before": {
+              "path": "y7T93MtN2voy_4QjdBBJ2/client/f775b9264df673882ca451478971ef88c74bc066",
+              "type": "file",
+              "sha256": "f3ffc04351b21a6c157e9a2e680488247f912fd429ea5b4453896be86f30c3f6"
+            },
+            "after": null
+          },
+          {
+            "path": "y7T93MtN2voy_4QjdBBJ2/client/fc1ff2ebaae9058c0f7dd6327243927565607a58",
+            "before": {
+              "path": "y7T93MtN2voy_4QjdBBJ2/client/fc1ff2ebaae9058c0f7dd6327243927565607a58",
+              "type": "file",
+              "sha256": "0caef01e35b86a1f53877b386a712b720c29873979466c08b56ccc7e50835501"
+            },
+            "after": null
+          }
+        ]
+      },
+      {
+        "path": "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\stage-w1d-20261115-pair\\execution-npm-cache",
+        "changes": []
+      }
+    ],
+    "installationEnvironment": [
+      {
+        "path": "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\stage-w1d-20261115-pair\\old-install-cache",
+        "changes": []
+      },
+      {
+        "path": "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\stage-w1d-20261115-pair\\old-install-temp",
+        "changes": []
+      }
+    ]
+  },
+  {
+    "target": "new",
+    "from": "S1-before-config",
+    "to": "S2-config-loaded",
+    "environment": [
+      {
+        "path": "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\stage-w1d-20261115-pair\\execution-temp",
+        "changes": []
+      },
+      {
+        "path": "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\stage-w1d-20261115-pair\\execution-npm-cache",
+        "changes": []
+      }
+    ],
+    "installationEnvironment": [
+      {
+        "path": "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\stage-w1d-20261115-pair\\new-install-cache",
+        "changes": []
+      },
+      {
+        "path": "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\stage-w1d-20261115-pair\\new-install-temp",
+        "changes": []
+      }
+    ]
+  },
+  {
+    "target": "new",
+    "from": "S2-config-loaded",
+    "to": "S3-inventory-collected",
+    "environment": [
+      {
+        "path": "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\stage-w1d-20261115-pair\\execution-temp",
+        "changes": [
+          {
+            "path": "VN5torG_zcfJYdMes0b9a",
+            "before": null,
+            "after": {
+              "path": "VN5torG_zcfJYdMes0b9a",
+              "type": "directory"
+            }
+          },
+          {
+            "path": "VN5torG_zcfJYdMes0b9a/client",
+            "before": null,
+            "after": {
+              "path": "VN5torG_zcfJYdMes0b9a/client",
+              "type": "directory"
+            }
+          },
+          {
+            "path": "VN5torG_zcfJYdMes0b9a/client/0633303e11e9ea1d54d9c3f1632e83ec93d5e731",
+            "before": null,
+            "after": {
+              "path": "VN5torG_zcfJYdMes0b9a/client/0633303e11e9ea1d54d9c3f1632e83ec93d5e731",
+              "type": "file",
+              "sha256": "25c22734ffc397cf2ba9907ca124e30ee1c40e346c47b9ca79170a7ab80f246c"
+            }
+          },
+          {
+            "path": "VN5torG_zcfJYdMes0b9a/client/08545f01f17f211606b184eb38c0e2defdd93245",
+            "before": null,
+            "after": {
+              "path": "VN5torG_zcfJYdMes0b9a/client/08545f01f17f211606b184eb38c0e2defdd93245",
+              "type": "file",
+              "sha256": "b0eb6f23f05782530c749978a0a07237f4b829f9344f6cd3c2494bb8bc8f13bc"
+            }
+          },
+          {
+            "path": "VN5torG_zcfJYdMes0b9a/client/08962a0405c8b47cf72d6a10e5c793aa05a4dfe2",
+            "before": null,
+            "after": {
+              "path": "VN5torG_zcfJYdMes0b9a/client/08962a0405c8b47cf72d6a10e5c793aa05a4dfe2",
+              "type": "file",
+              "sha256": "b2ef3907a17fa4065843ff33e96896d5f2ce0ab16cf22a2592064557c9509f7f"
+            }
+          },
+          {
+            "path": "VN5torG_zcfJYdMes0b9a/client/14382308262382a9c59561953c1f56cafe1b03dd",
+            "before": null,
+            "after": {
+              "path": "VN5torG_zcfJYdMes0b9a/client/14382308262382a9c59561953c1f56cafe1b03dd",
+              "type": "file",
+              "sha256": "e74419b8cb573e60f2359b6d7d25a99511a18689d3b200ccc6d1c4880fc58d0b"
+            }
+          },
+          {
+            "path": "VN5torG_zcfJYdMes0b9a/client/17b9820bab87d6242c1e424d4f87a865b9662978",
+            "before": null,
+            "after": {
+              "path": "VN5torG_zcfJYdMes0b9a/client/17b9820bab87d6242c1e424d4f87a865b9662978",
+              "type": "file",
+              "sha256": "d03f66d717cb796ae66756ba9388d5a0a16331539c01dc2b3c32dbffd879d6ed"
+            }
+          },
+          {
+            "path": "VN5torG_zcfJYdMes0b9a/client/18aadab1e7c924d591385306d9dd9d590fdc62a1",
+            "before": null,
+            "after": {
+              "path": "VN5torG_zcfJYdMes0b9a/client/18aadab1e7c924d591385306d9dd9d590fdc62a1",
+              "type": "file",
+              "sha256": "13b8ceec5a9270ada0179dd3ef4b240ded8b5c5c18705c2e15ae8080be08f8f2"
+            }
+          },
+          {
+            "path": "VN5torG_zcfJYdMes0b9a/client/19e3e2a9e603176579b3709cc0100f07f8642994",
+            "before": null,
+            "after": {
+              "path": "VN5torG_zcfJYdMes0b9a/client/19e3e2a9e603176579b3709cc0100f07f8642994",
+              "type": "file",
+              "sha256": "6dfba307091ab3d1eb3fff5116865c3bd6e8a6e9e5a7111313a9ea0aa104221a"
+            }
+          },
+          {
+            "path": "VN5torG_zcfJYdMes0b9a/client/1b9eea5930e09518e2aa43e8d6688aaa5e80ed88",
+            "before": null,
+            "after": {
+              "path": "VN5torG_zcfJYdMes0b9a/client/1b9eea5930e09518e2aa43e8d6688aaa5e80ed88",
+              "type": "file",
+              "sha256": "18f18aed9242945951c96a52b523b7f9f79014b06b74dfb54d3d13727deeae1b"
+            }
+          },
+          {
+            "path": "VN5torG_zcfJYdMes0b9a/client/20dd225120806ac655878ed1890b275ad92f5708",
+            "before": null,
+            "after": {
+              "path": "VN5torG_zcfJYdMes0b9a/client/20dd225120806ac655878ed1890b275ad92f5708",
+              "type": "file",
+              "sha256": "d620e74615c0603364419368134a20ad75144825dab9d786168c104cad7c62c3"
+            }
+          },
+          {
+            "path": "VN5torG_zcfJYdMes0b9a/client/243519f3e768c94174360e18c275c4f1d48eff38",
+            "before": null,
+            "after": {
+              "path": "VN5torG_zcfJYdMes0b9a/client/243519f3e768c94174360e18c275c4f1d48eff38",
+              "type": "file",
+              "sha256": "eda91fb56b4cb887a7663f2ffababd34c34cd3423389b5cc7d1c7a2667a60d97"
+            }
+          },
+          {
+            "path": "VN5torG_zcfJYdMes0b9a/client/259af2755d16c827ca8c99cdc8db23ee79a2a4f6",
+            "before": null,
+            "after": {
+              "path": "VN5torG_zcfJYdMes0b9a/client/259af2755d16c827ca8c99cdc8db23ee79a2a4f6",
+              "type": "file",
+              "sha256": "84d044b3d8b914c19679ba80a7f4a22bbfef0319c312bb92bb52224dd7af3921"
+            }
+          },
+          {
+            "path": "VN5torG_zcfJYdMes0b9a/client/27c87a34a1eac281ae41049cac0dd0172dd3872b",
+            "before": null,
+            "after": {
+              "path": "VN5torG_zcfJYdMes0b9a/client/27c87a34a1eac281ae41049cac0dd0172dd3872b",
+              "type": "file",
+              "sha256": "c40127b5fb7e1bb9342981409bb1a9ac8f574de93b53babaa426a52602941327"
+            }
+          },
+          {
+            "path": "VN5torG_zcfJYdMes0b9a/client/296ea0e6cbec0201767323b2b8704b20dd2fe304",
+            "before": null,
+            "after": {
+              "path": "VN5torG_zcfJYdMes0b9a/client/296ea0e6cbec0201767323b2b8704b20dd2fe304",
+              "type": "file",
+              "sha256": "4f96cfc89b8f4c49543744142e09022a15dcbd762a4a4972be39fe1e26731669"
+            }
+          },
+          {
+            "path": "VN5torG_zcfJYdMes0b9a/client/3380ee2f62f41f0b43a98a071a473f755a4f1441",
+            "before": null,
+            "after": {
+              "path": "VN5torG_zcfJYdMes0b9a/client/3380ee2f62f41f0b43a98a071a473f755a4f1441",
+              "type": "file",
+              "sha256": "19b7889813601d8593686649373760ac57c38be76332e2481473af6047fde6f7"
+            }
+          },
+          {
+            "path": "VN5torG_zcfJYdMes0b9a/client/3dd913542ec00603cf20a4841c231ff27708299a",
+            "before": null,
+            "after": {
+              "path": "VN5torG_zcfJYdMes0b9a/client/3dd913542ec00603cf20a4841c231ff27708299a",
+              "type": "file",
+              "sha256": "5f393369031ae37ea8de0c5f01dac344fd376b957e8eff7aca975919d7c39834"
+            }
+          },
+          {
+            "path": "VN5torG_zcfJYdMes0b9a/client/3f9e620ebe6fa3d1ed999ed4fa30ab5a85a8d126",
+            "before": null,
+            "after": {
+              "path": "VN5torG_zcfJYdMes0b9a/client/3f9e620ebe6fa3d1ed999ed4fa30ab5a85a8d126",
+              "type": "file",
+              "sha256": "3166b257ba3648975e12724f51d7a8042ecc14d31a1ff56eb2ee4cad867420e1"
+            }
+          },
+          {
+            "path": "VN5torG_zcfJYdMes0b9a/client/40f3f02d7a1a393ccba39e9ee0af7654f39f25fc",
+            "before": null,
+            "after": {
+              "path": "VN5torG_zcfJYdMes0b9a/client/40f3f02d7a1a393ccba39e9ee0af7654f39f25fc",
+              "type": "file",
+              "sha256": "f6fd4f70cedca4f024386df0031bce126e7541d46a36223f50e5443ddd2dae08"
+            }
+          },
+          {
+            "path": "VN5torG_zcfJYdMes0b9a/client/45b731e1771ca4fc68f73398dba5fc4062f4eacd",
+            "before": null,
+            "after": {
+              "path": "VN5torG_zcfJYdMes0b9a/client/45b731e1771ca4fc68f73398dba5fc4062f4eacd",
+              "type": "file",
+              "sha256": "aa09a8b3fd3a879725c0a828c28084c1efb08292ffdd8bb1c4c970a0662d9be7"
+            }
+          },
+          {
+            "path": "VN5torG_zcfJYdMes0b9a/client/496c2017972e8e7e5931cb891c2c8e4e4cd7cdf5",
+            "before": null,
+            "after": {
+              "path": "VN5torG_zcfJYdMes0b9a/client/496c2017972e8e7e5931cb891c2c8e4e4cd7cdf5",
+              "type": "file",
+              "sha256": "7d73292c0070f1fd9bac2faa8ddb6311ad3ec75afc6eb1ceae2d2fddb81b12db"
+            }
+          },
+          {
+            "path": "VN5torG_zcfJYdMes0b9a/client/4e3495bfdef5d2a6cef4e66b9223c092b27b34b9",
+            "before": null,
+            "after": {
+              "path": "VN5torG_zcfJYdMes0b9a/client/4e3495bfdef5d2a6cef4e66b9223c092b27b34b9",
+              "type": "file",
+              "sha256": "4adc7af8287cbe81353a1d4c41ebc3a9859cae0903cd02e5a9eabf6bae6e2e32"
+            }
+          },
+          {
+            "path": "VN5torG_zcfJYdMes0b9a/client/526ffc95f79606b4d9ed0214cdf1d70febe7e24f",
+            "before": null,
+            "after": {
+              "path": "VN5torG_zcfJYdMes0b9a/client/526ffc95f79606b4d9ed0214cdf1d70febe7e24f",
+              "type": "file",
+              "sha256": "9c5bd3fbd3cf27c7601e24e063a2ec345755906af64b16709a94684013b8f717"
+            }
+          },
+          {
+            "path": "VN5torG_zcfJYdMes0b9a/client/54c2fbea56cbac4702be102f731cd06114580205",
+            "before": null,
+            "after": {
+              "path": "VN5torG_zcfJYdMes0b9a/client/54c2fbea56cbac4702be102f731cd06114580205",
+              "type": "file",
+              "sha256": "34d4c47eb793fc39f6bc4a5c65890ae8caa0f2cd2571be476604d0b777eecbe1"
+            }
+          },
+          {
+            "path": "VN5torG_zcfJYdMes0b9a/client/5aaa8769a4cd408c0aca36675825975392579ec7",
+            "before": null,
+            "after": {
+              "path": "VN5torG_zcfJYdMes0b9a/client/5aaa8769a4cd408c0aca36675825975392579ec7",
+              "type": "file",
+              "sha256": "213800eef919324a575d0427d06db631c9150e52243067ab090d1eb28f9294c9"
+            }
+          },
+          {
+            "path": "VN5torG_zcfJYdMes0b9a/client/67a29e54a2ccd24b02c0684bdfff54f86cb7268b",
+            "before": null,
+            "after": {
+              "path": "VN5torG_zcfJYdMes0b9a/client/67a29e54a2ccd24b02c0684bdfff54f86cb7268b",
+              "type": "file",
+              "sha256": "b77d0e414a37b80208f640a27ea4a708be065f361fa7e1de14406a48a6966424"
+            }
+          },
+          {
+            "path": "VN5torG_zcfJYdMes0b9a/client/699af924a101f14f4fd29b6c8abea25b8cd4befa",
+            "before": null,
+            "after": {
+              "path": "VN5torG_zcfJYdMes0b9a/client/699af924a101f14f4fd29b6c8abea25b8cd4befa",
+              "type": "file",
+              "sha256": "e6ee3a347dfcfacee140821cd2cc8b9a9938202fe67a312d06752c391c4a1cab"
+            }
+          },
+          {
+            "path": "VN5torG_zcfJYdMes0b9a/client/7547d7642332a219b4a50b6683e140c9b9246357",
+            "before": null,
+            "after": {
+              "path": "VN5torG_zcfJYdMes0b9a/client/7547d7642332a219b4a50b6683e140c9b9246357",
+              "type": "file",
+              "sha256": "04db8352897f86fc5caed71bc85a767fe28b60e4cd44a0454fe62230049ae55d"
+            }
+          },
+          {
+            "path": "VN5torG_zcfJYdMes0b9a/client/78e90a19f460f4afe0e00760fbc8637eb9122eb3",
+            "before": null,
+            "after": {
+              "path": "VN5torG_zcfJYdMes0b9a/client/78e90a19f460f4afe0e00760fbc8637eb9122eb3",
+              "type": "file",
+              "sha256": "11d3b804b984bffd02c34f522b94e0c74d0e484b0fca5022151de5da5f2aa67d"
+            }
+          },
+          {
+            "path": "VN5torG_zcfJYdMes0b9a/client/7932b9cc992c5e035ceda9da1e85631a7c26f070",
+            "before": null,
+            "after": {
+              "path": "VN5torG_zcfJYdMes0b9a/client/7932b9cc992c5e035ceda9da1e85631a7c26f070",
+              "type": "file",
+              "sha256": "24334bfc50957d61c1bb5376390153bf65d3b9e8283d36a9a2b40cf244ec8d3b"
+            }
+          },
+          {
+            "path": "VN5torG_zcfJYdMes0b9a/client/7b91fe796964c6918cfc911dfe08d00ef405e4dd",
+            "before": null,
+            "after": {
+              "path": "VN5torG_zcfJYdMes0b9a/client/7b91fe796964c6918cfc911dfe08d00ef405e4dd",
+              "type": "file",
+              "sha256": "73b218ed978f62948925ba4f221044383583d34db5fbfb4ddbe32702e3f08eed"
+            }
+          },
+          {
+            "path": "VN5torG_zcfJYdMes0b9a/client/7bc156c3eebe5945cae031f40323ea2612e6f510",
+            "before": null,
+            "after": {
+              "path": "VN5torG_zcfJYdMes0b9a/client/7bc156c3eebe5945cae031f40323ea2612e6f510",
+              "type": "file",
+              "sha256": "1c2fbd804e9d4439e7a7b2f1a2d8d8fff56f3ec225cd790ed6b6ca52bb0dcb73"
+            }
+          },
+          {
+            "path": "VN5torG_zcfJYdMes0b9a/client/7d1595039326237daf83d96f8c3f27283cc396fe",
+            "before": null,
+            "after": {
+              "path": "VN5torG_zcfJYdMes0b9a/client/7d1595039326237daf83d96f8c3f27283cc396fe",
+              "type": "file",
+              "sha256": "143de9deddddf6fb47e23a9e0e5d23b73bca935c939b08a4f783b2fa71d77cf0"
+            }
+          },
+          {
+            "path": "VN5torG_zcfJYdMes0b9a/client/8a5e43b9ab37e4534cbb27211fc0965a12b79cfe",
+            "before": null,
+            "after": {
+              "path": "VN5torG_zcfJYdMes0b9a/client/8a5e43b9ab37e4534cbb27211fc0965a12b79cfe",
+              "type": "file",
+              "sha256": "f810b545ec0743f722b1a81336cb63fc38fde299d5624ec53670819d9359b9a8"
+            }
+          },
+          {
+            "path": "VN5torG_zcfJYdMes0b9a/client/921f7b49ed3ab97e02b9988e2490068b32439668",
+            "before": null,
+            "after": {
+              "path": "VN5torG_zcfJYdMes0b9a/client/921f7b49ed3ab97e02b9988e2490068b32439668",
+              "type": "file",
+              "sha256": "ea48163e8cef77eb5e42181db115fc048e09a7a53a8f6ad54b6c654ad65ca3a1"
+            }
+          },
+          {
+            "path": "VN5torG_zcfJYdMes0b9a/client/969d9618b85d2dc5627ff5c7d8fe184153f50715",
+            "before": null,
+            "after": {
+              "path": "VN5torG_zcfJYdMes0b9a/client/969d9618b85d2dc5627ff5c7d8fe184153f50715",
+              "type": "file",
+              "sha256": "87383208a166e071c7791be49adaaa39adc3fca13be5bd51ea6abb0df5bc48be"
+            }
+          },
+          {
+            "path": "VN5torG_zcfJYdMes0b9a/client/984c29b7e1068993857a64e7bad96920dc9ce0cb",
+            "before": null,
+            "after": {
+              "path": "VN5torG_zcfJYdMes0b9a/client/984c29b7e1068993857a64e7bad96920dc9ce0cb",
+              "type": "file",
+              "sha256": "bbd9863d0b6bd9e29462466f9825f767d485f4a2af3a36d80371a7e5b763b5cc"
+            }
+          },
+          {
+            "path": "VN5torG_zcfJYdMes0b9a/client/9d191899176863990ae20371bff322c75d72e29d",
+            "before": null,
+            "after": {
+              "path": "VN5torG_zcfJYdMes0b9a/client/9d191899176863990ae20371bff322c75d72e29d",
+              "type": "file",
+              "sha256": "005a8bd5a490f0116fbc480319e8ae4f1336c7035b5a960aa244a7a1711aee1c"
+            }
+          },
+          {
+            "path": "VN5torG_zcfJYdMes0b9a/client/a537b30e17ad444c4ef0d3d6541d0d308caf9720",
+            "before": null,
+            "after": {
+              "path": "VN5torG_zcfJYdMes0b9a/client/a537b30e17ad444c4ef0d3d6541d0d308caf9720",
+              "type": "file",
+              "sha256": "37bb8f6cbb6fd97e0b22cba11e3ff11193531fbf1cb7049f8e59a42654238201"
+            }
+          },
+          {
+            "path": "VN5torG_zcfJYdMes0b9a/client/a86ceb9afbcde948ddbf6bd6115547c65f560aaa",
+            "before": null,
+            "after": {
+              "path": "VN5torG_zcfJYdMes0b9a/client/a86ceb9afbcde948ddbf6bd6115547c65f560aaa",
+              "type": "file",
+              "sha256": "d3c54699d08b8e26acacdc4d09d66703cc1c8ac9d15fb463169cbfdb36ac1756"
+            }
+          },
+          {
+            "path": "VN5torG_zcfJYdMes0b9a/client/adf11282780ca6799230be58f6d5302d4f3bc3cc",
+            "before": null,
+            "after": {
+              "path": "VN5torG_zcfJYdMes0b9a/client/adf11282780ca6799230be58f6d5302d4f3bc3cc",
+              "type": "file",
+              "sha256": "64023431aa9d7d1d2d8f42a46b2c8aa7265d37ef25721ea5fb11b845c6227a72"
+            }
+          },
+          {
+            "path": "VN5torG_zcfJYdMes0b9a/client/af490624c89fee7d8d7917a6a59748113ad0107b",
+            "before": null,
+            "after": {
+              "path": "VN5torG_zcfJYdMes0b9a/client/af490624c89fee7d8d7917a6a59748113ad0107b",
+              "type": "file",
+              "sha256": "4def21382b4e79259975fc371502691a0276bcbb9f87371ccaec39835b4be52b"
+            }
+          },
+          {
+            "path": "VN5torG_zcfJYdMes0b9a/client/afa6ec8f38bec3c7d1415b8967f2ffc56461fe60",
+            "before": null,
+            "after": {
+              "path": "VN5torG_zcfJYdMes0b9a/client/afa6ec8f38bec3c7d1415b8967f2ffc56461fe60",
+              "type": "file",
+              "sha256": "ae3d3a082bb95bfc4a412caafc963584def5aeccce7a14a7658035439038a331"
+            }
+          },
+          {
+            "path": "VN5torG_zcfJYdMes0b9a/client/b0e832778c6e66e05d08c176672d52bc19058ec5",
+            "before": null,
+            "after": {
+              "path": "VN5torG_zcfJYdMes0b9a/client/b0e832778c6e66e05d08c176672d52bc19058ec5",
+              "type": "file",
+              "sha256": "d3e09b6865fb99c2a2cfe8ed49575dcc6bb7caa21b5c0d941562004ca32b6d1c"
+            }
+          },
+          {
+            "path": "VN5torG_zcfJYdMes0b9a/client/b49c687f935a3c2497b926ee36c73469c66ee951",
+            "before": null,
+            "after": {
+              "path": "VN5torG_zcfJYdMes0b9a/client/b49c687f935a3c2497b926ee36c73469c66ee951",
+              "type": "file",
+              "sha256": "95d77b1c3b260842c7ac2a8fb35e68d7ba2a26a583a071c820223473d936f4c3"
+            }
+          },
+          {
+            "path": "VN5torG_zcfJYdMes0b9a/client/b97fe7a9c961b3d03df931fd802e772c8121b0d0",
+            "before": null,
+            "after": {
+              "path": "VN5torG_zcfJYdMes0b9a/client/b97fe7a9c961b3d03df931fd802e772c8121b0d0",
+              "type": "file",
+              "sha256": "c4c7728d368ca5c2f3ef4d9835af73679c27d60958b8bdc005b1c05313316a59"
+            }
+          },
+          {
+            "path": "VN5torG_zcfJYdMes0b9a/client/bb2cf1a10470afdd0350f0582c1ac96836cea43d",
+            "before": null,
+            "after": {
+              "path": "VN5torG_zcfJYdMes0b9a/client/bb2cf1a10470afdd0350f0582c1ac96836cea43d",
+              "type": "file",
+              "sha256": "fad4bed42d3cd11fcf679cb2022d61d9285f8591d5f9a9ab67f53c8eed66a1d5"
+            }
+          },
+          {
+            "path": "VN5torG_zcfJYdMes0b9a/client/be53d6e5588959fd951e591e2b31056dab9947eb",
+            "before": null,
+            "after": {
+              "path": "VN5torG_zcfJYdMes0b9a/client/be53d6e5588959fd951e591e2b31056dab9947eb",
+              "type": "file",
+              "sha256": "412e6892eed6faf85a5e39cd60a98c86b94be3100242a9fc443f48c93ab4d5de"
+            }
+          },
+          {
+            "path": "VN5torG_zcfJYdMes0b9a/client/cb43ab854e5ae6a1f6faaacf8001356476e8299f",
+            "before": null,
+            "after": {
+              "path": "VN5torG_zcfJYdMes0b9a/client/cb43ab854e5ae6a1f6faaacf8001356476e8299f",
+              "type": "file",
+              "sha256": "3641150934641c66b7ed0a5a15caf6a9e82e81e63740e9fe70783a5415404a26"
+            }
+          },
+          {
+            "path": "VN5torG_zcfJYdMes0b9a/client/cd102348e4af38c6ec4103e7f0f0e17c856b28b5",
+            "before": null,
+            "after": {
+              "path": "VN5torG_zcfJYdMes0b9a/client/cd102348e4af38c6ec4103e7f0f0e17c856b28b5",
+              "type": "file",
+              "sha256": "2433eb08f7ca02126651395d84af6ddeb4a5b1d5818acd92671a28f2d15e2ce7"
+            }
+          },
+          {
+            "path": "VN5torG_zcfJYdMes0b9a/client/d054ef3187475647bd206d16cae29d4dfacac12d",
+            "before": null,
+            "after": {
+              "path": "VN5torG_zcfJYdMes0b9a/client/d054ef3187475647bd206d16cae29d4dfacac12d",
+              "type": "file",
+              "sha256": "015f6ea5320a5a49301ce18cc382fda8a46e94718ac0f7ef5c089fb3314337fb"
+            }
+          },
+          {
+            "path": "VN5torG_zcfJYdMes0b9a/client/d1cffb7350edcbfa035680c14c47ac1df2a712b9",
+            "before": null,
+            "after": {
+              "path": "VN5torG_zcfJYdMes0b9a/client/d1cffb7350edcbfa035680c14c47ac1df2a712b9",
+              "type": "file",
+              "sha256": "383b9a5fa67cdf5df6c076308be84d459a93d4b2b6647c098e325ad9ee65bfb4"
+            }
+          },
+          {
+            "path": "VN5torG_zcfJYdMes0b9a/client/d28dd6456233c1677a3060747bb6e70fe78edbfc",
+            "before": null,
+            "after": {
+              "path": "VN5torG_zcfJYdMes0b9a/client/d28dd6456233c1677a3060747bb6e70fe78edbfc",
+              "type": "file",
+              "sha256": "da22fbc87e3bddcbe7c129ce8e7781d41a4d5667042ff12c33da916ecc10a531"
+            }
+          },
+          {
+            "path": "VN5torG_zcfJYdMes0b9a/client/d2ffe32fb72fba73515b5a06e32b04e951213e98",
+            "before": null,
+            "after": {
+              "path": "VN5torG_zcfJYdMes0b9a/client/d2ffe32fb72fba73515b5a06e32b04e951213e98",
+              "type": "file",
+              "sha256": "86c2023d3d52a42b4fd01899471b414c564f41aa077bd324e26df1cd8ad34200"
+            }
+          },
+          {
+            "path": "VN5torG_zcfJYdMes0b9a/client/d36183e4a31c9630809ccce3b3e26ad7fa9b2b12",
+            "before": null,
+            "after": {
+              "path": "VN5torG_zcfJYdMes0b9a/client/d36183e4a31c9630809ccce3b3e26ad7fa9b2b12",
+              "type": "file",
+              "sha256": "3aad08c10fb138cbb1ea9f0f30a6cc7f7c2687397e3a5e721ff6fb0034ca2c2f"
+            }
+          },
+          {
+            "path": "VN5torG_zcfJYdMes0b9a/client/dcfecd603e42b0814efae291a12288851f5fb274",
+            "before": null,
+            "after": {
+              "path": "VN5torG_zcfJYdMes0b9a/client/dcfecd603e42b0814efae291a12288851f5fb274",
+              "type": "file",
+              "sha256": "9cb4fbdb8b59cd6209bc4f2a31346dcb95fbd6f1bd71741f3133c0103e21bd35"
+            }
+          },
+          {
+            "path": "VN5torG_zcfJYdMes0b9a/client/df9cab6a55a66a6ceedba2a62fab657c245cba8a",
+            "before": null,
+            "after": {
+              "path": "VN5torG_zcfJYdMes0b9a/client/df9cab6a55a66a6ceedba2a62fab657c245cba8a",
+              "type": "file",
+              "sha256": "a1c8d371bd7de061836d2301acba379e98b57dab4cb00fa18a71aff9a320a760"
+            }
+          },
+          {
+            "path": "VN5torG_zcfJYdMes0b9a/client/e2f784020021ff01bb8ed1c6ab8f90ac90273df7",
+            "before": null,
+            "after": {
+              "path": "VN5torG_zcfJYdMes0b9a/client/e2f784020021ff01bb8ed1c6ab8f90ac90273df7",
+              "type": "file",
+              "sha256": "c5ce5074d8103326f0c8163f6ceae105ed72cadb5600fd9e2d116001cd6853f4"
+            }
+          },
+          {
+            "path": "VN5torG_zcfJYdMes0b9a/client/e32b606354887cde6ddd55eda91d38b4c2ef44d8",
+            "before": null,
+            "after": {
+              "path": "VN5torG_zcfJYdMes0b9a/client/e32b606354887cde6ddd55eda91d38b4c2ef44d8",
+              "type": "file",
+              "sha256": "7992be34b2ae54e2c11a988b5e909dd6a0010251af2d21471877375889b1b2b8"
+            }
+          },
+          {
+            "path": "VN5torG_zcfJYdMes0b9a/client/e62a5377d53c29f414fc666e580ce9720f168673",
+            "before": null,
+            "after": {
+              "path": "VN5torG_zcfJYdMes0b9a/client/e62a5377d53c29f414fc666e580ce9720f168673",
+              "type": "file",
+              "sha256": "3b391e66ea34929586b506f34da2b08f21eccf9968560395c475693142d07d74"
+            }
+          },
+          {
+            "path": "VN5torG_zcfJYdMes0b9a/client/e99cd608d0d7995e5b0be6319955c02ecb817761",
+            "before": null,
+            "after": {
+              "path": "VN5torG_zcfJYdMes0b9a/client/e99cd608d0d7995e5b0be6319955c02ecb817761",
+              "type": "file",
+              "sha256": "7a456cbe198b87913afa7283adc23a8db22ba32719fe29cab6957882aed313a7"
+            }
+          },
+          {
+            "path": "VN5torG_zcfJYdMes0b9a/client/e9fd5c72a30c8567681628798c105ca838956cbf",
+            "before": null,
+            "after": {
+              "path": "VN5torG_zcfJYdMes0b9a/client/e9fd5c72a30c8567681628798c105ca838956cbf",
+              "type": "file",
+              "sha256": "860e6a254db7047a85ccfcb8555042561a8255406eb3f197036b615d74662878"
+            }
+          },
+          {
+            "path": "VN5torG_zcfJYdMes0b9a/client/eac430780548beb1cbb14f60c637cf273fe91f29",
+            "before": null,
+            "after": {
+              "path": "VN5torG_zcfJYdMes0b9a/client/eac430780548beb1cbb14f60c637cf273fe91f29",
+              "type": "file",
+              "sha256": "5e5f1992d0b812197b935eff9eed30cf4f73daffdec56f9eb3f2d8c5848e8f52"
+            }
+          },
+          {
+            "path": "VN5torG_zcfJYdMes0b9a/client/f78fea7de86c1b28dae84914a554dd16d267a86d",
+            "before": null,
+            "after": {
+              "path": "VN5torG_zcfJYdMes0b9a/client/f78fea7de86c1b28dae84914a554dd16d267a86d",
+              "type": "file",
+              "sha256": "1fa6d18d7be979d288a6ee59e3d28f50ff19ea3d133eda60543cf70973900848"
+            }
+          },
+          {
+            "path": "VN5torG_zcfJYdMes0b9a/client/f97391db6202c7f6b81af3ba41081a00b854f7a8",
+            "before": null,
+            "after": {
+              "path": "VN5torG_zcfJYdMes0b9a/client/f97391db6202c7f6b81af3ba41081a00b854f7a8",
+              "type": "file",
+              "sha256": "ecd5cc00037ace7ca1af4141dab8e916805051f21cc8c579a121924c31b2cfe0"
+            }
+          }
+        ]
+      },
+      {
+        "path": "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\stage-w1d-20261115-pair\\execution-npm-cache",
+        "changes": []
+      }
+    ],
+    "installationEnvironment": [
+      {
+        "path": "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\stage-w1d-20261115-pair\\new-install-cache",
+        "changes": []
+      },
+      {
+        "path": "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\stage-w1d-20261115-pair\\new-install-temp",
+        "changes": []
+      }
+    ]
+  },
+  {
+    "target": "new",
+    "from": "S3-inventory-collected",
+    "to": "post-close",
+    "environment": [
+      {
+        "path": "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\stage-w1d-20261115-pair\\execution-temp",
+        "changes": [
+          {
+            "path": "VN5torG_zcfJYdMes0b9a",
+            "before": {
+              "path": "VN5torG_zcfJYdMes0b9a",
+              "type": "directory"
+            },
+            "after": null
+          },
+          {
+            "path": "VN5torG_zcfJYdMes0b9a/client",
+            "before": {
+              "path": "VN5torG_zcfJYdMes0b9a/client",
+              "type": "directory"
+            },
+            "after": null
+          },
+          {
+            "path": "VN5torG_zcfJYdMes0b9a/client/0633303e11e9ea1d54d9c3f1632e83ec93d5e731",
+            "before": {
+              "path": "VN5torG_zcfJYdMes0b9a/client/0633303e11e9ea1d54d9c3f1632e83ec93d5e731",
+              "type": "file",
+              "sha256": "25c22734ffc397cf2ba9907ca124e30ee1c40e346c47b9ca79170a7ab80f246c"
+            },
+            "after": null
+          },
+          {
+            "path": "VN5torG_zcfJYdMes0b9a/client/08545f01f17f211606b184eb38c0e2defdd93245",
+            "before": {
+              "path": "VN5torG_zcfJYdMes0b9a/client/08545f01f17f211606b184eb38c0e2defdd93245",
+              "type": "file",
+              "sha256": "b0eb6f23f05782530c749978a0a07237f4b829f9344f6cd3c2494bb8bc8f13bc"
+            },
+            "after": null
+          },
+          {
+            "path": "VN5torG_zcfJYdMes0b9a/client/08962a0405c8b47cf72d6a10e5c793aa05a4dfe2",
+            "before": {
+              "path": "VN5torG_zcfJYdMes0b9a/client/08962a0405c8b47cf72d6a10e5c793aa05a4dfe2",
+              "type": "file",
+              "sha256": "b2ef3907a17fa4065843ff33e96896d5f2ce0ab16cf22a2592064557c9509f7f"
+            },
+            "after": null
+          },
+          {
+            "path": "VN5torG_zcfJYdMes0b9a/client/14382308262382a9c59561953c1f56cafe1b03dd",
+            "before": {
+              "path": "VN5torG_zcfJYdMes0b9a/client/14382308262382a9c59561953c1f56cafe1b03dd",
+              "type": "file",
+              "sha256": "e74419b8cb573e60f2359b6d7d25a99511a18689d3b200ccc6d1c4880fc58d0b"
+            },
+            "after": null
+          },
+          {
+            "path": "VN5torG_zcfJYdMes0b9a/client/17b9820bab87d6242c1e424d4f87a865b9662978",
+            "before": {
+              "path": "VN5torG_zcfJYdMes0b9a/client/17b9820bab87d6242c1e424d4f87a865b9662978",
+              "type": "file",
+              "sha256": "d03f66d717cb796ae66756ba9388d5a0a16331539c01dc2b3c32dbffd879d6ed"
+            },
+            "after": null
+          },
+          {
+            "path": "VN5torG_zcfJYdMes0b9a/client/18aadab1e7c924d591385306d9dd9d590fdc62a1",
+            "before": {
+              "path": "VN5torG_zcfJYdMes0b9a/client/18aadab1e7c924d591385306d9dd9d590fdc62a1",
+              "type": "file",
+              "sha256": "13b8ceec5a9270ada0179dd3ef4b240ded8b5c5c18705c2e15ae8080be08f8f2"
+            },
+            "after": null
+          },
+          {
+            "path": "VN5torG_zcfJYdMes0b9a/client/19e3e2a9e603176579b3709cc0100f07f8642994",
+            "before": {
+              "path": "VN5torG_zcfJYdMes0b9a/client/19e3e2a9e603176579b3709cc0100f07f8642994",
+              "type": "file",
+              "sha256": "6dfba307091ab3d1eb3fff5116865c3bd6e8a6e9e5a7111313a9ea0aa104221a"
+            },
+            "after": null
+          },
+          {
+            "path": "VN5torG_zcfJYdMes0b9a/client/1b9eea5930e09518e2aa43e8d6688aaa5e80ed88",
+            "before": {
+              "path": "VN5torG_zcfJYdMes0b9a/client/1b9eea5930e09518e2aa43e8d6688aaa5e80ed88",
+              "type": "file",
+              "sha256": "18f18aed9242945951c96a52b523b7f9f79014b06b74dfb54d3d13727deeae1b"
+            },
+            "after": null
+          },
+          {
+            "path": "VN5torG_zcfJYdMes0b9a/client/20dd225120806ac655878ed1890b275ad92f5708",
+            "before": {
+              "path": "VN5torG_zcfJYdMes0b9a/client/20dd225120806ac655878ed1890b275ad92f5708",
+              "type": "file",
+              "sha256": "d620e74615c0603364419368134a20ad75144825dab9d786168c104cad7c62c3"
+            },
+            "after": null
+          },
+          {
+            "path": "VN5torG_zcfJYdMes0b9a/client/243519f3e768c94174360e18c275c4f1d48eff38",
+            "before": {
+              "path": "VN5torG_zcfJYdMes0b9a/client/243519f3e768c94174360e18c275c4f1d48eff38",
+              "type": "file",
+              "sha256": "eda91fb56b4cb887a7663f2ffababd34c34cd3423389b5cc7d1c7a2667a60d97"
+            },
+            "after": null
+          },
+          {
+            "path": "VN5torG_zcfJYdMes0b9a/client/259af2755d16c827ca8c99cdc8db23ee79a2a4f6",
+            "before": {
+              "path": "VN5torG_zcfJYdMes0b9a/client/259af2755d16c827ca8c99cdc8db23ee79a2a4f6",
+              "type": "file",
+              "sha256": "84d044b3d8b914c19679ba80a7f4a22bbfef0319c312bb92bb52224dd7af3921"
+            },
+            "after": null
+          },
+          {
+            "path": "VN5torG_zcfJYdMes0b9a/client/27c87a34a1eac281ae41049cac0dd0172dd3872b",
+            "before": {
+              "path": "VN5torG_zcfJYdMes0b9a/client/27c87a34a1eac281ae41049cac0dd0172dd3872b",
+              "type": "file",
+              "sha256": "c40127b5fb7e1bb9342981409bb1a9ac8f574de93b53babaa426a52602941327"
+            },
+            "after": null
+          },
+          {
+            "path": "VN5torG_zcfJYdMes0b9a/client/296ea0e6cbec0201767323b2b8704b20dd2fe304",
+            "before": {
+              "path": "VN5torG_zcfJYdMes0b9a/client/296ea0e6cbec0201767323b2b8704b20dd2fe304",
+              "type": "file",
+              "sha256": "4f96cfc89b8f4c49543744142e09022a15dcbd762a4a4972be39fe1e26731669"
+            },
+            "after": null
+          },
+          {
+            "path": "VN5torG_zcfJYdMes0b9a/client/3380ee2f62f41f0b43a98a071a473f755a4f1441",
+            "before": {
+              "path": "VN5torG_zcfJYdMes0b9a/client/3380ee2f62f41f0b43a98a071a473f755a4f1441",
+              "type": "file",
+              "sha256": "19b7889813601d8593686649373760ac57c38be76332e2481473af6047fde6f7"
+            },
+            "after": null
+          },
+          {
+            "path": "VN5torG_zcfJYdMes0b9a/client/3dd913542ec00603cf20a4841c231ff27708299a",
+            "before": {
+              "path": "VN5torG_zcfJYdMes0b9a/client/3dd913542ec00603cf20a4841c231ff27708299a",
+              "type": "file",
+              "sha256": "5f393369031ae37ea8de0c5f01dac344fd376b957e8eff7aca975919d7c39834"
+            },
+            "after": null
+          },
+          {
+            "path": "VN5torG_zcfJYdMes0b9a/client/3f9e620ebe6fa3d1ed999ed4fa30ab5a85a8d126",
+            "before": {
+              "path": "VN5torG_zcfJYdMes0b9a/client/3f9e620ebe6fa3d1ed999ed4fa30ab5a85a8d126",
+              "type": "file",
+              "sha256": "3166b257ba3648975e12724f51d7a8042ecc14d31a1ff56eb2ee4cad867420e1"
+            },
+            "after": null
+          },
+          {
+            "path": "VN5torG_zcfJYdMes0b9a/client/40f3f02d7a1a393ccba39e9ee0af7654f39f25fc",
+            "before": {
+              "path": "VN5torG_zcfJYdMes0b9a/client/40f3f02d7a1a393ccba39e9ee0af7654f39f25fc",
+              "type": "file",
+              "sha256": "f6fd4f70cedca4f024386df0031bce126e7541d46a36223f50e5443ddd2dae08"
+            },
+            "after": null
+          },
+          {
+            "path": "VN5torG_zcfJYdMes0b9a/client/45b731e1771ca4fc68f73398dba5fc4062f4eacd",
+            "before": {
+              "path": "VN5torG_zcfJYdMes0b9a/client/45b731e1771ca4fc68f73398dba5fc4062f4eacd",
+              "type": "file",
+              "sha256": "aa09a8b3fd3a879725c0a828c28084c1efb08292ffdd8bb1c4c970a0662d9be7"
+            },
+            "after": null
+          },
+          {
+            "path": "VN5torG_zcfJYdMes0b9a/client/496c2017972e8e7e5931cb891c2c8e4e4cd7cdf5",
+            "before": {
+              "path": "VN5torG_zcfJYdMes0b9a/client/496c2017972e8e7e5931cb891c2c8e4e4cd7cdf5",
+              "type": "file",
+              "sha256": "7d73292c0070f1fd9bac2faa8ddb6311ad3ec75afc6eb1ceae2d2fddb81b12db"
+            },
+            "after": null
+          },
+          {
+            "path": "VN5torG_zcfJYdMes0b9a/client/4e3495bfdef5d2a6cef4e66b9223c092b27b34b9",
+            "before": {
+              "path": "VN5torG_zcfJYdMes0b9a/client/4e3495bfdef5d2a6cef4e66b9223c092b27b34b9",
+              "type": "file",
+              "sha256": "4adc7af8287cbe81353a1d4c41ebc3a9859cae0903cd02e5a9eabf6bae6e2e32"
+            },
+            "after": null
+          },
+          {
+            "path": "VN5torG_zcfJYdMes0b9a/client/526ffc95f79606b4d9ed0214cdf1d70febe7e24f",
+            "before": {
+              "path": "VN5torG_zcfJYdMes0b9a/client/526ffc95f79606b4d9ed0214cdf1d70febe7e24f",
+              "type": "file",
+              "sha256": "9c5bd3fbd3cf27c7601e24e063a2ec345755906af64b16709a94684013b8f717"
+            },
+            "after": null
+          },
+          {
+            "path": "VN5torG_zcfJYdMes0b9a/client/54c2fbea56cbac4702be102f731cd06114580205",
+            "before": {
+              "path": "VN5torG_zcfJYdMes0b9a/client/54c2fbea56cbac4702be102f731cd06114580205",
+              "type": "file",
+              "sha256": "34d4c47eb793fc39f6bc4a5c65890ae8caa0f2cd2571be476604d0b777eecbe1"
+            },
+            "after": null
+          },
+          {
+            "path": "VN5torG_zcfJYdMes0b9a/client/5aaa8769a4cd408c0aca36675825975392579ec7",
+            "before": {
+              "path": "VN5torG_zcfJYdMes0b9a/client/5aaa8769a4cd408c0aca36675825975392579ec7",
+              "type": "file",
+              "sha256": "213800eef919324a575d0427d06db631c9150e52243067ab090d1eb28f9294c9"
+            },
+            "after": null
+          },
+          {
+            "path": "VN5torG_zcfJYdMes0b9a/client/67a29e54a2ccd24b02c0684bdfff54f86cb7268b",
+            "before": {
+              "path": "VN5torG_zcfJYdMes0b9a/client/67a29e54a2ccd24b02c0684bdfff54f86cb7268b",
+              "type": "file",
+              "sha256": "b77d0e414a37b80208f640a27ea4a708be065f361fa7e1de14406a48a6966424"
+            },
+            "after": null
+          },
+          {
+            "path": "VN5torG_zcfJYdMes0b9a/client/699af924a101f14f4fd29b6c8abea25b8cd4befa",
+            "before": {
+              "path": "VN5torG_zcfJYdMes0b9a/client/699af924a101f14f4fd29b6c8abea25b8cd4befa",
+              "type": "file",
+              "sha256": "e6ee3a347dfcfacee140821cd2cc8b9a9938202fe67a312d06752c391c4a1cab"
+            },
+            "after": null
+          },
+          {
+            "path": "VN5torG_zcfJYdMes0b9a/client/7547d7642332a219b4a50b6683e140c9b9246357",
+            "before": {
+              "path": "VN5torG_zcfJYdMes0b9a/client/7547d7642332a219b4a50b6683e140c9b9246357",
+              "type": "file",
+              "sha256": "04db8352897f86fc5caed71bc85a767fe28b60e4cd44a0454fe62230049ae55d"
+            },
+            "after": null
+          },
+          {
+            "path": "VN5torG_zcfJYdMes0b9a/client/78e90a19f460f4afe0e00760fbc8637eb9122eb3",
+            "before": {
+              "path": "VN5torG_zcfJYdMes0b9a/client/78e90a19f460f4afe0e00760fbc8637eb9122eb3",
+              "type": "file",
+              "sha256": "11d3b804b984bffd02c34f522b94e0c74d0e484b0fca5022151de5da5f2aa67d"
+            },
+            "after": null
+          },
+          {
+            "path": "VN5torG_zcfJYdMes0b9a/client/7932b9cc992c5e035ceda9da1e85631a7c26f070",
+            "before": {
+              "path": "VN5torG_zcfJYdMes0b9a/client/7932b9cc992c5e035ceda9da1e85631a7c26f070",
+              "type": "file",
+              "sha256": "24334bfc50957d61c1bb5376390153bf65d3b9e8283d36a9a2b40cf244ec8d3b"
+            },
+            "after": null
+          },
+          {
+            "path": "VN5torG_zcfJYdMes0b9a/client/7b91fe796964c6918cfc911dfe08d00ef405e4dd",
+            "before": {
+              "path": "VN5torG_zcfJYdMes0b9a/client/7b91fe796964c6918cfc911dfe08d00ef405e4dd",
+              "type": "file",
+              "sha256": "73b218ed978f62948925ba4f221044383583d34db5fbfb4ddbe32702e3f08eed"
+            },
+            "after": null
+          },
+          {
+            "path": "VN5torG_zcfJYdMes0b9a/client/7bc156c3eebe5945cae031f40323ea2612e6f510",
+            "before": {
+              "path": "VN5torG_zcfJYdMes0b9a/client/7bc156c3eebe5945cae031f40323ea2612e6f510",
+              "type": "file",
+              "sha256": "1c2fbd804e9d4439e7a7b2f1a2d8d8fff56f3ec225cd790ed6b6ca52bb0dcb73"
+            },
+            "after": null
+          },
+          {
+            "path": "VN5torG_zcfJYdMes0b9a/client/7d1595039326237daf83d96f8c3f27283cc396fe",
+            "before": {
+              "path": "VN5torG_zcfJYdMes0b9a/client/7d1595039326237daf83d96f8c3f27283cc396fe",
+              "type": "file",
+              "sha256": "143de9deddddf6fb47e23a9e0e5d23b73bca935c939b08a4f783b2fa71d77cf0"
+            },
+            "after": null
+          },
+          {
+            "path": "VN5torG_zcfJYdMes0b9a/client/8a5e43b9ab37e4534cbb27211fc0965a12b79cfe",
+            "before": {
+              "path": "VN5torG_zcfJYdMes0b9a/client/8a5e43b9ab37e4534cbb27211fc0965a12b79cfe",
+              "type": "file",
+              "sha256": "f810b545ec0743f722b1a81336cb63fc38fde299d5624ec53670819d9359b9a8"
+            },
+            "after": null
+          },
+          {
+            "path": "VN5torG_zcfJYdMes0b9a/client/921f7b49ed3ab97e02b9988e2490068b32439668",
+            "before": {
+              "path": "VN5torG_zcfJYdMes0b9a/client/921f7b49ed3ab97e02b9988e2490068b32439668",
+              "type": "file",
+              "sha256": "ea48163e8cef77eb5e42181db115fc048e09a7a53a8f6ad54b6c654ad65ca3a1"
+            },
+            "after": null
+          },
+          {
+            "path": "VN5torG_zcfJYdMes0b9a/client/969d9618b85d2dc5627ff5c7d8fe184153f50715",
+            "before": {
+              "path": "VN5torG_zcfJYdMes0b9a/client/969d9618b85d2dc5627ff5c7d8fe184153f50715",
+              "type": "file",
+              "sha256": "87383208a166e071c7791be49adaaa39adc3fca13be5bd51ea6abb0df5bc48be"
+            },
+            "after": null
+          },
+          {
+            "path": "VN5torG_zcfJYdMes0b9a/client/984c29b7e1068993857a64e7bad96920dc9ce0cb",
+            "before": {
+              "path": "VN5torG_zcfJYdMes0b9a/client/984c29b7e1068993857a64e7bad96920dc9ce0cb",
+              "type": "file",
+              "sha256": "bbd9863d0b6bd9e29462466f9825f767d485f4a2af3a36d80371a7e5b763b5cc"
+            },
+            "after": null
+          },
+          {
+            "path": "VN5torG_zcfJYdMes0b9a/client/9d191899176863990ae20371bff322c75d72e29d",
+            "before": {
+              "path": "VN5torG_zcfJYdMes0b9a/client/9d191899176863990ae20371bff322c75d72e29d",
+              "type": "file",
+              "sha256": "005a8bd5a490f0116fbc480319e8ae4f1336c7035b5a960aa244a7a1711aee1c"
+            },
+            "after": null
+          },
+          {
+            "path": "VN5torG_zcfJYdMes0b9a/client/a537b30e17ad444c4ef0d3d6541d0d308caf9720",
+            "before": {
+              "path": "VN5torG_zcfJYdMes0b9a/client/a537b30e17ad444c4ef0d3d6541d0d308caf9720",
+              "type": "file",
+              "sha256": "37bb8f6cbb6fd97e0b22cba11e3ff11193531fbf1cb7049f8e59a42654238201"
+            },
+            "after": null
+          },
+          {
+            "path": "VN5torG_zcfJYdMes0b9a/client/a86ceb9afbcde948ddbf6bd6115547c65f560aaa",
+            "before": {
+              "path": "VN5torG_zcfJYdMes0b9a/client/a86ceb9afbcde948ddbf6bd6115547c65f560aaa",
+              "type": "file",
+              "sha256": "d3c54699d08b8e26acacdc4d09d66703cc1c8ac9d15fb463169cbfdb36ac1756"
+            },
+            "after": null
+          },
+          {
+            "path": "VN5torG_zcfJYdMes0b9a/client/adf11282780ca6799230be58f6d5302d4f3bc3cc",
+            "before": {
+              "path": "VN5torG_zcfJYdMes0b9a/client/adf11282780ca6799230be58f6d5302d4f3bc3cc",
+              "type": "file",
+              "sha256": "64023431aa9d7d1d2d8f42a46b2c8aa7265d37ef25721ea5fb11b845c6227a72"
+            },
+            "after": null
+          },
+          {
+            "path": "VN5torG_zcfJYdMes0b9a/client/af490624c89fee7d8d7917a6a59748113ad0107b",
+            "before": {
+              "path": "VN5torG_zcfJYdMes0b9a/client/af490624c89fee7d8d7917a6a59748113ad0107b",
+              "type": "file",
+              "sha256": "4def21382b4e79259975fc371502691a0276bcbb9f87371ccaec39835b4be52b"
+            },
+            "after": null
+          },
+          {
+            "path": "VN5torG_zcfJYdMes0b9a/client/afa6ec8f38bec3c7d1415b8967f2ffc56461fe60",
+            "before": {
+              "path": "VN5torG_zcfJYdMes0b9a/client/afa6ec8f38bec3c7d1415b8967f2ffc56461fe60",
+              "type": "file",
+              "sha256": "ae3d3a082bb95bfc4a412caafc963584def5aeccce7a14a7658035439038a331"
+            },
+            "after": null
+          },
+          {
+            "path": "VN5torG_zcfJYdMes0b9a/client/b0e832778c6e66e05d08c176672d52bc19058ec5",
+            "before": {
+              "path": "VN5torG_zcfJYdMes0b9a/client/b0e832778c6e66e05d08c176672d52bc19058ec5",
+              "type": "file",
+              "sha256": "d3e09b6865fb99c2a2cfe8ed49575dcc6bb7caa21b5c0d941562004ca32b6d1c"
+            },
+            "after": null
+          },
+          {
+            "path": "VN5torG_zcfJYdMes0b9a/client/b49c687f935a3c2497b926ee36c73469c66ee951",
+            "before": {
+              "path": "VN5torG_zcfJYdMes0b9a/client/b49c687f935a3c2497b926ee36c73469c66ee951",
+              "type": "file",
+              "sha256": "95d77b1c3b260842c7ac2a8fb35e68d7ba2a26a583a071c820223473d936f4c3"
+            },
+            "after": null
+          },
+          {
+            "path": "VN5torG_zcfJYdMes0b9a/client/b97fe7a9c961b3d03df931fd802e772c8121b0d0",
+            "before": {
+              "path": "VN5torG_zcfJYdMes0b9a/client/b97fe7a9c961b3d03df931fd802e772c8121b0d0",
+              "type": "file",
+              "sha256": "c4c7728d368ca5c2f3ef4d9835af73679c27d60958b8bdc005b1c05313316a59"
+            },
+            "after": null
+          },
+          {
+            "path": "VN5torG_zcfJYdMes0b9a/client/bb2cf1a10470afdd0350f0582c1ac96836cea43d",
+            "before": {
+              "path": "VN5torG_zcfJYdMes0b9a/client/bb2cf1a10470afdd0350f0582c1ac96836cea43d",
+              "type": "file",
+              "sha256": "fad4bed42d3cd11fcf679cb2022d61d9285f8591d5f9a9ab67f53c8eed66a1d5"
+            },
+            "after": null
+          },
+          {
+            "path": "VN5torG_zcfJYdMes0b9a/client/be53d6e5588959fd951e591e2b31056dab9947eb",
+            "before": {
+              "path": "VN5torG_zcfJYdMes0b9a/client/be53d6e5588959fd951e591e2b31056dab9947eb",
+              "type": "file",
+              "sha256": "412e6892eed6faf85a5e39cd60a98c86b94be3100242a9fc443f48c93ab4d5de"
+            },
+            "after": null
+          },
+          {
+            "path": "VN5torG_zcfJYdMes0b9a/client/cb43ab854e5ae6a1f6faaacf8001356476e8299f",
+            "before": {
+              "path": "VN5torG_zcfJYdMes0b9a/client/cb43ab854e5ae6a1f6faaacf8001356476e8299f",
+              "type": "file",
+              "sha256": "3641150934641c66b7ed0a5a15caf6a9e82e81e63740e9fe70783a5415404a26"
+            },
+            "after": null
+          },
+          {
+            "path": "VN5torG_zcfJYdMes0b9a/client/cd102348e4af38c6ec4103e7f0f0e17c856b28b5",
+            "before": {
+              "path": "VN5torG_zcfJYdMes0b9a/client/cd102348e4af38c6ec4103e7f0f0e17c856b28b5",
+              "type": "file",
+              "sha256": "2433eb08f7ca02126651395d84af6ddeb4a5b1d5818acd92671a28f2d15e2ce7"
+            },
+            "after": null
+          },
+          {
+            "path": "VN5torG_zcfJYdMes0b9a/client/d054ef3187475647bd206d16cae29d4dfacac12d",
+            "before": {
+              "path": "VN5torG_zcfJYdMes0b9a/client/d054ef3187475647bd206d16cae29d4dfacac12d",
+              "type": "file",
+              "sha256": "015f6ea5320a5a49301ce18cc382fda8a46e94718ac0f7ef5c089fb3314337fb"
+            },
+            "after": null
+          },
+          {
+            "path": "VN5torG_zcfJYdMes0b9a/client/d1cffb7350edcbfa035680c14c47ac1df2a712b9",
+            "before": {
+              "path": "VN5torG_zcfJYdMes0b9a/client/d1cffb7350edcbfa035680c14c47ac1df2a712b9",
+              "type": "file",
+              "sha256": "383b9a5fa67cdf5df6c076308be84d459a93d4b2b6647c098e325ad9ee65bfb4"
+            },
+            "after": null
+          },
+          {
+            "path": "VN5torG_zcfJYdMes0b9a/client/d28dd6456233c1677a3060747bb6e70fe78edbfc",
+            "before": {
+              "path": "VN5torG_zcfJYdMes0b9a/client/d28dd6456233c1677a3060747bb6e70fe78edbfc",
+              "type": "file",
+              "sha256": "da22fbc87e3bddcbe7c129ce8e7781d41a4d5667042ff12c33da916ecc10a531"
+            },
+            "after": null
+          },
+          {
+            "path": "VN5torG_zcfJYdMes0b9a/client/d2ffe32fb72fba73515b5a06e32b04e951213e98",
+            "before": {
+              "path": "VN5torG_zcfJYdMes0b9a/client/d2ffe32fb72fba73515b5a06e32b04e951213e98",
+              "type": "file",
+              "sha256": "86c2023d3d52a42b4fd01899471b414c564f41aa077bd324e26df1cd8ad34200"
+            },
+            "after": null
+          },
+          {
+            "path": "VN5torG_zcfJYdMes0b9a/client/d36183e4a31c9630809ccce3b3e26ad7fa9b2b12",
+            "before": {
+              "path": "VN5torG_zcfJYdMes0b9a/client/d36183e4a31c9630809ccce3b3e26ad7fa9b2b12",
+              "type": "file",
+              "sha256": "3aad08c10fb138cbb1ea9f0f30a6cc7f7c2687397e3a5e721ff6fb0034ca2c2f"
+            },
+            "after": null
+          },
+          {
+            "path": "VN5torG_zcfJYdMes0b9a/client/dcfecd603e42b0814efae291a12288851f5fb274",
+            "before": {
+              "path": "VN5torG_zcfJYdMes0b9a/client/dcfecd603e42b0814efae291a12288851f5fb274",
+              "type": "file",
+              "sha256": "9cb4fbdb8b59cd6209bc4f2a31346dcb95fbd6f1bd71741f3133c0103e21bd35"
+            },
+            "after": null
+          },
+          {
+            "path": "VN5torG_zcfJYdMes0b9a/client/df9cab6a55a66a6ceedba2a62fab657c245cba8a",
+            "before": {
+              "path": "VN5torG_zcfJYdMes0b9a/client/df9cab6a55a66a6ceedba2a62fab657c245cba8a",
+              "type": "file",
+              "sha256": "a1c8d371bd7de061836d2301acba379e98b57dab4cb00fa18a71aff9a320a760"
+            },
+            "after": null
+          },
+          {
+            "path": "VN5torG_zcfJYdMes0b9a/client/e2f784020021ff01bb8ed1c6ab8f90ac90273df7",
+            "before": {
+              "path": "VN5torG_zcfJYdMes0b9a/client/e2f784020021ff01bb8ed1c6ab8f90ac90273df7",
+              "type": "file",
+              "sha256": "c5ce5074d8103326f0c8163f6ceae105ed72cadb5600fd9e2d116001cd6853f4"
+            },
+            "after": null
+          },
+          {
+            "path": "VN5torG_zcfJYdMes0b9a/client/e32b606354887cde6ddd55eda91d38b4c2ef44d8",
+            "before": {
+              "path": "VN5torG_zcfJYdMes0b9a/client/e32b606354887cde6ddd55eda91d38b4c2ef44d8",
+              "type": "file",
+              "sha256": "7992be34b2ae54e2c11a988b5e909dd6a0010251af2d21471877375889b1b2b8"
+            },
+            "after": null
+          },
+          {
+            "path": "VN5torG_zcfJYdMes0b9a/client/e62a5377d53c29f414fc666e580ce9720f168673",
+            "before": {
+              "path": "VN5torG_zcfJYdMes0b9a/client/e62a5377d53c29f414fc666e580ce9720f168673",
+              "type": "file",
+              "sha256": "3b391e66ea34929586b506f34da2b08f21eccf9968560395c475693142d07d74"
+            },
+            "after": null
+          },
+          {
+            "path": "VN5torG_zcfJYdMes0b9a/client/e99cd608d0d7995e5b0be6319955c02ecb817761",
+            "before": {
+              "path": "VN5torG_zcfJYdMes0b9a/client/e99cd608d0d7995e5b0be6319955c02ecb817761",
+              "type": "file",
+              "sha256": "7a456cbe198b87913afa7283adc23a8db22ba32719fe29cab6957882aed313a7"
+            },
+            "after": null
+          },
+          {
+            "path": "VN5torG_zcfJYdMes0b9a/client/e9fd5c72a30c8567681628798c105ca838956cbf",
+            "before": {
+              "path": "VN5torG_zcfJYdMes0b9a/client/e9fd5c72a30c8567681628798c105ca838956cbf",
+              "type": "file",
+              "sha256": "860e6a254db7047a85ccfcb8555042561a8255406eb3f197036b615d74662878"
+            },
+            "after": null
+          },
+          {
+            "path": "VN5torG_zcfJYdMes0b9a/client/eac430780548beb1cbb14f60c637cf273fe91f29",
+            "before": {
+              "path": "VN5torG_zcfJYdMes0b9a/client/eac430780548beb1cbb14f60c637cf273fe91f29",
+              "type": "file",
+              "sha256": "5e5f1992d0b812197b935eff9eed30cf4f73daffdec56f9eb3f2d8c5848e8f52"
+            },
+            "after": null
+          },
+          {
+            "path": "VN5torG_zcfJYdMes0b9a/client/f78fea7de86c1b28dae84914a554dd16d267a86d",
+            "before": {
+              "path": "VN5torG_zcfJYdMes0b9a/client/f78fea7de86c1b28dae84914a554dd16d267a86d",
+              "type": "file",
+              "sha256": "1fa6d18d7be979d288a6ee59e3d28f50ff19ea3d133eda60543cf70973900848"
+            },
+            "after": null
+          },
+          {
+            "path": "VN5torG_zcfJYdMes0b9a/client/f97391db6202c7f6b81af3ba41081a00b854f7a8",
+            "before": {
+              "path": "VN5torG_zcfJYdMes0b9a/client/f97391db6202c7f6b81af3ba41081a00b854f7a8",
+              "type": "file",
+              "sha256": "ecd5cc00037ace7ca1af4141dab8e916805051f21cc8c579a121924c31b2cfe0"
+            },
+            "after": null
+          }
+        ]
+      },
+      {
+        "path": "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\stage-w1d-20261115-pair\\execution-npm-cache",
+        "changes": []
+      }
+    ],
+    "installationEnvironment": [
+      {
+        "path": "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\stage-w1d-20261115-pair\\new-install-cache",
+        "changes": []
+      },
+      {
+        "path": "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\stage-w1d-20261115-pair\\new-install-temp",
+        "changes": []
+      }
+    ]
+  }
+]

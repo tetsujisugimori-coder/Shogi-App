@@ -1,0 +1,20 @@
+# Independent review record (W1h)
+
+## Final submitted independent review outcome (2026-11-18; supersedes historical PENDING statements)
+**PARTIAL / result B / limited P2-W1g-01 and P3-W1g-02 CLOSED; merge recommendation NO; PR #218 Draft.** Reviewer B independently re-fetched the fixed submitted HEAD `cd8811983222039681cad20ff026a940c5948f1a` (tree `5201f152e1940f7c9102a655b71ca7ec845c82da`) into a separate verification area and reported **225 PASS / 0 FAIL / 0 SKIP**, exact Git-byte/size/SHA verification of 71 submitted paths, and a matching 70-entry non-self manifest. The definitive record is the [submitted-version independent review](https://github.com/tetsujisugimori-coder/Shogi-App/pull/218#pullrequestreview-5958805338), alongside the [final report](https://github.com/tetsujisugimori-coder/Shogi-App/pull/218#issuecomment-6981873433) and [CI completion addendum](https://github.com/tetsujisugimori-coder/Shogi-App/pull/218#issuecomment-6981900289). Final [product CI](https://github.com/tetsujisugimori-coder/Shogi-App/actions/runs/44326699142) and [verifier CI](https://github.com/tetsujisugimori-coder/Shogi-App/actions/runs/44326698834) completed SUCCESS (Ubuntu 2,587 PASS; macOS 2,585 PASS + 2 existing SKIP).
+**Limits remain:** This is technical separation under the same owner/account/host, not third-party human independence; the recorded 225 checks do not establish operational source authentication or permission to start fixed comparisons. New Level 2 raw records lack confirmed permanent storage and independent retrieval; publication-path handling remains P3 OPEN. Comparison gate BLOCKED; formal old 0 / new 0; S4/S5 NOT_TESTED; R8/H1–H4 UNKNOWN. Draft and merge NO remain unchanged.
+**Historical note:** The "pending" and earlier intermediate run statements retained below are faithful snapshots from before the submitted-version review, not the current decision. No original RED/GREEN record or historical statement has been removed.
+
+B is a separate AI agent/session and verification area, with shared owner, credentials, host and filesystem. SOLO_STANDARD technical separation, not third-party human independence. B directly inspected code and executed independent inputs rather than adopting A's PASS claims.
+
+## Findings and same-input correction
+- B-P2-01: malformed `ready.sha256.json` could make launch's catch append an event into an unidentified output. Independent harmless fixture reproduced added file. Fixed: launch errors return structured rejection without writes. Same input now UNKNOWN with unchanged output set. CLOSED in local code review.
+- B-P3-01: JS regex coercion accepted array HEAD/tree in the seal schema. Reproduced by B. Explicit string checks added, same input now SEAL_SCHEMA_INVALID. Producer and validator reject. CLOSED in local code review.
+- Additional entry inventory: historical W1d/e/f probes can collect through parent/child routes. Guard added before any output or target import. Six direct synthetic rejection cases, no fixed target execution. Review of final submitted version pending.
+
+B's first related run: 211 passed, no failures/skips, exit 0. This precedes the six historical-probe cases and is not a final-head result. Fixed GitHub retrieval and final-head rerun are separate pending steps; final PR review/comment is authoritative for their outcome.
+
+P2-W1g-01 and P3-W1g-02 final CLOSED decisions await B's final submitted-version check. No claim of full independent authentication, kernel provenance, exclusive writer, semantic consumer chain or config equivalence. Old P2 closures unchanged absent new evidence.
+
+## Publication limitation
+Two initial synthetic RED logs included local workspace path strings in stack traces. Public representations are now path-redacted, with raw/public digests in publication-redactions.json and original bytes retained privately. Prior Git history is not rewritten. No credentials or secret experiment text was involved; historical publication cannot be claimed erased. Information-handling P3 remains OPEN.

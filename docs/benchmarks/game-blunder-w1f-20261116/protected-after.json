@@ -1,0 +1,115 @@
+{
+  "checks": [
+    {
+      "root": "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\stage-w1-snapshots",
+      "entries": 35054,
+      "unchanged": true
+    },
+    {
+      "root": "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\stage-w1c-20261115-01",
+      "entries": 2795,
+      "unchanged": true
+    },
+    {
+      "root": "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\stage-w1c-20261115-02",
+      "entries": 2794,
+      "unchanged": true
+    },
+    {
+      "root": "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\stage-w1c-20261115-03",
+      "entries": 36070,
+      "unchanged": true
+    },
+    {
+      "root": "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\stage-w1d-20261115-collection",
+      "entries": 77,
+      "unchanged": true
+    },
+    {
+      "root": "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\stage-w1d-20261115-final-ci",
+      "entries": 15,
+      "unchanged": true
+    },
+    {
+      "root": "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\stage-w1d-20261115-generated-controls",
+      "entries": 910,
+      "unchanged": true
+    },
+    {
+      "root": "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\stage-w1d-20261115-generated-final",
+      "entries": 910,
+      "unchanged": true
+    },
+    {
+      "root": "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\stage-w1d-20261115-generated-timing-final",
+      "entries": 909,
+      "unchanged": true
+    },
+    {
+      "root": "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\stage-w1d-20261115-offline",
+      "entries": 9354,
+      "unchanged": true
+    },
+    {
+      "root": "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\stage-w1d-20261115-pair",
+      "entries": 36071,
+      "unchanged": true
+    },
+    {
+      "root": "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\stage-w1d-20261115-runtime",
+      "entries": 221,
+      "unchanged": true
+    },
+    {
+      "root": "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\stage-w1d-20261115-supplemental",
+      "entries": 344,
+      "unchanged": true
+    },
+    {
+      "root": "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\stage-w1e-20261116",
+      "entries": 40493,
+      "unchanged": true
+    },
+    {
+      "root": "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\w1c-final-ci-13a5b9f",
+      "entries": 8,
+      "unchanged": true
+    },
+    {
+      "root": "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\repo\\.tmp-tests",
+      "entries": 6817,
+      "unchanged": true
+    },
+    {
+      "root": "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\repo\\docs\\benchmarks\\game-blunder-w1b-review-20261115",
+      "entries": 1755,
+      "unchanged": true
+    },
+    {
+      "root": "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\repo\\docs\\benchmarks\\game-blunder-w1c-20261115",
+      "entries": 1707,
+      "unchanged": true
+    },
+    {
+      "root": "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\repo\\docs\\benchmarks\\game-blunder-w1d-20261115",
+      "entries": 514,
+      "unchanged": true
+    },
+    {
+      "root": "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\repo\\docs\\benchmarks\\game-blunder-w1e-20261116",
+      "entries": 110,
+      "unchanged": true
+    },
+    {
+      "root": "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\repo\\docs\\benchmarks\\game-blunder-windows-stage-w1-20261112",
+      "entries": 117,
+      "unchanged": true
+    },
+    {
+      "root": "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\repo\\docs\\benchmarks\\game-blunder-windows-stage-w1b-20261112",
+      "entries": 139,
+      "unchanged": true
+    }
+  ],
+  "allUnchanged": true
+}

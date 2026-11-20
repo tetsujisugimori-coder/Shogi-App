@@ -1,0 +1,27 @@
+✔ zero (1.8229ms)
+✔ missing file (0.2549ms)
+✔ count mismatch (0.1827ms)
+✔ unfinished suite (0.227ms)
+✔ failure with zero exit (0.231ms)
+✔ normal duplicates (0.1511ms)
+✔ unverified inventory cannot pass (0.1675ms)
+✔ failure survives contradictory count (0.1832ms)
+✔ zero suite counts (0.1997ms)
+✔ false failed suite (0.2273ms)
+✔ runtime extensions (0.2089ms)
+✔ runtime count wrong type (0.1336ms)
+✔ runtime errors wrong type (0.0866ms)
+✔ runtime extension contradiction (0.0686ms)
+✔ real runtime errors without JSON extensions (0.1226ms)
+✔ external verified flag insufficient (0.1099ms)
+✔ malformed nested records rejected (0.0839ms)
+✔ malformed inventory rejected (0.1259ms)
+✔ runtime suite failure survives JSON success (0.1073ms)
+ℹ tests 19
+ℹ suites 0
+ℹ pass 19
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 13.0144

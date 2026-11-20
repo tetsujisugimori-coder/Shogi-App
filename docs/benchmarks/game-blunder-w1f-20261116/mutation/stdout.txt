@@ -1,0 +1,1 @@
+{"mutation":"force final aggregate status PASS","expected":"regression process exit 1","exitCode":1,"detected":true,"retained":"C:\\Users\\tetsu\\AppData\\Local\\Packages\\openai.codex_2p2nqsd0c76g0\\AC\\#!sandbox.{8395f72f-ced2-4d09-90a4-3b1497bcc22d}\\Temp\\shogi-w1c-mutant-n5wIo2"}

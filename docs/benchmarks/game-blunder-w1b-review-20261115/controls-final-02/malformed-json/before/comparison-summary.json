@@ -1,0 +1,9 @@
+{
+  "runs": [
+    {
+      "name": "run-01",
+      "status": "INVALID",
+      "reason": "malformed result JSON"
+    }
+  ]
+}

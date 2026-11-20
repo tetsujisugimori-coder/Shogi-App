@@ -1,0 +1,92 @@
+{
+  "environment": "exec_command require_escalated",
+  "temp": "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\repo\\.tmp-tests\\review-20261111",
+  "runs": [
+    {
+      "runnerTimeout": 5000,
+      "seconds": 1.821884,
+      "file": "src/test/match-journal.test.ts",
+      "run": "single-1-0",
+      "exitCode": 0,
+      "workers": 1,
+      "pattern": "accepts terminal PV shorter"
+    },
+    {
+      "runnerTimeout": 5000,
+      "seconds": 2.2620983,
+      "file": "src/test/shogi-two-ply-minimax-ai.test.ts",
+      "run": "single-1-1",
+      "exitCode": 0,
+      "workers": 1,
+      "pattern": "深さ3の途中で詰み"
+    },
+    {
+      "files": [
+        "src/test/match-journal.test.ts",
+        "src/test/shogi-two-ply-minimax-ai.test.ts"
+      ],
+      "runnerTimeout": 5000,
+      "seconds": 2.3765563,
+      "run": "parallel-1-5000",
+      "exitCode": 0,
+      "workers": 2,
+      "pattern": "accepts terminal PV shorter|深さ3の途中で詰み"
+    },
+    {
+      "files": [
+        "src/test/match-journal.test.ts",
+        "src/test/shogi-two-ply-minimax-ai.test.ts"
+      ],
+      "runnerTimeout": 15000,
+      "seconds": 2.2614514,
+      "run": "parallel-1-15000",
+      "exitCode": 0,
+      "workers": 2,
+      "pattern": "accepts terminal PV shorter|深さ3の途中で詰み"
+    },
+    {
+      "runnerTimeout": 5000,
+      "seconds": 1.8079936,
+      "file": "src/test/match-journal.test.ts",
+      "run": "single-2-0",
+      "exitCode": 0,
+      "workers": 1,
+      "pattern": "accepts terminal PV shorter"
+    },
+    {
+      "runnerTimeout": 5000,
+      "seconds": 2.2313635,
+      "file": "src/test/shogi-two-ply-minimax-ai.test.ts",
+      "run": "single-2-1",
+      "exitCode": 0,
+      "workers": 1,
+      "pattern": "深さ3の途中で詰み"
+    },
+    {
+      "files": [
+        "src/test/match-journal.test.ts",
+        "src/test/shogi-two-ply-minimax-ai.test.ts"
+      ],
+      "runnerTimeout": 5000,
+      "seconds": 2.2916991,
+      "run": "parallel-2-5000",
+      "exitCode": 0,
+      "workers": 2,
+      "pattern": "accepts terminal PV shorter|深さ3の途中で詰み"
+    },
+    {
+      "files": [
+        "src/test/match-journal.test.ts",
+        "src/test/shogi-two-ply-minimax-ai.test.ts"
+      ],
+      "runnerTimeout": 15000,
+      "seconds": 2.2639443,
+      "run": "parallel-2-15000",
+      "exitCode": 0,
+      "workers": 2,
+      "pattern": "accepts terminal PV shorter|深さ3の途中で詰み"
+    }
+  ],
+  "head": "1edc169cc9ff27b7c77e825e95b893e5b0252ed1",
+  "cache": "retained shared workspace cache"
+}

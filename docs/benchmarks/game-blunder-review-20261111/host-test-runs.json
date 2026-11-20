@@ -1,0 +1,76 @@
+[
+  {
+    "exitCode": 1,
+    "head": "1edc169cc9ff27b7c77e825e95b893e5b0252ed1",
+    "temp": "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\repo\\.tmp-tests\\review-20261111",
+    "workers": 2,
+    "runnerTimeout": 5000,
+    "name": "host-full-5s-1",
+    "cache": "retained shared workspace cache",
+    "command": [
+      "node",
+      "node_modules/vitest/vitest.mjs",
+      "run",
+      "--reporter=default",
+      "--reporter=json",
+      "--outputFile=docs/benchmarks/game-blunder-review-20261111/host-full-5s-1.json"
+    ],
+    "environment": "exec_command require_escalated",
+    "seconds": 220.2038042
+  },
+  {
+    "exitCode": 0,
+    "head": "1edc169cc9ff27b7c77e825e95b893e5b0252ed1",
+    "temp": "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\repo\\.tmp-tests\\review-20261111",
+    "workers": 2,
+    "runnerTimeout": 5000,
+    "name": "host-full-5s-2",
+    "cache": "retained shared workspace cache",
+    "command": [
+      "node",
+      "node_modules/vitest/vitest.mjs",
+      "run",
+      "--reporter=default",
+      "--reporter=json",
+      "--outputFile=docs/benchmarks/game-blunder-review-20261111/host-full-5s-2.json"
+    ],
+    "environment": "exec_command require_escalated",
+    "seconds": 173.7112683
+  },
+  {
+    "seconds": 27.8545355,
+    "environment": "exec_command require_escalated",
+    "name": "lint",
+    "command": [
+      "npm",
+      "run",
+      "lint"
+    ],
+    "exitCode": 0,
+    "head": "1edc169cc9ff27b7c77e825e95b893e5b0252ed1"
+  },
+  {
+    "seconds": 13.9252702,
+    "environment": "exec_command require_escalated",
+    "name": "build",
+    "command": [
+      "npm",
+      "run",
+      "build"
+    ],
+    "exitCode": 0,
+    "head": "1edc169cc9ff27b7c77e825e95b893e5b0252ed1"
+  },
+  {
+    "seconds": 0.4570931,
+    "environment": "exec_command require_escalated",
+    "name": "verify-lock",
+    "command": [
+      "npm",
+      "run",
+      "verify:lock"
+    ],
+    "exitCode": 0,
+    "head": "1edc169cc9ff27b7c77e825e95b893e5b0252ed1"
+  }
+]

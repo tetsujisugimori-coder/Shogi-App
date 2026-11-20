@@ -1,0 +1,18 @@
+{
+  "at": "2026-11-15T14:46:26.526Z",
+  "status": "NOT_READY",
+  "comparison": "NOT_TESTED",
+  "comparisonSpawns": {
+    "old": 0,
+    "new": 0
+  },
+  "S4": "NOT_TESTED",
+  "S5": "NOT_TESTED",
+  "blocking": [
+    "Observed TEMP lifecycle: 65 generated entries per target, differing random directories and hashes; full content/lifecycle constraints not established.",
+    "Default Vitest results cache writes duration/result state; no validated transition allowance."
+  ],
+  "allowance": "NONE; complete dependency/environment seals retained",
+  "notBlockedByAuthorization": true,
+  "meaning": "Safety/equivalence gate unmet, not missing user permission or inaccessible GitHub."
+}

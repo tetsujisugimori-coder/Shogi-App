@@ -1,0 +1,38 @@
+{
+  "mode": "run",
+  "runId": "c17880aa-cbf9-476b-b320-bd592278042f",
+  "trialId": "dd4a2ef8-4f53-4317-b3bf-19d8e896b655",
+  "preflightSha256": "9c3366234beee44dccf639c50fdf19cf56b8b20aa2efb23155aec2da3d20ba15",
+  "dir": "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\repo\\.tmp-tests\\w1b-review-20261115-final-02\\b",
+  "output": "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\repo\\docs\\benchmarks\\game-blunder-w1b-review-20261115\\controls-final-02\\connected-normal\\trial-1",
+  "filters": [],
+  "command": [
+    "createVitest",
+    "test",
+    "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\repo\\.tmp-tests\\w1b-review-20261115-final-02\\b"
+  ],
+  "inventorySha256": "75b31614d3887e0cae521155f0cc9382a507bd82a07b1d2cb558a0ed01c1fa61",
+  "expectedSettings": {
+    "pool": "forks",
+    "maxWorkers": 2,
+    "testTimeout": 5000,
+    "hookTimeout": 10000,
+    "isolate": true,
+    "environment": "node",
+    "cache": false,
+    "cacheDir": "C:/Users/tetsu/Documents/ChatGPT/将棋アプリ/repo/.tmp-tests/w1b-review-20261115-final-02/cache/vitest/da39a3ee5e6b4b0d3255bfef95601890afd80709",
+    "setupFiles": [],
+    "node": "v24.20.0",
+    "nodePath": "C:\\Program Files\\nodejs\\node.exe",
+    "npm": "11.17.0",
+    "npmCache": "C:\\Users\\tetsu\\AppData\\Roaming\\npm-cache",
+    "TEMP": "C:\\Users\\tetsu\\AppData\\Local\\Temp",
+    "TMP": "C:\\Users\\tetsu\\AppData\\Local\\Temp",
+    "cwd": "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\repo\\.tmp-tests\\w1b-review-20261115-final-02\\b",
+    "command": [
+      "createVitest",
+      "test",
+      "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\repo\\.tmp-tests\\w1b-review-20261115-final-02\\b"
+    ]
+  }
+}

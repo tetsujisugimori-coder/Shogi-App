@@ -1,0 +1,60 @@
+[
+  {
+    "name": "interrupted-runtime",
+    "input": "retained derivative copy of accepted normal",
+    "expected": "INVALID / exit 1 / new comparison events 0",
+    "actual": {
+      "status": "INVALID",
+      "reason": "Error: changed or missing runtime.json"
+    },
+    "exitCode": 1,
+    "comparisonEventsBefore": 2,
+    "comparisonEventsAfter": 2,
+    "newComparisonEvents": 0
+  },
+  {
+    "name": "missing-completion",
+    "input": "retained derivative copy of accepted normal",
+    "expected": "INVALID / exit 1 / new comparison events 0",
+    "actual": {
+      "status": "INVALID",
+      "reason": "Error: ENOENT: no such file or directory, open 'C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\repo\\docs\\benchmarks\\game-blunder-w1c-20261115\\offline-final\\missing-completion\\comparison.json'"
+    },
+    "exitCode": 1,
+    "comparisonEventsBefore": 2,
+    "comparisonEventsAfter": 2,
+    "newComparisonEvents": 0
+  },
+  {
+    "name": "another-trial-result",
+    "input": "retained derivative copy of accepted normal",
+    "expected": "INVALID / exit 1 / new comparison events 0",
+    "actual": {
+      "status": "INVALID",
+      "reason": "Error: changed or missing runtime.json"
+    },
+    "exitCode": 1,
+    "comparisonEventsBefore": 2,
+    "comparisonEventsAfter": 2,
+    "newComparisonEvents": 0
+  },
+  {
+    "name": "truncated-log",
+    "input": "retained derivative copy of accepted normal",
+    "expected": "INVALID / exit 1 / new comparison events 0",
+    "actual": {
+      "status": "INVALID",
+      "reason": "Error: changed or missing stderr.log"
+    },
+    "exitCode": 1,
+    "comparisonEventsBefore": 2,
+    "comparisonEventsAfter": 2,
+    "newComparisonEvents": 0
+  },
+  {
+    "name": "existing output reuse CLI",
+    "expected": "exit 1 / new comparison events 0",
+    "exitCode": 1,
+    "newComparisonEvents": 0
+  }
+]

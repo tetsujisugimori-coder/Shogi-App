@@ -1,0 +1,16 @@
+{
+  "start": "2026-11-18T15:37:07.330777+00:00",
+  "end": "2026-11-18T15:37:07.505660+00:00",
+  "command": [
+    "python",
+    "-B",
+    "scripts/stage-w1i-custody-test.py"
+  ],
+  "timeout_seconds": 60,
+  "retry": 0,
+  "exit": 0,
+  "environment": "Linux-6.18.57-x86_64-with-glibc2.41",
+  "python": "3.12.14",
+  "code_sha": "01101f32a111835fa64a205b762f2c794796e4c232e717ccd6238337a01e9664",
+  "test_sha": "b8cdb5a57511f646eb0d3d3fc56253477685cb0478b3255b6a8473e610cfc8aa"
+}

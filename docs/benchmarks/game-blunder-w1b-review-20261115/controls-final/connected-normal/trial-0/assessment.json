@@ -1,0 +1,42 @@
+{
+  "runId": "b844c8fc-9b83-4d41-9e79-59bbeed0ebc6",
+  "trialId": "65270864-6c38-460a-b410-798d9e0783e6",
+  "exitCode": 0,
+  "provenanceVerified": true,
+  "assessment": {
+    "status": "PASS",
+    "invalid": [],
+    "incomplete": [],
+    "failures": [],
+    "counts": {
+      "total": 2,
+      "passed": 2,
+      "failed": 0,
+      "skipped": 0,
+      "todo": 0
+    },
+    "tests": [
+      {
+        "file": "C:/Users/tetsu/Documents/ChatGPT/将棋アプリ/repo/.tmp-tests/w1b-review-20261115-final/a/tiny.test.js",
+        "name": "outer inner same",
+        "status": "passed"
+      },
+      {
+        "file": "C:/Users/tetsu/Documents/ChatGPT/将棋アプリ/repo/.tmp-tests/w1b-review-20261115-final/a/tiny.test.js",
+        "name": "outer inner same",
+        "status": "passed"
+      }
+    ]
+  },
+  "bindings": {
+    "vitest.json": "0ce5aaad52ed5a76b72621f411205adf48fdb9a43150437476b8c51ac97aae66",
+    "runtime.json": "43a2b5dbf6085cf2b71e29b654bdfb5634793d6060817c9c28d43f9dc164e374",
+    "settings.json": "5ba58986e6cbd779ad049f420091eb59378a9b6c38673247a16f468a030323ab",
+    "request.json": "a660294335f4040b2d972885bf9980ccf30d198057fe9dcceba813e5092bf85e",
+    "stdout.log": "eb03641611517c2773b36966d0a05eb28d64d1e62324398e7cbfe980c1fb3bca",
+    "stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "exit.json": "07818db839063759e30a47b4d4da8f02386c8d4ed547f5408f3e127a77f95ad6"
+  },
+  "preflightSha256": "502d14d5b46659aba0a5989a3dba9eca356b8bdb85c2d876e50fc9a2ccfc9027",
+  "inventorySha256": "2443e52f59cc58c9547577f2778eb28f404281714d4a90df01428cb5ca810953"
+}

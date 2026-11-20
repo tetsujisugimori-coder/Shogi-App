@@ -1,0 +1,35 @@
+{
+  "runs": [
+    {
+      "name": "run-01",
+      "head": "old",
+      "exitCode": 0,
+      "status": "FAIL",
+      "invalid": [
+        "failures with zero exit code",
+        "success disagrees with exit code or failures"
+      ],
+      "incomplete": [],
+      "failures": [
+        {
+          "file": "a.test.ts",
+          "name": null,
+          "kind": "suite"
+        },
+        {
+          "file": "a.test.ts",
+          "name": "one",
+          "kind": "test"
+        }
+      ],
+      "counts": {
+        "total": 2,
+        "passed": 1,
+        "failed": 1,
+        "skipped": 0,
+        "todo": 0
+      },
+      "signals": []
+    }
+  ]
+}

@@ -1,0 +1,13 @@
+{
+  "command": [
+    "C:\\Program Files\\nodejs\\node.exe",
+    "scripts/stage-w1d-generated-check.mjs",
+    "../stage-w1d-20261115-generated-timing-final"
+  ],
+  "cwd": "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\repo",
+  "started": "2026-11-15T14:43:12.567Z",
+  "finished": "2026-11-15T14:43:30.770Z",
+  "exitCode": 0,
+  "signal": null,
+  "error": null
+}

@@ -1,0 +1,97 @@
+{
+  "mode": "run",
+  "runId": "358c9bda-a312-4d83-989d-6e54d18117be",
+  "trialId": "fd15aee9-b75a-4b37-88b7-6629105853d0",
+  "preflightSha256": "889d33920d339533132ca2a3b2b88ed0545a6ab828f8ed08da4d2a96cabe70d9",
+  "target": {
+    "repo": "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\stage-w1f-20261116\\runtime-retry\\runtime-error\\source",
+    "dir": "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\stage-w1f-20261116\\runtime-retry\\runtime-error\\b",
+    "head": "45c4f7d58214637fa6273aeaca77c6dfe5dac6e3"
+  },
+  "observation": {
+    "dir": "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\stage-w1f-20261116\\runtime-retry\\runtime-error\\b",
+    "head": "45c4f7d58214637fa6273aeaca77c6dfe5dac6e3",
+    "source": [
+      {
+        "path": "package-lock.json",
+        "sha256": "5e8430b71c59da6d0bf9018c0c2910312da375a97ff194b2e332903844c97c57"
+      },
+      {
+        "path": "package.json",
+        "sha256": "3ca9d4afd21425087cf31893b8f9f63c81b0b8408db5e343ca76e5f8aa26ab9a"
+      },
+      {
+        "path": "tiny.test.js",
+        "sha256": "4ddb300f0bbe2d7ebe1180726862575ef314ad5ee7e28c818e4c2c91e4c8597e"
+      },
+      {
+        "path": "vitest.config.mjs",
+        "sha256": "9b981c44129a7dcd004873c8b9f6b65d6e4a42f434a9d1b12c17dd8feeb8545f"
+      }
+    ],
+    "sourceSha256": "c904a80195b8921d1950660e0ce8bf4d24b566413359bfc65de17dd616eff16e",
+    "dependencyRoot": "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\repo\\node_modules",
+    "dependencyCount": 14934,
+    "dependenciesSha256": "51899a816445582ccf5f88f12c1daedcf0e10c8f5be9a656294ca8031ee074be",
+    "lockSha256": "5e8430b71c59da6d0bf9018c0c2910312da375a97ff194b2e332903844c97c57",
+    "vitest": "4.1.11"
+  },
+  "environment": {
+    "TEMP": "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\stage-w1f-20261116\\runtime-retry\\runtime-error\\temp",
+    "TMP": "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\stage-w1f-20261116\\runtime-retry\\runtime-error\\temp",
+    "npm_config_cache": "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\stage-w1f-20261116\\runtime-retry\\runtime-error\\npm-cache"
+  },
+  "isolationPlan": {
+    "environment": {
+      "TEMP": "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\stage-w1f-20261116\\runtime-retry\\runtime-error\\temp",
+      "TMP": "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\stage-w1f-20261116\\runtime-retry\\runtime-error\\temp",
+      "npm_config_cache": "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\stage-w1f-20261116\\runtime-retry\\runtime-error\\npm-cache"
+    },
+    "isolationPaths": [
+      "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\stage-w1f-20261116\\runtime-retry\\runtime-error\\cache"
+    ]
+  },
+  "environmentTrees": {
+    "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\stage-w1f-20261116\\runtime-retry\\runtime-error\\cache": [],
+    "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\stage-w1f-20261116\\runtime-retry\\runtime-error\\npm-cache": [],
+    "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\stage-w1f-20261116\\runtime-retry\\runtime-error\\temp": []
+  },
+  "dir": "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\stage-w1f-20261116\\runtime-retry\\runtime-error\\b",
+  "output": "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\repo\\docs\\benchmarks\\game-blunder-w1f-20261116\\runtime-retry\\runtime-error\\record\\trial-1",
+  "filters": [],
+  "command": [
+    "createVitest",
+    "test",
+    "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\stage-w1f-20261116\\runtime-retry\\runtime-error\\b"
+  ],
+  "inventorySha256": "0f904be1ba2acd7382b69c774f7b933f04b9d35dfa5edf1db2b0dc92e5d8ffec",
+  "expectedSettings": {
+    "pool": "forks",
+    "maxWorkers": 2,
+    "testTimeout": 5000,
+    "hookTimeout": 10000,
+    "isolate": true,
+    "fileParallelism": true,
+    "environment": "node",
+    "cache": false,
+    "cacheDir": "C:/Users/tetsu/Documents/ChatGPT/将棋アプリ/stage-w1f-20261116/runtime-retry/runtime-error/cache/vitest/da39a3ee5e6b4b0d3255bfef95601890afd80709",
+    "setupFiles": [],
+    "node": "v24.20.0",
+    "nodePath": "C:\\Program Files\\nodejs\\node.exe",
+    "npm": "11.17.0",
+    "npmCache": "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\stage-w1f-20261116\\runtime-retry\\runtime-error\\npm-cache",
+    "TEMP": "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\stage-w1f-20261116\\runtime-retry\\runtime-error\\temp",
+    "TMP": "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\stage-w1f-20261116\\runtime-retry\\runtime-error\\temp",
+    "cwd": "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\stage-w1f-20261116\\runtime-retry\\runtime-error\\b",
+    "command": [
+      "createVitest",
+      "test",
+      "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\stage-w1f-20261116\\runtime-retry\\runtime-error\\b"
+    ],
+    "npmProbeEnvironment": {
+      "NODE_DISABLE_COMPILE_CACHE": "1",
+      "npm_config_update_notifier": "false",
+      "npm_config_logs_max": "0"
+    }
+  }
+}

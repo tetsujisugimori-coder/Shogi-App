@@ -1,0 +1,346 @@
+[
+  {
+    "name": "normal-duplicates",
+    "expected": "PASS",
+    "launch": {
+      "command": [
+        "C:\\Program Files\\nodejs\\node.exe",
+        "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\repo\\scripts\\stage-w1b-runner.mjs",
+        "launch",
+        "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\repo\\docs\\benchmarks\\game-blunder-w1d-20261115\\runtime\\normal-duplicates\\record"
+      ],
+      "exitCode": 0,
+      "signal": null,
+      "stdout": "{\"runId\":\"e95698e4-109a-4215-8de0-a082e471b835\",\"results\":[{\"trialId\":\"ae7a672c-e3a8-4ef9-87f6-86f71375501f\",\"status\":\"PASS\"},{\"trialId\":\"742fb526-a1ab-4431-9494-eb44626d5c09\",\"status\":\"PASS\"}],\"status\":\"PASS\"}\n",
+      "stderr": "",
+      "result": {
+        "runId": "e95698e4-109a-4215-8de0-a082e471b835",
+        "results": [
+          {
+            "trialId": "ae7a672c-e3a8-4ef9-87f6-86f71375501f",
+            "status": "PASS"
+          },
+          {
+            "trialId": "742fb526-a1ab-4431-9494-eb44626d5c09",
+            "status": "PASS"
+          }
+        ],
+        "status": "PASS"
+      }
+    },
+    "verify": {
+      "command": [
+        "C:\\Program Files\\nodejs\\node.exe",
+        "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\repo\\scripts\\stage-w1b-runner.mjs",
+        "verify",
+        "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\repo\\docs\\benchmarks\\game-blunder-w1d-20261115\\runtime\\normal-duplicates\\record"
+      ],
+      "exitCode": 0,
+      "signal": null,
+      "stdout": "{\"status\":\"PASS\",\"runId\":\"e95698e4-109a-4215-8de0-a082e471b835\",\"results\":[{\"trialId\":\"ae7a672c-e3a8-4ef9-87f6-86f71375501f\",\"status\":\"PASS\"},{\"trialId\":\"742fb526-a1ab-4431-9494-eb44626d5c09\",\"status\":\"PASS\"}]}\n",
+      "stderr": "",
+      "result": {
+        "status": "PASS",
+        "runId": "e95698e4-109a-4215-8de0-a082e471b835",
+        "results": [
+          {
+            "trialId": "ae7a672c-e3a8-4ef9-87f6-86f71375501f",
+            "status": "PASS"
+          },
+          {
+            "trialId": "742fb526-a1ab-4431-9494-eb44626d5c09",
+            "status": "PASS"
+          }
+        ]
+      }
+    },
+    "assessments": [
+      {
+        "status": "PASS",
+        "invalid": [],
+        "incomplete": [],
+        "failures": [],
+        "counts": {
+          "total": 2,
+          "passed": 2,
+          "failed": 0,
+          "skipped": 0,
+          "todo": 0
+        },
+        "tests": [
+          {
+            "file": "C:/Users/tetsu/Documents/ChatGPT/将棋アプリ/stage-w1d-20261115-runtime/normal-duplicates/a/tiny.test.js",
+            "name": "outer same",
+            "status": "passed"
+          },
+          {
+            "file": "C:/Users/tetsu/Documents/ChatGPT/将棋アプリ/stage-w1d-20261115-runtime/normal-duplicates/a/tiny.test.js",
+            "name": "outer same",
+            "status": "passed"
+          }
+        ]
+      },
+      {
+        "status": "PASS",
+        "invalid": [],
+        "incomplete": [],
+        "failures": [],
+        "counts": {
+          "total": 2,
+          "passed": 2,
+          "failed": 0,
+          "skipped": 0,
+          "todo": 0
+        },
+        "tests": [
+          {
+            "file": "C:/Users/tetsu/Documents/ChatGPT/将棋アプリ/stage-w1d-20261115-runtime/normal-duplicates/b/tiny.test.js",
+            "name": "outer same",
+            "status": "passed"
+          },
+          {
+            "file": "C:/Users/tetsu/Documents/ChatGPT/将棋アプリ/stage-w1d-20261115-runtime/normal-duplicates/b/tiny.test.js",
+            "name": "outer same",
+            "status": "passed"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "name": "runtime-error",
+    "expected": "INVALID",
+    "launch": {
+      "command": [
+        "C:\\Program Files\\nodejs\\node.exe",
+        "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\repo\\scripts\\stage-w1b-runner.mjs",
+        "launch",
+        "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\repo\\docs\\benchmarks\\game-blunder-w1d-20261115\\runtime\\runtime-error\\record"
+      ],
+      "exitCode": 1,
+      "signal": null,
+      "stdout": "{\"runId\":\"e67461d3-0eb7-4593-9680-cfc8a177d9e1\",\"results\":[{\"trialId\":\"33631b08-c0b5-47ca-849f-7a0bf4bf266f\",\"status\":\"INVALID\"},{\"trialId\":\"0f901076-0c39-4e52-be24-4a88f522dbc2\",\"status\":\"INVALID\"}],\"status\":\"NONPASS\"}\n",
+      "stderr": "",
+      "result": {
+        "runId": "e67461d3-0eb7-4593-9680-cfc8a177d9e1",
+        "results": [
+          {
+            "trialId": "33631b08-c0b5-47ca-849f-7a0bf4bf266f",
+            "status": "INVALID"
+          },
+          {
+            "trialId": "0f901076-0c39-4e52-be24-4a88f522dbc2",
+            "status": "INVALID"
+          }
+        ],
+        "status": "NONPASS"
+      }
+    },
+    "verify": {
+      "command": [
+        "C:\\Program Files\\nodejs\\node.exe",
+        "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\repo\\scripts\\stage-w1b-runner.mjs",
+        "verify",
+        "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\repo\\docs\\benchmarks\\game-blunder-w1d-20261115\\runtime\\runtime-error\\record"
+      ],
+      "exitCode": 1,
+      "signal": null,
+      "stdout": "{\"status\":\"NONPASS\",\"runId\":\"e67461d3-0eb7-4593-9680-cfc8a177d9e1\",\"results\":[{\"trialId\":\"33631b08-c0b5-47ca-849f-7a0bf4bf266f\",\"status\":\"INVALID\"},{\"trialId\":\"0f901076-0c39-4e52-be24-4a88f522dbc2\",\"status\":\"INVALID\"}]}\n",
+      "stderr": "",
+      "result": {
+        "status": "NONPASS",
+        "runId": "e67461d3-0eb7-4593-9680-cfc8a177d9e1",
+        "results": [
+          {
+            "trialId": "33631b08-c0b5-47ca-849f-7a0bf4bf266f",
+            "status": "INVALID"
+          },
+          {
+            "trialId": "0f901076-0c39-4e52-be24-4a88f522dbc2",
+            "status": "INVALID"
+          }
+        ]
+      }
+    },
+    "assessments": [
+      {
+        "status": "INVALID",
+        "invalid": [
+          "runtime unhandled errors",
+          "nonzero exit without recorded test failure",
+          "success disagrees with exit code or failures"
+        ],
+        "incomplete": [],
+        "failures": [],
+        "counts": {
+          "total": 1,
+          "passed": 1,
+          "failed": 0,
+          "skipped": 0,
+          "todo": 0
+        },
+        "tests": [
+          {
+            "file": "C:/Users/tetsu/Documents/ChatGPT/将棋アプリ/stage-w1d-20261115-runtime/runtime-error/a/tiny.test.js",
+            "name": "pass with runtime error",
+            "status": "passed"
+          }
+        ]
+      },
+      {
+        "status": "INVALID",
+        "invalid": [
+          "runtime unhandled errors",
+          "nonzero exit without recorded test failure",
+          "success disagrees with exit code or failures"
+        ],
+        "incomplete": [],
+        "failures": [],
+        "counts": {
+          "total": 1,
+          "passed": 1,
+          "failed": 0,
+          "skipped": 0,
+          "todo": 0
+        },
+        "tests": [
+          {
+            "file": "C:/Users/tetsu/Documents/ChatGPT/将棋アプリ/stage-w1d-20261115-runtime/runtime-error/b/tiny.test.js",
+            "name": "pass with runtime error",
+            "status": "passed"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "name": "assertion-failure",
+    "expected": "FAIL",
+    "launch": {
+      "command": [
+        "C:\\Program Files\\nodejs\\node.exe",
+        "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\repo\\scripts\\stage-w1b-runner.mjs",
+        "launch",
+        "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\repo\\docs\\benchmarks\\game-blunder-w1d-20261115\\runtime\\assertion-failure\\record"
+      ],
+      "exitCode": 1,
+      "signal": null,
+      "stdout": "{\"runId\":\"eabca151-c742-4d78-98c6-d8c9d4961956\",\"results\":[{\"trialId\":\"ef9728e3-c64b-4dcb-ba9b-d93f9c7bb924\",\"status\":\"FAIL\"},{\"trialId\":\"0bd9e9a2-e1f0-4c09-b99b-3dfe8bb59ab5\",\"status\":\"FAIL\"}],\"status\":\"NONPASS\"}\n",
+      "stderr": "",
+      "result": {
+        "runId": "eabca151-c742-4d78-98c6-d8c9d4961956",
+        "results": [
+          {
+            "trialId": "ef9728e3-c64b-4dcb-ba9b-d93f9c7bb924",
+            "status": "FAIL"
+          },
+          {
+            "trialId": "0bd9e9a2-e1f0-4c09-b99b-3dfe8bb59ab5",
+            "status": "FAIL"
+          }
+        ],
+        "status": "NONPASS"
+      }
+    },
+    "verify": {
+      "command": [
+        "C:\\Program Files\\nodejs\\node.exe",
+        "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\repo\\scripts\\stage-w1b-runner.mjs",
+        "verify",
+        "C:\\Users\\tetsu\\Documents\\ChatGPT\\将棋アプリ\\repo\\docs\\benchmarks\\game-blunder-w1d-20261115\\runtime\\assertion-failure\\record"
+      ],
+      "exitCode": 1,
+      "signal": null,
+      "stdout": "{\"status\":\"NONPASS\",\"runId\":\"eabca151-c742-4d78-98c6-d8c9d4961956\",\"results\":[{\"trialId\":\"ef9728e3-c64b-4dcb-ba9b-d93f9c7bb924\",\"status\":\"FAIL\"},{\"trialId\":\"0bd9e9a2-e1f0-4c09-b99b-3dfe8bb59ab5\",\"status\":\"FAIL\"}]}\n",
+      "stderr": "",
+      "result": {
+        "status": "NONPASS",
+        "runId": "eabca151-c742-4d78-98c6-d8c9d4961956",
+        "results": [
+          {
+            "trialId": "ef9728e3-c64b-4dcb-ba9b-d93f9c7bb924",
+            "status": "FAIL"
+          },
+          {
+            "trialId": "0bd9e9a2-e1f0-4c09-b99b-3dfe8bb59ab5",
+            "status": "FAIL"
+          }
+        ]
+      }
+    },
+    "assessments": [
+      {
+        "status": "FAIL",
+        "invalid": [],
+        "incomplete": [],
+        "failures": [
+          {
+            "file": "C:/Users/tetsu/Documents/ChatGPT/将棋アプリ/stage-w1d-20261115-runtime/assertion-failure/a/tiny.test.js",
+            "name": null,
+            "kind": "runtime-suite"
+          },
+          {
+            "file": "C:/Users/tetsu/Documents/ChatGPT/将棋アプリ/stage-w1d-20261115-runtime/assertion-failure/a/tiny.test.js",
+            "name": null,
+            "kind": "suite"
+          },
+          {
+            "file": "C:/Users/tetsu/Documents/ChatGPT/将棋アプリ/stage-w1d-20261115-runtime/assertion-failure/a/tiny.test.js",
+            "name": "fails",
+            "kind": "test"
+          }
+        ],
+        "counts": {
+          "total": 1,
+          "passed": 0,
+          "failed": 1,
+          "skipped": 0,
+          "todo": 0
+        },
+        "tests": [
+          {
+            "file": "C:/Users/tetsu/Documents/ChatGPT/将棋アプリ/stage-w1d-20261115-runtime/assertion-failure/a/tiny.test.js",
+            "name": "fails",
+            "status": "failed"
+          }
+        ]
+      },
+      {
+        "status": "FAIL",
+        "invalid": [],
+        "incomplete": [],
+        "failures": [
+          {
+            "file": "C:/Users/tetsu/Documents/ChatGPT/将棋アプリ/stage-w1d-20261115-runtime/assertion-failure/b/tiny.test.js",
+            "name": null,
+            "kind": "runtime-suite"
+          },
+          {
+            "file": "C:/Users/tetsu/Documents/ChatGPT/将棋アプリ/stage-w1d-20261115-runtime/assertion-failure/b/tiny.test.js",
+            "name": null,
+            "kind": "suite"
+          },
+          {
+            "file": "C:/Users/tetsu/Documents/ChatGPT/将棋アプリ/stage-w1d-20261115-runtime/assertion-failure/b/tiny.test.js",
+            "name": "fails",
+            "kind": "test"
+          }
+        ],
+        "counts": {
+          "total": 1,
+          "passed": 0,
+          "failed": 1,
+          "skipped": 0,
+          "todo": 0
+        },
+        "tests": [
+          {
+            "file": "C:/Users/tetsu/Documents/ChatGPT/将棋アプリ/stage-w1d-20261115-runtime/assertion-failure/b/tiny.test.js",
+            "name": "fails",
+            "status": "failed"
+          }
+        ]
+      }
+    ]
+  }
+]

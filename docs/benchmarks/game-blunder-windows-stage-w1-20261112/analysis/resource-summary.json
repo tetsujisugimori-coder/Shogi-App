@@ -1,0 +1,128 @@
+{
+  "generatedAt": "2026-11-12T00:56:05.249Z",
+  "runs": [
+    {
+      "sequence": 1,
+      "head": "old",
+      "sampled": true,
+      "start": "2026-11-12T09:39:18.4669112+09:00",
+      "end": "2026-11-12T09:41:09.6902475+09:00",
+      "wallSeconds": 111.224,
+      "vitestDurationSeconds": 108.39,
+      "beforeFreeBytes": 3156508672,
+      "afterFreeBytes": 3117121536,
+      "samples": {
+        "count": 55,
+        "peakVisibleNodeCount": 28,
+        "peakSingleNodeWorkingSetBytes": 453357568,
+        "scope": "all visible node processes, not attributed to workers"
+      }
+    },
+    {
+      "sequence": 2,
+      "head": "new",
+      "sampled": true,
+      "start": "2026-11-12T09:41:09.9563641+09:00",
+      "end": "2026-11-12T09:43:09.0990506+09:00",
+      "wallSeconds": 119.143,
+      "vitestDurationSeconds": 116.78,
+      "beforeFreeBytes": 3113213952,
+      "afterFreeBytes": 3330600960,
+      "samples": {
+        "count": 59,
+        "peakVisibleNodeCount": 28,
+        "peakSingleNodeWorkingSetBytes": 466370560,
+        "scope": "all visible node processes, not attributed to workers"
+      }
+    },
+    {
+      "sequence": 3,
+      "head": "new",
+      "sampled": false,
+      "start": "2026-11-12T09:43:09.3842263+09:00",
+      "end": "2026-11-12T09:45:00.3496769+09:00",
+      "wallSeconds": 110.965,
+      "vitestDurationSeconds": 109.71,
+      "beforeFreeBytes": 3323326464,
+      "afterFreeBytes": 3072036864,
+      "samples": null
+    },
+    {
+      "sequence": 4,
+      "head": "old",
+      "sampled": false,
+      "start": "2026-11-12T09:45:00.6102219+09:00",
+      "end": "2026-11-12T09:46:48.2103267+09:00",
+      "wallSeconds": 107.6,
+      "vitestDurationSeconds": 106.27,
+      "beforeFreeBytes": 3076476928,
+      "afterFreeBytes": 3338825728,
+      "samples": null
+    },
+    {
+      "sequence": 5,
+      "head": "new",
+      "sampled": true,
+      "start": "2026-11-12T09:46:48.4637051+09:00",
+      "end": "2026-11-12T09:48:37.5819147+09:00",
+      "wallSeconds": 109.118,
+      "vitestDurationSeconds": 106.44,
+      "beforeFreeBytes": 3335540736,
+      "afterFreeBytes": 3332575232,
+      "samples": {
+        "count": 54,
+        "peakVisibleNodeCount": 29,
+        "peakSingleNodeWorkingSetBytes": 452239360,
+        "scope": "all visible node processes, not attributed to workers"
+      }
+    },
+    {
+      "sequence": 6,
+      "head": "old",
+      "sampled": true,
+      "start": "2026-11-12T09:48:37.8435255+09:00",
+      "end": "2026-11-12T09:50:27.0351792+09:00",
+      "wallSeconds": 109.192,
+      "vitestDurationSeconds": 106.9,
+      "beforeFreeBytes": 3320578048,
+      "afterFreeBytes": 3200598016,
+      "samples": {
+        "count": 54,
+        "peakVisibleNodeCount": 29,
+        "peakSingleNodeWorkingSetBytes": 450932736,
+        "scope": "all visible node processes, not attributed to workers"
+      }
+    },
+    {
+      "sequence": 7,
+      "head": "old",
+      "sampled": false,
+      "start": "2026-11-12T09:50:27.3058511+09:00",
+      "end": "2026-11-12T09:52:16.8628242+09:00",
+      "wallSeconds": 109.557,
+      "vitestDurationSeconds": 108.26,
+      "beforeFreeBytes": 3201843200,
+      "afterFreeBytes": 3569352704,
+      "samples": null
+    },
+    {
+      "sequence": 8,
+      "head": "new",
+      "sampled": false,
+      "start": "2026-11-12T09:52:17.1296621+09:00",
+      "end": "2026-11-12T09:54:06.5036204+09:00",
+      "wallSeconds": 109.374,
+      "vitestDurationSeconds": 108.15,
+      "beforeFreeBytes": 3577262080,
+      "afterFreeBytes": 3158654976,
+      "samples": null
+    }
+  ],
+  "limitations": [
+    "Cumulative process CPU values in raw samples are not instantaneous utilization",
+    "Sampling includes unrelated processes",
+    "Wall time for sampled runs includes up to two seconds polling delay",
+    "No process attribution, GC, paging or cleanup observation",
+    "Sampling condition and run order are confounded"
+  ]
+}

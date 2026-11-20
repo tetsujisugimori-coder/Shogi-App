@@ -1,0 +1,115 @@
+{
+  "method": "Post-work byte comparison against gzip blobs at the fixed baseline HEAD. These raw log hashes were not recorded before work.",
+  "logs": [
+    {
+      "path": "docs/benchmarks/game-blunder-investigation-v4-20261105/validation/build.log",
+      "currentSha256": "c5e6509fd31a59a4c20b1d044e51a863f2d8ee935dd6d511b283555be519fd70",
+      "beforeHashRecorded": false,
+      "archivedPath": "docs/benchmarks/game-blunder-investigation-v4-20261105/validation/build.log.gz",
+      "fixedHead": "e1ccb1a2412e7faa86c2c1f60fdad1dca154023a",
+      "archivedGzipSha256": "1317634306c4136bfb697a4bf3e902c41094b0dcf43fbbb4a45678ae72fe251e",
+      "decompressedSha256": "c5e6509fd31a59a4c20b1d044e51a863f2d8ee935dd6d511b283555be519fd70",
+      "matchesFixedHeadArchive": true
+    },
+    {
+      "path": "docs/benchmarks/game-blunder-investigation-v4-20261105/validation/full-tests-harness-15s.log",
+      "currentSha256": "fc6a38ed07aad949f45029395f5f18866b9b1bc0cf5ca3cc0d82c324c593b10a",
+      "beforeHashRecorded": false,
+      "archivedPath": "docs/benchmarks/game-blunder-investigation-v4-20261105/validation/full-tests-harness-15s.log.gz",
+      "fixedHead": "e1ccb1a2412e7faa86c2c1f60fdad1dca154023a",
+      "archivedGzipSha256": "404de5bc23d78a0733d4ca5bf5c2873f1b3c78c785ceb17c2747771dbef4da27",
+      "decompressedSha256": "fc6a38ed07aad949f45029395f5f18866b9b1bc0cf5ca3cc0d82c324c593b10a",
+      "matchesFixedHeadArchive": true
+    },
+    {
+      "path": "docs/benchmarks/game-blunder-investigation-v4-20261105/validation/full-tests-single-worker.log",
+      "currentSha256": "5500d95e1198e8a22bf8dc23c4fa260c853048399341490a8e20532c3224c7a9",
+      "beforeHashRecorded": false,
+      "archivedPath": "docs/benchmarks/game-blunder-investigation-v4-20261105/validation/full-tests-single-worker.log.gz",
+      "fixedHead": "e1ccb1a2412e7faa86c2c1f60fdad1dca154023a",
+      "archivedGzipSha256": "f63f387346794cebeb0eee571abd5eb8a08f1eb1b6a0e97fc0f872a2cc53a1bd",
+      "decompressedSha256": "5500d95e1198e8a22bf8dc23c4fa260c853048399341490a8e20532c3224c7a9",
+      "matchesFixedHeadArchive": true
+    },
+    {
+      "path": "docs/benchmarks/game-blunder-investigation-v4-20261105/validation/full-tests.log",
+      "currentSha256": "c703a8400ebd1faf9fc9b4b20e5d3c8d490a17ed05b4e6144ba0041a5a8aec47",
+      "beforeHashRecorded": false,
+      "archivedPath": "docs/benchmarks/game-blunder-investigation-v4-20261105/validation/full-tests.log.gz",
+      "fixedHead": "e1ccb1a2412e7faa86c2c1f60fdad1dca154023a",
+      "archivedGzipSha256": "ac82285d5eed994ba10872280f00eea3211365ce4d43b53f9d2dfc3f4da5770c",
+      "decompressedSha256": "c703a8400ebd1faf9fc9b4b20e5d3c8d490a17ed05b4e6144ba0041a5a8aec47",
+      "matchesFixedHeadArchive": true
+    },
+    {
+      "path": "docs/benchmarks/game-blunder-investigation-v4-20261105/validation/lint-final.log",
+      "currentSha256": "ad6bec1b1378356ed1d37de83bed5cf5234df9e06b03d54d4963118d0dea0d0e",
+      "beforeHashRecorded": false,
+      "archivedPath": "docs/benchmarks/game-blunder-investigation-v4-20261105/validation/lint-final.log.gz",
+      "fixedHead": "e1ccb1a2412e7faa86c2c1f60fdad1dca154023a",
+      "archivedGzipSha256": "fcd25d8d06c63dba5ae178b8b1c7c7e3451ee73474868f8117bec69961757740",
+      "decompressedSha256": "ad6bec1b1378356ed1d37de83bed5cf5234df9e06b03d54d4963118d0dea0d0e",
+      "matchesFixedHeadArchive": true
+    },
+    {
+      "path": "docs/benchmarks/game-blunder-investigation-v4-20261105/validation/lint-provenance-fix.log",
+      "currentSha256": "ad6bec1b1378356ed1d37de83bed5cf5234df9e06b03d54d4963118d0dea0d0e",
+      "beforeHashRecorded": false,
+      "archivedPath": "docs/benchmarks/game-blunder-investigation-v4-20261105/validation/lint-provenance-fix.log.gz",
+      "fixedHead": "e1ccb1a2412e7faa86c2c1f60fdad1dca154023a",
+      "archivedGzipSha256": "fcd25d8d06c63dba5ae178b8b1c7c7e3451ee73474868f8117bec69961757740",
+      "decompressedSha256": "ad6bec1b1378356ed1d37de83bed5cf5234df9e06b03d54d4963118d0dea0d0e",
+      "matchesFixedHeadArchive": true
+    },
+    {
+      "path": "docs/benchmarks/game-blunder-investigation-v4-20261105/validation/lint.log",
+      "currentSha256": "ad6bec1b1378356ed1d37de83bed5cf5234df9e06b03d54d4963118d0dea0d0e",
+      "beforeHashRecorded": false,
+      "archivedPath": "docs/benchmarks/game-blunder-investigation-v4-20261105/validation/lint.log.gz",
+      "fixedHead": "e1ccb1a2412e7faa86c2c1f60fdad1dca154023a",
+      "archivedGzipSha256": "fcd25d8d06c63dba5ae178b8b1c7c7e3451ee73474868f8117bec69961757740",
+      "decompressedSha256": "ad6bec1b1378356ed1d37de83bed5cf5234df9e06b03d54d4963118d0dea0d0e",
+      "matchesFixedHeadArchive": true
+    },
+    {
+      "path": "docs/benchmarks/game-blunder-investigation-v4-20261105/validation/provenance-fix-tests.log",
+      "currentSha256": "1650d923df241ab95b8eeaba7c3981b387095fc69529ce80f947cd5b64f5774c",
+      "beforeHashRecorded": false,
+      "archivedPath": "docs/benchmarks/game-blunder-investigation-v4-20261105/validation/provenance-fix-tests.log.gz",
+      "fixedHead": "e1ccb1a2412e7faa86c2c1f60fdad1dca154023a",
+      "archivedGzipSha256": "2d40889b19071aa720ee1dac5164f3d7597c81c40251e369aac82992f8c45941",
+      "decompressedSha256": "1650d923df241ab95b8eeaba7c3981b387095fc69529ce80f947cd5b64f5774c",
+      "matchesFixedHeadArchive": true
+    },
+    {
+      "path": "docs/benchmarks/game-blunder-investigation-v4-20261105/validation/related-tests-workspace-temp.log",
+      "currentSha256": "189813930b73fcc48ae98ba50c3345421d5f266dd64b747185f0003ab917b06e",
+      "beforeHashRecorded": false,
+      "archivedPath": "docs/benchmarks/game-blunder-investigation-v4-20261105/validation/related-tests-workspace-temp.log.gz",
+      "fixedHead": "e1ccb1a2412e7faa86c2c1f60fdad1dca154023a",
+      "archivedGzipSha256": "30f9550f1414605150bb286e782815f48fb372c6234849593cb5778c0825dc24",
+      "decompressedSha256": "189813930b73fcc48ae98ba50c3345421d5f266dd64b747185f0003ab917b06e",
+      "matchesFixedHeadArchive": true
+    },
+    {
+      "path": "docs/benchmarks/game-blunder-investigation-v4-20261105/validation/related-tests.log",
+      "currentSha256": "dd4627a8762482c208b7e8e453ed70e918df5eab999db2e630a594f148d92611",
+      "beforeHashRecorded": false,
+      "archivedPath": "docs/benchmarks/game-blunder-investigation-v4-20261105/validation/related-tests.log.gz",
+      "fixedHead": "e1ccb1a2412e7faa86c2c1f60fdad1dca154023a",
+      "archivedGzipSha256": "bc0ba2048c9eaef3866566334e51fe21d6110d912d416a28103639c9daf80a9a",
+      "decompressedSha256": "dd4627a8762482c208b7e8e453ed70e918df5eab999db2e630a594f148d92611",
+      "matchesFixedHeadArchive": true
+    },
+    {
+      "path": "docs/benchmarks/game-blunder-investigation-v4-20261105/validation/verify-lock.log",
+      "currentSha256": "7bb24247ca4951914abfb7d570d9a87e32e49492a2c223b476591f64bb50c059",
+      "beforeHashRecorded": false,
+      "archivedPath": "docs/benchmarks/game-blunder-investigation-v4-20261105/validation/verify-lock.log.gz",
+      "fixedHead": "e1ccb1a2412e7faa86c2c1f60fdad1dca154023a",
+      "archivedGzipSha256": "8a751e88ced8b25eabd100bb07520b2f89637ecd2fc6e85a01bdc6fc269f92ee",
+      "decompressedSha256": "7bb24247ca4951914abfb7d570d9a87e32e49492a2c223b476591f64bb50c059",
+      "matchesFixedHeadArchive": true
+    }
+  ]
+}

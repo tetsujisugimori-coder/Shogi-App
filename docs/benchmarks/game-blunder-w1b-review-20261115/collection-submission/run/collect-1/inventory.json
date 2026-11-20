@@ -1,0 +1,16 @@
+{
+  "tests": [
+    {
+      "file": "C:/Users/tetsu/Documents/ChatGPT/将棋アプリ/repo/.tmp-tests/w1b-review-20261115-setup-submission/b/tiny.test.js",
+      "name": "never run",
+      "mode": "run"
+    }
+  ],
+  "suites": [
+    {
+      "id": "-270551241",
+      "file": "C:/Users/tetsu/Documents/ChatGPT/将棋アプリ/repo/.tmp-tests/w1b-review-20261115-setup-submission/b/tiny.test.js",
+      "mode": "run"
+    }
+  ]
+}

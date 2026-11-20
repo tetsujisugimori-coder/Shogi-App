@@ -1,0 +1,1 @@
+{"numTotalTests":1,"numPassedTests":0,"numFailedTests":1,"numPendingTests":0,"numTodoTests":0,"numTotalTestSuites":1,"numPassedTestSuites":0,"numFailedTestSuites":1,"numPendingTestSuites":0,"success":false,"testResults":[{"name":"a.test.ts","status":"failed","assertionResults":[{"fullName":"one","status":"failed","failureMessages":[]}]}]}
