@@ -21,3 +21,4 @@ scripts/stage-w1f-cache.mjs	UNDETERMINED	KEEP	W1_VERIFIER_STATIC_IMPORT	CIの既
 scripts/stage-w1g-seal.mjs	UNDETERMINED	KEEP	W1_VERIFIER_STATIC_IMPORT	CIの既存検証経路を保持。実行実証・マージ許可ではない	82b71f3fd4f4713259cb2baa10b93c2b8222836e
 scripts/stage-w1f-observer.mjs	UNDETERMINED	KEEP	W1_VERIFIER_STATIC_IMPORT	CIの既存検証経路を保持。実行実証・マージ許可ではない	35e6ea5ef267a6a340ebac175059f774010f07c3
 scripts/stage-w1f-events.mjs	UNDETERMINED	KEEP	W1_VERIFIER_STATIC_IMPORT	CIの既存検証経路を保持。実行実証・マージ許可ではない	d3d4a2029cb0c55f84f763fd5424b36408841723
+scripts/stage-w1h-target.mjs	UNDETERMINED	KEEP	W1_VERIFIER_STATIC_IMPORT	W1b runnerとworkerおよびW1d generated checkから参照される固定対象検査。旧経路を保護	8df1f11931739d564a1bc095e57be1fb1f4d694e
