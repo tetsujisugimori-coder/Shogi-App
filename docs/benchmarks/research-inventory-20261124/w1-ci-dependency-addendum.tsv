@@ -11,6 +11,7 @@ scripts/stage-w1c-mutation-check.mjs	UNDETERMINED	KEEP	W1_WORKFLOW_DIRECT	CIの�
 scripts/stage-w1f-observer-check.mjs	UNDETERMINED	KEEP	W1_WORKFLOW_DIRECT	CIの既存検証経路を保持。実行実証・マージ許可ではない	9b4abd3e580e21f7f9543a6f7f37d6625458c1ab
 scripts/stage-w1i-public-log-test.py	UNDETERMINED	KEEP	W1_WORKFLOW_DIRECT	CIの既存検証経路を保持。実行実証・マージ許可ではない	37a1ce4c1ca42377963043cf96d5e37afadddd2f
 scripts/stage-w1d-generated-check.mjs	UNDETERMINED	KEEP	W1_WORKFLOW_DIRECT	CIの既存検証経路を保持。実行実証・マージ許可ではない	d470100d8ec4670a8c1b860b9dd467f82ce5e22e
+scripts/stage-w1j-auth-check.mjs	RESEARCH	KEEP	W1_WORKFLOW_DIRECT	W1専用CIが直接起動する合成署名検証器。Shogi-Appの既存検証経路として保持し、研究課題はLab Issue #1〜#4に対応付ける	ef212c2e389a0707dd6c29ead99bc8d6f715079d
 scripts/stage-w1-summary.mjs	UNDETERMINED	KEEP	W1_VERIFIER_STATIC_IMPORT	CIの既存検証経路を保持。実行実証・マージ許可ではない	1e74f5c94459af4fb173544e8a90cf5f1b81a2e9
 scripts/stage-w1b-summary.mjs	UNDETERMINED	KEEP	W1_VERIFIER_STATIC_IMPORT	CIの既存検証経路を保持。実行実証・マージ許可ではない	cf2b21c7b700701ce0d34851bc46912f69cd3d3b
 scripts/stage-w1b-preflight.mjs	UNDETERMINED	KEEP	W1_VERIFIER_STATIC_IMPORT	CIの既存検証経路を保持。実行実証・マージ許可ではない	c990e6dcdd4f50a1ddfb2425dca7f79d049888bc
@@ -22,3 +23,4 @@ scripts/stage-w1g-seal.mjs	UNDETERMINED	KEEP	W1_VERIFIER_STATIC_IMPORT	CIの既�
 scripts/stage-w1f-observer.mjs	UNDETERMINED	KEEP	W1_VERIFIER_STATIC_IMPORT	CIの既存検証経路を保持。実行実証・マージ許可ではない	35e6ea5ef267a6a340ebac175059f774010f07c3
 scripts/stage-w1f-events.mjs	UNDETERMINED	KEEP	W1_VERIFIER_STATIC_IMPORT	CIの既存検証経路を保持。実行実証・マージ許可ではない	d3d4a2029cb0c55f84f763fd5424b36408841723
 scripts/stage-w1h-target.mjs	UNDETERMINED	KEEP	W1_VERIFIER_STATIC_IMPORT	W1b runnerとworkerおよびW1d generated checkから参照される固定対象検査。旧経路を保護	8df1f11931739d564a1bc095e57be1fb1f4d694e
+scripts/stage-w1j-auth-contract.mjs	RESEARCH	KEEP	W1_VERIFIER_STATIC_IMPORT	W1専用CIが起動するstage-w1j-auth-check.mjsの静的import先。Shogi-Appの既存検証経路として保持し、研究課題はLab Issue #1〜#4に対応付ける	82ee3dfc8448e8a1a9b73c0531906326c09bd8d6

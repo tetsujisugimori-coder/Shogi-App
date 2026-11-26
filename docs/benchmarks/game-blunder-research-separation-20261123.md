@@ -25,7 +25,7 @@ Gitの2つの固定treeから通常blobのpathとSHAを列挙し、path集合の
 ## 3. Shogi-Appに保持する責務（A）
 将棋のアルゴリズム構成を証拠で比較し、採用判断を行うことが製品側の中心課題。関連資産は次の通り。
 - **対局・局面の識別：** 4 journalと局面、root合法手、実手・代替手、棋譜の同一性、局面の再構築と合法性照合。
-- **棋力診断：** 探索深さ、通常探索・静止探索、SEE、手の順序、TT/killer、評価値・PV・停止理由、node/enter数、旧疑い局面の再集計。代表資料：[悪手診断v4](game-blunder-investigation-v4-20261105/README.md)。
+- **棋力診断：** 探索深さ、通常探索・静止探索、SEE、手の順序、TT/killer、評価値・PV・停止理由、node/enter数、旧疑い局面の再集計。代表資料の[悪手診断v4](https://github.com/tetsujisugimori-coder/Shogi-App/blob/ad82e73a3f9d72f860a8f4df0e10f525cdc77a33/docs/benchmarks/game-blunder-investigation-v4-20261105/README.md)はPR #218の固定HEADを参照する。
 - **比較の再現性：** 順序付き旧新版HEAD/tree、source/依存/lock/実効設定、同一予算、一要因の差、試行ID、反復順序、独立した再集計、正常・無効・破損・中断・未実行の区別。
 - **Windows/Vitest固有の診断・受入：** 既定5秒・2workerの不変、cache初期状態・隔離・キューへの影響、Windowsの時間切れと既存テストの原因隔離。該当するStage W1b〜W1fとW1専用CIは、当面Shogi-Appから動かさない。
 - **開始と採否：** `stage-w1g-gate.mjs`等の既存拒否経路、製品回帰、比較開始ゲート、棋力向上の受入判断はShogi-Appに残る。Labの検証が成功しても自動解除しない。
@@ -43,7 +43,7 @@ Gitの2つの固定treeから通常blobのpathとSHAを列挙し、path集合の
 | [#5](https://github.com/tetsujisugimori-coder/execution-trust-lab/issues/5) | OS/native/worker・ファイル操作・writer/rename来歴 | W1g〜W1fのNode観測がOS全体の証明であるとは主張しない |
 
 - [Lab移管表](https://github.com/tetsujisugimori-coder/execution-trust-lab/blob/19024311f9547d337b1a688e4f7c54bd7676dbeb/docs/shogi-app-transfer.md) はW1g〜W1jを工程別に対応付け済み。
-- [Lab Draft PR #6](https://github.com/tetsujisugimori-coder/execution-trust-lab/pull/6)は研究基盤と合成実験0001の提出物。**Issue登録・Draft作成と、実鍵／実OS来歴の立証完了とは別**。
+- 研究基盤と合成実験0001はLabのmainへマージ済み。実鍵と実OS来歴の立証は引き続き研究課題とする。[Lab PR #6](https://github.com/tetsujisugimori-coder/execution-trust-lab/pull/6)
 - 現時点で**Lab側へ移管したのは研究課題・参照・合成実験**。Shogi-Appの既存原票・コード・署名鍵・Gateを移動済みとは扱わない。
 
 ## 5. 共通部分（C）の所有権と証拠参照
@@ -57,7 +57,7 @@ Gitの2つの固定treeから通常blobのpathとSHAを列挙し、path集合の
 W1iで**承認された302件の保全限定PASS**は維持し、クラウド117件・Windows185件の別を残す。旧Windows29件は`OUT_OF_SCOPE`で追加調査・保存の対象にしない。歴史的な公開ログ2件のP3は`OPEN`として履歴を維持し、消えたとは主張しない。保全規約と実認証の研究を混同しない。元原票の移動・削除、歴史書換え、force-push、無断の再保存は行わない。
 
 ## 6. 次の小規模工程と判断点
-1. **この文書だけを別Draft PRとして提出。** PR #218、Issue #217、Labの既存IssueとDraft PR #6を変更しない。文書について固定HEADの独立レビューを受け、分類とリンクの妥当性を確認する。
+1. **棚卸し文書・台帳・追補を別Draft PRとして提出。** 固定HEADの独立レビューで分類とリンクの妥当性を確認する。PR #218とLabの研究記録は元の管理先で扱う。
 2. **比較仕様の独立した小PR：** 将棋固有の「候補アルゴリズム構成・比較指標・選定基準」を定義する。現行ゲートを迂回せず、実比較は起動しない。
 3. **実装の分割設計：** W1b〜W1fの必要最小限の診断・集計と、W1g〜W1jの研究用観測を「依存がある／参照で足りる／未判定」に切り分ける。必要なら別Issueで個々のコード候補を審査し、コード削除・移植は承認を分ける。
 4. **将来の比較開始判断：** Shogi-Appの全必須条件、正式CI、独立レビュー、所有者承認が揃うまで `BLOCKED`。研究台帳の完成を解除条件にしない。
